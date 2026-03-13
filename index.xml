@@ -1,666 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hot Headz Southern Foods</title>
-  <meta name="description" content="Hot Headz Southern Foods serves home-style Southern cooking in DeRidder, Louisiana. Breakfast, lunch, carry-out, dine-in, and delivery." />
+  <meta name="description" content="Hot Headz Southern Foods serves home-style Southern cooking in DeRidder, Louisiana. Breakfast, lunch, carry-out, dine-in, and delivery.">
   <style>
-    /* =========================================
-       Guided Explore Nav v2 (HotHeadz)
-       Custom CSS (GLOBAL)
-       ========================================= */
     :root{
-      --gen-glass: rgba(6,7,10,0.62);
-      --gen-glass-2: rgba(6,7,10,0.78);
-      --gen-border: rgba(255,255,255,0.14);
-      --gen-border-2: rgba(255,255,255,0.22);
-      --gen-text: rgba(255,255,255,0.92);
-      --gen-muted: rgba(255,255,255,0.62);
-      --gen-hotA: rgba(255,120,70,0.82);
-      --gen-hotB: rgba(255,60,140,0.74);
-      --gen-hotC: rgba(255,80,60,0.72);
-      --gen-radius-xl: 22px;
-      --gen-radius-lg: 16px;
-      --gen-radius-pill: 999px;
-      --gen-shadow: 0 18px 50px rgba(0,0,0,0.62);
-      --gen-font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-
-      --hhx-bg:#07060a;
-      --hhx-border: rgba(255,255,255,.14);
-      --hhx-text: rgba(255,255,255,.92);
-      --hhx-muted: rgba(255,255,255,.70);
-      --hhx-ember:#ff5b3d;
-      --hhx-ember2:#ffb04b;
-      --hhx-radius: 24px;
-      --hhx-radius2: 18px;
-      --hhx-shadow: 0 22px 70px rgba(0,0,0,.55);
-      --hhx-shadow2: 0 14px 40px rgba(0,0,0,.42);
-
-      --hhH-glass: rgba(10,10,14,0.42);
-      --hhH-border: rgba(255,255,255,0.14);
-      --hhH-border2: rgba(255,255,255,0.22);
-      --hhH-text: rgba(255,255,255,0.92);
-      --hhH-muted: rgba(255,255,255,0.68);
-      --hhH-hotA: rgba(255,140,80,0.75);
-      --hhH-hotB: rgba(255,60,140,0.65);
-      --hhH-radius-strip: 28px;
-      --hhH-radius-card: 20px;
-      --hhH-shadow-soft: 0 12px 34px rgba(0,0,0,0.52);
-      --hhH-shadow-deep: 0 18px 52px rgba(0,0,0,0.64);
+      --bg:#07060a;
+      --glass:rgba(255,255,255,.06);
+      --glass-dark:rgba(0,0,0,.28);
+      --border:rgba(255,255,255,.14);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.70);
+      --hot:#ff5b3d;
+      --warm:#ffb04b;
+      --shadow:0 22px 70px rgba(0,0,0,.55);
+      --shadow2:0 14px 40px rgba(0,0,0,.42);
+      --radius-xl:24px;
+      --radius-lg:18px;
+      --radius-pill:999px;
+      --font:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
     }
 
-    html { scroll-behavior: smooth; }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
     body{
-      margin: 0;
-      background: #07060a;
-      color: rgba(255,255,255,.92);
-      font-family: var(--gen-font);
-      padding-bottom: 90px;
-    }
-
-    a { color: inherit; }
-    img { max-width: 100%; }
-
-    .gen-root, .gen-root *{
-      box-sizing: border-box;
-      font-family: var(--gen-font);
-    }
-
-    .gen-root{
-      position: fixed;
-      inset: 0;
-      z-index: 999999;
-      pointer-events: none;
-    }
-
-    .gen-pill{
-      pointer-events: auto;
-      position: fixed;
-      top: 16px;
-      right: 16px;
-      display: none !important;
-      visibility: hidden !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
-      align-items: center;
-      gap: 10px;
-      padding: 11px 14px;
-      border-radius: var(--gen-radius-pill);
-      border: 1px solid var(--gen-border);
-      background: var(--gen-glass);
-      color: var(--gen-text);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: var(--gen-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
-      cursor: pointer;
-      transition: transform .14s ease, background .14s ease, border-color .14s ease, opacity .14s ease;
-    }
-
-    .gen-pill:hover{
-      transform: translateY(-1px);
-      background: rgba(0,0,0,0.56);
-      border-color: var(--gen-border-2);
-    }
-
-    .gen-pill:focus-visible{
-      outline: none;
-      box-shadow:
-        0 0 0 3px rgba(255,120,70,0.34),
-        var(--gen-shadow),
-        inset 0 1px 0 rgba(255,255,255,0.10);
-    }
-
-    .gen-pill-ic{ font-size: 16px; line-height: 1; }
-    .gen-pill-tx{ font-size: 13.5px; font-weight: 820; letter-spacing: -0.1px; }
-
-    .gen-pill-dot{
-      width: 9px;
-      height: 9px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, var(--gen-hotA), var(--gen-hotB));
-      box-shadow: 0 0 18px rgba(255,120,70,0.22);
-    }
-
-    .gen-panel{
-      pointer-events: auto;
-      position: fixed;
-      top: 62px;
-      right: 16px;
-      width: min(390px, calc(100vw - 32px));
-      max-height: min(600px, calc(100vh - 140px));
-      border-radius: var(--gen-radius-xl);
-      border: 1px solid var(--gen-border);
-      background: var(--gen-glass-2);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      box-shadow: var(--gen-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
-      overflow: hidden;
-      opacity: 0;
-      transform: translateY(6px) scale(0.985);
-      transition: opacity .16s ease, transform .16s ease;
-    }
-
-    .gen-panel.is-open{
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-
-    .gen-panel-head{
-      padding: 14px 14px 10px;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 10px;
-      background:
-        radial-gradient(420px 200px at 10% 0%, rgba(255,120,70,0.18), transparent 60%),
-        radial-gradient(420px 200px at 90% 0%, rgba(255,60,140,0.14), transparent 62%);
-      border-bottom: 1px solid rgba(255,255,255,0.10);
-    }
-
-    .gen-title{ font-weight: 900; font-size: 15px; color: var(--gen-text); }
-    .gen-sub{ margin-top: 2px; font-size: 12px; color: var(--gen-muted); }
-
-    .gen-close{
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.35);
-      color: var(--gen-text);
-      width: 36px;
-      height: 36px;
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
-      transition: background .14s ease, border-color .14s ease, transform .14s ease;
-    }
-
-    .gen-close:hover{
-      background: rgba(0,0,0,0.55);
-      border-color: rgba(255,255,255,0.22);
-      transform: translateY(-1px);
-    }
-
-    .gen-close:focus-visible{
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(255,120,70,0.34), inset 0 1px 0 rgba(255,255,255,0.10);
-    }
-
-    .gen-panel-body{
-      padding: 12px 14px 14px;
-      overflow: auto;
-      max-height: calc(600px - 120px);
-    }
-
-    .gen-search{
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.35);
-      padding: 10px 12px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
-    }
-
-    .gen-search-ic{ opacity: .9; font-size: 14px; }
-
-    .gen-search-input{
-      width: 100%;
-      border: none;
-      outline: none;
-      background: transparent;
-      color: var(--gen-text);
-      font-size: 13px;
-    }
-
-    .gen-search-input::placeholder{ color: rgba(255,255,255,0.55); }
-
-    .gen-list{
-      margin-top: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .gen-item{
-      width: 100%;
-      text-align: left;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.36);
-      padding: 11px 12px;
-      box-shadow: 0 12px 24px rgba(0,0,0,0.40),
-                  inset 0 1px 0 rgba(255,255,255,0.08);
-      cursor: pointer;
-      transition: transform .14s ease, background .14s ease, border-color .14s ease;
-    }
-
-    .gen-item:hover{
-      transform: translateY(-1px);
-      background: rgba(0,0,0,0.56);
-      border-color: rgba(255,255,255,0.22);
-    }
-
-    .gen-item:focus-visible{
-      outline: none;
-      box-shadow:
-        0 0 0 3px rgba(255,120,70,0.30),
-        0 12px 24px rgba(0,0,0,0.40),
-        inset 0 1px 0 rgba(255,255,255,0.10);
-    }
-
-    .gen-item-left{ min-width: 0; }
-    .gen-item-title{
-      font-weight: 900;
-      font-size: 13.5px;
-      color: var(--gen-text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .gen-item-sub{
-      margin-top: 2px;
-      font-size: 12px;
-      color: var(--gen-muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .gen-item-right{
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      flex: 0 0 auto;
-    }
-
-    .gen-badge{
-      font-size: 11px;
-      font-weight: 900;
-      padding: 6px 9px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: linear-gradient(90deg, rgba(255,120,70,0.18), rgba(255,60,140,0.14));
-      color: rgba(255,255,255,0.86);
-    }
-
-    .gen-jump{
-      width: 34px;
-      height: 34px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.35);
-      color: rgba(255,255,255,0.90);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .gen-item.is-active{
-      border-color: rgba(255,255,255,0.26);
-      background: rgba(0,0,0,0.64);
-    }
-
-    .gen-panel-foot{
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      border-top: 1px solid rgba(255,255,255,0.10);
-      background: rgba(0,0,0,0.18);
-    }
-
-    .gen-foot-left{
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      min-width: 0;
-    }
-
-    .gen-foot-tx{
-      font-size: 12px;
-      color: rgba(255,255,255,0.70);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .gen-top{
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.35);
-      color: rgba(255,255,255,0.92);
-      border-radius: 12px;
-      padding: 9px 10px;
-      font-size: 12.5px;
-      font-weight: 900;
-      cursor: pointer;
-      transition: background .14s ease, border-color .14s ease, transform .14s ease;
-    }
-
-    .gen-top:hover{
-      background: rgba(0,0,0,0.55);
-      border-color: rgba(255,255,255,0.22);
-      transform: translateY(-1px);
-    }
-
-    .gen-coach{
-      pointer-events: auto;
-      position: fixed;
-      left: 50%;
-      bottom: 108px;
-      transform: translateX(-50%);
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: var(--gen-radius-pill);
-      border: 1px solid rgba(255,255,255,0.18);
-      background: rgba(6,7,10,0.62);
-      color: rgba(255,255,255,0.92);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: var(--gen-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
-      cursor: pointer;
-      animation: genBreathe 2.2s ease-in-out infinite;
-    }
-
-    .gen-coach-ic{
-      width: 22px;
-      height: 22px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(180deg, rgba(255,120,70,0.22), rgba(255,60,140,0.18));
-      border: 1px solid rgba(255,255,255,0.14);
-    }
-
-    .gen-coach-tx{
-      font-size: 13px;
-      font-weight: 900;
-      letter-spacing: -0.1px;
-    }
-
-    @keyframes genBreathe{
-      0%,100%{ transform: translateX(-50%) translateY(0); }
-      50%{ transform: translateX(-50%) translateY(-3px); }
-    }
-
-    .gen-dock{
-      pointer-events: auto;
-      position: fixed;
-      left: 50%;
-      bottom: 16px;
-      transform: translateX(-50%);
-      width: min(660px, calc(100vw - 26px));
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 10px;
-      border-radius: var(--gen-radius-pill);
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(6,7,10,0.62);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: var(--gen-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
-    }
-
-    .gen-dock-btn{
-      text-decoration: none;
-      color: rgba(255,255,255,0.92);
-      flex: 1 1 0;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.36);
-      padding: 10px 8px;
-      box-shadow: 0 10px 22px rgba(0,0,0,0.34),
-                  inset 0 1px 0 rgba(255,255,255,0.08);
-      transition: transform .14s ease, background .14s ease, border-color .14s ease;
-      cursor: pointer;
-    }
-
-    .gen-dock-btn:hover{
-      transform: translateY(-1px);
-      background: rgba(0,0,0,0.56);
-      border-color: rgba(255,255,255,0.22);
-    }
-
-    .gen-dock-ic{ font-size: 16px; line-height: 1; }
-
-    .gen-dock-tx{
-      font-size: 11.5px;
-      font-weight: 900;
-      letter-spacing: -0.1px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .gen-dock-cta{
-      background: linear-gradient(90deg, rgba(255,120,70,0.22), rgba(255,60,140,0.16));
-      border-color: rgba(255,255,255,0.20);
-    }
-
-    .gen-dock-btn.copied{
-      border-color: rgba(255,255,255,0.26);
-      background: rgba(0,0,0,0.62);
-    }
-
-    .crawfish-hours { font-size: 0.9em; opacity: 0.85; }
-
-    .site-footer,
-    .site-footer *{ box-sizing: border-box; }
-
-    .site-footer{
-      color: rgba(255,255,255,.92);
-      padding: clamp(28px, 3.5vw, 52px) clamp(16px, 3vw, 28px) 18px;
-      border-top: 1px solid rgba(255,255,255,.12);
-      text-align: center;
-    }
-
-    .footer-inner{
-      max-width: 1160px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: clamp(24px, 4vw, 60px);
-      justify-items: center;
-    }
-
-    .footer-col{
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .footer-title{
-      margin: 0 0 6px;
-      font-size: 1.12rem;
-      font-weight: 650;
-    }
-
-    .footer-text{
-      margin: 0 0 6px;
-      line-height: 1.6;
-      color: rgba(255,255,255,.82);
-    }
-
-    .footer-link,
-    .social-link{
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: rgba(255,255,255,.9);
-      text-decoration: none;
-      border-bottom: 1px solid rgba(255,255,255,.18);
-      padding-bottom: 2px;
-    }
-
-    .footer-phone{ font-weight: 650; }
-
-    .hours{
-      width: 100%;
-      max-width: 360px;
-      margin: 6px auto 10px;
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: 14px;
-      padding: 16px;
-      box-shadow: 0 10px 40px rgba(0,0,0,.18);
-    }
-
-    .hours-title{ margin: 0 0 14px; font-weight: 700; }
-
-    .hours-list{
-      display: grid;
-      gap: 14px;
-    }
-
-    .hours-row{
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .hours-row .day{ font-weight: 600; }
-    .hours-row .time{ font-variant-numeric: tabular-nums; opacity: .95; }
-
-    .contact-block{
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .icon{
-      display: inline-flex;
-      width: 28px;
-      height: 28px;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.22);
-    }
-
-    .footer-bottom{
-      max-width: 1160px;
-      margin: 28px auto 0;
-      padding-top: 16px;
-      border-top: 1px solid rgba(255,255,255,.12);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .footer-meta{
-      margin: 0;
-      font-size: .95rem;
-      color: rgba(255,255,255,.72);
-    }
-
-    .footer-credit{
-      margin: 0;
-      font-size: .85rem;
-      color: rgba(255,255,255,.55);
-    }
-
-    .footer-credit strong{
-      font-weight: 600;
-      color: rgba(255,255,255,.75);
-    }
-
-    .footer-credit .credit-name{
-      color: rgba(255,255,255,.65);
-    }
-
-    .gen-hidden-link { display: none !important; }
-    .gen-hidden-link.is-visible {
-      display: flex !important;
-      opacity: 0;
-      transform: translateY(6px);
-      transition: opacity 200ms ease, transform 200ms ease;
-    }
-    .gen-hidden-link.is-visible.is-on {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .gen-hidden-link.is-visible { opacity: 0.9; }
-    #genAboutLink {
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      user-select: none;
-      touch-action: manipulation;
-    }
-
-    /* Home page */
-    .hhx-home{
-      position: relative;
-      color: var(--hhx-text);
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
       background:
         radial-gradient(1400px 800px at 20% -10%, rgba(255,91,61,.14), transparent 55%),
         radial-gradient(1200px 700px at 90% 0%, rgba(255,176,75,.10), transparent 55%),
         radial-gradient(1000px 700px at 50% 90%, rgba(255,255,255,.06), transparent 60%),
-        var(--hhx-bg);
-      overflow: hidden;
+        var(--bg);
+      padding-bottom:92px;
     }
 
-    .hhx-backdrop{ position:absolute; inset:0; pointer-events:none; }
-    .hhx-smoke{
+    a{color:inherit}
+    img{display:block;max-width:100%}
+    .wrap{max-width:1140px;margin:0 auto;padding:18px 16px 54px}
+
+    .hero-mini{
+      position:relative;
+      overflow:hidden;
+      border:1px solid var(--border);
+      border-radius:28px;
+      background:rgba(0,0,0,.18);
+      box-shadow:var(--shadow2);
+      margin-bottom:16px;
+    }
+
+    .hero-mini::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(820px 420px at 18% 0%, rgba(255,180,90,0.14), transparent 66%),
+        radial-gradient(840px 460px at 88% 0%, rgba(255,80,60,0.11), transparent 62%),
+        radial-gradient(980px 560px at 50% 110%, rgba(255,60,140,0.09), transparent 60%),
+        linear-gradient(180deg, rgba(6,7,10,0.22), rgba(6,7,10,0.80));
+      pointer-events:none;
+    }
+
+    .hero-mini-inner{
+      position:relative;
+      z-index:1;
+      max-width:1100px;
+      margin:0 auto;
+      padding:14px 16px 16px;
+      text-align:center;
+    }
+
+    .hero-kicker{
+      color:rgba(255,255,255,.72);
+      font-weight:900;
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:.22px;
+    }
+
+    .hero-title{
+      margin:6px 0 4px;
+      font-weight:950;
+      letter-spacing:-.03em;
+      line-height:1.05;
+      font-size:clamp(20px,2.3vw,30px);
+    }
+
+    .hero-sub{
+      margin:0;
+      color:rgba(255,255,255,.78);
+      font-size:13px;
+      line-height:1.42;
+    }
+
+    .hero-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:center;
+      margin-top:10px;
+    }
+
+    .btn{
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:13px;
+      color:var(--text);
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.26);
+      box-shadow:0 12px 34px rgba(0,0,0,.35);
+      transition:transform .14s ease, box-shadow .14s ease, background .14s ease;
+    }
+
+    .btn:hover{transform:translateY(-1px);box-shadow:0 18px 46px rgba(0,0,0,.45)}
+    .btn-primary{
+      border-color:transparent;
+      background:linear-gradient(135deg,var(--hot),var(--warm));
+      color:#1a0d0b;
+    }
+
+    .menu-strip{
+      position:relative;
+      margin-top:12px;
+      overflow:hidden;
+      border-radius:28px;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.18);
+      box-shadow:var(--shadow2);
+      padding:8px 0;
+    }
+
+    .menu-track{
+      display:flex;
+      gap:10px;
+      width:max-content;
+      padding:0 12px;
+      will-change:transform;
+      user-select:none;
+      touch-action:pan-x;
+    }
+
+    .menu-card{
+      flex:0 0 auto;
+      width:190px;
+      border-radius:20px;
+      border:1px solid var(--border);
+      background:rgba(6,7,10,.44);
+      box-shadow:0 10px 24px rgba(0,0,0,.50), inset 0 1px 0 rgba(255,255,255,.08);
+      overflow:hidden;
+      cursor:pointer;
+    }
+
+    .menu-card-top{
+      padding:10px 11px 8px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+
+    .menu-card-name{
+      font-size:12px;
+      font-weight:950;
+      line-height:1.1;
+    }
+
+    .menu-card-tag{
+      font-size:10px;
+      white-space:nowrap;
+      color:rgba(255,255,255,.72);
+      font-weight:900;
+    }
+
+    .menu-heat{
+      height:4px;
+      background:linear-gradient(90deg, rgba(255,80,60,0), rgba(255,140,80,.75), rgba(255,60,140,.65), rgba(255,80,60,0));
+    }
+
+    .home{
+      position:relative;
+      overflow:hidden;
+    }
+
+    .backdrop{position:absolute;inset:0;pointer-events:none}
+    .smoke{
       position:absolute; inset:-20%;
       background:
         radial-gradient(700px 420px at 20% 25%, rgba(255,255,255,.06), transparent 60%),
         radial-gradient(700px 420px at 70% 35%, rgba(255,255,255,.04), transparent 62%),
         radial-gradient(900px 540px at 50% 80%, rgba(255,91,61,.06), transparent 70%);
-      filter: blur(16px);
-      transform: rotate(-6deg);
-      opacity: .9;
+      filter:blur(16px);
+      transform:rotate(-6deg);
+      opacity:.9;
     }
-    .hhx-glow{
+    .glow{
       position:absolute; inset:-10%;
-      background: conic-gradient(from 120deg, rgba(255,91,61,.10), rgba(255,176,75,.08), rgba(255,255,255,.06), rgba(255,91,61,.10));
-      filter: blur(40px);
-      opacity: .55;
+      background:conic-gradient(from 120deg, rgba(255,91,61,.10), rgba(255,176,75,.08), rgba(255,255,255,.06), rgba(255,91,61,.10));
+      filter:blur(40px);
+      opacity:.55;
     }
 
-    .hhx-wrap{
-      max-width: 1140px;
-      margin: 0 auto;
-      padding: 34px 16px 54px;
-      position: relative;
-      z-index: 1;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    }
-
-    .hhx-hero{
+    .hero{
       display:grid;
-      grid-template-columns: 1.3fr .7fr;
-      gap: 16px;
-      align-items: stretch;
+      grid-template-columns:1.3fr .7fr;
+      gap:16px;
+      align-items:stretch;
     }
-    .hhx-heroCard{
-      background: linear-gradient(to bottom, rgba(255,255,255,.08), rgba(255,255,255,.05));
-      border: 1px solid var(--hhx-border);
-      border-radius: var(--hhx-radius);
-      box-shadow: var(--hhx-shadow);
-      padding: 22px 20px;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      position: relative;
+
+    .hero-card,
+    .panel,
+    .fb-panel{
+      border:1px solid var(--border);
+      border-radius:var(--radius-xl);
+      background:linear-gradient(to bottom, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+    }
+
+    .hero-card{
+      padding:22px 20px;
+      position:relative;
       overflow:hidden;
     }
-    .hhx-heroCard:before{
+
+    .hero-card::before{
       content:"";
       position:absolute; inset:0;
       background:
@@ -668,332 +239,291 @@
         radial-gradient(900px 260px at 85% 10%, rgba(255,176,75,.10), transparent 62%);
       pointer-events:none;
     }
-    .hhx-heroCard > *{ position:relative; z-index:1; }
 
-    .hhx-kicker{
+    .hero-card > *{position:relative;z-index:1}
+
+    .kicker{
       display:inline-block;
-      padding: 7px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(0,0,0,.22);
-      font-weight: 750;
-      color: var(--hhx-muted);
-      font-size: 13px;
-      letter-spacing: .02em;
+      padding:7px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(0,0,0,.22);
+      font-weight:750;
+      color:var(--muted);
+      font-size:13px;
     }
 
-    .hhx-h1{
-      margin: 12px 0 6px;
-      font-size: clamp(28px, 4vw, 44px);
-      letter-spacing: -0.04em;
-      line-height: 1.02;
-      font-weight: 950;
+    h1{
+      margin:12px 0 6px;
+      font-size:clamp(28px,4vw,44px);
+      letter-spacing:-.04em;
+      line-height:1.02;
+      font-weight:950;
     }
 
-    .hhx-sub{
-      margin: 0 0 14px;
-      color: var(--hhx-muted);
-      font-weight: 700;
-      font-size: clamp(14px, 1.6vw, 16px);
-      line-height: 1.35;
+    .sub{
+      margin:0 0 14px;
+      color:var(--muted);
+      font-weight:700;
+      font-size:clamp(14px,1.6vw,16px);
+      line-height:1.35;
     }
 
-    .hhx-ctaRow{
+    .cta-row{
       display:flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin: 12px 0 12px;
+      flex-wrap:wrap;
+      gap:10px;
+      margin:12px 0;
     }
 
-    .hhx-btn{
-      text-decoration:none;
-      color: var(--hhx-text);
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(0,0,0,.26);
-      padding: 11px 14px;
-      border-radius: 999px;
-      font-weight: 850;
-      font-size: 14px;
-      transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
-      box-shadow: 0 14px 34px rgba(0,0,0,.35);
-    }
-    .hhx-btn:hover{ transform: translateY(-1px); box-shadow: 0 18px 46px rgba(0,0,0,.45); }
-    .hhx-btn--primary{
-      border-color: transparent;
-      background: linear-gradient(135deg, var(--hhx-ember), var(--hhx-ember2));
-      color: #1a0d0b;
-      box-shadow: 0 18px 56px rgba(255,91,61,.20);
-    }
-
-    .hhx-quickFacts{
+    .facts{
       display:flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:10px;
     }
-    .hhx-pill{
+
+    .pill{
       display:inline-flex;
       align-items:center;
-      gap: 10px;
-      padding: 9px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      font-weight: 800;
-      color: rgba(255,255,255,.82);
-      font-size: 13px;
+      gap:10px;
+      padding:9px 12px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.06);
+      font-weight:800;
+      color:rgba(255,255,255,.82);
+      font-size:13px;
     }
-    .hhx-dot{ width:9px; height:9px; border-radius: 99px; background: var(--hhx-ember); box-shadow: 0 0 0 4px rgba(255,91,61,.18); }
-    .hhx-dot2{ background: var(--hhx-ember2); box-shadow: 0 0 0 4px rgba(255,176,75,.16); }
-    .hhx-dot3{ background: rgba(255,255,255,.72); box-shadow: 0 0 0 4px rgba(255,255,255,.10); }
 
-    .hhx-sigil{
-      position: relative;
-      width: 240px;
-      height: 240px;
-      border-radius: 50%;
+    .dot{width:9px;height:9px;border-radius:99px;background:var(--hot);box-shadow:0 0 0 4px rgba(255,91,61,.18)}
+    .dot2{background:var(--warm);box-shadow:0 0 0 4px rgba(255,176,75,.16)}
+    .dot3{background:rgba(255,255,255,.72);box-shadow:0 0 0 4px rgba(255,255,255,.10)}
+
+    .sigil{
+      position:relative;
+      width:240px;
+      height:240px;
+      border-radius:50%;
       display:grid;
       place-items:center;
-      border: 1px solid rgba(255,255,255,.18);
+      justify-self:center;
+      border:1px solid rgba(255,255,255,.18);
       background:
         radial-gradient(circle at 30% 20%, rgba(255,176,75,.12), transparent 55%),
         radial-gradient(circle at 70% 80%, rgba(255,91,61,.14), transparent 55%),
         rgba(0,0,0,.34);
-      box-shadow:
-        0 30px 80px rgba(0,0,0,.62),
-        inset 0 0 0 1px rgba(255,255,255,.08);
+      box-shadow:0 30px 80px rgba(0,0,0,.62), inset 0 0 0 1px rgba(255,255,255,.08);
       overflow:hidden;
-      justify-self: center;
     }
-    .hhx-sigil::before{
+
+    .sigil::before{
       content:"";
       position:absolute;
       inset:-40%;
-      background: conic-gradient(
-        from 0deg,
-        rgba(255,91,61,.16),
-        rgba(255,176,75,.14),
-        rgba(255,255,255,.06),
-        rgba(255,91,61,.16)
-      );
-      filter: blur(42px);
+      background:conic-gradient(from 0deg, rgba(255,91,61,.16), rgba(255,176,75,.14), rgba(255,255,255,.06), rgba(255,91,61,.16));
+      filter:blur(42px);
       opacity:.6;
-      animation: hhxSealSpin 18s linear infinite;
+      animation:spin 18s linear infinite;
     }
-    @keyframes hhxSealSpin{ to{ transform: rotate(360deg); } }
 
-    .hhx-sigilRing{
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .sigil-ring{
       position:absolute;
-      inset: 20px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,.16);
-      box-shadow:
-        inset 0 0 28px rgba(255,255,255,.06),
-        0 0 40px rgba(255,91,61,.18);
-      z-index: 1;
+      inset:20px;
+      border-radius:50%;
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow:inset 0 0 28px rgba(255,255,255,.06), 0 0 40px rgba(255,91,61,.18);
+      z-index:1;
     }
 
-    .hhx-sigilCore{
+    .sigil-core{
       position:absolute;
-      width: 140px;
-      height: 140px;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 30% 20%, rgba(255,255,255,.10), transparent 60%),
-        rgba(0,0,0,.28);
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: inset 0 0 40px rgba(0,0,0,.55);
-      z-index: 2;
+      width:140px;
+      height:140px;
+      border-radius:50%;
+      background:radial-gradient(circle at 30% 20%, rgba(255,255,255,.10), transparent 60%), rgba(0,0,0,.28);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:inset 0 0 40px rgba(0,0,0,.55);
+      z-index:2;
     }
 
-    .hhx-sigilLogo{
-      position: relative;
-      z-index: 3;
-      width: 96px;
-      height: 96px;
-      border-radius: 50%;
-      object-fit: cover;
-      background: rgba(0,0,0,.35);
-      border: 2px solid rgba(255,255,255,.22);
-      box-shadow:
-        0 20px 48px rgba(0,0,0,.6),
-        inset 0 0 0 1px rgba(255,255,255,.12);
+    .sigil-logo{
+      position:relative;
+      z-index:3;
+      width:96px;
+      height:96px;
+      border-radius:50%;
+      object-fit:cover;
+      border:2px solid rgba(255,255,255,.22);
+      box-shadow:0 20px 48px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.12);
     }
 
-    .hhx-sigilText{
+    .sigil-text{
       position:absolute;
-      bottom: 14px;
-      z-index: 4;
-      font-weight: 900;
-      letter-spacing: .30em;
-      font-size: 11px;
-      color: rgba(255,255,255,.74);
+      bottom:14px;
+      z-index:4;
+      font-weight:900;
+      letter-spacing:.30em;
+      font-size:11px;
+      color:rgba(255,255,255,.74);
     }
 
-    .hhx-navGrid{
+    .nav-grid{
       display:grid;
-      grid-template-columns: repeat(4, minmax(0,1fr));
-      gap: 12px;
-      margin: 14px 0;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:12px;
+      margin:14px 0;
     }
 
-    .hhx-navCard{
+    .nav-card{
       display:block;
       text-decoration:none;
-      color: var(--hhx-text);
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      border-radius: var(--hhx-radius2);
-      padding: 14px;
-      box-shadow: 0 14px 40px rgba(0,0,0,.35);
-      transition: transform .14s ease, background .14s ease, box-shadow .14s ease;
+      color:var(--text);
+      border:1px solid var(--border);
+      background:var(--glass);
+      border-radius:var(--radius-lg);
+      padding:14px;
+      box-shadow:var(--shadow2);
+      transition:transform .14s ease, background .14s ease;
     }
-    .hhx-navCard:hover{ transform: translateY(-2px); background: rgba(255,255,255,.08); box-shadow: 0 18px 56px rgba(0,0,0,.44); }
 
-    .hhx-navIcon{ font-size: 22px; opacity: .95; }
-    .hhx-navTitle{ margin-top: 8px; font-weight: 950; letter-spacing: -0.02em; font-size: 16px; }
-    .hhx-navDesc{ margin-top: 6px; color: var(--hhx-muted); font-weight: 700; font-size: 13px; line-height: 1.35; }
+    .nav-card:hover{transform:translateY(-2px);background:rgba(255,255,255,.08)}
+    .nav-icon{font-size:22px}
+    .nav-title{margin-top:8px;font-weight:950;font-size:16px}
+    .nav-desc{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.35;font-weight:700}
 
-    .hhx-split{
+    .split{
       display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 12px;
-      margin-top: 12px;
+      grid-template-columns:1.2fr .8fr;
+      gap:12px;
+      margin-top:12px;
     }
 
-    .hhx-panel{
-      border-radius: var(--hhx-radius);
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      box-shadow: var(--hhx-shadow2);
-      padding: 18px;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+    .panel{padding:18px;box-shadow:var(--shadow2)}
+    h2{
+      margin:0 0 8px;
+      font-weight:950;
+      letter-spacing:-.03em;
+      font-size:clamp(18px,2.5vw,22px);
     }
 
-    .hhx-h2{
-      margin: 0 0 8px;
-      font-weight: 950;
-      letter-spacing: -0.03em;
-      font-size: clamp(18px, 2.5vw, 22px);
-    }
-    .hhx-p{
-      margin: 0;
-      color: var(--hhx-muted);
-      font-weight: 700;
-      font-size: 14px;
-      line-height: 1.45;
+    .panel p{
+      margin:0;
+      color:var(--muted);
+      font-weight:700;
+      font-size:14px;
+      line-height:1.45;
     }
 
-    .hhx-featureRow{
-      margin-top: 14px;
+    .feature-row{
+      margin-top:14px;
       display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
     }
 
-    .hhx-feature{
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.20);
-      padding: 12px;
+    .feature{
+      border-radius:18px;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.20);
+      padding:12px;
     }
-    .hhx-featureTop{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 8px; }
-    .hhx-chip{
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      color: rgba(255,255,255,.80);
-    }
-    .hhx-featureText{ color: rgba(255,255,255,.72); font-weight: 700; font-size: 13px; line-height: 1.4; }
 
-    .hhx-panel--info .hhx-infoTop{
+    .feature-top{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+    .chip{
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.06);
+      color:rgba(255,255,255,.80);
+    }
+
+    .feature-text{color:rgba(255,255,255,.72);font-weight:700;font-size:13px;line-height:1.4}
+
+    .info-top{
       display:flex;
       align-items:flex-start;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .hhx-mini{ color: rgba(255,255,255,.66); font-weight: 900; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; }
-    .hhx-strong{ margin-top: 6px; font-weight: 900; font-size: 14px; letter-spacing: -0.01em; }
-    .hhx-link{ display:inline-block; margin-top: 8px; color: rgba(255,255,255,.82); font-weight: 900; text-decoration:none; }
-    .hhx-link:hover{ text-decoration: underline; }
-
-    .hhx-badge{
-      padding: 8px 10px;
-      border-radius: 999px;
-      font-weight: 950;
-      font-size: 12px;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      background: linear-gradient(135deg, rgba(255,91,61,.20), rgba(255,176,75,.18));
-      border: 1px solid rgba(255,255,255,.16);
-      color: rgba(255,255,255,.90);
-      white-space: nowrap;
+      justify-content:space-between;
+      gap:10px;
     }
 
-    .hhx-hours{
-      margin-top: 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.14);
-      overflow: hidden;
+    .mini{color:rgba(255,255,255,.66);font-weight:900;font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+    .strong{margin-top:6px;font-weight:900;font-size:14px}
+    .link{display:inline-block;margin-top:8px;color:rgba(255,255,255,.82);font-weight:900;text-decoration:none}
+    .link:hover{text-decoration:underline}
+
+    .badge{
+      padding:8px 10px;
+      border-radius:999px;
+      font-weight:950;
+      font-size:12px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      background:linear-gradient(135deg, rgba(255,91,61,.20), rgba(255,176,75,.18));
+      border:1px solid rgba(255,255,255,.16);
+      white-space:nowrap;
     }
-    .hhx-hourRow{
+
+    .hours-box{
+      margin-top:14px;
+      border-radius:18px;
+      border:1px solid var(--border);
+      overflow:hidden;
+    }
+
+    .hour-row{
       display:flex;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 10px 12px;
-      background: rgba(0,0,0,.22);
-      border-top: 1px solid rgba(255,255,255,.10);
-      font-weight: 800;
-      color: rgba(255,255,255,.84);
-      font-size: 13px;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px 12px;
+      background:rgba(0,0,0,.22);
+      border-top:1px solid rgba(255,255,255,.10);
+      font-weight:800;
+      color:rgba(255,255,255,.84);
+      font-size:13px;
     }
-    .hhx-hourRow:first-child{ border-top: none; }
 
-    .hhx-callBox{
-      margin-top: 14px;
-      padding: 12px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.22);
+    .hour-row:first-child{border-top:none}
+
+    .call-box{
+      margin-top:14px;
+      padding:12px;
+      border-radius:18px;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.22);
     }
-    .hhx-call{
+
+    .call{
       display:inline-block;
-      margin-top: 6px;
-      font-weight: 950;
-      font-size: 18px;
-      letter-spacing: -0.02em;
+      margin-top:6px;
+      font-weight:950;
+      font-size:18px;
       text-decoration:none;
-      color: rgba(255,255,255,.94);
-    }
-    .hhx-call:hover{ text-decoration: underline; }
-    .hhx-callNote{
-      margin-top: 8px;
-      color: rgba(255,255,255,.68);
-      font-weight: 700;
-      font-size: 13px;
-      line-height: 1.35;
     }
 
-    .hhx-fbWrap{ margin-top: 14px; }
-
-    .hhx-fbPanel{
-      border-radius: var(--hhx-radius);
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      box-shadow: var(--hhx-shadow2);
-      padding: 16px;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      position: relative;
-      overflow: hidden;
+    .call-note{
+      margin-top:8px;
+      color:rgba(255,255,255,.68);
+      font-weight:700;
+      font-size:13px;
+      line-height:1.35;
     }
-    .hhx-fbPanel::before{
+
+    .fb-wrap{margin-top:14px}
+    .fb-panel{
+      padding:16px;
+      position:relative;
+      overflow:hidden;
+      box-shadow:var(--shadow2);
+    }
+
+    .fb-panel::before{
       content:"";
       position:absolute;
       inset:0;
@@ -1002,864 +532,454 @@
         radial-gradient(900px 260px at 88% 10%, rgba(255,176,75,.10), transparent 62%);
       pointer-events:none;
     }
-    .hhx-fbPanel > *{ position:relative; z-index:1; }
 
-    .hhx-fbTop{
+    .fb-panel > *{position:relative;z-index:1}
+
+    .fb-top{
       display:flex;
+      justify-content:space-between;
       align-items:flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-    .hhx-fbTitle{
-      margin-top: 6px;
-      font-weight: 950;
-      letter-spacing: -0.02em;
-      font-size: 18px;
-    }
-    .hhx-fbSub{
-      margin-top: 6px;
-      color: var(--hhx-muted);
-      font-weight: 750;
-      font-size: 13px;
-      line-height: 1.35;
-      max-width: 560px;
+      gap:12px;
+      margin-bottom:12px;
     }
 
-    .hhx-fbBtn{
-      text-decoration:none;
-      color: var(--hhx-text);
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(0,0,0,.26);
-      padding: 10px 12px;
-      border-radius: 999px;
-      font-weight: 900;
-      font-size: 13px;
-      white-space: nowrap;
-      transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
-      box-shadow: 0 14px 34px rgba(0,0,0,.35);
-    }
-    .hhx-fbBtn:hover{ transform: translateY(-1px); box-shadow: 0 18px 46px rgba(0,0,0,.45); }
-    .hhx-fbBtn--full{ display:inline-flex; justify-content:center; width:100%; }
+    .fb-title{margin-top:6px;font-weight:950;font-size:18px}
+    .fb-sub{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.35;font-weight:750;max-width:560px}
 
-    .hhx-fbGrid{
+    .fb-grid{
       display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 12px;
-      align-items: stretch;
+      grid-template-columns:1.2fr .8fr;
+      gap:12px;
+      align-items:stretch;
     }
 
-    .hhx-fbEmbed{
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.22);
-      overflow: hidden;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
-      min-height: 520px;
-      width: 100%;
-      max-width: 100%;
-      display:block;
+    .fb-embed,
+    .fb-side{
+      border-radius:18px;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.22);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
     }
 
-    .hhx-fbFrame{
-      position: relative;
-      width: 100%;
-      height: 520px;
-      overflow: hidden;
-      border-radius: 18px;
-    }
+    .fb-embed{overflow:hidden;min-height:520px}
+    .fb-embed iframe{width:100%;height:520px;border:0;display:block}
 
-    #hhx-fbIframe{
-      width: 100%;
-      height: 520px;
-      border: 0;
-      display: block;
-      max-width: 100%;
-      overflow: hidden;
-    }
-
-    .hhx-fbFallback{
-      position: absolute;
-      inset: 0;
-      display: grid;
-      align-content: center;
-      gap: 10px;
-      padding: 18px;
-      background: rgba(0,0,0,.55);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,.10);
-    }
-    .hhx-fbFallbackIcon{
-      width: 46px;
-      height: 46px;
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.08);
-      font-size: 20px;
-    }
-    .hhx-fbFallbackTitle{
-      font-weight: 950;
-      letter-spacing: -0.02em;
-      font-size: 16px;
-    }
-    .hhx-fbFallbackText{
-      color: rgba(255,255,255,.74);
-      font-weight: 700;
-      font-size: 13px;
-      line-height: 1.35;
-      max-width: 520px;
-    }
-
-    .hhx-fbSideCard{
-      height: 100%;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.22);
-      padding: 14px;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+    .fb-side{
+      padding:14px;
       display:flex;
-      flex-direction: column;
-      gap: 10px;
+      flex-direction:column;
+      gap:10px;
     }
 
-    .hhx-fbSideIcon{
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
-      display:grid;
-      place-items:center;
-      background: linear-gradient(135deg, rgba(255,91,61,.22), rgba(255,176,75,.18));
-      border: 1px solid rgba(255,255,255,.16);
-      box-shadow: 0 18px 46px rgba(0,0,0,.35);
-      font-size: 20px;
-    }
-    .hhx-fbSideH{ font-weight: 950; letter-spacing: -0.02em; font-size: 16px; }
-    .hhx-fbSideP{ color: var(--hhx-muted); font-weight: 750; font-size: 13px; line-height: 1.35; }
-
-    .hhx-fbPills{
-      margin-top: auto;
-      display:flex;
-      flex-wrap:wrap;
-      gap: 8px;
+    .fb-side-icon{
+      width:44px;height:44px;border-radius:14px;
+      display:grid;place-items:center;
+      background:linear-gradient(135deg, rgba(255,91,61,.22), rgba(255,176,75,.18));
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow:0 18px 46px rgba(0,0,0,.35);
+      font-size:20px;
     }
 
-    .hhx-marquee{
-      margin-top: 14px;
-      border-radius: var(--hhx-radius);
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.05);
-      overflow: hidden;
-      box-shadow: var(--hhx-shadow2);
-    }
-    .hhx-marqueeTrack{
-      display:flex;
-      gap: 10px;
-      padding: 12px;
-      width: max-content;
-      animation: hhxMarquee 26s linear infinite;
-      will-change: transform;
-    }
-    @keyframes hhxMarquee{
-      from{ transform: translateX(0); }
-      to{ transform: translateX(-50%); }
-    }
-    .hhx-photo{
-      width: 260px;
-      aspect-ratio: 4/3;
-      border-radius: 18px;
+    .fb-side h3{margin:0;font-size:16px}
+    .fb-side p{margin:0;color:var(--muted);font-size:13px;line-height:1.35;font-weight:750}
+    .fb-pills{margin-top:auto;display:flex;flex-wrap:wrap;gap:8px}
+
+    .marquee{
+      margin-top:14px;
+      border-radius:var(--radius-xl);
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.05);
       overflow:hidden;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.25);
-      flex: 0 0 auto;
+      box-shadow:var(--shadow2);
     }
-    .hhx-photo img{
+
+    .marquee-track{
+      display:flex;
+      gap:10px;
+      padding:12px;
+      width:max-content;
+      animation:marquee 26s linear infinite;
+    }
+
+    @keyframes marquee{
+      from{transform:translateX(0)}
+      to{transform:translateX(-50%)}
+    }
+
+    .photo{
+      width:260px;
+      aspect-ratio:4/3;
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.25);
+      flex:0 0 auto;
+    }
+
+    .photo img{
       width:100%;
       height:100%;
-      object-fit: cover;
-      display:block;
-      transform: scale(1.02);
-      filter: contrast(1.02) saturate(1.02);
+      object-fit:cover;
+      transform:scale(1.02);
+      filter:contrast(1.02) saturate(1.02);
     }
 
-    #hhHomeMenuHero{
-      position: relative;
-      width: 100%;
-      min-height: clamp(200px, 32vh, 340px);
-      overflow: hidden;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      margin-top: 4px;
-      filter: drop-shadow(0 16px 44px rgba(0,0,0,0.34));
+    .dock{
+      position:fixed;
+      left:50%;
+      bottom:16px;
+      transform:translateX(-50%);
+      width:min(660px, calc(100vw - 26px));
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(6,7,10,.62);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      box-shadow:0 18px 50px rgba(0,0,0,.62), inset 0 1px 0 rgba(255,255,255,.08);
+      z-index:9999;
     }
 
-    #hhHomeMenuHero .hh-bg{
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(820px 420px at 18% 0%, rgba(255,180,90,0.14), transparent 66%),
-        radial-gradient(840px 460px at 88% 0%, rgba(255,80,60,0.11), transparent 62%),
-        radial-gradient(980px 560px at 50% 110%, rgba(255,60,140,0.09), transparent 60%),
-        linear-gradient(180deg, rgba(6,7,10,0.22), rgba(6,7,10,0.80));
-      transform: scale(1.01);
+    .dock-btn{
+      text-decoration:none;
+      color:rgba(255,255,255,.92);
+      flex:1 1 0;
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:4px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.36);
+      padding:10px 8px;
+      box-shadow:0 10px 22px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.08);
+      transition:transform .14s ease, background .14s ease;
+      cursor:pointer;
     }
 
-    #hhHomeMenuHero .hh-inner{
-      position: relative;
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 12px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      align-items: center;
-      text-align: center;
+    .dock-btn:hover{transform:translateY(-1px);background:rgba(0,0,0,.56)}
+    .dock-cta{background:linear-gradient(90deg, rgba(255,120,70,.22), rgba(255,60,140,.16))}
+    .dock-ic{font-size:16px;line-height:1}
+    .dock-tx{font-size:11.5px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+    .site-footer,.site-footer *{box-sizing:border-box}
+    .site-footer{
+      color:rgba(255,255,255,.92);
+      padding:clamp(28px,3.5vw,52px) clamp(16px,3vw,28px) 18px;
+      border-top:1px solid rgba(255,255,255,.12);
+      text-align:center;
     }
 
-    #hhHomeMenuHero .hh-top{
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+    .footer-inner{
+      max-width:1160px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:clamp(24px,4vw,60px);
+      justify-items:center;
     }
 
-    #hhHomeMenuHero .hh-kicker{
-      color: rgba(255,255,255,0.72);
-      font-weight: 900;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: .22px;
+    .footer-col{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:10px;
     }
 
-    #hhHomeMenuHero .hh-title{
-      margin: 2px 0 3px;
-      color: var(--hhH-text);
-      font-weight: 950;
-      letter-spacing: -0.55px;
-      line-height: 1.05;
-      font-size: clamp(18px, 2.2vw, 28px);
+    .footer-title{margin:0 0 6px;font-size:1.12rem;font-weight:650}
+    .footer-text{margin:0 0 6px;line-height:1.6;color:rgba(255,255,255,.82)}
+    .footer-link,.social-link{
+      display:inline-flex;align-items:center;gap:8px;
+      color:rgba(255,255,255,.9);text-decoration:none;
+      border-bottom:1px solid rgba(255,255,255,.18);padding-bottom:2px;
     }
 
-    #hhHomeMenuHero .hh-sub{
-      margin: 0;
-      max-width: 62ch;
-      color: rgba(255,255,255,0.78);
-      font-size: clamp(11px, 0.9vw, 13px);
-      line-height: 1.42;
+    .hours{
+      width:100%;max-width:360px;margin:6px auto 10px;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:14px;padding:16px;
+      box-shadow:0 10px 40px rgba(0,0,0,.18);
     }
 
-    #hhHomeMenuHero .hh-actions{
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-top: 4px;
+    .hours-title{margin:0 0 14px;font-weight:700}
+    .hours-list{display:grid;gap:14px}
+    .hours-row{display:flex;flex-direction:column;gap:4px}
+    .hours-row .day{font-weight:600}
+    .hours-row .time{font-variant-numeric:tabular-nums;opacity:.95}
+    .crawfish-hours{font-size:.9em;opacity:.85}
+    .contact-block{display:flex;flex-direction:column;align-items:center;gap:6px}
+    .icon{
+      display:inline-flex;width:28px;height:28px;align-items:center;justify-content:center;
+      border-radius:999px;border:1px solid rgba(255,255,255,.22);
     }
 
-    #hhHomeMenuHero .hh-btn{
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-weight: 900;
-      font-size: 11px;
-      color: rgba(255,255,255,0.94);
-      border: 1px solid var(--hhH-border);
-      background: rgba(0,0,0,0.32);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      box-shadow: var(--hhH-shadow-soft), inset 0 1px 0 rgba(255,255,255,0.08);
-      transition: transform .14s ease, border-color .14s ease, background .14s ease, box-shadow .14s ease;
+    .footer-bottom{
+      max-width:1160px;
+      margin:28px auto 0;
+      padding-top:16px;
+      border-top:1px solid rgba(255,255,255,.12);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:6px;
     }
 
-    #hhHomeMenuHero .hh-btn:hover{
-      transform: translateY(-1px);
-      border-color: var(--hhH-border2);
-      background: rgba(0,0,0,0.42);
-      box-shadow: var(--hhH-shadow-deep), inset 0 1px 0 rgba(255,255,255,0.10);
+    .footer-meta{margin:0;font-size:.95rem;color:rgba(255,255,255,.72)}
+    .footer-credit{margin:0;font-size:.85rem;color:rgba(255,255,255,.55)}
+    .footer-credit strong{font-weight:600;color:rgba(255,255,255,.75)}
+    .credit-name{color:rgba(255,255,255,.65)}
+
+    @media (max-width:900px){
+      .hero{grid-template-columns:1fr}
+      .split{grid-template-columns:1fr}
+      .nav-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
+      .fb-top{flex-direction:column}
+      .fb-grid{grid-template-columns:1fr}
+      .footer-inner{grid-template-columns:1fr}
+      .sigil{width:200px;height:200px}
+      .sigil-core{width:118px;height:118px}
+      .sigil-logo{width:84px;height:84px}
     }
 
-    #hhHomeMenuHero .hh-btn-primary{
-      background: linear-gradient(90deg, rgba(255,120,70,0.22), rgba(255,60,140,0.16));
-      border-color: rgba(255,255,255,0.18);
+    @media (max-width:720px){
+      .hero-actions{width:100%}
+      .hero-actions .btn{flex:1 1 auto}
+      .menu-card{width:200px}
+      .dock{gap:8px;padding:9px}
+      .dock-btn{padding:10px 6px}
+      .dock-ic{font-size:15px}
+      .dock-tx{font-size:11px}
     }
 
-    #hhHomeMenuHero .hh-strip{
-      position: relative;
-      width: min(1000px, 100%);
-      border-radius: var(--hhH-radius-strip);
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.18);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: var(--hhH-shadow-deep), inset 0 1px 0 rgba(255,255,255,0.08);
-      overflow: hidden;
-      padding: 6px 0;
+    @media (max-width:560px){
+      .feature-row{grid-template-columns:1fr}
+      .photo{width:200px}
     }
 
-    #hhHomeMenuHero .hh-track{
-      display: flex;
-      gap: 10px;
-      will-change: transform;
-      padding: 0 12px;
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: pan-x;
+    @media (max-width:520px){
+      .nav-grid{grid-template-columns:1fr}
     }
 
-    #hhHomeMenuHero .hh-card{
-      flex: 0 0 auto;
-      width: clamp(140px, 16vw, 200px);
-      border-radius: var(--hhH-radius-card);
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(6,7,10,0.44);
-      box-shadow: 0 10px 24px rgba(0,0,0,0.50),
-                  inset 0 1px 0 rgba(255,255,255,0.08);
-      overflow: hidden;
-      cursor: pointer;
-      transform: translateZ(0);
-      transition: transform .14s ease, border-color .14s ease, background .14s ease;
+    @media (max-width:380px){
+      .dock{gap:6px;padding:8px}
+      .dock-tx{display:none}
     }
 
-    #hhHomeMenuHero .hh-card:hover{
-      transform: translateY(-2px);
-      border-color: rgba(255,255,255,0.22);
-      background: rgba(6,7,10,0.54);
-    }
-
-    #hhHomeMenuHero .hh-card-top{
-      padding: 8px 10px 6px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    #hhHomeMenuHero .hh-card-name{
-      color: rgba(255,255,255,0.94);
-      font-weight: 950;
-      font-size: 12px;
-      line-height: 1.1;
-      letter-spacing: -0.2px;
-    }
-
-    #hhHomeMenuHero .hh-card-tag{
-      color: rgba(255,255,255,0.72);
-      font-weight: 900;
-      font-size: 10px;
-      white-space: nowrap;
-    }
-
-    #hhHomeMenuHero .hh-heat{
-      height: 4px;
-      background: linear-gradient(90deg, rgba(255,80,60,0.0), var(--hhH-hotA), var(--hhH-hotB), rgba(255,80,60,0.0));
-      opacity: 0.85;
-    }
-
-    #hhHomeMenuHero .hh-fade{
-      position: absolute;
-      top: 0; bottom: 0;
-      width: 56px;
-      pointer-events: none;
-      z-index: 2;
-    }
-    #hhHomeMenuHero .hh-fade.left{
-      left: 0;
-      background: linear-gradient(90deg, rgba(6,7,10,0.92), rgba(6,7,10,0.0));
-    }
-    #hhHomeMenuHero .hh-fade.right{
-      right: 0;
-      background: linear-gradient(270deg, rgba(6,7,10,0.92), rgba(6,7,10,0.0));
-    }
-
-    #hhHomeMenuHero .hh-down{
-      align-self: center;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(0,0,0,0.26);
-      color: rgba(255,255,255,0.92);
-      font-weight: 950;
-      font-size: 11px;
-      cursor: pointer;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.26),
-                  inset 0 1px 0 rgba(255,255,255,0.08);
-      transition: transform .14s ease, background .14s ease, border-color .14s ease;
-    }
-
-    #hhHomeMenuHero .hh-down:hover{
-      transform: translateY(-1px);
-      background: rgba(0,0,0,0.34);
-      border-color: rgba(255,255,255,0.22);
-    }
-
-    #hhHomeMenuHero .hh-down-ic{
-      width: 14px; height: 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: linear-gradient(180deg, rgba(255,120,70,0.18), rgba(255,60,140,0.12));
-      position: relative;
-      overflow: hidden;
-    }
-
-    #hhHomeMenuHero .hh-down-ic span{
-      display: inline-block;
-      font-size: 11px;
-      line-height: 1;
-      animation: hhArrowBounce 1.05s ease-in-out infinite;
-      will-change: transform;
-    }
-
-    @keyframes hhArrowBounce{
-      0%   { transform: translateY(-1px); opacity: .92; }
-      50%  { transform: translateY(2px);  opacity: 1; }
-      100% { transform: translateY(-1px); opacity: .92; }
-    }
-
-    @media (max-width: 900px){
-      .hhx-hero{ grid-template-columns: 1fr; }
-      .hhx-split{ grid-template-columns: 1fr; }
-      .hhx-navGrid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
-      .hhx-fbTop{ flex-direction: column; }
-      .hhx-fbGrid{ grid-template-columns: 1fr; }
-      .footer-inner{ grid-template-columns: 1fr; }
-      .hhx-sigil{ width: 200px; height: 200px; margin: 0 auto; }
-      .hhx-sigilCore{ width: 118px; height: 118px; }
-      .hhx-sigilLogo{ width: 84px; height: 84px; }
-    }
-
-    @media (max-width: 720px){
-      .gen-pill{ top: 12px; right: 12px; padding: 10px 12px; }
-      .gen-panel{
-        top: 58px;
-        right: 12px;
-        width: calc(100vw - 24px);
-        max-height: calc(100vh - 170px);
-      }
-      .gen-coach{ bottom: 98px; }
-      .gen-dock{ gap: 8px; padding: 9px; }
-      .gen-dock-btn{ padding: 10px 6px; }
-      .gen-dock-ic{ font-size: 15px; }
-      .gen-dock-tx{ font-size: 11px; }
-
-      #hhHomeMenuHero{ min-height: clamp(220px, 38vh, 380px); }
-      #hhHomeMenuHero .hh-actions{ width: 100%; }
-      #hhHomeMenuHero .hh-btn{ flex: 1 1 auto; }
-      #hhHomeMenuHero .hh-card{ width: 200px; }
-      #hhHomeMenuHero .hh-fade{ width: 74px; }
-    }
-
-    @media (max-width: 560px){
-      .hhx-featureRow{ grid-template-columns: 1fr; }
-      .hhx-photo{ width: 200px; }
-    }
-
-    @media (max-width: 520px){
-      .hhx-navGrid{ grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 380px){
-      .gen-dock{ gap: 6px; padding: 8px; }
-      .gen-dock-tx{ display: none; }
-      .gen-coach{ padding: 10px 12px; }
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      .gen-pill,
-      .gen-panel,
-      .gen-item,
-      .gen-dock-btn,
-      .gen-coach,
-      .hhx-marqueeTrack,
-      .hhx-sigil::before,
-      #hhHomeMenuHero .hh-down-ic span,
-      #hhHomeMenuHero .hh-card{
-        transition: none !important;
-        animation: none !important;
-      }
+    @media (prefers-reduced-motion:reduce){
+      html{scroll-behavior:auto}
+      .sigil::before,
+      .marquee-track{animation:none!important}
+      *{transition:none!important}
     }
   </style>
 </head>
 <body>
-  <!-- Guided Explore Nav -->
-  <div id="genRoot" class="gen-root" hidden>
-    <button
-      id="genPill"
-      class="gen-pill"
-      type="button"
-      aria-haspopup="dialog"
-      aria-expanded="false"
-      aria-controls="genPanel"
-    >
-      <span class="gen-pill-ic" aria-hidden="true">🧭</span>
-      <span class="gen-pill-tx">Explore</span>
-      <span class="gen-pill-dot" aria-hidden="true"></span>
-    </button>
+  <div class="wrap">
+    <section class="hero-mini" aria-label="Today’s lunch preview">
+      <div class="hero-mini-inner">
+        <div class="hero-kicker" id="heroDate">Today</div>
+        <div class="hero-title">Today’s Lunch Preview</div>
+        <p class="hero-sub">Swipe or drag left and right — tap any item to open the menu.</p>
 
-    <div
-      id="genPanel"
-      class="gen-panel"
-      role="dialog"
-      aria-modal="false"
-      aria-label="Explore the page"
-      aria-hidden="true"
-    >
-      <div class="gen-panel-head">
-        <div class="gen-panel-title">
-          <div class="gen-title">Explore</div>
-          <div class="gen-sub">Jump to sections instantly</div>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="menu.html">View Full Menu</a>
+          <a class="btn" href="tel:3372211035">Call to Order</a>
         </div>
 
-        <button id="genClose" class="gen-close" type="button" aria-label="Close explore panel">✕</button>
-      </div>
-
-      <div class="gen-panel-body">
-        <div class="gen-search" role="search">
-          <span class="gen-search-ic" aria-hidden="true">⌕</span>
-          <input
-            id="genSearch"
-            type="text"
-            class="gen-search-input"
-            placeholder="Search sections…"
-            autocomplete="off"
-            inputmode="search"
-          />
-        </div>
-
-        <div id="genList" class="gen-list" role="list"></div>
-      </div>
-
-      <div class="gen-panel-foot">
-        <div class="gen-foot-left">
-          <span class="gen-mini" aria-hidden="true">🔥</span>
-          <span class="gen-foot-tx">Tip: click a section to jump</span>
-        </div>
-        <button id="genTop" class="gen-top" type="button">Back to top</button>
-      </div>
-    </div>
-
-    <button id="genCoach" class="gen-coach" type="button" aria-label="Scroll to explore" hidden>
-      <span class="gen-coach-ic" aria-hidden="true">↓</span>
-      <span class="gen-coach-tx">Scroll for more</span>
-    </button>
-
-    <nav id="genDock" class="gen-dock" aria-label="Quick actions" hidden>
-      <a class="gen-dock-btn" href="/" aria-label="Home">
-        <span class="gen-dock-ic" aria-hidden="true">🏠</span>
-        <span class="gen-dock-tx">Home</span>
-      </a>
-
-      <a class="gen-dock-btn" href="/menu" aria-label="Menu">
-        <span class="gen-dock-ic" aria-hidden="true">🍽️</span>
-        <span class="gen-dock-tx">Menu</span>
-      </a>
-
-      <a class="gen-dock-btn" href="/delivery" aria-label="Delivery options">
-        <span class="gen-dock-ic" aria-hidden="true">🚗</span>
-        <span class="gen-dock-tx">Delivery</span>
-      </a>
-
-      <a class="gen-dock-btn gen-dock-cta" href="tel:3372211035" aria-label="Place an order">
-        <span class="gen-dock-ic" aria-hidden="true">📞</span>
-        <span class="gen-dock-tx">Order</span>
-      </a>
-
-      <a id="genAboutLink" class="gen-dock-btn" href="/about" aria-label="About us">
-        <span class="gen-dock-ic" aria-hidden="true">ℹ️</span>
-        <span class="gen-dock-tx">About</span>
-      </a>
-
-      <button id="genSideShare" class="gen-dock-btn gen-side-share" type="button" aria-label="Share this page">
-        <span class="gen-dock-ic" aria-hidden="true">📤</span>
-        <span class="gen-dock-tx">Share</span>
-      </button>
-    </nav>
-  </div>
-
-  <div id="gen-home"></div>
-
-  <section id="hhHomeMenuHero" aria-label="Today’s lunch preview">
-    <div class="hh-bg" aria-hidden="true"></div>
-
-    <div class="hh-inner">
-      <div class="hh-top">
-        <div class="hh-kicker" id="hhHeroKicker">Loading…</div>
-        <div class="hh-title" id="hhHeroTitle">Today’s Lunch Preview</div>
-        <p class="hh-sub" id="hhHeroSub">Swipe/drag left &amp; right — tap any item to open the menu.</p>
-
-        <div class="hh-actions">
-          <a class="hh-btn hh-btn-primary" href="/menu">View Full Menu</a>
-          <a class="hh-btn" href="tel:3372211035">Call to Order</a>
+        <div class="menu-strip">
+          <div class="menu-track" id="menuTrack"></div>
         </div>
       </div>
+    </section>
 
-      <div class="hh-strip" role="region" aria-label="Scrolling lunch items">
-        <div class="hh-track" id="hhHeroTrack"></div>
-        <div class="hh-fade left" aria-hidden="true"></div>
-        <div class="hh-fade right" aria-hidden="true"></div>
+    <section class="home" aria-label="Hot Headz Southern Foods homepage">
+      <div class="backdrop" aria-hidden="true">
+        <div class="smoke"></div>
+        <div class="glow"></div>
       </div>
 
-      <button class="hh-down" id="hhHeroDown" type="button" aria-label="Scroll down">
-        <span class="hh-down-ic" aria-hidden="true"><span>↓</span></span>
-        <span>Keep scrolling</span>
-      </button>
-    </div>
-  </section>
+      <header class="hero">
+        <div class="hero-card">
+          <div class="kicker">Home-style Southern cooking, made fresh daily</div>
 
-  <section class="hhx-home" aria-label="Hot Headz Southern Foods homepage">
-    <div class="hhx-backdrop" aria-hidden="true">
-      <div class="hhx-smoke"></div>
-      <div class="hhx-glow"></div>
-    </div>
+          <h1>Hot Headz Southern Foods</h1>
+          <p class="sub">Breakfast &amp; Lunch • Cafeteria-Style • Made From Scratch</p>
 
-    <div class="hhx-wrap">
-      <header class="hhx-hero">
-        <div class="hhx-heroCard">
-          <div class="hhx-kicker">Home-style Southern cooking, made fresh daily</div>
-
-          <h1 class="hhx-h1">Hot Headz Southern Foods</h1>
-          <p class="hhx-sub">
-            Breakfast &amp; Lunch • Cafeteria-Style • Made From Scratch
-          </p>
-
-          <div class="hhx-ctaRow">
-            <a class="hhx-btn hhx-btn--primary" href="/menu">View Today’s Menu</a>
-            <a class="hhx-btn" href="tel:3372211035">Call to Order</a>
-            <a class="hhx-btn" href="/delivery-options">Delivery Options</a>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="menu.html">View Today’s Menu</a>
+            <a class="btn" href="tel:3372211035">Call to Order</a>
+            <a class="btn" href="delivery.html">Delivery Options</a>
           </div>
 
-          <div class="hhx-quickFacts" role="list" aria-label="Quick info">
-            <div class="hhx-pill" role="listitem">
-              <span class="hhx-dot" aria-hidden="true"></span>
-              DeRidder, LA
-            </div>
-            <div class="hhx-pill" role="listitem">
-              <span class="hhx-dot hhx-dot2" aria-hidden="true"></span>
-              Dine-In • Carry-Out • Delivery
-            </div>
-            <div class="hhx-pill" role="listitem">
-              <span class="hhx-dot hhx-dot3" aria-hidden="true"></span>
-              (10 plates+ • within 10 miles)
-            </div>
+          <div class="facts" role="list" aria-label="Quick info">
+            <div class="pill" role="listitem"><span class="dot" aria-hidden="true"></span>DeRidder, LA</div>
+            <div class="pill" role="listitem"><span class="dot dot2" aria-hidden="true"></span>Dine-In • Carry-Out • Delivery</div>
+            <div class="pill" role="listitem"><span class="dot dot3" aria-hidden="true"></span>(10 plates+ • within 10 miles)</div>
           </div>
         </div>
 
-        <div class="hhx-sigil" aria-hidden="true">
-          <div class="hhx-sigilRing"></div>
-          <div class="hhx-sigilCore"></div>
-
-          <img
-            class="hhx-sigilLogo"
-            src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/56a6bcf8-18fc-4dcc-9f69-fd6f3774fac2/IMG_4798.png?format=750w"
-            alt="Hot Headz Southern Foods logo"
-          />
-
-          <div class="hhx-sigilText">EST. 2020</div>
+        <div class="sigil" aria-hidden="true">
+          <div class="sigil-ring"></div>
+          <div class="sigil-core"></div>
+          <img class="sigil-logo" src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/56a6bcf8-18fc-4dcc-9f69-fd6f3774fac2/IMG_4798.png?format=750w" alt="Hot Headz Southern Foods logo">
+          <div class="sigil-text">EST. 2020</div>
         </div>
       </header>
 
-      <div id="gen-menu"></div>
-
-      <section class="hhx-navGrid" aria-label="Navigate">
-        <a class="hhx-navCard" href="/menu">
-          <div class="hhx-navIcon" aria-hidden="true">🍽️</div>
-          <div class="hhx-navTitle">Menu</div>
-          <div class="hhx-navDesc">Breakfast plates, daily lunch, salad bar, drinks &amp; dessert.</div>
+      <section class="nav-grid" aria-label="Navigate">
+        <a class="nav-card" href="menu.html">
+          <div class="nav-icon" aria-hidden="true">🍽️</div>
+          <div class="nav-title">Menu</div>
+          <div class="nav-desc">Breakfast plates, daily lunch, salad bar, drinks &amp; dessert.</div>
         </a>
 
-        <a class="hhx-navCard" href="/delivery">
-          <div class="hhx-navIcon" aria-hidden="true">🚗</div>
-          <div class="hhx-navTitle">Delivery</div>
-          <div class="hhx-navDesc">Check availability &amp; how delivery works.</div>
+        <a class="nav-card" href="delivery.html">
+          <div class="nav-icon" aria-hidden="true">🚗</div>
+          <div class="nav-title">Delivery</div>
+          <div class="nav-desc">Check availability &amp; how delivery works.</div>
         </a>
 
-        <a class="hhx-navCard" href="/about">
-          <div class="hhx-navIcon" aria-hidden="true">🏠</div>
-          <div class="hhx-navTitle">About Us</div>
-          <div class="hhx-navDesc">Why locals call it “comfort food done right.”</div>
+        <a class="nav-card" href="about.html">
+          <div class="nav-icon" aria-hidden="true">🏠</div>
+          <div class="nav-title">About Us</div>
+          <div class="nav-desc">Why locals call it comfort food done right.</div>
         </a>
 
-        <a class="hhx-navCard" href="https://www.facebook.com/profile.php?id=100064025473003" target="_blank" rel="noopener">
-          <div class="hhx-navIcon" aria-hidden="true">📣</div>
-          <div class="hhx-navTitle">Facebook</div>
-          <div class="hhx-navDesc">Updates, posts, and community buzz.</div>
+        <a class="nav-card" href="https://www.facebook.com/profile.php?id=100064025473003" target="_blank" rel="noopener">
+          <div class="nav-icon" aria-hidden="true">📣</div>
+          <div class="nav-title">Facebook</div>
+          <div class="nav-desc">Updates, posts, and community buzz.</div>
         </a>
       </section>
 
-      <section class="hhx-split">
-        <article class="hhx-panel">
-          <h2 class="hhx-h2">Fresh. Filling. From scratch.</h2>
-          <p class="hhx-p">
-            Hot Headz Southern Foods serves hearty, home-style meals the way they’re meant to be —
+      <section class="split">
+        <article class="panel">
+          <h2>Fresh. Filling. From scratch.</h2>
+          <p>
+            Hot Headz Southern Foods serves hearty, home-style meals the way they are meant to be —
             fresh, generous, and full of flavor. Come in for breakfast classics, then swing by for lunch favorites.
           </p>
 
-          <div class="hhx-featureRow">
-            <div class="hhx-feature">
-              <div class="hhx-featureTop">
-                <span class="hhx-chip">Fast + Friendly</span>
-                <span class="hhx-chip">Cafeteria Style</span>
+          <div class="feature-row">
+            <div class="feature">
+              <div class="feature-top">
+                <span class="chip">Fast + Friendly</span>
+                <span class="chip">Cafeteria Style</span>
               </div>
-              <div class="hhx-featureText">
-                Order quick, eat happy, and get back to your day — without sacrificing quality.
-              </div>
+              <div class="feature-text">Order quick, eat happy, and get back to your day — without sacrificing quality.</div>
             </div>
 
-            <div class="hhx-feature">
-              <div class="hhx-featureTop">
-                <span class="hhx-chip">Made Daily</span>
-                <span class="hhx-chip">Comfort Food</span>
+            <div class="feature">
+              <div class="feature-top">
+                <span class="chip">Made Daily</span>
+                <span class="chip">Comfort Food</span>
               </div>
-              <div class="hhx-featureText">
-                Classic Southern plates with the kind of flavor you remember.
-              </div>
+              <div class="feature-text">Classic Southern plates with the kind of flavor you remember.</div>
             </div>
           </div>
         </article>
 
-        <aside class="hhx-panel hhx-panel--info" aria-label="Location, hours, and contact">
-          <div id="gen-location"></div>
-          <div class="hhx-infoTop">
+        <aside class="panel" aria-label="Location, hours, and contact">
+          <div class="info-top">
             <div>
-              <div class="hhx-mini">Location</div>
-              <div class="hhx-strong">2741 US-190, DeRidder, LA 70634</div>
-              <a class="hhx-link" href="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634" target="_blank" rel="noopener">
-                Get Directions →
-              </a>
+              <div class="mini">Location</div>
+              <div class="strong">2741 US-190, DeRidder, LA 70634</div>
+              <a class="link" href="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634" target="_blank" rel="noopener">Get Directions →</a>
             </div>
-            <div class="hhx-badge" aria-hidden="true">OPEN DAILY</div>
+            <div class="badge" aria-hidden="true">OPEN DAILY</div>
           </div>
 
-          <div class="hhx-hours">
-            <div class="hhx-hourRow"><span>Mon–Fri</span><span>5:30 AM – 2:00 PM</span></div>
-            <div class="hhx-hourRow"><span>Saturday</span><span>6:00 AM – 2:00 PM</span></div>
-            <div class="hhx-hourRow"><span>Sunday</span><span>7:00 AM – 3:00 PM</span></div>
+          <div class="hours-box">
+            <div class="hour-row"><span>Mon–Fri</span><span>5:30 AM – 2:00 PM</span></div>
+            <div class="hour-row"><span>Saturday</span><span>6:00 AM – 2:00 PM</span></div>
+            <div class="hour-row"><span>Sunday</span><span>7:00 AM – 3:00 PM</span></div>
           </div>
 
-          <div id="gen-order"></div>
-          <div class="hhx-callBox">
-            <div class="hhx-mini">Call to Order</div>
-            <a class="hhx-call" href="tel:3372211035">(337) 221-1035</a>
-            <div class="hhx-callNote">Delivery available for 10+ orders within a 10-mile radius.</div>
+          <div class="call-box">
+            <div class="mini">Call to Order</div>
+            <a class="call" href="tel:3372211035">(337) 221-1035</a>
+            <div class="call-note">Delivery available for 10+ orders within a 10-mile radius.</div>
           </div>
         </aside>
       </section>
 
-      <div id="gen-delivery"></div>
-
-      <section class="hhx-fbWrap" aria-label="Facebook updates">
-        <div class="hhx-fbPanel">
-          <div class="hhx-fbTop">
+      <section class="fb-wrap" aria-label="Facebook updates">
+        <div class="fb-panel">
+          <div class="fb-top">
             <div>
-              <div class="hhx-mini">Facebook</div>
-              <div class="hhx-fbTitle">Latest updates &amp; posts</div>
-              <div class="hhx-fbSub">Follow Hot Headz for daily specials, photos, and announcements.</div>
+              <div class="mini">Facebook</div>
+              <div class="fb-title">Latest updates &amp; posts</div>
+              <div class="fb-sub">Follow Hot Headz for daily specials, photos, and announcements.</div>
             </div>
 
-            <a class="hhx-fbBtn"
-               href="https://www.facebook.com/profile.php?id=100064025473003"
-               target="_blank" rel="noopener">
-              Open Facebook →
-            </a>
+            <a class="btn" href="https://www.facebook.com/profile.php?id=100064025473003" target="_blank" rel="noopener">Open Facebook →</a>
           </div>
 
-          <div class="hhx-fbGrid">
-            <div class="hhx-fbEmbed" aria-label="Facebook Page Feed">
-              <div class="hhx-fbFrame" id="hhx-fbFrame">
-                <iframe
-                  id="hhx-fbIframe"
-                  title="Hot Headz Facebook Feed"
-                  loading="lazy"
-                  scrolling="no"
-                  frameborder="0"
-                  allow="encrypted-media; picture-in-picture; web-share"
-                  allowfullscreen="true"></iframe>
-
-                <div class="hhx-fbFallback" id="hhx-fbFallback" hidden>
-                  <div class="hhx-fbFallbackIcon" aria-hidden="true">📘</div>
-                  <div class="hhx-fbFallbackTitle">Facebook feed preview unavailable</div>
-                  <div class="hhx-fbFallbackText">
-                    Some browsers and privacy settings block embedded Facebook timelines.
-                    Use the button above to open the page directly.
-                  </div>
-                  <a class="hhx-fbBtn hhx-fbBtn--full"
-                     href="https://www.facebook.com/profile.php?id=100064025473003"
-                     target="_blank" rel="noopener">
-                    Open Facebook →
-                  </a>
-                </div>
-              </div>
+          <div class="fb-grid">
+            <div class="fb-embed">
+              <iframe
+                title="Hot Headz Facebook Feed"
+                loading="lazy"
+                src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fpages%2FHot-Headz-Southern-Foods%2F100064025473003%2F&tabs=timeline&width=500&height=520&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true">
+              </iframe>
             </div>
 
-            <div class="hhx-fbSideCard">
-              <div class="hhx-fbSideIcon" aria-hidden="true">🔥</div>
-              <div class="hhx-fbSideH">Stay in the loop</div>
-              <div class="hhx-fbSideP">
-                Check Facebook for daily specials, plate photos, updates, and local announcements.
-              </div>
+            <div class="fb-side">
+              <div class="fb-side-icon" aria-hidden="true">🔥</div>
+              <h3>Stay in the loop</h3>
+              <p>Check Facebook for daily specials, plate photos, updates, and local announcements.</p>
 
-              <div class="hhx-fbPills">
-                <span class="hhx-pill">Daily Specials</span>
-                <span class="hhx-pill">New Photos</span>
-                <span class="hhx-pill">Community Updates</span>
+              <div class="fb-pills">
+                <span class="pill">Daily Specials</span>
+                <span class="pill">New Photos</span>
+                <span class="pill">Community Updates</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <div id="gen-about"></div>
+      <section class="marquee" aria-label="Photo highlights">
+        <div class="marquee-track">
+          <figure class="photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a1f1f8e4-ac79-47f2-83d3-3ca8cdc1465f/_1013557.png?format=750w" alt=""></figure>
+          <figure class="photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/bb8c3f58-b60a-43c8-a27b-23016601ae79/_1013546.png?format=750w" alt=""></figure>
+          <figure class="photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/e224a71b-4f49-491f-b025-2c35d8ebbbc9/627539034_1382867730524063_6201184549603031044_n.jpg?format=750w" alt=""></figure>
+          <figure class="photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/0db41e04-6d91-492f-8b42-4fc6248489e1/305566447_455732733237572_7406694886463339819_n.jpg?format=750w" alt=""></figure>
+          <figure class="photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a318b1f8-44cd-4e14-91d0-28db1ec22992/Screenshot+2026-02-11+220600.png?format=750w" alt=""></figure>
+          <figure class="photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/60a521f4-075c-4248-b85b-0bd8c3bfcf24/FoodPicHotHeadz2.jpg?format=750w" alt=""></figure>
+          <figure class="photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/bd1149f5-9010-4315-947f-43d0aae70bf9/FoodPicHotHeadz1.jpg?format=750w" alt=""></figure>
+          <figure class="photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a826ba0b-4314-493b-a043-7e310475acfe/FoodPicHotHeadz.jpg?format=750w" alt=""></figure>
 
-      <section class="hhx-marquee" aria-label="Photo highlights">
-        <div class="hhx-marqueeTrack">
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a1f1f8e4-ac79-47f2-83d3-3ca8cdc1465f/_1013557.png?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/bb8c3f58-b60a-43c8-a27b-23016601ae79/_1013546.png?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/e224a71b-4f49-491f-b025-2c35d8ebbbc9/627539034_1382867730524063_6201184549603031044_n.jpg?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/0db41e04-6d91-492f-8b42-4fc6248489e1/305566447_455732733237572_7406694886463339819_n.jpg?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a318b1f8-44cd-4e14-91d0-28db1ec22992/Screenshot+2026-02-11+220600.png?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/60a521f4-075c-4248-b85b-0bd8c3bfcf24/FoodPicHotHeadz2.jpg?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/bd1149f5-9010-4315-947f-43d0aae70bf9/FoodPicHotHeadz1.jpg?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a826ba0b-4314-493b-a043-7e310475acfe/FoodPicHotHeadz.jpg?format=750w" alt=""></figure>
-
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a1f1f8e4-ac79-47f2-83d3-3ca8cdc1465f/_1013557.png?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/bb8c3f58-b60a-43c8-a27b-23016601ae79/_1013546.png?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/e224a71b-4f49-491f-b025-2c35d8ebbbc9/627539034_1382867730524063_6201184549603031044_n.jpg?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/0db41e04-6d91-492f-8b42-4fc6248489e1/305566447_455732733237572_7406694886463339819_n.jpg?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a318b1f8-44cd-4e14-91d0-28db1ec22992/Screenshot+2026-02-11+220600.png?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/60a521f4-075c-4248-b85b-0bd8c3bfcf24/FoodPicHotHeadz2.jpg?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/bd1149f5-9010-4315-947f-43d0aae70bf9/FoodPicHotHeadz1.jpg?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a826ba0b-4314-493b-a043-7e310475acfe/FoodPicHotHeadz.jpg?format=750w" alt=""></figure>
+          <figure class="photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a1f1f8e4-ac79-47f2-83d3-3ca8cdc1465f/_1013557.png?format=750w" alt=""></figure>
+          <figure class="photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/bb8c3f58-b60a-43c8-a27b-23016601ae79/_1013546.png?format=750w" alt=""></figure>
+          <figure class="photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/e224a71b-4f49-491f-b025-2c35d8ebbbc9/627539034_1382867730524063_6201184549603031044_n.jpg?format=750w" alt=""></figure>
+          <figure class="photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/0db41e04-6d91-492f-8b42-4fc6248489e1/305566447_455732733237572_7406694886463339819_n.jpg?format=750w" alt=""></figure>
+          <figure class="photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a318b1f8-44cd-4e14-91d0-28db1ec22992/Screenshot+2026-02-11+220600.png?format=750w" alt=""></figure>
+          <figure class="photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/60a521f4-075c-4248-b85b-0bd8c3bfcf24/FoodPicHotHeadz2.jpg?format=750w" alt=""></figure>
+          <figure class="photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/bd1149f5-9010-4315-947f-43d0aae70bf9/FoodPicHotHeadz1.jpg?format=750w" alt=""></figure>
+          <figure class="photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a826ba0b-4314-493b-a043-7e310475acfe/FoodPicHotHeadz.jpg?format=750w" alt=""></figure>
         </div>
       </section>
-    </div>
-  </section>
+    </section>
+  </div>
 
   <footer class="site-footer" aria-label="Footer">
     <div class="footer-inner">
-      <div class="footer-col footer-left">
+      <div class="footer-col">
         <h3 class="footer-title">Location</h3>
         <address class="footer-text">
           2741 US-190,<br>
           Deridder, LA 70634
         </address>
-        <a class="footer-link"
-           href="https://maps.google.com/?q=2741%20US-190%2C%20Deridder%2C%20LA%2070634"
-           target="_blank" rel="noreferrer">
-          Get Directions →
-        </a>
+        <a class="footer-link" href="https://maps.google.com/?q=2741%20US-190%2C%20Deridder%2C%20LA%2070634" target="_blank" rel="noreferrer">Get Directions →</a>
       </div>
 
-      <div class="footer-col footer-center">
+      <div class="footer-col">
         <section class="hours" aria-label="Business hours">
           <p class="hours-title">Hours</p>
 
@@ -1895,13 +1015,11 @@
 
         <div class="contact-block">
           <h3 class="footer-title">Contact Us</h3>
-          <a class="footer-link footer-phone" href="tel:+13372211035">
-            (337) 221-1035
-          </a>
+          <a class="footer-link" href="tel:+13372211035">(337) 221-1035</a>
         </div>
       </div>
 
-      <div class="footer-col footer-right">
+      <div class="footer-col">
         <h3 class="footer-title">Follow Us</h3>
         <a class="social-link" href="https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/" target="_blank" rel="noreferrer">
           <span class="icon" aria-hidden="true">
@@ -1915,641 +1033,165 @@
     </div>
 
     <div class="footer-bottom">
-      <p class="footer-meta">
-        © <span id="year"></span> HotHeadzSouthernFoods. All rights reserved.
-      </p>
-
-      <p class="footer-credit">
-        Website by <strong>NorthStar Digital LLC</strong> · Built by <span class="credit-name">Westyn Ardoin</span>
-      </p>
+      <p class="footer-meta">© <span id="year"></span> HotHeadzSouthernFoods. All rights reserved.</p>
+      <p class="footer-credit">Website by <strong>NorthStar Digital LLC</strong> · Built by <span class="credit-name">Westyn Ardoin</span></p>
     </div>
   </footer>
 
-  <script id="hh-menu-data" type="application/json">
-  {
-    "menus": {
-      "2026-03-12": {
-        "lunch": {
-          "show": true,
-          "items": [
-            { "name": "Smothered Pork Chops" },
-            { "name": "Fried Chicken" },
-            { "name": "Red Beans & Rice" },
-            { "name": "Mac & Cheese" },
-            { "name": "Cabbage" },
-            { "name": "Cornbread" }
-          ]
-        }
-      }
-    }
-  }
-  </script>
+  <nav class="dock" aria-label="Quick actions">
+    <a class="dock-btn" href="index.html" aria-label="Home">
+      <span class="dock-ic" aria-hidden="true">🏠</span>
+      <span class="dock-tx">Home</span>
+    </a>
+
+    <a class="dock-btn" href="menu.html" aria-label="Menu">
+      <span class="dock-ic" aria-hidden="true">🍽️</span>
+      <span class="dock-tx">Menu</span>
+    </a>
+
+    <a class="dock-btn" href="delivery.html" aria-label="Delivery options">
+      <span class="dock-ic" aria-hidden="true">🚗</span>
+      <span class="dock-tx">Delivery</span>
+    </a>
+
+    <a class="dock-btn dock-cta" href="tel:3372211035" aria-label="Place an order">
+      <span class="dock-ic" aria-hidden="true">📞</span>
+      <span class="dock-tx">Order</span>
+    </a>
+
+    <a class="dock-btn" href="about.html" aria-label="About us">
+      <span class="dock-ic" aria-hidden="true">ℹ️</span>
+      <span class="dock-tx">About</span>
+    </a>
+
+    <button id="shareBtn" class="dock-btn" type="button" aria-label="Share this page">
+      <span class="dock-ic" aria-hidden="true">📤</span>
+      <span class="dock-tx">Share</span>
+    </button>
+  </nav>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const wrap = document.getElementById("hhWrap");
-      const burger = document.getElementById("hhBurger");
-      if (!wrap || !burger) return;
+    (function(){
+      const items = [
+        "Smothered Pork Chops",
+        "Fried Chicken",
+        "Red Beans & Rice",
+        "Mac & Cheese",
+        "Cabbage",
+        "Cornbread"
+      ];
 
-      burger.addEventListener("click", function () {
-        const open = wrap.classList.toggle("is-open");
-        burger.setAttribute("aria-expanded", String(open));
-      });
-    });
-  </script>
+      const track = document.getElementById("menuTrack");
+      const dateEl = document.getElementById("heroDate");
+      const yearEl = document.getElementById("year");
+      const shareBtn = document.getElementById("shareBtn");
+      if (!track) return;
 
-  <script>
-    (() => {
-      const INIT_KEY = "__GEN_NAV_V2_INIT__";
+      const now = new Date();
+      dateEl.textContent = now.toLocaleDateString("en-US", { weekday:"long", year:"numeric", month:"2-digit", day:"2-digit" });
+      yearEl.textContent = now.getFullYear();
 
-      function oncePerPage() {
-        const stamp = location.pathname + "|" + location.search;
-        if (!window[INIT_KEY]) window[INIT_KEY] = { stamp: null };
-        if (window[INIT_KEY].stamp === stamp) return false;
-        window[INIT_KEY].stamp = stamp;
-        return true;
-      }
-
-      function ready(fn){
-        if (document.readyState === "complete" || document.readyState === "interactive") {
-          setTimeout(fn, 0);
-        } else {
-          document.addEventListener("DOMContentLoaded", fn, { once: true });
-        }
-      }
-
-      function escapeHtml(str){
-        return String(str)
-          .replaceAll("&","&amp;")
-          .replaceAll("<","&lt;")
-          .replaceAll(">","&gt;")
-          .replaceAll('"',"&quot;")
-          .replaceAll("'","&#039;");
-      }
-
-      function init(){
-        const root   = document.getElementById("genRoot");
-        const pill   = document.getElementById("genPill");
-        const panel  = document.getElementById("genPanel");
-        const close  = document.getElementById("genClose");
-        const list   = document.getElementById("genList");
-        const search = document.getElementById("genSearch");
-        const topBtn = document.getElementById("genTop");
-        const coach  = document.getElementById("genCoach");
-        const dock   = document.getElementById("genDock");
-
-        if (!root || !pill || !panel || !close || !list || !search || !topBtn || !coach || !dock) return;
-
-        root.hidden = false;
-        dock.hidden = false;
-
-        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-        const SECTIONS = [
-          { id: "gen-home",     label: "Home",     sub: "Top of page" },
-          { id: "gen-delivery", label: "Delivery", sub: "Pickup & delivery options" },
-          { id: "gen-menu",     label: "Menu",     sub: "Browse the plates" },
-          { id: "gen-order",    label: "Order",    sub: "Call and place an order" },
-          { id: "gen-about",    label: "About",    sub: "Our story + vibe" },
-          { id: "gen-location", label: "Location", sub: "Hours + map" }
-        ];
-
-        const found = SECTIONS
-          .map(s => ({...s, el: document.getElementById(s.id)}))
-          .filter(s => !!s.el);
-
-        if (found.length === 0) {
-          pill.querySelector(".gen-pill-tx").textContent = "Menu";
-          pill.querySelector(".gen-pill-ic").textContent = "🍽️";
-          pill.addEventListener("click", () => { window.location.href = "/menu"; });
-          panel.style.display = "none";
-          coach.hidden = true;
-          return;
-        }
-
-        function makeItem(section, idx){
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = "gen-item";
-          btn.setAttribute("data-idx", String(idx));
-          btn.setAttribute("role","listitem");
-          btn.setAttribute("aria-label", `Jump to ${section.label}`);
-
-          btn.innerHTML = `
-            <span class="gen-item-left">
-              <div class="gen-item-title">${escapeHtml(section.label)}</div>
-              <div class="gen-item-sub">${escapeHtml(section.sub || "")}</div>
-            </span>
-            <span class="gen-item-right" aria-hidden="true">
-              <span class="gen-badge">Jump</span>
-              <span class="gen-jump">↵</span>
-            </span>
-          `;
-
-          btn.addEventListener("click", () => jumpTo(idx));
-          btn.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              jumpTo(idx);
-            }
-          });
-
-          return btn;
-        }
-
-        function renderList(filterText = ""){
-          list.innerHTML = "";
-          const q = (filterText || "").trim().toLowerCase();
-
-          let count = 0;
-          found.forEach((s, idx) => {
-            const hay = (s.label + " " + (s.sub || "")).toLowerCase();
-            if (q && !hay.includes(q)) return;
-            list.appendChild(makeItem(s, idx));
-            count++;
-          });
-
-          if (count === 0) {
-            const empty = document.createElement("div");
-            empty.style.padding = "14px";
-            empty.style.color = "rgba(255,255,255,0.72)";
-            empty.style.fontSize = "13px";
-            empty.textContent = "No matches. Try a different word.";
-            list.appendChild(empty);
-          }
-        }
-
-        renderList("");
-
-        function openPanel(){
-          panel.classList.add("is-open");
-          panel.setAttribute("aria-hidden","false");
-          pill.setAttribute("aria-expanded","true");
-          setTimeout(() => search.focus(), 60);
-        }
-
-        function closePanel(){
-          panel.classList.remove("is-open");
-          panel.setAttribute("aria-hidden","true");
-          pill.setAttribute("aria-expanded","false");
-        }
-
-        function togglePanel(){
-          const isOpen = panel.classList.contains("is-open");
-          isOpen ? closePanel() : openPanel();
-        }
-
-        pill.onclick = togglePanel;
-        close.onclick = closePanel;
-
-        document.addEventListener("pointerdown", (e) => {
-          if (!panel.classList.contains("is-open")) return;
-          if (panel.contains(e.target) || pill.contains(e.target)) return;
-          closePanel();
-        });
-
-        document.addEventListener("keydown", (e) => {
-          if (e.key !== "Escape") return;
-          if (panel.classList.contains("is-open")) closePanel();
-        });
-
-        search.addEventListener("input", (e) => renderList(e.target.value || ""));
-
-        function jumpTo(idx){
-          const s = found[idx];
-          if (!s || !s.el) return;
-          closePanel();
-
-          if (s.id === "gen-home") {
-            window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
-            return;
-          }
-
-          s.el.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
-        }
-
-        topBtn.addEventListener("click", () => {
-          closePanel();
-          window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
-        });
-
-        let activeIdx = 0;
-
-        function setActive(idx){
-          activeIdx = idx;
-          const items = list.querySelectorAll(".gen-item");
-          items.forEach(i => i.classList.remove("is-active"));
-
-          const activeEl = [...items].find(b => b.getAttribute("data-idx") === String(idx));
-          if (activeEl) activeEl.classList.add("is-active");
-
-          const dot = pill.querySelector(".gen-pill-dot");
-          if (dot){
-            dot.style.filter = "brightness(1.25)";
-            setTimeout(() => { dot.style.filter = "none"; }, 180);
-          }
-        }
-
-        const io = new IntersectionObserver((entries) => {
-          const visible = entries
-            .filter(en => en.isIntersecting)
-            .sort((a,b) => a.boundingClientRect.top - b.boundingClientRect.top);
-
-          if (!visible.length) return;
-
-          const id = visible[0].target.id;
-          const idx = found.findIndex(s => s.id === id);
-          if (idx !== -1 && idx !== activeIdx) setActive(idx);
-        }, { threshold: 0.35 });
-
-        found.forEach(s => io.observe(s.el));
-        setActive(0);
-
-        const COACH_KEY = "genCoachDismissedV2";
-
-        function getCoachDismissed(){
-          try { return localStorage.getItem(COACH_KEY) === "1"; } catch(e){ return false; }
-        }
-
-        function setCoachDismissed(){
-          try { localStorage.setItem(COACH_KEY, "1"); } catch(e){}
-        }
-
-        function updateCoach(){
-          const y = window.scrollY || document.documentElement.scrollTop || 0;
-          if (getCoachDismissed()) { coach.hidden = true; return; }
-          coach.hidden = y > 40;
-        }
-
-        coach.addEventListener("click", () => {
-          setCoachDismissed();
-          coach.hidden = true;
-
-          const homeIdx = found.findIndex(s => s.id === "gen-home");
-          const targetIdx = (homeIdx === 0 && found[1]) ? 1 : 0;
-          const target = found[targetIdx]?.el;
-
-          if (target) target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
-          else window.scrollBy({ top: 420, behavior: reduceMotion ? "auto" : "smooth" });
-        });
-
-        window.addEventListener("scroll", () => {
-          updateCoach();
-
-          const y = window.scrollY || document.documentElement.scrollTop || 0;
-          if (y > 120 && !getCoachDismissed()) {
-            setCoachDismissed();
-            coach.hidden = true;
-          }
-        }, { passive: true });
-
-        updateCoach();
-
-        function updatePill(){
-          const y = window.scrollY || document.documentElement.scrollTop || 0;
-          pill.style.opacity = (y > 20) ? "1" : "0.985";
-        }
-        window.addEventListener("scroll", updatePill, { passive: true });
-        updatePill();
-      }
-
-      ready(() => {
-        if (oncePerPage()) init();
-
-        const origPush = history.pushState;
-        history.pushState = function(){
-          origPush.apply(this, arguments);
-          setTimeout(() => { if (oncePerPage()) init(); }, 50);
-        };
-        window.addEventListener("popstate", () => setTimeout(() => { if (oncePerPage()) init(); }, 50));
-      });
-    })();
-  </script>
-
-  <script>
-    (() => {
-      const hero = document.getElementById("hhHomeMenuHero");
-      const track = document.getElementById("hhHeroTrack");
-      const down = document.getElementById("hhHeroDown");
-      const kicker = document.getElementById("hhHeroKicker");
-      const sub = document.getElementById("hhHeroSub");
-      if (!hero || !track || !down || !kicker || !sub) return;
-
-      const DEBUG = new URLSearchParams(location.search).get("hhdebug") === "1";
-      const log = (...a) => DEBUG && console.log("[HH HERO]", ...a);
-
-      const DATA_URL = "/menu-data";
-      const JSON_ID = "hh-menu-data";
-      const MAX_ITEMS = 18;
-      const LOAD_TIMEOUT_MS = 9000;
-      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-      const toISODateLocal = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-      const weekdayName = (d) => d.toLocaleDateString("en-US",{weekday:"long"});
-
-      const escapeHtml = (str) =>
-        String(str ?? "")
-          .replaceAll("&","&amp;")
-          .replaceAll("<","&lt;")
-          .replaceAll(">","&gt;")
-          .replaceAll('"',"&quot;")
-          .replaceAll("'","&#039;");
-
-      function cardHTML(name, tag){
+      function card(name){
         return `
-          <div class="hh-card" role="button" tabindex="0">
-            <div class="hh-card-top">
-              <div class="hh-card-name">${escapeHtml(name)}</div>
-              <div class="hh-card-tag">${escapeHtml(tag)}</div>
+          <div class="menu-card" tabindex="0" role="button" aria-label="Open menu for ${name}">
+            <div class="menu-card-top">
+              <div class="menu-card-name">${name}</div>
+              <div class="menu-card-tag">Tap → Menu</div>
             </div>
-            <div class="hh-heat" aria-hidden="true"></div>
+            <div class="menu-heat" aria-hidden="true"></div>
           </div>
         `;
       }
 
-      function goToMenu(){ window.location.href = "/menu"; }
+      track.innerHTML = items.map(card).join("") + items.map(card).join("");
 
-      function bindCards(){
-        [...track.querySelectorAll(".hh-card")].forEach(card => {
-          card.addEventListener("click", goToMenu);
-          card.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); goToMenu(); }
-          });
-        });
-      }
+      function goMenu(){ window.location.href = "menu.html"; }
 
-      let w = 0;
-      function recalc(){ w = track.scrollWidth / 2; }
-
-      function setItems(names, tag){
-        const list = (names || []).slice(0, MAX_ITEMS);
-        const safe = list.length ? list : ["Lunch menu unavailable"];
-        const label = tag || "Tap → Menu";
-        track.innerHTML = safe.map(n => cardHTML(n, label)).join("") + safe.map(n => cardHTML(n, label)).join("");
-        bindCards();
-        recalc();
-      }
-
-      async function fetchWithTimeout(url, ms){
-        const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), ms);
-        try{
-          return await fetch(url, { credentials:"same-origin", signal: ctrl.signal, cache:"no-store" });
-        } finally { clearTimeout(timer); }
-      }
-
-      function extractJSONFromHTML(html){
-        const doc = new DOMParser().parseFromString(html, "text/html");
-        const el = doc.getElementById(JSON_ID);
-        if (el && (el.textContent||"").trim()) return (el.textContent||"").trim();
-        return null;
-      }
-
-      function parseLunchNames(data, iso){
-        const menu = (data?.menus||{})[iso];
-        const lunch = menu?.lunch;
-        if (!menu || !lunch || lunch.show === false) return [];
-        const items = Array.isArray(lunch.items) ? lunch.items : [];
-        return items
-          .map(x => (x && typeof x === "object") ? String(x.name||"").trim() : String(x||"").trim())
-          .filter(Boolean);
-      }
-
-      const now = new Date();
-      kicker.textContent = `${weekdayName(now)} • ${toISODateLocal(now)}`;
-      setItems(["Loading today’s lunch…"], "Please wait");
-
-      (async () => {
-        try{
-          if (location.pathname === DATA_URL) throw new Error("Skipping self-fetch on menu-data page");
-          const res = await fetchWithTimeout(DATA_URL, LOAD_TIMEOUT_MS);
-          if (!res.ok) throw new Error(`Fetch ${DATA_URL} failed (${res.status})`);
-          const html = await res.text();
-          const jsonText = extractJSONFromHTML(html);
-          if (!jsonText) throw new Error(`Could not find #${JSON_ID} on ${DATA_URL}`);
-
-          const data = JSON.parse(jsonText);
-          const iso = toISODateLocal(new Date());
-          const names = parseLunchNames(data, iso);
-
-          if (DEBUG) sub.textContent = names.length ? `DEBUG: loaded ${names.length} items from /menu-data` : `DEBUG: no lunch items for ${iso}`;
-          setItems(names.length ? names : ["Lunch menu unavailable"], "Tap → Menu");
-        }catch(err){
-          log("ERROR", err);
-          const inlineJSON = document.getElementById(JSON_ID)?.textContent?.trim();
-          if (inlineJSON) {
-            try {
-              const data = JSON.parse(inlineJSON);
-              const iso = toISODateLocal(new Date());
-              const names = parseLunchNames(data, iso);
-              setItems(names.length ? names : ["Tap to view today’s menu"], "Tap → Menu");
-              return;
-            } catch (e) {}
+      track.querySelectorAll(".menu-card").forEach(function(el){
+        el.addEventListener("click", goMenu);
+        el.addEventListener("keydown", function(e){
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            goMenu();
           }
-          setItems(["Tap to view today’s menu"], "Tap → Menu");
-          if (DEBUG) sub.textContent = `DEBUG: ${err?.message || "Unknown error"}`;
-        }
-      })();
-
-      down.addEventListener("click", () => window.scrollBy({ top: 620, behavior: reduceMotion ? "auto" : "smooth" }));
+        });
+      });
 
       let x = 0;
-      const speed = 1.25;
-      let isHover = false, isDown = false, startX=0, startOffset=0;
+      let w = 0;
+      let isHover = false;
+      let isDown = false;
+      let startX = 0;
+      let startOffset = 0;
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-      hero.addEventListener("mouseenter", () => isHover = true);
-      hero.addEventListener("mouseleave", () => isHover = false);
+      function recalc(){ w = track.scrollWidth / 2; }
+      function setTransform(){ track.style.transform = "translate3d(" + (-x) + "px,0,0)"; }
+
+      recalc();
       window.addEventListener("resize", recalc);
 
-      function setTransform(){ track.style.transform = `translate3d(${-x}px,0,0)`; }
+      track.addEventListener("mouseenter", function(){ isHover = true; });
+      track.addEventListener("mouseleave", function(){ isHover = false; });
 
-      track.addEventListener("pointerdown", (e) => {
+      track.addEventListener("pointerdown", function(e){
         isDown = true;
-        track.setPointerCapture(e.pointerId);
+        try { track.setPointerCapture(e.pointerId); } catch(err){}
         startX = e.clientX;
         startOffset = x;
       });
-      track.addEventListener("pointermove", (e) => {
+
+      track.addEventListener("pointermove", function(e){
         if (!isDown) return;
         const dx = e.clientX - startX;
         x = startOffset - dx;
         if (w > 0) x = ((x % w) + w) % w;
         setTransform();
       });
-      track.addEventListener("pointerup", () => isDown = false);
-      track.addEventListener("pointercancel", () => isDown = false);
+
+      function stopDrag(){ isDown = false; }
+      track.addEventListener("pointerup", stopDrag);
+      track.addEventListener("pointercancel", stopDrag);
 
       function tick(){
-        if (!reduceMotion && !isDown && !isHover){
-          x += speed;
+        if (!reduceMotion && !isHover && !isDown) {
+          x += 1.1;
           if (w > 0 && x >= w) x -= w;
           setTransform();
         }
         requestAnimationFrame(tick);
       }
-      recalc(); tick();
-    })();
-  </script>
+      tick();
 
-  <script>
-    (function () {
-      const about = document.getElementById("genAboutLink");
-      if (!about) return;
+      if (shareBtn) {
+        shareBtn.addEventListener("click", async function(){
+          const data = {
+            title: document.title,
+            text: "Take a look at this page",
+            url: window.location.href
+          };
 
-      const UPDATER_URL = "/fb-menu";
-      const HOLD_MS = 1000;
+          try {
+            if (navigator.share) {
+              await navigator.share(data);
+              return;
+            }
 
-      let holdTimer = null;
-      let longPressed = false;
-
-      function startHold() {
-        longPressed = false;
-        holdTimer = setTimeout(() => {
-          longPressed = true;
-          try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) {}
-          window.location.href = UPDATER_URL;
-        }, HOLD_MS);
-      }
-
-      function cancelHold() {
-        if (holdTimer) clearTimeout(holdTimer);
-        holdTimer = null;
-      }
-
-      about.addEventListener("pointerdown", startHold);
-      about.addEventListener("pointerup", cancelHold);
-      about.addEventListener("pointercancel", cancelHold);
-      about.addEventListener("pointerleave", cancelHold);
-
-      about.addEventListener("touchstart", startHold, { passive: true });
-      about.addEventListener("touchend", cancelHold);
-      about.addEventListener("touchcancel", cancelHold);
-
-      about.addEventListener("contextmenu", function (e) {
-        e.preventDefault();
-      });
-
-      about.addEventListener("click", function (e) {
-        if (longPressed) {
-          e.preventDefault();
-          e.stopPropagation();
-          longPressed = false;
-        }
-      }, true);
-    })();
-  </script>
-
-  <script>
-    (function () {
-      var shareBtn = document.getElementById('genSideShare');
-      if (!shareBtn) return;
-
-      shareBtn.addEventListener('click', async function () {
-        var shareData = {
-          title: document.title || 'Check this out',
-          text: 'Take a look at this page',
-          url: window.location.href
-        };
-
-        try {
-          if (navigator.share) {
-            await navigator.share(shareData);
-            return;
-          }
-
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            await navigator.clipboard.writeText(window.location.href);
-            shareBtn.classList.add('copied');
-            var label = shareBtn.querySelector('.gen-dock-tx');
-            if (label) {
-              var oldText = label.textContent;
-              label.textContent = 'Copied';
-              setTimeout(function () {
-                label.textContent = oldText;
-                shareBtn.classList.remove('copied');
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              await navigator.clipboard.writeText(window.location.href);
+              const label = shareBtn.querySelector(".dock-tx");
+              const oldText = label ? label.textContent : "";
+              if (label) label.textContent = "Copied";
+              setTimeout(function(){
+                if (label) label.textContent = oldText;
               }, 1800);
             }
-            return;
+          } catch (err) {
+            console.log("Share failed", err);
           }
-
-          var temp = document.createElement('input');
-          temp.value = window.location.href;
-          document.body.appendChild(temp);
-          temp.select();
-          temp.setSelectionRange(0, 99999);
-          document.execCommand('copy');
-          document.body.removeChild(temp);
-
-          var label2 = shareBtn.querySelector('.gen-dock-tx');
-          if (label2) {
-            var oldText2 = label2.textContent;
-            label2.textContent = 'Copied';
-            setTimeout(function () {
-              label2.textContent = oldText2;
-            }, 1800);
-          }
-        } catch (e) {
-          console.log('Share/copy failed', e);
-        }
-      });
+        });
+      }
     })();
-  </script>
-
-  <script>
-    (function(){
-      var FB_HREF_FOR_EMBED = "https://www.facebook.com/pages/Hot-Headz-Southern-Foods/100064025473003/";
-      var frame = document.getElementById("hhx-fbFrame");
-      var iframe = document.getElementById("hhx-fbIframe");
-      var fallback = document.getElementById("hhx-fbFallback");
-      if(!frame || !iframe) return;
-
-      function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
-
-      function buildSrc(w){
-        var h = 520;
-        var href = encodeURIComponent(FB_HREF_FOR_EMBED);
-        return "https://www.facebook.com/plugins/page.php" +
-          "?href=" + href +
-          "&tabs=timeline" +
-          "&width=" + w +
-          "&height=" + h +
-          "&small_header=false" +
-          "&adapt_container_width=true" +
-          "&hide_cover=false" +
-          "&show_facepile=true";
-      }
-
-      function setIframe(){
-        var w = Math.floor(frame.getBoundingClientRect().width || 0);
-        w = clamp(w, 280, 900);
-        iframe.src = buildSrc(w);
-      }
-
-      function showFallbackSoon(){
-        if(!fallback) return;
-        fallback.hidden = true;
-        setTimeout(function(){ fallback.hidden = false; }, 2500);
-      }
-
-      iframe.addEventListener("load", function(){
-        if (fallback) fallback.hidden = true;
-      });
-
-      if ("ResizeObserver" in window){
-        var ro = new ResizeObserver(function(){ setIframe(); });
-        ro.observe(frame);
-      } else {
-        window.addEventListener("resize", setIframe, {passive:true});
-        window.addEventListener("orientationchange", function(){ setTimeout(setIframe, 250); }, {passive:true});
-      }
-
-      setIframe();
-      showFallbackSoon();
-    })();
-  </script>
-
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
