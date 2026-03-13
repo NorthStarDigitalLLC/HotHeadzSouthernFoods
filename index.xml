@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hot Headz Southern Foods | Home-style Southern Cooking</title>
   <meta name="description" content="Hot Headz Southern Foods serves fresh, made-from-scratch breakfast and lunch in DeRidder, LA. Cafeteria-style comfort food since 2020.">
 
@@ -14,9 +14,8 @@
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
   <style>
-    /* ---------- ROOT VARIABLES (COMBINED) ---------- */
+    /* ---------- ROOT VARIABLES ---------- */
     :root {
-      /* Homepage variables */
       --hhx-bg: #07060a;
       --hhx-border: rgba(255,255,255,.14);
       --hhx-text: rgba(255,255,255,.92);
@@ -28,7 +27,6 @@
       --hhx-shadow: 0 22px 70px rgba(0,0,0,.55);
       --hhx-shadow2: 0 14px 40px rgba(0,0,0,.42);
 
-      /* Explore nav variables */
       --gen-glass: rgba(6,7,10,0.62);
       --gen-glass-2: rgba(6,7,10,0.78);
       --gen-border: rgba(255,255,255,0.14);
@@ -44,7 +42,6 @@
       --gen-shadow: 0 18px 50px rgba(0,0,0,0.62);
       --gen-font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 
-      /* Lunch hero variables */
       --hhH-glass: rgba(10,10,14,0.42);
       --hhH-border: rgba(255,255,255,0.14);
       --hhH-border2: rgba(255,255,255,0.22);
@@ -76,10 +73,10 @@
       color: rgba(255,255,255,0.92);
       font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
       line-height: 1.5;
-      padding-bottom: 90px; /* space for dock */
+      padding-bottom: 90px;
     }
 
-    /* ---------- HOMEPAGE STYLES (hhx-home) ---------- */
+    /* ---------- HOMEPAGE STYLES ---------- */
     .hhx-home {
       position: relative;
       color: var(--hhx-text);
@@ -1011,6 +1008,10 @@
       border-color: rgba(255,255,255,0.20);
     }
 
+    .gen-dock-btn.copied {
+      background: rgba(255,120,70,0.4);
+    }
+
     @media (max-width: 720px) {
       .gen-pill { top: 12px; right: 12px; padding: 10px 12px; }
       .gen-panel {
@@ -1372,7 +1373,7 @@
       .footer-inner { grid-template-columns: 1fr; }
     }
 
-    /* Hide the explore pill if needed (the CSS already includes a rule to hide .gen-pill) */
+    /* Hide the explore pill */
     .gen-pill {
       display: none !important;
       visibility: hidden !important;
@@ -1403,17 +1404,20 @@
 <body>
   <!-- Required anchors for explore nav (invisible) -->
   <div id="gen-home" style="position: absolute; top: 0; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-menu" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-delivery" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-order" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-about" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-location" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
 
-  <!-- ===== FLOATING EXPLORE NAV (genRoot) ===== -->
+  <!-- ===== FLOATING EXPLORE NAV ===== -->
   <div id="genRoot" class="gen-root" hidden>
-    <!-- Floating Explore Pill (hidden by CSS) -->
     <button id="genPill" class="gen-pill" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="genPanel">
       <span class="gen-pill-ic" aria-hidden="true">🧭</span>
       <span class="gen-pill-tx">Explore</span>
       <span class="gen-pill-dot" aria-hidden="true"></span>
     </button>
 
-    <!-- Mini Map / Explore Panel -->
     <div id="genPanel" class="gen-panel" role="dialog" aria-modal="false" aria-label="Explore the page" aria-hidden="true">
       <div class="gen-panel-head">
         <div class="gen-panel-title">
@@ -1425,7 +1429,7 @@
       <div class="gen-panel-body">
         <div class="gen-search" role="search">
           <span class="gen-search-ic" aria-hidden="true">⌕</span>
-          <input id="genSearch" type="text" class="gen-search-input" placeholder="Search sections…" autocomplete="off" inputmode="search" />
+          <input id="genSearch" type="text" class="gen-search-input" placeholder="Search sections…" autocomplete="off" inputmode="search">
         </div>
         <div id="genList" class="gen-list" role="list"></div>
       </div>
@@ -1438,13 +1442,11 @@
       </div>
     </div>
 
-    <!-- Scroll Coach -->
     <button id="genCoach" class="gen-coach" type="button" aria-label="Scroll to explore" hidden>
       <span class="gen-coach-ic" aria-hidden="true">↓</span>
       <span class="gen-coach-tx">Scroll for more</span>
     </button>
 
-    <!-- Mobile/All-device Dock (links updated to anchors) -->
     <nav id="genDock" class="gen-dock" aria-label="Quick actions" hidden>
       <a class="gen-dock-btn" href="#gen-home" aria-label="Home">
         <span class="gen-dock-ic" aria-hidden="true">🏠</span>
@@ -1474,7 +1476,7 @@
   </div>
 
   <!-- ===== LUNCH PREVIEW HERO ===== -->
-  <section id="hhHomeMenuHero" aria-label="Today’s lunch preview"><div id="gen-menu" aria-hidden="true" style="position: relative; top: -12px;"></div>
+  <section id="hhHomeMenuHero" aria-label="Today’s lunch preview">
     <div class="hh-bg" aria-hidden="true"></div>
     <div class="hh-inner">
       <div class="hh-top">
@@ -1532,11 +1534,10 @@
           </div>
         </div>
 
-        <!-- SIGNATURE SEAL -->
         <div class="hhx-sigil" aria-hidden="true">
           <div class="hhx-sigilRing"></div>
           <div class="hhx-sigilCore"></div>
-          <img class="hhx-sigilLogo" src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/56a6bcf8-18fc-4dcc-9f69-fd6f3774fac2/IMG_4798.png?format=750w" alt="Hot Headz Southern Foods logo" />
+          <img class="hhx-sigilLogo" src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/56a6bcf8-18fc-4dcc-9f69-fd6f3774fac2/IMG_4798.png?format=750w" alt="Hot Headz Southern Foods logo">
           <div class="hhx-sigilText">EST. 2020</div>
         </div>
       </header>
@@ -1567,7 +1568,6 @@
 
       <!-- STORY + HOURS/LOCATION -->
       <section class="hhx-split">
-        <div id="gen-about" aria-hidden="true" style="position: relative; top: -12px;"></div>
         <article class="hhx-panel">
           <h2 class="hhx-h2">Fresh. Filling. From scratch.</h2>
           <p class="hhx-p">
@@ -1596,7 +1596,7 @@
           </div>
         </article>
 
-        <aside id="gen-location" class="hhx-panel hhx-panel--info" aria-label="Location, hours, and contact">
+        <aside class="hhx-panel hhx-panel--info" aria-label="Location, hours, and contact">
           <div class="hhx-infoTop">
             <div>
               <div class="hhx-mini">Location</div>
@@ -1614,8 +1614,7 @@
             <div class="hhx-hourRow"><span>Sunday</span><span>7:00 AM – 3:00 PM</span></div>
           </div>
 
-          <div id="gen-delivery" aria-hidden="true" style="position: relative; top: -12px;"></div>
-          <div id="gen-order" class="hhx-callBox">
+          <div class="hhx-callBox">
             <div class="hhx-mini">Call to Order</div>
             <a class="hhx-call" href="tel:3372211035">(337) 221-1035</a>
             <div class="hhx-callNote">Delivery available for 10+ orders within a 10-mile radius.</div>
@@ -1639,7 +1638,6 @@
             <div class="hhx-fbEmbed" aria-label="Facebook Page Feed">
               <div class="hhx-fbFrame" id="hhx-fbFrame">
                 <iframe id="hhx-fbIframe" title="Hot Headz Facebook Feed" loading="lazy" scrolling="no" frameborder="0" allow="encrypted-media; picture-in-picture; web-share" allowfullscreen="true"></iframe>
-                <!-- Fallback will be shown if iframe fails -->
               </div>
             </div>
             <div class="hhx-fbSideCard">
@@ -1658,24 +1656,23 @@
       <!-- SCROLLING PHOTOS -->
       <section class="hhx-marquee" aria-label="Photo highlights">
         <div class="hhx-marqueeTrack">
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a1f1f8e4-ac79-47f2-83d3-3ca8cdc1465f/_1013557.png?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/bb8c3f58-b60a-43c8-a27b-23016601ae79/_1013546.png?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/e224a71b-4f49-491f-b025-2c35d8ebbbc9/627539034_1382867730524063_6201184549603031044_n.jpg?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/0db41e04-6d91-492f-8b42-4fc6248489e1/305566447_455732733237572_7406694886463339819_n.jpg?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a318b1f8-44cd-4e14-91d0-28db1ec22992/Screenshot+2026-02-11+220600.png?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/60a521f4-075c-4248-b85b-0bd8c3bfcf24/FoodPicHotHeadz2.jpg?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/bd1149f5-9010-4315-947f-43d0aae70bf9/FoodPicHotHeadz1.jpg?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a826ba0b-4314-493b-a043-7e310475acfe/FoodPicHotHeadz.jpg?format=750w" alt=""></figure>
-
+          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a1f1f8e4-ac79-47f2-83d3-3ca8cdc1465f/_1013557.png?format=750w" alt="Delicious southern breakfast plate"></figure>
+          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/bb8c3f58-b60a-43c8-a27b-23016601ae79/_1013546.png?format=750w" alt="Southern lunch special"></figure>
+          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/e224a71b-4f49-491f-b025-2c35d8ebbbc9/627539034_1382867730524063_6201184549603031044_n.jpg?format=750w" alt="Happy customers"></figure>
+          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/0db41e04-6d91-492f-8b42-4fc6248489e1/305566447_455732733237572_7406694886463339819_n.jpg?format=750w" alt="Southern fried chicken"></figure>
+          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a318b1f8-44cd-4e14-91d0-28db1ec22992/Screenshot+2026-02-11+220600.png?format=750w" alt="Daily specials board"></figure>
+          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/60a521f4-075c-4248-b85b-0bd8c3bfcf24/FoodPicHotHeadz2.jpg?format=750w?format=750w" alt="Homestyle cooking"></figure>
+          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/bd1149f5-9010-4315-947f-43d0aae70bf9/FoodPicHotHeadz1.jpg?format=750w?format=750w" alt="Breakfast favorites"></figure>
+          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a826ba0b-4314-493b-a043-7e310475acfe/FoodPicHotHeadz.jpg?format=750w?format=750w" alt="Lunch plate"></figure>
           <!-- duplicate for seamless loop -->
           <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a1f1f8e4-ac79-47f2-83d3-3ca8cdc1465f/_1013557.png?format=750w" alt=""></figure>
           <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/bb8c3f58-b60a-43c8-a27b-23016601ae79/_1013546.png?format=750w" alt=""></figure>
           <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/e224a71b-4f49-491f-b025-2c35d8ebbbc9/627539034_1382867730524063_6201184549603031044_n.jpg?format=750w" alt=""></figure>
           <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/0db41e04-6d91-492f-8b42-4fc6248489e1/305566447_455732733237572_7406694886463339819_n.jpg?format=750w" alt=""></figure>
           <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a318b1f8-44cd-4e14-91d0-28db1ec22992/Screenshot+2026-02-11+220600.png?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/60a521f4-075c-4248-b85b-0bd8c3bfcf24/FoodPicHotHeadz2.jpg?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/bd1149f5-9010-4315-947f-43d0aae70bf9/FoodPicHotHeadz1.jpg?format=750w" alt=""></figure>
-          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a826ba0b-4314-493b-a043-7e310475acfe/FoodPicHotHeadz.jpg?format=750w" alt=""></figure>
+          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/60a521f4-075c-4248-b85b-0bd8c3bfcf24/FoodPicHotHeadz2.jpg?format=750w?format=750w" alt=""></figure>
+          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/bd1149f5-9010-4315-947f-43d0aae70bf9/FoodPicHotHeadz1.jpg?format=750w?format=750w" alt=""></figure>
+          <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a826ba0b-4314-493b-a043-7e310475acfe/FoodPicHotHeadz.jpg?format=750w?format=750w" alt=""></figure>
         </div>
       </section>
     </div>
@@ -1684,19 +1681,17 @@
   <!-- ===== FOOTER ===== -->
   <footer class="site-footer" aria-label="Footer">
     <div class="footer-inner">
-      <!-- LEFT -->
       <div class="footer-col footer-left">
         <h3 class="footer-title">Location</h3>
         <address class="footer-text">
           2741 US-190,<br>
-          DeRidder, LA 70634
+          Deridder, LA 70634
         </address>
-        <a class="footer-link" href="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634" target="_blank" rel="noreferrer">
+        <a class="footer-link" href="https://maps.google.com/?q=2741%20US-190%2C%20Deridder%2C%20LA%2070634" target="_blank" rel="noreferrer">
           Get Directions →
         </a>
       </div>
 
-      <!-- CENTER -->
       <div class="footer-col footer-center">
         <section class="hours" aria-label="Business hours">
           <p class="hours-title">Hours</p>
@@ -1736,13 +1731,12 @@
         </div>
       </div>
 
-      <!-- RIGHT -->
       <div class="footer-col footer-right">
         <h3 class="footer-title">Follow Us</h3>
         <a class="social-link" href="https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/" target="_blank" rel="noreferrer">
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-              <path d="M22 12a10 10 0 1 0-11.56 9.88v-7H7.9V12h2.54V9.8c0-2.5 1.5-3.9 3.78-3.9 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.88h-2.34v7A10 10 0 0 0 22 12z"/>
+              <path d="M22 12a10 10 0 1 0-11.56 9.88v-7H7.9V12h2.54V9.8c0-2.5 1.5-3.9 3.78-3.9 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.88h-2.34v7A10 10 0 0 0 22 12z"></path>
             </svg>
           </span>
           Facebook
@@ -1761,7 +1755,10 @@
   </footer>
 
   <!-- ===== SCRIPTS ===== -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
+    AOS.init({ once: false, duration: 1000 });
+
     // Guided Explore Nav v2
     (() => {
       const INIT_KEY = "__GEN_NAV_V2_INIT__";
@@ -1818,7 +1815,7 @@
         if (found.length === 0) {
           pill.querySelector(".gen-pill-tx").textContent = "Menu";
           pill.querySelector(".gen-pill-ic").textContent = "🍽️";
-          pill.addEventListener("click", () => { window.location.href = "/menu"; });
+          pill.addEventListener("click", () => { window.location.href = "#gen-menu"; });
           panel.style.display = "none";
           coach.hidden = true;
           return;
@@ -1988,10 +1985,8 @@
         window.addEventListener("popstate", () => setTimeout(() => { if (oncePerPage()) init(); }, 50));
       });
     })();
-  </script>
 
-  <script>
-    // Lunch Hero
+    // Lunch Hero with static data
     (() => {
       const hero = document.getElementById("hhHomeMenuHero");
       const track = document.getElementById("hhHeroTrack");
@@ -2000,14 +1995,22 @@
       const sub = document.getElementById("hhHeroSub");
       if (!hero || !track || !down || !kicker || !sub) return;
 
-      const DEBUG = new URLSearchParams(location.search).get("hhdebug") === "1";
-      const log = (...a) => DEBUG && console.log("[HH HERO]", ...a);
-
-      const DATA_URL = "/menu-data";
-      const JSON_ID = "hh-menu-data";
-      const MAX_ITEMS = 18;
-      const LOAD_TIMEOUT_MS = 9000;
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      const LUNCH_ITEMS = [
+        "Red Beans & Rice",
+        "Fried Chicken",
+        "Catfish Plate",
+        "Meatloaf",
+        "Smothered Pork Chops",
+        "Chicken & Sausage Gumbo",
+        "Shrimp Po' Boy",
+        "Crawfish Étouffée",
+        "Jambalaya",
+        "Mac & Cheese",
+        "Collard Greens",
+        "Cornbread"
+      ];
 
       const toISODateLocal = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
       const weekdayName = (d) => d.toLocaleDateString("en-US",{weekday:"long"});
@@ -2032,7 +2035,7 @@
         `;
       }
 
-      function goToMenu() { window.location.href = "#gen-menu"; }  // Updated to anchor
+      function goToMenu() { window.location.href = "#gen-menu"; }
 
       function bindCards() {
         [...track.querySelectorAll(".hh-card")].forEach(card => {
@@ -2047,7 +2050,7 @@
       function recalc() { w = track.scrollWidth / 2; }
 
       function setItems(names, tag) {
-        const list = (names || []).slice(0, MAX_ITEMS);
+        const list = names.slice(0, 12);
         const safe = list.length ? list : ["Lunch menu unavailable"];
         const label = tag || "Tap → Menu";
         track.innerHTML = safe.map(n => cardHTML(n, label)).join("") + safe.map(n => cardHTML(n, label)).join("");
@@ -2055,55 +2058,9 @@
         recalc();
       }
 
-      async function fetchWithTimeout(url, ms) {
-        const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), ms);
-        try {
-          return await fetch(url, { credentials: "same-origin", signal: ctrl.signal, cache: "no-store" });
-        } finally { clearTimeout(timer); }
-      }
-
-      function extractJSONFromHTML(html) {
-        const doc = new DOMParser().parseFromString(html, "text/html");
-        const el = doc.getElementById(JSON_ID);
-        if (el && (el.textContent || "").trim()) return (el.textContent || "").trim();
-        return null;
-      }
-
-      function parseLunchNames(data, iso) {
-        const menu = (data?.menus || {})[iso];
-        const lunch = menu?.lunch;
-        if (!menu || !lunch || lunch.show === false) return [];
-        const items = Array.isArray(lunch.items) ? lunch.items : [];
-        return items
-          .map(x => (x && typeof x === "object") ? String(x.name || "").trim() : String(x || "").trim())
-          .filter(Boolean);
-      }
-
       const now = new Date();
       kicker.textContent = `${weekdayName(now)} • ${toISODateLocal(now)}`;
-      setItems(["Loading today’s lunch…"], "Please wait");
-
-      (async () => {
-        try {
-          const res = await fetchWithTimeout(DATA_URL, LOAD_TIMEOUT_MS);
-          if (!res.ok) throw new Error(`Fetch ${DATA_URL} failed (${res.status})`);
-          const html = await res.text();
-          const jsonText = extractJSONFromHTML(html);
-          if (!jsonText) throw new Error(`Could not find #${JSON_ID} on ${DATA_URL}`);
-
-          const data = JSON.parse(jsonText);
-          const iso = toISODateLocal(new Date());
-          const names = parseLunchNames(data, iso);
-
-          if (DEBUG) sub.textContent = names.length ? `DEBUG: loaded ${names.length} items from /menu-data` : `DEBUG: no lunch items for ${iso}`;
-          setItems(names.length ? names : ["Lunch menu unavailable"], "Tap → Menu");
-        } catch (err) {
-          log("ERROR", err);
-          setItems(["Tap to view today’s menu"], "Tap → Menu");
-          if (DEBUG) sub.textContent = `DEBUG: ${err?.message || "Unknown error"}`;
-        }
-      })();
+      setItems(LUNCH_ITEMS, "Today's special");
 
       down.addEventListener("click", () => window.scrollBy({ top: 620, behavior: reduceMotion ? "auto" : "smooth" }));
 
@@ -2144,57 +2101,14 @@
       recalc();
       tick();
     })();
-  </script>
 
-  <script>
-    // Long-press on About link
-    (function () {
-      const about = document.getElementById("genAboutLink");
-      if (!about) return;
-      const UPDATER_URL = "/fb-menu";
-      const HOLD_MS = 1000;
-      let holdTimer = null;
-      let longPressed = false;
-
-      function startHold() {
-        longPressed = false;
-        holdTimer = setTimeout(() => {
-          longPressed = true;
-          try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) {}
-          window.location.href = UPDATER_URL;
-        }, HOLD_MS);
-      }
-      function cancelHold() {
-        if (holdTimer) clearTimeout(holdTimer);
-        holdTimer = null;
-      }
-      about.addEventListener("pointerdown", startHold);
-      about.addEventListener("pointerup", cancelHold);
-      about.addEventListener("pointercancel", cancelHold);
-      about.addEventListener("pointerleave", cancelHold);
-      about.addEventListener("touchstart", startHold, { passive: true });
-      about.addEventListener("touchend", cancelHold);
-      about.addEventListener("touchcancel", cancelHold);
-      about.addEventListener("contextmenu", function (e) { e.preventDefault(); });
-      about.addEventListener("click", function (e) {
-        if (longPressed) {
-          e.preventDefault();
-          e.stopPropagation();
-          longPressed = false;
-        }
-      }, true);
-    })();
-  </script>
-
-  <script>
     // Share button
     (function () {
-      const root = document.getElementById('genRoot');
       const shareBtn = document.getElementById('genSideShare');
       if (!shareBtn) return;
 
       shareBtn.addEventListener('click', async function () {
-        var shareData = {
+        const shareData = {
           title: document.title || 'Check this out',
           text: 'Take a look at this page',
           url: window.location.href
@@ -2208,29 +2122,29 @@
           if (navigator.clipboard && navigator.clipboard.writeText) {
             await navigator.clipboard.writeText(window.location.href);
             shareBtn.classList.add('copied');
-            var label = shareBtn.querySelector('.gen-dock-tx');
+            const label = shareBtn.querySelector('.gen-dock-tx');
             if (label) {
-              var oldText = label.textContent;
+              const oldText = label.textContent;
               label.textContent = 'Copied';
-              setTimeout(function () {
+              setTimeout(() => {
                 label.textContent = oldText;
                 shareBtn.classList.remove('copied');
               }, 1800);
             }
             return;
           }
-          var temp = document.createElement('input');
+          const temp = document.createElement('input');
           temp.value = window.location.href;
           document.body.appendChild(temp);
           temp.select();
           temp.setSelectionRange(0, 99999);
           document.execCommand('copy');
           document.body.removeChild(temp);
-          var label2 = shareBtn.querySelector('.gen-dock-tx');
+          const label2 = shareBtn.querySelector('.gen-dock-tx');
           if (label2) {
-            var oldText2 = label2.textContent;
+            const oldText2 = label2.textContent;
             label2.textContent = 'Copied';
-            setTimeout(function () {
+            setTimeout(() => {
               label2.textContent = oldText2;
             }, 1800);
           }
@@ -2239,25 +2153,21 @@
         }
       });
     })();
-  </script>
 
-  <script>
     // Update copyright year
     document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
 
-  <!-- Facebook embed script (if needed) -->
-  <script>
+    // Facebook embed
     (function(){
-      var FB_HREF_FOR_EMBED = "https://www.facebook.com/pages/Hot-Headz-Southern-Foods/100064025473003/";
-      var frame = document.getElementById("hhx-fbFrame");
-      var iframe = document.getElementById("hhx-fbIframe");
+      const FB_HREF_FOR_EMBED = "https://www.facebook.com/pages/Hot-Headz-Southern-Foods/100064025473003/";
+      const frame = document.getElementById("hhx-fbFrame");
+      const iframe = document.getElementById("hhx-fbIframe");
       if(!frame || !iframe) return;
 
       function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
       function buildSrc(w){
-        var h = 520;
-        var href = encodeURIComponent(FB_HREF_FOR_EMBED);
+        const h = 520;
+        const href = encodeURIComponent(FB_HREF_FOR_EMBED);
         return "https://www.facebook.com/plugins/page.php" +
           "?href=" + href +
           "&tabs=timeline" +
@@ -2270,17 +2180,17 @@
       }
 
       function setIframe(){
-        var w = Math.floor(frame.getBoundingClientRect().width || 0);
+        const w = Math.floor(frame.getBoundingClientRect().width || 0);
         w = clamp(w, 280, 900);
         iframe.src = buildSrc(w);
       }
 
       if ("ResizeObserver" in window){
-        var ro = new ResizeObserver(function(){ setIframe(); });
+        const ro = new ResizeObserver(() => setIframe());
         ro.observe(frame);
       } else {
         window.addEventListener("resize", setIframe, {passive:true});
-        window.addEventListener("orientationchange", function(){ setTimeout(setIframe, 250); }, {passive:true});
+        window.addEventListener("orientationchange", () => setTimeout(setIframe, 250), {passive:true});
       }
       setIframe();
     })();
