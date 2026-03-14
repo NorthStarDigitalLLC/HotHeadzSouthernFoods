@@ -1815,7 +1815,7 @@
         if (found.length === 0) {
           pill.querySelector(".gen-pill-tx").textContent = "Menu";
           pill.querySelector(".gen-pill-ic").textContent = "🍽️";
-          pill.addEventListener("click", () => { window.location.href = "menu.html"; }); // changed to menu.html
+          pill.addEventListener("click", () => { window.location.href = "menu.html"; });
           panel.style.display = "none";
           coach.hidden = true;
           return;
@@ -1988,7 +1988,7 @@
   </script>
 
   <script>
-    // Lunch Hero with static data – no fetch errors (unchanged)
+    // Lunch Hero with static data – no fetch errors
     (() => {
       const hero = document.getElementById("hhHomeMenuHero");
       const track = document.getElementById("hhHeroTrack");
@@ -2106,25 +2106,43 @@
   </script>
 
   <script>
-    // Long-press on About link
-(function () {
-  const about = document.getElementById("genAboutLink");
-  if (!about) return;
-  const UPDATER_URL = "/fb-menu.html";  // <-- must match your file name
-  const HOLD_MS = 1000;
-  let holdTimer = null;
-  let longPressed = false;
+    // Long-press on About link – now redirects to fb-menu.html
+    (function () {
+      const about = document.getElementById("genAboutLink");
+      if (!about) return;
+      const UPDATER_URL = "/fb-menu.html";  // <-- admin page
+      const HOLD_MS = 1000;
+      let holdTimer = null;
+      let longPressed = false;
 
-  function startHold() {
-    longPressed = false;
-    holdTimer = setTimeout(() => {
-      longPressed = true;
-      try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) {}
-      window.location.href = UPDATER_URL;
-    }, HOLD_MS);
-  }
-  // ... rest of the event handlers
-})();
+      function startHold() {
+        longPressed = false;
+        holdTimer = setTimeout(() => {
+          longPressed = true;
+          try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) {}
+          window.location.href = UPDATER_URL;
+        }, HOLD_MS);
+      }
+      function cancelHold() {
+        if (holdTimer) clearTimeout(holdTimer);
+        holdTimer = null;
+      }
+      about.addEventListener("pointerdown", startHold);
+      about.addEventListener("pointerup", cancelHold);
+      about.addEventListener("pointercancel", cancelHold);
+      about.addEventListener("pointerleave", cancelHold);
+      about.addEventListener("touchstart", startHold, { passive: true });
+      about.addEventListener("touchend", cancelHold);
+      about.addEventListener("touchcancel", cancelHold);
+      about.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+      about.addEventListener("click", function (e) {
+        if (longPressed) {
+          e.preventDefault();
+          e.stopPropagation();
+          longPressed = false;
+        }
+      }, true);
+    })();
   </script>
 
   <script>
