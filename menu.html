@@ -860,7 +860,7 @@
     // AOS init (optional)
     AOS.init({ once: false, duration: 1000 });
 
-    // ----- MENU SCRIPT (modified to auto-switch after closing time) -----
+    // ----- MENU SCRIPT (modified to shift days after closing) -----
     (function(){
       const DATA_URLS = ["/menu-data.html", "/menu-data/"]; // tries both
       const $ = (id)=>document.getElementById(id);
@@ -1313,44 +1313,68 @@
             if(advBtn) advBtn.style.display="none";
           }
 
-          const now=new Date();
-          const todayISO=toISODateLocal(now);
-          const todayName=weekdayName(now);
+          const now = new Date();
+          const calendarTodayISO = toISODateLocal(now);      // actual today's date
+          const calendarTodayName = weekdayName(now);
 
-          const tomorrow=new Date(now); tomorrow.setDate(now.getDate()+1);
-          const tomorrowISO=toISODateLocal(tomorrow);
-          const tomorrowName=weekdayName(tomorrow);
+          const calendarTomorrow = new Date(now); 
+          calendarTomorrow.setDate(now.getDate() + 1);
+          const calendarTomorrowISO = toISODateLocal(calendarTomorrow);
+          const calendarTomorrowName = weekdayName(calendarTomorrow);
 
-          setText("hhDayBtnToday", todayName);
-          setText("hhDayBtnTomorrow", tomorrowName);
+          // Default display dates (what we show in Today/Tomorrow tabs)
+          let displayTodayISO = calendarTodayISO;
+          let displayTodayName = calendarTodayName;
+          let displayTomorrowISO = calendarTomorrowISO;
+          let displayTomorrowName = calendarTomorrowName;
 
-          setText("hh-today-title", `${todayName} (${formatDateNice(now)}) Menu`);
-          setText("hh-tomorrow-title", `${tomorrowName} (${formatDateNice(tomorrow)}) Menu`);
+          const weekly = data?.hours?.weekly || [];
+          const closureToday = getClosure(data, calendarTodayName);
+
+          // Check if we are past closing time for today (and not already closed)
+          const pastClosing = isPastClosingToday(weekly, calendarTodayName);
+          if (pastClosing && !closureToday?.closed) {
+            // Shift everything forward: Today becomes tomorrow, Tomorrow becomes day after
+            displayTodayISO = calendarTomorrowISO;
+            displayTodayName = calendarTomorrowName;
+
+            const dayAfterTomorrow = new Date(now);
+            dayAfterTomorrow.setDate(now.getDate() + 2);
+            displayTomorrowISO = toISODateLocal(dayAfterTomorrow);
+            displayTomorrowName = weekdayName(dayAfterTomorrow);
+          }
+
+          // Update tab labels
+          setText("hhDayBtnToday", displayTodayName);
+          setText("hhDayBtnTomorrow", displayTomorrowName);
+
+          // Update panel titles
+          setText("hh-today-title", `${displayTodayName} (${formatDateNice(parseISODateToLocal(displayTodayISO))}) Menu`);
+          setText("hh-tomorrow-title", `${displayTomorrowName} (${formatDateNice(parseISODateToLocal(displayTomorrowISO))}) Menu`);
 
           setText("hh-hours-note", data?.hours?.note || "");
           setText("hh-hours-note-2", data?.hours?.note || "");
 
-          const weekly=data?.hours?.weekly||[];
-          const hoursToday=findHours(weekly, todayName);
-          const hoursTomorrow=findHours(weekly, tomorrowName);
+          const hoursToday = findHours(weekly, displayTodayName);
+          const hoursTomorrow = findHours(weekly, displayTomorrowName);
 
-          const closureToday=getClosure(data, todayName);
-          const closureTomorrow=getClosure(data, tomorrowName);
+          const closureDisplayToday = getClosure(data, displayTodayName);
+          const closureDisplayTomorrow = getClosure(data, displayTomorrowName);
 
-          const lineToday = closureToday?.closed ? `${todayName} Hours: Closed`
-            : `${todayName} Hours: ${hoursToday.open} – ${hoursToday.close}` +
+          const lineToday = closureDisplayToday?.closed ? `${displayTodayName} Hours: Closed`
+            : `${displayTodayName} Hours: ${hoursToday.open} – ${hoursToday.close}` +
               (hoursToday.breakfast ? ` • Breakfast ${hoursToday.breakfast}` : "") +
               (hoursToday.lunch ? ` • Lunch ${hoursToday.lunch}` : "");
 
-          const lineTomorrow = closureTomorrow?.closed ? `${tomorrowName} Hours: Closed`
-            : `${tomorrowName} Hours: ${hoursTomorrow.open} – ${hoursTomorrow.close}` +
+          const lineTomorrow = closureDisplayTomorrow?.closed ? `${displayTomorrowName} Hours: Closed`
+            : `${displayTomorrowName} Hours: ${hoursTomorrow.open} – ${hoursTomorrow.close}` +
               (hoursTomorrow.breakfast ? ` • Breakfast ${hoursTomorrow.breakfast}` : "") +
               (hoursTomorrow.lunch ? ` • Lunch ${hoursTomorrow.lunch}` : "");
 
           setText("hh-hours-line", lineToday);
           setText("hh-hours-line-2", lineTomorrow);
 
-          const phone=data?.phoneTel || "#";
+          const phone = data?.phoneTel || "#";
           ["hh-call-btn-today-b","hh-call-btn-today-l","hh-call-btn-today-c",
            "hh-call-btn-tomorrow-b","hh-call-btn-tomorrow-l","hh-call-btn-tomorrow-c"
           ].forEach(id=>{ const a=$(id); if(a) a.href=phone; });
@@ -1358,34 +1382,33 @@
           setText("hh-delivery-note", data?.deliveryNote || "");
           setText("hh-delivery-note-2", data?.deliveryNote || "");
 
-          if(closureToday?.closed){
+          if(closureDisplayToday?.closed){
             $("hh-today-closed").hidden=false;
-            setText("hh-today-closed-title", `${todayName} (${todayISO})`);
-            setText("hh-today-closed-msg", closureToday.message || "See you tomorrow!");
+            setText("hh-today-closed-title", `${displayTodayName} (${displayTodayISO})`);
+            setText("hh-today-closed-msg", closureDisplayToday.message || "See you tomorrow!");
+          } else {
+            $("hh-today-closed").hidden=true;
           }
-          if(closureTomorrow?.closed){
+          if(closureDisplayTomorrow?.closed){
             $("hh-tomorrow-closed").hidden=false;
-            setText("hh-tomorrow-closed-title", `${tomorrowName} (${tomorrowISO})`);
-            setText("hh-tomorrow-closed-msg", closureTomorrow.message || "See you tomorrow!");
+            setText("hh-tomorrow-closed-title", `${displayTomorrowName} (${displayTomorrowISO})`);
+            setText("hh-tomorrow-closed-msg", closureDisplayTomorrow.message || "See you tomorrow!");
+          } else {
+            $("hh-tomorrow-closed").hidden=true;
           }
 
-          fillTwoDay("hh-today", "Today", todayISO, data, hoursToday, todayISO);
-          fillTwoDay("hh-tomorrow", "Tomorrow", tomorrowISO, data, hoursTomorrow, todayISO);
+          // Fill panels with the display dates (shifted if past closing)
+          fillTwoDay("hh-today", "Today", displayTodayISO, data, hoursToday, calendarTodayISO);
+          fillTwoDay("hh-tomorrow", "Tomorrow", displayTomorrowISO, data, hoursTomorrow, calendarTodayISO);
 
-          setText("hh-today-lunch-items-title", `${todayName} Lunch Items`);
-          setText("hh-tomorrow-lunch-items-title", `${tomorrowName} Lunch Items`);
+          setText("hh-today-lunch-items-title", `${displayTodayName} Lunch Items`);
+          setText("hh-tomorrow-lunch-items-title", `${displayTomorrowName} Lunch Items`);
 
-          // Check if we are past closing time for today
-          const pastClosing = isPastClosingToday(weekly, todayName);
-          if (pastClosing && !closureToday?.closed) {
-            // Automatically switch to tomorrow's tab
-            const tomorrowBtn = document.getElementById("hhDayBtnTomorrow");
-            if (tomorrowBtn && activateDay) {
-              activateDay(tomorrowBtn);
-            }
-          }
+          // Ensure the "Today" tab is active (it is by default, but after shift we might want to activate it)
+          // No need – the default active is today panel, and we've updated its content.
 
-          buildAdvancedCarousel(data, todayISO);
+          // Build advanced carousel using the actual calendar date (not shifted)
+          buildAdvancedCarousel(data, calendarTodayISO);
 
         }catch(e){
           console.error("HOT HEADZ MENU ERROR:", e);
