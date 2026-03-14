@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hot Headz – Delivery Checker</title>
+  <meta name="description" content="Check if we deliver to your address. 10+ plates required within 10 miles of DeRidder, LA.">
+
+  <!-- Google Fonts & Font Awesome (same as homepage) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- Leaflet CSS (map) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+    /* ---------- RESET / BASE ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      max-width: 100%;
+    }
+    html {
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+    }
+    body {
+      background-color: #07060a;
+      color: rgba(255,255,255,0.92);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.5;
+      padding-bottom: 90px; /* space for bottom dock */
+    }
+
+    /* ---------- FLOATING DOCK (copied from homepage) ---------- */
+    :root {
+      --gen-glass: rgba(6,7,10,0.62);
+      --gen-glass-2: rgba(6,7,10,0.78);
+      --gen-border: rgba(255,255,255,0.14);
+      --gen-border-2: rgba(255,255,255,0.22);
+      --gen-text: rgba(255,255,255,0.92);
+      --gen-muted: rgba(255,255,255,0.62);
+      --gen-hotA: rgba(255,120,70,0.82);
+      --gen-hotB: rgba(255,60,140,0.74);
+      --gen-radius-pill: 999px;
+      --gen-shadow: 0 18px 50px rgba(0,0,0,0.62);
+    }
+
+    .gen-root, .gen-root * { box-sizing: border-box; }
+    .gen-root {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      pointer-events: none;
+    }
+    .gen-dock {
+      pointer-events: auto;
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      width: min(660px, calc(100vw - 26px));
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px;
+      border-radius: var(--gen-radius-pill);
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(6,7,10,0.62);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: var(--gen-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .gen-dock-btn {
+      text-decoration: none;
+      color: rgba(255,255,255,0.92);
+      flex: 1 1 0;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.36);
+      padding: 10px 8px;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.08);
+      transition: transform 0.14s ease;
+    }
+    .gen-dock-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(0,0,0,0.56);
+      border-color: rgba(255,255,255,0.22);
+    }
+    .gen-dock-ic { font-size: 16px; }
+    .gen-dock-tx {
+      font-size: 11.5px;
+      font-weight: 900;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .gen-dock-cta {
+      background: linear-gradient(90deg, rgba(255,120,70,0.22), rgba(255,60,140,0.16));
+    }
+    .gen-dock-btn.is-active {
+      background: rgba(42,127,98,0.3);
+      border-color: rgba(255,179,90,0.5);
+    }
+
+    @media (max-width: 720px) {
+      .gen-dock { gap: 8px; padding: 9px; }
+      .gen-dock-ic { font-size: 15px; }
+      .gen-dock-tx { font-size: 11px; }
+    }
+    @media (max-width: 380px) {
+      .gen-dock-tx { display: none; }
+    }
+
+    /* ===== DELIVERY PAGE STYLES (as provided) ===== */
+    .hh-delivery{
+      --bg: #07060a;
+      --glass: rgba(10,12,18,.62);
+      --glass2: rgba(10,12,18,.48);
+      --stroke: rgba(255,255,255,.14);
+      --stroke2: rgba(255,255,255,.10);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.70);
+      --soft: rgba(255,255,255,.58);
+      --ember: #ff5b3d;
+      --ember2: #ffb04b;
+      --shadow: 0 22px 70px rgba(0,0,0,.55);
+      --shadow2: 0 14px 40px rgba(0,0,0,.42);
+      --r1: 24px;
+      --r2: 18px;
+
+      max-width: 980px;
+      margin: 2rem auto;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      padding: 0 1rem;
+    }
+
+    .hh-glass{
+      background: linear-gradient(to bottom, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      background-color: var(--glass);
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .hh-headerbox{
+      border-radius: var(--r1);
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hh-headerbox::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(900px 260px at 10% 0%, rgba(255,91,61,.14), transparent 62%),
+        radial-gradient(900px 260px at 90% 10%, rgba(255,176,75,.10), transparent 62%);
+      pointer-events:none;
+    }
+    .hh-headerbox > *{ position: relative; z-index: 1; }
+
+    .hh-headTop{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hh-title{
+      margin: 0;
+      font-size: clamp(22px, 3.2vw, 34px);
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      font-weight: 950;
+    }
+
+    .hh-badge{
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, rgba(255,91,61,.22), rgba(255,176,75,.18));
+      border: 1px solid rgba(255,255,255,.16);
+      color: rgba(255,255,255,.90);
+      white-space: nowrap;
+    }
+
+    .hh-sub{
+      margin: 8px 0 0;
+      font-weight: 700;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .hh-card{
+      border-radius: var(--r1);
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .hh-grid{
+      display:grid;
+      grid-template-columns: 1.4fr .6fr;
+      gap: 12px;
+    }
+    @media (max-width: 720px){
+      .hh-grid{ grid-template-columns: 1fr; }
+    }
+
+    .hh-label{
+      display:flex;
+      flex-direction: column;
+      gap: 8px;
+      font-weight: 850;
+    }
+
+    .hh-labelText{
+      color: rgba(255,255,255,.82);
+      font-size: 13px;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+    }
+
+    .hh-input{
+      padding: 14px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--stroke2);
+      font-size: 16px;
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      outline: none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .hh-input::placeholder{ color: rgba(255,255,255,.45); }
+    .hh-input:focus{
+      border-color: rgba(255,176,75,.38);
+      box-shadow:
+        0 0 0 4px rgba(255,176,75,.12),
+        inset 0 1px 0 rgba(255,255,255,.06);
+    }
+
+    .hh-actions{
+      display:flex;
+      gap: 10px;
+      margin: 12px 0 10px;
+      flex-wrap: wrap;
+    }
+    @media (max-width: 720px){
+      .hh-actions{ flex-direction: column; }
+    }
+
+    .hh-btn{
+      padding: 13px 14px;
+      border-radius: 16px;
+      font-weight: 950;
+      font-size: 15px;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,.12);
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      user-select:none;
+      transition: transform .14s ease, box-shadow .14s ease, opacity .14s ease, background .14s ease;
+    }
+    .hh-btn:active{ transform: translateY(1px); }
+
+    .hh-btn--primary{
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--ember), var(--ember2));
+      color: rgba(12,12,12,.94);
+      box-shadow: 0 18px 52px rgba(255,91,61,.18);
+    }
+    .hh-btn--primary:hover{ opacity: .95; }
+
+    .hh-btn--ghost{
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+    }
+    .hh-btn--ghost:hover{ background: rgba(255,255,255,.09); }
+
+    .hh-call{
+      margin-top: 12px;
+      width: 100%;
+    }
+
+    .hh-status{
+      padding: 14px 14px;
+      border-radius: 16px;
+      background: rgba(0,0,0,.20);
+      border: 1px solid var(--stroke2);
+      font-weight: 850;
+      color: rgba(255,255,255,.86);
+      line-height: 1.35;
+    }
+
+    .hh-status.is-good{
+      border-color: rgba(255,176,75,.35);
+      box-shadow: 0 0 0 4px rgba(255,176,75,.10);
+    }
+    .hh-status.is-bad{
+      border-color: rgba(255,91,61,.35);
+      box-shadow: 0 0 0 4px rgba(255,91,61,.10);
+    }
+
+    .hh-hint{
+      margin: 10px 0 0;
+      color: rgba(255,255,255,.58);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .hh-mapWrap{
+      border-radius: var(--r1);
+      overflow: hidden;
+      padding: 10px;
+    }
+
+    .hh-map{
+      height: 420px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      overflow: hidden;
+    }
+
+    .hh-note{
+      margin: 10px 0 0;
+      font-size: 12px;
+      color: rgba(255,255,255,.62);
+      font-weight: 700;
+    }
+
+    /* Leaflet tweaks */
+    .leaflet-control-zoom a{
+      background: rgba(0,0,0,.55) !important;
+      color: rgba(255,255,255,.90) !important;
+      border: 1px solid rgba(255,255,255,.14) !important;
+    }
+    .leaflet-control-attribution{
+      background: rgba(0,0,0,.55) !important;
+      color: rgba(255,255,255,.75) !important;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.10);
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .hh-btn{ transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- invisible anchors (for explore nav if used) -->
+  <div id="gen-home" style="position: absolute; top:0; height:1px; width:1px; opacity:0;"></div>
+  <div id="gen-menu" style="position: absolute; height:1px; width:1px; opacity:0;"></div>
+  <div id="gen-delivery" style="position: absolute; height:1px; width:1px; opacity:0;"></div>
+  <div id="gen-order" style="position: absolute; height:1px; width:1px; opacity:0;"></div>
+  <div id="gen-about" style="position: absolute; height:1px; width:1px; opacity:0;"></div>
+  <div id="gen-location" style="position: absolute; height:1px; width:1px; opacity:0;"></div>
+
+  <!-- floating dock -->
+  <div id="genRoot" class="gen-root" hidden>
+    <nav id="genDock" class="gen-dock" aria-label="Quick actions" hidden>
+      <a class="gen-dock-btn" href="index.html" aria-label="Home">
+        <span class="gen-dock-ic" aria-hidden="true">🏠</span>
+        <span class="gen-dock-tx">Home</span>
+      </a>
+      <a class="gen-dock-btn" href="menu.html" aria-label="Menu">
+        <span class="gen-dock-ic" aria-hidden="true">🍽️</span>
+        <span class="gen-dock-tx">Menu</span>
+      </a>
+      <a class="gen-dock-btn is-active" href="delivery.html" aria-label="Delivery options">
+        <span class="gen-dock-ic" aria-hidden="true">🚗</span>
+        <span class="gen-dock-tx">Delivery</span>
+      </a>
+      <a class="gen-dock-btn gen-dock-cta" href="tel:3372211035" aria-label="Place an order">
+        <span class="gen-dock-ic" aria-hidden="true">📞</span>
+        <span class="gen-dock-tx">Order</span>
+      </a>
+      <a class="gen-dock-btn" href="about.html" aria-label="About us">
+        <span class="gen-dock-ic" aria-hidden="true">ℹ️</span>
+        <span class="gen-dock-tx">About</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- DELIVERY CONTENT -->
+  <section class="hh-delivery" aria-label="Delivery availability checker">
+
+    <!-- HEADER -->
+    <header class="hh-headerbox hh-glass">
+      <div class="hh-headTop">
+        <h2 class="hh-title">Check Delivery Availability</h2>
+        <span class="hh-badge" aria-hidden="true">10+ plates • 10 miles</span>
+      </div>
+
+      <p class="hh-sub">
+        Delivery is available for <strong>10 plates or more</strong> within a
+        <strong>10-mile radius</strong> of our location in DeRidder.
+      </p>
+    </header>
+
+    <!-- CARD -->
+    <div class="hh-card hh-glass">
+
+      <div class="hh-grid">
+        <label class="hh-label">
+          <span class="hh-labelText">Your address</span>
+          <input
+            id="addr"
+            class="hh-input"
+            inputmode="text"
+            autocomplete="street-address"
+            placeholder="123 Main St, DeRidder, LA"
+            aria-describedby="status"
+          />
+        </label>
+
+        <label class="hh-label">
+          <span class="hh-labelText">Number of plates</span>
+          <input
+            id="plates"
+            class="hh-input"
+            type="number"
+            min="1"
+            value="10"
+            inputmode="numeric"
+          />
+        </label>
+      </div>
+
+      <div class="hh-actions">
+        <button id="check" class="hh-btn hh-btn--primary" type="button">
+          Check Address
+        </button>
+        <button id="reset" class="hh-btn hh-btn--ghost" type="button">
+          Clear
+        </button>
+      </div>
+
+      <div id="status" class="hh-status" role="status" aria-live="polite">
+        Enter an address (or tap the map) to check delivery availability.
+      </div>
+
+      <a
+        id="callBtn"
+        href="tel:3372211035"
+        class="hh-btn hh-btn--primary hh-call"
+        style="display:none"
+      >
+        📞 Call to Place Order
+      </a>
+
+      <p class="hh-hint">
+        Tip: You can also tap the map to drop a pin.
+      </p>
+    </div>
+
+    <!-- MAP -->
+    <div class="hh-mapWrap hh-glass">
+      <div id="map" class="hh-map" aria-label="Map"></div>
+    </div>
+
+    <p class="hh-note">
+      Distance is estimated straight-line. Actual driving routes may vary.
+    </p>
+
+  </section>
+
+  <!-- SCRIPTS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function(){
+
+      /* =========================
+         SETTINGS (EDIT THESE)
+      ========================= */
+      const REST = { lat: 30.8466, lng: -93.2893 }; // Hot Headz
+      const RADIUS_MILES = 10;
+      const MIN_PLATES = 10;
+
+      /* =========================
+         DOM
+      ========================= */
+      const statusEl = document.getElementById("status");
+      const addrEl   = document.getElementById("addr");
+      const platesEl = document.getElementById("plates");
+      const callBtn  = document.getElementById("callBtn");
+      const checkBtn = document.getElementById("check");
+      const resetBtn = document.getElementById("reset");
+
+      /* =========================
+         MAP
+      ========================= */
+      const map = L.map("map", { zoomControl: true }).setView([REST.lat, REST.lng], 12);
+
+      // Imagery base
+      L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        { maxZoom: 19 }
+      ).addTo(map);
+
+      // Labels overlay
+      L.tileLayer(
+        "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+        { maxZoom: 19 }
+      ).addTo(map);
+
+      const restMarker = L.marker([REST.lat, REST.lng]).addTo(map)
+        .bindPopup("<b>Hot Headz Southern Foods</b><br>Delivery starts at 10+ plates.");
+
+      const radiusCircle = L.circle([REST.lat, REST.lng], {
+        radius: RADIUS_MILES * 1609.344,
+        color: "#ffb04b",
+        weight: 2,
+        fillColor: "#ff5b3d",
+        fillOpacity: 0.12
+      }).addTo(map);
+
+      map.fitBounds(radiusCircle.getBounds());
+
+      let userMarker = null;
+      let line = null;
+
+      /* =========================
+         HELPERS
+      ========================= */
+      function setStatus(text, kind){
+        statusEl.classList.remove("is-good", "is-bad");
+        if(kind === "good") statusEl.classList.add("is-good");
+        if(kind === "bad")  statusEl.classList.add("is-bad");
+        statusEl.textContent = text;
+      }
+
+      function setLoading(isLoading){
+        checkBtn.disabled = !!isLoading;
+        resetBtn.disabled = !!isLoading;
+        checkBtn.style.opacity = isLoading ? "0.75" : "1";
+        checkBtn.textContent = isLoading ? "Checking..." : "Check Address";
+      }
+
+      function clearCall(){
+        callBtn.style.display = "none";
+      }
+
+      function showCall(){
+        callBtn.style.display = "inline-flex";
+      }
+
+      function toMiles(a, b){
+        // Haversine
+        const R = 3958.7613;
+        const dLat = (b.lat - a.lat) * Math.PI/180;
+        const dLng = (b.lng - a.lng) * Math.PI/180;
+
+        const s1 = Math.sin(dLat/2);
+        const s2 = Math.sin(dLng/2);
+
+        const h = s1*s1 + Math.cos(a.lat*Math.PI/180) * Math.cos(b.lat*Math.PI/180) * s2*s2;
+        return 2 * R * Math.asin(Math.sqrt(h));
+      }
+
+      function drawTo(loc){
+        if(userMarker) userMarker.remove();
+        if(line) line.remove();
+
+        userMarker = L.marker([loc.lat, loc.lng]).addTo(map);
+
+        line = L.polyline(
+          [[REST.lat, REST.lng], [loc.lat, loc.lng]],
+          { color: "#ffffff", weight: 2, opacity: 0.75, dashArray: "6 8" }
+        ).addTo(map);
+
+        const bounds = L.latLngBounds([[REST.lat, REST.lng], [loc.lat, loc.lng]]);
+        map.fitBounds(bounds, { padding: [40, 40] });
+      }
+
+      function evaluate(dist, plates){
+        clearCall();
+
+        const d = dist.toFixed(2);
+        const p = Number(plates) || 0;
+
+        if(dist <= RADIUS_MILES && p >= MIN_PLATES){
+          setStatus(`✅ You’re within ${d} miles and have ${p} plates. Delivery is available.`, "good");
+          showCall();
+          return;
+        }
+
+        if(dist <= RADIUS_MILES && p < MIN_PLATES){
+          setStatus(`⚠️ You’re within ${d} miles, but need ${MIN_PLATES}+ plates (you entered ${p}).`, "bad");
+          return;
+        }
+
+        setStatus(`❌ You’re ${d} miles away — outside the ${RADIUS_MILES}-mile delivery area.`, "bad");
+      }
+
+      async function geocode(q){
+        // Nominatim is rate-limited; keep requests reasonable.
+        const url =
+          "https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=us&q=" +
+          encodeURIComponent(q);
+
+        const res = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        if(!res.ok) throw new Error("Geocode failed");
+        const data = await res.json();
+
+        if(!data || !data[0]) return null;
+
+        return { lat: Number(data[0].lat), lng: Number(data[0].lon) };
+      }
+
+      /* =========================
+         EVENTS
+      ========================= */
+      async function runCheck(){
+        const addr = addrEl.value.trim();
+        if(!addr){
+          setStatus("Please enter your address (include city & state if possible).", "bad");
+          return;
+        }
+
+        setLoading(true);
+        setStatus("Looking up that address…", null);
+        clearCall();
+
+        try{
+          const loc = await geocode(addr + ", USA");
+          if(!loc){
+            setStatus("Address not found. Try adding: DeRidder, LA.", "bad");
+            return;
+          }
+
+          drawTo(loc);
+          const dist = toMiles(REST, loc);
+          evaluate(dist, platesEl.value);
+
+        }catch(e){
+          setStatus("Couldn’t check that address right now. Please try again in a moment.", "bad");
+        }finally{
+          setLoading(false);
+        }
+      }
+
+      checkBtn.addEventListener("click", runCheck);
+
+      addrEl.addEventListener("keydown", (e) => {
+        if(e.key === "Enter"){
+          e.preventDefault();
+          runCheck();
+        }
+      });
+
+      platesEl.addEventListener("change", () => {
+        // If user already has a line drawn, re-evaluate on plate change
+        if(userMarker){
+          const loc = { lat: userMarker.getLatLng().lat, lng: userMarker.getLatLng().lng };
+          const dist = toMiles(REST, loc);
+          evaluate(dist, platesEl.value);
+        }
+      });
+
+      resetBtn.addEventListener("click", () => {
+        if(userMarker) userMarker.remove();
+        if(line) line.remove();
+
+        userMarker = null;
+        line = null;
+
+        addrEl.value = "";
+        platesEl.value = MIN_PLATES;
+
+        clearCall();
+        map.fitBounds(radiusCircle.getBounds());
+        setStatus("Enter an address (or tap the map) to check delivery availability.", null);
+      });
+
+      map.on("click", (e) => {
+        const loc = { lat: e.latlng.lat, lng: e.latlng.lng };
+        drawTo(loc);
+        const dist = toMiles(REST, loc);
+        evaluate(dist, platesEl.value);
+      });
+
+    });
+
+    // Show the bottom dock
+    (function() {
+      const root = document.getElementById('genRoot');
+      const dock = document.getElementById('genDock');
+      if (root && dock) {
+        root.hidden = false;
+        dock.hidden = false;
+      }
+    })();
+  </script>
+</body>
+</html>
