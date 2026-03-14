@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hot Headz Southern Foods – Menu</title>
-  <meta name="description" content="Daily breakfast, lunch, crawfish, salad bar, drinks and desserts – made fresh.">
+  <meta name="description" content="Fresh Southern cooking – breakfast, lunch, salad bar & more.">
 
-  <!-- Google Fonts & Font Awesome (same as homepage) -->
+  <!-- Google Fonts & Font Awesome -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
@@ -18,18 +18,16 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      max-width: 100%;
     }
     html {
       scroll-behavior: smooth;
-      overflow-x: hidden;
     }
     body {
       background-color: #07060a;
       color: rgba(255,255,255,0.92);
-      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      font-family: 'Inter', sans-serif;
       line-height: 1.5;
-      padding-bottom: 90px;
+      padding-bottom: 90px; /* space for bottom dock */
     }
 
     /* ---------- FLOATING DOCK (from homepage) ---------- */
@@ -42,25 +40,17 @@
       --gen-muted: rgba(255,255,255,0.62);
       --gen-hotA: rgba(255,120,70,0.82);
       --gen-hotB: rgba(255,60,140,0.74);
-      --gen-radius-xl: 22px;
-      --gen-radius-lg: 16px;
       --gen-radius-pill: 999px;
       --gen-shadow: 0 18px 50px rgba(0,0,0,0.62);
-      --gen-font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
     }
 
-    .gen-root, .gen-root * { box-sizing: border-box; font-family: var(--gen-font); }
+    .gen-root, .gen-root * { box-sizing: border-box; }
     .gen-root {
       position: fixed;
       inset: 0;
       z-index: 999999;
       pointer-events: none;
     }
-    /* Explore pill – hidden */
-    .gen-pill {
-      display: none !important;
-    }
-
     .gen-dock {
       pointer-events: auto;
       position: fixed;
@@ -94,514 +84,160 @@
       background: rgba(0,0,0,0.36);
       padding: 10px 8px;
       box-shadow: 0 10px 22px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.08);
-      transition: transform .14s ease, background .14s ease, border-color .14s ease;
+      transition: transform 0.14s ease;
     }
     .gen-dock-btn:hover {
       transform: translateY(-1px);
       background: rgba(0,0,0,0.56);
       border-color: rgba(255,255,255,0.22);
     }
-    .gen-dock-ic { font-size: 16px; line-height: 1; }
+    .gen-dock-ic { font-size: 16px; }
     .gen-dock-tx {
       font-size: 11.5px;
       font-weight: 900;
-      letter-spacing: -0.1px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     .gen-dock-cta {
       background: linear-gradient(90deg, rgba(255,120,70,0.22), rgba(255,60,140,0.16));
-      border-color: rgba(255,255,255,0.20);
     }
     .gen-dock-btn.is-active {
       background: rgba(42,127,98,0.3);
       border-color: rgba(255,179,90,0.5);
     }
-
     @media (max-width: 720px) {
       .gen-dock { gap: 8px; padding: 9px; }
-      .gen-dock-btn { padding: 10px 6px; }
       .gen-dock-ic { font-size: 15px; }
       .gen-dock-tx { font-size: 11px; }
     }
     @media (max-width: 380px) {
-      .gen-dock { gap: 6px; padding: 8px; }
       .gen-dock-tx { display: none; }
     }
 
-    /* ===== MENU STYLES – paper on dark table, now centered ===== */
-    :root{
-      --hh-accent:#c05a2a;
-      --hh-accent-2:#2a7f62;
-      --hh-ink:#14110e;
-      --hh-muted:rgba(20,17,14,.68);
-      --hh-table:#070604;
-      --hh-table2:#0b0806;
-      --hh-paper:#f6f0e6;
-      --hh-paper2:#efe6d9;
-      --hh-radius: 26px;
-      --hh-radius2: 34px;
-      --hh-pill: 999px;
-      --hh-shadow: 0 26px 90px rgba(0,0,0,.48);
-      --hh-shadow2: 0 16px 48px rgba(0,0,0,.22);
-      --hh-shadow3: 0 10px 24px rgba(0,0,0,.14);
+    /* ---------- MENU STYLES ---------- */
+    :root {
+      --paper: #f6f0e6;
+      --ink: #14110e;
+      --accent: #c05a2a;
     }
-
-    .hh-menu{
-      width: 100%;
-      max-width: none;
-      min-height: 100vh;
-      margin: 0;
-      padding: 18px 14px 70px;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color: rgba(245,240,230,.94);
-      position: relative;
-      isolation: isolate;
-      background:
-        radial-gradient(1100px 700px at 16% 14%, rgba(192,90,42,.18), transparent 60%),
-        radial-gradient(1000px 700px at 86% 20%, rgba(42,127,98,.14), transparent 64%),
-        linear-gradient(180deg, var(--hh-table), var(--hh-table2) 42%, #050403);
-      box-shadow: var(--hh-shadow);
-      overflow: hidden;
+    .menu-page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem 4rem;
+      color: var(--paper);
     }
-    .hh-menu::before{
-      content:"";
-      position:absolute; inset:0;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.20'/%3E%3C/svg%3E");
-      opacity:.12;
-      mix-blend-mode: overlay;
-      pointer-events:none;
-      z-index:0;
-    }
-    .hh-menu > *{ position:relative; z-index:1; }
-
-    /* ----- CENTERED HEADER ----- */
-    .hh-header {
-      margin: 10px 0 14px;
-      padding: 14px 14px 0;
+    .menu-header {
       text-align: center;
+      margin-bottom: 2rem;
     }
-    .hh-title{
-      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-      font-size: clamp(20px, 2.2vw, 30px);
-      font-weight: 850;
-      letter-spacing: .2px;
-      line-height: 1.1;
+    .menu-header h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-family: Georgia, serif;
+      font-weight: 700;
+      letter-spacing: -0.02em;
     }
-    .hh-updated{
-      margin-top: 8px;
-      font-weight: 820;
-      color: rgba(245,240,230,.72);
-      font-size: 13.2px;
-      line-height: 1.35;
+    .menu-hours {
+      font-size: 1.1rem;
+      opacity: 0.85;
+      margin-top: 0.5rem;
     }
-    .hh-note{
-      margin-top: 8px;
-      font-weight: 780;
-      color: rgba(245,240,230,.62);
-      font-size: 13px;
-      line-height: 1.35;
+    .menu-note {
+      font-size: 1rem;
+      opacity: 0.75;
+      margin-top: 0.25rem;
     }
-
-    .hh-stickywrap{ position: sticky; top: 10px; z-index: 90; }
-
-    /* ----- CENTERED DAY BAR ----- */
-    .hh-daybar{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content: center;    /* center the day buttons */
-      margin: 14px;
-      padding: 10px;
-      border-radius: var(--hh-radius2);
-      background: rgba(0,0,0,.30);
-      border: 1px solid rgba(245,240,230,.14);
-      box-shadow: var(--hh-shadow2);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+    .menu-delivery {
+      margin-top: 1rem;
+      font-weight: 600;
+      color: var(--accent);
     }
 
-    .hh-day,
-    .hh-tab{
-      border: 1px solid rgba(245,240,230,.14);
-      background: rgba(255,255,255,.06);
-      color: rgba(245,240,230,.92);
-      padding: 10px 14px;
-      border-radius: var(--hh-pill);
-      font-weight: 900;
-      cursor: pointer;
-      transition: transform .14s ease, box-shadow .14s ease, background .14s ease, border-color .14s ease;
-      white-space: nowrap;
-      box-shadow: 0 10px 22px rgba(0,0,0,.25);
-    }
-    .hh-day:hover,
-    .hh-tab:hover{ transform: translateY(-1px); border-color: rgba(255,179,90,.28); }
-
-    .hh-day.is-active{
-      border-color: rgba(192,90,42,.45);
-      background: linear-gradient(180deg, rgba(192,90,42,.26), rgba(0,0,0,.22));
-    }
-
-    /* ----- CENTERED CATEGORY TABS ----- */
-    .hh-tablist{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content: center;    /* center category tabs */
-      margin: 0 14px 12px;
-      position: sticky;
-      top: 86px;
-      z-index: 80;
-      padding: 10px;
-      border-radius: var(--hh-radius2);
-      background: rgba(0,0,0,.24);
-      border: 1px solid rgba(245,240,230,.14);
-      box-shadow: var(--hh-shadow2);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-    .hh-tab.is-active{
-      border-color: rgba(192,90,42,.50);
-      background: linear-gradient(135deg, rgba(192,90,42,.32), rgba(42,127,98,.18));
-    }
-
-    .hh-panels{ padding: 0 14px 16px; }
-
-    .hh-panel{
-      background: linear-gradient(180deg, var(--hh-paper), var(--hh-paper2));
-      color: var(--hh-ink);
-      border: 1px solid rgba(20,17,14,.14);
-      border-radius: var(--hh-radius2);
-      padding: 18px;
-      box-shadow: var(--hh-shadow2);
-      position: relative;
-      overflow: hidden;
-    }
-    .hh-panel::before{
-      content:"";
-      position:absolute;
-      inset:auto -30% -55% -30%;
-      height: 240px;
-      background:
-        radial-gradient(circle at 30% 45%, rgba(192,90,42,.18), transparent 62%),
-        radial-gradient(circle at 70% 55%, rgba(42,127,98,.12), transparent 64%);
-      transform: rotate(-6deg);
-      pointer-events:none;
-    }
-    .hh-panel > *{ position:relative; z-index:1; }
-
-    .hh-panel h3{
-      margin: 0 0 8px;
-      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-      font-size: clamp(18px, 2vw, 24px);
-      font-weight: 850;
-      letter-spacing: .2px;
-    }
-    .hh-sub{
-      margin: 0 0 12px;
-      font-weight: 820;
-      color: rgba(20,17,14,.72);
-      font-size: 13.2px;
-      line-height: 1.38;
-    }
-    .hh-panel h4{
-      text-transform: uppercase;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
-      font-size: 10.6px;
-      letter-spacing: .14em;
-      color: rgba(20,17,14,.62);
-      margin: 16px 0 10px;
-    }
-
-    /* ----- LISTS REMAIN LEFT-ALIGNED ----- */
-    .hh-stack{
-      list-style:none;
-      padding-left:0;
-      margin:0;
-      display:grid;
-      grid-template-columns:1fr;
-      gap:10px;
-    }
-    @media(min-width:860px){
-      .hh-stack{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    .hh-stack li{
-      padding: 11px 12px;
-      background: rgba(255,255,255,.62);
-      border: 1px solid rgba(20,17,14,.12);
-      border-radius: 18px;
-      line-height: 1.25;
-      box-shadow: var(--hh-shadow3);
-      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
-    }
-    .hh-stack li:hover{
-      transform: translateY(-1px);
-      border-color: rgba(192,90,42,.26);
-      box-shadow: 0 14px 30px rgba(0,0,0,.12);
-    }
-
-    .hh-cta{ margin-top: 14px; display:grid; gap:10px; }
-    .hh-btn{
-      background: linear-gradient(135deg, rgba(20,17,14,.92), rgba(20,17,14,.78));
-      color: rgba(245,240,230,.96);
-      padding: 12px 14px;
-      border-radius: 20px;
-      text-decoration:none;
-      font-weight: 950;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      box-shadow: 0 18px 40px rgba(0,0,0,.22);
-      transition: transform .14s ease, box-shadow .14s ease;
-    }
-    .hh-btn:hover{ transform: translateY(-1px); box-shadow: 0 22px 60px rgba(0,0,0,.26); }
-
-    .hh-small{ color: rgba(20,17,14,.70); font-weight: 780; line-height: 1.35; font-size: 13px; }
-
-    .hh-daypanel[hidden]{ display:none; }
-    .hh-daypanel{ animation: hhFadeUp .22s ease-out; }
-    @keyframes hhFadeUp{ from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-
-    /* State card */
-    .hh-state{
-      border: 1px solid rgba(245,240,230,.14);
-      border-radius: var(--hh-radius2);
-      padding: 20px;
-      margin: 14px;
-      background: rgba(0,0,0,.22);
-      color: rgba(245,240,230,.92);
-      box-shadow: var(--hh-shadow2);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      position:relative;
-      overflow:hidden;
-    }
-    .hh-state::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        radial-gradient(700px 280px at 10% 10%, rgba(192,90,42,.22), transparent 60%),
-        radial-gradient(700px 280px at 90% 0%, rgba(42,127,98,.16), transparent 62%);
-      pointer-events:none;
-      opacity:.9;
-    }
-    .hh-state > *{ position:relative; z-index:1; }
-
-    .hh-badge{
-      font-weight: 980;
-      text-transform: uppercase;
-      letter-spacing: .14em;
-      font-size: 11px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(245,240,230,.18);
-      background: rgba(255,255,255,.06);
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-    }
-    .hh-badge::before{
-      content:"";
-      width:8px;height:8px;
-      border-radius: 99px;
-      background: rgba(255,179,90,.92);
-      display:inline-block;
-    }
-    .hh-badge.is-dark::before{ background: rgba(245,240,230,.92); }
-
-    .hh-state-title{
-      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-      font-size: clamp(20px, 2.6vw, 30px);
-      font-weight: 850;
-      letter-spacing: .2px;
-      margin: 10px 0 6px;
-      line-height: 1.08;
-    }
-    .hh-state-msg{
-      font-weight: 780;
-      color: rgba(245,240,230,.74);
-      margin: 0;
-      line-height: 1.35;
-      font-size: 13.2px;
-    }
-
-    /* Advanced */
-    .hh-advanced-top{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:12px;
-      margin: 8px 14px 12px;
-    }
-    .hh-advanced-title{
-      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-      font-size: clamp(18px, 2.2vw, 26px);
-      font-weight: 850;
-      letter-spacing: .2px;
-      color: rgba(245,240,230,.92);
-    }
-    .hh-advanced-disclaimer{
-      font-weight: 780;
-      color: rgba(245,240,230,.68);
-      text-align:right;
-      max-width: 520px;
-      font-size: 12.8px;
-      line-height: 1.35;
-    }
-    .hh-hint{ color: rgba(245,240,230,.62); font-weight: 760; margin: 8px 14px 0; font-size: 12.6px; }
-
-    .hh-adv-carousel{
-      display:flex;
-      gap:14px;
-      overflow-x:auto;
-      padding: 2px 14px 14px;
-      scroll-snap-type:x mandatory;
-      -webkit-overflow-scrolling:touch;
-    }
-    .hh-adv-card{ flex: 0 0 92%; max-width: 720px; scroll-snap-align:start; }
-    @media(min-width:860px){ .hh-adv-card{ flex: 0 0 48%; } }
-    .hh-adv-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:baseline;
-      gap:10px;
-      margin: 0 0 10px;
-      padding: 0 6px;
-      color: rgba(245,240,230,.86);
-    }
-    .hh-adv-dayname{
-      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-      font-size: 18px;
-      font-weight: 850;
-      letter-spacing: .2px;
-    }
-    .hh-adv-date,
-    .hh-adv-hours{ color: rgba(245,240,230,.68); font-weight: 780; font-size: 12.8px; }
-
-    /* Mobile */
-    @media(max-width: 560px){
-      .hh-menu{ padding: 14px 10px 72px; border-radius: 26px; }
-      .hh-daybar{
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        gap: 8px;
-        padding: 8px;
-        border-radius: 20px;
-        margin: 12px;
-        justify-content: flex-start; /* on mobile, keep scrollable left-aligned */
-      }
-      .hh-daybar::-webkit-scrollbar{ display:none; }
-      .hh-tablist{
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        gap: 8px;
-        padding: 8px;
-        border-radius: 20px;
-        top: 74px;
-        margin: 0 12px 12px;
-        justify-content: flex-start;
-      }
-      .hh-tablist::-webkit-scrollbar{ display:none; }
-      .hh-day,
-      .hh-tab{ padding: 8px 10px; font-size: 13px; }
-      .hh-header{ padding: 10px 12px 0; }
-      .hh-panels{ padding: 0 12px 14px; }
-      .hh-panel{ padding: 14px; border-radius: 26px; }
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      .hh-daypanel{ animation:none; }
-      .hh-day, .hh-tab, .hh-stack li, .hh-btn{ transition:none; }
-    }
-
-    /* Click‑for‑description dropdowns */
-    .hh-hintline{
-      margin: 6px 0 10px;
-      font-size: 12.6px;
-      font-weight: 780;
-      color: rgba(20,17,14,.62);
-    }
-    .hh-stack details{
-      background: rgba(255,255,255,.62);
-      border: 1px solid rgba(20,17,14,.12);
-      border-radius: 18px;
-      box-shadow: var(--hh-shadow3);
-      overflow: hidden;
-      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
-    }
-    .hh-stack details:hover{
-      transform: translateY(-1px);
-      border-color: rgba(192,90,42,.26);
-      box-shadow: 0 14px 30px rgba(0,0,0,.12);
-    }
-    .hh-stack summary{
-      list-style: none;
-      cursor: pointer;
-      padding: 11px 12px;
-      font-weight: 860;
-      line-height: 1.25;
+    .categories {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      flex-direction: column;
+      gap: 2.5rem;
     }
-    .hh-stack summary::-webkit-details-marker{ display:none; }
-    .hh-stack summary::after{
-      content: "＋";
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
-      opacity: .65;
-      flex: 0 0 auto;
+    .category {
+      background: rgba(255,255,255,0.05);
+      border-radius: 24px;
+      padding: 1.5rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(4px);
     }
-    .hh-stack details[open] summary::after{ content: "－"; opacity: .8; }
-    .hh-desc{
-      padding: 0 12px 12px;
-      color: rgba(20,17,14,.72);
-      font-size: 12.8px;
-      font-weight: 760;
-      line-height: 1.35;
+    .category h2 {
+      font-size: 1.8rem;
+      font-family: Georgia, serif;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      border-bottom: 2px solid var(--accent);
+      display: inline-block;
+      padding-bottom: 0.25rem;
+    }
+    .category-sub {
+      font-size: 1rem;
+      opacity: 0.8;
+      margin: 0.5rem 0 1rem;
+    }
+    .category-details {
+      font-size: 0.95rem;
+      opacity: 0.85;
+      margin: 1rem 0 0;
+      padding: 1rem;
+      background: rgba(0,0,0,0.2);
+      border-radius: 12px;
     }
 
-    .hh-lunch-unavail{
-      margin: 10px 0 6px;
-      padding: 12px 12px;
-      border-radius: 18px;
-      border: 1px solid rgba(20,17,14,.14);
-      background: rgba(255,255,255,.66);
-      box-shadow: var(--hh-shadow3);
+    /* Item grid */
+    .item-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
     }
-    .hh-lunch-unavail-title{
-      margin-top: 8px;
-      font-weight: 880;
-      color: rgba(20,17,14,.82);
-      font-size: 13px;
-      line-height: 1.35;
+    @media (min-width: 640px) {
+      .item-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
+    .menu-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 0.5rem 0;
+      border-bottom: 1px dashed rgba(255,255,255,0.2);
+    }
+    .item-name {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    .item-desc {
+      font-size: 0.9rem;
+      opacity: 0.7;
+      margin-left: 0.5rem;
+      font-style: italic;
+    }
+    .item-price {
+      font-weight: 700;
+      color: var(--accent);
+      white-space: nowrap;
+      margin-left: 1rem;
+    }
+
+    /* Loading / error states */
+    .loading, .error {
+      text-align: center;
+      padding: 4rem 1rem;
+      font-size: 1.2rem;
+    }
+    .error { color: #ff6b6b; }
   </style>
 </head>
 <body>
-  <!-- Required invisible anchors (optional, for explore nav if used) -->
-  <div id="gen-home" style="position: absolute; top: 0; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
-  <div id="gen-menu" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
-  <div id="gen-delivery" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
-  <div id="gen-order" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
-  <div id="gen-about" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
-  <div id="gen-location" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <!-- invisible anchors for possible future use (optional) -->
+  <div id="gen-home" style="position: absolute; top:0; height:1px; width:1px; opacity:0;"></div>
 
-  <!-- ===== FLOATING DOCK ===== -->
+  <!-- floating dock -->
   <div id="genRoot" class="gen-root" hidden>
-    <button id="genPill" class="gen-pill" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="genPanel">
-      <span class="gen-pill-ic" aria-hidden="true">🧭</span>
-      <span class="gen-pill-tx">Explore</span>
-      <span class="gen-pill-dot" aria-hidden="true"></span>
-    </button>
-    <div id="genPanel" class="gen-panel" role="dialog" aria-modal="false" aria-label="Explore the page" aria-hidden="true" style="display:none;"></div>
-    <button id="genCoach" class="gen-coach" type="button" aria-label="Scroll to explore" hidden></button>
-
     <nav id="genDock" class="gen-dock" aria-label="Quick actions" hidden>
       <a class="gen-dock-btn" href="index.html" aria-label="Home">
         <span class="gen-dock-ic" aria-hidden="true">🏠</span>
@@ -619,754 +255,124 @@
         <span class="gen-dock-ic" aria-hidden="true">📞</span>
         <span class="gen-dock-tx">Order</span>
       </a>
-      <a id="genAboutLink" class="gen-dock-btn" href="about.html" aria-label="About us">
+      <a class="gen-dock-btn" href="about.html" aria-label="About us">
         <span class="gen-dock-ic" aria-hidden="true">ℹ️</span>
         <span class="gen-dock-tx">About</span>
       </a>
-      <button id="genSideShare" class="gen-dock-btn gen-side-share" type="button" aria-label="Share this page">
-        <span class="gen-dock-ic" aria-hidden="true">📤</span>
-        <span class="gen-dock-tx">Share</span>
-      </button>
     </nav>
   </div>
 
-  <!-- ===== MENU HTML (original, unchanged) ===== -->
-  <div class="hh-menu" role="region" aria-label="Menu" id="hh-menu-root">
-
-    <!-- Sticky top nav -->
-    <div class="hh-stickywrap">
-      <div class="hh-daybar" role="tablist" aria-label="Day selector">
-        <button class="hh-day is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-day-today" id="hhDayBtnToday">Today</button>
-        <button class="hh-day" type="button" role="tab" aria-selected="false" aria-controls="hh-day-tomorrow" id="hhDayBtnTomorrow">Tomorrow</button>
-        <button class="hh-day" type="button" role="tab" aria-selected="false" aria-controls="hh-day-advanced" id="hhDayBtnAdvanced">Advanced Menu</button>
-      </div>
+  <!-- main menu content -->
+  <main class="menu-page" id="menu-root">
+    <div class="menu-header">
+      <h1>Hot Headz Southern Foods</h1>
+      <div class="menu-hours" id="hours-line"></div>
+      <div class="menu-note" id="note-line"></div>
+      <div class="menu-delivery" id="delivery-line"></div>
     </div>
 
-    <!-- TODAY -->
-    <div class="hh-daypanel is-active" id="hh-day-today" role="tabpanel" aria-labelledby="hhDayBtnToday">
-      <div class="hh-header">
-        <div class="hh-title" id="hh-today-title">Today’s Menu</div>
-        <div class="hh-updated" id="hh-hours-line">Loading hours…</div>
-        <div class="hh-note" id="hh-hours-note"></div>
-      </div>
+    <div id="categories-container" class="categories"></div>
+    <div id="loading" class="loading">Loading menu…</div>
+    <div id="error" class="error" hidden></div>
+  </main>
 
-      <!-- Only show CLOSED at day level -->
-      <div class="hh-state hh-closed" id="hh-today-closed" hidden>
-        <div class="hh-badge">Closed</div>
-        <div class="hh-state-title" id="hh-today-closed-title"></div>
-        <div class="hh-state-msg" id="hh-today-closed-msg"></div>
-      </div>
-
-      <div class="hh-tablist" role="tablist" aria-label="Today categories">
-        <button class="hh-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-today-breakfast" id="hhTabTodayBreakfast">Breakfast</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-lunch" id="hhTabTodayLunch">Lunch</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-crawfish" id="hhTabTodayCrawfish">Crawfish</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-salad" id="hhTabTodaySalad">Salad Bar</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-drinks" id="hhTabTodayDrinks">Drinks</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-dessert" id="hhTabTodayDessert">Dessert</button>
-      </div>
-
-      <div class="hh-panels">
-        <section class="hh-panel is-active" id="hh-today-breakfast" role="tabpanel" aria-labelledby="hhTabTodayBreakfast">
-          <h3>Breakfast</h3>
-          <p class="hh-sub" id="hh-today-breakfast-sub"></p>
-          <h4>Plates</h4>
-          <ul class="hh-stack" id="hh-today-breakfast-plates"></ul>
-          <h4>Available Items</h4>
-          <ul class="hh-stack" id="hh-today-breakfast-items"></ul>
-          <div class="hh-cta">
-            <a class="hh-btn" id="hh-call-btn-today-b" href="#">Call to Order</a>
-            <div class="hh-small" id="hh-delivery-note"></div>
-          </div>
-        </section>
-
-        <section class="hh-panel" id="hh-today-lunch" hidden role="tabpanel" aria-labelledby="hhTabTodayLunch">
-          <h3>Lunch</h3>
-          <p class="hh-sub" id="hh-today-lunch-sub">Loading today’s lunch menu…</p>
-
-          <!-- Lunch-only unavailable message -->
-          <div class="hh-lunch-unavail" id="hh-today-lunch-unavail" hidden>
-            <div class="hh-badge is-dark">Unavailable</div>
-            <div class="hh-lunch-unavail-title" id="hh-today-lunch-unavail-title">Lunch menu unavailable.</div>
-          </div>
-
-          <div id="hh-today-lunch-content" style="display:none">
-            <h4>Plates</h4>
-            <ul class="hh-stack" id="hh-today-lunch-plates"></ul>
-
-            <h4 id="hh-today-lunch-items-title">Today’s Lunch Items</h4>
-            <div class="hh-hintline" id="hh-today-lunch-hint" hidden></div>
-            <ul class="hh-stack" id="hh-today-lunch-items"></ul>
-          </div>
-
-          <div class="hh-cta">
-            <a class="hh-btn" id="hh-call-btn-today-l" href="#">Call to Order</a>
-          </div>
-        </section>
-
-        <section class="hh-panel" id="hh-today-crawfish" hidden role="tabpanel" aria-labelledby="hhTabTodayCrawfish">
-          <h3>Crawfish</h3>
-          <p class="hh-sub" id="hh-today-crawfish-sub"></p>
-          <ul class="hh-stack" id="hh-today-crawfish-items"></ul>
-          <div class="hh-cta">
-            <a class="hh-btn" id="hh-call-btn-today-c" href="#">Call to Order</a>
-          </div>
-        </section>
-
-        <section class="hh-panel" id="hh-today-salad" hidden role="tabpanel" aria-labelledby="hhTabTodaySalad">
-          <h3>Salad Bar</h3>
-          <p class="hh-sub" id="hh-today-salad-sub"></p>
-          <h4>Pricing</h4>
-          <ul class="hh-stack" id="hh-today-salad-pricing"></ul>
-          <h4>Lettuce</h4>
-          <ul class="hh-stack" id="hh-today-salad-lettuce"></ul>
-          <h4>Toppings</h4>
-          <ul class="hh-stack" id="hh-today-salad-toppings"></ul>
-          <h4>Dressing</h4>
-          <ul class="hh-stack" id="hh-today-salad-dressing"></ul>
-        </section>
-
-        <section class="hh-panel" id="hh-today-drinks" hidden role="tabpanel" aria-labelledby="hhTabTodayDrinks">
-          <h3>Drinks</h3>
-          <ul class="hh-stack" id="hh-today-drinks-items"></ul>
-        </section>
-
-        <section class="hh-panel" id="hh-today-dessert" hidden role="tabpanel" aria-labelledby="hhTabTodayDessert">
-          <h3>Dessert</h3>
-          <p class="hh-sub" id="hh-today-dessert-sub"></p>
-          <ul class="hh-stack" id="hh-today-dessert-items"></ul>
-        </section>
-      </div>
-    </div>
-
-    <!-- TOMORROW -->
-    <div class="hh-daypanel" id="hh-day-tomorrow" hidden role="tabpanel" aria-labelledby="hhDayBtnTomorrow">
-      <div class="hh-header">
-        <div class="hh-title" id="hh-tomorrow-title">Tomorrow’s Menu</div>
-        <div class="hh-updated" id="hh-hours-line-2">Loading hours…</div>
-        <div class="hh-note" id="hh-hours-note-2"></div>
-      </div>
-
-      <!-- Only show CLOSED at day level -->
-      <div class="hh-state hh-closed" id="hh-tomorrow-closed" hidden>
-        <div class="hh-badge">Closed</div>
-        <div class="hh-state-title" id="hh-tomorrow-closed-title"></div>
-        <div class="hh-state-msg" id="hh-tomorrow-closed-msg"></div>
-      </div>
-
-      <div class="hh-tablist" role="tablist" aria-label="Tomorrow categories">
-        <button class="hh-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-tomorrow-breakfast" id="hhTabTomorrowBreakfast">Breakfast</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-lunch" id="hhTabTomorrowLunch">Lunch</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-crawfish" id="hhTabTomorrowCrawfish">Crawfish</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-salad" id="hhTabTomorrowSalad">Salad Bar</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-drinks" id="hhTabTomorrowDrinks">Drinks</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-dessert" id="hhTabTomorrowDessert">Dessert</button>
-      </div>
-
-      <div class="hh-panels">
-        <section class="hh-panel is-active" id="hh-tomorrow-breakfast" role="tabpanel" aria-labelledby="hhTabTomorrowBreakfast">
-          <h3>Breakfast</h3>
-          <p class="hh-sub" id="hh-tomorrow-breakfast-sub"></p>
-          <h4>Plates</h4>
-          <ul class="hh-stack" id="hh-tomorrow-breakfast-plates"></ul>
-          <h4>Available Items</h4>
-          <ul class="hh-stack" id="hh-tomorrow-breakfast-items"></ul>
-          <div class="hh-cta">
-            <a class="hh-btn" id="hh-call-btn-tomorrow-b" href="#">Call to Order</a>
-            <div class="hh-small" id="hh-delivery-note-2"></div>
-          </div>
-        </section>
-
-        <section class="hh-panel" id="hh-tomorrow-lunch" hidden role="tabpanel" aria-labelledby="hhTabTomorrowLunch">
-          <h3>Lunch</h3>
-          <p class="hh-sub" id="hh-tomorrow-lunch-sub">Loading tomorrow’s lunch menu…</p>
-
-          <!-- Lunch-only unavailable message -->
-          <div class="hh-lunch-unavail" id="hh-tomorrow-lunch-unavail" hidden>
-            <div class="hh-badge is-dark">Unavailable</div>
-            <div class="hh-lunch-unavail-title" id="hh-tomorrow-lunch-unavail-title">Lunch menu unavailable.</div>
-          </div>
-
-          <div id="hh-tomorrow-lunch-content" style="display:none">
-            <h4>Plates</h4>
-            <ul class="hh-stack" id="hh-tomorrow-lunch-plates"></ul>
-
-            <h4 id="hh-tomorrow-lunch-items-title">Tomorrow’s Lunch Items</h4>
-            <div class="hh-hintline" id="hh-tomorrow-lunch-hint" hidden></div>
-            <ul class="hh-stack" id="hh-tomorrow-lunch-items"></ul>
-          </div>
-
-          <div class="hh-cta">
-            <a class="hh-btn" id="hh-call-btn-tomorrow-l" href="#">Call to Order</a>
-          </div>
-        </section>
-
-        <section class="hh-panel" id="hh-tomorrow-crawfish" hidden role="tabpanel" aria-labelledby="hhTabTomorrowCrawfish">
-          <h3>Crawfish</h3>
-          <p class="hh-sub" id="hh-tomorrow-crawfish-sub"></p>
-          <ul class="hh-stack" id="hh-tomorrow-crawfish-items"></ul>
-          <div class="hh-cta">
-            <a class="hh-btn" id="hh-call-btn-tomorrow-c" href="#">Call to Order</a>
-          </div>
-        </section>
-
-        <section class="hh-panel" id="hh-tomorrow-salad" hidden role="tabpanel" aria-labelledby="hhTabTomorrowSalad">
-          <h3>Salad Bar</h3>
-          <p class="hh-sub" id="hh-tomorrow-salad-sub"></p>
-          <h4>Pricing</h4>
-          <ul class="hh-stack" id="hh-tomorrow-salad-pricing"></ul>
-          <h4>Lettuce</h4>
-          <ul class="hh-stack" id="hh-tomorrow-salad-lettuce"></ul>
-          <h4>Toppings</h4>
-          <ul class="hh-stack" id="hh-tomorrow-salad-toppings"></ul>
-          <h4>Dressing</h4>
-          <ul class="hh-stack" id="hh-tomorrow-salad-dressing"></ul>
-        </section>
-
-        <section class="hh-panel" id="hh-tomorrow-drinks" hidden role="tabpanel" aria-labelledby="hhTabTomorrowDrinks">
-          <h3>Drinks</h3>
-          <ul class="hh-stack" id="hh-tomorrow-drinks-items"></ul>
-        </section>
-
-        <section class="hh-panel" id="hh-tomorrow-dessert" hidden role="tabpanel" aria-labelledby="hhTabTomorrowDessert">
-          <h3>Dessert</h3>
-          <p class="hh-sub" id="hh-tomorrow-dessert-sub"></p>
-          <ul class="hh-stack" id="hh-tomorrow-dessert-items"></ul>
-        </section>
-      </div>
-    </div>
-
-    <!-- ADVANCED -->
-    <div class="hh-daypanel" id="hh-day-advanced" hidden role="tabpanel" aria-labelledby="hhDayBtnAdvanced">
-      <div class="hh-advanced-top">
-        <div class="hh-advanced-title">Advanced Menu</div>
-        <div class="hh-advanced-disclaimer" id="hh-advanced-disclaimer"></div>
-      </div>
-      <div class="hh-adv-carousel" id="hh-adv-carousel" aria-label="Advanced menu day cards"></div>
-      <div class="hh-hint">Tip: swipe left/right for each day.</div>
-    </div>
-
-    <!-- Error state -->
-    <div class="hh-state" id="hh-load-error" hidden>
-      <div class="hh-badge is-dark">Error</div>
-      <div class="hh-state-title">Menu couldn’t load</div>
-      <p class="hh-state-msg" id="hh-load-error-msg">Please try again in a moment.</p>
-    </div>
-  </div>
-
-  <!-- ===== SCRIPTS ===== -->
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
-    // AOS init (optional)
-    AOS.init({ once: false, duration: 1000 });
-
-    // ----- MENU SCRIPT (exactly as provided) -----
-    (function(){
-      const DATA_URLS = ["/menu-data", "/menu-data/"]; // tries both
-      const $ = (id)=>document.getElementById(id);
-
-      function setText(id, text){ const el=$(id); if(el) el.textContent = text || ""; }
-      function setList(id, items){
-        const ul=$(id); if(!ul) return;
-        ul.innerHTML="";
-        (items||[]).forEach(t=>{
-          const li=document.createElement("li");
-          li.textContent=String(t ?? "");
-          ul.appendChild(li);
-        });
-      }
-
-      function escapeHtml(str){
-        return String(str ?? "")
-          .replace(/&/g,"&amp;")
-          .replace(/</g,"&lt;")
-          .replace(/>/g,"&gt;")
-          .replace(/"/g,"&quot;")
-          .replace(/'/g,"&#039;");
-      }
-
-      function normalizeItems(arr){
-        return Array.isArray(arr) ? arr.map(x=>String(x||"").trim()).filter(Boolean) : [];
-      }
-
-      function toISODateLocal(d){
-        const y=d.getFullYear();
-        const m=String(d.getMonth()+1).padStart(2,"0");
-        const day=String(d.getDate()).padStart(2,"0");
-        return `${y}-${m}-${day}`;
-      }
-
-      function formatDateNice(d){
-        return d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
-      }
-
-      function weekdayName(d){
-        return d.toLocaleDateString("en-US",{weekday:"long"});
-      }
-
-      function parseISODateToLocal(iso){
-        const [y,m,d]=String(iso).split("-").map(Number);
-        return new Date(y,(m||1)-1,d||1);
-      }
-
-      function normalizeDateKey(key){
-        const s=String(key||"").trim();
-        const m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-        if(!m) return null;
-        const y=m[1];
-        const mo=String(Number(m[2])).padStart(2,"0");
-        const da=String(Number(m[3])).padStart(2,"0");
-        return `${y}-${mo}-${da}`;
-      }
-
-      function showLoadError(msg){
-        const err = $("hh-load-error");
-        const msgEl = $("hh-load-error-msg");
-        if(msgEl) msgEl.textContent = msg || "Please try again.";
-        if(err) err.hidden = false;
-      }
-
-      async function fetchHtml(url){
-        const res = await fetch(url, { credentials:"same-origin", cache:"no-store" });
-        if(!res.ok) throw new Error(`Fetch failed ${res.status} at ${url}`);
-        return await res.text();
-      }
-
-      function extractJsonFromHtml(html, urlLabel){
-        const doc = new DOMParser().parseFromString(html, "text/html");
-        const script = doc.querySelector("#hh-menu-data");
-        if(!script) throw new Error(`No #hh-menu-data found on ${urlLabel}`);
-        const raw = (script.textContent || "").trim();
-        if(!raw) throw new Error(`#hh-menu-data is empty on ${urlLabel}`);
-        return JSON.parse(raw);
-      }
-
-      async function readData(){
-        // 1) If JSON is on THIS page, use it (great for testing)
-        const local = document.querySelector("#hh-menu-data");
-        if(local && local.textContent.trim()){
-          const data = JSON.parse(local.textContent.trim());
-          return normalizeMenus(data);
-        }
-
-        // 2) Otherwise fetch from hidden data page (try both URLs)
-        let lastErr = null;
-        for(const url of DATA_URLS){
-          try{
-            const html = await fetchHtml(url);
-            const data = extractJsonFromHtml(html, url);
-            return normalizeMenus(data);
-          }catch(e){
-            lastErr = e;
-          }
-        }
-        throw lastErr || new Error("Menu data could not be read.");
-      }
-
-      function normalizeMenus(data){
-        const rawMenus=data?.menus||{};
-        const normalizedMenus={};
-        Object.keys(rawMenus).forEach(k=>{
-          const nk=normalizeDateKey(k);
-          if(!nk) return;
-          normalizedMenus[nk]=rawMenus[k];
-        });
-        data.menus=normalizedMenus;
-        return data;
-      }
-
-      function findHours(weekly, dayName){
-        return (weekly||[]).find(d => (d.day||"").toLowerCase()===(dayName||"").toLowerCase())
-          || {day:dayName, open:"", close:"", breakfast:"", lunch:""};
-      }
-
-      function getClosure(data, dayName){
-        const c=data?.closures||{};
-        const key=Object.keys(c).find(k => (k||"").toLowerCase()===(dayName||"").toLowerCase());
-        return key ? c[key] : null;
-      }
-
-      function getMenuByDate(data, isoDate){
-        return (data?.menus||{})[isoDate] || null;
-      }
-
-      function normalizeLunchItems(rawItems){
-        const items = Array.isArray(rawItems) ? rawItems : [];
-        return items.map(raw=>{
-          if(raw && typeof raw === "object"){
-            const name = String(raw.name ?? "").trim();
-            const desc = String(raw.desc ?? "").trim();
-            return { name, desc };
-          }
-          const s = String(raw ?? "").trim();
-          if(!s) return null;
-          return { name: s, desc: "" };
-        }).filter(Boolean).filter(x=>x.name);
-      }
-
-      function setDropdownList(listId, items, noDescText){
-        const ul = $(listId); if(!ul) return;
-        ul.innerHTML = "";
-        items.forEach(it=>{
-          const li = document.createElement("li");
-          const details = document.createElement("details");
-          const summary = document.createElement("summary");
-          summary.textContent = it.name;
-
-          const d = document.createElement("div");
-          d.className = "hh-desc";
-          d.textContent = it.desc ? it.desc : (noDescText || "No description for this item.");
-
-          details.appendChild(summary);
-          details.appendChild(d);
-          li.appendChild(details);
-          ul.appendChild(li);
-        });
-      }
-
-      function setCrawfishVisibility(prefix, show){
-        const tab = $(`hhTab${prefix}Crawfish`);
-        const panel = $(`hh-${prefix.toLowerCase()}-crawfish`);
-        if(tab) tab.style.display = show ? "" : "none";
-        if(!show){
-          if(panel) panel.hidden = true;
-          if(tab && tab.classList.contains("is-active")){
-            const breakfastTab = $(`hhTab${prefix}Breakfast`);
-            if(breakfastTab) breakfastTab.click();
-          }
-          return;
-        }
-        if(tab && tab.classList.contains("is-active")){
-          if(panel) panel.hidden = false;
-        }
-      }
-
-      function crawfishFor(data, menu){
-        const def=data?.defaults?.crawfish||{};
-        const c=menu?.crawfish||{};
-        const show=(c.show===false) ? false : true;
-        const subtitle=(c.subtitle ?? def.subtitle ?? "").trim();
-        const items=normalizeItems(c.items ?? def.items ?? []);
-        return {show, subtitle, items};
-      }
-
-      function getLunchAvailability(data, isoDate, todayISO){
-        const msg = data?.settings?.autoClearMessage || "Lunch menu unavailable.";
-        const today=parseISODateToLocal(todayISO);
-        const cur=parseISODateToLocal(isoDate);
-        today.setHours(12,0,0,0);
-        cur.setHours(12,0,0,0);
-
-        if(data?.settings?.autoClearPastDays && cur < today) return { ok:false, msg };
-
-        const menu=getMenuByDate(data, isoDate);
-        if(!menu) return { ok:false, msg };
-
-        const lunch=menu?.lunch || {};
-        if(lunch.show === false) return { ok:false, msg };
-
-        const items = normalizeLunchItems(lunch.items);
-        if(items.length === 0) return { ok:false, msg };
-
-        return { ok:true, msg:"" };
-      }
-
-      function showLunchUnavailable(prefixIdBase, msg){
-        const un = $(`${prefixIdBase}-lunch-unavail`);
-        const unTitle = $(`${prefixIdBase}-lunch-unavail-title`);
-        const content = $(`${prefixIdBase}-lunch-content`);
-        const hint = $(`${prefixIdBase}-lunch-hint`);
-        if(un) un.hidden = false;
-        if(unTitle) unTitle.textContent = msg || "Lunch menu unavailable.";
-        if(content) content.style.display = "none";
-        if(hint) hint.hidden = true;
-      }
-
-      function showLunchAvailable(prefixIdBase){
-        const un = $(`${prefixIdBase}-lunch-unavail`);
-        const content = $(`${prefixIdBase}-lunch-content`);
-        if(un) un.hidden = true;
-        if(content) content.style.display = "";
-      }
-
-      function fillTwoDay(prefixIdBase, labelPrefix, isoDate, data, hours, todayISO){
-        const defaults=data?.defaults||{};
-        const menu=getMenuByDate(data, isoDate) || {};
-
-        // Breakfast
-        const b=menu?.breakfast||{};
-        const bDef=defaults?.breakfast||{};
-        const bHours = hours?.breakfast ? `Breakfast ${hours.breakfast}. ` : "";
-        setText(`${prefixIdBase}-breakfast-sub`, (bHours + ((b.subtitle ?? bDef.subtitle ?? "").trim())).trim());
-        setList(`${prefixIdBase}-breakfast-plates`, normalizeItems(b.plates ?? bDef.plates ?? []));
-        setList(`${prefixIdBase}-breakfast-items`,  normalizeItems(b.items  ?? bDef.items  ?? []));
-
-        // Lunch
-        const l=menu?.lunch||{};
-        const lDef=defaults?.lunch||{};
-        const lHours = hours?.lunch ? `Lunch ${hours.lunch}. ` : "";
-        setText(`${prefixIdBase}-lunch-sub`, (lHours + ((l.subtitle ?? lDef.subtitle ?? "").trim())).trim());
-
-        const lunchAvail = getLunchAvailability(data, isoDate, todayISO);
-        if(!lunchAvail.ok){
-          showLunchUnavailable(prefixIdBase, lunchAvail.msg);
-          setList(`${prefixIdBase}-lunch-plates`, []);
-          const ul = $(`${prefixIdBase}-lunch-items`);
-          if(ul) ul.innerHTML = "";
-        } else {
-          showLunchAvailable(prefixIdBase);
-          setList(`${prefixIdBase}-lunch-plates`, normalizeItems(l.plates ?? lDef.plates ?? []));
-          const items = normalizeLunchItems(l.items);
-          const hint = $(`${prefixIdBase}-lunch-hint`);
-          if(hint){
-            hint.textContent = data?.settings?.clickForDescriptionHint || "Tip: click an item for description.";
-            hint.hidden = (items.length === 0);
-          }
-          setDropdownList(`${prefixIdBase}-lunch-items`, items, data?.settings?.noDescriptionText);
-        }
-
-        // Crawfish
-        const c=crawfishFor(data, menu);
-        setText(`${prefixIdBase}-crawfish-sub`, c.subtitle);
-        setList(`${prefixIdBase}-crawfish-items`, c.items.length ? c.items : ["Call to ask about crawfish availability."]);
-        setCrawfishVisibility(labelPrefix, c.show);
-
-        // Salad
-        const s=menu?.salad||{};
-        const sDef=defaults?.salad||{};
-        setText(`${prefixIdBase}-salad-sub`, (s.subtitle ?? sDef.subtitle ?? "").trim());
-        setList(`${prefixIdBase}-salad-pricing`, normalizeItems(s.items ?? sDef.items ?? []));
-        setList(`${prefixIdBase}-salad-lettuce`,  normalizeItems(s.saladBar?.lettuce  ?? sDef.saladBar?.lettuce  ?? []));
-        setList(`${prefixIdBase}-salad-toppings`, normalizeItems(s.saladBar?.toppings ?? sDef.saladBar?.toppings ?? []));
-        setList(`${prefixIdBase}-salad-dressing`, normalizeItems(s.saladBar?.dressing ?? sDef.saladBar?.dressing ?? []));
-
-        // Drinks
-        const d=menu?.drinks||{};
-        const dDef=defaults?.drinks||{};
-        setList(`${prefixIdBase}-drinks-items`, normalizeItems(d.items ?? dDef.items ?? []));
-
-        // Dessert
-        const ds=menu?.dessert||{};
-        const dsDef=defaults?.dessert||{};
-        setText(`${prefixIdBase}-dessert-sub`, (ds.subtitle ?? dsDef.subtitle ?? "").trim());
-        const desserts=normalizeItems(ds.items ?? []);
-        setList(`${prefixIdBase}-dessert-items`, desserts.length ? desserts : ["(Dessert not posted yet.)"]);
-      }
-
-      function buildAdvancedCarousel(data, todayISO){
-        const wrap=$("hh-adv-carousel");
-        if(!wrap) return;
-        wrap.innerHTML="";
-
-        const weekly=data?.hours?.weekly||[];
-        const lDef=data?.defaults?.lunch||{};
-        const windowDays=Math.max(1, Math.min(31, Number(data?.settings?.advancedWindowDays ?? 7)));
-        const start=parseISODateToLocal(todayISO);
-
-        for(let i=0;i<windowDays;i++){
-          const d=new Date(start);
-          d.setDate(start.getDate()+i);
-          const iso=toISODateLocal(d);
-          const dayName=weekdayName(d);
-          const hours=findHours(weekly, dayName);
-
-          const closure=getClosure(data, dayName);
-          const isClosed=!!closure?.closed;
-          const menu=getMenuByDate(data, iso) || {};
-          const lunch=menu?.lunch||{};
-          const items=normalizeLunchItems(lunch.items);
-
-          let state = { kind:"open", msg:"" };
-          if(isClosed){
-            state = { kind:"closed", msg: closure.message || "See you tomorrow!" };
-          } else {
-            const avail=getLunchAvailability(data, iso, todayISO);
-            if(!avail.ok) state = { kind:"unavailable", msg: avail.msg };
-          }
-
-          const card=document.createElement("article");
-          card.className="hh-adv-card";
-
-          const head=document.createElement("div");
-          head.className="hh-adv-head";
-          head.innerHTML=`
-            <div>
-              <div class="hh-adv-dayname">${escapeHtml(dayName)}</div>
-              <div class="hh-adv-date">${escapeHtml(formatDateNice(d))}</div>
-            </div>
-            <div class="hh-adv-hours">${state.kind==="closed" ? "Closed" : (hours.lunch ? `Lunch ${escapeHtml(hours.lunch)}` : "")}</div>
-          `;
-          card.appendChild(head);
-
-          if(state.kind!=="open"){
-            const st=document.createElement("div");
-            st.className="hh-state";
-            st.innerHTML=`
-              <div class="hh-badge ${state.kind==="unavailable" ? "is-dark" : ""}">${state.kind==="closed" ? "Closed" : "Unavailable"}</div>
-              <div class="hh-state-title">${escapeHtml(dayName)}</div>
-              <p class="hh-state-msg">${escapeHtml(state.msg)}</p>
-            `;
-            card.appendChild(st);
-          } else {
-            const panel=document.createElement("section");
-            panel.className="hh-panel";
-
-            const subtitle=((hours.lunch ? `Lunch ${hours.lunch}. ` : "") + ((lunch.subtitle ?? lDef.subtitle ?? "").trim())).trim();
-            const plates=normalizeItems(lunch.plates ?? lDef.plates ?? []);
-            const hintText=data?.settings?.clickForDescriptionHint || "Tip: click an item for description.";
-            const noDesc=data?.settings?.noDescriptionText || "No description for this item.";
-
-            panel.innerHTML=`
-              <h3>Lunch</h3>
-              <p class="hh-sub">${escapeHtml(subtitle)}</p>
-              <h4>Plates</h4>
-              <ul class="hh-stack">${plates.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>
-              <h4>${escapeHtml(dayName)} Lunch Items</h4>
-              <div class="hh-hintline">${escapeHtml(hintText)}</div>
-              <ul class="hh-stack">
-                ${items.map(it=>{
-                  const d = it.desc ? it.desc : noDesc;
-                  return `<li><details><summary>${escapeHtml(it.name)}</summary><div class="hh-desc">${escapeHtml(d)}</div></details></li>`;
-                }).join("")}
-              </ul>
-            `;
-            card.appendChild(panel);
-          }
-
-          wrap.appendChild(card);
-        }
-      }
-
-      function wireTabs(dayPanelEl){
-        if(!dayPanelEl) return;
-        const tabs=Array.from(dayPanelEl.querySelectorAll(".hh-tab[role='tab']"));
-        const panels=Array.from(dayPanelEl.querySelectorAll(".hh-panel[role='tabpanel']"));
-        if(!tabs.length || !panels.length) return;
-
-        function activateTab(tab){
-          const targetId=tab.getAttribute("aria-controls");
-          tabs.forEach(t=>{
-            const active=(t===tab);
-            t.classList.toggle("is-active", active);
-            t.setAttribute("aria-selected", active ? "true" : "false");
-          });
-          panels.forEach(p=> p.hidden = (p.id !== targetId));
-        }
-        tabs.forEach(tab=> tab.addEventListener("click", ()=> activateTab(tab)));
-      }
-
-      function wireDayTabs(){
-        const dayButtons=Array.from(document.querySelectorAll(".hh-day[role='tab']"));
-        const dayPanels=Array.from(document.querySelectorAll(".hh-daypanel[role='tabpanel']"));
-
-        function activate(btn){
-          const targetId=btn.getAttribute("aria-controls");
-          dayButtons.forEach(b=>{
-            const active=(b===btn);
-            b.classList.toggle("is-active", active);
-            b.setAttribute("aria-selected", active ? "true" : "false");
-          });
-          dayPanels.forEach(p=> p.hidden = (p.id !== targetId));
-        }
-        dayButtons.forEach(btn=> btn.addEventListener("click", ()=> activate(btn)));
-      }
-
-      // ---- INIT ----
-      wireDayTabs();
-      wireTabs($("hh-day-today"));
-      wireTabs($("hh-day-tomorrow"));
-
-      (async function init(){
-        try{
-          const data = await readData();
-
-          setText("hh-advanced-disclaimer", data?.settings?.advancedDisclaimer || "");
-          if(!data?.settings?.showAdvancedTab){
-            const advBtn=$("hhDayBtnAdvanced");
-            if(advBtn) advBtn.style.display="none";
-          }
-
-          const now=new Date();
-          const todayISO=toISODateLocal(now);
-          const todayName=weekdayName(now);
-
-          const tomorrow=new Date(now); tomorrow.setDate(now.getDate()+1);
-          const tomorrowISO=toISODateLocal(tomorrow);
-          const tomorrowName=weekdayName(tomorrow);
-
-          setText("hhDayBtnToday", todayName);
-          setText("hhDayBtnTomorrow", tomorrowName);
-
-          setText("hh-today-title", `${todayName} (${formatDateNice(now)}) Menu`);
-          setText("hh-tomorrow-title", `${tomorrowName} (${formatDateNice(tomorrow)}) Menu`);
-
-          setText("hh-hours-note", data?.hours?.note || "");
-          setText("hh-hours-note-2", data?.hours?.note || "");
-
-          const weekly=data?.hours?.weekly||[];
-          const hoursToday=findHours(weekly, todayName);
-          const hoursTomorrow=findHours(weekly, tomorrowName);
-
-          const closureToday=getClosure(data, todayName);
-          const closureTomorrow=getClosure(data, tomorrowName);
-
-          const lineToday = closureToday?.closed ? `${todayName} Hours: Closed`
-            : `${todayName} Hours: ${hoursToday.open} – ${hoursToday.close}` +
-              (hoursToday.breakfast ? ` • Breakfast ${hoursToday.breakfast}` : "") +
-              (hoursToday.lunch ? ` • Lunch ${hoursToday.lunch}` : "");
-
-          const lineTomorrow = closureTomorrow?.closed ? `${tomorrowName} Hours: Closed`
-            : `${tomorrowName} Hours: ${hoursTomorrow.open} – ${hoursTomorrow.close}` +
-              (hoursTomorrow.breakfast ? ` • Breakfast ${hoursTomorrow.breakfast}` : "") +
-              (hoursTomorrow.lunch ? ` • Lunch ${hoursTomorrow.lunch}` : "");
-
-          setText("hh-hours-line", lineToday);
-          setText("hh-hours-line-2", lineTomorrow);
-
-          const phone=data?.phoneTel || "#";
-          ["hh-call-btn-today-b","hh-call-btn-today-l","hh-call-btn-today-c",
-           "hh-call-btn-tomorrow-b","hh-call-btn-tomorrow-l","hh-call-btn-tomorrow-c"
-          ].forEach(id=>{ const a=$(id); if(a) a.href=phone; });
-
-          setText("hh-delivery-note", data?.deliveryNote || "");
-          setText("hh-delivery-note-2", data?.deliveryNote || "");
-
-          if(closureToday?.closed){
-            $("hh-today-closed").hidden=false;
-            setText("hh-today-closed-title", `${todayName} (${todayISO})`);
-            setText("hh-today-closed-msg", closureToday.message || "See you tomorrow!");
-          }
-          if(closureTomorrow?.closed){
-            $("hh-tomorrow-closed").hidden=false;
-            setText("hh-tomorrow-closed-title", `${tomorrowName} (${tomorrowISO})`);
-            setText("hh-tomorrow-closed-msg", closureTomorrow.message || "See you tomorrow!");
-          }
-
-          fillTwoDay("hh-today", "Today", todayISO, data, hoursToday, todayISO);
-          fillTwoDay("hh-tomorrow", "Tomorrow", tomorrowISO, data, hoursTomorrow, todayISO);
-
-          setText("hh-today-lunch-items-title", `${todayName} Lunch Items`);
-          setText("hh-tomorrow-lunch-items-title", `${tomorrowName} Lunch Items`);
-
-          buildAdvancedCarousel(data, todayISO);
-
-        }catch(e){
-          console.error("HOT HEADZ MENU ERROR:", e);
-          setText("hh-hours-line", "Menu unavailable right now.");
-          setText("hh-hours-line-2", "Menu unavailable right now.");
-          showLoadError(String(e && e.message ? e.message : e));
-        }
-      })();
-    })();
-
-    // ----- DOCK SCRIPT -----
     (function() {
+      const DATA_URL = "/menu-data.html"; // your hidden data page
+      const container = document.getElementById('categories-container');
+      const loading = document.getElementById('loading');
+      const errorDiv = document.getElementById('error');
+      const hoursEl = document.getElementById('hours-line');
+      const noteEl = document.getElementById('note-line');
+      const deliveryEl = document.getElementById('delivery-line');
+
+      // show dock
       const root = document.getElementById('genRoot');
       const dock = document.getElementById('genDock');
       if (root && dock) {
         root.hidden = false;
         dock.hidden = false;
       }
+
+      async function fetchData() {
+        try {
+          const res = await fetch(DATA_URL, { cache: 'no-store' });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const html = await res.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const script = doc.querySelector('#hh-menu-data');
+          if (!script) throw new Error('Menu data not found');
+          return JSON.parse(script.textContent);
+        } catch (err) {
+          throw new Error('Failed to load menu: ' + err.message);
+        }
+      }
+
+      function renderItem(item) {
+        const desc = item.description ? `<span class="item-desc">${escapeHtml(item.description)}</span>` : '';
+        const price = item.price ? `<span class="item-price">${escapeHtml(item.price)}</span>` : '';
+        return `
+          <div class="menu-item">
+            <span class="item-name">${escapeHtml(item.name)}${desc}</span>
+            ${price}
+          </div>
+        `;
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function renderCategory(cat) {
+        let itemsHtml = '';
+        if (cat.items && cat.items.length) {
+          itemsHtml = cat.items.map(renderItem).join('');
+        }
+        let detailsHtml = '';
+        if (cat.details) {
+          detailsHtml = `<div class="category-details">${escapeHtml(cat.details)}</div>`;
+        }
+        return `
+          <section class="category">
+            <h2>${escapeHtml(cat.name)}</h2>
+            ${cat.subtitle ? `<p class="category-sub">${escapeHtml(cat.subtitle)}</p>` : ''}
+            <div class="item-grid">
+              ${itemsHtml}
+            </div>
+            ${detailsHtml}
+          </section>
+        `;
+      }
+
+      async function init() {
+        try {
+          const data = await fetchData();
+          hoursEl.textContent = data.hours || '';
+          noteEl.textContent = data.note || '';
+          deliveryEl.textContent = data.delivery || '';
+
+          if (data.categories && data.categories.length) {
+            container.innerHTML = data.categories.map(renderCategory).join('');
+          } else {
+            container.innerHTML = '<p class="error">No menu categories found.</p>';
+          }
+          loading.hidden = true;
+        } catch (err) {
+          loading.hidden = true;
+          errorDiv.hidden = false;
+          errorDiv.textContent = err.message;
+          console.error(err);
+        }
+      }
+
+      init();
     })();
   </script>
 </body>
