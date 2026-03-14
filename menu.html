@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
   <style>
-    /* ---------- RESET / BASE (copied from homepage) ---------- */
+    /* ---------- RESET / BASE ---------- */
     * {
       margin: 0;
       padding: 0;
@@ -29,10 +29,10 @@
       color: rgba(255,255,255,0.92);
       font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
       line-height: 1.5;
-      padding-bottom: 90px; /* space for bottom dock */
+      padding-bottom: 90px;
     }
 
-    /* ---------- FLOATING DOCK (genRoot) – copied from homepage ---------- */
+    /* ---------- FLOATING DOCK (from homepage) ---------- */
     :root {
       --gen-glass: rgba(6,7,10,0.62);
       --gen-glass-2: rgba(6,7,10,0.78);
@@ -56,46 +56,11 @@
       z-index: 999999;
       pointer-events: none;
     }
-    /* Explore pill – hidden on this page (optional) */
-    .gen-pill {
-      pointer-events: auto;
-      position: fixed;
-      top: 16px;
-      right: 16px;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 11px 14px;
-      border-radius: var(--gen-radius-pill);
-      border: 1px solid var(--gen-border);
-      background: var(--gen-glass);
-      color: var(--gen-text);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: var(--gen-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
-      cursor: pointer;
-      transition: transform .14s ease, background .14s ease, border-color .14s ease;
-    }
-    .gen-pill:hover {
-      transform: translateY(-1px);
-      background: rgba(0,0,0,0.56);
-      border-color: var(--gen-border-2);
-    }
-    .gen-pill-ic { font-size: 16px; line-height: 1; }
-    .gen-pill-tx { font-size: 13.5px; font-weight: 820; }
-    .gen-pill-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, var(--gen-hotA), var(--gen-hotB));
-      box-shadow: 0 0 18px rgba(255,120,70,0.22);
-    }
-    /* We can hide the pill if desired – same as homepage */
+    /* Explore pill – hidden */
     .gen-pill {
       display: none !important;
     }
 
-    /* Dock – visible at bottom */
     .gen-dock {
       pointer-events: auto;
       position: fixed;
@@ -149,14 +114,11 @@
       background: linear-gradient(90deg, rgba(255,120,70,0.22), rgba(255,60,140,0.16));
       border-color: rgba(255,255,255,0.20);
     }
-
-    /* Active state for current page */
     .gen-dock-btn.is-active {
       background: rgba(42,127,98,0.3);
       border-color: rgba(255,179,90,0.5);
     }
 
-    /* Responsive dock tweaks */
     @media (max-width: 720px) {
       .gen-dock { gap: 8px; padding: 9px; }
       .gen-dock-btn { padding: 10px 6px; }
@@ -168,22 +130,19 @@
       .gen-dock-tx { display: none; }
     }
 
-    /* ===== MENU STYLES (paper‑on‑dark‑table) – adjusted for full screen ===== */
+    /* ===== MENU STYLES – paper on dark table, now centered ===== */
     :root{
       --hh-accent:#c05a2a;
       --hh-accent-2:#2a7f62;
       --hh-ink:#14110e;
       --hh-muted:rgba(20,17,14,.68);
-
       --hh-table:#070604;
       --hh-table2:#0b0806;
       --hh-paper:#f6f0e6;
       --hh-paper2:#efe6d9;
-
       --hh-radius: 26px;
       --hh-radius2: 34px;
       --hh-pill: 999px;
-
       --hh-shadow: 0 26px 90px rgba(0,0,0,.48);
       --hh-shadow2: 0 16px 48px rgba(0,0,0,.22);
       --hh-shadow3: 0 10px 24px rgba(0,0,0,.14);
@@ -191,15 +150,14 @@
 
     .hh-menu{
       width: 100%;
-      max-width: none;           /* full width */
-      min-height: 100vh;         /* at least full viewport height */
+      max-width: none;
+      min-height: 100vh;
       margin: 0;
       padding: 18px 14px 70px;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color: rgba(245,240,230,.94);
       position: relative;
       isolation: isolate;
-
       background:
         radial-gradient(1100px 700px at 16% 14%, rgba(192,90,42,.18), transparent 60%),
         radial-gradient(1000px 700px at 86% 20%, rgba(42,127,98,.14), transparent 64%),
@@ -218,10 +176,12 @@
     }
     .hh-menu > *{ position:relative; z-index:1; }
 
-    /* ... all the rest of your existing menu styles remain exactly the same ... */
-    /* (I've included the full set from your original code below) */
-
-    .hh-header{ margin: 10px 0 14px; padding: 14px 14px 0; }
+    /* ----- CENTERED HEADER ----- */
+    .hh-header {
+      margin: 10px 0 14px;
+      padding: 14px 14px 0;
+      text-align: center;
+    }
     .hh-title{
       font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
       font-size: clamp(20px, 2.2vw, 30px);
@@ -246,10 +206,12 @@
 
     .hh-stickywrap{ position: sticky; top: 10px; z-index: 90; }
 
+    /* ----- CENTERED DAY BAR ----- */
     .hh-daybar{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
+      justify-content: center;    /* center the day buttons */
       margin: 14px;
       padding: 10px;
       border-radius: var(--hh-radius2);
@@ -281,10 +243,12 @@
       background: linear-gradient(180deg, rgba(192,90,42,.26), rgba(0,0,0,.22));
     }
 
+    /* ----- CENTERED CATEGORY TABS ----- */
     .hh-tablist{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
+      justify-content: center;    /* center category tabs */
       margin: 0 14px 12px;
       position: sticky;
       top: 86px;
@@ -350,6 +314,7 @@
       margin: 16px 0 10px;
     }
 
+    /* ----- LISTS REMAIN LEFT-ALIGNED ----- */
     .hh-stack{
       list-style:none;
       padding-left:0;
@@ -519,7 +484,6 @@
     /* Mobile */
     @media(max-width: 560px){
       .hh-menu{ padding: 14px 10px 72px; border-radius: 26px; }
-
       .hh-daybar{
         flex-wrap: nowrap;
         overflow-x: auto;
@@ -528,9 +492,9 @@
         padding: 8px;
         border-radius: 20px;
         margin: 12px;
+        justify-content: flex-start; /* on mobile, keep scrollable left-aligned */
       }
       .hh-daybar::-webkit-scrollbar{ display:none; }
-
       .hh-tablist{
         flex-wrap: nowrap;
         overflow-x: auto;
@@ -540,18 +504,16 @@
         border-radius: 20px;
         top: 74px;
         margin: 0 12px 12px;
+        justify-content: flex-start;
       }
       .hh-tablist::-webkit-scrollbar{ display:none; }
-
       .hh-day,
       .hh-tab{ padding: 8px 10px; font-size: 13px; }
-
       .hh-header{ padding: 10px 12px 0; }
       .hh-panels{ padding: 0 12px 14px; }
       .hh-panel{ padding: 14px; border-radius: 26px; }
     }
 
-    /* Reduce motion */
     @media (prefers-reduced-motion: reduce){
       .hh-daypanel{ animation:none; }
       .hh-day, .hh-tab, .hh-stack li, .hh-btn{ transition:none; }
@@ -564,7 +526,6 @@
       font-weight: 780;
       color: rgba(20,17,14,.62);
     }
-
     .hh-stack details{
       background: rgba(255,255,255,.62);
       border: 1px solid rgba(20,17,14,.12);
@@ -578,7 +539,6 @@
       border-color: rgba(192,90,42,.26);
       box-shadow: 0 14px 30px rgba(0,0,0,.12);
     }
-
     .hh-stack summary{
       list-style: none;
       cursor: pointer;
@@ -591,7 +551,6 @@
       gap: 12px;
     }
     .hh-stack summary::-webkit-details-marker{ display:none; }
-
     .hh-stack summary::after{
       content: "＋";
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
@@ -599,7 +558,6 @@
       flex: 0 0 auto;
     }
     .hh-stack details[open] summary::after{ content: "－"; opacity: .8; }
-
     .hh-desc{
       padding: 0 12px 12px;
       color: rgba(20,17,14,.72);
@@ -626,7 +584,7 @@
   </style>
 </head>
 <body>
-  <!-- Required invisible anchors for explore nav (if used) – optional but safe -->
+  <!-- Required invisible anchors (optional, for explore nav if used) -->
   <div id="gen-home" style="position: absolute; top: 0; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
   <div id="gen-menu" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
   <div id="gen-delivery" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
@@ -634,22 +592,16 @@
   <div id="gen-about" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
   <div id="gen-location" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
 
-  <!-- ===== FLOATING DOCK (same as homepage, with active state on Menu) ===== -->
+  <!-- ===== FLOATING DOCK ===== -->
   <div id="genRoot" class="gen-root" hidden>
-    <!-- Explore pill (hidden by CSS) -->
     <button id="genPill" class="gen-pill" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="genPanel">
       <span class="gen-pill-ic" aria-hidden="true">🧭</span>
       <span class="gen-pill-tx">Explore</span>
       <span class="gen-pill-dot" aria-hidden="true"></span>
     </button>
-
-    <!-- Panel (not used on this page, but kept for completeness) -->
     <div id="genPanel" class="gen-panel" role="dialog" aria-modal="false" aria-label="Explore the page" aria-hidden="true" style="display:none;"></div>
-
-    <!-- Scroll coach (hidden) -->
     <button id="genCoach" class="gen-coach" type="button" aria-label="Scroll to explore" hidden></button>
 
-    <!-- Bottom dock -->
     <nav id="genDock" class="gen-dock" aria-label="Quick actions" hidden>
       <a class="gen-dock-btn" href="index.html" aria-label="Home">
         <span class="gen-dock-ic" aria-hidden="true">🏠</span>
@@ -910,7 +862,7 @@
 
     // ----- MENU SCRIPT (exactly as provided) -----
     (function(){
-      const DATA_URLS = ["/menu-data.html", "/menu-data/"]; // tries both
+      const DATA_URLS = ["/menu-data", "/menu-data/"]; // tries both
       const $ = (id)=>document.getElementById(id);
 
       function setText(id, text){ const el=$(id); if(el) el.textContent = text || ""; }
@@ -1407,7 +1359,7 @@
       })();
     })();
 
-    // ----- DOCK SCRIPT (minimal to show dock) -----
+    // ----- DOCK SCRIPT -----
     (function() {
       const root = document.getElementById('genRoot');
       const dock = document.getElementById('genDock');
