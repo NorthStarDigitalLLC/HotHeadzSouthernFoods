@@ -630,7 +630,7 @@
     </nav>
   </div>
 
-  <!-- ===== MENU HTML (original, unchanged) ===== -->
+  <!-- ===== MENU HTML ===== -->
   <div class="hh-menu" role="region" aria-label="Menu" id="hh-menu-root">
 
     <!-- Sticky top nav -->
@@ -860,7 +860,7 @@
     // AOS init (optional)
     AOS.init({ once: false, duration: 1000 });
 
-    // ----- MENU SCRIPT (exactly as provided) -----
+    // ----- MENU SCRIPT (modified to auto-switch after closing time) -----
     (function(){
       const DATA_URLS = ["/menu-data.html", "/menu-data/"]; // tries both
       const $ = (id)=>document.getElementById(id);
@@ -1089,6 +1089,30 @@
         if(content) content.style.display = "";
       }
 
+      // Helper to parse time string "5:30 AM" to minutes since midnight
+      function parseTimeToMinutes(timeStr) {
+        if (!timeStr) return null;
+        const match = timeStr.match(/(\d+):?(\d*)\s*(AM|PM)/i);
+        if (!match) return null;
+        let hours = parseInt(match[1], 10);
+        const minutes = match[2] ? parseInt(match[2], 10) : 0;
+        const ampm = match[3].toUpperCase();
+        if (ampm === 'PM' && hours !== 12) hours += 12;
+        if (ampm === 'AM' && hours === 12) hours = 0;
+        return hours * 60 + minutes;
+      }
+
+      // Check if current time is past closing for today
+      function isPastClosingToday(weekly, todayName) {
+        const hours = findHours(weekly, todayName);
+        if (!hours.close) return false;
+        const closeMinutes = parseTimeToMinutes(hours.close);
+        if (closeMinutes === null) return false;
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        return currentMinutes >= closeMinutes;
+      }
+
       function fillTwoDay(prefixIdBase, labelPrefix, isoDate, data, hours, todayISO){
         const defaults=data?.defaults||{};
         const menu=getMenuByDate(data, isoDate) || {};
@@ -1269,10 +1293,13 @@
           dayPanels.forEach(p=> p.hidden = (p.id !== targetId));
         }
         dayButtons.forEach(btn=> btn.addEventListener("click", ()=> activate(btn)));
+
+        // Return the activate function so we can call it externally
+        return activate;
       }
 
       // ---- INIT ----
-      wireDayTabs();
+      const activateDay = wireDayTabs(); // get the function to programmatically activate a day
       wireTabs($("hh-day-today"));
       wireTabs($("hh-day-tomorrow"));
 
@@ -1347,6 +1374,16 @@
 
           setText("hh-today-lunch-items-title", `${todayName} Lunch Items`);
           setText("hh-tomorrow-lunch-items-title", `${tomorrowName} Lunch Items`);
+
+          // Check if we are past closing time for today
+          const pastClosing = isPastClosingToday(weekly, todayName);
+          if (pastClosing && !closureToday?.closed) {
+            // Automatically switch to tomorrow's tab
+            const tomorrowBtn = document.getElementById("hhDayBtnTomorrow");
+            if (tomorrowBtn && activateDay) {
+              activateDay(tomorrowBtn);
+            }
+          }
 
           buildAdvancedCarousel(data, todayISO);
 
