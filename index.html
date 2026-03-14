@@ -2106,12 +2106,25 @@
   </script>
 
   <script>
-    // Long-press on About link – now just scrolls to #gen-about (no 404)
-    (function () {
-      const about = document.getElementById("genAboutLink");
-      if (!about) return;
-      // Removed the long-press to /fb-menu to avoid 404
-    })();
+    // Long-press on About link
+(function () {
+  const about = document.getElementById("genAboutLink");
+  if (!about) return;
+  const UPDATER_URL = "/fb-menu.html";  // <-- must match your file name
+  const HOLD_MS = 1000;
+  let holdTimer = null;
+  let longPressed = false;
+
+  function startHold() {
+    longPressed = false;
+    holdTimer = setTimeout(() => {
+      longPressed = true;
+      try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) {}
+      window.location.href = UPDATER_URL;
+    }, HOLD_MS);
+  }
+  // ... rest of the event handlers
+})();
   </script>
 
   <script>
