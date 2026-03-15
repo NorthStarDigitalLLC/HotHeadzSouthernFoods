@@ -592,42 +592,34 @@
   <div id="gen-about" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
   <div id="gen-location" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
 
-  <!-- ===== FLOATING DOCK ===== -->
-  <div id="genRoot" class="gen-root" hidden>
-    <button id="genPill" class="gen-pill" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="genPanel">
-      <span class="gen-pill-ic" aria-hidden="true">🧭</span>
-      <span class="gen-pill-tx">Explore</span>
-      <span class="gen-pill-dot" aria-hidden="true"></span>
-    </button>
-    <div id="genPanel" class="gen-panel" role="dialog" aria-modal="false" aria-label="Explore the page" aria-hidden="true" style="display:none;"></div>
-    <button id="genCoach" class="gen-coach" type="button" aria-label="Scroll to explore" hidden></button>
 
-    <nav id="genDock" class="gen-dock" aria-label="Quick actions" hidden>
-      <a class="gen-dock-btn" href="index.html" aria-label="Home">
-        <span class="gen-dock-ic" aria-hidden="true">🏠</span>
-        <span class="gen-dock-tx">Home</span>
-      </a>
-      <a class="gen-dock-btn is-active" href="menu.html" aria-label="Menu">
-        <span class="gen-dock-ic" aria-hidden="true">🍽️</span>
-        <span class="gen-dock-tx">Menu</span>
-      </a>
-      <a class="gen-dock-btn" href="delivery.html" aria-label="Delivery options">
-        <span class="gen-dock-ic" aria-hidden="true">🚗</span>
-        <span class="gen-dock-tx">Delivery</span>
-      </a>
-      <a class="gen-dock-btn gen-dock-cta" href="tel:3372211035" aria-label="Place an order">
-        <span class="gen-dock-ic" aria-hidden="true">📞</span>
-        <span class="gen-dock-tx">Order</span>
-      </a>
-      <a id="genAboutLink" class="gen-dock-btn" href="about.html" aria-label="About us">
-        <span class="gen-dock-ic" aria-hidden="true">ℹ️</span>
-        <span class="gen-dock-tx">About</span>
-      </a>
-      <button id="genSideShare" class="gen-dock-btn gen-side-share" type="button" aria-label="Share this page">
-        <span class="gen-dock-ic" aria-hidden="true">📤</span>
-        <span class="gen-dock-tx">Share</span>
-      </button>
-    </nav>
+   <!-- ===== CIRCULAR NAVIGATION BUTTONS ===== -->
+  <div class="nav-btn left-center" id="navBtnLeft">
+    <i class="fas fa-compass btn-icon"></i>
+    <div class="btn-text">
+      <span class="main">NAVIGATION</span>
+      <span class="sub">explore pages</span>
+    </div>
+  </div>
+
+  <div class="nav-btn bottom-center" id="navBtnBottom">
+    <i class="fas fa-compass btn-icon"></i>
+    <div class="btn-text">
+      <span class="main">NAVIGATION</span>
+      <span class="sub">explore pages</span>
+    </div>
+  </div>
+
+  <!-- CIRCULAR MENU OVERLAY with page links (5 items evenly spaced at 72° increments) -->
+  <div class="circ-menu-overlay" id="circMenuOverlay">
+    <div class="circular-menu">
+      <div class="center-home" id="homeCenter" data-link="index.html"><i class="fas fa-home"></i></div>
+      <div class="menu-item" style="--angle: 0;" data-link="delivery.html">Delivery</div>
+      <div class="menu-item" style="--angle: 72;" data-link="tel:3372211035">Order</div>
+      <div class="menu-item" style="--angle: 144;" data-link="about.html">About</div>
+      <div class="menu-item" style="--angle: 216;" data-link="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634">Location</div>
+      <div class="menu-item" style="--angle: 288;" data-action="share">Share</div>
+    </div>
   </div>
 
   <!-- ===== MENU HTML ===== -->
@@ -1427,6 +1419,90 @@
         root.hidden = false;
         dock.hidden = false;
       }
+    })();
+  </script>
+
+
+   <!-- Circular menu toggle script with page navigation and share -->
+  <script>
+    (function() {
+      const overlay = document.getElementById('circMenuOverlay');
+      const leftBtn = document.getElementById('navBtnLeft');
+      const bottomBtn = document.getElementById('navBtnBottom');
+      const homeCenter = document.getElementById('homeCenter');
+      const menuItems = document.querySelectorAll('.menu-item');
+
+      function toggleMenu() {
+        overlay.classList.toggle('open');
+      }
+
+      leftBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMenu();
+      });
+
+      bottomBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMenu();
+      });
+
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('open');
+        }
+      });
+
+      async function sharePage() {
+        const shareData = {
+          title: document.title || 'Hot Headz Southern Foods',
+          text: 'Check out Hot Headz Southern Foods in DeRidder, LA!',
+          url: window.location.href
+        };
+        try {
+          if (navigator.share) {
+            await navigator.share(shareData);
+          } else if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(window.location.href);
+            const shareItem = document.querySelector('.menu-item[data-action="share"]');
+            if (shareItem) {
+              const originalText = shareItem.textContent;
+              shareItem.textContent = 'Copied';
+              setTimeout(() => shareItem.textContent = originalText, 1500);
+            }
+          } else {
+            const temp = document.createElement('input');
+            temp.value = window.location.href;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            alert('Link copied to clipboard!');
+          }
+        } catch (e) { console.log('Share failed', e); }
+      }
+
+      function navigate(link) {
+        if (!link) return;
+        window.location.href = link;
+      }
+
+      homeCenter.addEventListener('click', () => {
+        overlay.classList.remove('open');
+        const link = homeCenter.getAttribute('data-link');
+        if (link) navigate(link);
+      });
+
+      menuItems.forEach(item => {
+        item.addEventListener('click', () => {
+          overlay.classList.remove('open');
+          const link = item.getAttribute('data-link');
+          const action = item.getAttribute('data-action');
+          if (action === 'share') sharePage();
+          else if (link) navigate(link);
+        });
+      });
+
+      document.querySelector('.circular-menu').addEventListener('click', e => e.stopPropagation());
     })();
   </script>
 </body>
