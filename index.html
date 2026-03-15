@@ -41,6 +41,22 @@
       --hhx-radius2: 18px;
       --hhx-shadow: 0 22px 70px rgba(0,0,0,.55);
       --hhx-shadow2: 0 14px 40px rgba(0,0,0,.42);
+
+      --gen-glass: rgba(6,7,10,0.62);
+      --gen-glass-2: rgba(6,7,10,0.78);
+      --gen-border: rgba(255,255,255,0.14);
+      --gen-border-2: rgba(255,255,255,0.22);
+      --gen-text: rgba(255,255,255,0.92);
+      --gen-muted: rgba(255,255,255,0.62);
+      --gen-hotA: rgba(255,120,70,0.82);
+      --gen-hotB: rgba(255,60,140,0.74);
+      --gen-hotC: rgba(255,80,60,0.72);
+      --gen-radius-xl: 22px;
+      --gen-radius-lg: 16px;
+      --gen-radius-pill: 999px;
+      --gen-shadow: 0 18px 50px rgba(0,0,0,0.62);
+      --gen-font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+
       --hhH-glass: rgba(10,10,14,0.42);
       --hhH-border: rgba(255,255,255,0.14);
       --hhH-border2: rgba(255,255,255,0.22);
@@ -53,16 +69,20 @@
       --hhH-shadow-soft: 0 12px 34px rgba(0,0,0,0.52);
       --hhH-shadow-deep: 0 18px 52px rgba(0,0,0,0.64);
     }
+
+    /* ---------- RESET / BASE ---------- */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       max-width: 100%;
     }
+
     html {
       scroll-behavior: smooth;
       overflow-x: hidden;
     }
+
     body {
       background-color: #07060a;
       color: rgba(255,255,255,0.92);
@@ -70,6 +90,7 @@
       line-height: 1.5;
       padding-bottom: 90px;
     }
+
     /* ---------- HOMEPAGE STYLES ---------- */
     .hhx-home {
       position: relative;
@@ -81,6 +102,7 @@
         var(--hhx-bg);
       overflow: hidden;
     }
+
     .hhx-backdrop { position: absolute; inset: 0; pointer-events: none; }
     .hhx-smoke {
       position: absolute; inset: -20%;
@@ -98,6 +120,7 @@
       filter: blur(40px);
       opacity: .55;
     }
+
     .hhx-wrap {
       max-width: 1140px;
       margin: 0 auto;
@@ -106,143 +129,15 @@
       z-index: 1;
     }
 
-    /* ==================== IMMERSIVE HEADER ==================== */
-    .hhx-immersive-header {
-      position: relative;
-      min-height: 85vh;
-      display: flex;
-      align-items: center;
-      margin-bottom: 2rem;
-      perspective: 2000px;
-      transform-style: preserve-3d;
+    /* HERO */
+    .hhx-hero {
+      display: grid;
+      grid-template-columns: 1.3fr .7fr;
+      gap: 16px;
+      align-items: stretch;
     }
-    #header-canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.4;
-    }
-    .header-layer {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transform-style: preserve-3d;
-    }
-    .header-layer-1 {
-      transform: translateZ(-200px) scale(1.2);
-      background: radial-gradient(circle at 30% 50%, rgba(255,91,61,0.2) 0%, transparent 60%);
-      filter: blur(40px);
-    }
-    .header-layer-2 {
-      transform: translateZ(-100px) scale(1.1);
-    }
-    .header-layer-3 {
-      transform: translateZ(0px) scale(1);
-    }
-    .header-layer-4 {
-      transform: translateZ(100px) scale(0.9);
-    }
-    .hhx-header-title {
-      font-family: 'Inter', sans-serif;
-      font-weight: 950;
-      font-size: clamp(3rem, 10vw, 7rem);
-      text-transform: uppercase;
-      color: transparent;
-      -webkit-text-stroke: 2px var(--hhx-ember);
-      text-shadow: 0 0 50px rgba(255,91,61,0.5);
-      letter-spacing: -0.02em;
-      line-height: 1;
-      animation: drift 12s infinite alternate ease-in-out;
-      text-align: center;
-    }
-    .hhx-header-title span {
-      display: block;
-      font-size: 0.3em;
-      font-weight: 500;
-      color: var(--hhx-ember2);
-      -webkit-text-stroke: 0;
-      text-shadow: 0 0 30px rgba(255,176,75,0.8);
-      letter-spacing: 0.2em;
-    }
-    @keyframes drift {
-      0% { transform: translateX(-1%) translateY(-1%) rotateX(1deg) rotateY(1deg); }
-      100% { transform: translateX(1%) translateY(1%) rotateX(-1deg) rotateY(-1deg); }
-    }
-    .hhx-floating-card {
-      position: absolute;
-      bottom: 20%;
-      right: 5%;
-      width: 300px;
-      padding: 2rem;
-      background: rgba(10,8,7,0.7);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255,91,61,0.3);
-      border-radius: 30px;
-      transform: translateZ(80px) rotateY(5deg) rotateX(2deg);
-      box-shadow: 0 30px 50px rgba(0,0,0,0.7);
-      animation: float 6s infinite alternate;
-    }
-    @keyframes float {
-      0% { transform: translateZ(80px) rotateY(5deg) rotateX(2deg) translateY(0); }
-      100% { transform: translateZ(80px) rotateY(5deg) rotateX(2deg) translateY(-20px); }
-    }
-    .hhx-floating-card .card-header {
-      display: flex;
-      justify-content: space-between;
-      border-bottom: 1px dashed var(--hhx-ember);
-      padding-bottom: 0.8rem;
-      margin-bottom: 1rem;
-      font-weight: 700;
-      color: var(--hhx-ember2);
-    }
-    .hhx-floating-card .card-item {
-      display: flex;
-      justify-content: space-between;
-      margin: 0.8rem 0;
-      font-size: 1rem;
-    }
-    .hhx-floating-card .price {
-      color: var(--hhx-ember2);
-      font-weight: 700;
-    }
-    .hhx-header-stats {
-      position: absolute;
-      bottom: 3rem;
-      left: 2rem;
-      display: flex;
-      gap: 2rem;
-      background: rgba(0,0,0,0.35);
-      backdrop-filter: blur(12px);
-      padding: 1rem 2rem;
-      border-radius: 60px;
-      border: 1px solid rgba(255,255,255,0.1);
-      z-index: 10;
-    }
-    .hhx-header-stats .stat {
-      text-align: center;
-    }
-    .hhx-header-stats .number {
-      font-size: 1.8rem;
-      font-weight: 900;
-      color: var(--hhx-ember2);
-      line-height: 1;
-    }
-    .hhx-header-stats .label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      opacity: 0.8;
-    }
-    @media (max-width: 800px) {
-      .hhx-floating-card { display: none; }
-      .hhx-header-stats { left: 50%; transform: translateX(-50%); bottom: 1rem; }
-    }
-    /* ---------- rest of existing styles (unchanged) ---------- */
+    @media (max-width: 900px) { .hhx-hero { grid-template-columns: 1fr; } }
+
     .hhx-heroCard {
       background: linear-gradient(to bottom, rgba(255,255,255,.08), rgba(255,255,255,.05));
       border: 1px solid var(--hhx-border);
@@ -263,6 +158,7 @@
       pointer-events: none;
     }
     .hhx-heroCard > * { position: relative; z-index: 1; }
+
     .hhx-kicker {
       display: inline-block;
       padding: 7px 12px;
@@ -274,6 +170,7 @@
       font-size: 13px;
       letter-spacing: .02em;
     }
+
     .hhx-h1 {
       margin: 12px 0 6px;
       font-size: clamp(28px, 4vw, 44px);
@@ -281,6 +178,7 @@
       line-height: 1.02;
       font-weight: 950;
     }
+
     .hhx-sub {
       margin: 0 0 14px;
       color: var(--hhx-muted);
@@ -288,12 +186,14 @@
       font-size: clamp(14px, 1.6vw, 16px);
       line-height: 1.35;
     }
+
     .hhx-ctaRow {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       margin: 12px 0 12px;
     }
+
     .hhx-btn {
       text-decoration: none;
       color: var(--hhx-text);
@@ -316,6 +216,7 @@
       color: #1a0d0b;
       box-shadow: 0 18px 56px rgba(255,91,61,.20);
     }
+
     .hhx-quickFacts {
       display: flex;
       flex-wrap: wrap;
@@ -337,6 +238,8 @@
     .hhx-dot { width: 9px; height: 9px; border-radius: 99px; background: var(--hhx-ember); box-shadow: 0 0 0 4px rgba(255,91,61,.18); }
     .hhx-dot2 { background: var(--hhx-ember2); box-shadow: 0 0 0 4px rgba(255,176,75,.16); }
     .hhx-dot3 { background: rgba(255,255,255,.72); box-shadow: 0 0 0 4px rgba(255,255,255,.10); }
+
+    /* SIGNATURE SEAL */
     .hhx-sigil {
       position: relative;
       width: 240px;
@@ -370,6 +273,7 @@
       animation: hhxSealSpin 18s linear infinite;
     }
     @keyframes hhxSealSpin { to { transform: rotate(360deg); } }
+
     .hhx-sigilRing {
       position: absolute;
       inset: 20px;
@@ -419,6 +323,8 @@
       .hhx-sigilCore { width: 118px; height: 118px; }
       .hhx-sigilLogo { width: 84px; height: 84px; }
     }
+
+    /* NAV GRID */
     .hhx-navGrid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0,1fr));
@@ -427,6 +333,7 @@
     }
     @media (max-width: 900px) { .hhx-navGrid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
     @media (max-width: 520px) { .hhx-navGrid { grid-template-columns: 1fr; } }
+
     .hhx-navCard {
       display: block;
       text-decoration: none;
@@ -446,6 +353,8 @@
     .hhx-navIcon { font-size: 22px; opacity: .95; }
     .hhx-navTitle { margin-top: 8px; font-weight: 950; letter-spacing: -0.02em; font-size: 16px; }
     .hhx-navDesc { margin-top: 6px; color: var(--hhx-muted); font-weight: 700; font-size: 13px; line-height: 1.35; }
+
+    /* SPLIT */
     .hhx-split {
       display: grid;
       grid-template-columns: 1.2fr .8fr;
@@ -453,6 +362,7 @@
       margin-top: 12px;
     }
     @media (max-width: 900px) { .hhx-split { grid-template-columns: 1fr; } }
+
     .hhx-panel {
       border-radius: var(--hhx-radius);
       border: 1px solid rgba(255,255,255,.14);
@@ -462,6 +372,7 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
     }
+
     .hhx-h2 {
       margin: 0 0 8px;
       font-weight: 950;
@@ -475,6 +386,7 @@
       font-size: 14px;
       line-height: 1.45;
     }
+
     .hhx-featureRow {
       margin-top: 14px;
       display: grid;
@@ -482,6 +394,7 @@
       gap: 10px;
     }
     @media (max-width: 560px) { .hhx-featureRow { grid-template-columns: 1fr; } }
+
     .hhx-feature {
       border-radius: 18px;
       border: 1px solid rgba(255,255,255,.14);
@@ -501,6 +414,7 @@
       color: rgba(255,255,255,.80);
     }
     .hhx-featureText { color: rgba(255,255,255,.72); font-weight: 700; font-size: 13px; line-height: 1.4; }
+
     .hhx-panel--info .hhx-infoTop {
       display: flex;
       align-items: flex-start;
@@ -511,6 +425,7 @@
     .hhx-strong { margin-top: 6px; font-weight: 900; font-size: 14px; letter-spacing: -0.01em; }
     .hhx-link { display: inline-block; margin-top: 8px; color: rgba(255,255,255,.82); font-weight: 900; text-decoration: none; }
     .hhx-link:hover { text-decoration: underline; }
+
     .hhx-badge {
       padding: 8px 10px;
       border-radius: 999px;
@@ -523,6 +438,7 @@
       color: rgba(255,255,255,.90);
       white-space: nowrap;
     }
+
     .hhx-hours {
       margin-top: 14px;
       border-radius: 18px;
@@ -541,6 +457,7 @@
       font-size: 13px;
     }
     .hhx-hourRow:first-child { border-top: none; }
+
     .hhx-callBox {
       margin-top: 14px;
       padding: 12px;
@@ -565,7 +482,10 @@
       font-size: 13px;
       line-height: 1.35;
     }
+
+    /* FACEBOOK SECTION */
     .hhx-fbWrap { margin-top: 14px; }
+
     .hhx-fbPanel {
       border-radius: var(--hhx-radius);
       border: 1px solid rgba(255,255,255,.14);
@@ -586,6 +506,7 @@
       pointer-events: none;
     }
     .hhx-fbPanel > * { position: relative; z-index: 1; }
+
     .hhx-fbTop {
       display: flex;
       align-items: flex-start;
@@ -607,6 +528,7 @@
       line-height: 1.35;
       max-width: 560px;
     }
+
     .hhx-fbBtn {
       text-decoration: none;
       color: var(--hhx-text);
@@ -624,6 +546,7 @@
       transform: translateY(-1px);
       box-shadow: 0 18px 46px rgba(0,0,0,.45);
     }
+
     .hhx-fbGrid {
       display: grid;
       grid-template-columns: 1.2fr .8fr;
@@ -634,6 +557,7 @@
       .hhx-fbTop { flex-direction: column; }
       .hhx-fbGrid { grid-template-columns: 1fr; }
     }
+
     .hhx-fbEmbed {
       border-radius: 18px;
       border: 1px solid rgba(255,255,255,.14);
@@ -645,6 +569,7 @@
       max-width: 100%;
       display: block;
     }
+
     .hhx-fbFrame {
       position: relative;
       width: 100%;
@@ -652,6 +577,7 @@
       overflow: hidden;
       border-radius: 18px;
     }
+
     #hhx-fbIframe {
       width: 100%;
       height: 520px;
@@ -660,6 +586,7 @@
       max-width: 100%;
       overflow: hidden;
     }
+
     .hhx-fbFallback {
       position: absolute;
       inset: 0;
@@ -694,6 +621,7 @@
       line-height: 1.35;
       max-width: 520px;
     }
+
     .hhx-fbSideCard {
       height: 100%;
       border-radius: 18px;
@@ -719,6 +647,8 @@
     .hhx-fbSideH { font-weight: 950; letter-spacing: -0.02em; font-size: 16px; }
     .hhx-fbSideP { color: var(--hhx-muted); font-weight: 750; font-size: 13px; line-height: 1.35; }
     .hhx-fbPills { margin-top: auto; display: flex; flex-wrap: wrap; gap: 8px; }
+
+    /* MARQUEE */
     .hhx-marquee {
       margin-top: 14px;
       border-radius: var(--hhx-radius);
@@ -981,7 +911,7 @@
       }
     }
 
-    /* ---------- LUNCH HERO ---------- */
+    /* ---------- LUNCH HERO (hhHomeMenuHero) ---------- */
     #hhHomeMenuHero {
       position: relative;
       width: 100%;
@@ -1209,7 +1139,7 @@
       #hhHomeMenuHero .hh-card { transition: none !important; }
     }
 
-    /* ---------- FOOTER ---------- */
+    /* ---------- FOOTER (site-footer) ---------- */
     .site-footer,
     .site-footer * { box-sizing: border-box; }
     .site-footer {
@@ -1315,6 +1245,29 @@
     @media (max-width: 900px) {
       .footer-inner { grid-template-columns: 1fr; }
     }
+
+    /* Hide the old explore pill (if any) */
+    .gen-pill {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    /* Hidden updater link */
+    .gen-hidden-link { display: none !important; }
+    .gen-hidden-link.is-visible { display: flex !important; opacity: 0; transform: translateY(6px); transition: opacity 200ms ease, transform 200ms ease; }
+    .gen-hidden-link.is-visible.is-on { opacity: 1; transform: translateY(0); }
+
+    /* Prevent iOS/Safari long-press link preview */
+    #genAboutLink {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    /* Reduced motion for homepage */
     @media (prefers-reduced-motion: reduce) {
       .hhx-marqueeTrack { animation: none; }
       .hhx-sigil::before { animation: none; }
@@ -1322,7 +1275,7 @@
   </style>
 </head>
 <body>
-  <!-- Hidden anchors for sections (keep same IDs) -->
+  <!-- Required anchors for explore nav (invisible) -->
   <div id="gen-home" style="position: absolute; top: 0; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
   <div id="gen-menu" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
   <div id="gen-delivery" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
@@ -1330,7 +1283,7 @@
   <div id="gen-about" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
   <div id="gen-location" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
 
-  <!-- ===== NEW CIRCULAR NAVIGATION BUTTONS ===== -->
+  <!-- ===== NEW CIRCULAR NAVIGATION BUTTONS (replaces old genRoot) ===== -->
   <div class="nav-btn left-center" id="navBtnLeft">
     <i class="fas fa-compass btn-icon"></i>
     <div class="btn-text">
@@ -1360,31 +1313,28 @@
     </div>
   </div>
 
-  <!-- ===== IMMERSIVE HEADER ===== -->
-  <canvas id="header-canvas"></canvas>
-  <section class="hhx-immersive-header">
-    <div class="header-layer header-layer-1"></div>
-    <div class="header-layer header-layer-2">
-      <div class="hhx-header-title">
-        HOT HEADZ
-        <span>SOUTHERN FOODS</span>
+  <!-- ===== LUNCH PREVIEW HERO ===== -->
+  <section id="hhHomeMenuHero" aria-label="Today’s lunch preview">
+    <div class="hh-bg" aria-hidden="true"></div>
+    <div class="hh-inner">
+      <div class="hh-top">
+        <div class="hh-kicker" id="hhHeroKicker">Loading…</div>
+        <div class="hh-title" id="hhHeroTitle">Today’s Lunch Preview</div>
+        <p class="hh-sub" id="hhHeroSub">Swipe/drag left & right — tap any item to open the menu.</p>
+        <div class="hh-actions">
+          <a class="hh-btn hh-btn-primary" href="menu.html">View Full Menu</a>
+          <a class="hh-btn" href="tel:3372211035">Call to Order</a>
+        </div>
       </div>
-    </div>
-    <div class="header-layer header-layer-3"></div>
-    <div class="hhx-floating-card">
-      <div class="card-header">
-        <span>🔥 TODAY'S SPECIALS</span>
-        <i class="fas fa-utensils"></i>
+      <div class="hh-strip" role="region" aria-label="Scrolling lunch items">
+        <div class="hh-track" id="hhHeroTrack"></div>
+        <div class="hh-fade left" aria-hidden="true"></div>
+        <div class="hh-fade right" aria-hidden="true"></div>
       </div>
-      <div class="card-item"><span>Red Beans & Rice</span> <span class="price">$8.99</span></div>
-      <div class="card-item"><span>Fried Chicken Plate</span> <span class="price">$10.99</span></div>
-      <div class="card-item"><span>Catfish Po' Boy</span> <span class="price">$9.99</span></div>
-      <div class="card-item"><span>Meatloaf</span> <span class="price">$8.99</span></div>
-    </div>
-    <div class="hhx-header-stats">
-      <div class="stat"><span class="number">2020</span> <div class="label">Est.</div></div>
-      <div class="stat"><span class="number">4.8</span> <div class="label">★ Rating</div></div>
-      <div class="stat"><span class="number">Family</span> <div class="label">Owned</div></div>
+      <button class="hh-down" id="hhHeroDown" type="button" aria-label="Scroll down">
+        <span class="hh-down-ic" aria-hidden="true"><span>↓</span></span>
+        <span>Keep scrolling</span>
+      </button>
     </div>
   </section>
 
@@ -1395,6 +1345,41 @@
       <div class="hhx-glow"></div>
     </div>
     <div class="hhx-wrap">
+      <!-- HERO -->
+      <header class="hhx-hero">
+        <div class="hhx-heroCard">
+          <div class="hhx-kicker">Home-style Southern cooking, made fresh daily</div>
+          <h1 class="hhx-h1">Hot Headz Southern Foods</h1>
+          <p class="hhx-sub">Breakfast &amp; Lunch • Cafeteria-Style • Made From Scratch</p>
+          <div class="hhx-ctaRow">
+            <a class="hhx-btn hhx-btn--primary" href="menu.html">View Today’s Menu</a>
+            <a class="hhx-btn" href="tel:3372211035">Call to Order</a>
+            <a class="hhx-btn" href="delivery.html">Delivery Options</a>
+          </div>
+          <div class="hhx-quickFacts" role="list" aria-label="Quick info">
+            <div class="hhx-pill" role="listitem">
+              <span class="hhx-dot" aria-hidden="true"></span>
+              DeRidder, LA
+            </div>
+            <div class="hhx-pill" role="listitem">
+              <span class="hhx-dot hhx-dot2" aria-hidden="true"></span>
+              Dine-In • Carry-Out • Delivery
+            </div>
+            <div class="hhx-pill" role="listitem">
+              <span class="hhx-dot hhx-dot3" aria-hidden="true"></span>
+              (10 plates+ • within 10 miles)
+            </div>
+          </div>
+        </div>
+
+        <div class="hhx-sigil" aria-hidden="true">
+          <div class="hhx-sigilRing"></div>
+          <div class="hhx-sigilCore"></div>
+          <img class="hhx-sigilLogo" src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/56a6bcf8-18fc-4dcc-9f69-fd6f3774fac2/IMG_4798.png?format=750w" alt="Hot Headz Southern Foods logo">
+          <div class="hhx-sigilText">EST. 2020</div>
+        </div>
+      </header>
+
       <!-- NAV CARDS -->
       <section class="hhx-navGrid" aria-label="Navigate">
         <a class="hhx-navCard" href="menu.html">
@@ -1517,6 +1502,8 @@
           <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/60a521f4-075c-4248-b85b-0bd8c3bfcf24/FoodPicHotHeadz2.jpg?format=750w?format=750w" alt=""></figure>
           <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/bd1149f5-9010-4315-947f-43d0aae70bf9/FoodPicHotHeadz1.jpg?format=750w?format=750w" alt=""></figure>
           <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a826ba0b-4314-493b-a043-7e310475acfe/FoodPicHotHeadz.jpg?format=750w?format=750w" alt=""></figure>
+
+          <!-- duplicate for seamless loop -->
           <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a1f1f8e4-ac79-47f2-83d3-3ca8cdc1465f/_1013557.png?format=750w" alt=""></figure>
           <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/bb8c3f58-b60a-43c8-a27b-23016601ae79/_1013546.png?format=750w" alt=""></figure>
           <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/e224a71b-4f49-491f-b025-2c35d8ebbbc9/627539034_1382867730524063_6201184549603031044_n.jpg?format=750w" alt=""></figure>
@@ -1527,31 +1514,6 @@
           <figure class="hhx-photo"><img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/a826ba0b-4314-493b-a043-7e310475acfe/FoodPicHotHeadz.jpg?format=750w?format=750w" alt=""></figure>
         </div>
       </section>
-    </div>
-  </section>
-
-  <!-- ===== LUNCH PREVIEW HERO ===== -->
-  <section id="hhHomeMenuHero" aria-label="Today’s lunch preview">
-    <div class="hh-bg" aria-hidden="true"></div>
-    <div class="hh-inner">
-      <div class="hh-top">
-        <div class="hh-kicker" id="hhHeroKicker">Loading…</div>
-        <div class="hh-title" id="hhHeroTitle">Today’s Lunch Preview</div>
-        <p class="hh-sub" id="hhHeroSub">Swipe/drag left & right — tap any item to open the menu.</p>
-        <div class="hh-actions">
-          <a class="hh-btn hh-btn-primary" href="menu.html">View Full Menu</a>
-          <a class="hh-btn" href="tel:3372211035">Call to Order</a>
-        </div>
-      </div>
-      <div class="hh-strip" role="region" aria-label="Scrolling lunch items">
-        <div class="hh-track" id="hhHeroTrack"></div>
-        <div class="hh-fade left" aria-hidden="true"></div>
-        <div class="hh-fade right" aria-hidden="true"></div>
-      </div>
-      <button class="hh-down" id="hhHeroDown" type="button" aria-label="Scroll down">
-        <span class="hh-down-ic" aria-hidden="true"><span>↓</span></span>
-        <span>Keep scrolling</span>
-      </button>
     </div>
   </section>
 
@@ -1631,13 +1593,15 @@
     </div>
   </footer>
 
+  <!-- ===== SCRIPTS ===== -->
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
+    // AOS init
     AOS.init({ once: false, duration: 1000 });
   </script>
 
+  <!-- Circular menu toggle script -->
   <script>
-    // Circular menu toggle
     (function() {
       const overlay = document.getElementById('circMenuOverlay');
       const leftBtn = document.getElementById('navBtnLeft');
@@ -1688,7 +1652,7 @@
   </script>
 
   <script>
-    // Lunch Hero (unchanged)
+    // Lunch Hero with static data – no fetch errors
     (() => {
       const hero = document.getElementById("hhHomeMenuHero");
       const track = document.getElementById("hhHeroTrack");
@@ -1698,6 +1662,7 @@
       if (!hero || !track || !down || !kicker || !sub) return;
 
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
       const LUNCH_ITEMS = [
         "Red Beans & Rice",
         "Fried Chicken",
@@ -1805,68 +1770,107 @@
   </script>
 
   <script>
-    // Smoke canvas for header
-    (function() {
-      const canvas = document.getElementById('header-canvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      let width, height;
-      let particles = [];
+    // Long-press on About link – now redirects to fb-menu.html
+    (function () {
+      const about = document.getElementById("genAboutLink");
+      if (!about) return;
+      const UPDATER_URL = "/fb-menu.html";  // <-- admin page
+      const HOLD_MS = 1000;
+      let holdTimer = null;
+      let longPressed = false;
 
-      function initParticles() {
-        const count = 40;
-        for (let i = 0; i < count; i++) {
-          particles.push({
-            x: Math.random(),
-            y: Math.random(),
-            radius: 0.1 + Math.random() * 0.2,
-            speedX: (Math.random() - 0.5) * 0.001,
-            speedY: (Math.random() - 0.8) * 0.0005,
-            opacity: 0.1 + Math.random() * 0.2,
-          });
+      function startHold() {
+        longPressed = false;
+        holdTimer = setTimeout(() => {
+          longPressed = true;
+          try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) {}
+          window.location.href = UPDATER_URL;
+        }, HOLD_MS);
+      }
+      function cancelHold() {
+        if (holdTimer) clearTimeout(holdTimer);
+        holdTimer = null;
+      }
+      about.addEventListener("pointerdown", startHold);
+      about.addEventListener("pointerup", cancelHold);
+      about.addEventListener("pointercancel", cancelHold);
+      about.addEventListener("pointerleave", cancelHold);
+      about.addEventListener("touchstart", startHold, { passive: true });
+      about.addEventListener("touchend", cancelHold);
+      about.addEventListener("touchcancel", cancelHold);
+      about.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+      about.addEventListener("click", function (e) {
+        if (longPressed) {
+          e.preventDefault();
+          e.stopPropagation();
+          longPressed = false;
         }
-      }
-
-      function resizeCanvas() {
-        width = window.innerWidth;
-        height = window.innerHeight;
-        canvas.width = width;
-        canvas.height = height;
-      }
-
-      function drawSmoke() {
-        ctx.clearRect(0, 0, width, height);
-        particles.forEach(p => {
-          p.x += p.speedX;
-          p.y += p.speedY;
-          if (p.x < 0) p.x = 1;
-          if (p.x > 1) p.x = 0;
-          if (p.y < 0) p.y = 1;
-          if (p.y > 1) p.y = 0;
-
-          const xPos = p.x * width;
-          const yPos = p.y * height;
-          const radius = p.radius * Math.min(width, height) * 0.6;
-
-          ctx.beginPath();
-          ctx.arc(xPos, yPos, radius, 0, Math.PI*2);
-          ctx.fillStyle = `rgba(255, 120, 70, ${p.opacity * 0.5})`;
-          ctx.filter = 'blur(12px)';
-          ctx.fill();
-        });
-        ctx.filter = 'none';
-        requestAnimationFrame(drawSmoke);
-      }
-
-      window.addEventListener('resize', resizeCanvas);
-      resizeCanvas();
-      initParticles();
-      drawSmoke();
+      }, true);
     })();
   </script>
 
   <script>
-    // Facebook embed (unchanged)
+    // Share button (unchanged)
+    (function () {
+      const shareBtn = document.getElementById('genSideShare');
+      if (!shareBtn) return;
+
+      shareBtn.addEventListener('click', async function () {
+        const shareData = {
+          title: document.title || 'Check this out',
+          text: 'Take a look at this page',
+          url: window.location.href
+        };
+
+        try {
+          if (navigator.share) {
+            await navigator.share(shareData);
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(window.location.href);
+            shareBtn.classList.add('copied');
+            const label = shareBtn.querySelector('.gen-dock-tx');
+            if (label) {
+              const oldText = label.textContent;
+              label.textContent = 'Copied';
+              setTimeout(() => {
+                label.textContent = oldText;
+                shareBtn.classList.remove('copied');
+              }, 1800);
+            }
+            return;
+          }
+          // Fallback
+          const temp = document.createElement('input');
+          temp.value = window.location.href;
+          document.body.appendChild(temp);
+          temp.select();
+          temp.setSelectionRange(0, 99999);
+          document.execCommand('copy');
+          document.body.removeChild(temp);
+          const label2 = shareBtn.querySelector('.gen-dock-tx');
+          if (label2) {
+            const oldText2 = label2.textContent;
+            label2.textContent = 'Copied';
+            setTimeout(() => {
+              label2.textContent = oldText2;
+            }, 1800);
+          }
+        } catch (e) {
+          console.log('Share/copy failed', e);
+        }
+      });
+    })();
+  </script>
+
+  <script>
+    // Update copyright year
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+
+  <!-- Facebook embed script (unchanged) -->
+  <script>
     (function(){
       const FB_HREF_FOR_EMBED = "https://www.facebook.com/pages/Hot-Headz-Southern-Foods/100064025473003/";
       const frame = document.getElementById("hhx-fbFrame");
@@ -1905,11 +1909,7 @@
     })();
   </script>
 
-  <script>
-    // Update copyright year
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
-
+  <!-- ===== STRUCTURED DATA (JSON-LD) ===== -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
