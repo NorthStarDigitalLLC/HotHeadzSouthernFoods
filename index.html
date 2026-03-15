@@ -583,12 +583,10 @@
     }
 
     .hhx-fbFrame {
-      position: relative;
-      width: 100%;
-      height: 520px;
-      overflow: hidden;
-      border-radius: 18px;
-    }
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
 
     #hhx-fbIframe {
       width: 100%;
@@ -1886,60 +1884,56 @@
 
   <!-- Facebook embed script (unchanged) -->
   <script>
-(function(){
-  // NOTE:
-  // This MUST be an embeddable Facebook PAGE url to display a timeline.
-  // If FB treats it like a profile (profile.php?id=...), the iframe will often show blank.
-  // Keep your button links as-is, but for embedding you may need a real Page @username URL.
-  var FB_HREF_FOR_EMBED = "https://www.facebook.com/pages/Hot-Headz-Southern-Foods/100064025473003/";
+(function() {
+  // Use the exact page URL that works in your browser
+  var FB_PAGE_URL = "https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/";
 
   var frame = document.getElementById("hhx-fbFrame");
   var iframe = document.getElementById("hhx-fbIframe");
   var fallback = document.getElementById("hhx-fbFallback");
-  if(!frame || !iframe) return;
 
-  function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+  if (!frame || !iframe) return;
 
-  function buildSrc(w){
-    var h = 520;
-    var href = encodeURIComponent(FB_HREF_FOR_EMBED);
+  // Hide fallback initially (it will only show if embed fails)
+  if (fallback) fallback.style.display = "none";
+
+  function buildSrc(width) {
     return "https://www.facebook.com/plugins/page.php" +
-      "?href=" + href +
+      "?href=" + encodeURIComponent(FB_PAGE_URL) +
       "&tabs=timeline" +
-      "&width=" + w +
-      "&height=" + h +
+      "&width=" + width +
+      "&height=520" +
       "&small_header=false" +
       "&adapt_container_width=true" +
       "&hide_cover=false" +
       "&show_facepile=true";
   }
 
-  function setIframe(){
-    var w = Math.floor(frame.getBoundingClientRect().width || 0);
-    w = clamp(w, 280, 900);
-    iframe.src = buildSrc(w);
+  function setIframeSize() {
+    // Get the container's width (or fallback to 500px)
+    var containerWidth = frame.getBoundingClientRect().width;
+    var width = Math.min(500, Math.max(280, containerWidth)); // clamp between 280-500
+    iframe.src = buildSrc(width);
   }
 
-  function showFallbackSoon(){
-    if(!fallback) return;
-    fallback.hidden = true;
+  // Set initial iframe
+  setIframeSize();
 
-    // Practical fallback: if FB blocks embedding, users won’t see content -> show overlay
-    setTimeout(function(){
-      fallback.hidden = false;
-    }, 2500);
+  // Update iframe when window resizes (debounced)
+  var resizeTimer;
+  window.addEventListener("resize", function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(setIframeSize, 250);
+  });
+
+  // Fallback: if the iframe fails to load after 5 seconds, show the fallback message
+  if (fallback) {
+    setTimeout(function() {
+      // Check if iframe content is accessible (optional)
+      // Simple fallback: show after timeout regardless
+      fallback.style.display = "flex";
+    }, 5000);
   }
-
-  if ("ResizeObserver" in window){
-    var ro = new ResizeObserver(function(){ setIframe(); });
-    ro.observe(frame);
-  } else {
-    window.addEventListener("resize", setIframe, {passive:true});
-    window.addEventListener("orientationchange", function(){ setTimeout(setIframe, 250); }, {passive:true});
-  }
-
-  setIframe();
-  showFallbackSoon();
 })();
 </script>
 
