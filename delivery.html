@@ -32,96 +32,10 @@
       color: rgba(255,255,255,0.92);
       font-family: 'Inter', sans-serif;
       line-height: 1.5;
-      padding-bottom: 90px; /* space for bottom dock */
+      padding-bottom: 90px; /* space for bottom navigation button */
     }
 
-    /* ---------- FLOATING DOCK (copied from homepage) ---------- */
-    :root {
-      --gen-glass: rgba(6,7,10,0.62);
-      --gen-glass-2: rgba(6,7,10,0.78);
-      --gen-border: rgba(255,255,255,0.14);
-      --gen-border-2: rgba(255,255,255,0.22);
-      --gen-text: rgba(255,255,255,0.92);
-      --gen-muted: rgba(255,255,255,0.62);
-      --gen-hotA: rgba(255,120,70,0.82);
-      --gen-hotB: rgba(255,60,140,0.74);
-      --gen-radius-pill: 999px;
-      --gen-shadow: 0 18px 50px rgba(0,0,0,0.62);
-    }
-
-    .gen-root, .gen-root * { box-sizing: border-box; }
-    .gen-root {
-      position: fixed;
-      inset: 0;
-      z-index: 999999;
-      pointer-events: none;
-    }
-    .gen-dock {
-      pointer-events: auto;
-      position: fixed;
-      left: 50%;
-      bottom: 16px;
-      transform: translateX(-50%);
-      width: min(660px, calc(100vw - 26px));
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 10px;
-      border-radius: var(--gen-radius-pill);
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(6,7,10,0.62);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: var(--gen-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
-    }
-    .gen-dock-btn {
-      text-decoration: none;
-      color: rgba(255,255,255,0.92);
-      flex: 1 1 0;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.36);
-      padding: 10px 8px;
-      box-shadow: 0 10px 22px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.08);
-      transition: transform 0.14s ease;
-    }
-    .gen-dock-btn:hover {
-      transform: translateY(-1px);
-      background: rgba(0,0,0,0.56);
-      border-color: rgba(255,255,255,0.22);
-    }
-    .gen-dock-ic { font-size: 16px; }
-    .gen-dock-tx {
-      font-size: 11.5px;
-      font-weight: 900;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .gen-dock-cta {
-      background: linear-gradient(90deg, rgba(255,120,70,0.22), rgba(255,60,140,0.16));
-    }
-    .gen-dock-btn.is-active {
-      background: rgba(42,127,98,0.3);
-      border-color: rgba(255,179,90,0.5);
-    }
-
-    @media (max-width: 720px) {
-      .gen-dock { gap: 8px; padding: 9px; }
-      .gen-dock-ic { font-size: 15px; }
-      .gen-dock-tx { font-size: 11px; }
-    }
-    @media (max-width: 380px) {
-      .gen-dock-tx { display: none; }
-    }
-
-    /* ===== DELIVERY PAGE STYLES (as provided) ===== */
+    /* ===== DELIVERY PAGE STYLES (unchanged) ===== */
     .hh-delivery{
       --bg: #07060a;
       --glass: rgba(10,12,18,.62);
@@ -363,10 +277,233 @@
     @media (prefers-reduced-motion: reduce){
       .hh-btn{ transition: none; }
     }
+
+    /* ==================== CIRCULAR NAVIGATION (adapted for Hot Headz) ==================== */
+    .nav-btn {
+      position: fixed;
+      z-index: 2000;
+      background: #1e1b1b;
+      border: 2px solid var(--ember, #ff5b3d);
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(255,91,61,0.5);
+      transition: all 0.2s ease;
+      backdrop-filter: blur(8px);
+    }
+
+    .nav-btn:hover {
+      transform: scale(1.05);
+      border-color: var(--ember2, #ffb04b);
+      box-shadow: 0 0 35px var(--ember, #ff5b3d);
+    }
+
+    .btn-icon {
+      font-size: 1.8rem;
+      color: var(--ember, #ff5b3d);
+    }
+
+    .btn-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+
+    .btn-text .main {
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.92);
+    }
+
+    .btn-text .sub {
+      font-size: 0.65rem;
+      opacity: 0.7;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+    }
+
+    /* left-center button - VERTICAL */
+    .nav-btn.left-center {
+      left: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+      flex-direction: column;
+      padding: 1rem 0.5rem;
+      gap: 8px;
+    }
+
+    .nav-btn.left-center .btn-text {
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .nav-btn.left-center .btn-text .main {
+      font-size: 0.9rem;
+      letter-spacing: normal;
+    }
+
+    .nav-btn.left-center .btn-text .sub {
+      font-size: 0.6rem;
+      margin-top: 4px;
+    }
+
+    /* bottom-center button - HORIZONTAL */
+    .nav-btn.bottom-center {
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      flex-direction: row;
+      padding: 0.8rem 1.8rem;
+    }
+
+    /* circular menu overlay */
+    .circ-menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      background: rgba(0,0,0,0.7);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      backdrop-filter: blur(8px);
+    }
+
+    .circ-menu-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .circular-menu {
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      background: transparent;
+      border: 2px solid var(--ember, #ff5b3d);
+      box-shadow: 0 0 40px rgba(255,91,61,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transform: scale(0.3);
+      transition: transform 0.3s ease;
+    }
+
+    .circ-menu-overlay.open .circular-menu {
+      transform: scale(1);
+    }
+
+    .center-home {
+      width: 70px;
+      height: 70px;
+      background: var(--ember2, #ffb04b);
+      border: 3px solid var(--ember, #ff5b3d);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.5rem;
+      color: #1a0d0b;
+      box-shadow: 0 0 30px var(--ember, #ff5b3d);
+      cursor: pointer;
+      transition: 0.2s;
+      z-index: 1001;
+    }
+    .center-home:hover {
+      background: var(--ember, #ff5b3d);
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .menu-item {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background: #1e1b1b;
+      border: 2px solid var(--ember, #ff5b3d);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.92);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      transition: all 0.2s;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0,0,0,0.7);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-130px) rotate(calc(var(--angle) * -1deg));
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 1px;
+      backdrop-filter: blur(4px);
+    }
+
+    .menu-item:hover {
+      background: var(--ember, #ff5b3d);
+      color: black;
+      border-color: var(--ember2, #ffb04b);
+      transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-140px) rotate(calc(var(--angle) * -1deg));
+      width: 65px;
+      height: 65px;
+    }
+
+    /* mobile adjustments */
+    @media (max-width: 600px) {
+      .nav-btn.left-center {
+        left: 10px;
+        padding: 0.8rem 0.3rem;
+      }
+      .nav-btn.left-center .btn-icon {
+        font-size: 1.5rem;
+      }
+      .nav-btn.left-center .btn-text .main {
+        font-size: 0.8rem;
+      }
+      .nav-btn.left-center .btn-text .sub {
+        font-size: 0.5rem;
+      }
+      .nav-btn.bottom-center {
+        bottom: 20px;
+        padding: 0.6rem 1.2rem;
+      }
+      .circular-menu {
+        width: 280px;
+        height: 280px;
+      }
+      .menu-item {
+        width: 50px;
+        height: 50px;
+        font-size: 0.7rem;
+        transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-100px) rotate(calc(var(--angle) * -1deg));
+      }
+      .menu-item:hover {
+        transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-110px) rotate(calc(var(--angle) * -1deg));
+        width: 55px;
+        height: 55px;
+      }
+      .center-home {
+        width: 60px;
+        height: 60px;
+        font-size: 1.2rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <!-- invisible anchors (for explore nav if used) -->
+  <!-- invisible anchors (kept for compatibility) -->
   <div id="gen-home" style="position: absolute; top:0; height:1px; width:1px; opacity:0;"></div>
   <div id="gen-menu" style="position: absolute; height:1px; width:1px; opacity:0;"></div>
   <div id="gen-delivery" style="position: absolute; height:1px; width:1px; opacity:0;"></div>
@@ -374,30 +511,33 @@
   <div id="gen-about" style="position: absolute; height:1px; width:1px; opacity:0;"></div>
   <div id="gen-location" style="position: absolute; height:1px; width:1px; opacity:0;"></div>
 
-  <!-- floating dock -->
-  <div id="genRoot" class="gen-root" hidden>
-    <nav id="genDock" class="gen-dock" aria-label="Quick actions" hidden>
-      <a class="gen-dock-btn" href="index.html" aria-label="Home">
-        <span class="gen-dock-ic" aria-hidden="true">🏠</span>
-        <span class="gen-dock-tx">Home</span>
-      </a>
-      <a class="gen-dock-btn" href="menu.html" aria-label="Menu">
-        <span class="gen-dock-ic" aria-hidden="true">🍽️</span>
-        <span class="gen-dock-tx">Menu</span>
-      </a>
-      <a class="gen-dock-btn is-active" href="delivery.html" aria-label="Delivery options">
-        <span class="gen-dock-ic" aria-hidden="true">🚗</span>
-        <span class="gen-dock-tx">Delivery</span>
-      </a>
-      <a class="gen-dock-btn gen-dock-cta" href="tel:3372211035" aria-label="Place an order">
-        <span class="gen-dock-ic" aria-hidden="true">📞</span>
-        <span class="gen-dock-tx">Order</span>
-      </a>
-      <a class="gen-dock-btn" href="about.html" aria-label="About us">
-        <span class="gen-dock-ic" aria-hidden="true">ℹ️</span>
-        <span class="gen-dock-tx">About</span>
-      </a>
-    </nav>
+  <!-- ===== CIRCULAR NAVIGATION BUTTONS ===== -->
+  <div class="nav-btn left-center" id="navBtnLeft">
+    <i class="fas fa-compass btn-icon"></i>
+    <div class="btn-text">
+      <span class="main">NAVIGATION</span>
+      <span class="sub">explore pages</span>
+    </div>
+  </div>
+
+  <div class="nav-btn bottom-center" id="navBtnBottom">
+    <i class="fas fa-compass btn-icon"></i>
+    <div class="btn-text">
+      <span class="main">NAVIGATION</span>
+      <span class="sub">explore pages</span>
+    </div>
+  </div>
+
+  <!-- CIRCULAR MENU OVERLAY with page links (5 items evenly spaced at 72° increments) -->
+  <div class="circ-menu-overlay" id="circMenuOverlay">
+    <div class="circular-menu">
+      <div class="center-home" id="homeCenter" data-link="index.html"><i class="fas fa-home"></i></div>
+      <div class="menu-item" style="--angle: 0;" data-link="menu.html">Menu</div>
+      <div class="menu-item" style="--angle: 72;" data-link="tel:3372211035">Order</div>
+      <div class="menu-item" style="--angle: 144;" data-link="about.html">About</div>
+      <div class="menu-item" style="--angle: 216;" data-link="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634">Location</div>
+      <div class="menu-item" style="--angle: 288;" data-action="share">Share</div>
+    </div>
   </div>
 
   <!-- DELIVERY CONTENT -->
@@ -706,14 +846,101 @@
 
     });
 
-    // Show the bottom dock
+    // Circular menu toggle script with page navigation and share
     (function() {
-      const root = document.getElementById('genRoot');
-      const dock = document.getElementById('genDock');
-      if (root && dock) {
-        root.hidden = false;
-        dock.hidden = false;
+      const overlay = document.getElementById('circMenuOverlay');
+      const leftBtn = document.getElementById('navBtnLeft');
+      const bottomBtn = document.getElementById('navBtnBottom');
+      const homeCenter = document.getElementById('homeCenter');
+      const menuItems = document.querySelectorAll('.menu-item');
+
+      function toggleMenu() {
+        overlay.classList.toggle('open');
       }
+
+      leftBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMenu();
+      });
+
+      bottomBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMenu();
+      });
+
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('open');
+        }
+      });
+
+      // Share function
+      async function sharePage() {
+        const shareData = {
+          title: document.title || 'Hot Headz Southern Foods',
+          text: 'Check out Hot Headz Southern Foods in DeRidder, LA!',
+          url: window.location.href
+        };
+        try {
+          if (navigator.share) {
+            await navigator.share(shareData);
+          } else if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(window.location.href);
+            // Provide visual feedback
+            const shareItem = document.querySelector('.menu-item[data-action="share"]');
+            if (shareItem) {
+              const originalText = shareItem.textContent;
+              shareItem.textContent = 'Copied';
+              setTimeout(() => {
+                shareItem.textContent = originalText;
+              }, 1500);
+            } else {
+              alert('Link copied to clipboard!');
+            }
+          } else {
+            // Fallback
+            const temp = document.createElement('input');
+            temp.value = window.location.href;
+            document.body.appendChild(temp);
+            temp.select();
+            temp.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            alert('Link copied to clipboard!');
+          }
+        } catch (e) {
+          console.log('Share/copy failed', e);
+        }
+      }
+
+      // Navigate to link (page or anchor)
+      function navigate(link) {
+        if (!link) return;
+        window.location.href = link; // external or relative works
+      }
+
+      homeCenter.addEventListener('click', () => {
+        overlay.classList.remove('open');
+        const link = homeCenter.getAttribute('data-link');
+        if (link) navigate(link);
+      });
+
+      menuItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+          overlay.classList.remove('open');
+          const link = item.getAttribute('data-link');
+          const action = item.getAttribute('data-action');
+          if (action === 'share') {
+            sharePage();
+          } else if (link) {
+            navigate(link);
+          }
+        });
+      });
+
+      document.querySelector('.circular-menu').addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
     })();
   </script>
 </body>
