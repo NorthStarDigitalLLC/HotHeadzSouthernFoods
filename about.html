@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Hot Headz | Southern Foods DeRidder</title>
+  <meta name="description" content="Family-owned since 2020, serving fresh Southern breakfast and lunch in DeRidder, LA. Made from scratch, served with a smile.">
+  
+  <!-- Google Fonts & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+  <style>
+    /* ---------- ROOT VARIABLES (same as homepage) ---------- */
+    :root {
+      --hhx-bg: #07060a;
+      --hhx-border: rgba(255,255,255,.14);
+      --hhx-text: rgba(255,255,255,.92);
+      --hhx-muted: rgba(255,255,255,.70);
+      --hhx-ember: #ff5b3d;
+      --hhx-ember2: #ffb04b;
+      --hhx-radius: 24px;
+      --hhx-radius2: 18px;
+      --hhx-shadow: 0 22px 70px rgba(0,0,0,.55);
+      --hhx-shadow2: 0 14px 40px rgba(0,0,0,.42);
+    }
+
+    /* ---------- RESET / BASE ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      max-width: 100%;
+    }
+    html {
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+    }
+    body {
+      background-color: #07060a;
+      color: rgba(255,255,255,0.92);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.5;
+      padding-bottom: 90px; /* space for bottom navigation button */
+    }
+
+    p { color: rgba(255,255,255,0.95); font-size: 1.05rem; }
+    h1, h2, h3 {
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      line-height: 1.1;
+      background: linear-gradient(135deg, #fff, var(--hhx-ember2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      margin-bottom: 1.5rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .section {
+      padding: 4rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2.5rem;
+      border-radius: 999px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--hhx-ember), var(--hhx-ember2));
+      color: #1a0d0b;
+      box-shadow: 0 14px 30px -14px rgba(255,91,61,0.5);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 28px 45px -18px rgba(255,91,61,0.6);
+    }
+    .btn-outline {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+    }
+    .btn-outline:hover {
+      border-color: var(--hhx-ember);
+      background: rgba(255,91,61,0.1);
+    }
+
+    /* ---------- HERO ---------- */
+    .hero {
+      min-height: 60vh;
+      display: flex;
+      align-items: center;
+      background: radial-gradient(circle at 70% 30%, rgba(255,91,61,0.15), transparent 50%),
+                  radial-gradient(circle at 30% 70%, rgba(255,176,75,0.1), transparent 50%),
+                  var(--hhx-bg);
+      padding: 4rem 0;
+    }
+    .hero .container {
+      display: grid;
+      gap: 2rem;
+    }
+    @media (min-width: 768px) {
+      .hero .container {
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+      }
+    }
+    .hero h1 {
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      opacity: 0.8;
+    }
+    .hero-image {
+      border-radius: var(--hhx-radius);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: var(--hhx-shadow);
+    }
+    .hero-image img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* ---------- STORY CARD ---------- */
+    .story-grid {
+      display: grid;
+      gap: 2rem;
+    }
+    @media (min-width: 768px) {
+      .story-grid {
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+      }
+    }
+    .story-card {
+      background: rgba(30,27,27,0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--hhx-radius);
+      padding: 2rem;
+      box-shadow: var(--hhx-shadow2);
+    }
+    .story-card p {
+      margin-bottom: 1rem;
+    }
+
+    /* ---------- VALUES GRID ---------- */
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    .value-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--hhx-radius2);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+    .value-item:hover {
+      transform: translateY(-5px);
+      border-color: var(--hhx-ember);
+    }
+    .value-item i {
+      font-size: 2.5rem;
+      color: var(--hhx-ember);
+      margin-bottom: 1rem;
+    }
+    .value-item h3 {
+      margin-bottom: 0.5rem;
+    }
+
+    /* ---------- TEAM ---------- */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .team-member {
+      text-align: center;
+    }
+    .team-member img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--hhx-ember);
+      margin-bottom: 1rem;
+    }
+    .team-member h4 {
+      margin-bottom: 0.25rem;
+    }
+    .team-member p {
+      opacity: 0.7;
+      font-size: 0.9rem;
+    }
+
+    /* ---------- HOURS / LOCATION ---------- */
+    .info-card {
+      background: rgba(30,27,27,0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--hhx-radius);
+      padding: 2rem;
+      max-width: 500px;
+      margin: 2rem auto 0;
+    }
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    .info-row i {
+      width: 30px;
+      color: var(--hhx-ember);
+      font-size: 1.2rem;
+    }
+    .info-row .label {
+      font-weight: 600;
+      opacity: 0.8;
+    }
+    .info-row .value {
+      margin-left: auto;
+      font-weight: 700;
+    }
+
+    /* ---------- CTA ---------- */
+    .cta-section {
+      background: radial-gradient(ellipse at 50% 50%, rgba(255,91,61,0.2), transparent 70%);
+      border-radius: var(--hhx-radius);
+      padding: 4rem 2rem;
+      text-align: center;
+      border: 1px solid rgba(255,91,61,0.3);
+    }
+
+    /* ==================== CIRCULAR NAVIGATION (same as other pages) ==================== */
+    .nav-btn {
+      position: fixed;
+      z-index: 2000;
+      background: #1e1b1b;
+      border: 2px solid var(--hhx-ember);
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(255,91,61,0.5);
+      transition: all 0.2s ease;
+      backdrop-filter: blur(8px);
+    }
+
+    .nav-btn:hover {
+      transform: scale(1.05);
+      border-color: var(--hhx-ember2);
+      box-shadow: 0 0 35px var(--hhx-ember);
+    }
+
+    .btn-icon {
+      font-size: 1.8rem;
+      color: var(--hhx-ember);
+    }
+
+    .btn-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+
+    .btn-text .main {
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.92);
+    }
+
+    .btn-text .sub {
+      font-size: 0.65rem;
+      opacity: 0.7;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+    }
+
+    /* left-center button - VERTICAL */
+    .nav-btn.left-center {
+      left: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+      flex-direction: column;
+      padding: 1rem 0.5rem;
+      gap: 8px;
+    }
+
+    .nav-btn.left-center .btn-text {
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .nav-btn.left-center .btn-text .main {
+      font-size: 0.9rem;
+      letter-spacing: normal;
+    }
+
+    .nav-btn.left-center .btn-text .sub {
+      font-size: 0.6rem;
+      margin-top: 4px;
+    }
+
+    /* bottom-center button - HORIZONTAL */
+    .nav-btn.bottom-center {
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      flex-direction: row;
+      padding: 0.8rem 1.8rem;
+    }
+
+    /* circular menu overlay */
+    .circ-menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      background: rgba(0,0,0,0.7);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      backdrop-filter: blur(8px);
+    }
+
+    .circ-menu-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .circular-menu {
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      background: transparent;
+      border: 2px solid var(--hhx-ember);
+      box-shadow: 0 0 40px rgba(255,91,61,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transform: scale(0.3);
+      transition: transform 0.3s ease;
+    }
+
+    .circ-menu-overlay.open .circular-menu {
+      transform: scale(1);
+    }
+
+    .center-home {
+      width: 70px;
+      height: 70px;
+      background: var(--hhx-ember2);
+      border: 3px solid var(--hhx-ember);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.5rem;
+      color: #1a0d0b;
+      box-shadow: 0 0 30px var(--hhx-ember);
+      cursor: pointer;
+      transition: 0.2s;
+      z-index: 1001;
+    }
+    .center-home:hover {
+      background: var(--hhx-ember);
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .menu-item {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background: #1e1b1b;
+      border: 2px solid var(--hhx-ember);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.92);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      transition: all 0.2s;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0,0,0,0.7);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-130px) rotate(calc(var(--angle) * -1deg));
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 1px;
+      backdrop-filter: blur(4px);
+    }
+
+    .menu-item:hover {
+      background: var(--hhx-ember);
+      color: black;
+      border-color: var(--hhx-ember2);
+      transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-140px) rotate(calc(var(--angle) * -1deg));
+      width: 65px;
+      height: 65px;
+    }
+
+    /* mobile adjustments */
+    @media (max-width: 600px) {
+      .nav-btn.left-center {
+        left: 10px;
+        padding: 0.8rem 0.3rem;
+      }
+      .nav-btn.left-center .btn-icon {
+        font-size: 1.5rem;
+      }
+      .nav-btn.left-center .btn-text .main {
+        font-size: 0.8rem;
+      }
+      .nav-btn.left-center .btn-text .sub {
+        font-size: 0.5rem;
+      }
+      .nav-btn.bottom-center {
+        bottom: 20px;
+        padding: 0.6rem 1.2rem;
+      }
+      .circular-menu {
+        width: 280px;
+        height: 280px;
+      }
+      .menu-item {
+        width: 50px;
+        height: 50px;
+        font-size: 0.7rem;
+        transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-100px) rotate(calc(var(--angle) * -1deg));
+      }
+      .menu-item:hover {
+        transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-110px) rotate(calc(var(--angle) * -1deg));
+        width: 55px;
+        height: 55px;
+      }
+      .center-home {
+        width: 60px;
+        height: 60px;
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- invisible anchors (for compatibility) -->
+  <div id="gen-home" style="position: absolute; top:0; height:1px; width:1px; opacity:0;"></div>
+  <div id="gen-menu" style="position: absolute; height:1px; width:1px; opacity:0;"></div>
+  <div id="gen-delivery" style="position: absolute; height:1px; width:1px; opacity:0;"></div>
+  <div id="gen-order" style="position: absolute; height:1px; width:1px; opacity:0;"></div>
+  <div id="gen-about" style="position: absolute; height:1px; width:1px; opacity:0;"></div>
+  <div id="gen-location" style="position: absolute; height:1px; width:1px; opacity:0;"></div>
+
+  <!-- ===== CIRCULAR NAVIGATION BUTTONS ===== -->
+  <div class="nav-btn left-center" id="navBtnLeft">
+    <i class="fas fa-compass btn-icon"></i>
+    <div class="btn-text">
+      <span class="main">NAVIGATION</span>
+      <span class="sub">explore pages</span>
+    </div>
+  </div>
+
+  <div class="nav-btn bottom-center" id="navBtnBottom">
+    <i class="fas fa-compass btn-icon"></i>
+    <div class="btn-text">
+      <span class="main">NAVIGATION</span>
+      <span class="sub">explore pages</span>
+    </div>
+  </div>
+
+  <!-- CIRCULAR MENU OVERLAY (5 items evenly spaced at 72°) -->
+  <div class="circ-menu-overlay" id="circMenuOverlay">
+    <div class="circular-menu">
+      <div class="center-home" id="homeCenter" data-link="index.html"><i class="fas fa-home"></i></div>
+      <div class="menu-item" style="--angle: 0;" data-link="menu.html">Menu</div>
+      <div class="menu-item" style="--angle: 72;" data-link="delivery.html">Delivery</div>
+      <div class="menu-item" style="--angle: 144;" data-link="about.html">About</div>
+      <div class="menu-item" style="--angle: 216;" data-link="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634">Map</div>
+      <div class="menu-item" style="--angle: 288;" data-action="share">Share</div>
+    </div>
+  </div>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="container">
+      <div data-aos="fade-right">
+        <div class="family-kicker" style="border-left-color: var(--hhx-ember); color: var(--hhx-ember);">SINCE 2020</div>
+        <h1>Southern hospitality,<br>made from scratch</h1>
+        <p>Hot Headz Southern Foods started as a dream to bring real, homestyle cooking to DeRidder. Today, we're proud to serve breakfast and lunch made daily with love.</p>
+      </div>
+      <div data-aos="fade-left" class="hero-image">
+        <img src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/56a6bcf8-18fc-4dcc-9f69-fd6f3774fac2/IMG_4798.png?format=750w" alt="Hot Headz team">
+      </div>
+    </div>
+  </section>
+
+  <!-- STORY SECTION -->
+  <section class="section">
+    <div class="container">
+      <div class="story-grid">
+        <div class="story-card" data-aos="fade-up">
+          <h2>Our story</h2>
+          <p>Hot Headz Southern Foods opened its doors in 2020 with a simple mission: serve fresh, filling, from-scratch meals that remind you of Sunday dinner at grandma's. What started as a small cafeteria‑style spot quickly became a local favorite.</p>
+          <p>We believe food should be honest – no shortcuts, no premade sysco boxes. Just real ingredients, cooked with care, and served with a smile.</p>
+        </div>
+        <div class="story-card" data-aos="fade-up" data-aos-delay="100">
+          <h2>Made fresh daily</h2>
+          <p>Our kitchen starts before sunrise. From scratch‑made biscuits to our famous crawfish boils, everything is prepared in‑house. We don't just heat food – we cook it, and you can taste the difference.</p>
+          <p>Come see why locals call us “the hidden gem on 190.”</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUES SECTION -->
+  <section class="section">
+    <div class="container">
+      <h2 style="text-align: center;">What we stand for</h2>
+      <div class="values-grid">
+        <div class="value-item" data-aos="zoom-in">
+          <i class="fas fa-egg"></i>
+          <h3>Made from scratch</h3>
+          <p>No shortcuts. Every dish is prepared by hand daily.</p>
+        </div>
+        <div class="value-item" data-aos="zoom-in" data-aos-delay="50">
+          <i class="fas fa-hand-holding-heart"></i>
+          <h3>Family owned</h3>
+          <p>We treat every customer like part of the family.</p>
+        </div>
+        <div class="value-item" data-aos="zoom-in" data-aos-delay="100">
+          <i class="fas fa-leaf"></i>
+          <h3>Quality ingredients</h3>
+          <p>We source the best to bring you the best.</p>
+        </div>
+        <div class="value-item" data-aos="zoom-in" data-aos-delay="150">
+          <i class="fas fa-smile"></i>
+          <h3>Friendly service</h3>
+          <p>We believe a smile makes the meal taste better.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM SECTION (optional placeholder) -->
+  <section class="section">
+    <div class="container">
+      <h2 style="text-align: center;">Meet the team</h2>
+      <div class="team-grid">
+        <div class="team-member" data-aos="fade-up">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Owner">
+          <h4>James Hothead</h4>
+          <p>Founder & Pitmaster</p>
+        </div>
+        <div class="team-member" data-aos="fade-up" data-aos-delay="50">
+          <img src="https://images.unsplash.com/photo-1494790108777-8f9b3f2a0b8e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Chef">
+          <h4>Maria Santos</h4>
+          <p>Head Chef</p>
+        </div>
+        <div class="team-member" data-aos="fade-up" data-aos-delay="100">
+          <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Manager">
+          <h4>David Lee</h4>
+          <p>Operations Manager</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOURS & LOCATION -->
+  <section class="section">
+    <div class="container">
+      <div class="info-card" data-aos="fade-up">
+        <h2 style="text-align: center; margin-bottom: 2rem;">Visit us</h2>
+        <div class="info-row">
+          <i class="fas fa-map-pin"></i>
+          <span class="label">Address</span>
+          <span class="value">2741 US-190, DeRidder, LA</span>
+        </div>
+        <div class="info-row">
+          <i class="fas fa-phone"></i>
+          <span class="label">Phone</span>
+          <span class="value"><a href="tel:3372211035" style="color: inherit;">(337) 221-1035</a></span>
+        </div>
+        <div class="info-row">
+          <i class="fas fa-clock"></i>
+          <span class="label">Mon–Fri</span>
+          <span class="value">5:30 AM – 2:00 PM</span>
+        </div>
+        <div class="info-row">
+          <i class="fas fa-clock"></i>
+          <span class="label">Saturday</span>
+          <span class="value">6:00 AM – 2:00 PM</span>
+        </div>
+        <div class="info-row">
+          <i class="fas fa-clock"></i>
+          <span class="label">Sunday</span>
+          <span class="value">7:00 AM – 3:00 PM</span>
+        </div>
+        <div class="info-row">
+          <i class="fas fa-lobster"></i>
+          <span class="label">Crawfish hours</span>
+          <span class="value">4 PM – 8 PM daily</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA SECTION -->
+  <section class="section">
+    <div class="container">
+      <div class="cta-section" data-aos="zoom-in">
+        <h2 style="margin-bottom: 1rem;">Come taste the difference</h2>
+        <p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.8;">Family‑owned, community‑loved. Stop by today!</p>
+        <a href="tel:3372211035" class="btn btn-primary"><i class="fas fa-phone"></i> Call us</a>
+        <a href="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634" target="_blank" class="btn btn-outline" style="margin-left: 1rem;"><i class="fas fa-map-marked-alt"></i> Directions</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCRIPTS -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init({ once: false, duration: 1000 });
+
+    // Circular menu toggle script with page navigation and share
+    (function() {
+      const overlay = document.getElementById('circMenuOverlay');
+      const leftBtn = document.getElementById('navBtnLeft');
+      const bottomBtn = document.getElementById('navBtnBottom');
+      const homeCenter = document.getElementById('homeCenter');
+      const menuItems = document.querySelectorAll('.menu-item');
+
+      function toggleMenu() {
+        overlay.classList.toggle('open');
+      }
+
+      leftBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMenu();
+      });
+
+      bottomBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMenu();
+      });
+
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('open');
+        }
+      });
+
+      async function sharePage() {
+        const shareData = {
+          title: document.title || 'Hot Headz Southern Foods',
+          text: 'Check out Hot Headz Southern Foods in DeRidder, LA!',
+          url: window.location.href
+        };
+        try {
+          if (navigator.share) {
+            await navigator.share(shareData);
+          } else if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(window.location.href);
+            const shareItem = document.querySelector('.menu-item[data-action="share"]');
+            if (shareItem) {
+              const originalText = shareItem.textContent;
+              shareItem.textContent = 'Copied';
+              setTimeout(() => shareItem.textContent = originalText, 1500);
+            }
+          } else {
+            const temp = document.createElement('input');
+            temp.value = window.location.href;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            alert('Link copied to clipboard!');
+          }
+        } catch (e) { console.log('Share failed', e); }
+      }
+
+      function navigate(link) {
+        if (!link) return;
+        window.location.href = link;
+      }
+
+      homeCenter.addEventListener('click', () => {
+        overlay.classList.remove('open');
+        const link = homeCenter.getAttribute('data-link');
+        if (link) navigate(link);
+      });
+
+      menuItems.forEach(item => {
+        item.addEventListener('click', () => {
+          overlay.classList.remove('open');
+          const link = item.getAttribute('data-link');
+          const action = item.getAttribute('data-action');
+          if (action === 'share') sharePage();
+          else if (link) navigate(link);
+        });
+      });
+
+      document.querySelector('.circular-menu').addEventListener('click', e => e.stopPropagation());
+    })();
+  </script>
+</body>
+</html>
