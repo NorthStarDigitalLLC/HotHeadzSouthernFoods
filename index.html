@@ -1886,12 +1886,61 @@
 
   <!-- Facebook embed script (unchanged) -->
   <script>
-  (function() {
-    const iframe = document.getElementById('hhx-fbIframe');
-    if (!iframe) return;
-    const pageUrl = encodeURIComponent('https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/');
-    iframe.src = `https://www.facebook.com/plugins/page.php?href=${pageUrl}&tabs=timeline&width=500&height=520&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true`;
-  })();
+(function(){
+  // NOTE:
+  // This MUST be an embeddable Facebook PAGE url to display a timeline.
+  // If FB treats it like a profile (profile.php?id=...), the iframe will often show blank.
+  // Keep your button links as-is, but for embedding you may need a real Page @username URL.
+  var FB_HREF_FOR_EMBED = "https://www.facebook.com/pages/Hot-Headz-Southern-Foods/100064025473003/";
+
+  var frame = document.getElementById("hhx-fbFrame");
+  var iframe = document.getElementById("hhx-fbIframe");
+  var fallback = document.getElementById("hhx-fbFallback");
+  if(!frame || !iframe) return;
+
+  function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+  function buildSrc(w){
+    var h = 520;
+    var href = encodeURIComponent(FB_HREF_FOR_EMBED);
+    return "https://www.facebook.com/plugins/page.php" +
+      "?href=" + href +
+      "&tabs=timeline" +
+      "&width=" + w +
+      "&height=" + h +
+      "&small_header=false" +
+      "&adapt_container_width=true" +
+      "&hide_cover=false" +
+      "&show_facepile=true";
+  }
+
+  function setIframe(){
+    var w = Math.floor(frame.getBoundingClientRect().width || 0);
+    w = clamp(w, 280, 900);
+    iframe.src = buildSrc(w);
+  }
+
+  function showFallbackSoon(){
+    if(!fallback) return;
+    fallback.hidden = true;
+
+    // Practical fallback: if FB blocks embedding, users won’t see content -> show overlay
+    setTimeout(function(){
+      fallback.hidden = false;
+    }, 2500);
+  }
+
+  if ("ResizeObserver" in window){
+    var ro = new ResizeObserver(function(){ setIframe(); });
+    ro.observe(frame);
+  } else {
+    window.addEventListener("resize", setIframe, {passive:true});
+    window.addEventListener("orientationchange", function(){ setTimeout(setIframe, 250); }, {passive:true});
+  }
+
+  setIframe();
+  showFallbackSoon();
+})();
 </script>
 
   <!-- ===== STRUCTURED DATA (JSON-LD) ===== -->
