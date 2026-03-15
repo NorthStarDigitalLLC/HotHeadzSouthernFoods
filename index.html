@@ -688,7 +688,7 @@
       filter: contrast(1.02) saturate(1.02);
     }
 
-    /* ==================== CIRCULAR NAVIGATION (from Francis) ==================== */
+    /* ==================== CIRCULAR NAVIGATION ==================== */
     .nav-btn {
       position: fixed;
       z-index: 1000;
@@ -1275,7 +1275,7 @@
   </style>
 </head>
 <body>
-  <!-- Required anchors for explore nav (invisible) -->
+  <!-- Required anchors (kept for compatibility, no longer used for navigation) -->
   <div id="gen-home" style="position: absolute; top: 0; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
   <div id="gen-menu" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
   <div id="gen-delivery" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
@@ -1283,7 +1283,7 @@
   <div id="gen-about" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
   <div id="gen-location" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
 
-  <!-- ===== NEW CIRCULAR NAVIGATION BUTTONS (replaces old genRoot) ===== -->
+  <!-- ===== CIRCULAR NAVIGATION BUTTONS ===== -->
   <div class="nav-btn left-center" id="navBtnLeft">
     <i class="fas fa-compass btn-icon"></i>
     <div class="btn-text">
@@ -1300,16 +1300,16 @@
     </div>
   </div>
 
-  <!-- CIRCULAR MENU OVERLAY -->
+  <!-- CIRCULAR MENU OVERLAY with page links -->
   <div class="circ-menu-overlay" id="circMenuOverlay">
     <div class="circular-menu">
-      <div class="center-home" id="homeCenter"><i class="fas fa-home"></i></div>
-      <div class="menu-item" style="--angle: 0;" data-link="#gen-home">Home</div>
-      <div class="menu-item" style="--angle: 60;" data-link="#gen-menu">Menu</div>
-      <div class="menu-item" style="--angle: 120;" data-link="#gen-delivery">Delivery</div>
-      <div class="menu-item" style="--angle: 180;" data-link="#gen-order">Order</div>
-      <div class="menu-item" style="--angle: 240;" data-link="#gen-about">About</div>
-      <div class="menu-item" style="--angle: 300;" data-link="#gen-location">Location</div>
+      <div class="center-home" id="homeCenter" data-link="/"><i class="fas fa-home"></i></div>
+      <div class="menu-item" style="--angle: 0;" data-link="menu.html">Menu</div>
+      <div class="menu-item" style="--angle: 60;" data-link="delivery.html">Delivery</div>
+      <div class="menu-item" style="--angle: 120;" data-link="tel:3372211035">Order</div>
+      <div class="menu-item" style="--angle: 180;" data-link="about.html">About</div>
+      <div class="menu-item" style="--angle: 240;" data-link="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634">Location</div>
+      <!-- The sixth item (angle 300) is removed to keep six items evenly spaced; we can leave blank or add a placeholder if needed -->
     </div>
   </div>
 
@@ -1600,7 +1600,7 @@
     AOS.init({ once: false, duration: 1000 });
   </script>
 
-  <!-- Circular menu toggle script -->
+  <!-- Circular menu toggle script with page navigation -->
   <script>
     (function() {
       const overlay = document.getElementById('circMenuOverlay');
@@ -1629,19 +1629,24 @@
         }
       });
 
+      // Navigate to link
+      function navigate(link) {
+        if (!link) return;
+        // For tel: and http(s) links, just set location.href (works for tel, mailto, and external)
+        window.location.href = link;
+      }
+
       homeCenter.addEventListener('click', () => {
         overlay.classList.remove('open');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        const link = homeCenter.getAttribute('data-link');
+        if (link) navigate(link);
       });
 
       menuItems.forEach(item => {
         item.addEventListener('click', (e) => {
           overlay.classList.remove('open');
           const link = item.getAttribute('data-link');
-          if (link) {
-            const target = document.querySelector(link);
-            if (target) target.scrollIntoView({ behavior: 'smooth' });
-          }
+          if (link) navigate(link);
         });
       });
 
