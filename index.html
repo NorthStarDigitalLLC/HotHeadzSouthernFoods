@@ -1479,7 +1479,7 @@
               <div class="hhx-fbTitle">Latest updates &amp; posts</div>
               <div class="hhx-fbSub">Follow Hot Headz for daily specials, photos, and announcements.</div>
             </div>
-            <a class="hhx-fbBtn" href="https://www.facebook.com/profile.php?id=100064025473003" target="_blank" rel="noopener">Open Facebook →</a>
+            <a class="hhx-navCard" href="https://www.facebook.com/profile.php?id=100064025473003" ...>Open Facebook →</a>
           </div>
 
           <div class="hhx-fbGrid">
@@ -1886,43 +1886,13 @@
 
   <!-- Facebook embed script (unchanged) -->
   <script>
-    (function(){
-      const FB_HREF_FOR_EMBED = "https://www.facebook.com/pages/Hot-Headz-Southern-Foods/100064025473003/";
-      const frame = document.getElementById("hhx-fbFrame");
-      const iframe = document.getElementById("hhx-fbIframe");
-      if(!frame || !iframe) return;
-
-      function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
-      function buildSrc(w){
-        const h = 520;
-        const href = encodeURIComponent(FB_HREF_FOR_EMBED);
-        return "https://www.facebook.com/plugins/page.php" +
-          "?href=" + href +
-          "&tabs=timeline" +
-          "&width=" + w +
-          "&height=" + h +
-          "&small_header=false" +
-          "&adapt_container_width=true" +
-          "&hide_cover=false" +
-          "&show_facepile=true";
-      }
-
-      function setIframe(){
-        const w = Math.floor(frame.getBoundingClientRect().width || 0);
-        w = clamp(w, 280, 900);
-        iframe.src = buildSrc(w);
-      }
-
-      if ("ResizeObserver" in window){
-        const ro = new ResizeObserver(() => setIframe());
-        ro.observe(frame);
-      } else {
-        window.addEventListener("resize", setIframe, {passive:true});
-        window.addEventListener("orientationchange", () => setTimeout(setIframe, 250), {passive:true});
-      }
-      setIframe();
-    })();
-  </script>
+  (function() {
+    const iframe = document.getElementById('hhx-fbIframe');
+    if (!iframe) return;
+    const pageUrl = encodeURIComponent('https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/');
+    iframe.src = `https://www.facebook.com/plugins/page.php?href=${pageUrl}&tabs=timeline&width=500&height=520&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true`;
+  })();
+</script>
 
   <!-- ===== STRUCTURED DATA (JSON-LD) ===== -->
   <script type="application/ld+json">
