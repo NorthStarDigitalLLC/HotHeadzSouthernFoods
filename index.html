@@ -41,20 +41,6 @@
       --hhx-radius2: 18px;
       --hhx-shadow: 0 22px 70px rgba(0,0,0,.55);
       --hhx-shadow2: 0 14px 40px rgba(0,0,0,.42);
-      --gen-glass: rgba(6,7,10,0.62);
-      --gen-glass-2: rgba(6,7,10,0.78);
-      --gen-border: rgba(255,255,255,0.14);
-      --gen-border-2: rgba(255,255,255,0.22);
-      --gen-text: rgba(255,255,255,0.92);
-      --gen-muted: rgba(255,255,255,0.62);
-      --gen-hotA: rgba(255,120,70,0.82);
-      --gen-hotB: rgba(255,60,140,0.74);
-      --gen-hotC: rgba(255,80,60,0.72);
-      --gen-radius-xl: 22px;
-      --gen-radius-lg: 16px;
-      --gen-radius-pill: 999px;
-      --gen-shadow: 0 18px 50px rgba(0,0,0,0.62);
-      --gen-font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
       --hhH-glass: rgba(10,10,14,0.42);
       --hhH-border: rgba(255,255,255,0.14);
       --hhH-border2: rgba(255,255,255,0.22);
@@ -120,7 +106,7 @@
       z-index: 1;
     }
 
-    /* ==================== NEW IMMERSIVE HEADER ==================== */
+    /* ==================== IMMERSIVE HEADER ==================== */
     .hhx-immersive-header {
       position: relative;
       min-height: 85vh;
@@ -771,346 +757,231 @@
       transform: scale(1.02);
       filter: contrast(1.02) saturate(1.02);
     }
-    .gen-root, .gen-root * { box-sizing: border-box; font-family: var(--gen-font); }
-    .gen-root {
+
+    /* ==================== CIRCULAR NAVIGATION (from Francis) ==================== */
+    .nav-btn {
       position: fixed;
-      inset: 0;
-      z-index: 999999;
-      pointer-events: none;
-    }
-    .gen-pill {
-      pointer-events: auto;
-      position: fixed;
-      top: 16px;
-      right: 16px;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 11px 14px;
-      border-radius: var(--gen-radius-pill);
-      border: 1px solid var(--gen-border);
-      background: var(--gen-glass);
-      color: var(--gen-text);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: var(--gen-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
-      cursor: pointer;
-      transition: transform .14s ease, background .14s ease, border-color .14s ease, opacity .14s ease;
-    }
-    .gen-pill:hover {
-      transform: translateY(-1px);
-      background: rgba(0,0,0,0.56);
-      border-color: var(--gen-border-2);
-    }
-    .gen-pill-ic { font-size: 16px; line-height: 1; }
-    .gen-pill-tx { font-size: 13.5px; font-weight: 820; letter-spacing: -0.1px; }
-    .gen-pill-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, var(--gen-hotA), var(--gen-hotB));
-      box-shadow: 0 0 18px rgba(255,120,70,0.22);
-    }
-    .gen-panel {
-      pointer-events: auto;
-      position: fixed;
-      top: 62px;
-      right: 16px;
-      width: min(390px, calc(100vw - 32px));
-      max-height: min(600px, calc(100vh - 140px));
-      border-radius: var(--gen-radius-xl);
-      border: 1px solid var(--gen-border);
-      background: var(--gen-glass-2);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      box-shadow: var(--gen-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
-      overflow: hidden;
-      opacity: 0;
-      transform: translateY(6px) scale(0.985);
-      transition: opacity .16s ease, transform .16s ease;
-    }
-    .gen-panel.is-open {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-    .gen-panel-head {
-      padding: 14px 14px 10px;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 10px;
-      background:
-        radial-gradient(420px 200px at 10% 0%, rgba(255,120,70,0.18), transparent 60%),
-        radial-gradient(420px 200px at 90% 0%, rgba(255,60,140,0.14), transparent 62%);
-      border-bottom: 1px solid rgba(255,255,255,0.10);
-    }
-    .gen-title { font-weight: 900; font-size: 15px; color: var(--gen-text); }
-    .gen-sub { margin-top: 2px; font-size: 12px; color: var(--gen-muted); }
-    .gen-close {
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.35);
-      color: var(--gen-text);
-      width: 36px;
-      height: 36px;
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
-      transition: background .14s ease, border-color .14s ease, transform .14s ease;
-    }
-    .gen-close:hover {
-      background: rgba(0,0,0,0.55);
-      border-color: rgba(255,255,255,0.22);
-      transform: translateY(-1px);
-    }
-    .gen-panel-body {
-      padding: 12px 14px 14px;
-      overflow: auto;
-      max-height: calc(600px - 120px);
-    }
-    .gen-search {
+      z-index: 1000;
+      background: #1e1b1b;
+      border: 2px solid var(--hhx-ember);
+      border-radius: 50px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.35);
-      padding: 10px 12px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
-    }
-    .gen-search-ic { opacity: .9; font-size: 14px; }
-    .gen-search-input {
-      width: 100%;
-      border: none;
-      outline: none;
-      background: transparent;
-      color: var(--gen-text);
-      font-size: 13px;
-    }
-    .gen-search-input::placeholder { color: rgba(255,255,255,0.55); }
-    .gen-list {
-      margin-top: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .gen-item {
-      width: 100%;
-      text-align: left;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
       gap: 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.36);
-      padding: 11px 12px;
-      box-shadow: 0 12px 24px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.08);
       cursor: pointer;
-      transition: transform .14s ease, background .14s ease, border-color .14s ease;
+      box-shadow: 0 0 25px rgba(255,91,61,0.5);
+      transition: all 0.2s ease;
+      backdrop-filter: blur(8px);
     }
-    .gen-item:hover {
-      transform: translateY(-1px);
-      background: rgba(0,0,0,0.56);
-      border-color: rgba(255,255,255,0.22);
+
+    .nav-btn:hover {
+      transform: scale(1.05);
+      border-color: var(--hhx-ember2);
+      box-shadow: 0 0 35px var(--hhx-ember);
     }
-    .gen-item-left { min-width: 0; }
-    .gen-item-title {
-      font-weight: 900;
-      font-size: 13.5px;
-      color: var(--gen-text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+
+    .btn-icon {
+      font-size: 1.8rem;
+      color: var(--hhx-ember);
     }
-    .gen-item-sub {
-      margin-top: 2px;
-      font-size: 12px;
-      color: var(--gen-muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .gen-item-right {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      flex: 0 0 auto;
-    }
-    .gen-badge {
-      font-size: 11px;
-      font-weight: 900;
-      padding: 6px 9px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: linear-gradient(90deg, rgba(255,120,70,0.18), rgba(255,60,140,0.14));
-      color: rgba(255,255,255,0.86);
-    }
-    .gen-jump {
-      width: 34px;
-      height: 34px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.35);
-      color: rgba(255,255,255,0.90);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .gen-item.is-active {
-      border-color: rgba(255,255,255,0.26);
-      background: rgba(0,0,0,0.64);
-    }
-    .gen-panel-foot {
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      border-top: 1px solid rgba(255,255,255,0.10);
-      background: rgba(0,0,0,0.18);
-    }
-    .gen-foot-left {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      min-width: 0;
-    }
-    .gen-foot-tx {
-      font-size: 12px;
-      color: rgba(255,255,255,0.70);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .gen-top {
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.35);
-      color: rgba(255,255,255,0.92);
-      border-radius: 12px;
-      padding: 9px 10px;
-      font-size: 12.5px;
-      font-weight: 900;
-      cursor: pointer;
-      transition: background .14s ease, border-color .14s ease, transform .14s ease;
-    }
-    .gen-top:hover {
-      background: rgba(0,0,0,0.55);
-      border-color: rgba(255,255,255,0.22);
-      transform: translateY(-1px);
-    }
-    .gen-coach {
-      pointer-events: auto;
-      position: fixed;
-      left: 50%;
-      bottom: 108px;
-      transform: translateX(-50%);
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: var(--gen-radius-pill);
-      border: 1px solid rgba(255,255,255,0.18);
-      background: rgba(6,7,10,0.62);
-      color: rgba(255,255,255,0.92);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: var(--gen-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
-      cursor: pointer;
-      animation: genBreathe 2.2s ease-in-out infinite;
-    }
-    .gen-coach-ic {
-      width: 22px;
-      height: 22px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(180deg, rgba(255,120,70,0.22), rgba(255,60,140,0.18));
-      border: 1px solid rgba(255,255,255,0.14);
-    }
-    .gen-coach-tx { font-size: 13px; font-weight: 900; letter-spacing: -0.1px; }
-    @keyframes genBreathe {
-      0%,100% { transform: translateX(-50%) translateY(0); }
-      50% { transform: translateX(-50%) translateY(-3px); }
-    }
-    .gen-dock {
-      pointer-events: auto;
-      position: fixed;
-      left: 50%;
-      bottom: 16px;
-      transform: translateX(-50%);
-      width: min(660px, calc(100vw - 26px));
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 10px;
-      border-radius: var(--gen-radius-pill);
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(6,7,10,0.62);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: var(--gen-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
-    }
-    .gen-dock-btn {
-      text-decoration: none;
-      color: rgba(255,255,255,0.92);
-      flex: 1 1 0;
-      min-width: 0;
+
+    .btn-text {
       display: flex;
       flex-direction: column;
+      line-height: 1.2;
+    }
+
+    .btn-text .main {
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.92);
+    }
+
+    .btn-text .sub {
+      font-size: 0.65rem;
+      opacity: 0.7;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+    }
+
+    /* left-center button - VERTICAL */
+    .nav-btn.left-center {
+      left: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+      flex-direction: column;
+      padding: 1rem 0.5rem;
+      gap: 8px;
+    }
+
+    .nav-btn.left-center .btn-text {
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .nav-btn.left-center .btn-text .main {
+      font-size: 0.9rem;
+      letter-spacing: normal;
+    }
+
+    .nav-btn.left-center .btn-text .sub {
+      font-size: 0.6rem;
+      margin-top: 4px;
+    }
+
+    /* bottom-center button - HORIZONTAL */
+    .nav-btn.bottom-center {
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      flex-direction: row;
+      padding: 0.8rem 1.8rem;
+    }
+
+    /* circular menu overlay */
+    .circ-menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2000;
+      display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.36);
-      padding: 10px 8px;
-      box-shadow: 0 10px 22px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.08);
-      transition: transform .14s ease, background .14s ease, border-color .14s ease;
+      pointer-events: none;
+      background: rgba(0,0,0,0.7);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      backdrop-filter: blur(8px);
     }
-    .gen-dock-btn:hover {
-      transform: translateY(-1px);
-      background: rgba(0,0,0,0.56);
-      border-color: rgba(255,255,255,0.22);
+
+    .circ-menu-overlay.open {
+      opacity: 1;
+      pointer-events: all;
     }
-    .gen-dock-ic { font-size: 16px; line-height: 1; }
-    .gen-dock-tx {
-      font-size: 11.5px;
+
+    .circular-menu {
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      background: transparent;
+      border: 2px solid var(--hhx-ember);
+      box-shadow: 0 0 40px rgba(255,91,61,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transform: scale(0.3);
+      transition: transform 0.3s ease;
+    }
+
+    .circ-menu-overlay.open .circular-menu {
+      transform: scale(1);
+    }
+
+    .center-home {
+      width: 70px;
+      height: 70px;
+      background: var(--hhx-ember2);
+      border: 3px solid var(--hhx-ember);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-weight: 900;
-      letter-spacing: -0.1px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 1.5rem;
+      color: #1a0d0b;
+      box-shadow: 0 0 30px var(--hhx-ember);
+      cursor: pointer;
+      transition: 0.2s;
+      z-index: 1001;
     }
-    .gen-dock-cta {
-      background: linear-gradient(90deg, rgba(255,120,70,0.22), rgba(255,60,140,0.16));
-      border-color: rgba(255,255,255,0.20);
+    .center-home:hover {
+      background: var(--hhx-ember);
+      color: white;
+      transform: scale(1.05);
     }
-    @media (max-width: 720px) {
-      .gen-pill { top: 12px; right: 12px; padding: 10px 12px; }
-      .gen-panel {
-        top: 58px;
-        right: 12px;
-        width: calc(100vw - 24px);
-        max-height: calc(100vh - 170px);
+
+    .menu-item {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background: #1e1b1b;
+      border: 2px solid var(--hhx-ember);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.92);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      transition: all 0.2s;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0,0,0,0.7);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-130px) rotate(calc(var(--angle) * -1deg));
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 1px;
+      backdrop-filter: blur(4px);
+    }
+
+    .menu-item:hover {
+      background: var(--hhx-ember);
+      color: black;
+      border-color: var(--hhx-ember2);
+      transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-140px) rotate(calc(var(--angle) * -1deg));
+      width: 65px;
+      height: 65px;
+    }
+
+    /* mobile adjustments */
+    @media (max-width: 600px) {
+      .nav-btn.left-center {
+        left: 10px;
+        padding: 0.8rem 0.3rem;
       }
-      .gen-coach { bottom: 98px; }
-      .gen-dock { gap: 8px; padding: 9px; }
-      .gen-dock-btn { padding: 10px 6px; }
-      .gen-dock-ic { font-size: 15px; }
-      .gen-dock-tx { font-size: 11px; }
-    }
-    @media (max-width: 380px) {
-      .gen-dock { gap: 6px; padding: 8px; }
-      .gen-dock-tx { display: none; }
-      .gen-coach { padding: 10px 12px; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .gen-pill, .gen-panel, .gen-item, .gen-dock-btn, .gen-coach {
-        transition: none !important;
-        animation: none !important;
+      .nav-btn.left-center .btn-icon {
+        font-size: 1.5rem;
+      }
+      .nav-btn.left-center .btn-text .main {
+        font-size: 0.8rem;
+      }
+      .nav-btn.left-center .btn-text .sub {
+        font-size: 0.5rem;
+      }
+      .nav-btn.bottom-center {
+        bottom: 20px;
+        padding: 0.6rem 1.2rem;
+      }
+      .circular-menu {
+        width: 280px;
+        height: 280px;
+      }
+      .menu-item {
+        width: 50px;
+        height: 50px;
+        font-size: 0.7rem;
+        transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-100px) rotate(calc(var(--angle) * -1deg));
+      }
+      .menu-item:hover {
+        transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-110px) rotate(calc(var(--angle) * -1deg));
+        width: 55px;
+        height: 55px;
+      }
+      .center-home {
+        width: 60px;
+        height: 60px;
+        font-size: 1.2rem;
       }
     }
+
+    /* ---------- LUNCH HERO ---------- */
     #hhHomeMenuHero {
       position: relative;
       width: 100%;
@@ -1337,6 +1208,8 @@
       #hhHomeMenuHero .hh-down-ic span { animation: none !important; }
       #hhHomeMenuHero .hh-card { transition: none !important; }
     }
+
+    /* ---------- FOOTER ---------- */
     .site-footer,
     .site-footer * { box-sizing: border-box; }
     .site-footer {
@@ -1442,21 +1315,6 @@
     @media (max-width: 900px) {
       .footer-inner { grid-template-columns: 1fr; }
     }
-    .gen-pill {
-      display: none !important;
-      visibility: hidden !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
-    }
-    .gen-hidden-link { display: none !important; }
-    .gen-hidden-link.is-visible { display: flex !important; opacity: 0; transform: translateY(6px); transition: opacity 200ms ease, transform 200ms ease; }
-    .gen-hidden-link.is-visible.is-on { opacity: 1; transform: translateY(0); }
-    #genAboutLink {
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      user-select: none;
-      touch-action: manipulation;
-    }
     @media (prefers-reduced-motion: reduce) {
       .hhx-marqueeTrack { animation: none; }
       .hhx-sigil::before { animation: none; }
@@ -1464,74 +1322,45 @@
   </style>
 </head>
 <body>
+  <!-- Hidden anchors for sections (keep same IDs) -->
   <div id="gen-home" style="position: absolute; top: 0; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
   <div id="gen-menu" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
   <div id="gen-delivery" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
   <div id="gen-order" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
   <div id="gen-about" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
   <div id="gen-location" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
-  <div id="genRoot" class="gen-root" hidden>
-    <button id="genPill" class="gen-pill" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="genPanel">
-      <span class="gen-pill-ic" aria-hidden="true">🧭</span>
-      <span class="gen-pill-tx">Explore</span>
-      <span class="gen-pill-dot" aria-hidden="true"></span>
-    </button>
-    <div id="genPanel" class="gen-panel" role="dialog" aria-modal="false" aria-label="Explore the page" aria-hidden="true">
-      <div class="gen-panel-head">
-        <div class="gen-panel-title">
-          <div class="gen-title">Explore</div>
-          <div class="gen-sub">Jump to sections instantly</div>
-        </div>
-        <button id="genClose" class="gen-close" type="button" aria-label="Close explore panel">✕</button>
-      </div>
-      <div class="gen-panel-body">
-        <div class="gen-search" role="search">
-          <span class="gen-search-ic" aria-hidden="true">⌕</span>
-          <input id="genSearch" type="text" class="gen-search-input" placeholder="Search sections…" autocomplete="off" inputmode="search">
-        </div>
-        <div id="genList" class="gen-list" role="list"></div>
-      </div>
-      <div class="gen-panel-foot">
-        <div class="gen-foot-left">
-          <span class="gen-mini" aria-hidden="true">🔥</span>
-          <span class="gen-foot-tx">Tip: click a section to jump</span>
-        </div>
-        <button id="genTop" class="gen-top" type="button">Back to top</button>
-      </div>
+
+  <!-- ===== NEW CIRCULAR NAVIGATION BUTTONS ===== -->
+  <div class="nav-btn left-center" id="navBtnLeft">
+    <i class="fas fa-compass btn-icon"></i>
+    <div class="btn-text">
+      <span class="main">NAVIGATION</span>
+      <span class="sub">explore pages</span>
     </div>
-    <button id="genCoach" class="gen-coach" type="button" aria-label="Scroll to explore" hidden>
-      <span class="gen-coach-ic" aria-hidden="true">↓</span>
-      <span class="gen-coach-tx">Scroll for more</span>
-    </button>
-    <nav id="genDock" class="gen-dock" aria-label="Quick actions" hidden>
-      <a class="gen-dock-btn" href="#gen-home" aria-label="Home">
-        <span class="gen-dock-ic" aria-hidden="true">🏠</span>
-        <span class="gen-dock-tx">Home</span>
-      </a>
-      <a class="gen-dock-btn" href="menu.html" aria-label="Menu">
-        <span class="gen-dock-ic" aria-hidden="true">🍽️</span>
-        <span class="gen-dock-tx">Menu</span>
-      </a>
-      <a class="gen-dock-btn" href="delivery.html" aria-label="Delivery options">
-        <span class="gen-dock-ic" aria-hidden="true">🚗</span>
-        <span class="gen-dock-tx">Delivery</span>
-      </a>
-      <a class="gen-dock-btn gen-dock-cta" href="tel:3372211035" aria-label="Place an order">
-        <span class="gen-dock-ic" aria-hidden="true">📞</span>
-        <span class="gen-dock-tx">Order</span>
-      </a>
-      <a id="genAboutLink" class="gen-dock-btn" href="about.html" aria-label="About us">
-        <span class="gen-dock-ic" aria-hidden="true">ℹ️</span>
-        <span class="gen-dock-tx">About</span>
-      </a>
-      <button id="genSideShare" class="gen-dock-btn gen-side-share" type="button" aria-label="Share this page">
-        <span class="gen-dock-ic" aria-hidden="true">📤</span>
-        <span class="gen-dock-tx">Share</span>
-      </button>
-    </nav>
   </div>
 
-  <!-- ===== NEW IMMERSIVE HEADER ===== -->
+  <div class="nav-btn bottom-center" id="navBtnBottom">
+    <i class="fas fa-compass btn-icon"></i>
+    <div class="btn-text">
+      <span class="main">NAVIGATION</span>
+      <span class="sub">explore pages</span>
+    </div>
+  </div>
+
+  <!-- CIRCULAR MENU OVERLAY -->
+  <div class="circ-menu-overlay" id="circMenuOverlay">
+    <div class="circular-menu">
+      <div class="center-home" id="homeCenter"><i class="fas fa-home"></i></div>
+      <div class="menu-item" style="--angle: 0;" data-link="#gen-home">Home</div>
+      <div class="menu-item" style="--angle: 60;" data-link="#gen-menu">Menu</div>
+      <div class="menu-item" style="--angle: 120;" data-link="#gen-delivery">Delivery</div>
+      <div class="menu-item" style="--angle: 180;" data-link="#gen-order">Order</div>
+      <div class="menu-item" style="--angle: 240;" data-link="#gen-about">About</div>
+      <div class="menu-item" style="--angle: 300;" data-link="#gen-location">Location</div>
+    </div>
+  </div>
+
+  <!-- ===== IMMERSIVE HEADER ===== -->
   <canvas id="header-canvas"></canvas>
   <section class="hhx-immersive-header">
     <div class="header-layer header-layer-1"></div>
@@ -1559,14 +1388,13 @@
     </div>
   </section>
 
-  <!-- ===== MAIN HOMEPAGE CONTENT (unchanged after hero) ===== -->
+  <!-- ===== MAIN HOMEPAGE CONTENT ===== -->
   <section class="hhx-home" aria-label="Hot Headz Southern Foods homepage">
     <div class="hhx-backdrop" aria-hidden="true">
       <div class="hhx-smoke"></div>
       <div class="hhx-glow"></div>
     </div>
     <div class="hhx-wrap">
-      <!-- The old hero section is replaced, but we keep the rest -->
       <!-- NAV CARDS -->
       <section class="hhx-navGrid" aria-label="Navigate">
         <a class="hhx-navCard" href="menu.html">
@@ -1702,7 +1530,7 @@
     </div>
   </section>
 
-  <!-- ===== LUNCH PREVIEW HERO (unchanged) ===== -->
+  <!-- ===== LUNCH PREVIEW HERO ===== -->
   <section id="hhHomeMenuHero" aria-label="Today’s lunch preview">
     <div class="hh-bg" aria-hidden="true"></div>
     <div class="hh-inner">
@@ -1807,234 +1635,60 @@
   <script>
     AOS.init({ once: false, duration: 1000 });
   </script>
+
   <script>
-    (() => {
-      const INIT_KEY = "__GEN_NAV_V2_INIT__";
-      function oncePerPage() {
-        const stamp = location.pathname + "|" + location.search;
-        if (!window[INIT_KEY]) window[INIT_KEY] = { stamp: null };
-        if (window[INIT_KEY].stamp === stamp) return false;
-        window[INIT_KEY].stamp = stamp;
-        return true;
-      }
-      function ready(fn) {
-        if (document.readyState === "complete" || document.readyState === "interactive") {
-          setTimeout(fn, 0);
-        } else {
-          document.addEventListener("DOMContentLoaded", fn, { once: true });
-        }
-      }
-      function escapeHtml(str) {
-        return String(str)
-          .replaceAll("&", "&amp;")
-          .replaceAll("<", "&lt;")
-          .replaceAll(">", "&gt;")
-          .replaceAll('"', "&quot;")
-          .replaceAll("'", "&#039;");
-      }
-      function init() {
-        const root = document.getElementById("genRoot");
-        const pill = document.getElementById("genPill");
-        const panel = document.getElementById("genPanel");
-        const close = document.getElementById("genClose");
-        const list = document.getElementById("genList");
-        const search = document.getElementById("genSearch");
-        const topBtn = document.getElementById("genTop");
-        const coach = document.getElementById("genCoach");
-        const dock = document.getElementById("genDock");
-        if (!root || !pill || !panel || !close || !list || !search || !topBtn || !coach || !dock) return;
-        root.hidden = false;
-        dock.hidden = false;
+    // Circular menu toggle
+    (function() {
+      const overlay = document.getElementById('circMenuOverlay');
+      const leftBtn = document.getElementById('navBtnLeft');
+      const bottomBtn = document.getElementById('navBtnBottom');
+      const homeCenter = document.getElementById('homeCenter');
+      const menuItems = document.querySelectorAll('.menu-item');
 
-        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        const SECTIONS = [
-          { id: "gen-home",     label: "Home",     sub: "Top of page" },
-          { id: "gen-delivery", label: "Delivery", sub: "Pickup & delivery options" },
-          { id: "gen-menu",     label: "Menu",     sub: "Browse the plates" },
-          { id: "gen-order",    label: "Order",    sub: "Call and place an order" },
-          { id: "gen-about",    label: "About",    sub: "Our story + vibe" },
-          { id: "gen-location", label: "Location", sub: "Hours + map" },
-        ];
-
-        const found = SECTIONS
-          .map(s => ({ ...s, el: document.getElementById(s.id) }))
-          .filter(s => !!s.el);
-
-        if (found.length === 0) {
-          pill.querySelector(".gen-pill-tx").textContent = "Menu";
-          pill.querySelector(".gen-pill-ic").textContent = "🍽️";
-          pill.addEventListener("click", () => { window.location.href = "menu.html"; });
-          panel.style.display = "none";
-          coach.hidden = true;
-          return;
-        }
-
-        function makeItem(section, idx) {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = "gen-item";
-          btn.setAttribute("data-idx", String(idx));
-          btn.setAttribute("role", "listitem");
-          btn.setAttribute("aria-label", `Jump to ${section.label}`);
-          btn.innerHTML = `
-            <span class="gen-item-left">
-              <div class="gen-item-title">${escapeHtml(section.label)}</div>
-              <div class="gen-item-sub">${escapeHtml(section.sub || "")}</div>
-            </span>
-            <span class="gen-item-right" aria-hidden="true">
-              <span class="gen-badge">Jump</span>
-              <span class="gen-jump">↵</span>
-            </span>
-          `;
-          btn.addEventListener("click", () => jumpTo(idx));
-          btn.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              jumpTo(idx);
-            }
-          });
-          return btn;
-        }
-
-        function renderList(filterText = "") {
-          list.innerHTML = "";
-          const q = (filterText || "").trim().toLowerCase();
-          let count = 0;
-          found.forEach((s, idx) => {
-            const hay = (s.label + " " + (s.sub || "")).toLowerCase();
-            if (q && !hay.includes(q)) return;
-            list.appendChild(makeItem(s, idx));
-            count++;
-          });
-          if (count === 0) {
-            const empty = document.createElement("div");
-            empty.style.padding = "14px";
-            empty.style.color = "rgba(255,255,255,0.72)";
-            empty.style.fontSize = "13px";
-            empty.textContent = "No matches. Try a different word.";
-            list.appendChild(empty);
-          }
-        }
-        renderList("");
-
-        function openPanel() {
-          panel.classList.add("is-open");
-          panel.setAttribute("aria-hidden", "false");
-          pill.setAttribute("aria-expanded", "true");
-          setTimeout(() => search.focus(), 60);
-        }
-        function closePanel() {
-          panel.classList.remove("is-open");
-          panel.setAttribute("aria-hidden", "true");
-          pill.setAttribute("aria-expanded", "false");
-        }
-        function togglePanel() {
-          const isOpen = panel.classList.contains("is-open");
-          isOpen ? closePanel() : openPanel();
-        }
-        pill.onclick = togglePanel;
-        close.onclick = closePanel;
-
-        document.addEventListener("pointerdown", (e) => {
-          if (!panel.classList.contains("is-open")) return;
-          if (panel.contains(e.target) || pill.contains(e.target)) return;
-          closePanel();
-        });
-        document.addEventListener("keydown", (e) => {
-          if (e.key !== "Escape") return;
-          if (panel.classList.contains("is-open")) closePanel();
-        });
-        search.addEventListener("input", (e) => renderList(e.target.value || ""));
-
-        function jumpTo(idx) {
-          const s = found[idx];
-          if (!s || !s.el) return;
-          closePanel();
-          if (s.id === "gen-home") {
-            window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
-            return;
-          }
-          s.el.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
-        }
-        topBtn.addEventListener("click", () => {
-          closePanel();
-          window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
-        });
-
-        let activeIdx = 0;
-        function setActive(idx) {
-          activeIdx = idx;
-          const items = list.querySelectorAll(".gen-item");
-          items.forEach(i => i.classList.remove("is-active"));
-          const activeEl = [...items].find(b => b.getAttribute("data-idx") === String(idx));
-          if (activeEl) activeEl.classList.add("is-active");
-          const dot = pill.querySelector(".gen-pill-dot");
-          if (dot) {
-            dot.style.filter = "brightness(1.25)";
-            setTimeout(() => { dot.style.filter = "none"; }, 180);
-          }
-        }
-
-        const io = new IntersectionObserver((entries) => {
-          const visible = entries
-            .filter(en => en.isIntersecting)
-            .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-          if (!visible.length) return;
-          const id = visible[0].target.id;
-          const idx = found.findIndex(s => s.id === id);
-          if (idx !== -1 && idx !== activeIdx) setActive(idx);
-        }, { threshold: 0.35 });
-
-        found.forEach(s => io.observe(s.el));
-        setActive(0);
-
-        const COACH_KEY = "genCoachDismissedV2";
-        function getCoachDismissed() { try { return localStorage.getItem(COACH_KEY) === "1"; } catch(e) { return false; } }
-        function setCoachDismissed() { try { localStorage.setItem(COACH_KEY, "1"); } catch(e) {} }
-        function updateCoach() {
-          const y = window.scrollY || document.documentElement.scrollTop || 0;
-          if (getCoachDismissed()) { coach.hidden = true; return; }
-          coach.hidden = y > 40;
-        }
-        coach.addEventListener("click", () => {
-          setCoachDismissed();
-          coach.hidden = true;
-          const homeIdx = found.findIndex(s => s.id === "gen-home");
-          const targetIdx = (homeIdx === 0 && found[1]) ? 1 : 0;
-          const target = found[targetIdx]?.el;
-          if (target) target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
-          else window.scrollBy({ top: 420, behavior: reduceMotion ? "auto" : "smooth" });
-        });
-        window.addEventListener("scroll", () => {
-          updateCoach();
-          const y = window.scrollY || document.documentElement.scrollTop || 0;
-          if (y > 120 && !getCoachDismissed()) {
-            setCoachDismissed();
-            coach.hidden = true;
-          }
-        }, { passive: true });
-        updateCoach();
-
-        function updatePill() {
-          const y = window.scrollY || document.documentElement.scrollTop || 0;
-          pill.style.opacity = (y > 20) ? "1" : "0.985";
-        }
-        window.addEventListener("scroll", updatePill, { passive: true });
-        updatePill();
+      function toggleMenu() {
+        overlay.classList.toggle('open');
       }
 
-      ready(() => {
-        if (oncePerPage()) init();
-        const origPush = history.pushState;
-        history.pushState = function () {
-          origPush.apply(this, arguments);
-          setTimeout(() => { if (oncePerPage()) init(); }, 50);
-        };
-        window.addEventListener("popstate", () => setTimeout(() => { if (oncePerPage()) init(); }, 50));
+      leftBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMenu();
+      });
+
+      bottomBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMenu();
+      });
+
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('open');
+        }
+      });
+
+      homeCenter.addEventListener('click', () => {
+        overlay.classList.remove('open');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      menuItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+          overlay.classList.remove('open');
+          const link = item.getAttribute('data-link');
+          if (link) {
+            const target = document.querySelector(link);
+            if (target) target.scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      });
+
+      document.querySelector('.circular-menu').addEventListener('click', (e) => {
+        e.stopPropagation();
       });
     })();
   </script>
+
   <script>
+    // Lunch Hero (unchanged)
     (() => {
       const hero = document.getElementById("hhHomeMenuHero");
       const track = document.getElementById("hhHeroTrack");
@@ -2149,137 +1803,7 @@
       tick();
     })();
   </script>
-  <script>
-    (function () {
-      const about = document.getElementById("genAboutLink");
-      if (!about) return;
-      const UPDATER_URL = "/fb-menu.html";
-      const HOLD_MS = 1000;
-      let holdTimer = null;
-      let longPressed = false;
 
-      function startHold() {
-        longPressed = false;
-        holdTimer = setTimeout(() => {
-          longPressed = true;
-          try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) {}
-          window.location.href = UPDATER_URL;
-        }, HOLD_MS);
-      }
-      function cancelHold() {
-        if (holdTimer) clearTimeout(holdTimer);
-        holdTimer = null;
-      }
-      about.addEventListener("pointerdown", startHold);
-      about.addEventListener("pointerup", cancelHold);
-      about.addEventListener("pointercancel", cancelHold);
-      about.addEventListener("pointerleave", cancelHold);
-      about.addEventListener("touchstart", startHold, { passive: true });
-      about.addEventListener("touchend", cancelHold);
-      about.addEventListener("touchcancel", cancelHold);
-      about.addEventListener("contextmenu", function (e) { e.preventDefault(); });
-      about.addEventListener("click", function (e) {
-        if (longPressed) {
-          e.preventDefault();
-          e.stopPropagation();
-          longPressed = false;
-        }
-      }, true);
-    })();
-  </script>
-  <script>
-    (function () {
-      const shareBtn = document.getElementById('genSideShare');
-      if (!shareBtn) return;
-
-      shareBtn.addEventListener('click', async function () {
-        const shareData = {
-          title: document.title || 'Check this out',
-          text: 'Take a look at this page',
-          url: window.location.href
-        };
-
-        try {
-          if (navigator.share) {
-            await navigator.share(shareData);
-            return;
-          }
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            await navigator.clipboard.writeText(window.location.href);
-            shareBtn.classList.add('copied');
-            const label = shareBtn.querySelector('.gen-dock-tx');
-            if (label) {
-              const oldText = label.textContent;
-              label.textContent = 'Copied';
-              setTimeout(() => {
-                label.textContent = oldText;
-                shareBtn.classList.remove('copied');
-              }, 1800);
-            }
-            return;
-          }
-          const temp = document.createElement('input');
-          temp.value = window.location.href;
-          document.body.appendChild(temp);
-          temp.select();
-          temp.setSelectionRange(0, 99999);
-          document.execCommand('copy');
-          document.body.removeChild(temp);
-          const label2 = shareBtn.querySelector('.gen-dock-tx');
-          if (label2) {
-            const oldText2 = label2.textContent;
-            label2.textContent = 'Copied';
-            setTimeout(() => {
-              label2.textContent = oldText2;
-            }, 1800);
-          }
-        } catch (e) {
-          console.log('Share/copy failed', e);
-        }
-      });
-    })();
-  </script>
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
-  <script>
-    (function(){
-      const FB_HREF_FOR_EMBED = "https://www.facebook.com/pages/Hot-Headz-Southern-Foods/100064025473003/";
-      const frame = document.getElementById("hhx-fbFrame");
-      const iframe = document.getElementById("hhx-fbIframe");
-      if(!frame || !iframe) return;
-
-      function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
-      function buildSrc(w){
-        const h = 520;
-        const href = encodeURIComponent(FB_HREF_FOR_EMBED);
-        return "https://www.facebook.com/plugins/page.php" +
-          "?href=" + href +
-          "&tabs=timeline" +
-          "&width=" + w +
-          "&height=" + h +
-          "&small_header=false" +
-          "&adapt_container_width=true" +
-          "&hide_cover=false" +
-          "&show_facepile=true";
-      }
-
-      function setIframe(){
-        const w = Math.floor(frame.getBoundingClientRect().width || 0);
-        w = clamp(w, 280, 900);
-        iframe.src = buildSrc(w);
-      }
-
-      if ("ResizeObserver" in window){
-        const ro = new ResizeObserver(() => setIframe());
-        ro.observe(frame);
-      } else {
-        window.addEventListener("resize", setIframe, {passive:true});
-        window.addEventListener("orientationchange", () => setTimeout(setIframe, 250), {passive:true});
-      }
-      setIframe();
-    })();
-  </script>
   <script>
     // Smoke canvas for header
     (function() {
@@ -2340,6 +1864,52 @@
       drawSmoke();
     })();
   </script>
+
+  <script>
+    // Facebook embed (unchanged)
+    (function(){
+      const FB_HREF_FOR_EMBED = "https://www.facebook.com/pages/Hot-Headz-Southern-Foods/100064025473003/";
+      const frame = document.getElementById("hhx-fbFrame");
+      const iframe = document.getElementById("hhx-fbIframe");
+      if(!frame || !iframe) return;
+
+      function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+      function buildSrc(w){
+        const h = 520;
+        const href = encodeURIComponent(FB_HREF_FOR_EMBED);
+        return "https://www.facebook.com/plugins/page.php" +
+          "?href=" + href +
+          "&tabs=timeline" +
+          "&width=" + w +
+          "&height=" + h +
+          "&small_header=false" +
+          "&adapt_container_width=true" +
+          "&hide_cover=false" +
+          "&show_facepile=true";
+      }
+
+      function setIframe(){
+        const w = Math.floor(frame.getBoundingClientRect().width || 0);
+        w = clamp(w, 280, 900);
+        iframe.src = buildSrc(w);
+      }
+
+      if ("ResizeObserver" in window){
+        const ro = new ResizeObserver(() => setIframe());
+        ro.observe(frame);
+      } else {
+        window.addEventListener("resize", setIframe, {passive:true});
+        window.addEventListener("orientationchange", () => setTimeout(setIframe, 250), {passive:true});
+      }
+      setIframe();
+    })();
+  </script>
+
+  <script>
+    // Update copyright year
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
