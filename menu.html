@@ -4,12 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hot Headz Southern Foods – Menu + Cube + Plate Builder</title>
-  <meta name="description" content="Single-file menu system with Today / Tomorrow / Advanced views, spinning cube navigation, and a live plate builder.">
+  <meta name="description" content="Fixed version – cube always switches to correct day, plate builder works, analytics ready.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Google Analytics (replace G-XXXXXXXXXX with your ID) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
   <style>
+    /* ... keep your existing CSS exactly as you had it ... */
     *{margin:0;padding:0;box-sizing:border-box;max-width:100%}
     html{scroll-behavior:smooth;overflow-x:hidden}
     body{
@@ -302,7 +311,7 @@
       <div class="plate-builder-header">
         <div>
           <h3>Build Your Plate</h3>
-          <p>Add priced menu items and see the running total without losing the current menu.</p>
+          <p>Add priced menu items and see the running total.</p>
         </div>
         <button class="plate-builder-close" id="builderClose" type="button" aria-label="Collapse builder">×</button>
       </div>
@@ -331,8 +340,8 @@
   <div class="hh-menu" id="hh-menu-root">
     <div class="hh-header">
       <div class="hh-title">Hot Headz Southern Foods</div>
-      <div class="hh-updated">Fixed version: menu, cube, and plate builder all working.</div>
-      <div class="hh-note">This single file includes sample data so it loads immediately.</div>
+      <div class="hh-updated">Fixed version: cube now works on all days, plate builder totals correctly.</div>
+      <div class="hh-note">Google Analytics added – replace G-XXXXXXXXXX with your ID.</div>
     </div>
 
     <section class="hh-feature-wrap">
@@ -369,7 +378,7 @@
           <div class="hh-builder-stat"><strong>What to edit</strong><span>the JSON block at the bottom</span></div>
           <div class="hh-builder-stat"><strong>Best format</strong><span>name + desc + price objects</span></div>
         </div>
-        <div class="hh-helper-note">You can wire it to external data later, but this file is self-contained right now.</div>
+        <div class="hh-helper-note">You can wire it to external data later, but this file is self‑contained right now.</div>
       </article>
     </section>
 
@@ -608,6 +617,7 @@
 
       const data = JSON.parse($("hh-menu-data").textContent);
 
+      // ---------- PLATE BUILDER ----------
       const plateState = { items: [] };
       function updatePlateUI(){
         const list = $("builderList");
@@ -897,6 +907,62 @@
         });
       }
 
+      // ---------- CUBE + TAB SWITCHING (FIXED) ----------
+      const faces = {
+        "Breakfast": { x: 0, y: 0, tabToday: "hhTabTodayBreakfast", tabTomorrow: "hhTabTomorrowBreakfast" },
+        "Lunch":     { x: 0, y: -90, tabToday: "hhTabTodayLunch", tabTomorrow: "hhTabTomorrowLunch" },
+        "Crawfish":  { x: 0, y: -180, tabToday: "hhTabTodayCrawfish", tabTomorrow: "hhTabTomorrowCrawfish" },
+        "Salad Bar": { x: 0, y: 90, tabToday: "hhTabTodaySalad", tabTomorrow: "hhTabTomorrowSalad" },
+        "Drinks":    { x: -90, y: 0, tabToday: "hhTabTodayDrinks", tabTomorrow: "hhTabTomorrowDrinks" },
+        "Dessert":   { x: 90, y: 0, tabToday: "hhTabTodayDessert", tabTomorrow: "hhTabTomorrowDessert" }
+      };
+      const cube = $("menuCube");
+      const cubeButtons = Array.from(document.querySelectorAll(".hh-cube-btn"));
+
+      function rotateTo(faceName){
+        const face = faces[faceName];
+        if (!face) return;
+
+        // --- On mobile, just show the right face ---
+        if (window.innerWidth <= 560){
+          document.querySelectorAll(".hh-face").forEach(el => el.classList.remove("is-mobile-visible"));
+          const visible = Array.from(document.querySelectorAll(".hh-face")).find(el => el.dataset.target === faceName);
+          if (visible) visible.classList.add("is-mobile-visible");
+        } else {
+          cube.style.transform = `rotateX(${face.x}deg) rotateY(${face.y}deg)`;
+        }
+
+        cubeButtons.forEach(btn => btn.classList.toggle("is-active", btn.dataset.face === faceName));
+
+        // --- Determine which day is active ---
+        const activeDayBtn = document.querySelector(".hh-day.is-active");
+        if (!activeDayBtn) return;
+
+        // If we are on the Advanced panel, switch to Today first (Advanced has no inner tabs)
+        if (activeDayBtn.id === "hhDayBtnAdvanced") {
+          $("hhDayBtnToday").click();        // switch to Today panel
+        }
+
+        // Now decide whether to use Today or Tomorrow tab
+        const useTomorrow = document.querySelector("#hh-day-tomorrow") && !document.querySelector("#hh-day-tomorrow").hidden;
+        const tabId = useTomorrow ? face.tabTomorrow : face.tabToday;
+        const tab = $(tabId);
+        if (tab && getComputedStyle(tab).display !== "none") tab.click();
+      }
+
+      cubeButtons.forEach(btn => btn.addEventListener("click", () => rotateTo(btn.dataset.face)));
+      document.querySelectorAll(".hh-face").forEach(face => face.addEventListener("click", () => rotateTo(face.dataset.target)));
+
+      // Start with Breakfast face active
+      rotateTo("Breakfast");
+
+      // On window resize, keep the active face in sync
+      window.addEventListener("resize", () => {
+        const activeFace = document.querySelector(".hh-cube-btn.is-active")?.dataset.face || "Breakfast";
+        rotateTo(activeFace);
+      });
+
+      // ---------- INITIALISE THE MENU ----------
       try{
         setText("hh-advanced-disclaimer", data.settings.advancedDisclaimer || "");
         const now = new Date();
@@ -925,38 +991,7 @@
         wireInnerTabs("hh-day-today");
         wireInnerTabs("hh-day-tomorrow");
 
-        const faces = {
-          "Breakfast": { x: 0, y: 0, tabIds: ["hhTabTodayBreakfast", "hhTabTomorrowBreakfast"] },
-          "Lunch": { x: 0, y: -90, tabIds: ["hhTabTodayLunch", "hhTabTomorrowLunch"] },
-          "Crawfish": { x: 0, y: -180, tabIds: ["hhTabTodayCrawfish", "hhTabTomorrowCrawfish"] },
-          "Salad Bar": { x: 0, y: 90, tabIds: ["hhTabTodaySalad", "hhTabTomorrowSalad"] },
-          "Drinks": { x: -90, y: 0, tabIds: ["hhTabTodayDrinks", "hhTabTomorrowDrinks"] },
-          "Dessert": { x: 90, y: 0, tabIds: ["hhTabTodayDessert", "hhTabTomorrowDessert"] }
-        };
-        const cube = $("menuCube");
-        const cubeButtons = Array.from(document.querySelectorAll(".hh-cube-btn"));
-        function rotateTo(faceName){
-          const face = faces[faceName];
-          if (!face) return;
-          if (window.innerWidth <= 560){
-            document.querySelectorAll(".hh-face").forEach(el => el.classList.remove("is-mobile-visible"));
-            const visible = Array.from(document.querySelectorAll(".hh-face")).find(el => el.dataset.target === faceName);
-            if (visible) visible.classList.add("is-mobile-visible");
-          } else {
-            cube.style.transform = `rotateX(${face.x}deg) rotateY(${face.y}deg)`;
-          }
-          cubeButtons.forEach(btn => btn.classList.toggle("is-active", btn.dataset.face === faceName));
-          const activeDay = document.querySelector(".hh-day.is-active");
-          const useTomorrow = activeDay && activeDay.id === "hhDayBtnTomorrow";
-          const tabId = face.tabIds[useTomorrow ? 1 : 0];
-          const tab = $(tabId);
-          if (tab && getComputedStyle(tab).display !== "none") tab.click();
-        }
-        cubeButtons.forEach(btn => btn.addEventListener("click", () => rotateTo(btn.dataset.face)));
-        document.querySelectorAll(".hh-face").forEach(face => face.addEventListener("click", () => rotateTo(face.dataset.target)));
-        rotateTo("Breakfast");
-        window.addEventListener("resize", () => rotateTo(document.querySelector(".hh-cube-btn.is-active")?.dataset.face || "Breakfast"));
-
+        // ---------- CIRCULAR MENU ----------
         const overlay = $("circMenuOverlay");
         $("navBtnBottom").addEventListener("click", (e) => { e.stopPropagation(); overlay.classList.toggle("open"); });
         overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.classList.remove("open"); });
