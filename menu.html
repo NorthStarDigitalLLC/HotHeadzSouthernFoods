@@ -1,627 +1,1745 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Futuristic Holographic Menu</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hot Headz Southern Foods – Menu</title>
+  <meta name="description" content="Daily breakfast, lunch, crawfish, salad bar, drinks and desserts – made fresh.">
 
-<!-- External libs -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+  <!-- Google Fonts & Font Awesome (same as homepage) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-<style>
-  :root{
-    --bg:#05060a;
-    --accent:#44e6ff;
-    --ghost:#7ff0ff;
-    --glass: rgba(255,255,255,0.06);
-    --menu-size: min(34vh, 520px);
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+   <!-- ===== FAVICON / ICONS ===== -->
+<link rel="icon" type="image/webp" href="images/HotHeadzLogo.png">
+<link rel="apple-touch-icon" href="images/HotHeadzLogo.png">
+
+  <!-- ===== OPEN GRAPH ===== -->
+<meta property="og:image" content="images/HotHeadzLogo.png">
+<meta property="og:image:alt" content="Hot Headz Southern Foods logo">
+
+  <!-- ===== TWITTER CARD ===== -->
+<meta name="twitter:image" content="images/HotHeadzLogo.png">
+<meta name="twitter:image:alt" content="Hot Headz Southern Foods logo">
+    
+  <style>
+    /* ---------- RESET / BASE ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      max-width: 100%;
+    }
+    html {
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+    }
+    body {
+      background-color: #07060a;
+      color: rgba(255,255,255,0.92);
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
+      padding-bottom: 90px;
+    }
+
+    /* ---------- FLOATING DOCK (from homepage) ---------- */
+    :root {
+      --gen-glass: rgba(6,7,10,0.62);
+      --gen-glass-2: rgba(6,7,10,0.78);
+      --gen-border: rgba(255,255,255,0.14);
+      --gen-border-2: rgba(255,255,255,0.22);
+      --gen-text: rgba(255,255,255,0.92);
+      --gen-muted: rgba(255,255,255,0.62);
+      --gen-hotA: rgba(255,120,70,0.82);
+      --gen-hotB: rgba(255,60,140,0.74);
+      --gen-radius-xl: 22px;
+      --gen-radius-lg: 16px;
+      --gen-radius-pill: 999px;
+      --gen-shadow: 0 18px 50px rgba(0,0,0,0.62);
+      --gen-font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    .gen-root, .gen-root * { box-sizing: border-box; font-family: var(--gen-font); }
+    .gen-root {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      pointer-events: none;
+    }
+    /* Explore pill – hidden */
+    .gen-pill {
+      display: none !important;
+    }
+
+    .gen-dock {
+      pointer-events: auto;
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      width: min(660px, calc(100vw - 26px));
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px;
+      border-radius: var(--gen-radius-pill);
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(6,7,10,0.62);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: var(--gen-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .gen-dock-btn {
+      text-decoration: none;
+      color: rgba(255,255,255,0.92);
+      flex: 1 1 0;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.36);
+      padding: 10px 8px;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.08);
+      transition: transform .14s ease, background .14s ease, border-color .14s ease;
+    }
+    .gen-dock-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(0,0,0,0.56);
+      border-color: rgba(255,255,255,0.22);
+    }
+    .gen-dock-ic { font-size: 16px; line-height: 1; }
+    .gen-dock-tx {
+      font-size: 11.5px;
+      font-weight: 900;
+      letter-spacing: -0.1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .gen-dock-cta {
+      background: linear-gradient(90deg, rgba(255,120,70,0.22), rgba(255,60,140,0.16));
+      border-color: rgba(255,255,255,0.20);
+    }
+    .gen-dock-btn.is-active {
+      background: rgba(42,127,98,0.3);
+      border-color: rgba(255,179,90,0.5);
+    }
+
+    @media (max-width: 720px) {
+      .gen-dock { gap: 8px; padding: 9px; }
+      .gen-dock-btn { padding: 10px 6px; }
+      .gen-dock-ic { font-size: 15px; }
+      .gen-dock-tx { font-size: 11px; }
+    }
+    @media (max-width: 380px) {
+      .gen-dock { gap: 6px; padding: 8px; }
+      .gen-dock-tx { display: none; }
+    }
+
+    /* ===== MENU STYLES – paper on dark table, now centered ===== */
+    :root{
+      --hh-accent:#c05a2a;
+      --hh-accent-2:#2a7f62;
+      --hh-ink:#14110e;
+      --hh-muted:rgba(20,17,14,.68);
+      --hh-table:#070604;
+      --hh-table2:#0b0806;
+      --hh-paper:#f6f0e6;
+      --hh-paper2:#efe6d9;
+      --hh-radius: 26px;
+      --hh-radius2: 34px;
+      --hh-pill: 999px;
+      --hh-shadow: 0 26px 90px rgba(0,0,0,.48);
+      --hh-shadow2: 0 16px 48px rgba(0,0,0,.22);
+      --hh-shadow3: 0 10px 24px rgba(0,0,0,.14);
+    }
+
+    .hh-menu{
+      width: 100%;
+      max-width: none;
+      min-height: 100vh;
+      margin: 0;
+      padding: 18px 14px 70px;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: rgba(245,240,230,.94);
+      position: relative;
+      isolation: isolate;
+      background:
+        radial-gradient(1100px 700px at 16% 14%, rgba(192,90,42,.18), transparent 60%),
+        radial-gradient(1000px 700px at 86% 20%, rgba(42,127,98,.14), transparent 64%),
+        linear-gradient(180deg, var(--hh-table), var(--hh-table2) 42%, #050403);
+      box-shadow: var(--hh-shadow);
+      overflow: hidden;
+    }
+    .hh-menu::before{
+      content:"";
+      position:absolute; inset:0;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.20'/%3E%3C/svg%3E");
+      opacity:.12;
+      mix-blend-mode: overlay;
+      pointer-events:none;
+      z-index:0;
+    }
+    .hh-menu > *{ position:relative; z-index:1; }
+
+    /* ----- CENTERED HEADER ----- */
+    .hh-header {
+      margin: 10px 0 14px;
+      padding: 14px 14px 0;
+      text-align: center;
+    }
+    .hh-title{
+      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+      font-size: clamp(20px, 2.2vw, 30px);
+      font-weight: 850;
+      letter-spacing: .2px;
+      line-height: 1.1;
+    }
+    .hh-updated{
+      margin-top: 8px;
+      font-weight: 820;
+      color: rgba(245,240,230,.72);
+      font-size: 13.2px;
+      line-height: 1.35;
+    }
+    .hh-note{
+      margin-top: 8px;
+      font-weight: 780;
+      color: rgba(245,240,230,.62);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .hh-stickywrap{ position: sticky; top: 10px; z-index: 90; }
+
+    /* ----- CENTERED DAY BAR ----- */
+    .hh-daybar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content: center;    /* center the day buttons */
+      margin: 14px;
+      padding: 10px;
+      border-radius: var(--hh-radius2);
+      background: rgba(0,0,0,.30);
+      border: 1px solid rgba(245,240,230,.14);
+      box-shadow: var(--hh-shadow2);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .hh-day,
+    .hh-tab{
+      border: 1px solid rgba(245,240,230,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(245,240,230,.92);
+      padding: 10px 14px;
+      border-radius: var(--hh-pill);
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform .14s ease, box-shadow .14s ease, background .14s ease, border-color .14s ease;
+      white-space: nowrap;
+      box-shadow: 0 10px 22px rgba(0,0,0,.25);
+    }
+    .hh-day:hover,
+    .hh-tab:hover{ transform: translateY(-1px); border-color: rgba(255,179,90,.28); }
+
+    .hh-day.is-active{
+      border-color: rgba(192,90,42,.45);
+      background: linear-gradient(180deg, rgba(192,90,42,.26), rgba(0,0,0,.22));
+    }
+
+    /* ----- CENTERED CATEGORY TABS ----- */
+    .hh-tablist{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content: center;    /* center category tabs */
+      margin: 0 14px 12px;
+      position: sticky;
+      top: 86px;
+      z-index: 80;
+      padding: 10px;
+      border-radius: var(--hh-radius2);
+      background: rgba(0,0,0,.24);
+      border: 1px solid rgba(245,240,230,.14);
+      box-shadow: var(--hh-shadow2);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .hh-tab.is-active{
+      border-color: rgba(192,90,42,.50);
+      background: linear-gradient(135deg, rgba(192,90,42,.32), rgba(42,127,98,.18));
+    }
+
+    .hh-panels{ padding: 0 14px 16px; }
+
+    .hh-panel{
+      background: linear-gradient(180deg, var(--hh-paper), var(--hh-paper2));
+      color: var(--hh-ink);
+      border: 1px solid rgba(20,17,14,.14);
+      border-radius: var(--hh-radius2);
+      padding: 18px;
+      box-shadow: var(--hh-shadow2);
+      position: relative;
+      overflow: hidden;
+    }
+    .hh-panel::before{
+      content:"";
+      position:absolute;
+      inset:auto -30% -55% -30%;
+      height: 240px;
+      background:
+        radial-gradient(circle at 30% 45%, rgba(192,90,42,.18), transparent 62%),
+        radial-gradient(circle at 70% 55%, rgba(42,127,98,.12), transparent 64%);
+      transform: rotate(-6deg);
+      pointer-events:none;
+    }
+    .hh-panel > *{ position:relative; z-index:1; }
+
+    .hh-panel h3{
+      margin: 0 0 8px;
+      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+      font-size: clamp(18px, 2vw, 24px);
+      font-weight: 850;
+      letter-spacing: .2px;
+    }
+    .hh-sub{
+      margin: 0 0 12px;
+      font-weight: 820;
+      color: rgba(20,17,14,.72);
+      font-size: 13.2px;
+      line-height: 1.38;
+    }
+    .hh-panel h4{
+      text-transform: uppercase;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      font-size: 10.6px;
+      letter-spacing: .14em;
+      color: rgba(20,17,14,.62);
+      margin: 16px 0 10px;
+    }
+
+    /* ----- LISTS REMAIN LEFT-ALIGNED ----- */
+    .hh-stack{
+      list-style:none;
+      padding-left:0;
+      margin:0;
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
+    }
+    @media(min-width:860px){
+      .hh-stack{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    .hh-stack li{
+      padding: 11px 12px;
+      background: rgba(255,255,255,.62);
+      border: 1px solid rgba(20,17,14,.12);
+      border-radius: 18px;
+      line-height: 1.25;
+      box-shadow: var(--hh-shadow3);
+      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+    }
+    .hh-stack li:hover{
+      transform: translateY(-1px);
+      border-color: rgba(192,90,42,.26);
+      box-shadow: 0 14px 30px rgba(0,0,0,.12);
+    }
+
+    .hh-cta{ margin-top: 14px; display:grid; gap:10px; }
+    .hh-btn{
+      background: linear-gradient(135deg, rgba(20,17,14,.92), rgba(20,17,14,.78));
+      color: rgba(245,240,230,.96);
+      padding: 12px 14px;
+      border-radius: 20px;
+      text-decoration:none;
+      font-weight: 950;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.22);
+      transition: transform .14s ease, box-shadow .14s ease;
+    }
+    .hh-btn:hover{ transform: translateY(-1px); box-shadow: 0 22px 60px rgba(0,0,0,.26); }
+
+    .hh-small{ color: rgba(20,17,14,.70); font-weight: 780; line-height: 1.35; font-size: 13px; }
+
+    .hh-daypanel[hidden]{ display:none; }
+    .hh-daypanel{ animation: hhFadeUp .22s ease-out; }
+    @keyframes hhFadeUp{ from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+    /* State card */
+    .hh-state{
+      border: 1px solid rgba(245,240,230,.14);
+      border-radius: var(--hh-radius2);
+      padding: 20px;
+      margin: 14px;
+      background: rgba(0,0,0,.22);
+      color: rgba(245,240,230,.92);
+      box-shadow: var(--hh-shadow2);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      position:relative;
+      overflow:hidden;
+    }
+    .hh-state::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(700px 280px at 10% 10%, rgba(192,90,42,.22), transparent 60%),
+        radial-gradient(700px 280px at 90% 0%, rgba(42,127,98,.16), transparent 62%);
+      pointer-events:none;
+      opacity:.9;
+    }
+    .hh-state > *{ position:relative; z-index:1; }
+
+    .hh-badge{
+      font-weight: 980;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      font-size: 11px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(245,240,230,.18);
+      background: rgba(255,255,255,.06);
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .hh-badge::before{
+      content:"";
+      width:8px;height:8px;
+      border-radius: 99px;
+      background: rgba(255,179,90,.92);
+      display:inline-block;
+    }
+    .hh-badge.is-dark::before{ background: rgba(245,240,230,.92); }
+
+    .hh-state-title{
+      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+      font-size: clamp(20px, 2.6vw, 30px);
+      font-weight: 850;
+      letter-spacing: .2px;
+      margin: 10px 0 6px;
+      line-height: 1.08;
+    }
+    .hh-state-msg{
+      font-weight: 780;
+      color: rgba(245,240,230,.74);
+      margin: 0;
+      line-height: 1.35;
+      font-size: 13.2px;
+    }
+
+    /* Advanced */
+    .hh-advanced-top{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      margin: 8px 14px 12px;
+    }
+    .hh-advanced-title{
+      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+      font-size: clamp(18px, 2.2vw, 26px);
+      font-weight: 850;
+      letter-spacing: .2px;
+      color: rgba(245,240,230,.92);
+    }
+    .hh-advanced-disclaimer{
+      font-weight: 780;
+      color: rgba(245,240,230,.68);
+      text-align:right;
+      max-width: 520px;
+      font-size: 12.8px;
+      line-height: 1.35;
+    }
+    .hh-hint{ color: rgba(245,240,230,.62); font-weight: 760; margin: 8px 14px 0; font-size: 12.6px; }
+
+    .hh-adv-carousel{
+      display:flex;
+      gap:14px;
+      overflow-x:auto;
+      padding: 2px 14px 14px;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+    }
+    .hh-adv-card{ flex: 0 0 92%; max-width: 720px; scroll-snap-align:start; }
+    @media(min-width:860px){ .hh-adv-card{ flex: 0 0 48%; } }
+    .hh-adv-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap:10px;
+      margin: 0 0 10px;
+      padding: 0 6px;
+      color: rgba(245,240,230,.86);
+    }
+    .hh-adv-dayname{
+      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+      font-size: 18px;
+      font-weight: 850;
+      letter-spacing: .2px;
+    }
+    .hh-adv-date,
+    .hh-adv-hours{ color: rgba(245,240,230,.68); font-weight: 780; font-size: 12.8px; }
+
+    /* Mobile */
+    @media(max-width: 560px){
+      .hh-menu{ padding: 14px 10px 72px; border-radius: 26px; }
+      .hh-daybar{
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 8px;
+        padding: 8px;
+        border-radius: 20px;
+        margin: 12px;
+        justify-content: flex-start; /* on mobile, keep scrollable left-aligned */
+      }
+      .hh-daybar::-webkit-scrollbar{ display:none; }
+      .hh-tablist{
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 8px;
+        padding: 8px;
+        border-radius: 20px;
+        top: 74px;
+        margin: 0 12px 12px;
+        justify-content: flex-start;
+      }
+      .hh-tablist::-webkit-scrollbar{ display:none; }
+      .hh-day,
+      .hh-tab{ padding: 8px 10px; font-size: 13px; }
+      .hh-header{ padding: 10px 12px 0; }
+      .hh-panels{ padding: 0 12px 14px; }
+      .hh-panel{ padding: 14px; border-radius: 26px; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .hh-daypanel{ animation:none; }
+      .hh-day, .hh-tab, .hh-stack li, .hh-btn{ transition:none; }
+    }
+
+    /* Click‑for‑description dropdowns */
+    .hh-hintline{
+      margin: 6px 0 10px;
+      font-size: 12.6px;
+      font-weight: 780;
+      color: rgba(20,17,14,.62);
+    }
+    .hh-stack details{
+      background: rgba(255,255,255,.62);
+      border: 1px solid rgba(20,17,14,.12);
+      border-radius: 18px;
+      box-shadow: var(--hh-shadow3);
+      overflow: hidden;
+      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+    }
+    .hh-stack details:hover{
+      transform: translateY(-1px);
+      border-color: rgba(192,90,42,.26);
+      box-shadow: 0 14px 30px rgba(0,0,0,.12);
+    }
+    .hh-stack summary{
+      list-style: none;
+      cursor: pointer;
+      padding: 11px 12px;
+      font-weight: 860;
+      line-height: 1.25;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .hh-stack summary::-webkit-details-marker{ display:none; }
+    .hh-stack summary::after{
+      content: "＋";
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      opacity: .65;
+      flex: 0 0 auto;
+    }
+    .hh-stack details[open] summary::after{ content: "－"; opacity: .8; }
+    .hh-desc{
+      padding: 0 12px 12px;
+      color: rgba(20,17,14,.72);
+      font-size: 12.8px;
+      font-weight: 760;
+      line-height: 1.35;
+    }
+
+    .hh-lunch-unavail{
+      margin: 10px 0 6px;
+      padding: 12px 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(20,17,14,.14);
+      background: rgba(255,255,255,.66);
+      box-shadow: var(--hh-shadow3);
+    }
+    .hh-lunch-unavail-title{
+      margin-top: 8px;
+      font-weight: 880;
+      color: rgba(20,17,14,.82);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+
+
+
+    /* ==================== CIRCULAR NAVIGATION (adapted for Hot Headz) ==================== */
+.nav-btn {
+  position: fixed;
+  z-index: 2000;
+  background: #1e1b1b;
+  border: 2px solid var(--hh-accent, #c05a2a);
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  box-shadow: 0 0 25px rgba(192,90,42,0.5);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.nav-btn:hover {
+  transform: scale(1.05);
+  border-color: var(--hh-accent-2, #2a7f62);
+  box-shadow: 0 0 35px var(--hh-accent, #c05a2a);
+}
+
+.btn-icon {
+  font-size: 1.8rem;
+  color: var(--hh-accent, #c05a2a);
+}
+
+.btn-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.btn-text .main {
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.92);
+}
+
+.btn-text .sub {
+  font-size: 0.65rem;
+  opacity: 0.7;
+  color: rgba(255,255,255,0.7);
+  text-transform: uppercase;
+}
+
+/* left-center button - VERTICAL */
+.nav-btn.left-center {
+  left: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  flex-direction: column;
+  padding: 1rem 0.5rem;
+  gap: 8px;
+}
+
+.nav-btn.left-center .btn-text {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.nav-btn.left-center .btn-text .main {
+  font-size: 0.9rem;
+  letter-spacing: normal;
+}
+
+.nav-btn.left-center .btn-text .sub {
+  font-size: 0.6rem;
+  margin-top: 4px;
+}
+
+/* bottom-center button - HORIZONTAL */
+.nav-btn.bottom-center {
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  flex-direction: row;
+  padding: 0.8rem 1.8rem;
+}
+
+/* circular menu overlay */
+.circ-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background: rgba(0,0,0,0.7);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.circ-menu-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.circular-menu {
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: transparent;
+  border: 2px solid var(--hh-accent, #c05a2a);
+  box-shadow: 0 0 40px rgba(192,90,42,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transform: scale(0.3);
+  transition: transform 0.3s ease;
+}
+
+.circ-menu-overlay.open .circular-menu {
+  transform: scale(1);
+}
+
+.center-home {
+  width: 70px;
+  height: 70px;
+  background: var(--hh-accent-2, #2a7f62);
+  border: 3px solid var(--hh-accent, #c05a2a);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1.5rem;
+  color: #1a0d0b;
+  box-shadow: 0 0 30px var(--hh-accent, #c05a2a);
+  cursor: pointer;
+  transition: 0.2s;
+  z-index: 1001;
+}
+.center-home:hover {
+  background: var(--hh-accent, #c05a2a);
+  color: white;
+  transform: scale(1.05);
+}
+
+.menu-item {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: #1e1b1b;
+  border: 2px solid var(--hh-accent, #c05a2a);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.92);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(0,0,0,0.7);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-130px) rotate(calc(var(--angle) * -1deg));
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 1px;
+  backdrop-filter: blur(4px);
+}
+
+.menu-item:hover {
+  background: var(--hh-accent, #c05a2a);
+  color: black;
+  border-color: var(--hh-accent-2, #2a7f62);
+  transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-140px) rotate(calc(var(--angle) * -1deg));
+  width: 65px;
+  height: 65px;
+}
+
+/* mobile adjustments */
+@media (max-width: 600px) {
+  .nav-btn.left-center {
+    left: 10px;
+    padding: 0.8rem 0.3rem;
   }
-  html,body{height:100%;margin:0;background:radial-gradient(circle at 10% 10%, #071022 0%, var(--bg) 40%), #000;color:#eaf8ff;overflow:hidden}
-  .app{
-    position:relative;width:100%;height:100%;display:flex;align-items:flex-start;justify-content:flex-start;
+  .nav-btn.left-center .btn-icon {
+    font-size: 1.5rem;
   }
-
-  /* Toggle / Hamburger */
-  #menuToggle{
-    position: absolute;
-    left: 24px;
-    top: 24px;
-    width:56px;height:56px;border-radius:14px;border:none;cursor:pointer;
-    background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-    box-shadow: 0 6px 30px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
-    display:grid;place-items:center;
-    z-index: 30;
-    transition: transform .25s ease, box-shadow .25s ease;
+  .nav-btn.left-center .btn-text .main {
+    font-size: 0.8rem;
   }
-  #menuToggle:focus{outline:3px solid rgba(68,230,255,0.22)}
-  #menuToggle:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(68,230,255,0.06)}
-
-  /* hamburger lines */
-  .ham{
-    width:26px;height:2px;background:linear-gradient(90deg,var(--ghost),var(--accent));
-    position:relative;border-radius:2px;transition: all .35s cubic-bezier(.2,.8,.2,1);
+  .nav-btn.left-center .btn-text .sub {
+    font-size: 0.5rem;
   }
-  .ham::before,.ham::after{
-    content:"";position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ghost),var(--accent));
-    border-radius:2px;transition: all .35s cubic-bezier(.2,.8,.2,1)
+  .nav-btn.bottom-center {
+    bottom: 20px;
+    padding: 0.6rem 1.2rem;
   }
-  .ham::before{top:-8px}
-  .ham::after{bottom:-8px}
-
-  /* Active hamburger to "X" */
-  #menuToggle.active .ham{transform:rotate(45deg)}
-  #menuToggle.active .ham::before{transform:rotate(-90deg);top:0}
-  #menuToggle.active .ham::after{opacity:0}
-
-  /* Canvas container */
-  #menuCanvas{position:absolute;left:0;top:0;right:0;bottom:0;z-index:10;display:block}
-
-  /* ARIA live region for announcements */
-  #ariaLive{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
-
-  /* Fallback radial CSS menu */
-  .fallback-menu{
-    position:absolute;inset:unset;z-index:20;left:24px;top:96px;
-    display:none;flex-direction:column;gap:10px;background:var(--glass);border-radius:12px;padding:12px;backdrop-filter: blur(8px);
+  .circular-menu {
+    width: 280px;
+    height: 280px;
   }
-  .fallback-menu .item{color:#d1f6ff;padding:10px 14px;border-radius:8px;cursor:pointer;border:1px solid rgba(255,255,255,0.04)}
-  .fallback-menu .item:hover{background:linear-gradient(90deg, rgba(68,230,255,0.06), rgba(68,230,255,0.02));transform:translateY(-2px)}
-
-  /* small helpful HUD */
-  .hud{
-    position:absolute;right:28px;bottom:28px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-    border-radius:10px;padding:10px 12px;color:#b9f8ff;font-size:13px;z-index:20;border:1px solid rgba(68,230,255,0.06)
+  .menu-item {
+    width: 50px;
+    height: 50px;
+    font-size: 0.7rem;
+    transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-100px) rotate(calc(var(--angle) * -1deg));
   }
-
-  /* Responsive */
-  @media (max-width:800px){
-    #menuToggle{left:12px;top:12px}
-    .fallback-menu{left:12px;top:68px}
+  .menu-item:hover {
+    transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-110px) rotate(calc(var(--angle) * -1deg));
+    width: 55px;
+    height: 55px;
   }
-
-  /* Accessibility high-contrast mode toggle (example) */
-  .high-contrast body{ --accent:#00ffff; --ghost:#ffffff; background:#000;}
-</style>
+  .center-home {
+    width: 60px;
+    height: 60px;
+    font-size: 1.2rem;
+  }
+}
+    
+  </style>
 </head>
 <body>
-  <div class="app" id="app">
-    <button id="menuToggle" aria-expanded="false" aria-controls="holoMenu" aria-label="Open main menu">
-      <span class="ham" aria-hidden="true"></span>
-    </button>
+  <!-- Required invisible anchors (optional, for explore nav if used) -->
+  <div id="gen-home" style="position: absolute; top: 0; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-menu" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-delivery" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-order" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-about" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-location" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
 
-    <!-- WebGL canvas -->
-    <canvas id="menuCanvas" role="img" aria-label="Holographic site menu visualization"></canvas>
 
-    <!-- Fallback CSS menu for devices without WebGL -->
-    <nav class="fallback-menu" id="fallbackMenu" role="menu" aria-hidden="true"></nav>
+   <!-- ===== CIRCULAR NAVIGATION BUTTONS ===== -->
+  <!-- Left button removed as requested -->
 
-    <!-- ARIA live for announcements -->
-    <div id="ariaLive" role="status" aria-live="polite"></div>
-
-    <div class="hud" aria-hidden="true">Say: "Open About" • Click items to visit • Voice & keyboard accessible</div>
+  <div class="nav-btn bottom-center" id="navBtnBottom">
+    <i class="fas fa-compass btn-icon"></i>
+    <div class="btn-text">
+      <span class="main">NAVIGATION</span>
+      <span class="sub">explore pages</span>
+    </div>
   </div>
 
-<script>
-/* =========================
-   Config & menu data
-   ========================= */
-const menuItems = [
-  { id: 'home',    title: 'Home',      color: 0x44e6ff, href: '#home',    icon: '🏠' },
-  { id: 'about',   title: 'About',     color: 0xff66b6, href: '#about',   icon: '🛰️' },
-  { id: 'services',title: 'Services',  color: 0x9bff77, href: '#services',icon: '⚙️' },
-  { id: 'work',    title: 'Work',      color: 0xffb86a, href: '#work',    icon: '💠' },
-  { id: 'blog',    title: 'Blog',      color: 0x9bd6ff, href: '#blog',    icon: '✒️' },
-  { id: 'contact', title: 'Contact',   color: 0xff8cf3, href: '#contact', icon: '✉️' },
-];
+  <!-- CIRCULAR MENU OVERLAY with page links (5 items evenly spaced at 72° increments) -->
+  <div class="circ-menu-overlay" id="circMenuOverlay">
+    <div class="circular-menu">
+      <div class="center-home" id="homeCenter" data-link="index.html"><i class="fas fa-home"></i></div>
+      <div class="menu-item" style="--angle: 0;" data-link="delivery.html">Delivery</div>
+      <div class="menu-item" style="--angle: 72;" data-link="tel:3372211035">Order</div>
+      <div class="menu-item" style="--angle: 144;" data-link="about.html">About</div>
+      <div class="menu-item" style="--angle: 216;" data-link="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634">Location</div>
+      <div class="menu-item" style="--angle: 288;" data-action="share">Share</div>
+    </div>
+  </div>
 
-/* Local intelligence key for localStorage */
-const STORAGE_KEY = "holoMenuUsage_v1";
+  <!-- ===== MENU HTML ===== -->
+  <div class="hh-menu" role="region" aria-label="Menu" id="hh-menu-root">
 
-/* =========================
-   Predictive ordering
-   ========================= */
+    <!-- Sticky top nav -->
+    <div class="hh-stickywrap">
+      <div class="hh-daybar" role="tablist" aria-label="Day selector">
+        <button class="hh-day is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-day-today" id="hhDayBtnToday">Today</button>
+        <button class="hh-day" type="button" role="tab" aria-selected="false" aria-controls="hh-day-tomorrow" id="hhDayBtnTomorrow">Tomorrow</button>
+        <button class="hh-day" type="button" role="tab" aria-selected="false" aria-controls="hh-day-advanced" id="hhDayBtnAdvanced">Advanced Menu</button>
+      </div>
+    </div>
 
-/* We maintain usage data: {id: {freq: n, last: timestamp}}
-   Score = freq * 2 + recencyFactor (0..1)
-*/
-function loadUsage() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch(e) { return {}; }
-}
-function saveUsage(u){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(u)); } catch(e){} }
-function recordClick(id){
-  const u = loadUsage();
-  const now = Date.now();
-  if(!u[id]) u[id] = { freq: 0, last: now };
-  u[id].freq += 1;
-  u[id].last = now;
-  saveUsage(u);
-}
-function scoreId(id){
-  const u = loadUsage();
-  const meta = u[id];
-  if(!meta) return 0;
-  const freqScore = meta.freq;
-  const recencyScore = Math.max(0, 1 - ((Date.now() - meta.last)/(1000*60*60*24*30))); // 30 day decay
-  return freqScore*2 + recencyScore;
-}
-function orderedItems(){
-  return [...menuItems].sort((a,b) => scoreId(b.id) - scoreId(a.id));
-}
+    <!-- TODAY -->
+    <div class="hh-daypanel is-active" id="hh-day-today" role="tabpanel" aria-labelledby="hhDayBtnToday">
+      <div class="hh-header">
+        <div class="hh-title" id="hh-today-title">Today’s Menu</div>
+        <div class="hh-updated" id="hh-hours-line">Loading hours…</div>
+        <div class="hh-note" id="hh-hours-note"></div>
+      </div>
 
-/* =========================
-   Utilities
-   ========================= */
-const $ = sel => document.querySelector(sel);
-const $all = sel => Array.from(document.querySelectorAll(sel));
-function announce(text){ $('#ariaLive').textContent = text; }
+      <!-- Only show CLOSED at day level -->
+      <div class="hh-state hh-closed" id="hh-today-closed" hidden>
+        <div class="hh-badge">Closed</div>
+        <div class="hh-state-title" id="hh-today-closed-title"></div>
+        <div class="hh-state-msg" id="hh-today-closed-msg"></div>
+      </div>
 
-/* =========================
-   Fallback CSS menu
-   ========================= */
-const fallbackEl = $('#fallbackMenu');
-function createFallback() {
-  fallbackEl.innerHTML = '';
-  const items = orderedItems();
-  items.forEach(it=>{
-    const el = document.createElement('div');
-    el.className = 'item';
-    el.role = 'menuitem';
-    el.tabIndex = 0;
-    el.innerHTML = `<strong style="margin-right:8px">${it.icon}</strong>${it.title}`;
-    el.addEventListener('click', ()=>{
-      recordClick(it.id);
-      announce(`${it.title} opened`);
-      window.location.href = it.href;
-    });
-    el.addEventListener('keydown', (e)=>{
-      if(e.key==='Enter' || e.key===' ') el.click();
-    });
-    fallbackEl.appendChild(el);
-  });
-}
+      <div class="hh-tablist" role="tablist" aria-label="Today categories">
+        <button class="hh-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-today-breakfast" id="hhTabTodayBreakfast">Breakfast</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-lunch" id="hhTabTodayLunch">Lunch</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-crawfish" id="hhTabTodayCrawfish">Crawfish</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-salad" id="hhTabTodaySalad">Salad Bar</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-drinks" id="hhTabTodayDrinks">Drinks</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-dessert" id="hhTabTodayDessert">Dessert</button>
+      </div>
 
-/* =========================
-   WebGL Holo Menu (Three.js)
-   ========================= */
-const canvas = document.getElementById('menuCanvas');
-let renderer, scene, camera, raycaster, pointer, items3D = [], ringGroup, particleGroup, animId;
-let clock = new THREE.Clock();
+      <div class="hh-panels">
+        <section class="hh-panel is-active" id="hh-today-breakfast" role="tabpanel" aria-labelledby="hhTabTodayBreakfast">
+          <h3>Breakfast</h3>
+          <p class="hh-sub" id="hh-today-breakfast-sub"></p>
+          <h4>Plates</h4>
+          <ul class="hh-stack" id="hh-today-breakfast-plates"></ul>
+          <h4>Available Items</h4>
+          <ul class="hh-stack" id="hh-today-breakfast-items"></ul>
+          <div class="hh-cta">
+            <a class="hh-btn" id="hh-call-btn-today-b" href="#">Call to Order</a>
+            <div class="hh-small" id="hh-delivery-note"></div>
+          </div>
+        </section>
 
-function initThree(){
-  // Renderer
-  renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true, powerPreference:'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.outputEncoding = THREE.sRGBEncoding;
-  renderer.toneMappingExposure = 1.0;
+        <section class="hh-panel" id="hh-today-lunch" hidden role="tabpanel" aria-labelledby="hhTabTodayLunch">
+          <h3>Lunch</h3>
+          <p class="hh-sub" id="hh-today-lunch-sub">Loading today’s lunch menu…</p>
 
-  // Scene & camera
-  scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(35, window.innerWidth/window.innerHeight, 0.1, 2000);
-  camera.position.set(0, 0, 620);
+          <!-- Lunch-only unavailable message -->
+          <div class="hh-lunch-unavail" id="hh-today-lunch-unavail" hidden>
+            <div class="hh-badge is-dark">Unavailable</div>
+            <div class="hh-lunch-unavail-title" id="hh-today-lunch-unavail-title">Lunch menu unavailable.</div>
+          </div>
 
-  // Lighting
-  const amb = new THREE.AmbientLight(0xffffff, 0.6);
-  scene.add(amb);
-  const dir = new THREE.DirectionalLight(0xffffff, 0.6);
-  dir.position.set(0.5, 1, 0.5);
-  scene.add(dir);
+          <div id="hh-today-lunch-content" style="display:none">
+            <h4>Plates</h4>
+            <ul class="hh-stack" id="hh-today-lunch-plates"></ul>
 
-  // Groups
-  ringGroup = new THREE.Group();
-  scene.add(ringGroup);
-  particleGroup = new THREE.Group();
-  scene.add(particleGroup);
+            <h4 id="hh-today-lunch-items-title">Today’s Lunch Items</h4>
+            <div class="hh-hintline" id="hh-today-lunch-hint" hidden></div>
+            <ul class="hh-stack" id="hh-today-lunch-items"></ul>
+          </div>
 
-  raycaster = new THREE.Raycaster();
-  pointer = new THREE.Vector2(-9999, -9999);
-}
+          <div class="hh-cta">
+            <a class="hh-btn" id="hh-call-btn-today-l" href="#">Call to Order</a>
+          </div>
+        </section>
 
-/* Create canvas texture for each menu item (text + icon) */
-function createTextTexture(item, size=512){
-  const c = document.createElement('canvas');
-  c.width = c.height = size;
-  const ctx = c.getContext('2d');
-  // background transparent
-  ctx.clearRect(0,0,size,size);
-  // glow gradient
-  const g = ctx.createLinearGradient(0,0,size, size);
-  g.addColorStop(0, 'rgba(255,255,255,0.06)');
-  g.addColorStop(1, 'rgba(68,230,255,0.06)');
-  ctx.fillStyle = g;
-  // rounded background
-  const pad = 28;
-  roundRect(ctx, pad, pad, size-2*pad, size-2*pad, 28);
-  ctx.fill();
-  // title
-  ctx.font = 'bold 44px Inter, Arial';
-  ctx.fillStyle = 'rgba(255,255,255,0.92)';
-  ctx.textAlign = 'center';
-  ctx.fillText(item.title, size/2, size/2 + 10);
-  // icon
-  ctx.font = '48px system-ui, serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.95)';
-  ctx.fillText(item.icon, size/2, size/2 - 46);
-  // small subtitle
-  ctx.font = '14px Inter, Arial';
-  ctx.fillStyle = 'rgba(210,255,255,0.6)';
-  ctx.fillText(item.id, size/2, size - 48);
-  const tex = new THREE.CanvasTexture(c);
-  tex.encoding = THREE.sRGBEncoding;
-  tex.needsUpdate = true;
-  return tex;
-}
+        <section class="hh-panel" id="hh-today-crawfish" hidden role="tabpanel" aria-labelledby="hhTabTodayCrawfish">
+          <h3>Crawfish</h3>
+          <p class="hh-sub" id="hh-today-crawfish-sub"></p>
+          <ul class="hh-stack" id="hh-today-crawfish-items"></ul>
+          <div class="hh-cta">
+            <a class="hh-btn" id="hh-call-btn-today-c" href="#">Call to Order</a>
+          </div>
+        </section>
 
-function roundRect(ctx, x, y, w, h, r){
-  ctx.beginPath();
-  ctx.moveTo(x+r, y);
-  ctx.arcTo(x+w,y,x+w,y+h,r);
-  ctx.arcTo(x+w,y+h,x,y+h,r);
-  ctx.arcTo(x,y+h,x,y,r);
-  ctx.arcTo(x,y,x+w,y,r);
-  ctx.closePath();
-}
+        <section class="hh-panel" id="hh-today-salad" hidden role="tabpanel" aria-labelledby="hhTabTodaySalad">
+          <h3>Salad Bar</h3>
+          <p class="hh-sub" id="hh-today-salad-sub"></p>
+          <h4>Pricing</h4>
+          <ul class="hh-stack" id="hh-today-salad-pricing"></ul>
+          <h4>Lettuce</h4>
+          <ul class="hh-stack" id="hh-today-salad-lettuce"></ul>
+          <h4>Toppings</h4>
+          <ul class="hh-stack" id="hh-today-salad-toppings"></ul>
+          <h4>Dressing</h4>
+          <ul class="hh-stack" id="hh-today-salad-dressing"></ul>
+        </section>
 
-/* Holographic shader material (fragment + vertex) */
-const HoloShader = {
-  uniforms: {
-    uTime: { value: 0 },
-    uTex: { value: null },
-    uColor: { value: new THREE.Color(0x44e6ff) },
-    uOpacity: { value: 0.96 },
-  },
-  vertexShader: `
-    varying vec2 vUv;
-    varying float vWave;
-    uniform float uTime;
-    void main(){
-      vUv = uv;
-      vec3 pos = position;
-      // subtle wavy displacement
-      float wave = sin((uv.x+uTime*0.25)*6.2831)*0.8 + cos((uv.y+uTime*0.5)*3.1415)*0.6;
-      pos.z += wave * 6.0 * (1.0 - uv.y);
-      vWave = wave;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(pos,1.0);
-    }
-  `,
-  fragmentShader: `
-    uniform sampler2D uTex;
-    uniform float uTime;
-    uniform vec3 uColor;
-    uniform float uOpacity;
-    varying vec2 vUv;
-    varying float vWave;
-    // procedural noise (cheap)
-    float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453123); }
-    float noise(vec2 p){
-      vec2 i = floor(p);
-      vec2 f = fract(p);
-      float a = hash(i);
-      float b = hash(i + vec2(1.0, 0.0));
-      float c = hash(i + vec2(0.0, 1.0));
-      float d = hash(i + vec2(1.0, 1.0));
-      vec2 u = f*f*(3.0-2.0*f);
-      return mix(a,b,u.x) + (c-a)*u.y*(1.0-u.x) + (d-b)*u.x*u.y;
-    }
-    void main(){
-      vec4 base = texture2D(uTex, vUv);
-      // scanlines
-      float scan = sin((vUv.y*200.0 + uTime*40.0) * 3.1415) * 0.03;
-      // noisy shimmer
-      float n = noise(vUv*20.0 + uTime*0.7) * 0.12;
-      // tinted glass overlay
-      vec3 tint = uColor * (0.25 + vUv.y*0.75);
-      // fresnel rim
-      float fres = pow(1.0 - abs(vWave)*0.2 - vUv.y, 2.0);
-      vec3 color = mix(base.rgb, tint, 0.38) + n + scan;
-      color += fres * 0.2;
-      float alpha = base.a * uOpacity + 0.02;
-      // holographic edge
-      float edge = smoothstep(0.03, 0.0, min(vUv.x, 1.0 - vUv.x) + min(vUv.y, 1.0 - vUv.y));
-      color += vec3(0.3,0.6,0.7) * (1.0-edge) * 0.18;
-      gl_FragColor = vec4(color, clamp(alpha, 0.02, 1.0));
-    }
-  `
-};
+        <section class="hh-panel" id="hh-today-drinks" hidden role="tabpanel" aria-labelledby="hhTabTodayDrinks">
+          <h3>Drinks</h3>
+          <ul class="hh-stack" id="hh-today-drinks-items"></ul>
+        </section>
 
-/* Create holographic items and layout them around a ring */
-function buildRing(){
-  // Clear prev
-  items3D.forEach(it=>{
-    it.mesh.geometry.dispose();
-    it.mesh.material.dispose();
-    ringGroup.remove(it.mesh);
-  });
-  items3D = [];
+        <section class="hh-panel" id="hh-today-dessert" hidden role="tabpanel" aria-labelledby="hhTabTodayDessert">
+          <h3>Dessert</h3>
+          <p class="hh-sub" id="hh-today-dessert-sub"></p>
+          <ul class="hh-stack" id="hh-today-dessert-items"></ul>
+        </section>
+      </div>
+    </div>
 
-  const items = orderedItems();
-  const count = items.length;
-  const radius = 240;
-  const planeW = 200, planeH = 120;
+    <!-- TOMORROW -->
+    <div class="hh-daypanel" id="hh-day-tomorrow" hidden role="tabpanel" aria-labelledby="hhDayBtnTomorrow">
+      <div class="hh-header">
+        <div class="hh-title" id="hh-tomorrow-title">Tomorrow’s Menu</div>
+        <div class="hh-updated" id="hh-hours-line-2">Loading hours…</div>
+        <div class="hh-note" id="hh-hours-note-2"></div>
+      </div>
 
-  items.forEach((it, idx)=>{
-    const tex = createTextTexture(it, 512);
-    const mat = new THREE.ShaderMaterial({
-      ...HoloShader,
-      uniforms: {
-        uTime: { value: 0 },
-        uTex: { value: tex },
-        uColor: { value: new THREE.Color(it.color) },
-        uOpacity: { value: 0.96 }
-      },
-      transparent: true,
-      depthWrite: false,
-      side: THREE.DoubleSide
-    });
+      <!-- Only show CLOSED at day level -->
+      <div class="hh-state hh-closed" id="hh-tomorrow-closed" hidden>
+        <div class="hh-badge">Closed</div>
+        <div class="hh-state-title" id="hh-tomorrow-closed-title"></div>
+        <div class="hh-state-msg" id="hh-tomorrow-closed-msg"></div>
+      </div>
 
-    const geo = new THREE.PlaneGeometry(planeW, planeH, 12, 6);
-    const mesh = new THREE.Mesh(geo, mat);
-    // position around a subtly tilted ring
-    const angle = (idx / count) * Math.PI*2;
-    const y = Math.sin(angle*0.6) * 40;
-    const x = Math.cos(angle) * radius;
-    const z = Math.sin(angle) * radius*0.18 - 60; // slight forward/back
-    mesh.position.set(x, y, z);
-    mesh.lookAt(0,0,0); // face center
-    mesh.userData = { id: it.id, href: it.href, title: it.title };
-    ringGroup.add(mesh);
-    items3D.push({ item: it, mesh, mat, tex, base: { x,y,z,angle } });
-  });
+      <div class="hh-tablist" role="tablist" aria-label="Tomorrow categories">
+        <button class="hh-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-tomorrow-breakfast" id="hhTabTomorrowBreakfast">Breakfast</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-lunch" id="hhTabTomorrowLunch">Lunch</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-crawfish" id="hhTabTomorrowCrawfish">Crawfish</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-salad" id="hhTabTomorrowSalad">Salad Bar</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-drinks" id="hhTabTomorrowDrinks">Drinks</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-dessert" id="hhTabTomorrowDessert">Dessert</button>
+      </div>
 
-  // particle field (sparse)
-  buildParticleField();
-}
+      <div class="hh-panels">
+        <section class="hh-panel is-active" id="hh-tomorrow-breakfast" role="tabpanel" aria-labelledby="hhTabTomorrowBreakfast">
+          <h3>Breakfast</h3>
+          <p class="hh-sub" id="hh-tomorrow-breakfast-sub"></p>
+          <h4>Plates</h4>
+          <ul class="hh-stack" id="hh-tomorrow-breakfast-plates"></ul>
+          <h4>Available Items</h4>
+          <ul class="hh-stack" id="hh-tomorrow-breakfast-items"></ul>
+          <div class="hh-cta">
+            <a class="hh-btn" id="hh-call-btn-tomorrow-b" href="#">Call to Order</a>
+            <div class="hh-small" id="hh-delivery-note-2"></div>
+          </div>
+        </section>
 
-/* Create a modest particle field that reacts to pointer */
-function buildParticleField(){
-  // Clear previous
-  while(particleGroup.children.length) {
-    const c = particleGroup.children.pop();
-    if(c.geometry) c.geometry.dispose();
-    if(c.material) c.material.dispose();
-  }
-  const pts = new THREE.BufferGeometry();
-  const count = 220;
-  const positions = new Float32Array(count*3);
-  for(let i=0;i<count;i++){
-    const r = 280 + Math.random()*380;
-    const theta = Math.random()*Math.PI*2;
-    const vy = (Math.random()-0.5)*120;
-    positions[i*3+0] = Math.cos(theta)*r* (0.2 + Math.random()*1.0);
-    positions[i*3+1] = vy;
-    positions[i*3+2] = Math.sin(theta)*r* (0.2 + Math.random()*1.0);
-  }
-  pts.setAttribute('position', new THREE.BufferAttribute(positions,3));
-  const mat = new THREE.PointsMaterial({ size: 2.6, color: 0x66f0ff, transparent:true, opacity:0.72, depthWrite:false});
-  const points = new THREE.Points(pts,mat);
-  particleGroup.add(points);
-}
+        <section class="hh-panel" id="hh-tomorrow-lunch" hidden role="tabpanel" aria-labelledby="hhTabTomorrowLunch">
+          <h3>Lunch</h3>
+          <p class="hh-sub" id="hh-tomorrow-lunch-sub">Loading tomorrow’s lunch menu…</p>
 
-/* Interaction: hover & click */
-let hovered = null;
-function handlePointerMove(clientX, clientY){
-  pointer.x = (clientX / window.innerWidth) * 2 - 1;
-  pointer.y = -(clientY / window.innerHeight) * 2 + 1;
-}
+          <!-- Lunch-only unavailable message -->
+          <div class="hh-lunch-unavail" id="hh-tomorrow-lunch-unavail" hidden>
+            <div class="hh-badge is-dark">Unavailable</div>
+            <div class="hh-lunch-unavail-title" id="hh-tomorrow-lunch-unavail-title">Lunch menu unavailable.</div>
+          </div>
 
-function animate(){
-  const t = clock.getElapsedTime();
-  // update shader times
-  items3D.forEach((entry, idx)=>{
-    entry.mat.uniforms.uTime.value = t;
-    // subtle breathing & float
-    entry.mesh.rotation.z = Math.sin(t*0.7 + idx)*0.02;
-    entry.mesh.position.y = entry.base.y + Math.sin(t*0.8 + idx)*6;
-  });
+          <div id="hh-tomorrow-lunch-content" style="display:none">
+            <h4>Plates</h4>
+            <ul class="hh-stack" id="hh-tomorrow-lunch-plates"></ul>
 
-  // raycast
-  raycaster.setFromCamera(pointer, camera);
-  const intersects = raycaster.intersectObjects(items3D.map(e=>e.mesh), true);
-  if(intersects.length){
-    const obj = intersects[0].object;
-    if(hovered !== obj){
-      if(hovered) onUnhover(hovered);
-      hovered = obj;
-      onHover(obj);
-    }
-  } else {
-    if(hovered) onUnhover(hovered);
-    hovered = null;
-  }
+            <h4 id="hh-tomorrow-lunch-items-title">Tomorrow’s Lunch Items</h4>
+            <div class="hh-hintline" id="hh-tomorrow-lunch-hint" hidden></div>
+            <ul class="hh-stack" id="hh-tomorrow-lunch-items"></ul>
+          </div>
 
-  // animate camera slight orbit to look alive
-  const camTargetX = Math.sin(t*0.06) * 10;
-  gsap.to(camera.position, { duration: 0.6, x: camTargetX, ease: "sine.inOut" });
-  camera.lookAt(0,0,0);
+          <div class="hh-cta">
+            <a class="hh-btn" id="hh-call-btn-tomorrow-l" href="#">Call to Order</a>
+          </div>
+        </section>
 
-  renderer.render(scene, camera);
-  animId = requestAnimationFrame(animate);
-}
+        <section class="hh-panel" id="hh-tomorrow-crawfish" hidden role="tabpanel" aria-labelledby="hhTabTomorrowCrawfish">
+          <h3>Crawfish</h3>
+          <p class="hh-sub" id="hh-tomorrow-crawfish-sub"></p>
+          <ul class="hh-stack" id="hh-tomorrow-crawfish-items"></ul>
+          <div class="hh-cta">
+            <a class="hh-btn" id="hh-call-btn-tomorrow-c" href="#">Call to Order</a>
+          </div>
+        </section>
 
-function onHover(mesh){
-  // bring forward & scale up
-  gsap.to(mesh.position, { z: mesh.position.z - 36, duration:0.35, ease:"expo.out" });
-  gsap.to(mesh.scale, { x:1.18, y:1.18, z:1.18, duration:0.35, ease:"expo.out" });
-  // glow increase
-  gsap.to(mesh.material.uniforms.uOpacity, { value: 1.0, duration:0.28 });
-  announce(`${mesh.userData.title} focused`);
-}
-function onUnhover(mesh){
-  const original = items3D.find(e=>e.mesh===mesh).base;
-  gsap.to(mesh.position, { x: original.x, y: original.y, z: original.z, duration:0.6, ease:"elastic.out(1,0.6)" });
-  gsap.to(mesh.scale, { x:1, y:1, z:1, duration:0.6, ease:"elastic.out(1,0.6)" });
-  gsap.to(mesh.material.uniforms.uOpacity, { value: 0.96, duration:0.6 });
-}
+        <section class="hh-panel" id="hh-tomorrow-salad" hidden role="tabpanel" aria-labelledby="hhTabTomorrowSalad">
+          <h3>Salad Bar</h3>
+          <p class="hh-sub" id="hh-tomorrow-salad-sub"></p>
+          <h4>Pricing</h4>
+          <ul class="hh-stack" id="hh-tomorrow-salad-pricing"></ul>
+          <h4>Lettuce</h4>
+          <ul class="hh-stack" id="hh-tomorrow-salad-lettuce"></ul>
+          <h4>Toppings</h4>
+          <ul class="hh-stack" id="hh-tomorrow-salad-toppings"></ul>
+          <h4>Dressing</h4>
+          <ul class="hh-stack" id="hh-tomorrow-salad-dressing"></ul>
+        </section>
 
-/* Click handler: record and navigate (simulate SPA friendly) */
-function handleClick(){
-  if(!hovered) return;
-  const id = hovered.userData.id;
-  recordClick(id);
-  // animate feedback
-  gsap.to(hovered.scale, { x:1.4, y:1.4, duration:0.18, yoyo:true, repeat:1, ease:'power3.inOut' });
-  announce(`${hovered.userData.title} opened`);
-  // For demo navigate by hash or call function; real site should route properly
-  setTimeout(()=>{ window.location.href = hovered.userData.href; }, 240);
-  // Rebuild ring to reflect personalization reorder
-  setTimeout(()=>{ buildRing(); }, 520);
-}
+        <section class="hh-panel" id="hh-tomorrow-drinks" hidden role="tabpanel" aria-labelledby="hhTabTomorrowDrinks">
+          <h3>Drinks</h3>
+          <ul class="hh-stack" id="hh-tomorrow-drinks-items"></ul>
+        </section>
 
-/* Responsiveness & fallback */
-function onResize(){
-  const w = window.innerWidth, h = window.innerHeight;
-  renderer.setSize(w,h);
-  camera.aspect = w/h;
-  camera.updateProjectionMatrix();
-}
+        <section class="hh-panel" id="hh-tomorrow-dessert" hidden role="tabpanel" aria-labelledby="hhTabTomorrowDessert">
+          <h3>Dessert</h3>
+          <p class="hh-sub" id="hh-tomorrow-dessert-sub"></p>
+          <ul class="hh-stack" id="hh-tomorrow-dessert-items"></ul>
+        </section>
+      </div>
+    </div>
 
-/* Pause animation when page hidden */
-document.addEventListener('visibilitychange', ()=>{
-  if(document.hidden){ cancelAnimationFrame(animId); } else { clock.start(); animate(); }
-});
+    <!-- ADVANCED -->
+    <div class="hh-daypanel" id="hh-day-advanced" hidden role="tabpanel" aria-labelledby="hhDayBtnAdvanced">
+      <div class="hh-advanced-top">
+        <div class="hh-advanced-title">Advanced Menu</div>
+        <div class="hh-advanced-disclaimer" id="hh-advanced-disclaimer"></div>
+      </div>
+      <div class="hh-adv-carousel" id="hh-adv-carousel" aria-label="Advanced menu day cards"></div>
+      <div class="hh-hint">Tip: swipe left/right for each day.</div>
+    </div>
 
-/* =========================
-   Voice recognition (Web Speech API)
-   ========================= */
-let recognition;
-function initVoice(){
-  if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return;
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  recognition = new SR();
-  recognition.lang = 'en-US';
-  recognition.continuous = false;
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-  recognition.onresult = (e)=>{
-    const spoken = e.results[0][0].transcript.toLowerCase();
-    announce(`Heard: ${spoken}`);
-    // Try to match "open/about/contact"
-    for(const it of menuItems){
-      if(spoken.includes(it.title.toLowerCase()) || spoken.includes(it.id.toLowerCase())){
-        // animate to that item and click
-        const found = items3D.find(entry => entry.item.id === it.id);
-        if(found){
-          // move pointer to its position (visual)
-          handlePointerMove(window.innerWidth/2 + (found.mesh.position.x*1.1), window.innerHeight/2 - (found.mesh.position.y*1.1));
-          gsap.delayedCall(0.2, ()=>{ hovered = found.mesh; handleClick(); });
+    <!-- Error state -->
+    <div class="hh-state" id="hh-load-error" hidden>
+      <div class="hh-badge is-dark">Error</div>
+      <div class="hh-state-title">Menu couldn’t load</div>
+      <p class="hh-state-msg" id="hh-load-error-msg">Please try again in a moment.</p>
+    </div>
+  </div>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    // AOS init (optional)
+    AOS.init({ once: false, duration: 1000 });
+
+    // ----- MENU SCRIPT (modified to shift days after closing) -----
+    (function(){
+      const DATA_URLS = ["/menu-data.html", "/menu-data/"]; // tries both
+      const $ = (id)=>document.getElementById(id);
+
+      function setText(id, text){ const el=$(id); if(el) el.textContent = text || ""; }
+      function setList(id, items){
+        const ul=$(id); if(!ul) return;
+        ul.innerHTML="";
+        (items||[]).forEach(t=>{
+          const li=document.createElement("li");
+          li.textContent=String(t ?? "");
+          ul.appendChild(li);
+        });
+      }
+
+      function escapeHtml(str){
+        return String(str ?? "")
+          .replace(/&/g,"&amp;")
+          .replace(/</g,"&lt;")
+          .replace(/>/g,"&gt;")
+          .replace(/"/g,"&quot;")
+          .replace(/'/g,"&#039;");
+      }
+
+      function normalizeItems(arr){
+        return Array.isArray(arr) ? arr.map(x=>String(x||"").trim()).filter(Boolean) : [];
+      }
+
+      function toISODateLocal(d){
+        const y=d.getFullYear();
+        const m=String(d.getMonth()+1).padStart(2,"0");
+        const day=String(d.getDate()).padStart(2,"0");
+        return `${y}-${m}-${day}`;
+      }
+
+      function formatDateNice(d){
+        return d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+      }
+
+      function weekdayName(d){
+        return d.toLocaleDateString("en-US",{weekday:"long"});
+      }
+
+      function parseISODateToLocal(iso){
+        const [y,m,d]=String(iso).split("-").map(Number);
+        return new Date(y,(m||1)-1,d||1);
+      }
+
+      function normalizeDateKey(key){
+        const s=String(key||"").trim();
+        const m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+        if(!m) return null;
+        const y=m[1];
+        const mo=String(Number(m[2])).padStart(2,"0");
+        const da=String(Number(m[3])).padStart(2,"0");
+        return `${y}-${mo}-${da}`;
+      }
+
+      function showLoadError(msg){
+        const err = $("hh-load-error");
+        const msgEl = $("hh-load-error-msg");
+        if(msgEl) msgEl.textContent = msg || "Please try again.";
+        if(err) err.hidden = false;
+      }
+
+      async function fetchHtml(url){
+        const res = await fetch(url, { credentials:"same-origin", cache:"no-store" });
+        if(!res.ok) throw new Error(`Fetch failed ${res.status} at ${url}`);
+        return await res.text();
+      }
+
+      function extractJsonFromHtml(html, urlLabel){
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const script = doc.querySelector("#hh-menu-data");
+        if(!script) throw new Error(`No #hh-menu-data found on ${urlLabel}`);
+        const raw = (script.textContent || "").trim();
+        if(!raw) throw new Error(`#hh-menu-data is empty on ${urlLabel}`);
+        return JSON.parse(raw);
+      }
+
+      async function readData(){
+        // 1) If JSON is on THIS page, use it (great for testing)
+        const local = document.querySelector("#hh-menu-data");
+        if(local && local.textContent.trim()){
+          const data = JSON.parse(local.textContent.trim());
+          return normalizeMenus(data);
+        }
+
+        // 2) Otherwise fetch from hidden data page (try both URLs)
+        let lastErr = null;
+        for(const url of DATA_URLS){
+          try{
+            const html = await fetchHtml(url);
+            const data = extractJsonFromHtml(html, url);
+            return normalizeMenus(data);
+          }catch(e){
+            lastErr = e;
+          }
+        }
+        throw lastErr || new Error("Menu data could not be read.");
+      }
+
+      function normalizeMenus(data){
+        const rawMenus=data?.menus||{};
+        const normalizedMenus={};
+        Object.keys(rawMenus).forEach(k=>{
+          const nk=normalizeDateKey(k);
+          if(!nk) return;
+          normalizedMenus[nk]=rawMenus[k];
+        });
+        data.menus=normalizedMenus;
+        return data;
+      }
+
+      function findHours(weekly, dayName){
+        return (weekly||[]).find(d => (d.day||"").toLowerCase()===(dayName||"").toLowerCase())
+          || {day:dayName, open:"", close:"", breakfast:"", lunch:""};
+      }
+
+      function getClosure(data, dayName){
+        const c=data?.closures||{};
+        const key=Object.keys(c).find(k => (k||"").toLowerCase()===(dayName||"").toLowerCase());
+        return key ? c[key] : null;
+      }
+
+      function getMenuByDate(data, isoDate){
+        return (data?.menus||{})[isoDate] || null;
+      }
+
+      function normalizeLunchItems(rawItems){
+        const items = Array.isArray(rawItems) ? rawItems : [];
+        return items.map(raw=>{
+          if(raw && typeof raw === "object"){
+            const name = String(raw.name ?? "").trim();
+            const desc = String(raw.desc ?? "").trim();
+            return { name, desc };
+          }
+          const s = String(raw ?? "").trim();
+          if(!s) return null;
+          return { name: s, desc: "" };
+        }).filter(Boolean).filter(x=>x.name);
+      }
+
+      function setDropdownList(listId, items, noDescText){
+        const ul = $(listId); if(!ul) return;
+        ul.innerHTML = "";
+        items.forEach(it=>{
+          const li = document.createElement("li");
+          const details = document.createElement("details");
+          const summary = document.createElement("summary");
+          summary.textContent = it.name;
+
+          const d = document.createElement("div");
+          d.className = "hh-desc";
+          d.textContent = it.desc ? it.desc : (noDescText || "No description for this item.");
+
+          details.appendChild(summary);
+          details.appendChild(d);
+          li.appendChild(details);
+          ul.appendChild(li);
+        });
+      }
+
+      function setCrawfishVisibility(prefix, show){
+        const tab = $(`hhTab${prefix}Crawfish`);
+        const panel = $(`hh-${prefix.toLowerCase()}-crawfish`);
+        if(tab) tab.style.display = show ? "" : "none";
+        if(!show){
+          if(panel) panel.hidden = true;
+          if(tab && tab.classList.contains("is-active")){
+            const breakfastTab = $(`hhTab${prefix}Breakfast`);
+            if(breakfastTab) breakfastTab.click();
+          }
           return;
         }
+        if(tab && tab.classList.contains("is-active")){
+          if(panel) panel.hidden = false;
+        }
       }
-    }
-    announce('No match found in menu.');
-  };
-  recognition.onend = ()=>{/* UI status could go here */};
-  recognition.onerror = (e)=>{ console.warn('Speech error', e); };
-}
 
-function startVoice(){
-  if(!recognition) return alert('Voice not supported in this browser.');
-  recognition.start();
-  announce('Listening...');
-}
+      function crawfishFor(data, menu){
+        const def=data?.defaults?.crawfish||{};
+        const c=menu?.crawfish||{};
+        const show=(c.show===false) ? false : true;
+        const subtitle=(c.subtitle ?? def.subtitle ?? "").trim();
+        const items=normalizeItems(c.items ?? def.items ?? []);
+        return {show, subtitle, items};
+      }
 
-/* =========================
-   Init & event wiring
-   ========================= */
-let webglAvailable = true;
-function start(){
-  // Check WebGL support
-  try{
-    const gl = canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-    if(!gl) throw 'no gl';
-  } catch(e){ webglAvailable = false; }
+      function getLunchAvailability(data, isoDate, todayISO){
+        const msg = data?.settings?.autoClearMessage || "Lunch menu unavailable.";
+        const today=parseISODateToLocal(todayISO);
+        const cur=parseISODateToLocal(isoDate);
+        today.setHours(12,0,0,0);
+        cur.setHours(12,0,0,0);
 
-  if(!webglAvailable){
-    $('#menuCanvas').style.display = 'none';
-    fallbackEl.style.display = 'flex';
-    fallbackEl.setAttribute('aria-hidden', 'false');
-    createFallback();
-    return;
-  }
+        if(data?.settings?.autoClearPastDays && cur < today) return { ok:false, msg };
 
-  initThree();
-  createFallback(); // fallback hidden but useful for smaller screens and semantics
-  buildRing();
-  animate();
-  initVoice();
+        const menu=getMenuByDate(data, isoDate);
+        if(!menu) return { ok:false, msg };
 
-  // Events
-  window.addEventListener('resize', onResize);
-  window.addEventListener('mousemove', (e)=>{ handlePointerMove(e.clientX, e.clientY); });
-  window.addEventListener('touchmove', (e)=>{ if(e.touches && e.touches[0]) handlePointerMove(e.touches[0].clientX, e.touches[0].clientY); });
+        const lunch=menu?.lunch || {};
+        if(lunch.show === false) return { ok:false, msg };
 
-  // click mapping
-  window.addEventListener('click', (e)=>{
-    // avoid clicks on the hamburger or on fallback controls
-    if(e.target.closest('#menuToggle')) return;
-    handleClick();
-  });
+        const items = normalizeLunchItems(lunch.items);
+        if(items.length === 0) return { ok:false, msg };
 
-  // keyboard navigation: arrows to cycle through items, enter to open
-  let idx = 0;
-  document.addEventListener('keydown', (e)=>{
-    const count = items3D.length;
-    if(count === 0) return;
-    if(e.key === 'ArrowRight' || e.key === 'ArrowDown'){ idx = (idx+1)%count; focusIdx(idx); e.preventDefault(); }
-    if(e.key === 'ArrowLeft' || e.key === 'ArrowUp'){ idx = (idx-1+count)%count; focusIdx(idx); e.preventDefault(); }
-    if(e.key === 'Enter' || e.key === ' '){ hovered = items3D[idx].mesh; handleClick(); e.preventDefault(); }
-    if(e.key === 'v' && (e.ctrlKey || e.metaKey)){ startVoice(); e.preventDefault(); } // quick voice hotkey
-  });
+        return { ok:true, msg:"" };
+      }
 
-  function focusIdx(i){
-    idx = i;
-    const entry = items3D[idx];
-    if(entry){
-      // move pointer visually toward it
-      const rect = canvas.getBoundingClientRect();
-      const x = rect.left + rect.width/2 + entry.mesh.position.x*1.05;
-      const y = rect.top + rect.height/2 - entry.mesh.position.y*1.05;
-      handlePointerMove(x, y);
-      hovered = entry.mesh;
-      onHover(entry.mesh);
-    }
-  }
-}
+      function showLunchUnavailable(prefixIdBase, msg){
+        const un = $(`${prefixIdBase}-lunch-unavail`);
+        const unTitle = $(`${prefixIdBase}-lunch-unavail-title`);
+        const content = $(`${prefixIdBase}-lunch-content`);
+        const hint = $(`${prefixIdBase}-lunch-hint`);
+        if(un) un.hidden = false;
+        if(unTitle) unTitle.textContent = msg || "Lunch menu unavailable.";
+        if(content) content.style.display = "none";
+        if(hint) hint.hidden = true;
+      }
 
-/* =========================
-   Toggle menu visibility & UI
-   ========================= */
-const btn = $('#menuToggle');
-btn.addEventListener('click', ()=>{
-  const active = btn.classList.toggle('active');
-  btn.setAttribute('aria-expanded', active ? 'true' : 'false');
-  $('#fallbackMenu').style.display = (!webglAvailable && active) ? 'flex' : 'none';
-  // when opening: animate camera zoom in and wake animations
-  if(active){
-    gsap.to(camera.position, { z: 520, duration: 0.6, ease:'expo.out' });
-    $('#fallbackMenu').setAttribute('aria-hidden', 'false');
-    announce('Menu opened');
-  } else {
-    gsap.to(camera.position, { z: 620, duration: 0.6, ease:'expo.in' });
-    $('#fallbackMenu').setAttribute('aria-hidden', 'true');
-    announce('Menu closed');
-  }
-});
-/* Quick double-click / long-press on toggle to start voice */
-let pressTimer;
-btn.addEventListener('mousedown', ()=>{ pressTimer = setTimeout(()=> startVoice(), 700); });
-btn.addEventListener('mouseup', ()=>{ clearTimeout(pressTimer); });
-btn.addEventListener('touchstart', ()=>{ pressTimer = setTimeout(()=> startVoice(), 700); });
-btn.addEventListener('touchend', ()=>{ clearTimeout(pressTimer); });
+      function showLunchAvailable(prefixIdBase){
+        const un = $(`${prefixIdBase}-lunch-unavail`);
+        const content = $(`${prefixIdBase}-lunch-content`);
+        if(un) un.hidden = true;
+        if(content) content.style.display = "";
+      }
 
-/* =========================
-   Start everything
-   ========================= */
-start();
-/* initial fallback creation */
-createFallback();
+      // Helper to parse time string "5:30 AM" to minutes since midnight
+      function parseTimeToMinutes(timeStr) {
+        if (!timeStr) return null;
+        const match = timeStr.match(/(\d+):?(\d*)\s*(AM|PM)/i);
+        if (!match) return null;
+        let hours = parseInt(match[1], 10);
+        const minutes = match[2] ? parseInt(match[2], 10) : 0;
+        const ampm = match[3].toUpperCase();
+        if (ampm === 'PM' && hours !== 12) hours += 12;
+        if (ampm === 'AM' && hours === 12) hours = 0;
+        return hours * 60 + minutes;
+      }
 
-</script>
+      // Check if current time is past closing for today
+      function isPastClosingToday(weekly, todayName) {
+        const hours = findHours(weekly, todayName);
+        if (!hours.close) return false;
+        const closeMinutes = parseTimeToMinutes(hours.close);
+        if (closeMinutes === null) return false;
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        return currentMinutes >= closeMinutes;
+      }
+
+      function fillTwoDay(prefixIdBase, labelPrefix, isoDate, data, hours, todayISO){
+        const defaults=data?.defaults||{};
+        const menu=getMenuByDate(data, isoDate) || {};
+
+        // Breakfast
+        const b=menu?.breakfast||{};
+        const bDef=defaults?.breakfast||{};
+        const bHours = hours?.breakfast ? `Breakfast ${hours.breakfast}. ` : "";
+        setText(`${prefixIdBase}-breakfast-sub`, (bHours + ((b.subtitle ?? bDef.subtitle ?? "").trim())).trim());
+        setList(`${prefixIdBase}-breakfast-plates`, normalizeItems(b.plates ?? bDef.plates ?? []));
+        setList(`${prefixIdBase}-breakfast-items`,  normalizeItems(b.items  ?? bDef.items  ?? []));
+
+        // Lunch
+        const l=menu?.lunch||{};
+        const lDef=defaults?.lunch||{};
+        const lHours = hours?.lunch ? `Lunch ${hours.lunch}. ` : "";
+        setText(`${prefixIdBase}-lunch-sub`, (lHours + ((l.subtitle ?? lDef.subtitle ?? "").trim())).trim());
+
+        const lunchAvail = getLunchAvailability(data, isoDate, todayISO);
+        if(!lunchAvail.ok){
+          showLunchUnavailable(prefixIdBase, lunchAvail.msg);
+          setList(`${prefixIdBase}-lunch-plates`, []);
+          const ul = $(`${prefixIdBase}-lunch-items`);
+          if(ul) ul.innerHTML = "";
+        } else {
+          showLunchAvailable(prefixIdBase);
+          setList(`${prefixIdBase}-lunch-plates`, normalizeItems(l.plates ?? lDef.plates ?? []));
+          const items = normalizeLunchItems(l.items);
+          const hint = $(`${prefixIdBase}-lunch-hint`);
+          if(hint){
+            hint.textContent = data?.settings?.clickForDescriptionHint || "Tip: click an item for description.";
+            hint.hidden = (items.length === 0);
+          }
+          setDropdownList(`${prefixIdBase}-lunch-items`, items, data?.settings?.noDescriptionText);
+        }
+
+        // Crawfish
+        const c=crawfishFor(data, menu);
+        setText(`${prefixIdBase}-crawfish-sub`, c.subtitle);
+        setList(`${prefixIdBase}-crawfish-items`, c.items.length ? c.items : ["Call to ask about crawfish availability."]);
+        setCrawfishVisibility(labelPrefix, c.show);
+
+        // Salad
+        const s=menu?.salad||{};
+        const sDef=defaults?.salad||{};
+        setText(`${prefixIdBase}-salad-sub`, (s.subtitle ?? sDef.subtitle ?? "").trim());
+        setList(`${prefixIdBase}-salad-pricing`, normalizeItems(s.items ?? sDef.items ?? []));
+        setList(`${prefixIdBase}-salad-lettuce`,  normalizeItems(s.saladBar?.lettuce  ?? sDef.saladBar?.lettuce  ?? []));
+        setList(`${prefixIdBase}-salad-toppings`, normalizeItems(s.saladBar?.toppings ?? sDef.saladBar?.toppings ?? []));
+        setList(`${prefixIdBase}-salad-dressing`, normalizeItems(s.saladBar?.dressing ?? sDef.saladBar?.dressing ?? []));
+
+        // Drinks
+        const d=menu?.drinks||{};
+        const dDef=defaults?.drinks||{};
+        setList(`${prefixIdBase}-drinks-items`, normalizeItems(d.items ?? dDef.items ?? []));
+
+        // Dessert
+        const ds=menu?.dessert||{};
+        const dsDef=defaults?.dessert||{};
+        setText(`${prefixIdBase}-dessert-sub`, (ds.subtitle ?? dsDef.subtitle ?? "").trim());
+        const desserts=normalizeItems(ds.items ?? []);
+        setList(`${prefixIdBase}-dessert-items`, desserts.length ? desserts : ["(Dessert not posted yet.)"]);
+      }
+
+      function buildAdvancedCarousel(data, todayISO){
+        const wrap=$("hh-adv-carousel");
+        if(!wrap) return;
+        wrap.innerHTML="";
+
+        const weekly=data?.hours?.weekly||[];
+        const lDef=data?.defaults?.lunch||{};
+        const windowDays=Math.max(1, Math.min(31, Number(data?.settings?.advancedWindowDays ?? 7)));
+        const start=parseISODateToLocal(todayISO);
+
+        for(let i=0;i<windowDays;i++){
+          const d=new Date(start);
+          d.setDate(start.getDate()+i);
+          const iso=toISODateLocal(d);
+          const dayName=weekdayName(d);
+          const hours=findHours(weekly, dayName);
+
+          const closure=getClosure(data, dayName);
+          const isClosed=!!closure?.closed;
+          const menu=getMenuByDate(data, iso) || {};
+          const lunch=menu?.lunch||{};
+          const items=normalizeLunchItems(lunch.items);
+
+          let state = { kind:"open", msg:"" };
+          if(isClosed){
+            state = { kind:"closed", msg: closure.message || "See you tomorrow!" };
+          } else {
+            const avail=getLunchAvailability(data, iso, todayISO);
+            if(!avail.ok) state = { kind:"unavailable", msg: avail.msg };
+          }
+
+          const card=document.createElement("article");
+          card.className="hh-adv-card";
+
+          const head=document.createElement("div");
+          head.className="hh-adv-head";
+          head.innerHTML=`
+            <div>
+              <div class="hh-adv-dayname">${escapeHtml(dayName)}</div>
+              <div class="hh-adv-date">${escapeHtml(formatDateNice(d))}</div>
+            </div>
+            <div class="hh-adv-hours">${state.kind==="closed" ? "Closed" : (hours.lunch ? `Lunch ${escapeHtml(hours.lunch)}` : "")}</div>
+          `;
+          card.appendChild(head);
+
+          if(state.kind!=="open"){
+            const st=document.createElement("div");
+            st.className="hh-state";
+            st.innerHTML=`
+              <div class="hh-badge ${state.kind==="unavailable" ? "is-dark" : ""}">${state.kind==="closed" ? "Closed" : "Unavailable"}</div>
+              <div class="hh-state-title">${escapeHtml(dayName)}</div>
+              <p class="hh-state-msg">${escapeHtml(state.msg)}</p>
+            `;
+            card.appendChild(st);
+          } else {
+            const panel=document.createElement("section");
+            panel.className="hh-panel";
+
+            const subtitle=((hours.lunch ? `Lunch ${hours.lunch}. ` : "") + ((lunch.subtitle ?? lDef.subtitle ?? "").trim())).trim();
+            const plates=normalizeItems(lunch.plates ?? lDef.plates ?? []);
+            const hintText=data?.settings?.clickForDescriptionHint || "Tip: click an item for description.";
+            const noDesc=data?.settings?.noDescriptionText || "No description for this item.";
+
+            panel.innerHTML=`
+              <h3>Lunch</h3>
+              <p class="hh-sub">${escapeHtml(subtitle)}</p>
+              <h4>Plates</h4>
+              <ul class="hh-stack">${plates.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>
+              <h4>${escapeHtml(dayName)} Lunch Items</h4>
+              <div class="hh-hintline">${escapeHtml(hintText)}</div>
+              <ul class="hh-stack">
+                ${items.map(it=>{
+                  const d = it.desc ? it.desc : noDesc;
+                  return `<li><details><summary>${escapeHtml(it.name)}</summary><div class="hh-desc">${escapeHtml(d)}</div></details></li>`;
+                }).join("")}
+              </ul>
+            `;
+            card.appendChild(panel);
+          }
+
+          wrap.appendChild(card);
+        }
+      }
+
+      function wireTabs(dayPanelEl){
+        if(!dayPanelEl) return;
+        const tabs=Array.from(dayPanelEl.querySelectorAll(".hh-tab[role='tab']"));
+        const panels=Array.from(dayPanelEl.querySelectorAll(".hh-panel[role='tabpanel']"));
+        if(!tabs.length || !panels.length) return;
+
+        function activateTab(tab){
+          const targetId=tab.getAttribute("aria-controls");
+          tabs.forEach(t=>{
+            const active=(t===tab);
+            t.classList.toggle("is-active", active);
+            t.setAttribute("aria-selected", active ? "true" : "false");
+          });
+          panels.forEach(p=> p.hidden = (p.id !== targetId));
+        }
+        tabs.forEach(tab=> tab.addEventListener("click", ()=> activateTab(tab)));
+      }
+
+      function wireDayTabs(){
+        const dayButtons=Array.from(document.querySelectorAll(".hh-day[role='tab']"));
+        const dayPanels=Array.from(document.querySelectorAll(".hh-daypanel[role='tabpanel']"));
+
+        function activate(btn){
+          const targetId=btn.getAttribute("aria-controls");
+          dayButtons.forEach(b=>{
+            const active=(b===btn);
+            b.classList.toggle("is-active", active);
+            b.setAttribute("aria-selected", active ? "true" : "false");
+          });
+          dayPanels.forEach(p=> p.hidden = (p.id !== targetId));
+        }
+        dayButtons.forEach(btn=> btn.addEventListener("click", ()=> activate(btn)));
+
+        // Return the activate function so we can call it externally
+        return activate;
+      }
+
+      // ---- INIT ----
+      const activateDay = wireDayTabs(); // get the function to programmatically activate a day
+      wireTabs($("hh-day-today"));
+      wireTabs($("hh-day-tomorrow"));
+
+      (async function init(){
+        try{
+          const data = await readData();
+
+          setText("hh-advanced-disclaimer", data?.settings?.advancedDisclaimer || "");
+          if(!data?.settings?.showAdvancedTab){
+            const advBtn=$("hhDayBtnAdvanced");
+            if(advBtn) advBtn.style.display="none";
+          }
+
+          const now = new Date();
+          const calendarTodayISO = toISODateLocal(now);      // actual today's date
+          const calendarTodayName = weekdayName(now);
+
+          const calendarTomorrow = new Date(now); 
+          calendarTomorrow.setDate(now.getDate() + 1);
+          const calendarTomorrowISO = toISODateLocal(calendarTomorrow);
+          const calendarTomorrowName = weekdayName(calendarTomorrow);
+
+          // Default display dates (what we show in Today/Tomorrow tabs)
+          let displayTodayISO = calendarTodayISO;
+          let displayTodayName = calendarTodayName;
+          let displayTomorrowISO = calendarTomorrowISO;
+          let displayTomorrowName = calendarTomorrowName;
+
+          const weekly = data?.hours?.weekly || [];
+          const closureToday = getClosure(data, calendarTodayName);
+
+          // Check if we are past closing time for today (and not already closed)
+          const pastClosing = isPastClosingToday(weekly, calendarTodayName);
+          if (pastClosing && !closureToday?.closed) {
+            // Shift everything forward: Today becomes tomorrow, Tomorrow becomes day after
+            displayTodayISO = calendarTomorrowISO;
+            displayTodayName = calendarTomorrowName;
+
+            const dayAfterTomorrow = new Date(now);
+            dayAfterTomorrow.setDate(now.getDate() + 2);
+            displayTomorrowISO = toISODateLocal(dayAfterTomorrow);
+            displayTomorrowName = weekdayName(dayAfterTomorrow);
+          }
+
+          // Update tab labels
+          setText("hhDayBtnToday", displayTodayName);
+          setText("hhDayBtnTomorrow", displayTomorrowName);
+
+          // Update panel titles
+          setText("hh-today-title", `${displayTodayName} (${formatDateNice(parseISODateToLocal(displayTodayISO))}) Menu`);
+          setText("hh-tomorrow-title", `${displayTomorrowName} (${formatDateNice(parseISODateToLocal(displayTomorrowISO))}) Menu`);
+
+          setText("hh-hours-note", data?.hours?.note || "");
+          setText("hh-hours-note-2", data?.hours?.note || "");
+
+          const hoursToday = findHours(weekly, displayTodayName);
+          const hoursTomorrow = findHours(weekly, displayTomorrowName);
+
+          const closureDisplayToday = getClosure(data, displayTodayName);
+          const closureDisplayTomorrow = getClosure(data, displayTomorrowName);
+
+          const lineToday = closureDisplayToday?.closed ? `${displayTodayName} Hours: Closed`
+            : `${displayTodayName} Hours: ${hoursToday.open} – ${hoursToday.close}` +
+              (hoursToday.breakfast ? ` • Breakfast ${hoursToday.breakfast}` : "") +
+              (hoursToday.lunch ? ` • Lunch ${hoursToday.lunch}` : "");
+
+          const lineTomorrow = closureDisplayTomorrow?.closed ? `${displayTomorrowName} Hours: Closed`
+            : `${displayTomorrowName} Hours: ${hoursTomorrow.open} – ${hoursTomorrow.close}` +
+              (hoursTomorrow.breakfast ? ` • Breakfast ${hoursTomorrow.breakfast}` : "") +
+              (hoursTomorrow.lunch ? ` • Lunch ${hoursTomorrow.lunch}` : "");
+
+          setText("hh-hours-line", lineToday);
+          setText("hh-hours-line-2", lineTomorrow);
+
+          const phone = data?.phoneTel || "#";
+          ["hh-call-btn-today-b","hh-call-btn-today-l","hh-call-btn-today-c",
+           "hh-call-btn-tomorrow-b","hh-call-btn-tomorrow-l","hh-call-btn-tomorrow-c"
+          ].forEach(id=>{ const a=$(id); if(a) a.href=phone; });
+
+          setText("hh-delivery-note", data?.deliveryNote || "");
+          setText("hh-delivery-note-2", data?.deliveryNote || "");
+
+          if(closureDisplayToday?.closed){
+            $("hh-today-closed").hidden=false;
+            setText("hh-today-closed-title", `${displayTodayName} (${displayTodayISO})`);
+            setText("hh-today-closed-msg", closureDisplayToday.message || "See you tomorrow!");
+          } else {
+            $("hh-today-closed").hidden=true;
+          }
+          if(closureDisplayTomorrow?.closed){
+            $("hh-tomorrow-closed").hidden=false;
+            setText("hh-tomorrow-closed-title", `${displayTomorrowName} (${displayTomorrowISO})`);
+            setText("hh-tomorrow-closed-msg", closureDisplayTomorrow.message || "See you tomorrow!");
+          } else {
+            $("hh-tomorrow-closed").hidden=true;
+          }
+
+          // Fill panels with the display dates (shifted if past closing)
+          fillTwoDay("hh-today", "Today", displayTodayISO, data, hoursToday, calendarTodayISO);
+          fillTwoDay("hh-tomorrow", "Tomorrow", displayTomorrowISO, data, hoursTomorrow, calendarTodayISO);
+
+          setText("hh-today-lunch-items-title", `${displayTodayName} Lunch Items`);
+          setText("hh-tomorrow-lunch-items-title", `${displayTomorrowName} Lunch Items`);
+
+          // Ensure the "Today" tab is active (it is by default, but after shift we might want to activate it)
+          // No need – the default active is today panel, and we've updated its content.
+
+          // Build advanced carousel using the actual calendar date (not shifted)
+          buildAdvancedCarousel(data, calendarTodayISO);
+
+        }catch(e){
+          console.error("HOT HEADZ MENU ERROR:", e);
+          setText("hh-hours-line", "Menu unavailable right now.");
+          setText("hh-hours-line-2", "Menu unavailable right now.");
+          showLoadError(String(e && e.message ? e.message : e));
+        }
+      })();
+    })();
+
+    // ----- DOCK SCRIPT -----
+    (function() {
+      const root = document.getElementById('genRoot');
+      const dock = document.getElementById('genDock');
+      if (root && dock) {
+        root.hidden = false;
+        dock.hidden = false;
+      }
+    })();
+  </script>
+
+
+   <!-- Circular menu toggle script with page navigation and share -->
+  <script>
+    (function() {
+      const overlay = document.getElementById('circMenuOverlay');
+      const leftBtn = document.getElementById('navBtnLeft');
+      const bottomBtn = document.getElementById('navBtnBottom');
+      const homeCenter = document.getElementById('homeCenter');
+      const menuItems = document.querySelectorAll('.menu-item');
+
+      function toggleMenu() {
+        overlay.classList.toggle('open');
+      }
+
+      // leftBtn is now removed, so we need to check if it exists before adding listener
+      if (leftBtn) {
+        leftBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleMenu();
+        });
+      }
+
+      bottomBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMenu();
+      });
+
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('open');
+        }
+      });
+
+      async function sharePage() {
+        const shareData = {
+          title: document.title || 'Hot Headz Southern Foods',
+          text: 'Check out Hot Headz Southern Foods in DeRidder, LA!',
+          url: window.location.href
+        };
+        try {
+          if (navigator.share) {
+            await navigator.share(shareData);
+          } else if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(window.location.href);
+            const shareItem = document.querySelector('.menu-item[data-action="share"]');
+            if (shareItem) {
+              const originalText = shareItem.textContent;
+              shareItem.textContent = 'Copied';
+              setTimeout(() => shareItem.textContent = originalText, 1500);
+            }
+          } else {
+            const temp = document.createElement('input');
+            temp.value = window.location.href;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            alert('Link copied to clipboard!');
+          }
+        } catch (e) { console.log('Share failed', e); }
+      }
+
+      function navigate(link) {
+        if (!link) return;
+        window.location.href = link;
+      }
+
+      homeCenter.addEventListener('click', () => {
+        overlay.classList.remove('open');
+        const link = homeCenter.getAttribute('data-link');
+        if (link) navigate(link);
+      });
+
+      menuItems.forEach(item => {
+        item.addEventListener('click', () => {
+          overlay.classList.remove('open');
+          const link = item.getAttribute('data-link');
+          const action = item.getAttribute('data-action');
+          if (action === 'share') sharePage();
+          else if (link) navigate(link);
+        });
+      });
+
+      document.querySelector('.circular-menu').addEventListener('click', e => e.stopPropagation());
+    })();
+  </script>
 </body>
 </html>
