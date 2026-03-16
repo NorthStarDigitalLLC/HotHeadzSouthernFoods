@@ -3,26 +3,146 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hot Headz Southern Foods – Menu + Cube + Plate Builder</title>
-  <meta name="description" content="Single-file menu system with Today / Tomorrow / Advanced views, spinning cube navigation, and a live plate builder.">
+  <title>Hot Headz Southern Foods – Menu</title>
+  <meta name="description" content="Daily breakfast, lunch, crawfish, salad bar, drinks and desserts – made fresh.">
 
+  <!-- Google Fonts & Font Awesome (same as homepage) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
+   <!-- ===== FAVICON / ICONS ===== -->
+<link rel="icon" type="image/webp" href="images/HotHeadzLogo.png">
+<link rel="apple-touch-icon" href="images/HotHeadzLogo.png">
+
+  <!-- ===== OPEN GRAPH ===== -->
+<meta property="og:image" content="images/HotHeadzLogo.png">
+<meta property="og:image:alt" content="Hot Headz Southern Foods logo">
+
+  <!-- ===== TWITTER CARD ===== -->
+<meta name="twitter:image" content="images/HotHeadzLogo.png">
+<meta name="twitter:image:alt" content="Hot Headz Southern Foods logo">
+    
   <style>
-    *{margin:0;padding:0;box-sizing:border-box;max-width:100%}
-    html{scroll-behavior:smooth;overflow-x:hidden}
-    body{
-      background:#07060a;
-      color:rgba(255,255,255,.92);
-      font-family:'Inter',ui-sans-serif,system-ui,-apple-system,sans-serif;
-      line-height:1.5;
-      padding-bottom:110px;
-      overflow-x:hidden;
+    /* ---------- RESET / BASE ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      max-width: 100%;
+    }
+    html {
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+    }
+    body {
+      background-color: #07060a;
+      color: rgba(255,255,255,0.92);
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
+      padding-bottom: 90px;
     }
 
+    /* ---------- FLOATING DOCK (from homepage) ---------- */
+    :root {
+      --gen-glass: rgba(6,7,10,0.62);
+      --gen-glass-2: rgba(6,7,10,0.78);
+      --gen-border: rgba(255,255,255,0.14);
+      --gen-border-2: rgba(255,255,255,0.22);
+      --gen-text: rgba(255,255,255,0.92);
+      --gen-muted: rgba(255,255,255,0.62);
+      --gen-hotA: rgba(255,120,70,0.82);
+      --gen-hotB: rgba(255,60,140,0.74);
+      --gen-radius-xl: 22px;
+      --gen-radius-lg: 16px;
+      --gen-radius-pill: 999px;
+      --gen-shadow: 0 18px 50px rgba(0,0,0,0.62);
+      --gen-font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    .gen-root, .gen-root * { box-sizing: border-box; font-family: var(--gen-font); }
+    .gen-root {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      pointer-events: none;
+    }
+    /* Explore pill – hidden */
+    .gen-pill {
+      display: none !important;
+    }
+
+    .gen-dock {
+      pointer-events: auto;
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      width: min(660px, calc(100vw - 26px));
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px;
+      border-radius: var(--gen-radius-pill);
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(6,7,10,0.62);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: var(--gen-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .gen-dock-btn {
+      text-decoration: none;
+      color: rgba(255,255,255,0.92);
+      flex: 1 1 0;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.36);
+      padding: 10px 8px;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.08);
+      transition: transform .14s ease, background .14s ease, border-color .14s ease;
+    }
+    .gen-dock-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(0,0,0,0.56);
+      border-color: rgba(255,255,255,0.22);
+    }
+    .gen-dock-ic { font-size: 16px; line-height: 1; }
+    .gen-dock-tx {
+      font-size: 11.5px;
+      font-weight: 900;
+      letter-spacing: -0.1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .gen-dock-cta {
+      background: linear-gradient(90deg, rgba(255,120,70,0.22), rgba(255,60,140,0.16));
+      border-color: rgba(255,255,255,0.20);
+    }
+    .gen-dock-btn.is-active {
+      background: rgba(42,127,98,0.3);
+      border-color: rgba(255,179,90,0.5);
+    }
+
+    @media (max-width: 720px) {
+      .gen-dock { gap: 8px; padding: 9px; }
+      .gen-dock-btn { padding: 10px 6px; }
+      .gen-dock-ic { font-size: 15px; }
+      .gen-dock-tx { font-size: 11px; }
+    }
+    @media (max-width: 380px) {
+      .gen-dock { gap: 6px; padding: 8px; }
+      .gen-dock-tx { display: none; }
+    }
+
+    /* ===== MENU STYLES – paper on dark table, now centered ===== */
     :root{
       --hh-accent:#c05a2a;
       --hh-accent-2:#2a7f62;
@@ -32,478 +152,688 @@
       --hh-table2:#0b0806;
       --hh-paper:#f6f0e6;
       --hh-paper2:#efe6d9;
-      --hh-radius:26px;
-      --hh-radius2:34px;
-      --hh-pill:999px;
-      --hh-shadow:0 26px 90px rgba(0,0,0,.48);
-      --hh-shadow2:0 16px 48px rgba(0,0,0,.22);
-      --hh-shadow3:0 10px 24px rgba(0,0,0,.14);
-      --builder-width:min(420px,calc(100vw - 24px));
+      --hh-radius: 26px;
+      --hh-radius2: 34px;
+      --hh-pill: 999px;
+      --hh-shadow: 0 26px 90px rgba(0,0,0,.48);
+      --hh-shadow2: 0 16px 48px rgba(0,0,0,.22);
+      --hh-shadow3: 0 10px 24px rgba(0,0,0,.14);
     }
 
-    /* top helper */
     .hh-menu{
-      width:100%;
-      min-height:100vh;
-      margin:0;
-      padding:18px 14px 70px;
-      position:relative;
-      isolation:isolate;
+      width: 100%;
+      max-width: none;
+      min-height: 100vh;
+      margin: 0;
+      padding: 18px 14px 70px;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: rgba(245,240,230,.94);
+      position: relative;
+      isolation: isolate;
       background:
         radial-gradient(1100px 700px at 16% 14%, rgba(192,90,42,.18), transparent 60%),
         radial-gradient(1000px 700px at 86% 20%, rgba(42,127,98,.14), transparent 64%),
         linear-gradient(180deg, var(--hh-table), var(--hh-table2) 42%, #050403);
-      box-shadow:var(--hh-shadow);
-      overflow:hidden;
+      box-shadow: var(--hh-shadow);
+      overflow: hidden;
     }
     .hh-menu::before{
       content:"";
       position:absolute; inset:0;
       background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.20'/%3E%3C/svg%3E");
       opacity:.12;
-      mix-blend-mode:overlay;
+      mix-blend-mode: overlay;
       pointer-events:none;
       z-index:0;
     }
-    .hh-menu > *{position:relative;z-index:1}
-    .hh-header{margin:10px 0 14px;padding:14px 14px 0;text-align:center}
+    .hh-menu > *{ position:relative; z-index:1; }
+
+    /* ----- CENTERED HEADER ----- */
+    .hh-header {
+      margin: 10px 0 14px;
+      padding: 14px 14px 0;
+      text-align: center;
+    }
     .hh-title{
-      font-family:ui-serif,Georgia,Cambria,"Times New Roman",Times,serif;
-      font-size:clamp(22px,2.2vw,32px);
-      font-weight:850;
-      line-height:1.1;
+      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+      font-size: clamp(20px, 2.2vw, 30px);
+      font-weight: 850;
+      letter-spacing: .2px;
+      line-height: 1.1;
     }
-    .hh-updated,.hh-note{
-      margin-top:8px;
-      font-size:13px;
-      line-height:1.35;
+    .hh-updated{
+      margin-top: 8px;
+      font-weight: 820;
+      color: rgba(245,240,230,.72);
+      font-size: 13.2px;
+      line-height: 1.35;
     }
-    .hh-updated{font-weight:820;color:rgba(245,240,230,.72)}
-    .hh-note{font-weight:780;color:rgba(245,240,230,.62)}
-
-    /* circular nav */
-    .nav-btn{
-      position:fixed;
-      z-index:2000;
-      background:#1e1b1b;
-      border:2px solid var(--hh-accent);
-      border-radius:50px;
-      display:flex;
-      align-items:center;
-      gap:12px;
-      cursor:pointer;
-      box-shadow:0 0 25px rgba(192,90,42,.5);
-      transition:all .2s ease;
-      backdrop-filter:blur(8px);
-    }
-    .nav-btn:hover{
-      transform:scale(1.05);
-      border-color:var(--hh-accent-2);
-      box-shadow:0 0 35px var(--hh-accent);
-    }
-    .nav-btn.bottom-center{
-      bottom:30px;
-      left:50%;
-      transform:translateX(-50%);
-      padding:.8rem 1.8rem;
-    }
-    .btn-icon{font-size:1.8rem;color:var(--hh-accent)}
-    .btn-text{display:flex;flex-direction:column;line-height:1.2}
-    .btn-text .main{
-      font-weight:700;font-size:1rem;letter-spacing:2px;color:rgba(255,255,255,.92)
-    }
-    .btn-text .sub{
-      font-size:.65rem;opacity:.7;color:rgba(255,255,255,.7);text-transform:uppercase
+    .hh-note{
+      margin-top: 8px;
+      font-weight: 780;
+      color: rgba(245,240,230,.62);
+      font-size: 13px;
+      line-height: 1.35;
     }
 
-    .circ-menu-overlay{
-      position:fixed; inset:0; z-index:2500;
-      display:flex; align-items:center; justify-content:center;
-      pointer-events:none; background:rgba(0,0,0,.7);
-      opacity:0; transition:opacity .3s ease; backdrop-filter:blur(8px);
-    }
-    .circ-menu-overlay.open{opacity:1;pointer-events:all}
-    .circular-menu{
-      width:360px;height:360px;border-radius:50%;
-      border:2px solid var(--hh-accent); box-shadow:0 0 40px rgba(192,90,42,.5);
-      display:flex;align-items:center;justify-content:center;position:relative;
-      transform:scale(.3); transition:transform .3s ease;
-    }
-    .circ-menu-overlay.open .circular-menu{transform:scale(1)}
-    .center-home{
-      width:70px;height:70px;background:var(--hh-accent-2);
-      border:3px solid var(--hh-accent);border-radius:50%;
-      display:flex;align-items:center;justify-content:center;
-      font-weight:900;font-size:1.5rem;color:#1a0d0b;
-      box-shadow:0 0 30px var(--hh-accent);cursor:pointer;transition:.2s;z-index:1001;
-    }
-    .center-home:hover{background:var(--hh-accent);color:#fff;transform:scale(1.05)}
-    .menu-item{
-      position:absolute;width:60px;height:60px;background:#1e1b1b;
-      border:2px solid var(--hh-accent);border-radius:50%;
-      display:flex;align-items:center;justify-content:center;
-      color:rgba(255,255,255,.92);font-size:.8rem;font-weight:600;text-transform:uppercase;
-      transition:all .2s;cursor:pointer;box-shadow:0 0 15px rgba(0,0,0,.7);
-      top:50%;left:50%;
-      transform:translate(-50%,-50%) rotate(calc(var(--angle) * 1deg)) translateY(-130px) rotate(calc(var(--angle) * -1deg));
-      letter-spacing:1px;backdrop-filter:blur(4px);text-align:center;padding:6px;
-    }
-    .menu-item:hover{
-      background:var(--hh-accent);color:#000;border-color:var(--hh-accent-2);
-      transform:translate(-50%,-50%) rotate(calc(var(--angle) * 1deg)) translateY(-140px) rotate(calc(var(--angle) * -1deg));
-      width:65px;height:65px;
-    }
+    .hh-stickywrap{ position: sticky; top: 10px; z-index: 90; }
 
-    /* feature row */
-    .hh-feature-wrap{
-      margin:8px 14px 18px;
-      display:grid;
-      grid-template-columns:340px minmax(0,1fr);
-      gap:18px;
-      align-items:stretch;
-    }
-    .hh-cube-card,.hh-builder-intro{
-      border:1px solid rgba(245,240,230,.14);
-      border-radius:var(--hh-radius2);
-      background:rgba(0,0,0,.24);
-      box-shadow:var(--hh-shadow2);
-      backdrop-filter:blur(12px);
-      overflow:hidden; position:relative;
-    }
-    .hh-cube-card::after,.hh-builder-intro::after{
-      content:""; position:absolute; inset:0; pointer-events:none;
-      background:
-        radial-gradient(700px 280px at 10% 10%, rgba(192,90,42,.18), transparent 60%),
-        radial-gradient(700px 280px at 90% 0%, rgba(42,127,98,.12), transparent 62%);
-      opacity:.8;
-    }
-    .hh-cube-card>*,.hh-builder-intro>*{position:relative;z-index:1}
-    .hh-cube-card{display:grid;place-items:center;padding:18px 18px 16px;min-height:360px}
-    .hh-cube-head{text-align:center;margin-bottom:8px}
-    .hh-cube-head h2{
-      font-family:ui-serif,Georgia,Cambria,"Times New Roman",Times,serif;
-      font-size:clamp(20px,2vw,28px); line-height:1.05; margin-bottom:6px;
-    }
-    .hh-cube-head p{color:rgba(245,240,230,.72);font-size:13px;max-width:28ch}
-    .hh-cube-scene{width:230px;height:230px;perspective:1000px;margin:14px auto 10px}
-    .hh-cube{
-      width:100%;height:100%;position:relative;transform-style:preserve-3d;
-      transition:transform .8s cubic-bezier(.2,.8,.2,1);
-    }
-    .hh-face{
-      position:absolute; inset:0; border-radius:26px;
-      border:1px solid rgba(245,240,230,.18);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04)),
-        linear-gradient(135deg, rgba(192,90,42,.30), rgba(42,127,98,.12));
-      box-shadow:0 20px 40px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.10);
-      display:grid; place-items:center; text-align:center; padding:16px; color:rgba(245,240,230,.94);
-      backdrop-filter:blur(10px);
-    }
-    .hh-face i{font-size:32px;color:rgba(255,179,90,.92);margin-bottom:10px;display:block}
-    .hh-face strong{display:block;font-size:18px;font-weight:900;margin-bottom:4px}
-    .hh-face span{color:rgba(245,240,230,.68);font-size:12px;font-weight:700}
-    .hh-face.front{transform:rotateY(0deg) translateZ(115px)}
-    .hh-face.back{transform:rotateY(180deg) translateZ(115px)}
-    .hh-face.right{transform:rotateY(90deg) translateZ(115px)}
-    .hh-face.left{transform:rotateY(-90deg) translateZ(115px)}
-    .hh-face.top{transform:rotateX(90deg) translateZ(115px)}
-    .hh-face.bottom{transform:rotateX(-90deg) translateZ(115px)}
-    .hh-cube-controls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px}
-    .hh-cube-btn{
-      border:1px solid rgba(245,240,230,.15);background:rgba(255,255,255,.06);
-      color:rgba(245,240,230,.94);padding:9px 12px;border-radius:999px;font-size:12px;
-      font-weight:900;letter-spacing:.04em;cursor:pointer;transition:transform .14s ease, border-color .14s ease, background .14s ease;
-    }
-    .hh-cube-btn:hover,.hh-cube-btn.is-active{
-      transform:translateY(-1px);border-color:rgba(255,179,90,.32);
-      background:linear-gradient(135deg, rgba(192,90,42,.28), rgba(42,127,98,.18));
-    }
-    .hh-builder-intro{
-      padding:22px 22px 20px;display:grid;align-content:center;gap:14px;
-    }
-    .hh-builder-intro h2{
-      font-family:ui-serif,Georgia,Cambria,"Times New Roman",Times,serif;
-      font-size:clamp(24px,3vw,38px);line-height:1;
-    }
-    .hh-builder-intro p{color:rgba(245,240,230,.78);font-size:14px;max-width:60ch}
-    .hh-builder-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-    .hh-builder-stat{
-      padding:12px;border-radius:18px;border:1px solid rgba(245,240,230,.12);
-      background:rgba(255,255,255,.06);box-shadow:0 10px 22px rgba(0,0,0,.18);
-    }
-    .hh-builder-stat strong{
-      display:block;margin-bottom:4px;color:rgba(255,179,90,.92);
-      font-size:12px;text-transform:uppercase;letter-spacing:.08em;
-    }
-    .hh-builder-stat span{color:rgba(245,240,230,.82);font-weight:800;font-size:13px;line-height:1.25}
-    .hh-helper-note{font-size:12.5px;color:rgba(245,240,230,.62)}
-
-    /* tabs */
-    .hh-stickywrap{position:sticky;top:10px;z-index:90}
+    /* ----- CENTERED DAY BAR ----- */
     .hh-daybar{
-      display:flex;gap:10px;flex-wrap:wrap;justify-content:center;
-      margin:14px;padding:10px;border-radius:var(--hh-radius2);
-      background:rgba(0,0,0,.30);border:1px solid rgba(245,240,230,.14);
-      box-shadow:var(--hh-shadow2);backdrop-filter:blur(12px);
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content: center;    /* center the day buttons */
+      margin: 14px;
+      padding: 10px;
+      border-radius: var(--hh-radius2);
+      background: rgba(0,0,0,.30);
+      border: 1px solid rgba(245,240,230,.14);
+      box-shadow: var(--hh-shadow2);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
-    .hh-day,.hh-tab{
-      border:1px solid rgba(245,240,230,.14);
-      background:rgba(255,255,255,.06);color:rgba(245,240,230,.92);
-      padding:10px 14px;border-radius:var(--hh-pill);
-      font-weight:900;cursor:pointer;transition:transform .14s ease, background .14s ease, border-color .14s ease;
-      white-space:nowrap;box-shadow:0 10px 22px rgba(0,0,0,.25);
+
+    .hh-day,
+    .hh-tab{
+      border: 1px solid rgba(245,240,230,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(245,240,230,.92);
+      padding: 10px 14px;
+      border-radius: var(--hh-pill);
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform .14s ease, box-shadow .14s ease, background .14s ease, border-color .14s ease;
+      white-space: nowrap;
+      box-shadow: 0 10px 22px rgba(0,0,0,.25);
     }
-    .hh-day:hover,.hh-tab:hover{transform:translateY(-1px);border-color:rgba(255,179,90,.28)}
+    .hh-day:hover,
+    .hh-tab:hover{ transform: translateY(-1px); border-color: rgba(255,179,90,.28); }
+
     .hh-day.is-active{
-      border-color:rgba(192,90,42,.45);
-      background:linear-gradient(180deg, rgba(192,90,42,.26), rgba(0,0,0,.22));
+      border-color: rgba(192,90,42,.45);
+      background: linear-gradient(180deg, rgba(192,90,42,.26), rgba(0,0,0,.22));
     }
+
+    /* ----- CENTERED CATEGORY TABS ----- */
     .hh-tablist{
-      display:flex;gap:10px;flex-wrap:wrap;justify-content:center;
-      margin:0 14px 12px;position:sticky;top:86px;z-index:80;padding:10px;
-      border-radius:var(--hh-radius2);background:rgba(0,0,0,.24);
-      border:1px solid rgba(245,240,230,.14);box-shadow:var(--hh-shadow2);backdrop-filter:blur(12px);
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content: center;    /* center category tabs */
+      margin: 0 14px 12px;
+      position: sticky;
+      top: 86px;
+      z-index: 80;
+      padding: 10px;
+      border-radius: var(--hh-radius2);
+      background: rgba(0,0,0,.24);
+      border: 1px solid rgba(245,240,230,.14);
+      box-shadow: var(--hh-shadow2);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
     .hh-tab.is-active{
-      border-color:rgba(192,90,42,.50);
-      background:linear-gradient(135deg, rgba(192,90,42,.32), rgba(42,127,98,.18));
+      border-color: rgba(192,90,42,.50);
+      background: linear-gradient(135deg, rgba(192,90,42,.32), rgba(42,127,98,.18));
     }
 
-    .hh-panels{padding:0 14px 16px}
+    .hh-panels{ padding: 0 14px 16px; }
+
     .hh-panel{
-      background:linear-gradient(180deg, var(--hh-paper), var(--hh-paper2));
-      color:var(--hh-ink);border:1px solid rgba(20,17,14,.14);
-      border-radius:var(--hh-radius2);padding:18px;box-shadow:var(--hh-shadow2);
-      position:relative;overflow:hidden;
+      background: linear-gradient(180deg, var(--hh-paper), var(--hh-paper2));
+      color: var(--hh-ink);
+      border: 1px solid rgba(20,17,14,.14);
+      border-radius: var(--hh-radius2);
+      padding: 18px;
+      box-shadow: var(--hh-shadow2);
+      position: relative;
+      overflow: hidden;
     }
     .hh-panel::before{
-      content:"";position:absolute;inset:auto -30% -55% -30%;height:240px;
+      content:"";
+      position:absolute;
+      inset:auto -30% -55% -30%;
+      height: 240px;
       background:
         radial-gradient(circle at 30% 45%, rgba(192,90,42,.18), transparent 62%),
         radial-gradient(circle at 70% 55%, rgba(42,127,98,.12), transparent 64%);
-      transform:rotate(-6deg);pointer-events:none;
+      transform: rotate(-6deg);
+      pointer-events:none;
     }
-    .hh-panel>*{position:relative;z-index:1}
+    .hh-panel > *{ position:relative; z-index:1; }
+
     .hh-panel h3{
-      margin:0 0 8px;font-family:ui-serif,Georgia,Cambria,"Times New Roman",Times,serif;
-      font-size:clamp(18px,2vw,24px);font-weight:850;
+      margin: 0 0 8px;
+      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+      font-size: clamp(18px, 2vw, 24px);
+      font-weight: 850;
+      letter-spacing: .2px;
     }
     .hh-sub{
-      margin:0 0 12px;font-weight:820;color:rgba(20,17,14,.72);font-size:13.2px;line-height:1.38;
+      margin: 0 0 12px;
+      font-weight: 820;
+      color: rgba(20,17,14,.72);
+      font-size: 13.2px;
+      line-height: 1.38;
     }
     .hh-panel h4{
-      text-transform:uppercase;
-      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Courier New",monospace;
-      font-size:10.6px;letter-spacing:.14em;color:rgba(20,17,14,.62);margin:16px 0 10px;
+      text-transform: uppercase;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      font-size: 10.6px;
+      letter-spacing: .14em;
+      color: rgba(20,17,14,.62);
+      margin: 16px 0 10px;
     }
 
+    /* ----- LISTS REMAIN LEFT-ALIGNED ----- */
     .hh-stack{
-      list-style:none;padding-left:0;margin:0;display:grid;grid-template-columns:1fr;gap:10px;
+      list-style:none;
+      padding-left:0;
+      margin:0;
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
     }
-    @media(min-width:860px){ .hh-stack{grid-template-columns:repeat(2,minmax(0,1fr))} }
+    @media(min-width:860px){
+      .hh-stack{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
     .hh-stack li{
-      padding:11px 12px;background:rgba(255,255,255,.62);
-      border:1px solid rgba(20,17,14,.12);border-radius:18px;line-height:1.25;
-      box-shadow:var(--hh-shadow3);transition:transform .14s ease, border-color .14s ease;
+      padding: 11px 12px;
+      background: rgba(255,255,255,.62);
+      border: 1px solid rgba(20,17,14,.12);
+      border-radius: 18px;
+      line-height: 1.25;
+      box-shadow: var(--hh-shadow3);
+      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
     }
-    .hh-stack li:hover{transform:translateY(-1px);border-color:rgba(192,90,42,.26)}
+    .hh-stack li:hover{
+      transform: translateY(-1px);
+      border-color: rgba(192,90,42,.26);
+      box-shadow: 0 14px 30px rgba(0,0,0,.12);
+    }
 
-    /* priced cards */
-    .hh-item-card{display:grid;gap:10px}
-    .hh-item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-    .hh-item-name{font-weight:860;color:rgba(20,17,14,.92);line-height:1.25}
-    .hh-item-price{color:var(--hh-accent);font-weight:950;white-space:nowrap;font-size:13px}
-    .hh-item-desc{color:rgba(20,17,14,.70);font-size:12.6px;line-height:1.35}
-    .hh-item-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .hh-add-btn,.hh-plate-tag{
-      border-radius:999px;font-weight:900;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
-    }
-    .hh-add-btn{
-      border:1px solid rgba(192,90,42,.24);
-      background:linear-gradient(135deg, rgba(192,90,42,.15), rgba(42,127,98,.10));
-      color:rgba(20,17,14,.92);padding:8px 10px;cursor:pointer;
-    }
-    .hh-add-btn:hover{
-      border-color:rgba(192,90,42,.42);
-      background:linear-gradient(135deg, rgba(192,90,42,.25), rgba(42,127,98,.16));
-    }
-    .hh-plate-tag{padding:7px 10px;background:rgba(20,17,14,.08);border:1px solid rgba(20,17,14,.12);color:rgba(20,17,14,.68)}
-    .hh-hintline{margin:6px 0 10px;font-size:12.6px;font-weight:780;color:rgba(20,17,14,.62)}
-    .hh-stack details{
-      background:rgba(255,255,255,.62);border:1px solid rgba(20,17,14,.12);
-      border-radius:18px;box-shadow:var(--hh-shadow3);overflow:hidden;
-    }
-    .hh-stack summary{
-      list-style:none;cursor:pointer;padding:11px 12px;font-weight:860;line-height:1.25;
-      display:flex;align-items:center;justify-content:space-between;gap:12px;
-    }
-    .hh-stack summary::-webkit-details-marker{display:none}
-    .hh-stack summary::after{
-      content:"＋";font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Courier New",monospace;opacity:.65;flex:0 0 auto;
-    }
-    .hh-stack details[open] summary::after{content:"－";opacity:.8}
-    .hh-desc{padding:0 12px 12px;color:rgba(20,17,14,.72);font-size:12.8px;font-weight:760;line-height:1.35}
-
-    .hh-cta{margin-top:14px;display:grid;gap:10px}
+    .hh-cta{ margin-top: 14px; display:grid; gap:10px; }
     .hh-btn{
-      background:linear-gradient(135deg, rgba(20,17,14,.92), rgba(20,17,14,.78));
-      color:rgba(245,240,230,.96);padding:12px 14px;border-radius:20px;text-decoration:none;
-      font-weight:950;display:inline-flex;align-items:center;justify-content:center;gap:10px;
-      box-shadow:0 18px 40px rgba(0,0,0,.22);
+      background: linear-gradient(135deg, rgba(20,17,14,.92), rgba(20,17,14,.78));
+      color: rgba(245,240,230,.96);
+      padding: 12px 14px;
+      border-radius: 20px;
+      text-decoration:none;
+      font-weight: 950;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.22);
+      transition: transform .14s ease, box-shadow .14s ease;
     }
-    .hh-small{color:rgba(20,17,14,.70);font-weight:780;line-height:1.35;font-size:13px}
-    .hh-daypanel[hidden]{display:none}
-    .hh-lunch-unavail{
-      margin:10px 0 6px;padding:12px;border-radius:18px;border:1px solid rgba(20,17,14,.14);
-      background:rgba(255,255,255,.66);box-shadow:var(--hh-shadow3);
-    }
-    .hh-lunch-unavail-title{margin-top:8px;font-weight:880;color:rgba(20,17,14,.82);font-size:13px;line-height:1.35}
-    .hh-state{
-      border:1px solid rgba(245,240,230,.14);border-radius:var(--hh-radius2);padding:20px;margin:14px;
-      background:rgba(0,0,0,.22);color:rgba(245,240,230,.92);box-shadow:var(--hh-shadow2);
-      backdrop-filter:blur(12px);position:relative;overflow:hidden;
-    }
-    .hh-badge{
-      font-weight:980;text-transform:uppercase;letter-spacing:.14em;font-size:11px;
-      padding:7px 12px;border-radius:999px;border:1px solid rgba(245,240,230,.18);
-      background:rgba(255,255,255,.06);display:inline-flex;align-items:center;gap:8px;
-    }
-    .hh-state-title{
-      font-family:ui-serif,Georgia,Cambria,"Times New Roman",Times,serif;
-      font-size:clamp(20px,2.6vw,30px);font-weight:850;margin:10px 0 6px;line-height:1.08;
-    }
-    .hh-state-msg{font-weight:780;color:rgba(245,240,230,.74);font-size:13.2px}
+    .hh-btn:hover{ transform: translateY(-1px); box-shadow: 0 22px 60px rgba(0,0,0,.26); }
 
+    .hh-small{ color: rgba(20,17,14,.70); font-weight: 780; line-height: 1.35; font-size: 13px; }
+
+    .hh-daypanel[hidden]{ display:none; }
+    .hh-daypanel{ animation: hhFadeUp .22s ease-out; }
+    @keyframes hhFadeUp{ from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+    /* State card */
+    .hh-state{
+      border: 1px solid rgba(245,240,230,.14);
+      border-radius: var(--hh-radius2);
+      padding: 20px;
+      margin: 14px;
+      background: rgba(0,0,0,.22);
+      color: rgba(245,240,230,.92);
+      box-shadow: var(--hh-shadow2);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      position:relative;
+      overflow:hidden;
+    }
+    .hh-state::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(700px 280px at 10% 10%, rgba(192,90,42,.22), transparent 60%),
+        radial-gradient(700px 280px at 90% 0%, rgba(42,127,98,.16), transparent 62%);
+      pointer-events:none;
+      opacity:.9;
+    }
+    .hh-state > *{ position:relative; z-index:1; }
+
+    .hh-badge{
+      font-weight: 980;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      font-size: 11px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(245,240,230,.18);
+      background: rgba(255,255,255,.06);
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .hh-badge::before{
+      content:"";
+      width:8px;height:8px;
+      border-radius: 99px;
+      background: rgba(255,179,90,.92);
+      display:inline-block;
+    }
+    .hh-badge.is-dark::before{ background: rgba(245,240,230,.92); }
+
+    .hh-state-title{
+      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+      font-size: clamp(20px, 2.6vw, 30px);
+      font-weight: 850;
+      letter-spacing: .2px;
+      margin: 10px 0 6px;
+      line-height: 1.08;
+    }
+    .hh-state-msg{
+      font-weight: 780;
+      color: rgba(245,240,230,.74);
+      margin: 0;
+      line-height: 1.35;
+      font-size: 13.2px;
+    }
+
+    /* Advanced */
     .hh-advanced-top{
-      display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:8px 14px 12px
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      margin: 8px 14px 12px;
     }
     .hh-advanced-title{
-      font-family:ui-serif,Georgia,Cambria,"Times New Roman",Times,serif;
-      font-size:clamp(18px,2.2vw,26px);font-weight:850;color:rgba(245,240,230,.92)
+      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+      font-size: clamp(18px, 2.2vw, 26px);
+      font-weight: 850;
+      letter-spacing: .2px;
+      color: rgba(245,240,230,.92);
     }
     .hh-advanced-disclaimer{
-      font-weight:780;color:rgba(245,240,230,.68);text-align:right;max-width:520px;font-size:12.8px;line-height:1.35
+      font-weight: 780;
+      color: rgba(245,240,230,.68);
+      text-align:right;
+      max-width: 520px;
+      font-size: 12.8px;
+      line-height: 1.35;
     }
-    .hh-hint{color:rgba(245,240,230,.62);font-weight:760;margin:8px 14px 0;font-size:12.6px}
-    .hh-adv-carousel{display:flex;gap:14px;overflow-x:auto;padding:2px 14px 14px;scroll-snap-type:x mandatory}
-    .hh-adv-card{flex:0 0 92%;max-width:720px;scroll-snap-align:start}
-    @media(min-width:860px){ .hh-adv-card{flex:0 0 48%} }
-    .hh-adv-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:0 0 10px;padding:0 6px;color:rgba(245,240,230,.86)}
+    .hh-hint{ color: rgba(245,240,230,.62); font-weight: 760; margin: 8px 14px 0; font-size: 12.6px; }
+
+    .hh-adv-carousel{
+      display:flex;
+      gap:14px;
+      overflow-x:auto;
+      padding: 2px 14px 14px;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+    }
+    .hh-adv-card{ flex: 0 0 92%; max-width: 720px; scroll-snap-align:start; }
+    @media(min-width:860px){ .hh-adv-card{ flex: 0 0 48%; } }
+    .hh-adv-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap:10px;
+      margin: 0 0 10px;
+      padding: 0 6px;
+      color: rgba(245,240,230,.86);
+    }
     .hh-adv-dayname{
-      font-family:ui-serif,Georgia,Cambria,"Times New Roman",Times,serif;font-size:18px;font-weight:850
+      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+      font-size: 18px;
+      font-weight: 850;
+      letter-spacing: .2px;
     }
-    .hh-adv-date,.hh-adv-hours{color:rgba(245,240,230,.68);font-weight:780;font-size:12.8px}
+    .hh-adv-date,
+    .hh-adv-hours{ color: rgba(245,240,230,.68); font-weight: 780; font-size: 12.8px; }
 
-    /* builder */
-    .plate-builder{
-      position:fixed;right:14px;top:14px;width:var(--builder-width);max-height:calc(100vh - 28px);
-      z-index:1900;pointer-events:none;display:flex;justify-content:flex-end;align-items:flex-start;
+    /* Mobile */
+    @media(max-width: 560px){
+      .hh-menu{ padding: 14px 10px 72px; border-radius: 26px; }
+      .hh-daybar{
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 8px;
+        padding: 8px;
+        border-radius: 20px;
+        margin: 12px;
+        justify-content: flex-start; /* on mobile, keep scrollable left-aligned */
+      }
+      .hh-daybar::-webkit-scrollbar{ display:none; }
+      .hh-tablist{
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 8px;
+        padding: 8px;
+        border-radius: 20px;
+        top: 74px;
+        margin: 0 12px 12px;
+        justify-content: flex-start;
+      }
+      .hh-tablist::-webkit-scrollbar{ display:none; }
+      .hh-day,
+      .hh-tab{ padding: 8px 10px; font-size: 13px; }
+      .hh-header{ padding: 10px 12px 0; }
+      .hh-panels{ padding: 0 12px 14px; }
+      .hh-panel{ padding: 14px; border-radius: 26px; }
     }
-    .plate-builder-panel{
-      width:100%;pointer-events:auto;background:rgba(10,10,12,.86);
-      border:1px solid rgba(255,255,255,.12);box-shadow:0 25px 80px rgba(0,0,0,.44);
-      border-radius:28px;overflow:hidden;backdrop-filter:blur(18px);
-      transform:translateY(0);transition:transform .24s ease, opacity .24s ease;
-    }
-    .plate-builder.is-collapsed .plate-builder-panel{
-      transform:translateY(-8px);opacity:0;pointer-events:none;
-    }
-    .plate-builder-handle{
-      position:fixed;right:14px;top:14px;z-index:1950;pointer-events:auto;
-      background:linear-gradient(135deg, rgba(192,90,42,.88), rgba(42,127,98,.74));
-      border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.96);
-      border-radius:999px;padding:12px 16px;display:inline-flex;gap:10px;align-items:center;
-      cursor:pointer;font-weight:900;letter-spacing:.04em;box-shadow:0 18px 50px rgba(0,0,0,.42);
-    }
-    .plate-builder-handle .count{
-      min-width:26px;height:26px;border-radius:999px;background:rgba(255,255,255,.18);
-      display:grid;place-items:center;font-size:12px;
-    }
-    .plate-builder-header{
-      padding:18px 18px 14px;border-bottom:1px solid rgba(255,255,255,.08);
-      display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
-    }
-    .plate-builder-header h3{font-size:20px;line-height:1;margin-bottom:6px}
-    .plate-builder-header p{color:rgba(255,255,255,.68);font-size:12.8px;max-width:28ch}
-    .plate-builder-close{
-      border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;
-      width:40px;height:40px;border-radius:999px;cursor:pointer;font-size:18px;font-weight:900;
-    }
-    .plate-builder-body{padding:14px 18px 18px;display:grid;gap:14px;max-height:calc(100vh - 160px);overflow:auto}
-    .builder-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-    .builder-stat{
-      padding:12px;border-radius:18px;background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.08);
-    }
-    .builder-stat strong{
-      display:block;color:rgba(255,179,90,.92);font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;
-    }
-    .builder-stat span{color:#fff;font-weight:900;font-size:15px}
-    .builder-list{display:grid;gap:10px}
-    .builder-item{
-      padding:12px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:grid;gap:8px;
-    }
-    .builder-item-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
-    .builder-item-name{font-weight:800;color:rgba(255,255,255,.94)}
-    .builder-item-meta{color:rgba(255,255,255,.60);font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
-    .builder-item-price{color:rgba(255,179,90,.96);font-weight:900;white-space:nowrap}
-    .builder-item-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-    .qty-controls{display:inline-flex;align-items:center;gap:8px}
-    .qty-btn,.remove-btn,.builder-action{
-      border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);
-      color:rgba(255,255,255,.94);border-radius:999px;font-weight:900;cursor:pointer;
-    }
-    .qty-btn{width:32px;height:32px;display:grid;place-items:center;font-size:16px}
-    .remove-btn,.builder-action{padding:8px 12px;font-size:11px;letter-spacing:.06em;text-transform:uppercase}
-    .qty-value{min-width:18px;text-align:center;color:rgba(255,255,255,.90);font-weight:900}
-    .builder-empty{
-      padding:18px;border-radius:18px;border:1px dashed rgba(255,255,255,.14);
-      color:rgba(255,255,255,.62);text-align:center;font-size:13px;line-height:1.4;
-    }
-    .builder-note{color:rgba(255,255,255,.58);font-size:11.6px;line-height:1.4}
 
-    @media (max-width:1080px){
-      .hh-feature-wrap{grid-template-columns:1fr}
-      .plate-builder{top:auto;bottom:90px;right:12px;align-items:flex-end}
-      .plate-builder-handle{top:auto;bottom:160px;right:12px}
-      .plate-builder-body{max-height:min(60vh,540px)}
+    @media (prefers-reduced-motion: reduce){
+      .hh-daypanel{ animation:none; }
+      .hh-day, .hh-tab, .hh-stack li, .hh-btn{ transition:none; }
     }
-    @media (max-width:560px){
-      .hh-menu{padding:14px 10px 72px;border-radius:26px}
-      .hh-daybar,.hh-tablist{
-        flex-wrap:nowrap;overflow-x:auto;gap:8px;padding:8px;border-radius:20px;justify-content:flex-start;
-      }
-      .hh-tablist{top:74px;margin:0 12px 12px}
-      .hh-daybar{margin:12px}
-      .hh-day,.hh-tab{padding:8px 10px;font-size:13px}
-      .hh-header{padding:10px 12px 0}
-      .hh-panels{padding:0 12px 14px}
-      .hh-panel{padding:14px;border-radius:26px}
-      .hh-feature-wrap{margin:8px 12px 18px}
-      .hh-builder-grid,.builder-stats{grid-template-columns:1fr}
-      .hh-cube-card{min-height:320px}
-      .hh-cube-scene{width:190px;height:190px}
-      .hh-face{display:none}
-      .hh-face.is-mobile-visible{display:grid;position:relative;inset:auto}
-      .plate-builder{width:calc(100vw - 24px)}
-      .plate-builder-handle{bottom:150px;left:12px;right:auto;padding:10px 14px}
-      .plate-builder-panel{border-radius:24px}
-      .nav-btn.bottom-center{bottom:20px;padding:.6rem 1.2rem}
-      .circular-menu{width:280px;height:280px}
-      .menu-item{
-        width:50px;height:50px;font-size:.7rem;
-        transform:translate(-50%,-50%) rotate(calc(var(--angle) * 1deg)) translateY(-100px) rotate(calc(var(--angle) * -1deg));
-      }
-      .menu-item:hover{
-        transform:translate(-50%,-50%) rotate(calc(var(--angle) * 1deg)) translateY(-110px) rotate(calc(var(--angle) * -1deg));
-        width:55px;height:55px;
-      }
-      .center-home{width:60px;height:60px;font-size:1.2rem}
+
+    /* Click‑for‑description dropdowns */
+    .hh-hintline{
+      margin: 6px 0 10px;
+      font-size: 12.6px;
+      font-weight: 780;
+      color: rgba(20,17,14,.62);
     }
+    .hh-stack details{
+      background: rgba(255,255,255,.62);
+      border: 1px solid rgba(20,17,14,.12);
+      border-radius: 18px;
+      box-shadow: var(--hh-shadow3);
+      overflow: hidden;
+      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+    }
+    .hh-stack details:hover{
+      transform: translateY(-1px);
+      border-color: rgba(192,90,42,.26);
+      box-shadow: 0 14px 30px rgba(0,0,0,.12);
+    }
+    .hh-stack summary{
+      list-style: none;
+      cursor: pointer;
+      padding: 11px 12px;
+      font-weight: 860;
+      line-height: 1.25;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .hh-stack summary::-webkit-details-marker{ display:none; }
+    .hh-stack summary::after{
+      content: "＋";
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      opacity: .65;
+      flex: 0 0 auto;
+    }
+    .hh-stack details[open] summary::after{ content: "－"; opacity: .8; }
+    .hh-desc{
+      padding: 0 12px 12px;
+      color: rgba(20,17,14,.72);
+      font-size: 12.8px;
+      font-weight: 760;
+      line-height: 1.35;
+    }
+
+    .hh-lunch-unavail{
+      margin: 10px 0 6px;
+      padding: 12px 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(20,17,14,.14);
+      background: rgba(255,255,255,.66);
+      box-shadow: var(--hh-shadow3);
+    }
+    .hh-lunch-unavail-title{
+      margin-top: 8px;
+      font-weight: 880;
+      color: rgba(20,17,14,.82);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+
+
+
+    /* ==================== CIRCULAR NAVIGATION (adapted for Hot Headz) ==================== */
+.nav-btn {
+  position: fixed;
+  z-index: 2000;
+  background: #1e1b1b;
+  border: 2px solid var(--hh-accent, #c05a2a);
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  box-shadow: 0 0 25px rgba(192,90,42,0.5);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.nav-btn:hover {
+  transform: scale(1.05);
+  border-color: var(--hh-accent-2, #2a7f62);
+  box-shadow: 0 0 35px var(--hh-accent, #c05a2a);
+}
+
+.btn-icon {
+  font-size: 1.8rem;
+  color: var(--hh-accent, #c05a2a);
+}
+
+.btn-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.btn-text .main {
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.92);
+}
+
+.btn-text .sub {
+  font-size: 0.65rem;
+  opacity: 0.7;
+  color: rgba(255,255,255,0.7);
+  text-transform: uppercase;
+}
+
+/* left-center button - VERTICAL */
+.nav-btn.left-center {
+  left: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  flex-direction: column;
+  padding: 1rem 0.5rem;
+  gap: 8px;
+}
+
+.nav-btn.left-center .btn-text {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.nav-btn.left-center .btn-text .main {
+  font-size: 0.9rem;
+  letter-spacing: normal;
+}
+
+.nav-btn.left-center .btn-text .sub {
+  font-size: 0.6rem;
+  margin-top: 4px;
+}
+
+/* bottom-center button - HORIZONTAL */
+.nav-btn.bottom-center {
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  flex-direction: row;
+  padding: 0.8rem 1.8rem;
+}
+
+/* circular menu overlay */
+.circ-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background: rgba(0,0,0,0.7);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.circ-menu-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.circular-menu {
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: transparent;
+  border: 2px solid var(--hh-accent, #c05a2a);
+  box-shadow: 0 0 40px rgba(192,90,42,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transform: scale(0.3);
+  transition: transform 0.3s ease;
+}
+
+.circ-menu-overlay.open .circular-menu {
+  transform: scale(1);
+}
+
+.center-home {
+  width: 70px;
+  height: 70px;
+  background: var(--hh-accent-2, #2a7f62);
+  border: 3px solid var(--hh-accent, #c05a2a);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1.5rem;
+  color: #1a0d0b;
+  box-shadow: 0 0 30px var(--hh-accent, #c05a2a);
+  cursor: pointer;
+  transition: 0.2s;
+  z-index: 1001;
+}
+.center-home:hover {
+  background: var(--hh-accent, #c05a2a);
+  color: white;
+  transform: scale(1.05);
+}
+
+.menu-item {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: #1e1b1b;
+  border: 2px solid var(--hh-accent, #c05a2a);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.92);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(0,0,0,0.7);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-130px) rotate(calc(var(--angle) * -1deg));
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 1px;
+  backdrop-filter: blur(4px);
+}
+
+.menu-item:hover {
+  background: var(--hh-accent, #c05a2a);
+  color: black;
+  border-color: var(--hh-accent-2, #2a7f62);
+  transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-140px) rotate(calc(var(--angle) * -1deg));
+  width: 65px;
+  height: 65px;
+}
+
+/* mobile adjustments */
+@media (max-width: 600px) {
+  .nav-btn.left-center {
+    left: 10px;
+    padding: 0.8rem 0.3rem;
+  }
+  .nav-btn.left-center .btn-icon {
+    font-size: 1.5rem;
+  }
+  .nav-btn.left-center .btn-text .main {
+    font-size: 0.8rem;
+  }
+  .nav-btn.left-center .btn-text .sub {
+    font-size: 0.5rem;
+  }
+  .nav-btn.bottom-center {
+    bottom: 20px;
+    padding: 0.6rem 1.2rem;
+  }
+  .circular-menu {
+    width: 280px;
+    height: 280px;
+  }
+  .menu-item {
+    width: 50px;
+    height: 50px;
+    font-size: 0.7rem;
+    transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-100px) rotate(calc(var(--angle) * -1deg));
+  }
+  .menu-item:hover {
+    transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-110px) rotate(calc(var(--angle) * -1deg));
+    width: 55px;
+    height: 55px;
+  }
+  .center-home {
+    width: 60px;
+    height: 60px;
+    font-size: 1.2rem;
+  }
+}
+    
   </style>
 </head>
 <body>
+  <!-- Required invisible anchors (optional, for explore nav if used) -->
+  <div id="gen-home" style="position: absolute; top: 0; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-menu" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-delivery" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-order" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-about" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-location" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+
+
+   <!-- ===== CIRCULAR NAVIGATION BUTTONS ===== -->
+  <!-- Left button removed as requested -->
 
   <div class="nav-btn bottom-center" id="navBtnBottom">
     <i class="fas fa-compass btn-icon"></i>
@@ -513,6 +843,7 @@
     </div>
   </div>
 
+  <!-- CIRCULAR MENU OVERLAY with page links (5 items evenly spaced at 72° increments) -->
   <div class="circ-menu-overlay" id="circMenuOverlay">
     <div class="circular-menu">
       <div class="center-home" id="homeCenter" data-link="index.html"><i class="fas fa-home"></i></div>
@@ -524,95 +855,10 @@
     </div>
   </div>
 
-  <button class="plate-builder-handle" id="builderHandle" type="button" aria-expanded="true" aria-controls="plateBuilderPanel">
-    <i class="fas fa-utensils"></i>
-    <span>Plate Builder</span>
-    <span class="count" id="builderHandleCount">0</span>
-  </button>
-
-  <aside class="plate-builder" id="plateBuilderRoot">
-    <div class="plate-builder-panel" id="plateBuilderPanel">
-      <div class="plate-builder-header">
-        <div>
-          <h3>Build Your Plate</h3>
-          <p>Add priced menu items and see the running total without losing the current menu.</p>
-        </div>
-        <button class="plate-builder-close" id="builderClose" type="button" aria-label="Collapse builder">×</button>
-      </div>
-      <div class="plate-builder-body">
-        <div class="builder-stats">
-          <div class="builder-stat"><strong>Items</strong><span id="builderItemCount">0</span></div>
-          <div class="builder-stat"><strong>Categories</strong><span id="builderCategoryCount">0</span></div>
-          <div class="builder-stat"><strong>Total</strong><span id="builderTotal">$0.00</span></div>
-        </div>
-        <div class="builder-list" id="builderList">
-          <div class="builder-empty" id="builderEmpty">
-            Tap <strong>Add to Plate</strong> on any priced item. This single file keeps the current menu behavior and adds a live total builder.
-          </div>
-        </div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap">
-          <button class="builder-action" id="builderClear" type="button">Clear Plate</button>
-          <button class="builder-action" id="builderCopy" type="button">Copy Summary</button>
-        </div>
-        <div class="builder-note">
-          This file works immediately with included sample menu data. Swap the JSON block at the bottom with your real data whenever you want.
-        </div>
-      </div>
-    </div>
-  </aside>
-
+  <!-- ===== MENU HTML ===== -->
   <div class="hh-menu" role="region" aria-label="Menu" id="hh-menu-root">
-    <div class="hh-header">
-      <div class="hh-title">Hot Headz Southern Foods</div>
-      <div class="hh-updated">Single-file enhanced menu: current system + spinning cube + live plate builder.</div>
-      <div class="hh-note">You can use this as-is or replace the sample JSON data block with your real menu feed.</div>
-    </div>
 
-    <section class="hh-feature-wrap" aria-label="Interactive menu controls">
-      <article class="hh-cube-card">
-        <div class="hh-cube-head">
-          <h2>Spinning Menu Cube</h2>
-          <p>Use the cube to jump into a menu category without replacing your current tabs.</p>
-        </div>
-
-        <div class="hh-cube-scene">
-          <div class="hh-cube" id="menuCube">
-            <div class="hh-face front is-mobile-visible" data-target="Breakfast"><div><i class="fas fa-egg"></i><strong>Breakfast</strong><span>plates and quick starts</span></div></div>
-            <div class="hh-face right" data-target="Lunch"><div><i class="fas fa-drumstick-bite"></i><strong>Lunch</strong><span>daily plates and sides</span></div></div>
-            <div class="hh-face back" data-target="Crawfish"><div><i class="fas fa-fish"></i><strong>Crawfish</strong><span>seasonal draw</span></div></div>
-            <div class="hh-face left" data-target="Salad Bar"><div><i class="fas fa-leaf"></i><strong>Salad Bar</strong><span>fresh options</span></div></div>
-            <div class="hh-face top" data-target="Drinks"><div><i class="fas fa-glass-whiskey"></i><strong>Drinks</strong><span>cold extras</span></div></div>
-            <div class="hh-face bottom" data-target="Dessert"><div><i class="fas fa-cookie-bite"></i><strong>Dessert</strong><span>sweet finish</span></div></div>
-          </div>
-        </div>
-
-        <div class="hh-cube-controls">
-          <button class="hh-cube-btn is-active" type="button" data-face="Breakfast">Breakfast</button>
-          <button class="hh-cube-btn" type="button" data-face="Lunch">Lunch</button>
-          <button class="hh-cube-btn" type="button" data-face="Crawfish">Crawfish</button>
-          <button class="hh-cube-btn" type="button" data-face="Salad Bar">Salad Bar</button>
-          <button class="hh-cube-btn" type="button" data-face="Drinks">Drinks</button>
-          <button class="hh-cube-btn" type="button" data-face="Dessert">Dessert</button>
-        </div>
-      </article>
-
-      <article class="hh-builder-intro">
-        <h2>Keep the current menu. Add stronger UX.</h2>
-        <p>
-          This file preserves day-switching, tabbed sections, lunch availability rules, advanced menu cards, and circular navigation.
-          The new layers are the cube category controller and a live order-total builder.
-        </p>
-        <div class="hh-builder-grid">
-          <div class="hh-builder-stat"><strong>What stays</strong><span>today / tomorrow / advanced structure</span></div>
-          <div class="hh-builder-stat"><strong>What gets added</strong><span>cube navigation + add-to-plate totals</span></div>
-          <div class="hh-builder-stat"><strong>What to update later</strong><span>real pricing and exact menu items</span></div>
-        </div>
-        <div class="hh-helper-note">
-          The sample data below already uses item objects with name, description, and price. That is the format you want for full totals.
-        </div>
-      </article>
-    </section>
-
+    <!-- Sticky top nav -->
     <div class="hh-stickywrap">
       <div class="hh-daybar" role="tablist" aria-label="Day selector">
         <button class="hh-day is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-day-today" id="hhDayBtnToday">Today</button>
@@ -621,14 +867,16 @@
       </div>
     </div>
 
-    <div class="hh-daypanel" id="hh-day-today" role="tabpanel" aria-labelledby="hhDayBtnToday">
+    <!-- TODAY -->
+    <div class="hh-daypanel is-active" id="hh-day-today" role="tabpanel" aria-labelledby="hhDayBtnToday">
       <div class="hh-header">
         <div class="hh-title" id="hh-today-title">Today’s Menu</div>
         <div class="hh-updated" id="hh-hours-line">Loading hours…</div>
         <div class="hh-note" id="hh-hours-note"></div>
       </div>
 
-      <div class="hh-state" id="hh-today-closed" hidden>
+      <!-- Only show CLOSED at day level -->
+      <div class="hh-state hh-closed" id="hh-today-closed" hidden>
         <div class="hh-badge">Closed</div>
         <div class="hh-state-title" id="hh-today-closed-title"></div>
         <div class="hh-state-msg" id="hh-today-closed-msg"></div>
@@ -644,7 +892,7 @@
       </div>
 
       <div class="hh-panels">
-        <section class="hh-panel" id="hh-today-breakfast" role="tabpanel" aria-labelledby="hhTabTodayBreakfast">
+        <section class="hh-panel is-active" id="hh-today-breakfast" role="tabpanel" aria-labelledby="hhTabTodayBreakfast">
           <h3>Breakfast</h3>
           <p class="hh-sub" id="hh-today-breakfast-sub"></p>
           <h4>Plates</h4>
@@ -659,35 +907,48 @@
 
         <section class="hh-panel" id="hh-today-lunch" hidden role="tabpanel" aria-labelledby="hhTabTodayLunch">
           <h3>Lunch</h3>
-          <p class="hh-sub" id="hh-today-lunch-sub"></p>
+          <p class="hh-sub" id="hh-today-lunch-sub">Loading today’s lunch menu…</p>
+
+          <!-- Lunch-only unavailable message -->
           <div class="hh-lunch-unavail" id="hh-today-lunch-unavail" hidden>
-            <div class="hh-badge">Unavailable</div>
+            <div class="hh-badge is-dark">Unavailable</div>
             <div class="hh-lunch-unavail-title" id="hh-today-lunch-unavail-title">Lunch menu unavailable.</div>
           </div>
-          <div id="hh-today-lunch-content">
+
+          <div id="hh-today-lunch-content" style="display:none">
             <h4>Plates</h4>
             <ul class="hh-stack" id="hh-today-lunch-plates"></ul>
+
             <h4 id="hh-today-lunch-items-title">Today’s Lunch Items</h4>
-            <div class="hh-hintline" id="hh-today-lunch-hint"></div>
+            <div class="hh-hintline" id="hh-today-lunch-hint" hidden></div>
             <ul class="hh-stack" id="hh-today-lunch-items"></ul>
           </div>
-          <div class="hh-cta"><a class="hh-btn" id="hh-call-btn-today-l" href="#">Call to Order</a></div>
+
+          <div class="hh-cta">
+            <a class="hh-btn" id="hh-call-btn-today-l" href="#">Call to Order</a>
+          </div>
         </section>
 
         <section class="hh-panel" id="hh-today-crawfish" hidden role="tabpanel" aria-labelledby="hhTabTodayCrawfish">
           <h3>Crawfish</h3>
           <p class="hh-sub" id="hh-today-crawfish-sub"></p>
           <ul class="hh-stack" id="hh-today-crawfish-items"></ul>
-          <div class="hh-cta"><a class="hh-btn" id="hh-call-btn-today-c" href="#">Call to Order</a></div>
+          <div class="hh-cta">
+            <a class="hh-btn" id="hh-call-btn-today-c" href="#">Call to Order</a>
+          </div>
         </section>
 
         <section class="hh-panel" id="hh-today-salad" hidden role="tabpanel" aria-labelledby="hhTabTodaySalad">
           <h3>Salad Bar</h3>
           <p class="hh-sub" id="hh-today-salad-sub"></p>
-          <h4>Pricing</h4><ul class="hh-stack" id="hh-today-salad-pricing"></ul>
-          <h4>Lettuce</h4><ul class="hh-stack" id="hh-today-salad-lettuce"></ul>
-          <h4>Toppings</h4><ul class="hh-stack" id="hh-today-salad-toppings"></ul>
-          <h4>Dressing</h4><ul class="hh-stack" id="hh-today-salad-dressing"></ul>
+          <h4>Pricing</h4>
+          <ul class="hh-stack" id="hh-today-salad-pricing"></ul>
+          <h4>Lettuce</h4>
+          <ul class="hh-stack" id="hh-today-salad-lettuce"></ul>
+          <h4>Toppings</h4>
+          <ul class="hh-stack" id="hh-today-salad-toppings"></ul>
+          <h4>Dressing</h4>
+          <ul class="hh-stack" id="hh-today-salad-dressing"></ul>
         </section>
 
         <section class="hh-panel" id="hh-today-drinks" hidden role="tabpanel" aria-labelledby="hhTabTodayDrinks">
@@ -703,6 +964,7 @@
       </div>
     </div>
 
+    <!-- TOMORROW -->
     <div class="hh-daypanel" id="hh-day-tomorrow" hidden role="tabpanel" aria-labelledby="hhDayBtnTomorrow">
       <div class="hh-header">
         <div class="hh-title" id="hh-tomorrow-title">Tomorrow’s Menu</div>
@@ -710,7 +972,8 @@
         <div class="hh-note" id="hh-hours-note-2"></div>
       </div>
 
-      <div class="hh-state" id="hh-tomorrow-closed" hidden>
+      <!-- Only show CLOSED at day level -->
+      <div class="hh-state hh-closed" id="hh-tomorrow-closed" hidden>
         <div class="hh-badge">Closed</div>
         <div class="hh-state-title" id="hh-tomorrow-closed-title"></div>
         <div class="hh-state-msg" id="hh-tomorrow-closed-msg"></div>
@@ -726,513 +989,715 @@
       </div>
 
       <div class="hh-panels">
-        <section class="hh-panel" id="hh-tomorrow-breakfast" role="tabpanel" aria-labelledby="hhTabTomorrowBreakfast">
+        <section class="hh-panel is-active" id="hh-tomorrow-breakfast" role="tabpanel" aria-labelledby="hhTabTomorrowBreakfast">
           <h3>Breakfast</h3>
           <p class="hh-sub" id="hh-tomorrow-breakfast-sub"></p>
-          <h4>Plates</h4><ul class="hh-stack" id="hh-tomorrow-breakfast-plates"></ul>
-          <h4>Available Items</h4><ul class="hh-stack" id="hh-tomorrow-breakfast-items"></ul>
-          <div class="hh-cta"><a class="hh-btn" id="hh-call-btn-tomorrow-b" href="#">Call to Order</a><div class="hh-small" id="hh-delivery-note-2"></div></div>
+          <h4>Plates</h4>
+          <ul class="hh-stack" id="hh-tomorrow-breakfast-plates"></ul>
+          <h4>Available Items</h4>
+          <ul class="hh-stack" id="hh-tomorrow-breakfast-items"></ul>
+          <div class="hh-cta">
+            <a class="hh-btn" id="hh-call-btn-tomorrow-b" href="#">Call to Order</a>
+            <div class="hh-small" id="hh-delivery-note-2"></div>
+          </div>
         </section>
 
         <section class="hh-panel" id="hh-tomorrow-lunch" hidden role="tabpanel" aria-labelledby="hhTabTomorrowLunch">
           <h3>Lunch</h3>
-          <p class="hh-sub" id="hh-tomorrow-lunch-sub"></p>
+          <p class="hh-sub" id="hh-tomorrow-lunch-sub">Loading tomorrow’s lunch menu…</p>
+
+          <!-- Lunch-only unavailable message -->
           <div class="hh-lunch-unavail" id="hh-tomorrow-lunch-unavail" hidden>
-            <div class="hh-badge">Unavailable</div>
+            <div class="hh-badge is-dark">Unavailable</div>
             <div class="hh-lunch-unavail-title" id="hh-tomorrow-lunch-unavail-title">Lunch menu unavailable.</div>
           </div>
-          <div id="hh-tomorrow-lunch-content">
-            <h4>Plates</h4><ul class="hh-stack" id="hh-tomorrow-lunch-plates"></ul>
+
+          <div id="hh-tomorrow-lunch-content" style="display:none">
+            <h4>Plates</h4>
+            <ul class="hh-stack" id="hh-tomorrow-lunch-plates"></ul>
+
             <h4 id="hh-tomorrow-lunch-items-title">Tomorrow’s Lunch Items</h4>
-            <div class="hh-hintline" id="hh-tomorrow-lunch-hint"></div>
+            <div class="hh-hintline" id="hh-tomorrow-lunch-hint" hidden></div>
             <ul class="hh-stack" id="hh-tomorrow-lunch-items"></ul>
           </div>
-          <div class="hh-cta"><a class="hh-btn" id="hh-call-btn-tomorrow-l" href="#">Call to Order</a></div>
+
+          <div class="hh-cta">
+            <a class="hh-btn" id="hh-call-btn-tomorrow-l" href="#">Call to Order</a>
+          </div>
         </section>
 
         <section class="hh-panel" id="hh-tomorrow-crawfish" hidden role="tabpanel" aria-labelledby="hhTabTomorrowCrawfish">
-          <h3>Crawfish</h3><p class="hh-sub" id="hh-tomorrow-crawfish-sub"></p>
+          <h3>Crawfish</h3>
+          <p class="hh-sub" id="hh-tomorrow-crawfish-sub"></p>
           <ul class="hh-stack" id="hh-tomorrow-crawfish-items"></ul>
-          <div class="hh-cta"><a class="hh-btn" id="hh-call-btn-tomorrow-c" href="#">Call to Order</a></div>
+          <div class="hh-cta">
+            <a class="hh-btn" id="hh-call-btn-tomorrow-c" href="#">Call to Order</a>
+          </div>
         </section>
 
         <section class="hh-panel" id="hh-tomorrow-salad" hidden role="tabpanel" aria-labelledby="hhTabTomorrowSalad">
-          <h3>Salad Bar</h3><p class="hh-sub" id="hh-tomorrow-salad-sub"></p>
-          <h4>Pricing</h4><ul class="hh-stack" id="hh-tomorrow-salad-pricing"></ul>
-          <h4>Lettuce</h4><ul class="hh-stack" id="hh-tomorrow-salad-lettuce"></ul>
-          <h4>Toppings</h4><ul class="hh-stack" id="hh-tomorrow-salad-toppings"></ul>
-          <h4>Dressing</h4><ul class="hh-stack" id="hh-tomorrow-salad-dressing"></ul>
+          <h3>Salad Bar</h3>
+          <p class="hh-sub" id="hh-tomorrow-salad-sub"></p>
+          <h4>Pricing</h4>
+          <ul class="hh-stack" id="hh-tomorrow-salad-pricing"></ul>
+          <h4>Lettuce</h4>
+          <ul class="hh-stack" id="hh-tomorrow-salad-lettuce"></ul>
+          <h4>Toppings</h4>
+          <ul class="hh-stack" id="hh-tomorrow-salad-toppings"></ul>
+          <h4>Dressing</h4>
+          <ul class="hh-stack" id="hh-tomorrow-salad-dressing"></ul>
         </section>
 
         <section class="hh-panel" id="hh-tomorrow-drinks" hidden role="tabpanel" aria-labelledby="hhTabTomorrowDrinks">
-          <h3>Drinks</h3><ul class="hh-stack" id="hh-tomorrow-drinks-items"></ul>
+          <h3>Drinks</h3>
+          <ul class="hh-stack" id="hh-tomorrow-drinks-items"></ul>
         </section>
 
         <section class="hh-panel" id="hh-tomorrow-dessert" hidden role="tabpanel" aria-labelledby="hhTabTomorrowDessert">
-          <h3>Dessert</h3><p class="hh-sub" id="hh-tomorrow-dessert-sub"></p>
+          <h3>Dessert</h3>
+          <p class="hh-sub" id="hh-tomorrow-dessert-sub"></p>
           <ul class="hh-stack" id="hh-tomorrow-dessert-items"></ul>
         </section>
       </div>
     </div>
 
+    <!-- ADVANCED -->
     <div class="hh-daypanel" id="hh-day-advanced" hidden role="tabpanel" aria-labelledby="hhDayBtnAdvanced">
       <div class="hh-advanced-top">
         <div class="hh-advanced-title">Advanced Menu</div>
         <div class="hh-advanced-disclaimer" id="hh-advanced-disclaimer"></div>
       </div>
-      <div class="hh-adv-carousel" id="hh-adv-carousel"></div>
+      <div class="hh-adv-carousel" id="hh-adv-carousel" aria-label="Advanced menu day cards"></div>
       <div class="hh-hint">Tip: swipe left/right for each day.</div>
     </div>
 
+    <!-- Error state -->
     <div class="hh-state" id="hh-load-error" hidden>
-      <div class="hh-badge">Error</div>
+      <div class="hh-badge is-dark">Error</div>
       <div class="hh-state-title">Menu couldn’t load</div>
-      <div class="hh-state-msg" id="hh-load-error-msg">Please try again in a moment.</div>
+      <p class="hh-state-msg" id="hh-load-error-msg">Please try again in a moment.</p>
     </div>
   </div>
 
+  <!-- ===== SCRIPTS ===== -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
-    const plateState = { items: [] };
+    // AOS init (optional)
+    AOS.init({ once: false, duration: 1000 });
 
-    function escapeHtml(str){
-      return String(str ?? "")
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
-    }
-    function money(n){ return `$${Number(n || 0).toFixed(2)}`; }
-    function normalizeKey(text){
-      return String(text || "").toLowerCase().replace(/&/g,"and").replace(/[^a-z0-9]+/g," ").trim();
-    }
-
-    function updatePlateUI(){
-      const list = document.getElementById("builderList");
-      const empty = document.getElementById("builderEmpty");
-      const count = plateState.items.reduce((s,i)=>s+i.qty,0);
-      const total = plateState.items.reduce((s,i)=>s+(i.qty*i.price),0);
-      const categories = new Set(plateState.items.map(i=>i.category)).size;
-
-      document.getElementById("builderItemCount").textContent = count;
-      document.getElementById("builderCategoryCount").textContent = categories;
-      document.getElementById("builderTotal").textContent = money(total);
-      document.getElementById("builderHandleCount").textContent = count;
-
-      list.querySelectorAll(".builder-item").forEach(el=>el.remove());
-
-      if (!plateState.items.length){
-        empty.style.display = "";
-        return;
-      }
-      empty.style.display = "none";
-
-      plateState.items.forEach((item,index)=>{
-        const row = document.createElement("div");
-        row.className = "builder-item";
-        row.innerHTML = `
-          <div class="builder-item-top">
-            <div>
-              <div class="builder-item-name">${escapeHtml(item.name)}</div>
-              <div class="builder-item-meta">${escapeHtml(item.category)} • ${escapeHtml(item.plateGroup || "Menu Item")}</div>
-            </div>
-            <div class="builder-item-price">${money(item.qty * item.price)}</div>
-          </div>
-          <div class="builder-item-actions">
-            <div class="qty-controls">
-              <button class="qty-btn" type="button" data-builder-action="decrease" data-index="${index}">−</button>
-              <span class="qty-value">${item.qty}</span>
-              <button class="qty-btn" type="button" data-builder-action="increase" data-index="${index}">+</button>
-            </div>
-            <button class="remove-btn" type="button" data-builder-action="remove" data-index="${index}">Remove</button>
-          </div>
-        `;
-        list.appendChild(row);
-      });
-    }
-
-    function addToPlate(payload){
-      const existing = plateState.items.find(i => i.key === payload.key);
-      if (existing) existing.qty += 1;
-      else plateState.items.push({ ...payload, qty:1 });
-      updatePlateUI();
-      document.getElementById("plateBuilderRoot").classList.remove("is-collapsed");
-      document.getElementById("builderHandle").setAttribute("aria-expanded","true");
-    }
-
-    document.addEventListener("click", (e) => {
-      const addBtn = e.target.closest("[data-plate-payload]");
-      if (addBtn){
-        addToPlate(JSON.parse(addBtn.getAttribute("data-plate-payload")));
-      }
-
-      const actionBtn = e.target.closest("[data-builder-action]");
-      if (actionBtn){
-        const idx = Number(actionBtn.getAttribute("data-index"));
-        const action = actionBtn.getAttribute("data-builder-action");
-        const item = plateState.items[idx];
-        if (!item) return;
-        if (action === "increase") item.qty += 1;
-        if (action === "decrease") item.qty -= 1;
-        if (action === "remove" || item.qty <= 0) plateState.items.splice(idx,1);
-        updatePlateUI();
-      }
-    });
-
-    document.getElementById("builderClear").addEventListener("click", () => {
-      plateState.items = [];
-      updatePlateUI();
-    });
-
-    document.getElementById("builderCopy").addEventListener("click", async () => {
-      const lines = plateState.items.map(i => `${i.qty}x ${i.name} — ${money(i.qty * i.price)}`);
-      const total = plateState.items.reduce((s,i)=>s+(i.qty*i.price),0);
-      const text = lines.length ? `Hot Headz Plate Builder\n\n${lines.join("\n")}\n\nTotal: ${money(total)}` : "No items in plate yet.";
-      try{
-        await navigator.clipboard.writeText(text);
-        const btn = document.getElementById("builderCopy");
-        const old = btn.textContent;
-        btn.textContent = "Copied";
-        setTimeout(() => btn.textContent = old, 1200);
-      }catch(err){}
-    });
-
-    const builderRoot = document.getElementById("plateBuilderRoot");
-    const builderHandle = document.getElementById("builderHandle");
-    document.getElementById("builderClose").addEventListener("click", () => {
-      builderRoot.classList.add("is-collapsed");
-      builderHandle.setAttribute("aria-expanded","false");
-    });
-    builderHandle.addEventListener("click", () => {
-      builderRoot.classList.toggle("is-collapsed");
-      builderHandle.setAttribute("aria-expanded", String(!builderRoot.classList.contains("is-collapsed")));
-    });
-
-    updatePlateUI();
-  </script>
-
-  <script>
+    // ----- MENU SCRIPT (modified to shift days after closing) -----
     (function(){
-      const $ = (id) => document.getElementById(id);
-      function setText(id, text){ const el=$(id); if (el) el.textContent = text || ""; }
+      const DATA_URLS = ["/menu-data.html", "/menu-data/"]; // tries both
+      const $ = (id)=>document.getElementById(id);
 
-      function toISODateLocal(d){
-        const y = d.getFullYear();
-        const m = String(d.getMonth()+1).padStart(2,"0");
-        const day = String(d.getDate()).padStart(2,"0");
-        return `${y}-${m}-${day}`;
-      }
-      function parseISODateToLocal(iso){
-        const [y,m,d] = String(iso).split("-").map(Number);
-        return new Date(y,(m||1)-1,d||1);
-      }
-      function formatDateNice(d){
-        return d.toLocaleDateString("en-US",{month:"short", day:"numeric", year:"numeric"});
-      }
-      function weekdayName(d){
-        return d.toLocaleDateString("en-US",{weekday:"long"});
-      }
-
-      function createMenuPayload(item, fallbackCategory){
-        const isObj = item && typeof item === "object";
-        const name = isObj ? String(item.name || "").trim() : String(item || "").trim();
-        const price = isObj && typeof item.price === "number" ? item.price : null;
-        if (!name || price === null) return null;
-        return {
-          key: normalizeKey(name + "::" + fallbackCategory + "::" + (item.plateGroup || "")),
-          name,
-          price,
-          category: item.category || fallbackCategory || "Menu Item",
-          plateGroup: item.plateGroup || "Menu Item"
-        };
-      }
-
-      function renderList(id, items, fallbackCategory, options = {}){
-        const ul = $(id);
-        if (!ul) return;
-        ul.innerHTML = "";
-        (items || []).forEach(item => {
-          const li = document.createElement("li");
-          const isObj = item && typeof item === "object";
-          const name = isObj ? String(item.name || "").trim() : String(item || "").trim();
-          const desc = isObj ? String(item.desc || "").trim() : "";
-          const payload = createMenuPayload(item, fallbackCategory);
-
-          const wrap = document.createElement("div");
-          wrap.className = "hh-item-card";
-
-          const top = document.createElement("div");
-          top.className = "hh-item-top";
-          top.innerHTML = `
-            <div class="hh-item-name">${escapeHtml(name)}</div>
-            <div class="hh-item-price">${payload ? money(payload.price) : ""}</div>
-          `;
-          wrap.appendChild(top);
-
-          if (desc){
-            const d = document.createElement("div");
-            d.className = "hh-item-desc";
-            d.textContent = desc;
-            wrap.appendChild(d);
-          }
-
-          const actions = document.createElement("div");
-          actions.className = "hh-item-actions";
-
-          const tag = document.createElement("span");
-          tag.className = "hh-plate-tag";
-          tag.textContent = payload ? (payload.plateGroup || "Menu Item") : "Display Only";
-          actions.appendChild(tag);
-
-          if (payload){
-            const add = document.createElement("button");
-            add.className = "hh-add-btn";
-            add.type = "button";
-            add.textContent = "Add to Plate";
-            add.setAttribute("data-plate-payload", JSON.stringify(payload));
-            actions.appendChild(add);
-          }
-
-          wrap.appendChild(actions);
-
-          if (options.dropdown) {
-            const details = document.createElement("details");
-            const summary = document.createElement("summary");
-            summary.textContent = name;
-            const descBox = document.createElement("div");
-            descBox.className = "hh-desc";
-            descBox.textContent = desc || options.noDesc || "Description coming soon.";
-            details.appendChild(summary);
-            details.appendChild(descBox);
-            li.appendChild(details);
-            if (payload){
-              const extra = document.createElement("div");
-              extra.className = "hh-item-actions";
-              extra.style.padding = "0 12px 12px";
-              extra.innerHTML = `<span class="hh-plate-tag">${escapeHtml(payload.plateGroup || "Menu Item")}</span><span class="hh-plate-tag">${money(payload.price)}</span>`;
-              const add = document.createElement("button");
-              add.className = "hh-add-btn";
-              add.type = "button";
-              add.textContent = "Add to Plate";
-              add.setAttribute("data-plate-payload", JSON.stringify(payload));
-              extra.appendChild(add);
-              li.appendChild(extra);
-            }
-          } else {
-            li.appendChild(wrap);
-          }
-
+      function setText(id, text){ const el=$(id); if(el) el.textContent = text || ""; }
+      function setList(id, items){
+        const ul=$(id); if(!ul) return;
+        ul.innerHTML="";
+        (items||[]).forEach(t=>{
+          const li=document.createElement("li");
+          li.textContent=String(t ?? "");
           ul.appendChild(li);
         });
       }
 
+      function escapeHtml(str){
+        return String(str ?? "")
+          .replace(/&/g,"&amp;")
+          .replace(/</g,"&lt;")
+          .replace(/>/g,"&gt;")
+          .replace(/"/g,"&quot;")
+          .replace(/'/g,"&#039;");
+      }
+
+      function normalizeItems(arr){
+        return Array.isArray(arr) ? arr.map(x=>String(x||"").trim()).filter(Boolean) : [];
+      }
+
+      function toISODateLocal(d){
+        const y=d.getFullYear();
+        const m=String(d.getMonth()+1).padStart(2,"0");
+        const day=String(d.getDate()).padStart(2,"0");
+        return `${y}-${m}-${day}`;
+      }
+
+      function formatDateNice(d){
+        return d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+      }
+
+      function weekdayName(d){
+        return d.toLocaleDateString("en-US",{weekday:"long"});
+      }
+
+      function parseISODateToLocal(iso){
+        const [y,m,d]=String(iso).split("-").map(Number);
+        return new Date(y,(m||1)-1,d||1);
+      }
+
+      function normalizeDateKey(key){
+        const s=String(key||"").trim();
+        const m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+        if(!m) return null;
+        const y=m[1];
+        const mo=String(Number(m[2])).padStart(2,"0");
+        const da=String(Number(m[3])).padStart(2,"0");
+        return `${y}-${mo}-${da}`;
+      }
+
+      function showLoadError(msg){
+        const err = $("hh-load-error");
+        const msgEl = $("hh-load-error-msg");
+        if(msgEl) msgEl.textContent = msg || "Please try again.";
+        if(err) err.hidden = false;
+      }
+
+      async function fetchHtml(url){
+        const res = await fetch(url, { credentials:"same-origin", cache:"no-store" });
+        if(!res.ok) throw new Error(`Fetch failed ${res.status} at ${url}`);
+        return await res.text();
+      }
+
+      function extractJsonFromHtml(html, urlLabel){
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const script = doc.querySelector("#hh-menu-data");
+        if(!script) throw new Error(`No #hh-menu-data found on ${urlLabel}`);
+        const raw = (script.textContent || "").trim();
+        if(!raw) throw new Error(`#hh-menu-data is empty on ${urlLabel}`);
+        return JSON.parse(raw);
+      }
+
+      async function readData(){
+        // 1) If JSON is on THIS page, use it (great for testing)
+        const local = document.querySelector("#hh-menu-data");
+        if(local && local.textContent.trim()){
+          const data = JSON.parse(local.textContent.trim());
+          return normalizeMenus(data);
+        }
+
+        // 2) Otherwise fetch from hidden data page (try both URLs)
+        let lastErr = null;
+        for(const url of DATA_URLS){
+          try{
+            const html = await fetchHtml(url);
+            const data = extractJsonFromHtml(html, url);
+            return normalizeMenus(data);
+          }catch(e){
+            lastErr = e;
+          }
+        }
+        throw lastErr || new Error("Menu data could not be read.");
+      }
+
+      function normalizeMenus(data){
+        const rawMenus=data?.menus||{};
+        const normalizedMenus={};
+        Object.keys(rawMenus).forEach(k=>{
+          const nk=normalizeDateKey(k);
+          if(!nk) return;
+          normalizedMenus[nk]=rawMenus[k];
+        });
+        data.menus=normalizedMenus;
+        return data;
+      }
+
       function findHours(weekly, dayName){
-        return (weekly || []).find(d => (d.day || "").toLowerCase() === (dayName || "").toLowerCase()) || {};
+        return (weekly||[]).find(d => (d.day||"").toLowerCase()===(dayName||"").toLowerCase())
+          || {day:dayName, open:"", close:"", breakfast:"", lunch:""};
+      }
+
+      function getClosure(data, dayName){
+        const c=data?.closures||{};
+        const key=Object.keys(c).find(k => (k||"").toLowerCase()===(dayName||"").toLowerCase());
+        return key ? c[key] : null;
       }
 
       function getMenuByDate(data, isoDate){
-        return (data.menus || {})[isoDate] || {};
+        return (data?.menus||{})[isoDate] || null;
       }
 
-      function getLunchAvailability(menu){
-        const lunch = menu.lunch || {};
-        if (lunch.show === false) return { ok:false, msg:"Lunch menu unavailable." };
-        if (!Array.isArray(lunch.items) || !lunch.items.length) return { ok:false, msg:"Lunch menu unavailable." };
-        return { ok:true, msg:"" };
+      function normalizeLunchItems(rawItems){
+        const items = Array.isArray(rawItems) ? rawItems : [];
+        return items.map(raw=>{
+          if(raw && typeof raw === "object"){
+            const name = String(raw.name ?? "").trim();
+            const desc = String(raw.desc ?? "").trim();
+            return { name, desc };
+          }
+          const s = String(raw ?? "").trim();
+          if(!s) return null;
+          return { name: s, desc: "" };
+        }).filter(Boolean).filter(x=>x.name);
+      }
+
+      function setDropdownList(listId, items, noDescText){
+        const ul = $(listId); if(!ul) return;
+        ul.innerHTML = "";
+        items.forEach(it=>{
+          const li = document.createElement("li");
+          const details = document.createElement("details");
+          const summary = document.createElement("summary");
+          summary.textContent = it.name;
+
+          const d = document.createElement("div");
+          d.className = "hh-desc";
+          d.textContent = it.desc ? it.desc : (noDescText || "No description for this item.");
+
+          details.appendChild(summary);
+          details.appendChild(d);
+          li.appendChild(details);
+          ul.appendChild(li);
+        });
       }
 
       function setCrawfishVisibility(prefix, show){
         const tab = $(`hhTab${prefix}Crawfish`);
-        if (tab) tab.style.display = show ? "" : "none";
+        const panel = $(`hh-${prefix.toLowerCase()}-crawfish`);
+        if(tab) tab.style.display = show ? "" : "none";
+        if(!show){
+          if(panel) panel.hidden = true;
+          if(tab && tab.classList.contains("is-active")){
+            const breakfastTab = $(`hhTab${prefix}Breakfast`);
+            if(breakfastTab) breakfastTab.click();
+          }
+          return;
+        }
+        if(tab && tab.classList.contains("is-active")){
+          if(panel) panel.hidden = false;
+        }
       }
 
-      function fillDay(prefix, label, isoDate, data, hours){
-        const menu = getMenuByDate(data, isoDate);
-        const defaults = data.defaults || {};
+      function crawfishFor(data, menu){
+        const def=data?.defaults?.crawfish||{};
+        const c=menu?.crawfish||{};
+        const show=(c.show===false) ? false : true;
+        const subtitle=(c.subtitle ?? def.subtitle ?? "").trim();
+        const items=normalizeItems(c.items ?? def.items ?? []);
+        return {show, subtitle, items};
+      }
 
-        setText(`${prefix}-breakfast-sub`, `Breakfast ${hours.breakfast || ""}. ${(menu.breakfast?.subtitle || defaults.breakfast?.subtitle || "").trim()}`.trim());
-        renderList(`${prefix}-breakfast-plates`, menu.breakfast?.plates || defaults.breakfast?.plates || [], "Breakfast");
-        renderList(`${prefix}-breakfast-items`, menu.breakfast?.items || defaults.breakfast?.items || [], "Breakfast");
+      function getLunchAvailability(data, isoDate, todayISO){
+        const msg = data?.settings?.autoClearMessage || "Lunch menu unavailable.";
+        const today=parseISODateToLocal(todayISO);
+        const cur=parseISODateToLocal(isoDate);
+        today.setHours(12,0,0,0);
+        cur.setHours(12,0,0,0);
 
-        setText(`${prefix}-lunch-sub`, `Lunch ${hours.lunch || ""}. ${(menu.lunch?.subtitle || defaults.lunch?.subtitle || "").trim()}`.trim());
-        const lunchAvail = getLunchAvailability(menu);
-        $(`${prefix}-lunch-unavail`).hidden = lunchAvail.ok;
-        if (!lunchAvail.ok) {
-          setText(`${prefix}-lunch-unavail-title`, lunchAvail.msg);
-          $(`${prefix}-lunch-content`).style.display = "none";
+        if(data?.settings?.autoClearPastDays && cur < today) return { ok:false, msg };
+
+        const menu=getMenuByDate(data, isoDate);
+        if(!menu) return { ok:false, msg };
+
+        const lunch=menu?.lunch || {};
+        if(lunch.show === false) return { ok:false, msg };
+
+        const items = normalizeLunchItems(lunch.items);
+        if(items.length === 0) return { ok:false, msg };
+
+        return { ok:true, msg:"" };
+      }
+
+      function showLunchUnavailable(prefixIdBase, msg){
+        const un = $(`${prefixIdBase}-lunch-unavail`);
+        const unTitle = $(`${prefixIdBase}-lunch-unavail-title`);
+        const content = $(`${prefixIdBase}-lunch-content`);
+        const hint = $(`${prefixIdBase}-lunch-hint`);
+        if(un) un.hidden = false;
+        if(unTitle) unTitle.textContent = msg || "Lunch menu unavailable.";
+        if(content) content.style.display = "none";
+        if(hint) hint.hidden = true;
+      }
+
+      function showLunchAvailable(prefixIdBase){
+        const un = $(`${prefixIdBase}-lunch-unavail`);
+        const content = $(`${prefixIdBase}-lunch-content`);
+        if(un) un.hidden = true;
+        if(content) content.style.display = "";
+      }
+
+      // Helper to parse time string "5:30 AM" to minutes since midnight
+      function parseTimeToMinutes(timeStr) {
+        if (!timeStr) return null;
+        const match = timeStr.match(/(\d+):?(\d*)\s*(AM|PM)/i);
+        if (!match) return null;
+        let hours = parseInt(match[1], 10);
+        const minutes = match[2] ? parseInt(match[2], 10) : 0;
+        const ampm = match[3].toUpperCase();
+        if (ampm === 'PM' && hours !== 12) hours += 12;
+        if (ampm === 'AM' && hours === 12) hours = 0;
+        return hours * 60 + minutes;
+      }
+
+      // Check if current time is past closing for today
+      function isPastClosingToday(weekly, todayName) {
+        const hours = findHours(weekly, todayName);
+        if (!hours.close) return false;
+        const closeMinutes = parseTimeToMinutes(hours.close);
+        if (closeMinutes === null) return false;
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        return currentMinutes >= closeMinutes;
+      }
+
+      function fillTwoDay(prefixIdBase, labelPrefix, isoDate, data, hours, todayISO){
+        const defaults=data?.defaults||{};
+        const menu=getMenuByDate(data, isoDate) || {};
+
+        // Breakfast
+        const b=menu?.breakfast||{};
+        const bDef=defaults?.breakfast||{};
+        const bHours = hours?.breakfast ? `Breakfast ${hours.breakfast}. ` : "";
+        setText(`${prefixIdBase}-breakfast-sub`, (bHours + ((b.subtitle ?? bDef.subtitle ?? "").trim())).trim());
+        setList(`${prefixIdBase}-breakfast-plates`, normalizeItems(b.plates ?? bDef.plates ?? []));
+        setList(`${prefixIdBase}-breakfast-items`,  normalizeItems(b.items  ?? bDef.items  ?? []));
+
+        // Lunch
+        const l=menu?.lunch||{};
+        const lDef=defaults?.lunch||{};
+        const lHours = hours?.lunch ? `Lunch ${hours.lunch}. ` : "";
+        setText(`${prefixIdBase}-lunch-sub`, (lHours + ((l.subtitle ?? lDef.subtitle ?? "").trim())).trim());
+
+        const lunchAvail = getLunchAvailability(data, isoDate, todayISO);
+        if(!lunchAvail.ok){
+          showLunchUnavailable(prefixIdBase, lunchAvail.msg);
+          setList(`${prefixIdBase}-lunch-plates`, []);
+          const ul = $(`${prefixIdBase}-lunch-items`);
+          if(ul) ul.innerHTML = "";
         } else {
-          $(`${prefix}-lunch-content`).style.display = "";
-          renderList(`${prefix}-lunch-plates`, menu.lunch?.plates || defaults.lunch?.plates || [], "Lunch");
-          setText(`${prefix}-lunch-hint`, data.settings?.clickForDescriptionHint || "Tip: click an item for description.");
-          renderList(`${prefix}-lunch-items`, menu.lunch?.items || defaults.lunch?.items || [], "Lunch", { dropdown:true, noDesc:data.settings?.noDescriptionText });
+          showLunchAvailable(prefixIdBase);
+          setList(`${prefixIdBase}-lunch-plates`, normalizeItems(l.plates ?? lDef.plates ?? []));
+          const items = normalizeLunchItems(l.items);
+          const hint = $(`${prefixIdBase}-lunch-hint`);
+          if(hint){
+            hint.textContent = data?.settings?.clickForDescriptionHint || "Tip: click an item for description.";
+            hint.hidden = (items.length === 0);
+          }
+          setDropdownList(`${prefixIdBase}-lunch-items`, items, data?.settings?.noDescriptionText);
         }
 
-        const crawfish = menu.crawfish || defaults.crawfish || {};
-        setText(`${prefix}-crawfish-sub`, crawfish.subtitle || "");
-        renderList(`${prefix}-crawfish-items`, crawfish.items || [], "Crawfish");
-        setCrawfishVisibility(label, crawfish.show !== false);
+        // Crawfish
+        const c=crawfishFor(data, menu);
+        setText(`${prefixIdBase}-crawfish-sub`, c.subtitle);
+        setList(`${prefixIdBase}-crawfish-items`, c.items.length ? c.items : ["Call to ask about crawfish availability."]);
+        setCrawfishVisibility(labelPrefix, c.show);
 
-        const salad = menu.salad || defaults.salad || {};
-        setText(`${prefix}-salad-sub`, salad.subtitle || "");
-        renderList(`${prefix}-salad-pricing`, salad.items || [], "Salad Bar");
-        renderList(`${prefix}-salad-lettuce`, salad.saladBar?.lettuce || [], "Salad Bar");
-        renderList(`${prefix}-salad-toppings`, salad.saladBar?.toppings || [], "Salad Bar");
-        renderList(`${prefix}-salad-dressing`, salad.saladBar?.dressing || [], "Salad Bar");
+        // Salad
+        const s=menu?.salad||{};
+        const sDef=defaults?.salad||{};
+        setText(`${prefixIdBase}-salad-sub`, (s.subtitle ?? sDef.subtitle ?? "").trim());
+        setList(`${prefixIdBase}-salad-pricing`, normalizeItems(s.items ?? sDef.items ?? []));
+        setList(`${prefixIdBase}-salad-lettuce`,  normalizeItems(s.saladBar?.lettuce  ?? sDef.saladBar?.lettuce  ?? []));
+        setList(`${prefixIdBase}-salad-toppings`, normalizeItems(s.saladBar?.toppings ?? sDef.saladBar?.toppings ?? []));
+        setList(`${prefixIdBase}-salad-dressing`, normalizeItems(s.saladBar?.dressing ?? sDef.saladBar?.dressing ?? []));
 
-        renderList(`${prefix}-drinks-items`, (menu.drinks?.items || defaults.drinks?.items || []), "Drinks");
-        setText(`${prefix}-dessert-sub`, (menu.dessert?.subtitle || defaults.dessert?.subtitle || ""));
-        renderList(`${prefix}-dessert-items`, (menu.dessert?.items || defaults.dessert?.items || []), "Dessert");
+        // Drinks
+        const d=menu?.drinks||{};
+        const dDef=defaults?.drinks||{};
+        setList(`${prefixIdBase}-drinks-items`, normalizeItems(d.items ?? dDef.items ?? []));
+
+        // Dessert
+        const ds=menu?.dessert||{};
+        const dsDef=defaults?.dessert||{};
+        setText(`${prefixIdBase}-dessert-sub`, (ds.subtitle ?? dsDef.subtitle ?? "").trim());
+        const desserts=normalizeItems(ds.items ?? []);
+        setList(`${prefixIdBase}-dessert-items`, desserts.length ? desserts : ["(Dessert not posted yet.)"]);
       }
 
-      function buildAdvanced(data, todayISO){
-        const wrap = $("hh-adv-carousel");
-        wrap.innerHTML = "";
-        const days = Number(data.settings?.advancedWindowDays || 7);
-        const weekly = data.hours?.weekly || [];
-        for(let i=0;i<days;i++){
-          const d = parseISODateToLocal(todayISO);
-          d.setDate(d.getDate() + i);
-          const iso = toISODateLocal(d);
-          const dayName = weekdayName(d);
-          const hours = findHours(weekly, dayName);
-          const menu = getMenuByDate(data, iso);
+      function buildAdvancedCarousel(data, todayISO){
+        const wrap=$("hh-adv-carousel");
+        if(!wrap) return;
+        wrap.innerHTML="";
 
-          const card = document.createElement("article");
-          card.className = "hh-adv-card";
+        const weekly=data?.hours?.weekly||[];
+        const lDef=data?.defaults?.lunch||{};
+        const windowDays=Math.max(1, Math.min(31, Number(data?.settings?.advancedWindowDays ?? 7)));
+        const start=parseISODateToLocal(todayISO);
 
-          const head = document.createElement("div");
-          head.className = "hh-adv-head";
-          head.innerHTML = `
+        for(let i=0;i<windowDays;i++){
+          const d=new Date(start);
+          d.setDate(start.getDate()+i);
+          const iso=toISODateLocal(d);
+          const dayName=weekdayName(d);
+          const hours=findHours(weekly, dayName);
+
+          const closure=getClosure(data, dayName);
+          const isClosed=!!closure?.closed;
+          const menu=getMenuByDate(data, iso) || {};
+          const lunch=menu?.lunch||{};
+          const items=normalizeLunchItems(lunch.items);
+
+          let state = { kind:"open", msg:"" };
+          if(isClosed){
+            state = { kind:"closed", msg: closure.message || "See you tomorrow!" };
+          } else {
+            const avail=getLunchAvailability(data, iso, todayISO);
+            if(!avail.ok) state = { kind:"unavailable", msg: avail.msg };
+          }
+
+          const card=document.createElement("article");
+          card.className="hh-adv-card";
+
+          const head=document.createElement("div");
+          head.className="hh-adv-head";
+          head.innerHTML=`
             <div>
               <div class="hh-adv-dayname">${escapeHtml(dayName)}</div>
               <div class="hh-adv-date">${escapeHtml(formatDateNice(d))}</div>
             </div>
-            <div class="hh-adv-hours">${escapeHtml(hours.lunch ? `Lunch ${hours.lunch}` : "")}</div>
+            <div class="hh-adv-hours">${state.kind==="closed" ? "Closed" : (hours.lunch ? `Lunch ${escapeHtml(hours.lunch)}` : "")}</div>
           `;
           card.appendChild(head);
 
-          const panel = document.createElement("section");
-          panel.className = "hh-panel";
-          panel.innerHTML = `<h3>Lunch</h3><p class="hh-sub">${escapeHtml(menu.lunch?.subtitle || data.defaults?.lunch?.subtitle || "")}</p><h4>Plates</h4><ul class="hh-stack"></ul><h4>${escapeHtml(dayName)} Lunch Items</h4><div class="hh-hintline">${escapeHtml(data.settings?.clickForDescriptionHint || "Tip: click an item for description.")}</div><ul class="hh-stack"></ul>`;
-          card.appendChild(panel);
+          if(state.kind!=="open"){
+            const st=document.createElement("div");
+            st.className="hh-state";
+            st.innerHTML=`
+              <div class="hh-badge ${state.kind==="unavailable" ? "is-dark" : ""}">${state.kind==="closed" ? "Closed" : "Unavailable"}</div>
+              <div class="hh-state-title">${escapeHtml(dayName)}</div>
+              <p class="hh-state-msg">${escapeHtml(state.msg)}</p>
+            `;
+            card.appendChild(st);
+          } else {
+            const panel=document.createElement("section");
+            panel.className="hh-panel";
+
+            const subtitle=((hours.lunch ? `Lunch ${hours.lunch}. ` : "") + ((lunch.subtitle ?? lDef.subtitle ?? "").trim())).trim();
+            const plates=normalizeItems(lunch.plates ?? lDef.plates ?? []);
+            const hintText=data?.settings?.clickForDescriptionHint || "Tip: click an item for description.";
+            const noDesc=data?.settings?.noDescriptionText || "No description for this item.";
+
+            panel.innerHTML=`
+              <h3>Lunch</h3>
+              <p class="hh-sub">${escapeHtml(subtitle)}</p>
+              <h4>Plates</h4>
+              <ul class="hh-stack">${plates.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>
+              <h4>${escapeHtml(dayName)} Lunch Items</h4>
+              <div class="hh-hintline">${escapeHtml(hintText)}</div>
+              <ul class="hh-stack">
+                ${items.map(it=>{
+                  const d = it.desc ? it.desc : noDesc;
+                  return `<li><details><summary>${escapeHtml(it.name)}</summary><div class="hh-desc">${escapeHtml(d)}</div></details></li>`;
+                }).join("")}
+              </ul>
+            `;
+            card.appendChild(panel);
+          }
 
           wrap.appendChild(card);
-          const lists = panel.querySelectorAll(".hh-stack");
-          const temp1 = document.createElement("ul");
-          temp1.className = "hh-stack";
-          temp1.id = `adv-plates-${i}`;
-          lists[0].replaceWith(temp1);
-          const temp2 = document.createElement("ul");
-          temp2.className = "hh-stack";
-          temp2.id = `adv-items-${i}`;
-          lists[1].replaceWith(temp2);
-
-          renderList(`adv-plates-${i}`, menu.lunch?.plates || data.defaults?.lunch?.plates || [], "Lunch");
-          renderList(`adv-items-${i}`, menu.lunch?.items || data.defaults?.lunch?.items || [], "Lunch", { dropdown:true, noDesc:data.settings?.noDescriptionText });
         }
+      }
+
+      function wireTabs(dayPanelEl){
+        if(!dayPanelEl) return;
+        const tabs=Array.from(dayPanelEl.querySelectorAll(".hh-tab[role='tab']"));
+        const panels=Array.from(dayPanelEl.querySelectorAll(".hh-panel[role='tabpanel']"));
+        if(!tabs.length || !panels.length) return;
+
+        function activateTab(tab){
+          const targetId=tab.getAttribute("aria-controls");
+          tabs.forEach(t=>{
+            const active=(t===tab);
+            t.classList.toggle("is-active", active);
+            t.setAttribute("aria-selected", active ? "true" : "false");
+          });
+          panels.forEach(p=> p.hidden = (p.id !== targetId));
+        }
+        tabs.forEach(tab=> tab.addEventListener("click", ()=> activateTab(tab)));
       }
 
       function wireDayTabs(){
-        const dayButtons = Array.from(document.querySelectorAll(".hh-day[role='tab']"));
-        const dayPanels = Array.from(document.querySelectorAll(".hh-daypanel[role='tabpanel']"));
+        const dayButtons=Array.from(document.querySelectorAll(".hh-day[role='tab']"));
+        const dayPanels=Array.from(document.querySelectorAll(".hh-daypanel[role='tabpanel']"));
+
         function activate(btn){
-          const targetId = btn.getAttribute("aria-controls");
-          dayButtons.forEach(b => {
-            const active = b === btn;
+          const targetId=btn.getAttribute("aria-controls");
+          dayButtons.forEach(b=>{
+            const active=(b===btn);
             b.classList.toggle("is-active", active);
             b.setAttribute("aria-selected", active ? "true" : "false");
           });
-          dayPanels.forEach(p => p.hidden = (p.id !== targetId));
+          dayPanels.forEach(p=> p.hidden = (p.id !== targetId));
         }
-        dayButtons.forEach(btn => btn.addEventListener("click", () => activate(btn)));
+        dayButtons.forEach(btn=> btn.addEventListener("click", ()=> activate(btn)));
+
+        // Return the activate function so we can call it externally
+        return activate;
       }
 
-      function wireInnerTabs(panel){
-        const tabs = Array.from(panel.querySelectorAll(".hh-tab[role='tab']"));
-        const panels = Array.from(panel.querySelectorAll(".hh-panel[role='tabpanel']"));
-        tabs.forEach(tab => {
-          tab.addEventListener("click", () => {
-            const targetId = tab.getAttribute("aria-controls");
-            tabs.forEach(t => {
-              const active = t === tab;
-              t.classList.toggle("is-active", active);
-              t.setAttribute("aria-selected", active ? "true" : "false");
-            });
-            panels.forEach(p => p.hidden = (p.id !== targetId));
-          });
-        });
-      }
+      // ---- INIT ----
+      const activateDay = wireDayTabs(); // get the function to programmatically activate a day
+      wireTabs($("hh-day-today"));
+      wireTabs($("hh-day-tomorrow"));
 
-      function init(){
-        const data = JSON.parse(document.getElementById("hh-menu-data").textContent);
-        setText("hh-advanced-disclaimer", data.settings?.advancedDisclaimer || "");
+      (async function init(){
+        try{
+          const data = await readData();
 
-        const now = new Date();
-        const todayISO = toISODateLocal(now);
-        const tomorrow = new Date(now);
-        tomorrow.setDate(now.getDate()+1);
-        const tomorrowISO = toISODateLocal(tomorrow);
+          setText("hh-advanced-disclaimer", data?.settings?.advancedDisclaimer || "");
+          if(!data?.settings?.showAdvancedTab){
+            const advBtn=$("hhDayBtnAdvanced");
+            if(advBtn) advBtn.style.display="none";
+          }
 
-        const weekly = data.hours?.weekly || [];
-        const todayName = weekdayName(now);
-        const tomorrowName = weekdayName(tomorrow);
-        const todayHours = findHours(weekly, todayName);
-        const tomorrowHours = findHours(weekly, tomorrowName);
+          const now = new Date();
+          const calendarTodayISO = toISODateLocal(now);      // actual today's date
+          const calendarTodayName = weekdayName(now);
 
-        setText("hhDayBtnToday", todayName);
-        setText("hhDayBtnTomorrow", tomorrowName);
-        setText("hh-today-title", `${todayName} (${formatDateNice(now)}) Menu`);
-        setText("hh-tomorrow-title", `${tomorrowName} (${formatDateNice(tomorrow)}) Menu`);
-        setText("hh-hours-line", `${todayName} Hours: ${todayHours.open} – ${todayHours.close} • Breakfast ${todayHours.breakfast} • Lunch ${todayHours.lunch}`);
-        setText("hh-hours-line-2", `${tomorrowName} Hours: ${tomorrowHours.open} – ${tomorrowHours.close} • Breakfast ${tomorrowHours.breakfast} • Lunch ${tomorrowHours.lunch}`);
-        setText("hh-hours-note", data.hours?.note || "");
-        setText("hh-hours-note-2", data.hours?.note || "");
-        setText("hh-delivery-note", data.deliveryNote || "");
-        setText("hh-delivery-note-2", data.deliveryNote || "");
+          const calendarTomorrow = new Date(now); 
+          calendarTomorrow.setDate(now.getDate() + 1);
+          const calendarTomorrowISO = toISODateLocal(calendarTomorrow);
+          const calendarTomorrowName = weekdayName(calendarTomorrow);
 
-        ["hh-call-btn-today-b","hh-call-btn-today-l","hh-call-btn-today-c","hh-call-btn-tomorrow-b","hh-call-btn-tomorrow-l","hh-call-btn-tomorrow-c"].forEach(id => {
-          const a = $(id);
-          if (a) a.href = data.phoneTel || "#";
-        });
+          // Default display dates (what we show in Today/Tomorrow tabs)
+          let displayTodayISO = calendarTodayISO;
+          let displayTodayName = calendarTodayName;
+          let displayTomorrowISO = calendarTomorrowISO;
+          let displayTomorrowName = calendarTomorrowName;
 
-        fillDay("hh-today", "Today", todayISO, data, todayHours);
-        fillDay("hh-tomorrow", "Tomorrow", tomorrowISO, data, tomorrowHours);
-        buildAdvanced(data, todayISO);
+          const weekly = data?.hours?.weekly || [];
+          const closureToday = getClosure(data, calendarTodayName);
 
-        wireDayTabs();
-        wireInnerTabs(document.getElementById("hh-day-today"));
-        wireInnerTabs(document.getElementById("hh-day-tomorrow"));
-      }
+          // Check if we are past closing time for today (and not already closed)
+          const pastClosing = isPastClosingToday(weekly, calendarTodayName);
+          if (pastClosing && !closureToday?.closed) {
+            // Shift everything forward: Today becomes tomorrow, Tomorrow becomes day after
+            displayTodayISO = calendarTomorrowISO;
+            displayTodayName = calendarTomorrowName;
 
-      try { init(); }
-      catch(err){
-        console.error(err);
-        $("hh-load-error").hidden = false;
-        setText("hh-load-error-msg", err.message || "Please try again in a moment.");
+            const dayAfterTomorrow = new Date(now);
+            dayAfterTomorrow.setDate(now.getDate() + 2);
+            displayTomorrowISO = toISODateLocal(dayAfterTomorrow);
+            displayTomorrowName = weekdayName(dayAfterTomorrow);
+          }
+
+          // Update tab labels
+          setText("hhDayBtnToday", displayTodayName);
+          setText("hhDayBtnTomorrow", displayTomorrowName);
+
+          // Update panel titles
+          setText("hh-today-title", `${displayTodayName} (${formatDateNice(parseISODateToLocal(displayTodayISO))}) Menu`);
+          setText("hh-tomorrow-title", `${displayTomorrowName} (${formatDateNice(parseISODateToLocal(displayTomorrowISO))}) Menu`);
+
+          setText("hh-hours-note", data?.hours?.note || "");
+          setText("hh-hours-note-2", data?.hours?.note || "");
+
+          const hoursToday = findHours(weekly, displayTodayName);
+          const hoursTomorrow = findHours(weekly, displayTomorrowName);
+
+          const closureDisplayToday = getClosure(data, displayTodayName);
+          const closureDisplayTomorrow = getClosure(data, displayTomorrowName);
+
+          const lineToday = closureDisplayToday?.closed ? `${displayTodayName} Hours: Closed`
+            : `${displayTodayName} Hours: ${hoursToday.open} – ${hoursToday.close}` +
+              (hoursToday.breakfast ? ` • Breakfast ${hoursToday.breakfast}` : "") +
+              (hoursToday.lunch ? ` • Lunch ${hoursToday.lunch}` : "");
+
+          const lineTomorrow = closureDisplayTomorrow?.closed ? `${displayTomorrowName} Hours: Closed`
+            : `${displayTomorrowName} Hours: ${hoursTomorrow.open} – ${hoursTomorrow.close}` +
+              (hoursTomorrow.breakfast ? ` • Breakfast ${hoursTomorrow.breakfast}` : "") +
+              (hoursTomorrow.lunch ? ` • Lunch ${hoursTomorrow.lunch}` : "");
+
+          setText("hh-hours-line", lineToday);
+          setText("hh-hours-line-2", lineTomorrow);
+
+          const phone = data?.phoneTel || "#";
+          ["hh-call-btn-today-b","hh-call-btn-today-l","hh-call-btn-today-c",
+           "hh-call-btn-tomorrow-b","hh-call-btn-tomorrow-l","hh-call-btn-tomorrow-c"
+          ].forEach(id=>{ const a=$(id); if(a) a.href=phone; });
+
+          setText("hh-delivery-note", data?.deliveryNote || "");
+          setText("hh-delivery-note-2", data?.deliveryNote || "");
+
+          if(closureDisplayToday?.closed){
+            $("hh-today-closed").hidden=false;
+            setText("hh-today-closed-title", `${displayTodayName} (${displayTodayISO})`);
+            setText("hh-today-closed-msg", closureDisplayToday.message || "See you tomorrow!");
+          } else {
+            $("hh-today-closed").hidden=true;
+          }
+          if(closureDisplayTomorrow?.closed){
+            $("hh-tomorrow-closed").hidden=false;
+            setText("hh-tomorrow-closed-title", `${displayTomorrowName} (${displayTomorrowISO})`);
+            setText("hh-tomorrow-closed-msg", closureDisplayTomorrow.message || "See you tomorrow!");
+          } else {
+            $("hh-tomorrow-closed").hidden=true;
+          }
+
+          // Fill panels with the display dates (shifted if past closing)
+          fillTwoDay("hh-today", "Today", displayTodayISO, data, hoursToday, calendarTodayISO);
+          fillTwoDay("hh-tomorrow", "Tomorrow", displayTomorrowISO, data, hoursTomorrow, calendarTodayISO);
+
+          setText("hh-today-lunch-items-title", `${displayTodayName} Lunch Items`);
+          setText("hh-tomorrow-lunch-items-title", `${displayTomorrowName} Lunch Items`);
+
+          // Ensure the "Today" tab is active (it is by default, but after shift we might want to activate it)
+          // No need – the default active is today panel, and we've updated its content.
+
+          // Build advanced carousel using the actual calendar date (not shifted)
+          buildAdvancedCarousel(data, calendarTodayISO);
+
+        }catch(e){
+          console.error("HOT HEADZ MENU ERROR:", e);
+          setText("hh-hours-line", "Menu unavailable right now.");
+          setText("hh-hours-line-2", "Menu unavailable right now.");
+          showLoadError(String(e && e.message ? e.message : e));
+        }
+      })();
+    })();
+
+    // ----- DOCK SCRIPT -----
+    (function() {
+      const root = document.getElementById('genRoot');
+      const dock = document.getElementById('genDock');
+      if (root && dock) {
+        root.hidden = false;
+        dock.hidden = false;
       }
     })();
   </script>
 
+
+   <!-- Circular menu toggle script with page navigation and share -->
   <script>
     (function() {
       const overlay = document.getElementById('circMenuOverlay');
+      const leftBtn = document.getElementById('navBtnLeft');
       const bottomBtn = document.getElementById('navBtnBottom');
       const homeCenter = document.getElementById('homeCenter');
       const menuItems = document.querySelectorAll('.menu-item');
 
-      function toggleMenu() { overlay.classList.toggle('open'); }
-      bottomBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
+      function toggleMenu() {
+        overlay.classList.toggle('open');
+      }
+
+      // leftBtn is now removed, so we need to check if it exists before adding listener
+      if (leftBtn) {
+        leftBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleMenu();
+        });
+      }
+
+      bottomBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMenu();
+      });
+
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('open');
+        }
+      });
 
       async function sharePage() {
         const shareData = {
           title: document.title || 'Hot Headz Southern Foods',
-          text: 'Check out Hot Headz Southern Foods!',
+          text: 'Check out Hot Headz Southern Foods in DeRidder, LA!',
           url: window.location.href
         };
         try {
-          if (navigator.share) await navigator.share(shareData);
-          else if (navigator.clipboard) {
+          if (navigator.share) {
+            await navigator.share(shareData);
+          } else if (navigator.clipboard && navigator.clipboard.writeText) {
             await navigator.clipboard.writeText(window.location.href);
             const shareItem = document.querySelector('.menu-item[data-action="share"]');
             if (shareItem) {
@@ -1240,15 +1705,27 @@
               shareItem.textContent = 'Copied';
               setTimeout(() => shareItem.textContent = originalText, 1500);
             }
+          } else {
+            const temp = document.createElement('input');
+            temp.value = window.location.href;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            alert('Link copied to clipboard!');
           }
-        } catch (e) {}
+        } catch (e) { console.log('Share failed', e); }
       }
 
-      function navigate(link) { if (link) window.location.href = link; }
+      function navigate(link) {
+        if (!link) return;
+        window.location.href = link;
+      }
 
       homeCenter.addEventListener('click', () => {
         overlay.classList.remove('open');
-        navigate(homeCenter.getAttribute('data-link'));
+        const link = homeCenter.getAttribute('data-link');
+        if (link) navigate(link);
       });
 
       menuItems.forEach(item => {
@@ -1263,134 +1740,6 @@
 
       document.querySelector('.circular-menu').addEventListener('click', e => e.stopPropagation());
     })();
-  </script>
-
-  <script>
-    (function() {
-      const faces = {
-        "Breakfast": { x: 0, y: 0, tabIds: ["hhTabTodayBreakfast", "hhTabTomorrowBreakfast"] },
-        "Lunch": { x: 0, y: -90, tabIds: ["hhTabTodayLunch", "hhTabTomorrowLunch"] },
-        "Crawfish": { x: 0, y: -180, tabIds: ["hhTabTodayCrawfish", "hhTabTomorrowCrawfish"] },
-        "Salad Bar": { x: 0, y: 90, tabIds: ["hhTabTodaySalad", "hhTabTomorrowSalad"] },
-        "Drinks": { x: -90, y: 0, tabIds: ["hhTabTodayDrinks", "hhTabTomorrowDrinks"] },
-        "Dessert": { x: 90, y: 0, tabIds: ["hhTabTodayDessert", "hhTabTomorrowDessert"] }
-      };
-
-      const cube = document.getElementById("menuCube");
-      const buttons = Array.from(document.querySelectorAll(".hh-cube-btn"));
-
-      function openCurrentDayTab(faceName) {
-        const activeDay = document.querySelector(".hh-day.is-active");
-        const useTomorrow = activeDay && activeDay.id === "hhDayBtnTomorrow";
-        const tabId = faces[faceName].tabIds[useTomorrow ? 1 : 0];
-        const tab = document.getElementById(tabId);
-        if (tab && getComputedStyle(tab).display !== "none") tab.click();
-      }
-
-      function rotateTo(faceName) {
-        const face = faces[faceName];
-        if (!face) return;
-        if (window.innerWidth <= 560) {
-          document.querySelectorAll(".hh-face").forEach(el => el.classList.remove("is-mobile-visible"));
-          const visible = Array.from(document.querySelectorAll(".hh-face")).find(el => el.dataset.target === faceName);
-          if (visible) visible.classList.add("is-mobile-visible");
-        } else {
-          cube.style.transform = `rotateX(${face.x}deg) rotateY(${face.y}deg)`;
-        }
-        buttons.forEach(btn => btn.classList.toggle("is-active", btn.dataset.face === faceName));
-        openCurrentDayTab(faceName);
-      }
-
-      buttons.forEach(btn => btn.addEventListener("click", () => rotateTo(btn.dataset.face)));
-      document.querySelectorAll(".hh-face").forEach(face => face.addEventListener("click", () => rotateTo(face.dataset.target)));
-      rotateTo("Breakfast");
-      window.addEventListener("resize", () => rotateTo(document.querySelector(".hh-cube-btn.is-active")?.dataset.face || "Breakfast"));
-    })();
-  </script>
-
-  <script id="hh-menu-data" type="application/json">
-  {
-    "phoneTel": "tel:3372211035",
-    "deliveryNote": "Delivery availability and final pricing can be adjusted any time in this same file.",
-    "hours": {
-      "note": "Sample in-file data is included so the page works immediately.",
-      "weekly": [
-        { "day": "Sunday", "open": "6:00 AM", "close": "2:00 PM", "breakfast": "6:00 AM - 10:30 AM", "lunch": "10:30 AM - 2:00 PM" },
-        { "day": "Monday", "open": "5:30 AM", "close": "3:00 PM", "breakfast": "5:30 AM - 10:30 AM", "lunch": "10:30 AM - 3:00 PM" },
-        { "day": "Tuesday", "open": "5:30 AM", "close": "3:00 PM", "breakfast": "5:30 AM - 10:30 AM", "lunch": "10:30 AM - 3:00 PM" },
-        { "day": "Wednesday", "open": "5:30 AM", "close": "3:00 PM", "breakfast": "5:30 AM - 10:30 AM", "lunch": "10:30 AM - 3:00 PM" },
-        { "day": "Thursday", "open": "5:30 AM", "close": "3:00 PM", "breakfast": "5:30 AM - 10:30 AM", "lunch": "10:30 AM - 3:00 PM" },
-        { "day": "Friday", "open": "5:30 AM", "close": "4:00 PM", "breakfast": "5:30 AM - 10:30 AM", "lunch": "10:30 AM - 4:00 PM" },
-        { "day": "Saturday", "open": "6:00 AM", "close": "2:00 PM", "breakfast": "6:00 AM - 10:30 AM", "lunch": "10:30 AM - 2:00 PM" }
-      ]
-    },
-    "settings": {
-      "advancedWindowDays": 7,
-      "advancedDisclaimer": "This is the full one-file build: menu system, cube navigation, circular nav, and live total builder.",
-      "clickForDescriptionHint": "Tip: click an item for description.",
-      "noDescriptionText": "Description coming soon."
-    },
-    "defaults": {
-      "breakfast": {
-        "subtitle": "Hot breakfast favorites made fresh.",
-        "plates": [
-          { "name": "2 Egg Plate", "desc": "Eggs, toast, grits, and your choice of breakfast meat.", "price": 8.99, "category": "Breakfast", "plateGroup": "Plate" },
-          { "name": "Pancake Plate", "desc": "Pancakes, eggs, and breakfast meat.", "price": 9.49, "category": "Breakfast", "plateGroup": "Plate" }
-        ],
-        "items": [
-          { "name": "Breakfast Burrito", "desc": "Egg, cheese, and sausage wrapped hot and ready.", "price": 7.99, "category": "Breakfast", "plateGroup": "A La Carte" },
-          { "name": "Sausage Biscuit", "desc": "A quick hot breakfast sandwich.", "price": 3.99, "category": "Breakfast", "plateGroup": "A La Carte" }
-        ]
-      },
-      "lunch": {
-        "subtitle": "Plate lunches and daily favorites.",
-        "plates": [
-          { "name": "Daily Plate Lunch", "desc": "Main dish with two sides and bread.", "price": 12.99, "category": "Lunch", "plateGroup": "Plate" },
-          { "name": "Fried Chicken Plate", "desc": "Crispy fried chicken with two sides.", "price": 13.99, "category": "Lunch", "plateGroup": "Plate" }
-        ],
-        "items": [
-          { "name": "Burger", "desc": "Classic burger hot off the grill.", "price": 8.49, "category": "Lunch", "plateGroup": "Sandwich" },
-          { "name": "Cheeseburger", "desc": "Burger with melted cheese and fixings.", "price": 8.99, "category": "Lunch", "plateGroup": "Sandwich" },
-          { "name": "Fries", "desc": "Golden crispy fries.", "price": 2.99, "category": "Sides", "plateGroup": "Side" },
-          { "name": "Mac and Cheese", "desc": "Creamy baked-style mac.", "price": 3.49, "category": "Sides", "plateGroup": "Side" }
-        ]
-      },
-      "crawfish": {
-        "show": true,
-        "subtitle": "Call for seasonal crawfish availability.",
-        "items": [
-          { "name": "Crawfish by the Pound", "desc": "Seasonal crawfish special.", "price": 5.99, "category": "Crawfish", "plateGroup": "Seafood" }
-        ]
-      },
-      "salad": {
-        "subtitle": "Fresh salad bar options.",
-        "items": [
-          { "name": "Salad Bar", "desc": "Full salad bar access.", "price": 9.99, "category": "Salad Bar", "plateGroup": "Salad" },
-          { "name": "Side Salad", "desc": "Smaller salad option.", "price": 4.99, "category": "Salad Bar", "plateGroup": "Salad" }
-        ],
-        "saladBar": {
-          "lettuce": [ { "name": "Romaine" }, { "name": "Iceberg" } ],
-          "toppings": [ { "name": "Tomatoes" }, { "name": "Cheese" }, { "name": "Croutons" }, { "name": "Cucumbers" } ],
-          "dressing": [ { "name": "Ranch" }, { "name": "Italian" }, { "name": "French" } ]
-        }
-      },
-      "drinks": {
-        "items": [
-          { "name": "Sweet Tea", "desc": "Cold southern sweet tea.", "price": 2.49, "category": "Drinks", "plateGroup": "Drink" },
-          { "name": "Coke", "desc": "Classic fountain drink.", "price": 2.59, "category": "Drinks", "plateGroup": "Drink" },
-          { "name": "Water", "desc": "Bottled water.", "price": 1.49, "category": "Drinks", "plateGroup": "Drink" }
-        ]
-      },
-      "dessert": {
-        "subtitle": "Save room for dessert.",
-        "items": [
-          { "name": "Banana Pudding", "desc": "House favorite southern dessert.", "price": 4.49, "category": "Dessert", "plateGroup": "Dessert" },
-          { "name": "Slice of Cake", "desc": "Daily rotating cake slice.", "price": 4.99, "category": "Dessert", "plateGroup": "Dessert" }
-        ]
-      }
-    },
-    "menus": {}
-  }
   </script>
 </body>
 </html>
