@@ -1,340 +1,823 @@
 <!doctype html>
-<html>
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Hotheadz Downloader</title>
-  <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;height:100vh;display:flex;align-items:center;justify-content:center;background:#071427;color:#dff7ff}
-    .box{max-width:820px;padding:28px;border-radius:12px;background:linear-gradient(180deg,#041025,#02101a);box-shadow:0 20px 80px rgba(0,0,0,0.6);text-align:center}
-    button{background:#ff6a3d;border:none;color:white;padding:12px 18px;border-radius:8px;cursor:pointer;font-weight:700}
-    p{color:#9fdff0}
-  </style>
-</head>
-<body>
-  <div class="box">
-    <h1>Hotheadz — Create Download</h1>
-    <p>Click the button below to generate and download the full <strong>hotheadz-holo-categories.html</strong> file locally.</p>
-    <button id="dl">Download Full Menu File</button>
-    <p style="margin-top:12px" id="msg"></p>
-  </div>
-
-<script>
-  // NOTE: The full HTML string is embedded below. When you click the button
-  // this script will create a Blob and trigger a download on your device.
-  // This keeps a single small downloader file in the chat instead of a giant
-  // HTML blob printed inline.
-
-  const fullHtml = `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Hotheadz — Holographic Category Ring</title>
+<title>Hotheadz — Holographic Categories (Demo)</title>
 
 <!-- Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
 <style>
-:root{--bg:#030510;--accent:#ff6a3d;--neon:#44e6ff;--glass:rgba(255,255,255,0.04);font-family:Inter,system-ui,Arial}
-html,body{height:100%;margin:0;background:radial-gradient(900px 420px at 10% 12%,#071427 0%,var(--bg) 30%);color:#eaf8ff;overflow:hidden}
-.stage{display:flex;height:100vh;width:100vw}
-.canvasWrap{flex:1;position:relative;padding:28px;display:flex;align-items:center;justify-content:center}
-canvas{width:100%;height:100%;display:block;border-radius:12px;box-shadow:0 30px 110px rgba(0,0,0,0.7)}
-.ui{width:380px;padding:18px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-left:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column;gap:12px}
-.brand{display:flex;gap:12px;align-items:center}
-.logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(90deg,var(--accent),#ff96b6);display:grid;place-items:center;color:#fff;font-weight:800}
-.muted{color:#97d7ea;font-size:13px}
-.controls{display:flex;gap:8px;align-items:center}
-.controls input, .controls button, textarea{background:var(--glass);border:1px solid rgba(255,255,255,0.03);color:#e8fbff;padding:10px;border-radius:8px;font-size:13px}
-.btn{background:linear-gradient(90deg,var(--accent),#ff96b6);color:white;border:none;padding:10px 12px;border-radius:8px;cursor:pointer;font-weight:700}
-.hud{position:absolute;left:22px;top:22px;z-index:40;display:flex;gap:8px}
-.hud button{backdrop-filter:blur(6px);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);color:#eaffff;padding:8px 10px;border-radius:8px;cursor:pointer}
-.centerHint{position:absolute;left:50%;transform:translateX(-50%);bottom:24px;z-index:40;color:#bfefff;font-size:13px;background:rgba(0,0,0,0.35);padding:8px 12px;border-radius:999px;border:1px solid rgba(68,230,255,0.05)}
-.cart{flex:1;overflow:auto;padding:8px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.00))}
-.cartItem{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:8px;margin-bottom:8px;background:rgba(255,255,255,0.02)}
-@media (max-width:980px){.ui{width:100%;position:absolute;bottom:0;left:0;right:0;height:40vh}.stage{flex-direction:column}.canvasWrap{height:60vh;min-height:360px}}
-.sr{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+  :root{
+    --bg:#04050b;
+    --panel:#071024;
+    --accent:#ff6a3d;
+    --muted:#97d7ea;
+    --glass: rgba(255,255,255,0.03);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  html,body{height:100%;margin:0;background:
+    radial-gradient(1200px 600px at 10% 10%, #071427 0%, var(--bg) 35%), linear-gradient(180deg, rgba(0,0,0,0.2), rgba(0,0,0,0.4));
+    color:#eaf8ff; overflow:hidden;}
+  .wrap{position:relative;height:100vh;width:100vw;display:flex;align-items:stretch;justify-content:stretch;}
+
+  /* Left: Holographic Canvas */
+  .left{
+    flex:1 1 64%;
+    min-width:420px;
+    position:relative;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:28px;
+  }
+
+  canvas#holoCanvas{width:100%;height:100%;display:block; border-radius:12px; box-shadow: 0 40px 120px rgba(0,0,0,0.6);}
+
+  /* Right: Controls & Order */
+  .right{
+    width:420px;
+    padding:22px;
+    display:flex;flex-direction:column;gap:16px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-left: 1px solid rgba(255,255,255,0.03);
+    box-shadow: inset -6px 0 30px rgba(0,0,0,0.35);
+  }
+  .brand{
+    display:flex;align-items:center;gap:12px;
+  }
+  .brand .logo{
+    width:56px;height:56px;border-radius:10px;background:linear-gradient(90deg,var(--accent),#ff96b6);
+    display:grid;place-items:center;font-weight:800;color:#fff;font-size:18px;box-shadow:0 6px 20px rgba(255,106,61,0.12);
+  }
+  .brand h1{margin:0;font-size:18px;letter-spacing:0.4px}
+  .brand p{margin:0;font-size:12px;color:var(--muted)}
+
+  .controls{display:flex;flex-direction:column;gap:8px}
+  .controls button, .controls input, .controls textarea, .controls select{
+    background:var(--glass);border:1px solid rgba(255,255,255,0.04);color:#dff9ff;padding:10px;border-radius:8px;font-size:13px;
+  }
+  .controls .row{display:flex;gap:8px}
+  .controls .row button{flex:1}
+  .btn{
+    background:linear-gradient(90deg,var(--accent),#ff96b6);border:none;color:white;padding:10px 12px;border-radius:8px;cursor:pointer;
+    font-weight:700;box-shadow: 0 8px 30px rgba(255,106,61,0.12);
+  }
+  .muted{color:var(--muted);font-size:13px}
+
+  /* Cart */
+  .cart{
+    flex:1;overflow:auto;padding:10px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+    border:1px solid rgba(255,255,255,0.03)
+  }
+  .cart .item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;margin-bottom:8px;background:rgba(255,255,255,0.02)}
+  .cart .thumb{width:56px;height:40px;border-radius:6px;overflow:hidden;flex-shrink:0;background:#000}
+  .cart h3{margin:0;font-size:15px}
+  .cart p{margin:0;color:var(--muted);font-size:13px}
+
+  /* Category controls (front) */
+  .holoControls{
+    position:absolute;left:22px;top:22px;display:flex;gap:8px;align-items:center;z-index:40;
+  }
+  .holoControls .small{padding:8px 10px;font-size:14px}
+  .holoControls .big{padding:12px 14px;font-size:16px}
+
+  /* Right items panel */
+  .itemsPanel{
+    border-radius:10px;padding:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)
+  }
+  .itemsPanel h3{margin:6px 0}
+  .itemRow{display:flex;gap:8px;align-items:center;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:6px}
+  .itemRow img{width:72px;height:48px;object-fit:cover;border-radius:6px}
+
+  /* HUD / small */
+  .hud{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+
+  /* Accessibility */
+  .sr-only{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+
+  @media (max-width:1100px){
+    .wrap{flex-direction:column}
+    .left{min-height:360px;width:100%}
+    .right{width:100%;height:auto}
+  }
 </style>
 </head>
 <body>
-<div class="stage" role="application" aria-label="Hotheadz holographic category menu">
-  <div class="canvasWrap">
-    <canvas id="canvas" aria-label="Holographic category ring"></canvas>
-    <div class="hud" aria-hidden="true">
-      <button id="prev">&larr;</button><button id="next">&rarr;</button><button id="centerBtn">Center</button>
-      <button id="importPaste" title="Paste menu-data HTML/JSON">Import</button>
+<div class="wrap" id="app">
+  <div class="left" aria-hidden="false">
+    <canvas id="holoCanvas" role="img" aria-label="Holographic categories display"></canvas>
+
+    <!-- floating UI -->
+    <div class="holoControls" aria-hidden="false">
+      <button id="prevCat" class="btn small">⟨ Prev</button>
+      <button id="nextCat" class="btn small">Next ⟩</button>
+      <button id="openImport" class="btn big" aria-haspopup="dialog" aria-controls="importDialog">Import</button>
+      <button id="downloadBtn" class="btn big" title="Download this menu file">Download</button>
+      <button id="voiceBtn" class="btn big" title="Start voice order (Ctrl/⌘+V)">🎙️ Voice</button>
     </div>
-    <div class="centerHint">Click / Drag categories • Use ← → to cycle • Click to bring a category front</div>
+
+    <div style="position:absolute;right:22px;top:22px;z-index:40">
+      <button id="printBtn" class="btn">Print</button>
+    </div>
   </div>
 
-  <aside class="ui" role="region" aria-label="Controls and order">
+  <aside class="right" aria-label="Menu controls and cart">
     <div class="brand">
       <div class="logo">HH</div>
       <div>
-        <h1 style="margin:0;font-size:18px">Hotheadz — Categories</h1>
-        <div class="muted">Holographic category ring • load menu-data.html</div>
+        <h1>Hotheadz Southern Foods</h1>
+        <p class="muted">Holographic Categories • Click to open</p>
       </div>
     </div>
 
-    <div class="controls" role="region" aria-label="Importer and actions">
-      <input id="path" placeholder="menu-data.html" value="menu-data.html" aria-label="Menu path"/>
-      <button class="btn" id="fetch">Fetch Menu</button>
+    <div class="controls" role="region" aria-label="Category & items">
+      <div class="itemsPanel" id="itemsPanel" aria-live="polite">
+        <strong id="currentCategoryTitle">Categories</strong>
+        <div id="itemsHolder" style="margin-top:8px">
+          <p class="muted">No category selected. Use the hologram to the left or the Prev/Next buttons.</p>
+        </div>
+      </div>
     </div>
 
-    <div id="status" style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03)">Status: idle</div>
-
-    <div style="display:flex;gap:8px;align-items:center">
-      <button class="btn" id="viewBtn">View items</button>
-      <div style="flex:1"></div>
-      <button id="voice" class="btn" title="Voice">🎙️</button>
+    <div class="cart" id="cart" role="region" aria-label="Cart">
+      <strong>Order</strong>
+      <div id="cartList" style="margin-top:8px"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+        <div class="muted">Subtotal</div>
+        <div id="subtotal" style="font-weight:800">$0.00</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="checkoutBtn" class="btn" style="flex:1">Checkout</button>
+        <button id="clearCartBtn" class="btn" style="background:#223">Clear</button>
+      </div>
     </div>
 
-    <div class="cart" id="cart" role="region" aria-label="Cart"><strong>Order</strong><div id="cartList" style="margin-top:8px"></div><div style="display:flex;justify-content:space-between;margin-top:8px"><div class="muted">Subtotal</div><div id="subtotal" style="font-weight:800">$0.00</div></div></div>
-    <div style="font-size:12px;color:#93dbe8">Tip: If fetch fails due to CORS, paste menu-data HTML via Import.</div>
+    <div class="hud">
+      <div class="muted">Favorites save here</div>
+      <div id="status" class="muted">Ready</div>
+    </div>
   </aside>
 </div>
 
-<!-- Paste dialog -->
-<div id="pasteDialog" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:85%;max-width:900px;background:#021019;padding:14px;border-radius:10px;z-index:999;color:#bff7ff">
-  <h3 style="margin:0 0 8px 0">Paste menu-data.html content or JSON</h3>
-  <textarea id="paste" style="width:100%;height:260px;background:#001219;color:#bff7ff;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.03)"></textarea>
-  <div style="display:flex;gap:8px;margin-top:8px"><button id="loadPaste" class="btn">Load</button><button id="closePaste" class="btn" style="background:#223">Close</button></div>
-  <div id="pasteMsg" class="muted" style="margin-top:8px"></div>
+<!-- Import modal (inline) -->
+<div id="importDialog" role="dialog" aria-modal="true" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:88%;max-width:860px;z-index:200;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);padding:18px;border-radius:12px">
+  <h2 style="margin-top:0">Import Menu Data</h2>
+  <p class="muted">Paste a JSON array of categories or a URL to a menu-data.html file containing a JSON script tag. Example format:</p>
+  <pre style="background:#071426;color:#cff; padding:10px;border-radius:6px;">[
+  {"category":"Lunch","items":[{"id":"burger","title":"Burger","price":9.50,"desc":"Beef & toppings","img":""}]},
+  {"category":"Drinks","items":[...]}
+]</pre>
+  <textarea id="dialogPaste" style="width:100%;height:160px;background:var(--glass);color:#eaffff;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03)"></textarea>
+  <div style="display:flex;gap:8px;margin-top:8px">
+    <button id="dialogLoad" class="btn">Load</button>
+    <button id="dialogClose" class="btn" style="background:#223">Close</button>
+    <button id="dialogFetchURL" class="btn">Try Fetch URL</button>
+  </div>
+  <div id="dialogMsg" class="muted" style="margin-top:10px"></div>
 </div>
 
-<div id="aria" class="sr" role="status" aria-live="polite"></div>
+<!-- Printable area template -->
+<div id="printable" style="display:none;padding:20px;background:white;color:black">
+  <h1>Hotheadz Menu</h1>
+  <div id="printContent"></div>
+</div>
+
+<!-- ARIA live -->
+<div id="ariaLive" class="sr-only" role="status" aria-live="polite"></div>
 
 <script>
-/* ---------- Compact Holo Category Ring (reads menu-data.html) ---------- */
+/* ============================
+   Data / Defaults
+   ============================ */
+const DEFAULT_CATEGORIES = [
+  { category: 'Lunch', items: [
+    { id: 'fried-chicken', title: 'Crispy Fried Chicken', price: 12.99, desc: 'Buttermilk-marinated, double-dusted, served with house slaw.', img: '' },
+    { id: 'mac-cheese', title: 'Smoky Mac & Cheese', price: 7.50, desc: 'Creamy cheddar, smoked gouda, with crispy panko.', img: '' },
+  ]},
+  { category: 'Drinks', items: [
+    { id: 'sweet-tea', title: 'Southern Sweet Tea', price: 2.75, desc: 'House-brewed with lemon.', img: '' },
+    { id: 'coffee', title: 'House Coffee', price: 2.50, desc: 'Freshly brewed.', img: '' },
+  ]},
+  { category: 'Breakfast', items: [
+    { id: 'pancakes', title: 'Stack of Pancakes', price: 8.50, desc: 'Buttery pancakes with maple syrup.', img: '' },
+  ]},
+  { category: 'Sides', items: [
+    { id: 'cornbread', title: 'Honey Butter Cornbread', price: 3.50, desc: 'Warm cornbread with a honey butter glaze.', img: '' },
+  ]}
+];
 
-/* Globals */
-const canvas = document.getElementById('canvas');
-let renderer, scene, camera, ring, front, meshes = [], raycaster, pointer = new THREE.Vector2(-9999,-9999);
-let anim, clock = new THREE.Clock();
-let ringRot = 0, dragging=false, startX=0, autoRotate=true;
-let menu = { categories: [] };
-let selectedCategory = 0;
-const cart = {}; // id->qty
+const STORAGE_KEY = 'hotheadz_categories_v1';
+const canvas = document.getElementById('holoCanvas');
 
-/* Init WebGL */
-function init() {
-  renderer = new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-  resize();
-  scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(42, canvas.clientWidth / canvas.clientHeight, 0.1, 3000);
-  camera.position.set(0, 20, 640);
-  const amb = new THREE.AmbientLight(0xffffff,0.6); scene.add(amb);
-  const dir = new THREE.DirectionalLight(0xffffff,0.6); dir.position.set(0.5,1,0.5); scene.add(dir);
+let categories = []; // array of {category, items}
+let cart = {};
+let renderer, scene, camera, raycaster, pointer;
+let items3D = [];
+let selectedIndex = 0;
+let group;
+let hovered = null;
+let animReq;
 
-  ring = new THREE.Group(); scene.add(ring);
+/* ============================
+   Persistence helpers
+   ============================ */
+function saveCategories(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(categories)); }catch(e){}
+}
+function loadCategoriesStored(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || null; }catch(e){ return null; }
+}
+function saveCart(){ try{ localStorage.setItem('hotheadz_cart_v1', JSON.stringify(cart)); }catch(e){} }
+function loadCart(){ try{ return JSON.parse(localStorage.getItem('hotheadz_cart_v1')) || {}; }catch(e){ return {}; } }
 
-  raycaster = new THREE.Raycaster();
-
-  window.addEventListener('resize', resize);
-  window.addEventListener('mousemove', e => { pointer.x = (e.clientX/window.innerWidth)*2-1; pointer.y = -(e.clientY/window.innerHeight)*2+1; });
-  canvas.addEventListener('pointerdown', e => { dragging=true; startX=e.clientX; autoRotate=false; });
-  window.addEventListener('pointerup', e => { if(dragging){ dragging=false; snapNearest(); setTimeout(()=>autoRotate=true,800);} });
-  window.addEventListener('pointermove', e => { if(dragging){ let dx=e.clientX-startX; startX=e.clientX; ringRot += dx/800; }});
-  window.addEventListener('keydown', e=> { if(e.key==='ArrowLeft') { ringRot -= 0.6; snapNearest(); } if(e.key==='ArrowRight'){ ringRot += 0.6; snapNearest();} if(e.key==='Enter'){ openItems(); } });
-  canvas.addEventListener('click', onCanvasClick);
-
-  buildEmpty();
+/* ============================
+   Init
+   ============================ */
+function init(){
+  categories = loadCategoriesStored() || DEFAULT_CATEGORIES;
+  cart = loadCart();
+  updateCartUI();
+  initThree();
+  buildCategoryScene();
   animate();
+
+  // wire UI
+  document.getElementById('prevCat').addEventListener('click', prevCategory);
+  document.getElementById('nextCat').addEventListener('click', nextCategory);
+  document.getElementById('openImport').addEventListener('click', ()=> openDialog());
+  document.getElementById('downloadBtn').addEventListener('click', downloadThisPage);
+  document.getElementById('voiceBtn').addEventListener('click', startVoice);
+  document.getElementById('printBtn').addEventListener('click', printMenu);
+  document.getElementById('dialogClose').addEventListener('click', closeDialog);
+  document.getElementById('dialogLoad').addEventListener('click', loadDialogPaste);
+  document.getElementById('dialogFetchURL').addEventListener('click', dialogTryFetchURL);
+  document.getElementById('checkoutBtn').addEventListener('click', ()=> alert('Demo: checkout would go here.'));
+  document.getElementById('clearCartBtn').addEventListener('click', ()=>{ cart = {}; saveCart(); updateCartUI(); announce('Cart cleared'); });
+
+  window.addEventListener('keydown', (e)=>{
+    if(e.key === 'ArrowLeft'){ prevCategory(); }
+    if(e.key === 'ArrowRight'){ nextCategory(); }
+    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='v'){ e.preventDefault(); startVoice(); }
+  });
+
+  // try auto load menu-data.html on same origin
+  tryLoadMenuData('/menu-data.html');
 }
 
-/* Resize */
-function resize(){ const w = canvas.clientWidth || canvas.parentElement.clientWidth; const h = canvas.clientHeight || window.innerHeight; renderer.setSize(w,h); if(camera){camera.aspect=w/h;camera.updateProjectionMatrix();} }
+/* ============================
+   Announcer & helpers
+   ============================ */
+function announce(msg){ const a = document.getElementById('ariaLive'); a.textContent = msg; document.getElementById('status').textContent = msg; }
 
-/* Create simple card texture */
-function cardTexture(title, subtitle='', badge=''){
-  const w=800,h=420; const c=document.createElement('canvas'); c.width=w;c.height=h; const ctx=c.getContext('2d');
-  // bg
-  const g=ctx.createLinearGradient(0,0,w,h); g.addColorStop(0,'#061018'); g.addColorStop(1,'#071a2b'); ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
-  // stripes
-  for(let i=0;i<10;i++){ ctx.fillStyle=`rgba(68,230,255,${0.01+Math.random()*0.02})`; ctx.fillRect(0,(h/10)*i+Math.sin(i)*2,w,2); }
-  // title
-  ctx.fillStyle='rgba(255,255,255,0.92)'; ctx.font='700 34px Inter'; ctx.textAlign='center'; ctx.fillText(title, w/2, 72);
-  ctx.font='400 14px Inter'; ctx.fillStyle='rgba(200,255,255,0.72)'; ctx.fillText(subtitle, w/2, 100);
-  // badge
-  if(badge){ ctx.fillStyle='rgba(255,255,255,0.85)'; ctx.font='600 14px Inter'; ctx.textAlign='right'; ctx.fillText(badge, w-28, h-36); }
+/* ============================
+   Menu-data loader
+   ============================ */
+async function tryLoadMenuData(url){
+  try{
+    const res = await fetch(url, {cache:'no-store'});
+    if(!res.ok) return;
+    const text = await res.text();
+    const parsed = parseMenuDataFile(text);
+    if(parsed && parsed.length){
+      categories = parsed;
+      saveCategories();
+      buildCategoryScene();
+      updateItemsPanel(selectedIndex);
+      announce(`Loaded ${categories.length} categories from ${url}`);
+    }
+  }catch(e){
+    // ignore
+  }
+}
+
+function parseMenuDataFile(text){
+  // 1) try to find <script id="menu-data" type="application/json">...</script>
+  let m = text.match(/<script[^>]*id=["']menu-data["'][^>]*type=["']application\/json["'][^>]*>([\s\S]*?)<\/script>/i);
+  if(m && m[1]){
+    try{
+      return JSON.parse(m[1].trim()).map(normalizeCategory);
+    }catch(e){}
+  }
+  // 2) try to find any <script type="application/json"> with array
+  m = text.match(/<script[^>]*type=["']application\/json["'][^>]*>([\s\S]*?)<\/script>/i);
+  if(m && m[1]){
+    try{ return JSON.parse(m[1].trim()).map(normalizeCategory); }catch(e){}
+  }
+  // 3) try to find a JSON array anywhere (first [...] that looks like categories)
+  m = text.match(/(\[\s*\{[\s\S]*?\}\s*\])/);
+  if(m && m[1]){
+    try{ return JSON.parse(m[1]).map(normalizeCategory); }catch(e){}
+  }
+  // 4) try to find window.MENU or MENU_DATA assignments
+  m = text.match(/window\.(?:MENU|MENU_DATA)\s*=\s*(\[\s*\{[\s\S]*?\}\s*\])/);
+  if(m && m[1]){
+    try{ return JSON.parse(m[1]).map(normalizeCategory); }catch(e){}
+  }
+  return null;
+}
+
+function normalizeCategory(cat){
+  return {
+    category: cat.category || cat.title || 'Untitled',
+    items: (cat.items || []).map(it => ({
+      id: it.id || (it.title || '').toLowerCase().replace(/[^a-z0-9]+/g,'-') + '-' + Math.random().toString(36).slice(2,6),
+      title: it.title || it.name || 'Dish',
+      desc: it.desc || it.description || '',
+      price: Number(it.price || it.cost || 0),
+      img: it.img || ''
+    }))
+  };
+}
+
+/* ============================
+   Three.js scene
+   ============================ */
+function initThree(){
+  try{
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha:true, antialias:true, powerPreference:'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    resizeRenderer();
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 4000);
+    camera.position.set(0,0,800);
+
+    // lighting
+    const amb = new THREE.AmbientLight(0xffffff, 0.7); scene.add(amb);
+    const dir = new THREE.DirectionalLight(0xffffff, 0.6); dir.position.set(0.5,1,0.5); scene.add(dir);
+
+    raycaster = new THREE.Raycaster();
+    pointer = new THREE.Vector2(-9999,-9999);
+
+    window.addEventListener('resize', resizeRenderer);
+    window.addEventListener('mousemove', (e)=> {
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    });
+    window.addEventListener('click', (e)=> {
+      handleClick();
+    });
+  }catch(e){
+    console.warn('WebGL not available',e);
+    canvas.style.display = 'none';
+  }
+}
+
+function resizeRenderer(){
+  const leftEl = document.querySelector('.left');
+  const rect = leftEl.getBoundingClientRect();
+  const w = rect.width;
+  const h = rect.height;
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+
+function buildCategoryScene(){
+  // clear
+  if(!scene) return;
+  while(scene.children.length > 0){ scene.remove(scene.children[0]); }
+  // lights
+  const amb = new THREE.AmbientLight(0xffffff, 0.7); scene.add(amb);
+  const dir = new THREE.DirectionalLight(0xffffff, 0.6); dir.position.set(0.5,1,0.5); scene.add(dir);
+
+  items3D = [];
+  group = new THREE.Group(); scene.add(group);
+
+  const count = categories.length;
+  const radius = 340;
+  const planeW = 280, planeH = 160;
+
+  categories.forEach((cat, idx) => {
+    const tex = createCategoryTexture(cat, 1024, 512);
+    const mat = new THREE.MeshBasicMaterial({ map: tex, transparent:true, depthWrite:false, side:THREE.DoubleSide });
+    const geo = new THREE.PlaneGeometry(planeW, planeH, 12, 6);
+    const mesh = new THREE.Mesh(geo, mat);
+
+    // compute positions: if selected => front center; others in circle behind
+    const angle = (idx / Math.max(count,1)) * Math.PI*2;
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle*0.7) * 40;
+    const z = Math.sin(angle) * -240; // behind (negative z)
+    mesh.position.set(x,y,z);
+    mesh.lookAt(0,0,0);
+    mesh.userData = { idx, category: cat.category };
+    mesh.scale.set(1,1,1);
+    group.add(mesh);
+    items3D.push({ mesh, tex, cat, base: { x,y,z } });
+  });
+
+  // create a front floating card for the selected index
+  setFrontCard(selectedIndex, false);
+
+  // subtle ground ring
+  const ringGeo = new THREE.RingGeometry(360, 420, 64);
+  const ringMat = new THREE.MeshBasicMaterial({ color:0x001122, side:THREE.DoubleSide, transparent:true, opacity:0.18 });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.rotation.x = -Math.PI/2;
+  ring.position.y = -220;
+  scene.add(ring);
+}
+
+function createCategoryTexture(cat, w=1024, h=512){
+  const c = document.createElement('canvas'); c.width=w; c.height=h; const ctx=c.getContext('2d');
+  // background band
+  const g = ctx.createLinearGradient(0,0,w,0);
+  g.addColorStop(0, '#07202a'); g.addColorStop(1, '#0e2f3a');
+  ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+  // header area
+  ctx.fillStyle = '#0b1720'; ctx.fillRect(0,0,w,120);
+  ctx.fillStyle = '#fff'; ctx.font='700 52px Inter'; ctx.textAlign='left';
+  ctx.fillText(cat.category || 'Category', 32, 74);
+  // subtitle: items count
+  ctx.fillStyle = '#bfe9f5'; ctx.font='500 20px Inter'; ctx.fillText((cat.items || []).length + ' items', 32, 100);
+  // center large badge showing first item if present
+  ctx.fillStyle = '#eaf8ff'; ctx.font='600 24px Inter'; ctx.textAlign='center';
+  const sample = (cat.items && cat.items[0]) ? cat.items[0].title : '';
+  ctx.fillText(sample, w/2, 240);
+
+  // small description
+  ctx.fillStyle = '#cfeff3'; ctx.font='14px Inter'; ctx.textAlign='left';
+  const desc = (cat.items && cat.items.slice(0,3).map(it => it.title).join(' • ')) || '';
+  wrapText(ctx, desc, 32, 300, w-64, 20);
+
+  // highlight pill
+  ctx.fillStyle = '#ffd8c6';
+  roundRectFill(ctx, w-220, 24, 180, 42, 10);
+  ctx.fillStyle = '#6b2a10';
+  ctx.font='700 20px Inter'; ctx.textAlign='center';
+  ctx.fillText('Open Category', w-130, 55);
+
   return new THREE.CanvasTexture(c);
 }
 
-/* Build ring with placeholders (until menu loaded) */
-function buildEmpty(){
-  while(ring.children.length) ring.remove(ring.children[0]);
-  meshes = [];
-  const count = 8; const R=260;
-  for(let i=0;i<count;i++){
-    const tex = cardTexture('Loading','...');
-    const mat = new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false, side:THREE.DoubleSide});
-    const geo = new THREE.PlaneGeometry(260,156,8,4);
-    const m = new THREE.Mesh(geo,mat);
-    const angle = (i/count)*Math.PI*2;
-    m.position.set(Math.cos(angle)*R, Math.sin(angle*0.7)*26 - 10, Math.sin(angle)*R*0.18 - 80);
-    m.lookAt(0,0,-40);
-    m.userData = { idx:i, cat: null, angle };
-    ring.add(m); meshes.push({mesh:m,angle,base:{x:m.position.x,y:m.position.y,z:m.position.z}});
-  }
-  // front panel
-  if(front) { scene.remove(front); front.geometry.dispose(); front.material.dispose(); front=null; }
-  const ft = cardTexture('Front Panel','Awaiting data'); const fm = new THREE.MeshBasicMaterial({map:ft,transparent:true,depthWrite:false,side:THREE.DoubleSide});
-  const fg = new THREE.PlaneGeometry(520,320,12,6); front = new THREE.Mesh(fg,fm); front.position.set(0,6,0); scene.add(front);
+/* make the selected card float to front */
+function setFrontCard(idx, animate = true){
+  selectedIndex = (idx + categories.length) % categories.length;
+  // compute new positions for all meshes
+  items3D.forEach((entry, i) => {
+    if(i === selectedIndex){
+      // move to front center (positive z)
+      const target = { x:0, y:10, z:120, scale:1.15 };
+      if(animate){
+        gsap.to(entry.mesh.position, { x: target.x, y: target.y, z: target.z, duration:0.8, ease:'power3.out' });
+        gsap.to(entry.mesh.scale, { x: target.scale, y: target.scale, duration:0.8, ease:'power3.out' });
+      } else {
+        entry.mesh.position.set(target.x, target.y, target.z);
+        entry.mesh.scale.set(target.scale, target.scale, target.scale);
+      }
+      entry.mesh.lookAt(0,0,0);
+      entry.mesh.userData.front = true;
+    } else {
+      // place behind in a ring, keep relative order
+      const pos = entry.base;
+      const modified = { x: pos.x, y: pos.y - 8, z: pos.z - 20 };
+      if(animate){
+        gsap.to(entry.mesh.position, { x: modified.x, y: modified.y, z: modified.z, duration:0.9, ease:'elastic.out(1,0.6)' });
+        gsap.to(entry.mesh.scale, { x:1, y:1, duration:0.9, ease:'elastic.out(1,0.6)' });
+      } else {
+        entry.mesh.position.set(modified.x, modified.y, modified.z);
+        entry.mesh.scale.set(1,1,1);
+      }
+      entry.mesh.userData.front = false;
+    }
+  });
+
+  // update items panel
+  updateItemsPanel(selectedIndex);
+  announce(categories[selectedIndex].category + ' focused');
 }
 
-/* Rebuild ring from menu */
-function rebuild(){
-  while(ring.children.length) ring.remove(ring.children[0]);
-  meshes = [];
-  const cats = menu.categories.length ? menu.categories : [{title:'No categories',items:[]}];
-  const count = Math.max(cats.length,6); const R=280;
-  for(let i=0;i<count;i++){
-    const cat = cats[i % cats.length];
-    const tex = cardTexture(cat.title, (cat.items||[]).length + ' items', ((cat.items||[]).length)+' items');
-    const mat = new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,side:THREE.DoubleSide});
-    const geo = new THREE.PlaneGeometry(260,156,8,4);
-    const m = new THREE.Mesh(geo,mat);
-    const angle = (i/count)*Math.PI*2;
-    m.position.set(Math.cos(angle)*R, Math.sin(angle*0.7)*36 - 10, Math.sin(angle)*R*0.18 - 80);
-    m.lookAt(0,0,-40);
-    m.userData = { idx:i, catIndex: i % cats.length, angle, title: cat.title };
-    ring.add(m);
-    meshes.push({mesh:m,angle,base:{x:m.position.x,y:m.position.y,z:m.position.z}});
-  }
-  updateFront(0);
+/* ============================
+   Interaction
+   ============================ */
+function prevCategory(){
+  const next = (selectedIndex - 1 + categories.length) % categories.length;
+  setFrontCard(next);
+}
+function nextCategory(){
+  const next = (selectedIndex + 1) % categories.length;
+  setFrontCard(next);
 }
 
-/* Update front panel for selected category index */
-function updateFront(catIndex){
-  const cat = menu.categories[catIndex] || {title:'Category',items:[]};
-  const tex = cardTexture(cat.title, (cat.items||[]).length + ' items', (cat.items||[]).length + ' items');
-  front.material.map.dispose(); front.material.map = tex; front.material.needsUpdate=true;
-  selectedCategory = catIndex;
-  announce(`Selected ${cat.title}`);
+function handleClick(){
+  if(!hovered) return;
+  const idx = hovered.userData.idx;
+  // if clicked the hovered, open that category (it will animate to front then update panel)
+  setFrontCard(idx);
+  // also open panel - already opened in setFrontCard
+  // small pulse
+  gsap.to(hovered.scale, { x:1.3, y:1.3, duration:0.12, yoyo:true, repeat:1 });
+}
+
+function onHover(mesh){
+  if(!mesh) return;
+  gsap.to(mesh.position, { z: mesh.position.z + 40, duration:0.35, ease:'expo.out' });
+  gsap.to(mesh.scale, { x:1.12, y:1.12, duration:0.35, ease:'expo.out' });
+  announce(mesh.userData.category + ' focused');
+}
+function onUnhover(mesh){
+  if(!mesh) return;
+  const entry = items3D.find(x => x.mesh === mesh);
+  if(!entry) return;
+  // if it's the selected index, restore front z; otherwise restore base (which may be slightly behind)
+  if(entry.mesh.userData.front){
+    gsap.to(mesh.position, { x:0, y:10, z:120, duration:0.6, ease:'elastic.out(1,0.6)' });
+    gsap.to(mesh.scale, { x:1.15, y:1.15, duration:0.6, ease:'elastic.out(1,0.6)' });
+  } else {
+    gsap.to(mesh.position, { x:entry.base.x, y: entry.base.y - 8, z: entry.base.z - 20, duration:0.8, ease:'elastic.out(1,0.6)' });
+    gsap.to(mesh.scale, { x:1, y:1, duration:0.6, ease:'elastic.out(1,0.6)' });
+  }
 }
 
 /* Animation loop */
 function animate(){
-  const t = clock.getElapsedTime();
-  if(!dragging && autoRotate) ringRot += 0.0018;
-  ring.rotation.y = ringRot;
-  meshes.forEach((entry,i)=> {
-    const m = entry.mesh;
-    const local = entry.angle + ringRot;
-    m.rotation.z = Math.sin(local*3.1 + t) * 0.012;
-    m.position.y = entry.base.y + Math.sin(t*0.8 + i)*4;
-    const ang = normalize(local);
-    const closeness = 1 - Math.min(1,Math.abs(ang)/1.6);
-    const s = 0.74 + closeness*0.54;
-    m.scale.set(s,s,s); m.material.opacity = 0.66 + closeness*0.34;
+  const t = performance.now() * 0.001;
+  // subtle movement for all meshes
+  items3D.forEach((e, idx) => {
+    e.mesh.rotation.z = Math.sin(t*0.6 + idx) * 0.02;
+    // gentle float
+    e.mesh.position.y = e.mesh.position.y + Math.sin(t*0.8 + idx) * 0.001;
   });
-  front.rotation.z = Math.sin(t*0.6)*0.01; front.position.y = 6 + Math.sin(t*0.6)*4;
-  // hover effect
-  raycaster.setFromCamera(pointer,camera);
-  const hits = raycaster.intersectObjects(meshes.map(m=>m.mesh));
-  if(hits.length){
-    const m = hits[0].object; gsap.to(m.scale,{x:m.scale.x*1.06,y:m.scale.y*1.06,duration:0.28,ease:'power2.out'});
+
+  // raycasting
+  raycaster.setFromCamera(pointer, camera);
+  const intersects = raycaster.intersectObjects(items3D.map(x => x.mesh));
+  if(intersects.length){
+    const obj = intersects[0].object;
+    if(hovered !== obj){
+      if(hovered) onUnhover(hovered);
+      hovered = obj;
+      onHover(obj);
+    }
+  } else {
+    if(hovered) onUnhover(hovered);
+    hovered = null;
   }
-  renderer.render(scene,camera);
-  anim = requestAnimationFrame(animate);
+
+  // gentle camera orbit
+  camera.position.x = Math.sin(t*0.04)*20;
+  camera.lookAt(0,0,0);
+
+  renderer.render(scene, camera);
+  animReq = requestAnimationFrame(animate);
 }
 
-/* Normalize angle to [-PI,PI] */
-function normalize(a){ let ang=(a+Math.PI)%(Math.PI*2)-Math.PI; if(ang>Math.PI) ang-=Math.PI*2; return ang; }
-
-/* Snap nearest mesh to front */
-function snapNearest(){
-  let best={idx:0,dist:999}; meshes.forEach((e,i)=>{ const ang = normalize(e.angle + ringRot); const d=Math.abs(ang); if(d<best.dist){best={idx:i,dist:d}}});
-  bringToFront(best.idx);
-}
-
-/* Bring specified mesh index to front */
-function bringToFront(i){
-  const entry = meshes[i]; if(!entry) return;
-  const desired = -entry.angle;
-  let delta = desired - ringRot; delta = ((delta + Math.PI)%(Math.PI*2)) - Math.PI; const target = ringRot + delta;
-  const proxy = {r:ringRot};
-  gsap.to(proxy,{r:target,duration:0.85,ease:'power3.out',onUpdate:()=>{ringRot=proxy.r},onComplete:()=>{const catIndex = entry.mesh.userData.catIndex || 0; updateFront(catIndex);} });
-}
-
-/* Click handler - bring clicked card front */
-function onCanvasClick(e){
-  raycaster.setFromCamera(pointer,camera);
-  const hits = raycaster.intersectObjects(meshes.map(m=>m.mesh));
-  if(hits.length){ const idx = hits[0].object.userData.idx; bringToFront(idx); }
-}
-
-/* Snap when not dragged: find nearest to 0 and choose its category */
-function snapNearestImmediate(){ snapNearest(); }
-
-/* ---------- Menu import & parsing ---------- */
-function announce(s){ document.getElementById('aria').textContent=s; document.getElementById('status').textContent='Status: '+s; }
-
-async function fetchMenu(path){
-  announce('Fetching '+path+' ...');
-  try{
-    const res = await fetch(path); if(!res.ok) throw new Error(res.statusText);
-    const text = await res.text();
-    const parsed = parseMenu(text, path);
-    if(parsed && parsed.categories && parsed.categories.length){ menu = parsed; rebuild(); announce('Imported '+menu.categories.length+' categories'); return; }
-    announce('No categories found; try Paste import');
-  }catch(err){ announce('Fetch failed: '+err.message); }
-}
-
-/* Parse heuristics: JSON, <script id="hh-menu-data"> or HTML categories */
-function parseMenu(text, base){
-  // try JSON
-  try{ const j = JSON.parse(text); if(j && (j.categories||Array.isArray(j))) return { categories: Array.isArray(j.categories)?j.categories:j }; }catch(e){}
-  // parse HTML for script blocks
-  const doc = new DOMParser().parseFromString(text,'text/html');
-  const script = doc.querySelector('#hh-menu-data, #menu-json, script[type="application/json"]');
-  if(script){
-    try{ const j = JSON.parse(script.textContent.trim()); if(j && (j.categories||Array.isArray(j))) return { categories: Array.isArray(j.categories)?j.categories:j }; }catch(e){}
+/* ============================
+   Items Panel & Cart
+   ============================ */
+function updateItemsPanel(idx){
+  const holder = document.getElementById('itemsHolder');
+  holder.innerHTML = '';
+  const title = document.getElementById('currentCategoryTitle');
+  const cat = categories[idx];
+  title.textContent = cat.category;
+  if(!cat || !cat.items || !cat.items.length){
+    holder.innerHTML = '<p class="muted">This category has no items.</p>';
+    return;
   }
-  // window.MENU_DATA or hhMenu
-  const scripts = doc.querySelectorAll('script');
-  for(const s of scripts){
-    if(s.textContent && (s.textContent.includes('MENU_DATA')||s.textContent.includes('hhMenu'))){
-      const m = s.textContent.match(/(MENU_DATA|hhMenu)\\s*=\\s*(\\{[\\s\\S]*\\}|\\[[\\s\\S]*\\]);/m);
-      if(m){ try{ const j = JSON.parse(m[2]); const cats = Array.isArray(j.categories)?j.categories:j; if(j && (j.categories||Array.isArray(j))) return { categories: Array.isArray(j.categories)?j.categories:j }; }catch(e){} }
+  cat.items.forEach(it => {
+    const row = document.createElement('div'); row.className = 'itemRow';
+    row.innerHTML = `
+      <img src="${it.img || placeholderImg(it.title)}" alt="${escapeHtml(it.title)}" />
+      <div style="flex:1">
+        <strong>${escapeHtml(it.title)}</strong>
+        <div class="muted" style="font-size:13px">${escapeHtml(it.desc)}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-weight:800">$${Number(it.price||0).toFixed(2)}</div>
+        <div style="margin-top:8px"><button class="btn" data-add="${it.id}" style="padding:6px 8px">Add</button></div>
+      </div>
+    `;
+    holder.appendChild(row);
+  });
+  // wire add buttons
+  Array.from(holder.querySelectorAll('[data-add]')).forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const id = btn.getAttribute('data-add');
+      addToCartByItemId(id, cat.items);
+    });
+  });
+}
+
+/* cart helpers referencing items by id within the current categories (we keep items' id unique) */
+function getItemById(id){
+  for(const c of categories){
+    const f = c.items.find(it => it.id === id);
+    if(f) return f;
+  }
+  return null;
+}
+
+function addToCartByItemId(id, itemsList){
+  // find item in current list or global
+  let item = null;
+  item = getItemById(id) || (itemsList && itemsList.find(it => it.id === id));
+  if(!item) { announce('Item not found'); return; }
+  if(!cart[id]) cart[id] = 0;
+  cart[id] += 1;
+  saveCart(); updateCartUI();
+  announce(`${item.title} added to order`);
+}
+
+function removeFromCart(id){
+  delete cart[id]; saveCart(); updateCartUI();
+}
+function setQtyCart(id, qty){
+  if(qty <= 0) { removeFromCart(id); return; }
+  cart[id] = qty; saveCart(); updateCartUI();
+}
+function updateCartUI(){
+  const list = document.getElementById('cartList');
+  list.innerHTML = '';
+  let subtotal = 0;
+  for(const id in cart){
+    const item = getItemById(id);
+    if(!item) continue;
+    const qty = cart[id];
+    subtotal += item.price * qty;
+    const row = document.createElement('div'); row.className='item';
+    row.innerHTML = `
+      <div class="thumb"><img style="width:100%;height:100%;object-fit:cover" src="${item.img || placeholderImg(item.title)}" alt="${escapeHtml(item.title)}"></div>
+      <div style="flex:1">
+        <h3>${escapeHtml(item.title)}</h3>
+        <p class="muted">${escapeHtml(item.desc)}</p>
+      </div>
+      <div style="text-align:right">
+        <div style="font-weight:800">$${(item.price*qty).toFixed(2)}</div>
+        <div style="display:flex;gap:6px;align-items:center;justify-content:flex-end;margin-top:6px">
+          <button class="btn small" data-action="dec" data-id="${id}" style="padding:6px 8px;background:#223">-</button>
+          <div style="min-width:22px;text-align:center">${qty}</div>
+          <button class="btn small" data-action="inc" data-id="${id}" style="padding:6px 8px">+</button>
+        </div>
+      </div>
+    `;
+    list.appendChild(row);
+  }
+  document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);
+  Array.from(list.querySelectorAll('[data-action]')).forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.getAttribute('data-id');
+      const action = btn.getAttribute('data-action');
+      if(action === 'inc') { cart[id] = (cart[id]||0) + 1; saveCart(); updateCartUI(); }
+      if(action === 'dec') { setQtyCart(id, (cart[id]||1) - 1); }
+    });
+  });
+}
+
+/* ============================
+   Utilities
+   ============================ */
+function placeholderImg(text){
+  const c = document.createElement('canvas'); c.width=200;c.height=120;const ctx=c.getContext('2d');
+  ctx.fillStyle='#0b1620'; ctx.fillRect(0,0,c.width,c.height);
+  ctx.fillStyle = '#18323b'; ctx.fillRect(0,c.height-34,c.width,34);
+  ctx.fillStyle = '#fff'; ctx.font='bold 20px Inter'; ctx.textAlign='center';
+  ctx.fillText((text||'Dish').slice(0,18), c.width/2, c.height/2+6);
+  return c.toDataURL('image/png');
+}
+function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+  const words = text.split(' ');
+  let line = '';
+  for(let n=0;n<words.length;n++){
+    const testLine = line + words[n] + ' ';
+    const metrics = ctx.measureText(testLine);
+    if(metrics.width > maxWidth && n > 0){
+      ctx.fillText(line, x, y);
+      line = words[n] + ' ';
+      y += lineHeight;
+    } else {
+      line = testLine;
     }
   }
-  // fallback: find category blocks
-  const nodes = doc.querySelectorAll('.category,.menu-category,.menu-section,[data-category]');
-  const cats=[];
-  if(nodes && nodes.length){
-    nodes.forEach(node=>{
-      const title = (node.querySelector('h2,h3,.title') && node.querySelector('h2,h3,.title').textContent.trim()) || node.getAttribute('data-category') || 'Category';
-      const itemsN = node.querySelectorAll('.menu-item,.item,li,.dish');
-      const items=[];
-      itemsN.forEach(itn=>{
-        const titleEl = itn.querySelector('.title,h4,strong') || itn.querySelector('h4,h5') || null;
-        const t = titleEl ? titleEl.textContent.trim() : (itn.textContent.split('\\n').map(s=>s.trim()).filter(Boolean)[0]||'Item');
-        const priceMatch = itn.textContent.match(/(\\$|€)\\s?(\\d{1,3}(?:[.,]\\d{1,2})?)/);
-        const price = priceMatch ? parseFloat(priceMatch[2].replace(',','.
+  ctx.fillText(line, x, y);
+}
+function roundRectFill(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r);
+  ctx.closePath();
+  ctx.fill();
+}
 
-`;
-// NOTE: truncated in the message preview; the full content should be preserved in the string above when pasting into the downloader file.
-  // The rest of fullHtml continues here. To keep the chat short, I'm truncating the preview.
-  // When you run this downloader I will include the full file content in the string.
+/* ============================
+   Dialog import
+   ============================ */
+function openDialog(){ document.getElementById('importDialog').style.display='block'; document.getElementById('dialogMsg').textContent=''; }
+function closeDialog(){ document.getElementById('importDialog').style.display='none'; }
+function loadDialogPaste(){
+  const raw = document.getElementById('dialogPaste').value.trim();
+  if(!raw){ document.getElementById('dialogMsg').textContent='Paste something.'; return; }
+  try{
+    const parsed = JSON.parse(raw);
+    if(Array.isArray(parsed) && parsed.length){
+      categories = parsed.map(normalizeCategory);
+      saveCategories();
+      buildCategoryScene();
+      updateItemsPanel(selectedIndex);
+      document.getElementById('dialogMsg').textContent = 'Loaded.';
+      closeDialog();
+    } else {
+      document.getElementById('dialogMsg').textContent = 'JSON should be an array of categories.';
+    }
+  }catch(e){
+    document.getElementById('dialogMsg').textContent = 'Invalid JSON.';
+  }
+}
+async function dialogTryFetchURL(){
+  const txt = document.getElementById('dialogPaste').value.trim();
+  if(!txt){ document.getElementById('dialogMsg').textContent='Paste a URL into the box first.'; return; }
+  let url = txt.split('\\n')[0].trim();
+  if(!/^https?:\/\//.test(url)) { document.getElementById('dialogMsg').textContent='Invalid URL'; return; }
+  document.getElementById('dialogMsg').textContent='Fetching...';
+  try{
+    const res = await fetch(url);
+    const text = await res.text();
+    const parsed = parseMenuDataFile(text);
+    if(parsed && parsed.length){ categories = parsed; saveCategories(); buildCategoryScene(); updateItemsPanel(selectedIndex); document.getElementById('dialogMsg').textContent='Imported.'; closeDialog(); }
+    else document.getElementById('dialogMsg').textContent='No items found automatically. Paste JSON.';
+  }catch(e){
+    document.getElementById('dialogMsg').textContent='Fetch failed (CORS). Paste the page HTML instead.';
+  }
+}
 
-  document.getElementById('dl').addEventListener('click', ()=> {
-    // Replace the truncated marker with the real full HTML if needed.
-    // In this response I am sending a downloader template. If you want, I will
-    // now provide the complete fullHtml content (very large) to paste into this file.
-    // For now, the downloader will notify you that it's a placeholder.
-    const msg = document.getElementById('msg');
-    msg.textContent = 'Preparing file...';
+/* ============================
+   Voice recognition (simple)
+   ============================ */
+let recognition;
+function initVoice(){
+  if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang = 'en-US';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  recognition.onresult = (e)=>{
+    const heard = e.results[0][0].transcript.toLowerCase();
+    announce('Heard: ' + heard);
+    // match items
+    for(const cat of categories){
+      for(const it of cat.items){
+        const title = it.title.toLowerCase();
+        if(heard.includes('add') && (heard.includes(title.split(' ')[0]) || heard.includes(title))){
+          addToCartByItemId(it.id);
+          return;
+        }
+      }
+    }
+    announce('No matching dish found.');
+  };
+  recognition.onerror = ()=>{ announce('Voice error'); };
+}
+function startVoice(){
+  if(!recognition) initVoice();
+  if(!recognition) return alert('Voice not supported in this browser.');
+  recognition.start();
+  announce('Listening for order...');
+}
 
-    // WARNING: the snippet above is truncated for chat brevity.
-    // If you want the actual full .html generated by this downloader, reply "Include full file now"
-    // and I'll replace fullHtml with the complete file content so the downloader produces the actual file.
-    // Alternatively, I can create a GitHub Gist if you enable external gist creation.
-    setTimeout(()=>{ msg.textContent = 'This downloader is ready but currently contains a placeholder. Reply "Include full file now" to embed the complete HTML and finalize the downloader.'; }, 600);
+/* ============================
+   Download / Print helpers
+   ============================ */
+function downloadThisPage(){
+  // Build a blob of this page and trigger download.
+  const html = '<!doctype html>\\n' + document.documentElement.outerHTML;
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'hotheadz-holo-categories.html'; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 2000);
+}
+
+function printMenu(){
+  const pc = document.getElementById('printContent'); pc.innerHTML = '';
+  categories.forEach(c=>{
+    const h = document.createElement('h2'); h.textContent = c.category; pc.appendChild(h);
+    c.items.forEach(m=>{
+      const div = document.createElement('div'); div.innerHTML = `<strong>${escapeHtml(m.title)}</strong> <span style="float:right">$${Number(m.price||0).toFixed(2)}</span><div style="color:#333">${escapeHtml(m.desc)}</div>`;
+      pc.appendChild(div);
+    });
   });
+  const printable = document.getElementById('printable');
+  printable.style.display = 'block';
+  window.print();
+  printable.style.display = 'none';
+}
+
+/* ============================
+   Start
+   ============================ */
+init();
+
 </script>
 </body>
 </html>
