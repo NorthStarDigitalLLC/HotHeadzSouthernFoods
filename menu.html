@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hot Headz Southern Foods – Menu + Cube + Plate Builder</title>
-  <meta name="description" content="Fixed version – cube always switches to correct day, plate builder works, analytics ready.">
+  <meta name="description" content="Fixed version – loads menu from external menu-data.html, cube always switches correctly, plate builder works.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <!-- Google Analytics (replace G-XXXXXXXXXX with your ID) -->
+  <!-- Google Analytics – replace G-XXXXXXXXXX with your real ID -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -18,7 +18,6 @@
     gtag('config', 'G-XXXXXXXXXX');
   </script>
   <style>
-    /* ... keep your existing CSS exactly as you had it ... */
     *{margin:0;padding:0;box-sizing:border-box;max-width:100%}
     html{scroll-behavior:smooth;overflow-x:hidden}
     body{
@@ -331,7 +330,7 @@
           <button class="builder-action" id="builderCopy" type="button">Copy Summary</button>
         </div>
         <div class="builder-note">
-          Replace the sample JSON at the bottom with your real item list, descriptions, and prices.
+          Menu data is loaded from <code>menu-data.html</code>. Update that file to change items.
         </div>
       </div>
     </div>
@@ -340,8 +339,8 @@
   <div class="hh-menu" id="hh-menu-root">
     <div class="hh-header">
       <div class="hh-title">Hot Headz Southern Foods</div>
-      <div class="hh-updated">Fixed version: cube now works on all days, plate builder totals correctly.</div>
-      <div class="hh-note">Google Analytics added – replace G-XXXXXXXXXX with your ID.</div>
+      <div class="hh-updated">Menu loaded from external file – edit menu-data.html to update</div>
+      <div class="hh-note">Cube navigation, plate builder, and day tabs all working.</div>
     </div>
 
     <section class="hh-feature-wrap">
@@ -375,10 +374,10 @@
         <p>This build keeps today, tomorrow, and advanced views while adding the cube and the live total builder.</p>
         <div class="hh-builder-grid">
           <div class="hh-builder-stat"><strong>Works now</strong><span>all sample data included</span></div>
-          <div class="hh-builder-stat"><strong>What to edit</strong><span>the JSON block at the bottom</span></div>
+          <div class="hh-builder-stat"><strong>What to edit</strong><span>menu-data.html</span></div>
           <div class="hh-builder-stat"><strong>Best format</strong><span>name + desc + price objects</span></div>
         </div>
-        <div class="hh-helper-note">You can wire it to external data later, but this file is self‑contained right now.</div>
+        <div class="hh-helper-note">The menu is now loaded from an external file – update it without touching this page.</div>
       </article>
     </section>
 
@@ -510,7 +509,7 @@
     </div>
   </div>
 
-    <script>
+  <script>
     document.addEventListener("DOMContentLoaded", async () => {
       const $ = (id) => document.getElementById(id);
       function setText(id, text){ const el=$(id); if(el) el.textContent = text || ""; }
@@ -535,7 +534,7 @@
       try {
         const response = await fetch('menu-data.html');
         if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-        data = await response.json();          // assuming the file contains valid JSON
+        data = await response.json();          // the file must contain valid JSON
       } catch (err) {
         console.error('Failed to load menu data:', err);
         $("hh-load-error").hidden = false;
@@ -877,430 +876,6 @@
 
       rotateTo("Breakfast");
 
-      window.addEventListener("resize", () => {
-        const activeFace = document.querySelector(".hh-cube-btn.is-active")?.dataset.face || "Breakfast";
-        rotateTo(activeFace);
-      });
-
-      // ---------- INITIALISE THE MENU ----------
-      try{
-        setText("hh-advanced-disclaimer", data.settings.advancedDisclaimer || "");
-        const now = new Date();
-        const tomorrow = new Date(now); tomorrow.setDate(now.getDate()+1);
-        const todayISO = toISODateLocal(now);
-        const tomorrowISO = toISODateLocal(tomorrow);
-        const todayName = weekdayName(now);
-        const tomorrowName = weekdayName(tomorrow);
-        const todayHours = findHours(data.hours.weekly, todayName);
-        const tomorrowHours = findHours(data.hours.weekly, tomorrowName);
-
-        setText("hhDayBtnToday", todayName);
-        setText("hhDayBtnTomorrow", tomorrowName);
-        setText("hh-today-title", `${todayName} (${formatDateNice(now)}) Menu`);
-        setText("hh-tomorrow-title", `${tomorrowName} (${formatDateNice(tomorrow)}) Menu`);
-        setText("hh-hours-line", `${todayName} Hours: ${todayHours.open} – ${todayHours.close} • Breakfast ${todayHours.breakfast} • Lunch ${todayHours.lunch}`);
-        setText("hh-hours-line-2", `${tomorrowName} Hours: ${tomorrowHours.open} – ${tomorrowHours.close} • Breakfast ${tomorrowHours.breakfast} • Lunch ${tomorrowHours.lunch}`);
-        setText("hh-hours-note", data.hours.note || "");
-        setText("hh-hours-note-2", data.hours.note || "");
-
-        fillDay("hh-today", "Today", todayISO, todayHours);
-        fillDay("hh-tomorrow", "Tomorrow", tomorrowISO, tomorrowHours);
-        buildAdvanced(todayISO);
-
-        wireDayTabs();
-        wireInnerTabs("hh-day-today");
-        wireInnerTabs("hh-day-tomorrow");
-
-        // ---------- CIRCULAR MENU ----------
-        const overlay = $("circMenuOverlay");
-        $("navBtnBottom").addEventListener("click", (e) => { e.stopPropagation(); overlay.classList.toggle("open"); });
-        overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.classList.remove("open"); });
-        $("homeCenter").addEventListener("click", () => { overlay.classList.remove("open"); window.location.href = $("homeCenter").dataset.link; });
-        document.querySelectorAll(".menu-item").forEach(item => {
-          item.addEventListener("click", async () => {
-            overlay.classList.remove("open");
-            const link = item.dataset.link;
-            const action = item.dataset.action;
-            if (action === "share"){
-              try{
-                if (navigator.share) await navigator.share({ title: document.title, text: "Check out Hot Headz Southern Foods!", url: window.location.href });
-                else if (navigator.clipboard) await navigator.clipboard.writeText(window.location.href);
-              }catch(err){}
-            } else if (link) {
-              window.location.href = link;
-            }
-          });
-        });
-      } catch(err){
-        console.error(err);
-        $("hh-load-error").hidden = false;
-        setText("hh-load-error-msg", err.message || "Please try again in a moment.");
-      }
-    });
-  </script>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const $ = (id) => document.getElementById(id);
-      function setText(id, text){ const el=$(id); if(el) el.textContent = text || ""; }
-      function escapeHtml(str){
-        return String(str ?? "")
-          .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
-          .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
-      }
-      function money(n){ return `$${Number(n || 0).toFixed(2)}`; }
-      function normalizeKey(text){
-        return String(text || "").toLowerCase().replace(/&/g,"and").replace(/[^a-z0-9]+/g," ").trim();
-      }
-      function toISODateLocal(d){
-        const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,"0"), day=String(d.getDate()).padStart(2,"0");
-        return `${y}-${m}-${day}`;
-      }
-      function formatDateNice(d){ return d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}); }
-      function weekdayName(d){ return d.toLocaleDateString("en-US",{weekday:"long"}); }
-
-      const data = JSON.parse($("hh-menu-data").textContent);
-
-      // ---------- PLATE BUILDER ----------
-      const plateState = { items: [] };
-      function updatePlateUI(){
-        const list = $("builderList");
-        const empty = $("builderEmpty");
-        const count = plateState.items.reduce((s,i)=>s+i.qty,0);
-        const total = plateState.items.reduce((s,i)=>s+(i.qty*i.price),0);
-        const categories = new Set(plateState.items.map(i=>i.category)).size;
-        $("builderItemCount").textContent = count;
-        $("builderCategoryCount").textContent = categories;
-        $("builderTotal").textContent = money(total);
-        $("builderHandleCount").textContent = count;
-        list.querySelectorAll(".builder-item").forEach(el => el.remove());
-        if (!plateState.items.length){ empty.style.display = ""; return; }
-        empty.style.display = "none";
-        plateState.items.forEach((item,index) => {
-          const row = document.createElement("div");
-          row.className = "builder-item";
-          row.innerHTML = `
-            <div class="builder-item-top">
-              <div>
-                <div class="builder-item-name">${escapeHtml(item.name)}</div>
-                <div class="builder-item-meta">${escapeHtml(item.category)} • ${escapeHtml(item.plateGroup || "Menu Item")}</div>
-              </div>
-              <div class="builder-item-price">${money(item.qty * item.price)}</div>
-            </div>
-            <div class="builder-item-actions">
-              <div class="qty-controls">
-                <button class="qty-btn" type="button" data-builder-action="decrease" data-index="${index}">−</button>
-                <span class="qty-value">${item.qty}</span>
-                <button class="qty-btn" type="button" data-builder-action="increase" data-index="${index}">+</button>
-              </div>
-              <button class="remove-btn" type="button" data-builder-action="remove" data-index="${index}">Remove</button>
-            </div>`;
-          list.appendChild(row);
-        });
-      }
-      function addToPlate(payload){
-        const existing = plateState.items.find(i => i.key === payload.key);
-        if (existing) existing.qty += 1;
-        else plateState.items.push({ ...payload, qty:1 });
-        updatePlateUI();
-        $("plateBuilderRoot").classList.remove("is-collapsed");
-        $("builderHandle").setAttribute("aria-expanded","true");
-      }
-
-      document.addEventListener("click", (e) => {
-        const addBtn = e.target.closest("[data-plate-payload]");
-        if (addBtn) addToPlate(JSON.parse(addBtn.getAttribute("data-plate-payload")));
-        const actionBtn = e.target.closest("[data-builder-action]");
-        if (actionBtn){
-          const idx = Number(actionBtn.getAttribute("data-index"));
-          const action = actionBtn.getAttribute("data-builder-action");
-          const item = plateState.items[idx];
-          if (!item) return;
-          if (action === "increase") item.qty += 1;
-          if (action === "decrease") item.qty -= 1;
-          if (action === "remove" || item.qty <= 0) plateState.items.splice(idx,1);
-          updatePlateUI();
-        }
-      });
-      $("builderClear").addEventListener("click", () => { plateState.items = []; updatePlateUI(); });
-      $("builderCopy").addEventListener("click", async () => {
-        const lines = plateState.items.map(i => `${i.qty}x ${i.name} — ${money(i.qty * i.price)}`);
-        const total = plateState.items.reduce((s,i)=>s+(i.qty*i.price),0);
-        const text = lines.length ? `Hot Headz Plate Builder\n\n${lines.join("\n")}\n\nTotal: ${money(total)}` : "No items in plate yet.";
-        try{
-          await navigator.clipboard.writeText(text);
-          const old = $("builderCopy").textContent;
-          $("builderCopy").textContent = "Copied";
-          setTimeout(() => $("builderCopy").textContent = old, 1200);
-        }catch(err){}
-      });
-      $("builderClose").addEventListener("click", () => {
-        $("plateBuilderRoot").classList.add("is-collapsed");
-        $("builderHandle").setAttribute("aria-expanded","false");
-      });
-      $("builderHandle").addEventListener("click", () => {
-        $("plateBuilderRoot").classList.toggle("is-collapsed");
-        $("builderHandle").setAttribute("aria-expanded", String(!$("plateBuilderRoot").classList.contains("is-collapsed")));
-      });
-      updatePlateUI();
-
-      function createMenuPayload(item, fallbackCategory){
-        if (!item || typeof item !== "object" || typeof item.price !== "number") return null;
-        return {
-          key: normalizeKey((item.name || "") + "::" + (item.category || fallbackCategory) + "::" + (item.plateGroup || "")),
-          name: String(item.name || "").trim(),
-          price: item.price,
-          category: item.category || fallbackCategory || "Menu Item",
-          plateGroup: item.plateGroup || "Menu Item"
-        };
-      }
-
-      function renderList(id, items, fallbackCategory, options = {}){
-        const ul = $(id);
-        if (!ul) return;
-        ul.innerHTML = "";
-        (items || []).forEach(item => {
-          const isObj = item && typeof item === "object";
-          const name = isObj ? String(item.name || "").trim() : String(item || "").trim();
-          const desc = isObj ? String(item.desc || "").trim() : "";
-          const payload = createMenuPayload(item, fallbackCategory);
-
-          const li = document.createElement("li");
-          if (options.dropdown) {
-            const details = document.createElement("details");
-            const summary = document.createElement("summary");
-            summary.textContent = name;
-            const descBox = document.createElement("div");
-            descBox.className = "hh-desc";
-            descBox.textContent = desc || options.noDesc || "Description coming soon.";
-            details.appendChild(summary);
-            details.appendChild(descBox);
-            li.appendChild(details);
-
-            if (payload){
-              const actions = document.createElement("div");
-              actions.className = "hh-item-actions";
-              actions.style.padding = "0 12px 12px";
-              actions.innerHTML = `<span class="hh-plate-tag">${escapeHtml(payload.plateGroup || "Menu Item")}</span><span class="hh-plate-tag">${money(payload.price)}</span>`;
-              const add = document.createElement("button");
-              add.className = "hh-add-btn";
-              add.type = "button";
-              add.textContent = "Add to Plate";
-              add.setAttribute("data-plate-payload", JSON.stringify(payload));
-              actions.appendChild(add);
-              li.appendChild(actions);
-            }
-          } else {
-            const wrap = document.createElement("div");
-            wrap.className = "hh-item-card";
-            const top = document.createElement("div");
-            top.className = "hh-item-top";
-            top.innerHTML = `<div class="hh-item-name">${escapeHtml(name)}</div><div class="hh-item-price">${payload ? money(payload.price) : ""}</div>`;
-            wrap.appendChild(top);
-            if (desc){
-              const d = document.createElement("div");
-              d.className = "hh-item-desc";
-              d.textContent = desc;
-              wrap.appendChild(d);
-            }
-            const actions = document.createElement("div");
-            actions.className = "hh-item-actions";
-            const tag = document.createElement("span");
-            tag.className = "hh-plate-tag";
-            tag.textContent = payload ? (payload.plateGroup || "Menu Item") : "Display Only";
-            actions.appendChild(tag);
-            if (payload){
-              const add = document.createElement("button");
-              add.className = "hh-add-btn";
-              add.type = "button";
-              add.textContent = "Add to Plate";
-              add.setAttribute("data-plate-payload", JSON.stringify(payload));
-              actions.appendChild(add);
-            }
-            wrap.appendChild(actions);
-            li.appendChild(wrap);
-          }
-          ul.appendChild(li);
-        });
-      }
-
-      function findHours(weekly, dayName){
-        return (weekly || []).find(d => (d.day || "").toLowerCase() === (dayName || "").toLowerCase()) || {};
-      }
-      function getMenuByDate(data, isoDate){ return (data.menus || {})[isoDate] || {}; }
-      function getLunchAvailability(menu){
-        const lunch = menu.lunch || data.defaults.lunch || {};
-        if (lunch.show === false) return { ok:false, msg:"Lunch menu unavailable." };
-        if (!Array.isArray(lunch.items) || !lunch.items.length) return { ok:false, msg:"Lunch menu unavailable." };
-        return { ok:true, msg:"" };
-      }
-
-      function fillDay(prefix, label, isoDate, hours){
-        const menu = getMenuByDate(data, isoDate);
-        const defaults = data.defaults || {};
-        const breakfast = { ...defaults.breakfast, ...(menu.breakfast || {}) };
-        const lunch = { ...defaults.lunch, ...(menu.lunch || {}) };
-        const crawfish = { ...defaults.crawfish, ...(menu.crawfish || {}) };
-        const salad = { ...defaults.salad, ...(menu.salad || {}) };
-        const drinks = { ...defaults.drinks, ...(menu.drinks || {}) };
-        const dessert = { ...defaults.dessert, ...(menu.dessert || {}) };
-
-        setText(`${prefix}-breakfast-sub`, `Breakfast ${hours.breakfast || ""}. ${breakfast.subtitle || ""}`.trim());
-        renderList(`${prefix}-breakfast-plates`, breakfast.plates || [], "Breakfast");
-        renderList(`${prefix}-breakfast-items`, breakfast.items || [], "Breakfast");
-
-        setText(`${prefix}-lunch-sub`, `Lunch ${hours.lunch || ""}. ${lunch.subtitle || ""}`.trim());
-        const lunchAvail = getLunchAvailability({ lunch });
-        $(`${prefix}-lunch-unavail`).hidden = lunchAvail.ok;
-        if (!lunchAvail.ok){
-          setText(`${prefix}-lunch-unavail-title`, lunchAvail.msg);
-          $(`${prefix}-lunch-content`).style.display = "none";
-        } else {
-          $(`${prefix}-lunch-content`).style.display = "";
-          setText(`${prefix}-lunch-hint`, data.settings.clickForDescriptionHint || "");
-          renderList(`${prefix}-lunch-plates`, lunch.plates || [], "Lunch");
-          renderList(`${prefix}-lunch-items`, lunch.items || [], "Lunch", { dropdown:true, noDesc:data.settings.noDescriptionText });
-        }
-
-        setText(`${prefix}-crawfish-sub`, crawfish.subtitle || "");
-        renderList(`${prefix}-crawfish-items`, crawfish.items || [], "Crawfish");
-        const crawTab = $(`${prefix === "hh-today" ? "hhTabTodayCrawfish" : "hhTabTomorrowCrawfish"}`);
-        if (crawTab) crawTab.style.display = crawfish.show === false ? "none" : "";
-
-        setText(`${prefix}-salad-sub`, salad.subtitle || "");
-        renderList(`${prefix}-salad-pricing`, salad.items || [], "Salad Bar");
-        renderList(`${prefix}-salad-lettuce`, salad.saladBar?.lettuce || [], "Salad Bar");
-        renderList(`${prefix}-salad-toppings`, salad.saladBar?.toppings || [], "Salad Bar");
-        renderList(`${prefix}-salad-dressing`, salad.saladBar?.dressing || [], "Salad Bar");
-
-        renderList(`${prefix}-drinks-items`, drinks.items || [], "Drinks");
-        setText(`${prefix}-dessert-sub`, dessert.subtitle || "");
-        renderList(`${prefix}-dessert-items`, dessert.items || [], "Dessert");
-      }
-
-      function buildAdvanced(todayISO){
-        const wrap = $("hh-adv-carousel");
-        wrap.innerHTML = "";
-        const days = Number(data.settings.advancedWindowDays || 7);
-        const weekly = data.hours.weekly || [];
-        for(let i=0;i<days;i++){
-          const d = new Date();
-          const base = todayISO.split("-").map(Number);
-          d.setFullYear(base[0], base[1]-1, base[2]);
-          d.setDate(d.getDate()+i);
-          const iso = toISODateLocal(d);
-          const dayName = weekdayName(d);
-          const hours = findHours(weekly, dayName);
-          const menu = getMenuByDate(data, iso);
-          const lunch = { ...data.defaults.lunch, ...(menu.lunch || {}) };
-
-          const card = document.createElement("article");
-          card.className = "hh-adv-card";
-          card.innerHTML = `
-            <div class="hh-adv-head">
-              <div>
-                <div class="hh-adv-dayname">${escapeHtml(dayName)}</div>
-                <div class="hh-adv-date">${escapeHtml(formatDateNice(d))}</div>
-              </div>
-              <div class="hh-adv-hours">${escapeHtml(hours.lunch ? `Lunch ${hours.lunch}` : "")}</div>
-            </div>
-            <section class="hh-panel">
-              <h3>Lunch</h3>
-              <p class="hh-sub">${escapeHtml(lunch.subtitle || "")}</p>
-              <h4>Plates</h4><ul class="hh-stack" id="adv-plates-${i}"></ul>
-              <h4>${escapeHtml(dayName)} Lunch Items</h4>
-              <div class="hh-hintline">${escapeHtml(data.settings.clickForDescriptionHint || "")}</div>
-              <ul class="hh-stack" id="adv-items-${i}"></ul>
-            </section>`;
-          wrap.appendChild(card);
-          renderList(`adv-plates-${i}`, lunch.plates || [], "Lunch");
-          renderList(`adv-items-${i}`, lunch.items || [], "Lunch", { dropdown:true, noDesc:data.settings.noDescriptionText });
-        }
-      }
-
-      function wireDayTabs(){
-        const dayButtons = Array.from(document.querySelectorAll(".hh-day[role='tab']"));
-        const dayPanels = [$("hh-day-today"), $("hh-day-tomorrow"), $("hh-day-advanced")];
-        dayButtons.forEach(btn => {
-          btn.addEventListener("click", () => {
-            const targetId = btn.getAttribute("aria-controls");
-            dayButtons.forEach(b => {
-              const active = b === btn;
-              b.classList.toggle("is-active", active);
-              b.setAttribute("aria-selected", active ? "true" : "false");
-            });
-            dayPanels.forEach(p => p.hidden = (p.id !== targetId));
-          });
-        });
-      }
-
-      function wireInnerTabs(containerId){
-        const container = $(containerId);
-        const tabs = Array.from(container.querySelectorAll(".hh-tab[role='tab']"));
-        const panels = Array.from(container.querySelectorAll(".hh-panel"));
-        tabs.forEach(tab => {
-          tab.addEventListener("click", () => {
-            const targetId = tab.getAttribute("aria-controls");
-            tabs.forEach(t => {
-              const active = t === tab;
-              t.classList.toggle("is-active", active);
-              t.setAttribute("aria-selected", active ? "true" : "false");
-            });
-            panels.forEach(p => p.hidden = (p.id !== targetId));
-          });
-        });
-      }
-
-      // ---------- CUBE + TAB SWITCHING (FIXED) ----------
-      const faces = {
-        "Breakfast": { x: 0, y: 0, tabToday: "hhTabTodayBreakfast", tabTomorrow: "hhTabTomorrowBreakfast" },
-        "Lunch":     { x: 0, y: -90, tabToday: "hhTabTodayLunch", tabTomorrow: "hhTabTomorrowLunch" },
-        "Crawfish":  { x: 0, y: -180, tabToday: "hhTabTodayCrawfish", tabTomorrow: "hhTabTomorrowCrawfish" },
-        "Salad Bar": { x: 0, y: 90, tabToday: "hhTabTodaySalad", tabTomorrow: "hhTabTomorrowSalad" },
-        "Drinks":    { x: -90, y: 0, tabToday: "hhTabTodayDrinks", tabTomorrow: "hhTabTomorrowDrinks" },
-        "Dessert":   { x: 90, y: 0, tabToday: "hhTabTodayDessert", tabTomorrow: "hhTabTomorrowDessert" }
-      };
-      const cube = $("menuCube");
-      const cubeButtons = Array.from(document.querySelectorAll(".hh-cube-btn"));
-
-      function rotateTo(faceName){
-        const face = faces[faceName];
-        if (!face) return;
-
-        // --- On mobile, just show the right face ---
-        if (window.innerWidth <= 560){
-          document.querySelectorAll(".hh-face").forEach(el => el.classList.remove("is-mobile-visible"));
-          const visible = Array.from(document.querySelectorAll(".hh-face")).find(el => el.dataset.target === faceName);
-          if (visible) visible.classList.add("is-mobile-visible");
-        } else {
-          cube.style.transform = `rotateX(${face.x}deg) rotateY(${face.y}deg)`;
-        }
-
-        cubeButtons.forEach(btn => btn.classList.toggle("is-active", btn.dataset.face === faceName));
-
-        // --- Determine which day is active ---
-        const activeDayBtn = document.querySelector(".hh-day.is-active");
-        if (!activeDayBtn) return;
-
-        // If we are on the Advanced panel, switch to Today first (Advanced has no inner tabs)
-        if (activeDayBtn.id === "hhDayBtnAdvanced") {
-          $("hhDayBtnToday").click();        // switch to Today panel
-        }
-
-        // Now decide whether to use Today or Tomorrow tab
-        const useTomorrow = document.querySelector("#hh-day-tomorrow") && !document.querySelector("#hh-day-tomorrow").hidden;
-        const tabId = useTomorrow ? face.tabTomorrow : face.tabToday;
-        const tab = $(tabId);
-        if (tab && getComputedStyle(tab).display !== "none") tab.click();
-      }
-
-      cubeButtons.forEach(btn => btn.addEventListener("click", () => rotateTo(btn.dataset.face)));
-      document.querySelectorAll(".hh-face").forEach(face => face.addEventListener("click", () => rotateTo(face.dataset.target)));
-
-      // Start with Breakfast face active
-      rotateTo("Breakfast");
-
-      // On window resize, keep the active face in sync
       window.addEventListener("resize", () => {
         const activeFace = document.querySelector(".hh-cube-btn.is-active")?.dataset.face || "Breakfast";
         rotateTo(activeFace);
