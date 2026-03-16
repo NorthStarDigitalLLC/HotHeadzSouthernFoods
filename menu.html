@@ -1,823 +1,2142 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Hotheadz — Holographic Categories (Demo)</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hot Headz — Holographic Category Carousel</title>
+  <meta name="description" content="Futuristic category-to-item holographic carousel powered by menu-data.html" />
+  <meta name="theme-color" content="#08070b" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#06070b;
+      --bg-2:#0c1020;
+      --bg-3:#10182b;
+      --ink:#ecfbff;
+      --muted:#9fd7e7;
+      --muted-2:rgba(236,251,255,.62);
+      --panel:rgba(255,255,255,.05);
+      --panel-2:rgba(255,255,255,.08);
+      --line:rgba(255,255,255,.10);
+      --line-2:rgba(255,255,255,.06);
+      --accent:#ff6a3d;
+      --accent-2:#44e6ff;
+      --accent-3:#8f6bff;
+      --good:#54e8a4;
+      --shadow-1:0 12px 30px rgba(0,0,0,.25);
+      --shadow-2:0 28px 90px rgba(0,0,0,.42);
+      --radius-xs:10px;
+      --radius-sm:14px;
+      --radius-md:20px;
+      --radius-lg:28px;
+      --radius-xl:38px;
+      --radius-pill:999px;
+      --site-max:1480px;
+      --card-w:min(32vw, 360px);
+      --card-h:min(50vw, 470px);
+      --font:Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
 
-<!-- Libraries -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:var(--font);
+      color:var(--ink);
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(68,230,255,.10), transparent 60%),
+        radial-gradient(1000px 680px at 90% 20%, rgba(255,106,61,.12), transparent 58%),
+        radial-gradient(900px 500px at 50% 100%, rgba(143,107,255,.10), transparent 60%),
+        linear-gradient(180deg, #05060b 0%, #070910 35%, #05060a 100%);
+      overflow-x:hidden;
+    }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.10;
+      mix-blend-mode:overlay;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");
+    }
 
-<style>
-  :root{
-    --bg:#04050b;
-    --panel:#071024;
-    --accent:#ff6a3d;
-    --muted:#97d7ea;
-    --glass: rgba(255,255,255,0.03);
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  }
-  html,body{height:100%;margin:0;background:
-    radial-gradient(1200px 600px at 10% 10%, #071427 0%, var(--bg) 35%), linear-gradient(180deg, rgba(0,0,0,0.2), rgba(0,0,0,0.4));
-    color:#eaf8ff; overflow:hidden;}
-  .wrap{position:relative;height:100vh;width:100vw;display:flex;align-items:stretch;justify-content:stretch;}
+    a{color:inherit;text-decoration:none}
+    img{display:block;max-width:100%}
+    button,input{font:inherit}
 
-  /* Left: Holographic Canvas */
-  .left{
-    flex:1 1 64%;
-    min-width:420px;
-    position:relative;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    padding:28px;
-  }
+    .app{
+      width:min(var(--site-max), calc(100vw - 18px));
+      margin-inline:auto;
+      min-height:100vh;
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+      gap:14px;
+      position:relative;
+      z-index:1;
+    }
 
-  canvas#holoCanvas{width:100%;height:100%;display:block; border-radius:12px; box-shadow: 0 40px 120px rgba(0,0,0,0.6);}
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:1000;
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      gap:14px;
+      align-items:center;
+      min-height:84px;
+      padding:14px 0 10px;
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      background:linear-gradient(180deg, rgba(6,7,11,.88), rgba(6,7,11,.52));
+      border-bottom:1px solid var(--line-2);
+    }
 
-  /* Right: Controls & Order */
-  .right{
-    width:420px;
-    padding:22px;
-    display:flex;flex-direction:column;gap:16px;
-    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border-left: 1px solid rgba(255,255,255,0.03);
-    box-shadow: inset -6px 0 30px rgba(0,0,0,0.35);
-  }
-  .brand{
-    display:flex;align-items:center;gap:12px;
-  }
-  .brand .logo{
-    width:56px;height:56px;border-radius:10px;background:linear-gradient(90deg,var(--accent),#ff96b6);
-    display:grid;place-items:center;font-weight:800;color:#fff;font-size:18px;box-shadow:0 6px 20px rgba(255,106,61,0.12);
-  }
-  .brand h1{margin:0;font-size:18px;letter-spacing:0.4px}
-  .brand p{margin:0;font-size:12px;color:var(--muted)}
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+    }
 
-  .controls{display:flex;flex-direction:column;gap:8px}
-  .controls button, .controls input, .controls textarea, .controls select{
-    background:var(--glass);border:1px solid rgba(255,255,255,0.04);color:#dff9ff;padding:10px;border-radius:8px;font-size:13px;
-  }
-  .controls .row{display:flex;gap:8px}
-  .controls .row button{flex:1}
-  .btn{
-    background:linear-gradient(90deg,var(--accent),#ff96b6);border:none;color:white;padding:10px 12px;border-radius:8px;cursor:pointer;
-    font-weight:700;box-shadow: 0 8px 30px rgba(255,106,61,0.12);
-  }
-  .muted{color:var(--muted);font-size:13px}
+    .logo{
+      width:54px;
+      height:54px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      letter-spacing:-.05em;
+      color:white;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.20), transparent 32%),
+        linear-gradient(135deg, var(--accent), #ff9f86 55%, var(--accent-3));
+      box-shadow:
+        0 0 40px rgba(255,106,61,.18),
+        0 10px 30px rgba(0,0,0,.28);
+    }
 
-  /* Cart */
-  .cart{
-    flex:1;overflow:auto;padding:10px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
-    border:1px solid rgba(255,255,255,0.03)
-  }
-  .cart .item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;margin-bottom:8px;background:rgba(255,255,255,0.02)}
-  .cart .thumb{width:56px;height:40px;border-radius:6px;overflow:hidden;flex-shrink:0;background:#000}
-  .cart h3{margin:0;font-size:15px}
-  .cart p{margin:0;color:var(--muted);font-size:13px}
+    .brand-copy{
+      min-width:0;
+    }
 
-  /* Category controls (front) */
-  .holoControls{
-    position:absolute;left:22px;top:22px;display:flex;gap:8px;align-items:center;z-index:40;
-  }
-  .holoControls .small{padding:8px 10px;font-size:14px}
-  .holoControls .big{padding:12px 14px;font-size:16px}
+    .brand-title{
+      font-size:15px;
+      font-weight:900;
+      letter-spacing:-.02em;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
 
-  /* Right items panel */
-  .itemsPanel{
-    border-radius:10px;padding:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)
-  }
-  .itemsPanel h3{margin:6px 0}
-  .itemRow{display:flex;gap:8px;align-items:center;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:6px}
-  .itemRow img{width:72px;height:48px;object-fit:cover;border-radius:6px}
+    .brand-sub{
+      font-size:12px;
+      color:var(--muted-2);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
 
-  /* HUD / small */
-  .hud{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+    .status-pill{
+      justify-self:center;
+      min-width:min(100%, 680px);
+      max-width:100%;
+      min-height:48px;
+      padding:10px 16px;
+      border-radius:var(--radius-pill);
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      box-shadow:var(--shadow-1);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+      text-align:center;
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+    }
 
-  /* Accessibility */
-  .sr-only{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+    .live-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--good);
+      box-shadow:0 0 14px var(--good);
+      animation:pulse 1.7s infinite;
+      flex:0 0 auto;
+    }
 
-  @media (max-width:1100px){
-    .wrap{flex-direction:column}
-    .left{min-height:360px;width:100%}
-    .right{width:100%;height:auto}
-  }
-</style>
+    .live-dot.closed{
+      background:var(--accent);
+      box-shadow:0 0 14px var(--accent);
+      animation:none;
+    }
+
+    @keyframes pulse{
+      0%{opacity:1;transform:scale(1)}
+      50%{opacity:.45;transform:scale(.84)}
+      100%{opacity:1;transform:scale(1)}
+    }
+
+    .status-main{
+      font-weight:900;
+      letter-spacing:-.02em;
+    }
+
+    .status-sub{
+      font-size:13px;
+      color:var(--muted-2);
+      font-weight:700;
+    }
+
+    .top-actions{
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .btn,
+    .mini-btn,
+    .chip,
+    .dock-btn{
+      border:none;
+      cursor:pointer;
+      transition:
+        transform .2s ease,
+        border-color .2s ease,
+        background .2s ease,
+        box-shadow .2s ease,
+        opacity .2s ease;
+    }
+
+    .btn:hover,
+    .mini-btn:hover,
+    .chip:hover,
+    .dock-btn:hover{
+      transform:translateY(-1px);
+    }
+
+    .btn{
+      min-height:46px;
+      padding:11px 15px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      color:var(--ink);
+      box-shadow:var(--shadow-1);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      font-size:13px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+
+    .btn.primary{
+      background:linear-gradient(135deg, rgba(255,106,61,.28), rgba(68,230,255,.15));
+      border-color:rgba(68,230,255,.24);
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:1.02fr .98fr;
+      gap:16px;
+      align-items:stretch;
+      min-height:0;
+    }
+
+    .panel{
+      position:relative;
+      overflow:hidden;
+      border-radius:var(--radius-xl);
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      box-shadow:
+        var(--shadow-2),
+        inset 0 1px 0 rgba(255,255,255,.05);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      min-height:0;
+    }
+
+    .panel::before{
+      content:"";
+      position:absolute;
+      inset:auto -18% -34% -18%;
+      height:280px;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 30% 40%, rgba(68,230,255,.12), transparent 60%),
+        radial-gradient(circle at 72% 56%, rgba(255,106,61,.14), transparent 62%),
+        radial-gradient(circle at 50% 20%, rgba(143,107,255,.14), transparent 62%);
+      transform:rotate(-5deg);
+    }
+
+    .panel-inner{
+      position:relative;
+      z-index:1;
+      height:100%;
+      padding:22px;
+      display:grid;
+      gap:16px;
+      align-content:start;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      width:max-content;
+      max-width:100%;
+      padding:8px 12px;
+      border-radius:var(--radius-pill);
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.05);
+      font-size:11px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      color:var(--ink);
+    }
+
+    .eyebrow-dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:var(--accent-2);
+      box-shadow:0 0 12px rgba(68,230,255,.74);
+      flex:0 0 auto;
+    }
+
+    .hero-title{
+      margin:0;
+      font-size:clamp(34px, 5vw, 74px);
+      line-height:.92;
+      letter-spacing:-.06em;
+      font-family:var(--font);
+      font-weight:900;
+      max-width:10.4ch;
+    }
+
+    .hero-copy{
+      margin:0;
+      max-width:60ch;
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.65;
+    }
+
+    .hero-grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:10px;
+    }
+
+    .mini-card{
+      border:1px solid var(--line);
+      border-radius:22px;
+      background:rgba(0,0,0,.16);
+      padding:14px;
+      box-shadow:var(--shadow-1);
+      display:grid;
+      gap:6px;
+      align-content:start;
+    }
+
+    .mini-k{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:var(--muted-2);
+      font-weight:900;
+    }
+
+    .mini-v{
+      font-size:18px;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+
+    .mini-copy{
+      color:var(--muted-2);
+      font-size:12px;
+      line-height:1.46;
+    }
+
+    .hero-bottom{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:flex-start;
+      justify-content:space-between;
+      margin-top:auto;
+    }
+
+    .hero-note{
+      max-width:62ch;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+    }
+
+    .hero-note strong{color:var(--ink)}
+
+    .carousel-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .carousel-title{
+      margin:0 0 8px;
+      font-size:clamp(28px, 3.4vw, 44px);
+      line-height:.95;
+      letter-spacing:-.05em;
+      font-weight:900;
+    }
+
+    .carousel-copy{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.58;
+      max-width:46ch;
+    }
+
+    .stage{
+      min-height:560px;
+      display:grid;
+      align-items:center;
+      position:relative;
+      overflow:visible;
+    }
+
+    .stage-glow{
+      position:absolute;
+      inset:auto 12% 8% 12%;
+      height:160px;
+      background:
+        radial-gradient(ellipse at center, rgba(68,230,255,.18), transparent 60%),
+        radial-gradient(ellipse at center, rgba(255,106,61,.14), transparent 62%);
+      filter:blur(20px);
+      pointer-events:none;
+    }
+
+    .carousel{
+      position:relative;
+      width:100%;
+      height:560px;
+      perspective:1800px;
+      transform-style:preserve-3d;
+      overflow:visible;
+    }
+
+    .card3d{
+      position:absolute;
+      top:50%;
+      left:50%;
+      width:var(--card-w);
+      max-width:360px;
+      min-width:260px;
+      height:var(--card-h);
+      min-height:360px;
+      max-height:470px;
+      transform-style:preserve-3d;
+      border-radius:32px;
+      border:1px solid rgba(255,255,255,.14);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+      box-shadow:
+        0 30px 90px rgba(0,0,0,.38),
+        inset 0 1px 0 rgba(255,255,255,.08);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      overflow:hidden;
+      transition:
+        transform .8s cubic-bezier(.2,.8,.2,1),
+        opacity .5s ease,
+        filter .5s ease,
+        box-shadow .5s ease,
+        border-color .3s ease;
+      will-change:transform, opacity;
+    }
+
+    .card3d::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(135deg, rgba(68,230,255,.12), transparent 20%, transparent 72%, rgba(255,106,61,.12)),
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,.20), transparent 26%);
+      opacity:.9;
+    }
+
+    .card3d.active{
+      border-color:rgba(68,230,255,.34);
+      box-shadow:
+        0 34px 100px rgba(0,0,0,.42),
+        0 0 80px rgba(68,230,255,.08),
+        inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+    .card-btn{
+      position:relative;
+      z-index:1;
+      width:100%;
+      height:100%;
+      border:none;
+      background:none;
+      color:inherit;
+      text-align:left;
+      padding:18px;
+      display:grid;
+      grid-template-rows:auto auto 1fr auto;
+      gap:14px;
+      cursor:pointer;
+    }
+
+    .card-badge{
+      justify-self:start;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 11px;
+      border-radius:var(--radius-pill);
+      background:rgba(0,0,0,.20);
+      border:1px solid rgba(255,255,255,.12);
+      font-size:11px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+    }
+
+    .card-emoji{
+      font-size:54px;
+      line-height:1;
+      filter:drop-shadow(0 8px 20px rgba(0,0,0,.28));
+    }
+
+    .card-title{
+      font-size:28px;
+      line-height:.95;
+      letter-spacing:-.05em;
+      font-weight:900;
+      margin:0;
+      max-width:10ch;
+    }
+
+    .card-desc{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.55;
+      max-width:34ch;
+    }
+
+    .card-meta{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .card-count{
+      font-size:13px;
+      color:var(--muted-2);
+      font-weight:800;
+    }
+
+    .card-action{
+      min-height:38px;
+      padding:0 12px;
+      border-radius:var(--radius-pill);
+      border:1px solid rgba(68,230,255,.24);
+      background:linear-gradient(135deg, rgba(255,106,61,.22), rgba(68,230,255,.14));
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:12px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.10em;
+      white-space:nowrap;
+    }
+
+    .carousel-controls{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .results{
+      display:grid;
+      gap:16px;
+      padding-bottom:120px;
+    }
+
+    .results-panel{
+      position:relative;
+      overflow:hidden;
+      border-radius:var(--radius-xl);
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      box-shadow:
+        var(--shadow-2),
+        inset 0 1px 0 rgba(255,255,255,.05);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+    }
+
+    .results-panel::before{
+      content:"";
+      position:absolute;
+      inset:auto -18% -34% -18%;
+      height:280px;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 30% 40%, rgba(68,230,255,.12), transparent 60%),
+        radial-gradient(circle at 72% 56%, rgba(255,106,61,.14), transparent 62%),
+        radial-gradient(circle at 50% 20%, rgba(143,107,255,.14), transparent 62%);
+      transform:rotate(-5deg);
+    }
+
+    .results-inner{
+      position:relative;
+      z-index:1;
+      padding:20px;
+      display:grid;
+      gap:14px;
+    }
+
+    .results-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+
+    .results-title{
+      margin:0 0 8px;
+      font-size:clamp(28px, 4vw, 46px);
+      line-height:.95;
+      letter-spacing:-.05em;
+      font-weight:900;
+    }
+
+    .results-copy{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.58;
+      max-width:62ch;
+    }
+
+    .selected-pill{
+      min-height:44px;
+      padding:10px 12px;
+      border-radius:var(--radius-pill);
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.05);
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:12px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      white-space:nowrap;
+    }
+
+    .toolbar{
+      position:sticky;
+      top:96px;
+      z-index:40;
+      display:grid;
+      grid-template-columns:1fr auto auto auto;
+      gap:10px;
+      align-items:center;
+      padding:10px;
+      border-radius:24px;
+      border:1px solid var(--line);
+      background:rgba(6,7,11,.86);
+      box-shadow:var(--shadow-1);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+    }
+
+    .search-wrap{
+      position:relative;
+      min-width:0;
+    }
+
+    .search{
+      width:100%;
+      min-height:50px;
+      padding:13px 44px 13px 16px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.18);
+      color:var(--ink);
+      outline:none;
+      box-shadow:var(--shadow-1);
+    }
+
+    .search::placeholder{color:rgba(236,251,255,.42)}
+
+    .search-icon{
+      position:absolute;
+      right:14px;
+      top:50%;
+      transform:translateY(-50%);
+      color:rgba(236,251,255,.42);
+      pointer-events:none;
+    }
+
+    .strip{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .chip{
+      min-height:40px;
+      padding:8px 12px;
+      border-radius:var(--radius-pill);
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.05);
+      color:var(--ink);
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:12px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .chip.active{
+      border-color:rgba(68,230,255,.30);
+      background:linear-gradient(135deg, rgba(255,106,61,.24), rgba(68,230,255,.12));
+    }
+
+    .meta{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .meta-text{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+      font-weight:800;
+    }
+
+    .item-grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:12px;
+      align-content:start;
+    }
+
+    .item-card{
+      border-radius:28px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      box-shadow:var(--shadow-1);
+      overflow:hidden;
+      transition:
+        transform .22s ease,
+        border-color .22s ease,
+        box-shadow .22s ease;
+    }
+
+    .item-card:hover{
+      transform:translateY(-1px);
+      border-color:rgba(68,230,255,.26);
+      box-shadow:var(--shadow-2);
+    }
+
+    .item-btn{
+      width:100%;
+      text-align:left;
+      border:none;
+      background:none;
+      color:inherit;
+      padding:0;
+      cursor:pointer;
+    }
+
+    .item-top{
+      padding:16px 16px 10px;
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      gap:12px;
+      align-items:start;
+    }
+
+    .item-icon{
+      width:48px;
+      height:48px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      font-size:24px;
+      background:linear-gradient(135deg, rgba(255,106,61,.20), rgba(68,230,255,.12));
+      border:1px solid var(--line);
+      box-shadow:var(--shadow-1);
+      flex:0 0 auto;
+    }
+
+    .item-title{
+      margin:0 0 6px;
+      font-size:17px;
+      line-height:1.08;
+      letter-spacing:-.03em;
+      font-weight:900;
+    }
+
+    .item-desc{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.52;
+      display:-webkit-box;
+      -webkit-line-clamp:3;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+
+    .item-price{
+      font-size:18px;
+      font-weight:900;
+      letter-spacing:-.03em;
+      white-space:nowrap;
+      padding-top:3px;
+    }
+
+    .item-bottom{
+      padding:0 16px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .tags{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 9px;
+      border-radius:var(--radius-pill);
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.05);
+      color:var(--muted-2);
+      font-size:11px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .item-view{
+      min-height:34px;
+      padding:0 12px;
+      border-radius:var(--radius-pill);
+      border:1px solid rgba(68,230,255,.20);
+      background:linear-gradient(135deg, rgba(255,106,61,.18), rgba(68,230,255,.10));
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:12px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.10em;
+      white-space:nowrap;
+    }
+
+    .empty{
+      min-height:280px;
+      border-radius:30px;
+      border:1px dashed rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      display:grid;
+      place-items:center;
+      padding:24px;
+      text-align:center;
+      color:var(--muted);
+    }
+
+    .empty strong{
+      display:block;
+      margin-bottom:8px;
+      color:var(--ink);
+      font-size:18px;
+    }
+
+    .detail{
+      position:fixed;
+      inset:0;
+      z-index:2000;
+      display:none;
+    }
+
+    .detail.open{display:block}
+
+    .detail-backdrop{
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,.72);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+    }
+
+    .detail-sheet{
+      position:absolute;
+      right:10px;
+      top:10px;
+      bottom:10px;
+      width:min(480px, calc(100vw - 20px));
+      border-radius:36px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(248,252,255,.96), rgba(235,245,255,.94));
+      color:#12202b;
+      box-shadow:0 34px 90px rgba(0,0,0,.38);
+      overflow:hidden;
+      transform:translateX(102%);
+      transition:transform .36s cubic-bezier(.2,.8,.2,1);
+    }
+
+    .detail.open .detail-sheet{
+      transform:translateX(0);
+    }
+
+    .detail-sheet::before{
+      content:"";
+      position:absolute;
+      inset:auto -18% -34% -18%;
+      height:280px;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 30% 40%, rgba(68,230,255,.12), transparent 60%),
+        radial-gradient(circle at 72% 56%, rgba(255,106,61,.14), transparent 62%),
+        radial-gradient(circle at 50% 20%, rgba(143,107,255,.14), transparent 62%);
+      transform:rotate(-5deg);
+    }
+
+    .detail-inner{
+      position:relative;
+      z-index:1;
+      height:100%;
+      display:grid;
+      grid-template-rows:auto auto auto 1fr auto;
+      gap:16px;
+      padding:20px;
+    }
+
+    .detail-close{
+      position:absolute;
+      top:14px;
+      right:14px;
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.08);
+      background:rgba(255,255,255,.82);
+      box-shadow:var(--shadow-1);
+      display:grid;
+      place-items:center;
+      color:#12202b;
+      font-weight:900;
+    }
+
+    .detail-eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      width:max-content;
+      max-width:100%;
+      border-radius:var(--radius-pill);
+      border:1px solid rgba(0,0,0,.08);
+      background:rgba(255,255,255,.70);
+      font-size:11px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:#12202b;
+    }
+
+    .detail-title{
+      margin:0;
+      font-size:clamp(34px, 5vw, 52px);
+      line-height:.92;
+      letter-spacing:-.06em;
+      font-weight:900;
+      color:#12202b;
+    }
+
+    .detail-desc{
+      margin:0;
+      color:rgba(18,32,43,.72);
+      font-size:15px;
+      line-height:1.62;
+    }
+
+    .detail-price-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .detail-price{
+      font-size:34px;
+      font-weight:900;
+      letter-spacing:-.05em;
+      color:#12202b;
+    }
+
+    .detail-tags{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .detail-tag{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:8px 10px;
+      border-radius:var(--radius-pill);
+      border:1px solid rgba(0,0,0,.08);
+      background:rgba(255,255,255,.70);
+      color:#12202b;
+      font-size:11px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.1em;
+    }
+
+    .detail-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:12px;
+    }
+
+    .detail-box{
+      border-radius:24px;
+      border:1px solid rgba(0,0,0,.08);
+      background:rgba(255,255,255,.70);
+      box-shadow:var(--shadow-1);
+      padding:16px;
+      display:grid;
+      gap:8px;
+      align-content:start;
+    }
+
+    .detail-box-title{
+      font-size:15px;
+      font-weight:900;
+      letter-spacing:-.02em;
+      color:#12202b;
+    }
+
+    .detail-box-copy{
+      color:rgba(18,32,43,.72);
+      font-size:13px;
+      line-height:1.55;
+    }
+
+    .detail-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .detail-btn{
+      min-height:50px;
+      padding:0 16px;
+      border-radius:20px;
+      border:1px solid rgba(0,0,0,.08);
+      background:#162430;
+      color:#fff;
+      box-shadow:var(--shadow-2);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      font-weight:900;
+    }
+
+    .detail-btn.primary{
+      background:linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-color:rgba(68,230,255,.20);
+    }
+
+    .dock{
+      display:none;
+    }
+
+    .toast-wrap{
+      position:fixed;
+      right:12px;
+      bottom:12px;
+      z-index:3000;
+      display:grid;
+      gap:10px;
+      width:min(360px, calc(100vw - 24px));
+      pointer-events:none;
+    }
+
+    .toast{
+      padding:14px 16px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(6,7,11,.94);
+      box-shadow:var(--shadow-2);
+      color:var(--ink);
+      font-size:14px;
+      line-height:1.46;
+      opacity:0;
+      transform:translateY(8px);
+      animation:toastIn .22s ease forwards;
+    }
+
+    @keyframes toastIn{
+      to{
+        opacity:1;
+        transform:translateY(0);
+      }
+    }
+
+    .sr-only{
+      position:absolute;
+      width:1px;
+      height:1px;
+      padding:0;
+      margin:-1px;
+      overflow:hidden;
+      clip:rect(0,0,0,0);
+      white-space:nowrap;
+      border:0;
+    }
+
+    @media (max-width: 1220px){
+      .hero{
+        grid-template-columns:1fr;
+      }
+      .item-grid{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 900px){
+      .topbar{
+        grid-template-columns:1fr;
+        justify-items:start;
+      }
+      .status-pill{justify-self:stretch}
+      .top-actions{justify-content:flex-start}
+      .hero-grid{
+        grid-template-columns:1fr;
+      }
+      .toolbar{
+        grid-template-columns:1fr 1fr;
+      }
+    }
+
+    @media (max-width: 680px){
+      :root{
+        --card-w:min(78vw, 340px);
+        --card-h:min(118vw, 430px);
+      }
+      .app{
+        width:calc(100vw - 10px);
+      }
+      .toolbar{
+        grid-template-columns:1fr;
+      }
+      .item-grid{
+        grid-template-columns:1fr;
+      }
+      .detail-sheet{
+        left:5px;
+        right:5px;
+        top:auto;
+        bottom:5px;
+        width:auto;
+        height:min(82vh, 720px);
+        border-radius:28px 28px 22px 22px;
+        transform:translateY(102%);
+      }
+      .detail.open .detail-sheet{
+        transform:translateY(0);
+      }
+      .detail-grid{
+        grid-template-columns:1fr;
+      }
+      .dock{
+        position:fixed;
+        left:50%;
+        transform:translateX(-50%);
+        bottom:8px;
+        z-index:1200;
+        display:grid;
+        grid-template-columns:repeat(4, minmax(0, 1fr));
+        gap:8px;
+        width:calc(100vw - 10px);
+      }
+      .dock-btn{
+        min-height:56px;
+        padding:10px 8px;
+        border-radius:18px;
+        border:1px solid var(--line);
+        background:rgba(6,7,11,.88);
+        color:var(--ink);
+        box-shadow:var(--shadow-2);
+        display:grid;
+        justify-items:center;
+        align-content:center;
+        gap:4px;
+        font-size:11px;
+        font-weight:900;
+        text-align:center;
+      }
+      .dock-emoji{
+        font-size:18px;
+        line-height:1;
+      }
+      .results{
+        padding-bottom:106px;
+      }
+      .toast-wrap{
+        bottom:84px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      html{scroll-behavior:auto}
+      *,
+      *::before,
+      *::after{
+        animation:none !important;
+        transition:none !important;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="wrap" id="app">
-  <div class="left" aria-hidden="false">
-    <canvas id="holoCanvas" role="img" aria-label="Holographic categories display"></canvas>
-
-    <!-- floating UI -->
-    <div class="holoControls" aria-hidden="false">
-      <button id="prevCat" class="btn small">⟨ Prev</button>
-      <button id="nextCat" class="btn small">Next ⟩</button>
-      <button id="openImport" class="btn big" aria-haspopup="dialog" aria-controls="importDialog">Import</button>
-      <button id="downloadBtn" class="btn big" title="Download this menu file">Download</button>
-      <button id="voiceBtn" class="btn big" title="Start voice order (Ctrl/⌘+V)">🎙️ Voice</button>
-    </div>
-
-    <div style="position:absolute;right:22px;top:22px;z-index:40">
-      <button id="printBtn" class="btn">Print</button>
-    </div>
-  </div>
-
-  <aside class="right" aria-label="Menu controls and cart">
-    <div class="brand">
-      <div class="logo">HH</div>
-      <div>
-        <h1>Hotheadz Southern Foods</h1>
-        <p class="muted">Holographic Categories • Click to open</p>
-      </div>
-    </div>
-
-    <div class="controls" role="region" aria-label="Category & items">
-      <div class="itemsPanel" id="itemsPanel" aria-live="polite">
-        <strong id="currentCategoryTitle">Categories</strong>
-        <div id="itemsHolder" style="margin-top:8px">
-          <p class="muted">No category selected. Use the hologram to the left or the Prev/Next buttons.</p>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">HH</div>
+        <div class="brand-copy">
+          <div class="brand-title">Hot Headz Southern Foods</div>
+          <div class="brand-sub">Holographic category carousel powered by menu-data.html</div>
         </div>
       </div>
-    </div>
 
-    <div class="cart" id="cart" role="region" aria-label="Cart">
-      <strong>Order</strong>
-      <div id="cartList" style="margin-top:8px"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-        <div class="muted">Subtotal</div>
-        <div id="subtotal" style="font-weight:800">$0.00</div>
+      <div class="status-pill" aria-live="polite">
+        <span class="live-dot" id="liveDot"></span>
+        <span class="status-main" id="liveMain">Checking restaurant status…</span>
+        <span class="status-sub" id="liveSub">Loading timing…</span>
       </div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button id="checkoutBtn" class="btn" style="flex:1">Checkout</button>
-        <button id="clearCartBtn" class="btn" style="background:#223">Clear</button>
+
+      <div class="top-actions">
+        <button class="btn" id="themeBtn" type="button">◐ Theme</button>
+        <button class="btn" id="shareBtn" type="button">📤 Share</button>
+        <a class="btn" href="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634" target="_blank" rel="noopener">📍 Directions</a>
+        <a class="btn primary" href="tel:3372211035">📞 Call</a>
       </div>
-    </div>
+    </header>
 
-    <div class="hud">
-      <div class="muted">Favorites save here</div>
-      <div id="status" class="muted">Ready</div>
-    </div>
-  </aside>
-</div>
+    <main class="hero">
+      <section class="panel">
+        <div class="panel-inner">
+          <div class="eyebrow"><span class="eyebrow-dot"></span> front card + circular stack behind it</div>
+          <h1 class="hero-title">Floating front card. The rest orbit behind it.</h1>
+          <p class="hero-copy">
+            This version treats the categories like a real holographic stack. One category sits at the front, the rest curve behind it in a circular belt.
+            Cycle left or right until the category you want comes forward, then click it to drill into that category’s items. When you click a category,
+            the same carousel becomes the item carousel for that category.
+          </p>
 
-<!-- Import modal (inline) -->
-<div id="importDialog" role="dialog" aria-modal="true" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:88%;max-width:860px;z-index:200;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);padding:18px;border-radius:12px">
-  <h2 style="margin-top:0">Import Menu Data</h2>
-  <p class="muted">Paste a JSON array of categories or a URL to a menu-data.html file containing a JSON script tag. Example format:</p>
-  <pre style="background:#071426;color:#cff; padding:10px;border-radius:6px;">[
-  {"category":"Lunch","items":[{"id":"burger","title":"Burger","price":9.50,"desc":"Beef & toppings","img":""}]},
-  {"category":"Drinks","items":[...]}
-]</pre>
-  <textarea id="dialogPaste" style="width:100%;height:160px;background:var(--glass);color:#eaffff;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03)"></textarea>
-  <div style="display:flex;gap:8px;margin-top:8px">
-    <button id="dialogLoad" class="btn">Load</button>
-    <button id="dialogClose" class="btn" style="background:#223">Close</button>
-    <button id="dialogFetchURL" class="btn">Try Fetch URL</button>
+          <div class="hero-grid">
+            <article class="mini-card">
+              <div class="mini-k">Step 1</div>
+              <div class="mini-v">Cycle</div>
+              <div class="mini-copy">Spin through the categories until the one you want reaches the front.</div>
+            </article>
+            <article class="mini-card">
+              <div class="mini-k">Step 2</div>
+              <div class="mini-v">Select</div>
+              <div class="mini-copy">Click the front category to enter that menu: lunch, breakfast, drinks, dessert, and more.</div>
+            </article>
+            <article class="mini-card">
+              <div class="mini-k">Step 3</div>
+              <div class="mini-v">Items</div>
+              <div class="mini-copy">The same floating carousel becomes the item view, with the chosen item sitting at the front.</div>
+            </article>
+          </div>
+
+          <div class="hero-bottom">
+            <div class="hero-note" id="heroNote">
+              <strong>Structure:</strong> categories come from <strong>menu-data.html</strong>, and once one is chosen, its items become the next carousel layer.
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="mini-btn" id="bestNowBtn" type="button">🕒 Best Right Now</button>
+              <button class="mini-btn" id="randomBtn" type="button">🎲 Pick Random</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-inner">
+          <div class="carousel-head">
+            <div>
+              <div class="eyebrow"><span class="eyebrow-dot"></span> floating holographic stack</div>
+              <h2 class="carousel-title" id="carouselTitle">Categories</h2>
+              <p class="carousel-copy" id="carouselCopy">
+                Click the front card to open that category. Use the arrows to cycle the stack.
+              </p>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="mini-btn" id="backBtn" type="button" style="display:none">← Back</button>
+              <button class="mini-btn" id="cyclePrevBtn" type="button">← Prev</button>
+              <button class="mini-btn" id="cycleNextBtn" type="button">Next →</button>
+            </div>
+          </div>
+
+          <div class="stage">
+            <div class="stage-glow"></div>
+            <div class="carousel" id="carousel"></div>
+          </div>
+
+          <div class="carousel-controls" id="carouselDots"></div>
+        </div>
+      </section>
+    </main>
+
+    <section class="results">
+      <section class="results-panel">
+        <div class="results-inner">
+          <div class="results-head">
+            <div>
+              <div class="eyebrow"><span class="eyebrow-dot"></span> item browser</div>
+              <h2 class="results-title" id="resultsTitle">Current view</h2>
+              <p class="results-copy" id="resultsCopy">Use the floating carousel above, then scroll here for the fuller grid view.</p>
+            </div>
+            <div class="selected-pill" id="selectedPill">No selection yet</div>
+          </div>
+
+          <div class="toolbar">
+            <label class="search-wrap">
+              <span class="sr-only">Search items</span>
+              <input class="search" id="searchInput" type="search" placeholder="Search menu items..." />
+              <span class="search-icon">⌕</span>
+            </label>
+            <button class="mini-btn" id="clearSearchBtn" type="button">Clear</button>
+            <button class="mini-btn" id="showAllBtn" type="button">Show All</button>
+            <button class="mini-btn" id="openFrontBtn" type="button">Open Front Card</button>
+          </div>
+
+          <div class="strip" id="chipStrip"></div>
+
+          <div class="meta">
+            <div class="meta-text" id="metaText">Waiting for category selection.</div>
+            <div class="meta-text" id="countText"></div>
+          </div>
+
+          <div class="item-grid" id="itemGrid"></div>
+        </div>
+      </section>
+    </section>
   </div>
-  <div id="dialogMsg" class="muted" style="margin-top:10px"></div>
-</div>
 
-<!-- Printable area template -->
-<div id="printable" style="display:none;padding:20px;background:white;color:black">
-  <h1>Hotheadz Menu</h1>
-  <div id="printContent"></div>
-</div>
+  <div class="detail" id="detail">
+    <div class="detail-backdrop" data-close-detail="true"></div>
+    <aside class="detail-sheet" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <div class="detail-inner">
+        <button class="detail-close" id="detailCloseBtn" type="button" aria-label="Close">✕</button>
 
-<!-- ARIA live -->
-<div id="ariaLive" class="sr-only" role="status" aria-live="polite"></div>
+        <div>
+          <div class="detail-eyebrow" id="detailEyebrow">Menu Item</div>
+        </div>
 
-<script>
-/* ============================
-   Data / Defaults
-   ============================ */
-const DEFAULT_CATEGORIES = [
-  { category: 'Lunch', items: [
-    { id: 'fried-chicken', title: 'Crispy Fried Chicken', price: 12.99, desc: 'Buttermilk-marinated, double-dusted, served with house slaw.', img: '' },
-    { id: 'mac-cheese', title: 'Smoky Mac & Cheese', price: 7.50, desc: 'Creamy cheddar, smoked gouda, with crispy panko.', img: '' },
-  ]},
-  { category: 'Drinks', items: [
-    { id: 'sweet-tea', title: 'Southern Sweet Tea', price: 2.75, desc: 'House-brewed with lemon.', img: '' },
-    { id: 'coffee', title: 'House Coffee', price: 2.50, desc: 'Freshly brewed.', img: '' },
-  ]},
-  { category: 'Breakfast', items: [
-    { id: 'pancakes', title: 'Stack of Pancakes', price: 8.50, desc: 'Buttery pancakes with maple syrup.', img: '' },
-  ]},
-  { category: 'Sides', items: [
-    { id: 'cornbread', title: 'Honey Butter Cornbread', price: 3.50, desc: 'Warm cornbread with a honey butter glaze.', img: '' },
-  ]}
-];
+        <div>
+          <h3 class="detail-title" id="detailTitle">Item</h3>
+          <p class="detail-desc" id="detailDesc">Description</p>
+        </div>
 
-const STORAGE_KEY = 'hotheadz_categories_v1';
-const canvas = document.getElementById('holoCanvas');
+        <div class="detail-price-row">
+          <div class="detail-price" id="detailPrice">$0.00</div>
+          <div class="detail-tags" id="detailTags"></div>
+        </div>
 
-let categories = []; // array of {category, items}
-let cart = {};
-let renderer, scene, camera, raycaster, pointer;
-let items3D = [];
-let selectedIndex = 0;
-let group;
-let hovered = null;
-let animReq;
+        <div class="detail-grid">
+          <div class="detail-box">
+            <div class="detail-box-title">Why it works</div>
+            <div class="detail-box-copy" id="detailWhy">Reason</div>
+          </div>
+          <div class="detail-box">
+            <div class="detail-box-title">Order cue</div>
+            <div class="detail-box-copy" id="detailCue">Cue</div>
+          </div>
+        </div>
 
-/* ============================
-   Persistence helpers
-   ============================ */
-function saveCategories(){
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(categories)); }catch(e){}
-}
-function loadCategoriesStored(){
-  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || null; }catch(e){ return null; }
-}
-function saveCart(){ try{ localStorage.setItem('hotheadz_cart_v1', JSON.stringify(cart)); }catch(e){} }
-function loadCart(){ try{ return JSON.parse(localStorage.getItem('hotheadz_cart_v1')) || {}; }catch(e){ return {}; } }
-
-/* ============================
-   Init
-   ============================ */
-function init(){
-  categories = loadCategoriesStored() || DEFAULT_CATEGORIES;
-  cart = loadCart();
-  updateCartUI();
-  initThree();
-  buildCategoryScene();
-  animate();
-
-  // wire UI
-  document.getElementById('prevCat').addEventListener('click', prevCategory);
-  document.getElementById('nextCat').addEventListener('click', nextCategory);
-  document.getElementById('openImport').addEventListener('click', ()=> openDialog());
-  document.getElementById('downloadBtn').addEventListener('click', downloadThisPage);
-  document.getElementById('voiceBtn').addEventListener('click', startVoice);
-  document.getElementById('printBtn').addEventListener('click', printMenu);
-  document.getElementById('dialogClose').addEventListener('click', closeDialog);
-  document.getElementById('dialogLoad').addEventListener('click', loadDialogPaste);
-  document.getElementById('dialogFetchURL').addEventListener('click', dialogTryFetchURL);
-  document.getElementById('checkoutBtn').addEventListener('click', ()=> alert('Demo: checkout would go here.'));
-  document.getElementById('clearCartBtn').addEventListener('click', ()=>{ cart = {}; saveCart(); updateCartUI(); announce('Cart cleared'); });
-
-  window.addEventListener('keydown', (e)=>{
-    if(e.key === 'ArrowLeft'){ prevCategory(); }
-    if(e.key === 'ArrowRight'){ nextCategory(); }
-    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='v'){ e.preventDefault(); startVoice(); }
-  });
-
-  // try auto load menu-data.html on same origin
-  tryLoadMenuData('/menu-data.html');
-}
-
-/* ============================
-   Announcer & helpers
-   ============================ */
-function announce(msg){ const a = document.getElementById('ariaLive'); a.textContent = msg; document.getElementById('status').textContent = msg; }
-
-/* ============================
-   Menu-data loader
-   ============================ */
-async function tryLoadMenuData(url){
-  try{
-    const res = await fetch(url, {cache:'no-store'});
-    if(!res.ok) return;
-    const text = await res.text();
-    const parsed = parseMenuDataFile(text);
-    if(parsed && parsed.length){
-      categories = parsed;
-      saveCategories();
-      buildCategoryScene();
-      updateItemsPanel(selectedIndex);
-      announce(`Loaded ${categories.length} categories from ${url}`);
-    }
-  }catch(e){
-    // ignore
-  }
-}
-
-function parseMenuDataFile(text){
-  // 1) try to find <script id="menu-data" type="application/json">...</script>
-  let m = text.match(/<script[^>]*id=["']menu-data["'][^>]*type=["']application\/json["'][^>]*>([\s\S]*?)<\/script>/i);
-  if(m && m[1]){
-    try{
-      return JSON.parse(m[1].trim()).map(normalizeCategory);
-    }catch(e){}
-  }
-  // 2) try to find any <script type="application/json"> with array
-  m = text.match(/<script[^>]*type=["']application\/json["'][^>]*>([\s\S]*?)<\/script>/i);
-  if(m && m[1]){
-    try{ return JSON.parse(m[1].trim()).map(normalizeCategory); }catch(e){}
-  }
-  // 3) try to find a JSON array anywhere (first [...] that looks like categories)
-  m = text.match(/(\[\s*\{[\s\S]*?\}\s*\])/);
-  if(m && m[1]){
-    try{ return JSON.parse(m[1]).map(normalizeCategory); }catch(e){}
-  }
-  // 4) try to find window.MENU or MENU_DATA assignments
-  m = text.match(/window\.(?:MENU|MENU_DATA)\s*=\s*(\[\s*\{[\s\S]*?\}\s*\])/);
-  if(m && m[1]){
-    try{ return JSON.parse(m[1]).map(normalizeCategory); }catch(e){}
-  }
-  return null;
-}
-
-function normalizeCategory(cat){
-  return {
-    category: cat.category || cat.title || 'Untitled',
-    items: (cat.items || []).map(it => ({
-      id: it.id || (it.title || '').toLowerCase().replace(/[^a-z0-9]+/g,'-') + '-' + Math.random().toString(36).slice(2,6),
-      title: it.title || it.name || 'Dish',
-      desc: it.desc || it.description || '',
-      price: Number(it.price || it.cost || 0),
-      img: it.img || ''
-    }))
-  };
-}
-
-/* ============================
-   Three.js scene
-   ============================ */
-function initThree(){
-  try{
-    renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha:true, antialias:true, powerPreference:'high-performance' });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    resizeRenderer();
-    renderer.outputEncoding = THREE.sRGBEncoding;
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 4000);
-    camera.position.set(0,0,800);
-
-    // lighting
-    const amb = new THREE.AmbientLight(0xffffff, 0.7); scene.add(amb);
-    const dir = new THREE.DirectionalLight(0xffffff, 0.6); dir.position.set(0.5,1,0.5); scene.add(dir);
-
-    raycaster = new THREE.Raycaster();
-    pointer = new THREE.Vector2(-9999,-9999);
-
-    window.addEventListener('resize', resizeRenderer);
-    window.addEventListener('mousemove', (e)=> {
-      const rect = renderer.domElement.getBoundingClientRect();
-      pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-    });
-    window.addEventListener('click', (e)=> {
-      handleClick();
-    });
-  }catch(e){
-    console.warn('WebGL not available',e);
-    canvas.style.display = 'none';
-  }
-}
-
-function resizeRenderer(){
-  const leftEl = document.querySelector('.left');
-  const rect = leftEl.getBoundingClientRect();
-  const w = rect.width;
-  const h = rect.height;
-  renderer.setSize(w, h);
-  camera.aspect = w / h;
-  camera.updateProjectionMatrix();
-}
-
-function buildCategoryScene(){
-  // clear
-  if(!scene) return;
-  while(scene.children.length > 0){ scene.remove(scene.children[0]); }
-  // lights
-  const amb = new THREE.AmbientLight(0xffffff, 0.7); scene.add(amb);
-  const dir = new THREE.DirectionalLight(0xffffff, 0.6); dir.position.set(0.5,1,0.5); scene.add(dir);
-
-  items3D = [];
-  group = new THREE.Group(); scene.add(group);
-
-  const count = categories.length;
-  const radius = 340;
-  const planeW = 280, planeH = 160;
-
-  categories.forEach((cat, idx) => {
-    const tex = createCategoryTexture(cat, 1024, 512);
-    const mat = new THREE.MeshBasicMaterial({ map: tex, transparent:true, depthWrite:false, side:THREE.DoubleSide });
-    const geo = new THREE.PlaneGeometry(planeW, planeH, 12, 6);
-    const mesh = new THREE.Mesh(geo, mat);
-
-    // compute positions: if selected => front center; others in circle behind
-    const angle = (idx / Math.max(count,1)) * Math.PI*2;
-    const x = Math.cos(angle) * radius;
-    const y = Math.sin(angle*0.7) * 40;
-    const z = Math.sin(angle) * -240; // behind (negative z)
-    mesh.position.set(x,y,z);
-    mesh.lookAt(0,0,0);
-    mesh.userData = { idx, category: cat.category };
-    mesh.scale.set(1,1,1);
-    group.add(mesh);
-    items3D.push({ mesh, tex, cat, base: { x,y,z } });
-  });
-
-  // create a front floating card for the selected index
-  setFrontCard(selectedIndex, false);
-
-  // subtle ground ring
-  const ringGeo = new THREE.RingGeometry(360, 420, 64);
-  const ringMat = new THREE.MeshBasicMaterial({ color:0x001122, side:THREE.DoubleSide, transparent:true, opacity:0.18 });
-  const ring = new THREE.Mesh(ringGeo, ringMat);
-  ring.rotation.x = -Math.PI/2;
-  ring.position.y = -220;
-  scene.add(ring);
-}
-
-function createCategoryTexture(cat, w=1024, h=512){
-  const c = document.createElement('canvas'); c.width=w; c.height=h; const ctx=c.getContext('2d');
-  // background band
-  const g = ctx.createLinearGradient(0,0,w,0);
-  g.addColorStop(0, '#07202a'); g.addColorStop(1, '#0e2f3a');
-  ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
-  // header area
-  ctx.fillStyle = '#0b1720'; ctx.fillRect(0,0,w,120);
-  ctx.fillStyle = '#fff'; ctx.font='700 52px Inter'; ctx.textAlign='left';
-  ctx.fillText(cat.category || 'Category', 32, 74);
-  // subtitle: items count
-  ctx.fillStyle = '#bfe9f5'; ctx.font='500 20px Inter'; ctx.fillText((cat.items || []).length + ' items', 32, 100);
-  // center large badge showing first item if present
-  ctx.fillStyle = '#eaf8ff'; ctx.font='600 24px Inter'; ctx.textAlign='center';
-  const sample = (cat.items && cat.items[0]) ? cat.items[0].title : '';
-  ctx.fillText(sample, w/2, 240);
-
-  // small description
-  ctx.fillStyle = '#cfeff3'; ctx.font='14px Inter'; ctx.textAlign='left';
-  const desc = (cat.items && cat.items.slice(0,3).map(it => it.title).join(' • ')) || '';
-  wrapText(ctx, desc, 32, 300, w-64, 20);
-
-  // highlight pill
-  ctx.fillStyle = '#ffd8c6';
-  roundRectFill(ctx, w-220, 24, 180, 42, 10);
-  ctx.fillStyle = '#6b2a10';
-  ctx.font='700 20px Inter'; ctx.textAlign='center';
-  ctx.fillText('Open Category', w-130, 55);
-
-  return new THREE.CanvasTexture(c);
-}
-
-/* make the selected card float to front */
-function setFrontCard(idx, animate = true){
-  selectedIndex = (idx + categories.length) % categories.length;
-  // compute new positions for all meshes
-  items3D.forEach((entry, i) => {
-    if(i === selectedIndex){
-      // move to front center (positive z)
-      const target = { x:0, y:10, z:120, scale:1.15 };
-      if(animate){
-        gsap.to(entry.mesh.position, { x: target.x, y: target.y, z: target.z, duration:0.8, ease:'power3.out' });
-        gsap.to(entry.mesh.scale, { x: target.scale, y: target.scale, duration:0.8, ease:'power3.out' });
-      } else {
-        entry.mesh.position.set(target.x, target.y, target.z);
-        entry.mesh.scale.set(target.scale, target.scale, target.scale);
-      }
-      entry.mesh.lookAt(0,0,0);
-      entry.mesh.userData.front = true;
-    } else {
-      // place behind in a ring, keep relative order
-      const pos = entry.base;
-      const modified = { x: pos.x, y: pos.y - 8, z: pos.z - 20 };
-      if(animate){
-        gsap.to(entry.mesh.position, { x: modified.x, y: modified.y, z: modified.z, duration:0.9, ease:'elastic.out(1,0.6)' });
-        gsap.to(entry.mesh.scale, { x:1, y:1, duration:0.9, ease:'elastic.out(1,0.6)' });
-      } else {
-        entry.mesh.position.set(modified.x, modified.y, modified.z);
-        entry.mesh.scale.set(1,1,1);
-      }
-      entry.mesh.userData.front = false;
-    }
-  });
-
-  // update items panel
-  updateItemsPanel(selectedIndex);
-  announce(categories[selectedIndex].category + ' focused');
-}
-
-/* ============================
-   Interaction
-   ============================ */
-function prevCategory(){
-  const next = (selectedIndex - 1 + categories.length) % categories.length;
-  setFrontCard(next);
-}
-function nextCategory(){
-  const next = (selectedIndex + 1) % categories.length;
-  setFrontCard(next);
-}
-
-function handleClick(){
-  if(!hovered) return;
-  const idx = hovered.userData.idx;
-  // if clicked the hovered, open that category (it will animate to front then update panel)
-  setFrontCard(idx);
-  // also open panel - already opened in setFrontCard
-  // small pulse
-  gsap.to(hovered.scale, { x:1.3, y:1.3, duration:0.12, yoyo:true, repeat:1 });
-}
-
-function onHover(mesh){
-  if(!mesh) return;
-  gsap.to(mesh.position, { z: mesh.position.z + 40, duration:0.35, ease:'expo.out' });
-  gsap.to(mesh.scale, { x:1.12, y:1.12, duration:0.35, ease:'expo.out' });
-  announce(mesh.userData.category + ' focused');
-}
-function onUnhover(mesh){
-  if(!mesh) return;
-  const entry = items3D.find(x => x.mesh === mesh);
-  if(!entry) return;
-  // if it's the selected index, restore front z; otherwise restore base (which may be slightly behind)
-  if(entry.mesh.userData.front){
-    gsap.to(mesh.position, { x:0, y:10, z:120, duration:0.6, ease:'elastic.out(1,0.6)' });
-    gsap.to(mesh.scale, { x:1.15, y:1.15, duration:0.6, ease:'elastic.out(1,0.6)' });
-  } else {
-    gsap.to(mesh.position, { x:entry.base.x, y: entry.base.y - 8, z: entry.base.z - 20, duration:0.8, ease:'elastic.out(1,0.6)' });
-    gsap.to(mesh.scale, { x:1, y:1, duration:0.6, ease:'elastic.out(1,0.6)' });
-  }
-}
-
-/* Animation loop */
-function animate(){
-  const t = performance.now() * 0.001;
-  // subtle movement for all meshes
-  items3D.forEach((e, idx) => {
-    e.mesh.rotation.z = Math.sin(t*0.6 + idx) * 0.02;
-    // gentle float
-    e.mesh.position.y = e.mesh.position.y + Math.sin(t*0.8 + idx) * 0.001;
-  });
-
-  // raycasting
-  raycaster.setFromCamera(pointer, camera);
-  const intersects = raycaster.intersectObjects(items3D.map(x => x.mesh));
-  if(intersects.length){
-    const obj = intersects[0].object;
-    if(hovered !== obj){
-      if(hovered) onUnhover(hovered);
-      hovered = obj;
-      onHover(obj);
-    }
-  } else {
-    if(hovered) onUnhover(hovered);
-    hovered = null;
-  }
-
-  // gentle camera orbit
-  camera.position.x = Math.sin(t*0.04)*20;
-  camera.lookAt(0,0,0);
-
-  renderer.render(scene, camera);
-  animReq = requestAnimationFrame(animate);
-}
-
-/* ============================
-   Items Panel & Cart
-   ============================ */
-function updateItemsPanel(idx){
-  const holder = document.getElementById('itemsHolder');
-  holder.innerHTML = '';
-  const title = document.getElementById('currentCategoryTitle');
-  const cat = categories[idx];
-  title.textContent = cat.category;
-  if(!cat || !cat.items || !cat.items.length){
-    holder.innerHTML = '<p class="muted">This category has no items.</p>';
-    return;
-  }
-  cat.items.forEach(it => {
-    const row = document.createElement('div'); row.className = 'itemRow';
-    row.innerHTML = `
-      <img src="${it.img || placeholderImg(it.title)}" alt="${escapeHtml(it.title)}" />
-      <div style="flex:1">
-        <strong>${escapeHtml(it.title)}</strong>
-        <div class="muted" style="font-size:13px">${escapeHtml(it.desc)}</div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-weight:800">$${Number(it.price||0).toFixed(2)}</div>
-        <div style="margin-top:8px"><button class="btn" data-add="${it.id}" style="padding:6px 8px">Add</button></div>
-      </div>
-    `;
-    holder.appendChild(row);
-  });
-  // wire add buttons
-  Array.from(holder.querySelectorAll('[data-add]')).forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const id = btn.getAttribute('data-add');
-      addToCartByItemId(id, cat.items);
-    });
-  });
-}
-
-/* cart helpers referencing items by id within the current categories (we keep items' id unique) */
-function getItemById(id){
-  for(const c of categories){
-    const f = c.items.find(it => it.id === id);
-    if(f) return f;
-  }
-  return null;
-}
-
-function addToCartByItemId(id, itemsList){
-  // find item in current list or global
-  let item = null;
-  item = getItemById(id) || (itemsList && itemsList.find(it => it.id === id));
-  if(!item) { announce('Item not found'); return; }
-  if(!cart[id]) cart[id] = 0;
-  cart[id] += 1;
-  saveCart(); updateCartUI();
-  announce(`${item.title} added to order`);
-}
-
-function removeFromCart(id){
-  delete cart[id]; saveCart(); updateCartUI();
-}
-function setQtyCart(id, qty){
-  if(qty <= 0) { removeFromCart(id); return; }
-  cart[id] = qty; saveCart(); updateCartUI();
-}
-function updateCartUI(){
-  const list = document.getElementById('cartList');
-  list.innerHTML = '';
-  let subtotal = 0;
-  for(const id in cart){
-    const item = getItemById(id);
-    if(!item) continue;
-    const qty = cart[id];
-    subtotal += item.price * qty;
-    const row = document.createElement('div'); row.className='item';
-    row.innerHTML = `
-      <div class="thumb"><img style="width:100%;height:100%;object-fit:cover" src="${item.img || placeholderImg(item.title)}" alt="${escapeHtml(item.title)}"></div>
-      <div style="flex:1">
-        <h3>${escapeHtml(item.title)}</h3>
-        <p class="muted">${escapeHtml(item.desc)}</p>
-      </div>
-      <div style="text-align:right">
-        <div style="font-weight:800">$${(item.price*qty).toFixed(2)}</div>
-        <div style="display:flex;gap:6px;align-items:center;justify-content:flex-end;margin-top:6px">
-          <button class="btn small" data-action="dec" data-id="${id}" style="padding:6px 8px;background:#223">-</button>
-          <div style="min-width:22px;text-align:center">${qty}</div>
-          <button class="btn small" data-action="inc" data-id="${id}" style="padding:6px 8px">+</button>
+        <div class="detail-actions">
+          <a class="detail-btn primary" href="tel:3372211035">📞 Call to Order</a>
+          <button class="detail-btn" id="detailRandomBtn" type="button">🎲 Pick Another</button>
+          <a class="detail-btn" href="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634" target="_blank" rel="noopener">📍 Directions</a>
         </div>
       </div>
-    `;
-    list.appendChild(row);
-  }
-  document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);
-  Array.from(list.querySelectorAll('[data-action]')).forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const id = btn.getAttribute('data-id');
-      const action = btn.getAttribute('data-action');
-      if(action === 'inc') { cart[id] = (cart[id]||0) + 1; saveCart(); updateCartUI(); }
-      if(action === 'dec') { setQtyCart(id, (cart[id]||1) - 1); }
-    });
-  });
-}
+    </aside>
+  </div>
 
-/* ============================
-   Utilities
-   ============================ */
-function placeholderImg(text){
-  const c = document.createElement('canvas'); c.width=200;c.height=120;const ctx=c.getContext('2d');
-  ctx.fillStyle='#0b1620'; ctx.fillRect(0,0,c.width,c.height);
-  ctx.fillStyle = '#18323b'; ctx.fillRect(0,c.height-34,c.width,34);
-  ctx.fillStyle = '#fff'; ctx.font='bold 20px Inter'; ctx.textAlign='center';
-  ctx.fillText((text||'Dish').slice(0,18), c.width/2, c.height/2+6);
-  return c.toDataURL('image/png');
-}
-function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function wrapText(ctx, text, x, y, maxWidth, lineHeight){
-  const words = text.split(' ');
-  let line = '';
-  for(let n=0;n<words.length;n++){
-    const testLine = line + words[n] + ' ';
-    const metrics = ctx.measureText(testLine);
-    if(metrics.width > maxWidth && n > 0){
-      ctx.fillText(line, x, y);
-      line = words[n] + ' ';
-      y += lineHeight;
-    } else {
-      line = testLine;
+  <nav class="dock" aria-label="Quick mobile actions">
+    <button class="dock-btn" id="dockPrevBtn" type="button">
+      <span class="dock-emoji">←</span>
+      <span>Prev</span>
+    </button>
+    <button class="dock-btn" id="dockOpenFrontBtn" type="button">
+      <span class="dock-emoji">◎</span>
+      <span>Open</span>
+    </button>
+    <button class="dock-btn" id="dockNextBtn" type="button">
+      <span class="dock-emoji">→</span>
+      <span>Next</span>
+    </button>
+    <button class="dock-btn" id="dockShareBtn" type="button">
+      <span class="dock-emoji">📤</span>
+      <span>Share</span>
+    </button>
+  </nav>
+
+  <div class="toast-wrap" id="toastWrap"></div>
+
+  <script src="menu-data.html"></script>
+  <script>
+    const APP = {
+      phone: "3372211035",
+      phoneDisplay: "(337) 221-1035",
+      categoryMeta: {
+        breakfast: { label: "Breakfast", emoji: "🍳", desc: "Morning plates and breakfast favorites." },
+        lunch: { label: "Lunch", emoji: "🍽️", desc: "Daily lunch selections and hot plates." },
+        crawfish: { label: "Crawfish", emoji: "🦞", desc: "Crawfish selections and seasonal favorites." },
+        salad: { label: "Salad", emoji: "🥗", desc: "Fresh salads and lighter choices." },
+        drinks: { label: "Drinks", emoji: "🥤", desc: "Cold drinks and add-ons." },
+        dessert: { label: "Dessert", emoji: "🍰", desc: "Sweet finishers and desserts." },
+        specials: { label: "Specials", emoji: "🔥", desc: "Special features and featured plates." }
+      },
+      hours: {
+        Monday:    { open: "05:00", close: "15:00", breakfast: "05:00–10:30", lunch: "11:00–14:30", closed: false },
+        Tuesday:   { open: "05:00", close: "15:00", breakfast: "05:00–10:30", lunch: "11:00–14:30", closed: false },
+        Wednesday: { open: "05:00", close: "15:00", breakfast: "05:00–10:30", lunch: "11:00–14:30", closed: false },
+        Thursday:  { open: "05:00", close: "15:00", breakfast: "05:00–10:30", lunch: "11:00–14:30", closed: false },
+        Friday:    { open: "05:00", close: "17:00", breakfast: "05:00–10:30", lunch: "11:00–16:00", closed: false },
+        Saturday:  { open: "07:00", close: "14:00", breakfast: "07:00–10:30", lunch: "11:00–13:30", closed: false },
+        Sunday:    { open: "", close: "", breakfast: "", lunch: "", closed: true }
+      }
+    };
+
+    const STATE = {
+      rawData: {},
+      normalized: {},
+      mode: "categories",   // categories | items
+      selectedCategory: null,
+      categoryCarousel: [],
+      itemCarousel: [],
+      carouselIndex: 0,
+      search: "",
+      lightMode: false
+    };
+
+    const els = {
+      liveDot: document.getElementById("liveDot"),
+      liveMain: document.getElementById("liveMain"),
+      liveSub: document.getElementById("liveSub"),
+      heroNote: document.getElementById("heroNote"),
+      carousel: document.getElementById("carousel"),
+      carouselDots: document.getElementById("carouselDots"),
+      carouselTitle: document.getElementById("carouselTitle"),
+      carouselCopy: document.getElementById("carouselCopy"),
+      backBtn: document.getElementById("backBtn"),
+      cyclePrevBtn: document.getElementById("cyclePrevBtn"),
+      cycleNextBtn: document.getElementById("cycleNextBtn"),
+      openFrontBtn: document.getElementById("openFrontBtn"),
+      resultsTitle: document.getElementById("resultsTitle"),
+      resultsCopy: document.getElementById("resultsCopy"),
+      selectedPill: document.getElementById("selectedPill"),
+      chipStrip: document.getElementById("chipStrip"),
+      metaText: document.getElementById("metaText"),
+      countText: document.getElementById("countText"),
+      itemGrid: document.getElementById("itemGrid"),
+      searchInput: document.getElementById("searchInput"),
+      clearSearchBtn: document.getElementById("clearSearchBtn"),
+      showAllBtn: document.getElementById("showAllBtn"),
+      randomBtn: document.getElementById("randomBtn"),
+      bestNowBtn: document.getElementById("bestNowBtn"),
+      shareBtn: document.getElementById("shareBtn"),
+      themeBtn: document.getElementById("themeBtn"),
+      detail: document.getElementById("detail"),
+      detailCloseBtn: document.getElementById("detailCloseBtn"),
+      detailEyebrow: document.getElementById("detailEyebrow"),
+      detailTitle: document.getElementById("detailTitle"),
+      detailDesc: document.getElementById("detailDesc"),
+      detailPrice: document.getElementById("detailPrice"),
+      detailTags: document.getElementById("detailTags"),
+      detailWhy: document.getElementById("detailWhy"),
+      detailCue: document.getElementById("detailCue"),
+      detailRandomBtn: document.getElementById("detailRandomBtn"),
+      dockPrevBtn: document.getElementById("dockPrevBtn"),
+      dockOpenFrontBtn: document.getElementById("dockOpenFrontBtn"),
+      dockNextBtn: document.getElementById("dockNextBtn"),
+      dockShareBtn: document.getElementById("dockShareBtn"),
+      toastWrap: document.getElementById("toastWrap")
+    };
+
+    function safe(value){
+      return String(value ?? "").trim();
     }
-  }
-  ctx.fillText(line, x, y);
-}
-function roundRectFill(ctx, x, y, w, h, r){
-  ctx.beginPath();
-  ctx.moveTo(x+r, y);
-  ctx.arcTo(x+w, y, x+w, y+h, r);
-  ctx.arcTo(x+w, y+h, x, y+h, r);
-  ctx.arcTo(x, y+h, x, y, r);
-  ctx.arcTo(x, y, x+w, y, r);
-  ctx.closePath();
-  ctx.fill();
-}
 
-/* ============================
-   Dialog import
-   ============================ */
-function openDialog(){ document.getElementById('importDialog').style.display='block'; document.getElementById('dialogMsg').textContent=''; }
-function closeDialog(){ document.getElementById('importDialog').style.display='none'; }
-function loadDialogPaste(){
-  const raw = document.getElementById('dialogPaste').value.trim();
-  if(!raw){ document.getElementById('dialogMsg').textContent='Paste something.'; return; }
-  try{
-    const parsed = JSON.parse(raw);
-    if(Array.isArray(parsed) && parsed.length){
-      categories = parsed.map(normalizeCategory);
-      saveCategories();
-      buildCategoryScene();
-      updateItemsPanel(selectedIndex);
-      document.getElementById('dialogMsg').textContent = 'Loaded.';
-      closeDialog();
-    } else {
-      document.getElementById('dialogMsg').textContent = 'JSON should be an array of categories.';
+    function escapeHtml(value){
+      return safe(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
-  }catch(e){
-    document.getElementById('dialogMsg').textContent = 'Invalid JSON.';
-  }
-}
-async function dialogTryFetchURL(){
-  const txt = document.getElementById('dialogPaste').value.trim();
-  if(!txt){ document.getElementById('dialogMsg').textContent='Paste a URL into the box first.'; return; }
-  let url = txt.split('\\n')[0].trim();
-  if(!/^https?:\/\//.test(url)) { document.getElementById('dialogMsg').textContent='Invalid URL'; return; }
-  document.getElementById('dialogMsg').textContent='Fetching...';
-  try{
-    const res = await fetch(url);
-    const text = await res.text();
-    const parsed = parseMenuDataFile(text);
-    if(parsed && parsed.length){ categories = parsed; saveCategories(); buildCategoryScene(); updateItemsPanel(selectedIndex); document.getElementById('dialogMsg').textContent='Imported.'; closeDialog(); }
-    else document.getElementById('dialogMsg').textContent='No items found automatically. Paste JSON.';
-  }catch(e){
-    document.getElementById('dialogMsg').textContent='Fetch failed (CORS). Paste the page HTML instead.';
-  }
-}
 
-/* ============================
-   Voice recognition (simple)
-   ============================ */
-let recognition;
-function initVoice(){
-  if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return;
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  recognition = new SR();
-  recognition.lang = 'en-US';
-  recognition.continuous = false;
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-  recognition.onresult = (e)=>{
-    const heard = e.results[0][0].transcript.toLowerCase();
-    announce('Heard: ' + heard);
-    // match items
-    for(const cat of categories){
-      for(const it of cat.items){
-        const title = it.title.toLowerCase();
-        if(heard.includes('add') && (heard.includes(title.split(' ')[0]) || heard.includes(title))){
-          addToCartByItemId(it.id);
+    function slug(value){
+      return safe(value).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    }
+
+    function toMoney(value){
+      const n = parseFloat(safe(value).replace(/[^0-9.]/g, ""));
+      return Number.isFinite(n) ? `$${n.toFixed(2)}` : (safe(value) || "Ask");
+    }
+
+    function weekdayName(date){
+      return date.toLocaleDateString("en-US", { weekday: "long" });
+    }
+
+    function time12(t){
+      if (!t || !/^\d{2}:\d{2}$/.test(t)) return t || "";
+      const [h, m] = t.split(":").map(Number);
+      const d = new Date();
+      d.setHours(h, m, 0, 0);
+      return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+    }
+
+    function mins(t){
+      if (!t || !/^\d{2}:\d{2}$/.test(t)) return null;
+      const [h, m] = t.split(":").map(Number);
+      return h * 60 + m;
+    }
+
+    function liveStatus(){
+      const now = new Date();
+      const day = weekdayName(now);
+      const info = APP.hours[day];
+
+      if (!info || info.closed) {
+        return {
+          open: false,
+          main: "Closed Today",
+          sub: "Browse the menus or plan your next order.",
+          note: "When closed, the interface should still make tomorrow’s food easy to discover."
+        };
+      }
+
+      const current = now.getHours() * 60 + now.getMinutes();
+      const open = mins(info.open);
+      const close = mins(info.close);
+      const breakfastEnd = info.breakfast ? mins(info.breakfast.split("–")[1]) : null;
+      const lunchStart = info.lunch ? mins(info.lunch.split("–")[0]) : null;
+      const lunchEnd = info.lunch ? mins(info.lunch.split("–")[1]) : null;
+
+      if (open !== null && current < open) {
+        return {
+          open: false,
+          main: "Opening Soon",
+          sub: `Opens at ${time12(info.open)}.`,
+          note: "The restaurant is closed right now, but the next move is still clear."
+        };
+      }
+
+      if (close !== null && current >= close) {
+        return {
+          open: false,
+          main: "Closed for the Day",
+          sub: "Look through the menu or plan tomorrow’s order.",
+          note: "After close, tomorrow’s most useful category should still be easy to reach."
+        };
+      }
+
+      if (breakfastEnd !== null && current < breakfastEnd) {
+        return {
+          open: true,
+          main: "Open Now · Breakfast",
+          sub: `Breakfast until ${time12(info.breakfast.split("–")[1])}.`,
+          note: "Breakfast should be the easiest recommendation right now."
+        };
+      }
+
+      if (lunchStart !== null && current < lunchStart) {
+        return {
+          open: true,
+          main: "Open Now",
+          sub: `Lunch starts at ${time12(info.lunch.split("–")[0])}.`,
+          note: "The page should stay helpful even between breakfast and lunch windows."
+        };
+      }
+
+      if (lunchEnd !== null && current <= lunchEnd) {
+        return {
+          open: true,
+          main: "Open Now · Lunch",
+          sub: `Lunch until ${time12(info.lunch.split("–")[1])}.`,
+          note: "Lunch deserves the strongest spotlight right now."
+        };
+      }
+
+      return {
+        open: true,
+        main: "Open Now",
+        sub: `Closes at ${time12(info.close)}.`,
+        note: "The restaurant is open, so order actions should stay front and obvious."
+      };
+    }
+
+    async function loadMenuData(){
+      if (window.MENU_DATA && typeof window.MENU_DATA === "object") {
+        return window.MENU_DATA;
+      }
+
+      try {
+        const res = await fetch("menu-data.html", { cache: "no-store" });
+        if (!res.ok) throw new Error(`menu-data.html returned ${res.status}`);
+        const html = await res.text();
+
+        const match =
+          html.match(/window\.MENU_DATA\s*=\s*([\s\S]*?);[\s]*<\/script>/i) ||
+          html.match(/window\.MENU_DATA\s*=\s*([\s\S]*?);[\s]*$/i);
+
+        if (match && match[1]) {
+          return new Function(`return (${match[1]});`)();
+        }
+
+        throw new Error("window.MENU_DATA not found");
+      } catch (err) {
+        console.error("MENU DATA LOAD ERROR:", err);
+        return {
+          breakfast: [
+            { name: "Loaded Breakfast Plate", price: "$11.99", desc: "Fallback sample item." },
+            { name: "Pancake Combo", price: "$10.49", desc: "Fallback sample item." }
+          ],
+          lunch: [
+            { name: "Crawfish Plate", price: "$16.99", desc: "Fallback sample item." },
+            { name: "Catfish Plate", price: "$14.99", desc: "Fallback sample item." }
+          ],
+          drinks: [
+            { name: "Sweet Tea", price: "$2.49", desc: "Fallback sample item." }
+          ],
+          dessert: [
+            { name: "Bread Pudding", price: "$5.99", desc: "Fallback sample item." }
+          ]
+        };
+      }
+    }
+
+    function normalizeData(raw){
+      const out = {};
+      const source = raw && typeof raw === "object" ? raw : {};
+
+      Object.keys(source).forEach((key) => {
+        const arr = Array.isArray(source[key]) ? source[key] : [];
+        const categoryKey = slug(key);
+
+        out[categoryKey] = arr.map((item, index) => {
+          const rec = item && typeof item === "object" ? item : { name: String(item ?? "") };
+          return {
+            id: `${categoryKey}-${slug(rec.name || rec.title || `item-${index}`)}-${index}`,
+            categoryKey,
+            name: safe(rec.name || rec.title || `Item ${index + 1}`),
+            desc: safe(rec.desc || rec.description || ""),
+            price: safe(rec.price || rec.cost || "Ask"),
+            badge: safe(rec.badge || rec.tag || ""),
+            mood: safe(rec.mood || ""),
+            emoji: safe(rec.emoji || rec.icon || APP.categoryMeta[categoryKey]?.emoji || "🍽️")
+          };
+        }).filter(item => item.name);
+      });
+
+      return out;
+    }
+
+    function currentCategoryMeta(key){
+      return APP.categoryMeta[key] || { label: key, emoji: "🍽️", desc: "Menu category" };
+    }
+
+    function categoryCards(){
+      return Object.keys(STATE.normalized)
+        .filter(key => (STATE.normalized[key] || []).length)
+        .map((key) => {
+          const meta = currentCategoryMeta(key);
+          return {
+            id: key,
+            type: "category",
+            key,
+            title: meta.label,
+            emoji: meta.emoji,
+            desc: meta.desc,
+            count: STATE.normalized[key].length
+          };
+        });
+    }
+
+    function itemCardsForCategory(key){
+      return (STATE.normalized[key] || []).map((item) => ({
+        id: item.id,
+        type: "item",
+        key: item.id,
+        title: item.name,
+        emoji: item.emoji,
+        desc: item.desc || "Tap to see details and order cues.",
+        count: item.price,
+        item
+      }));
+    }
+
+    function activeCarousel(){
+      return STATE.mode === "categories" ? STATE.categoryCarousel : STATE.itemCarousel;
+    }
+
+    function frontCard(){
+      const list = activeCarousel();
+      if (!list.length) return null;
+      const index = ((STATE.carouselIndex % list.length) + list.length) % list.length;
+      return list[index];
+    }
+
+    function renderStatus(){
+      const status = liveStatus();
+      els.liveMain.textContent = status.main;
+      els.liveSub.textContent = status.sub;
+      els.heroNote.innerHTML = `<strong>Right now:</strong> ${escapeHtml(status.note)}`;
+      els.liveDot.classList.toggle("closed", !status.open);
+    }
+
+    function renderCarousel(){
+      const list = activeCarousel();
+      const total = list.length;
+
+      els.carousel.innerHTML = "";
+      els.carouselDots.innerHTML = "";
+
+      if (!total) {
+        els.carousel.innerHTML = `<div class="empty"><div><strong>No menu content found.</strong>Please check menu-data.html.</div></div>`;
+        return;
+      }
+
+      list.forEach((entry, index) => {
+        const relative = index - STATE.carouselIndex;
+        const wrapped = ((relative + total + Math.floor(total / 2)) % total) - Math.floor(total / 2);
+
+        const abs = Math.abs(wrapped);
+        const x = wrapped * 150;
+        const z = -abs * 160;
+        const rotateY = wrapped * -18;
+        const scale = wrapped === 0 ? 1 : Math.max(0.72, 1 - abs * 0.12);
+        const opacity = wrapped === 0 ? 1 : Math.max(0.24, 1 - abs * 0.26);
+
+        const card = document.createElement("article");
+        card.className = "card3d" + (wrapped === 0 ? " active" : "");
+        card.style.transform = `translate3d(calc(-50% + ${x}px), -50%, ${z}px) rotateY(${rotateY}deg) scale(${scale})`;
+        card.style.opacity = opacity;
+        card.style.filter = wrapped === 0 ? "none" : "blur(" + Math.min(abs * 0.6, 1.4) + "px)";
+        card.style.zIndex = String(100 - abs);
+
+        const actionLabel = entry.type === "category" ? "Open Category" : "Open Item";
+        const countLabel = entry.type === "category" ? `${entry.count} item${entry.count === 1 ? "" : "s"}` : toMoney(entry.count);
+
+        card.innerHTML = `
+          <button class="card-btn" data-index="${index}" type="button">
+            <div class="card-badge">${entry.type === "category" ? "Category" : "Item"}</div>
+            <div class="card-emoji">${escapeHtml(entry.emoji)}</div>
+            <div>
+              <h3 class="card-title">${escapeHtml(entry.title)}</h3>
+              <p class="card-desc">${escapeHtml(entry.desc || "")}</p>
+            </div>
+            <div class="card-meta">
+              <div class="card-count">${escapeHtml(countLabel)}</div>
+              <div class="card-action">${actionLabel}</div>
+            </div>
+          </button>
+        `;
+
+        card.querySelector("button").addEventListener("click", () => {
+          if (wrapped === 0) {
+            openFront();
+          } else {
+            STATE.carouselIndex = index;
+            renderCarousel();
+          }
+        });
+
+        els.carousel.appendChild(card);
+
+        const dot = document.createElement("button");
+        dot.type = "button";
+        dot.className = "mini-btn";
+        dot.style.minHeight = "38px";
+        dot.style.padding = "8px 10px";
+        dot.style.borderRadius = "999px";
+        dot.textContent = wrapped === 0 ? "●" : "○";
+        dot.setAttribute("aria-label", `Go to ${entry.title}`);
+        dot.addEventListener("click", () => {
+          STATE.carouselIndex = index;
+          renderCarousel();
+        });
+        els.carouselDots.appendChild(dot);
+      });
+
+      if (STATE.mode === "categories") {
+        els.carouselTitle.textContent = "Categories";
+        els.carouselCopy.textContent = "Cycle through categories until the one you want reaches the front. Click the front card to enter that menu.";
+        els.backBtn.style.display = "none";
+      } else {
+        const meta = currentCategoryMeta(STATE.selectedCategory);
+        els.carouselTitle.textContent = meta.label;
+        els.carouselCopy.textContent = `You are now cycling through the items inside ${meta.label.toLowerCase()}. Click the front item to open its details.`;
+        els.backBtn.style.display = "";
+      }
+    }
+
+    function renderResults(){
+      const categoryKey = STATE.selectedCategory;
+      const categoryMeta = categoryKey ? currentCategoryMeta(categoryKey) : null;
+      const allItems = categoryKey ? (STATE.normalized[categoryKey] || []) : Object.keys(STATE.normalized).flatMap(key => STATE.normalized[key] || []);
+      const q = safe(STATE.search).toLowerCase();
+      const filtered = q
+        ? allItems.filter(item => [item.name, item.desc, item.price, item.badge, item.mood].join(" ").toLowerCase().includes(q))
+        : allItems;
+
+      if (!categoryKey) {
+        els.resultsTitle.textContent = "Browse the menu";
+        els.resultsCopy.textContent = "Choose a category from the floating carousel above. Once one is selected, its items will appear here.";
+        els.selectedPill.textContent = "No category selected";
+        els.metaText.textContent = "The item browser is waiting for a category.";
+        els.countText.textContent = "";
+      } else {
+        els.resultsTitle.textContent = categoryMeta.label;
+        els.resultsCopy.textContent = `${categoryMeta.desc} These items are coming from menu-data.html, so daily updates stay separate from the interface.`;
+        els.selectedPill.textContent = `${categoryMeta.emoji} ${categoryMeta.label}`;
+        els.metaText.textContent = q
+          ? `Filtering ${categoryMeta.label.toLowerCase()} for “${STATE.search}”.`
+          : `Showing ${categoryMeta.label.toLowerCase()} items.`;
+        els.countText.textContent = `${filtered.length} item${filtered.length === 1 ? "" : "s"}`;
+      }
+
+      els.chipStrip.innerHTML = "";
+      Object.keys(STATE.normalized).forEach((key) => {
+        if (!(STATE.normalized[key] || []).length) return;
+        const meta = currentCategoryMeta(key);
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "chip" + (STATE.selectedCategory === key ? " active" : "");
+        chip.innerHTML = `${escapeHtml(meta.emoji)} <span>${escapeHtml(meta.label)}</span>`;
+        chip.addEventListener("click", () => enterCategory(key, false));
+        els.chipStrip.appendChild(chip);
+      });
+
+      if (!filtered.length) {
+        els.itemGrid.innerHTML = `
+          <div class="empty" style="grid-column:1 / -1;">
+            <div>
+              <strong>No matching items found.</strong>
+              Clear the search or switch to a different category.
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      els.itemGrid.innerHTML = filtered.map((item) => {
+        const meta = currentCategoryMeta(item.categoryKey);
+        return `
+          <article class="item-card">
+            <button class="item-btn" data-item-id="${escapeHtml(item.id)}" type="button">
+              <div class="item-top">
+                <div class="item-icon">${escapeHtml(item.emoji || meta.emoji)}</div>
+                <div>
+                  <h3 class="item-title">${escapeHtml(item.name)}</h3>
+                  <p class="item-desc">${escapeHtml(item.desc || "Tap for details.")}</p>
+                </div>
+                <div class="item-price">${escapeHtml(toMoney(item.price))}</div>
+              </div>
+              <div class="item-bottom">
+                <div class="tags">
+                  ${item.badge ? `<span class="tag">🏷️ ${escapeHtml(item.badge)}</span>` : ""}
+                  ${item.mood ? `<span class="tag">✨ ${escapeHtml(item.mood)}</span>` : ""}
+                  <span class="tag">${escapeHtml(meta.emoji)} ${escapeHtml(meta.label)}</span>
+                </div>
+                <span class="item-view">View Item</span>
+              </div>
+            </button>
+          </article>
+        `;
+      }).join("");
+
+      els.itemGrid.querySelectorAll("[data-item-id]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const item = filtered.find(entry => entry.id === btn.dataset.itemId);
+          if (item) openDetail(item);
+        });
+      });
+    }
+
+    function enterCategory(key, scrollToResults = true){
+      STATE.selectedCategory = key;
+      STATE.mode = "items";
+      STATE.itemCarousel = itemCardsForCategory(key);
+      STATE.carouselIndex = 0;
+      renderCarousel();
+      renderResults();
+
+      if (scrollToResults) {
+        document.querySelector(".results").scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    function backToCategories(){
+      STATE.mode = "categories";
+      STATE.carouselIndex = 0;
+      renderCarousel();
+      renderResults();
+    }
+
+    function cycle(step){
+      const list = activeCarousel();
+      if (!list.length) return;
+      STATE.carouselIndex = (STATE.carouselIndex + step + list.length) % list.length;
+      renderCarousel();
+    }
+
+    function openFront(){
+      const entry = frontCard();
+      if (!entry) return;
+
+      if (entry.type === "category") {
+        enterCategory(entry.key, true);
+      } else {
+        openDetail(entry.item);
+      }
+    }
+
+    function openDetail(item){
+      const meta = currentCategoryMeta(item.categoryKey);
+      els.detailEyebrow.textContent = `${meta.emoji} ${meta.label}`;
+      els.detailTitle.textContent = item.name;
+      els.detailDesc.textContent = item.desc || "Call the restaurant for more details.";
+      els.detailPrice.textContent = toMoney(item.price);
+
+      els.detailTags.innerHTML = [
+        item.badge ? `<span class="detail-tag">🏷️ ${escapeHtml(item.badge)}</span>` : "",
+        item.mood ? `<span class="detail-tag">✨ ${escapeHtml(item.mood)}</span>` : "",
+        `<span class="detail-tag">${escapeHtml(meta.emoji)} ${escapeHtml(meta.label)}</span>`
+      ].filter(Boolean).join("");
+
+      els.detailWhy.textContent = item.badge
+        ? `${item.name} stands out because it is marked as ${item.badge.toLowerCase()}. It makes a strong quick recommendation.`
+        : `${item.name} works because the interface brings it forward clearly and keeps the next action simple.`;
+
+      els.detailCue.textContent = `Call ${APP.phoneDisplay} and ask for “${item.name}.” Since this page reads menu-data.html, the item name should match your most current menu update.`;
+
+      els.detail.classList.add("open");
+      els.detail.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeDetail(){
+      els.detail.classList.remove("open");
+      els.detail.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    function randomItem(){
+      const pool = STATE.selectedCategory
+        ? (STATE.normalized[STATE.selectedCategory] || [])
+        : Object.keys(STATE.normalized).flatMap(key => STATE.normalized[key] || []);
+
+      if (!pool.length) {
+        toast("No items are loaded yet.");
+        return;
+      }
+
+      const item = pool[Math.floor(Math.random() * pool.length)];
+      openDetail(item);
+    }
+
+    function bestCategoryNow(){
+      const state = liveStatus().main.toLowerCase();
+
+      if (state.includes("breakfast") && STATE.normalized.breakfast?.length) return "breakfast";
+      if (state.includes("lunch") && STATE.normalized.lunch?.length) return "lunch";
+      if (STATE.normalized.specials?.length) return "specials";
+      if (STATE.normalized.lunch?.length) return "lunch";
+      if (STATE.normalized.breakfast?.length) return "breakfast";
+
+      return Object.keys(STATE.normalized).find(key => STATE.normalized[key]?.length) || null;
+    }
+
+    async function sharePage(){
+      const shareData = {
+        title: document.title,
+        text: "Check out the Hot Headz Southern Foods menu.",
+        url: location.href
+      };
+
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+          toast("Shared successfully.");
           return;
         }
+
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(location.href);
+          toast("Link copied to clipboard.");
+          return;
+        }
+
+        toast("Share is not available on this device.");
+      } catch {
+        toast("Share cancelled.");
       }
     }
-    announce('No matching dish found.');
-  };
-  recognition.onerror = ()=>{ announce('Voice error'); };
-}
-function startVoice(){
-  if(!recognition) initVoice();
-  if(!recognition) return alert('Voice not supported in this browser.');
-  recognition.start();
-  announce('Listening for order...');
-}
 
-/* ============================
-   Download / Print helpers
-   ============================ */
-function downloadThisPage(){
-  // Build a blob of this page and trigger download.
-  const html = '<!doctype html>\\n' + document.documentElement.outerHTML;
-  const blob = new Blob([html], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'hotheadz-holo-categories.html'; document.body.appendChild(a); a.click();
-  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 2000);
-}
+    function toast(message){
+      const el = document.createElement("div");
+      el.className = "toast";
+      el.textContent = message;
+      els.toastWrap.appendChild(el);
 
-function printMenu(){
-  const pc = document.getElementById('printContent'); pc.innerHTML = '';
-  categories.forEach(c=>{
-    const h = document.createElement('h2'); h.textContent = c.category; pc.appendChild(h);
-    c.items.forEach(m=>{
-      const div = document.createElement('div'); div.innerHTML = `<strong>${escapeHtml(m.title)}</strong> <span style="float:right">$${Number(m.price||0).toFixed(2)}</span><div style="color:#333">${escapeHtml(m.desc)}</div>`;
-      pc.appendChild(div);
-    });
-  });
-  const printable = document.getElementById('printable');
-  printable.style.display = 'block';
-  window.print();
-  printable.style.display = 'none';
-}
+      setTimeout(() => {
+        el.style.opacity = "0";
+        el.style.transform = "translateY(6px)";
+        setTimeout(() => el.remove(), 220);
+      }, 2400);
+    }
 
-/* ============================
-   Start
-   ============================ */
-init();
+    function applyTheme(){
+      if (!STATE.lightMode) {
+        document.body.style.background = "";
+        return;
+      }
 
-</script>
+      document.body.style.background = "linear-gradient(180deg, #f7fbff, #ebf5ff 54%, #dfeefa 100%)";
+      toast("Light theme enabled.");
+    }
+
+    function bindEvents(){
+      els.cyclePrevBtn.addEventListener("click", () => cycle(-1));
+      els.cycleNextBtn.addEventListener("click", () => cycle(1));
+      els.backBtn.addEventListener("click", backToCategories);
+      els.openFrontBtn.addEventListener("click", openFront);
+      els.randomBtn.addEventListener("click", randomItem);
+      els.bestNowBtn.addEventListener("click", () => {
+        const key = bestCategoryNow();
+        if (key) {
+          enterCategory(key, true);
+          toast(`Showing ${currentCategoryMeta(key).label.toLowerCase()} for right now.`);
+        }
+      });
+      els.searchInput.addEventListener("input", (e) => {
+        STATE.search = e.target.value.trim();
+        renderResults();
+      });
+      els.clearSearchBtn.addEventListener("click", () => {
+        STATE.search = "";
+        els.searchInput.value = "";
+        renderResults();
+      });
+      els.showAllBtn.addEventListener("click", () => {
+        STATE.search = "";
+        els.searchInput.value = "";
+        backToCategories();
+      });
+      els.shareBtn.addEventListener("click", sharePage);
+      els.themeBtn.addEventListener("click", () => {
+        STATE.lightMode = !STATE.lightMode;
+        applyTheme();
+      });
+      els.detailCloseBtn.addEventListener("click", closeDetail);
+      els.detailRandomBtn.addEventListener("click", randomItem);
+      els.dockPrevBtn.addEventListener("click", () => cycle(-1));
+      els.dockOpenFrontBtn.addEventListener("click", openFront);
+      els.dockNextBtn.addEventListener("click", () => cycle(1));
+      els.dockShareBtn.addEventListener("click", sharePage);
+
+      document.querySelectorAll("[data-close-detail='true']").forEach((node) => {
+        node.addEventListener("click", closeDetail);
+      });
+
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeDetail();
+        if (e.key === "ArrowLeft") cycle(-1);
+        if (e.key === "ArrowRight") cycle(1);
+        if (e.key === "Enter") openFront();
+      });
+    }
+
+    async function init(){
+      renderStatus();
+      const raw = await loadMenuData();
+      STATE.rawData = raw;
+      STATE.normalized = normalizeData(raw);
+      STATE.categoryCarousel = categoryCards();
+      STATE.carouselIndex = 0;
+      bindEvents();
+      renderCarousel();
+      renderResults();
+
+      const suggested = bestCategoryNow();
+      if (suggested) {
+        STATE.selectedCategory = suggested;
+        renderResults();
+      }
+
+      toast("Category carousel loaded from menu-data.html.");
+    }
+
+    init();
+  </script>
 </body>
 </html>
