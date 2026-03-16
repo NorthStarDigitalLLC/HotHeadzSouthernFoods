@@ -1,1745 +1,780 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hot Headz Southern Foods – Menu</title>
-  <meta name="description" content="Daily breakfast, lunch, crawfish, salad bar, drinks and desserts – made fresh.">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Hotheadz — Holographic Menu (Demo)</title>
 
-  <!-- Google Fonts & Font Awesome (same as homepage) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<!-- Libraries (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
 
-   <!-- ===== FAVICON / ICONS ===== -->
-<link rel="icon" type="image/webp" href="images/HotHeadzLogo.png">
-<link rel="apple-touch-icon" href="images/HotHeadzLogo.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- ===== OPEN GRAPH ===== -->
-<meta property="og:image" content="images/HotHeadzLogo.png">
-<meta property="og:image:alt" content="Hot Headz Southern Foods logo">
-
-  <!-- ===== TWITTER CARD ===== -->
-<meta name="twitter:image" content="images/HotHeadzLogo.png">
-<meta name="twitter:image:alt" content="Hot Headz Southern Foods logo">
-    
-  <style>
-    /* ---------- RESET / BASE ---------- */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      max-width: 100%;
-    }
-    html {
-      scroll-behavior: smooth;
-      overflow-x: hidden;
-    }
-    body {
-      background-color: #07060a;
-      color: rgba(255,255,255,0.92);
-      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-      line-height: 1.5;
-      padding-bottom: 90px;
-    }
-
-    /* ---------- FLOATING DOCK (from homepage) ---------- */
-    :root {
-      --gen-glass: rgba(6,7,10,0.62);
-      --gen-glass-2: rgba(6,7,10,0.78);
-      --gen-border: rgba(255,255,255,0.14);
-      --gen-border-2: rgba(255,255,255,0.22);
-      --gen-text: rgba(255,255,255,0.92);
-      --gen-muted: rgba(255,255,255,0.62);
-      --gen-hotA: rgba(255,120,70,0.82);
-      --gen-hotB: rgba(255,60,140,0.74);
-      --gen-radius-xl: 22px;
-      --gen-radius-lg: 16px;
-      --gen-radius-pill: 999px;
-      --gen-shadow: 0 18px 50px rgba(0,0,0,0.62);
-      --gen-font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-    }
-
-    .gen-root, .gen-root * { box-sizing: border-box; font-family: var(--gen-font); }
-    .gen-root {
-      position: fixed;
-      inset: 0;
-      z-index: 999999;
-      pointer-events: none;
-    }
-    /* Explore pill – hidden */
-    .gen-pill {
-      display: none !important;
-    }
-
-    .gen-dock {
-      pointer-events: auto;
-      position: fixed;
-      left: 50%;
-      bottom: 16px;
-      transform: translateX(-50%);
-      width: min(660px, calc(100vw - 26px));
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 10px;
-      border-radius: var(--gen-radius-pill);
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(6,7,10,0.62);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: var(--gen-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
-    }
-    .gen-dock-btn {
-      text-decoration: none;
-      color: rgba(255,255,255,0.92);
-      flex: 1 1 0;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.36);
-      padding: 10px 8px;
-      box-shadow: 0 10px 22px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.08);
-      transition: transform .14s ease, background .14s ease, border-color .14s ease;
-    }
-    .gen-dock-btn:hover {
-      transform: translateY(-1px);
-      background: rgba(0,0,0,0.56);
-      border-color: rgba(255,255,255,0.22);
-    }
-    .gen-dock-ic { font-size: 16px; line-height: 1; }
-    .gen-dock-tx {
-      font-size: 11.5px;
-      font-weight: 900;
-      letter-spacing: -0.1px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .gen-dock-cta {
-      background: linear-gradient(90deg, rgba(255,120,70,0.22), rgba(255,60,140,0.16));
-      border-color: rgba(255,255,255,0.20);
-    }
-    .gen-dock-btn.is-active {
-      background: rgba(42,127,98,0.3);
-      border-color: rgba(255,179,90,0.5);
-    }
-
-    @media (max-width: 720px) {
-      .gen-dock { gap: 8px; padding: 9px; }
-      .gen-dock-btn { padding: 10px 6px; }
-      .gen-dock-ic { font-size: 15px; }
-      .gen-dock-tx { font-size: 11px; }
-    }
-    @media (max-width: 380px) {
-      .gen-dock { gap: 6px; padding: 8px; }
-      .gen-dock-tx { display: none; }
-    }
-
-    /* ===== MENU STYLES – paper on dark table, now centered ===== */
-    :root{
-      --hh-accent:#c05a2a;
-      --hh-accent-2:#2a7f62;
-      --hh-ink:#14110e;
-      --hh-muted:rgba(20,17,14,.68);
-      --hh-table:#070604;
-      --hh-table2:#0b0806;
-      --hh-paper:#f6f0e6;
-      --hh-paper2:#efe6d9;
-      --hh-radius: 26px;
-      --hh-radius2: 34px;
-      --hh-pill: 999px;
-      --hh-shadow: 0 26px 90px rgba(0,0,0,.48);
-      --hh-shadow2: 0 16px 48px rgba(0,0,0,.22);
-      --hh-shadow3: 0 10px 24px rgba(0,0,0,.14);
-    }
-
-    .hh-menu{
-      width: 100%;
-      max-width: none;
-      min-height: 100vh;
-      margin: 0;
-      padding: 18px 14px 70px;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color: rgba(245,240,230,.94);
-      position: relative;
-      isolation: isolate;
-      background:
-        radial-gradient(1100px 700px at 16% 14%, rgba(192,90,42,.18), transparent 60%),
-        radial-gradient(1000px 700px at 86% 20%, rgba(42,127,98,.14), transparent 64%),
-        linear-gradient(180deg, var(--hh-table), var(--hh-table2) 42%, #050403);
-      box-shadow: var(--hh-shadow);
-      overflow: hidden;
-    }
-    .hh-menu::before{
-      content:"";
-      position:absolute; inset:0;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.20'/%3E%3C/svg%3E");
-      opacity:.12;
-      mix-blend-mode: overlay;
-      pointer-events:none;
-      z-index:0;
-    }
-    .hh-menu > *{ position:relative; z-index:1; }
-
-    /* ----- CENTERED HEADER ----- */
-    .hh-header {
-      margin: 10px 0 14px;
-      padding: 14px 14px 0;
-      text-align: center;
-    }
-    .hh-title{
-      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-      font-size: clamp(20px, 2.2vw, 30px);
-      font-weight: 850;
-      letter-spacing: .2px;
-      line-height: 1.1;
-    }
-    .hh-updated{
-      margin-top: 8px;
-      font-weight: 820;
-      color: rgba(245,240,230,.72);
-      font-size: 13.2px;
-      line-height: 1.35;
-    }
-    .hh-note{
-      margin-top: 8px;
-      font-weight: 780;
-      color: rgba(245,240,230,.62);
-      font-size: 13px;
-      line-height: 1.35;
-    }
-
-    .hh-stickywrap{ position: sticky; top: 10px; z-index: 90; }
-
-    /* ----- CENTERED DAY BAR ----- */
-    .hh-daybar{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content: center;    /* center the day buttons */
-      margin: 14px;
-      padding: 10px;
-      border-radius: var(--hh-radius2);
-      background: rgba(0,0,0,.30);
-      border: 1px solid rgba(245,240,230,.14);
-      box-shadow: var(--hh-shadow2);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-
-    .hh-day,
-    .hh-tab{
-      border: 1px solid rgba(245,240,230,.14);
-      background: rgba(255,255,255,.06);
-      color: rgba(245,240,230,.92);
-      padding: 10px 14px;
-      border-radius: var(--hh-pill);
-      font-weight: 900;
-      cursor: pointer;
-      transition: transform .14s ease, box-shadow .14s ease, background .14s ease, border-color .14s ease;
-      white-space: nowrap;
-      box-shadow: 0 10px 22px rgba(0,0,0,.25);
-    }
-    .hh-day:hover,
-    .hh-tab:hover{ transform: translateY(-1px); border-color: rgba(255,179,90,.28); }
-
-    .hh-day.is-active{
-      border-color: rgba(192,90,42,.45);
-      background: linear-gradient(180deg, rgba(192,90,42,.26), rgba(0,0,0,.22));
-    }
-
-    /* ----- CENTERED CATEGORY TABS ----- */
-    .hh-tablist{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content: center;    /* center category tabs */
-      margin: 0 14px 12px;
-      position: sticky;
-      top: 86px;
-      z-index: 80;
-      padding: 10px;
-      border-radius: var(--hh-radius2);
-      background: rgba(0,0,0,.24);
-      border: 1px solid rgba(245,240,230,.14);
-      box-shadow: var(--hh-shadow2);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-    .hh-tab.is-active{
-      border-color: rgba(192,90,42,.50);
-      background: linear-gradient(135deg, rgba(192,90,42,.32), rgba(42,127,98,.18));
-    }
-
-    .hh-panels{ padding: 0 14px 16px; }
-
-    .hh-panel{
-      background: linear-gradient(180deg, var(--hh-paper), var(--hh-paper2));
-      color: var(--hh-ink);
-      border: 1px solid rgba(20,17,14,.14);
-      border-radius: var(--hh-radius2);
-      padding: 18px;
-      box-shadow: var(--hh-shadow2);
-      position: relative;
-      overflow: hidden;
-    }
-    .hh-panel::before{
-      content:"";
-      position:absolute;
-      inset:auto -30% -55% -30%;
-      height: 240px;
-      background:
-        radial-gradient(circle at 30% 45%, rgba(192,90,42,.18), transparent 62%),
-        radial-gradient(circle at 70% 55%, rgba(42,127,98,.12), transparent 64%);
-      transform: rotate(-6deg);
-      pointer-events:none;
-    }
-    .hh-panel > *{ position:relative; z-index:1; }
-
-    .hh-panel h3{
-      margin: 0 0 8px;
-      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-      font-size: clamp(18px, 2vw, 24px);
-      font-weight: 850;
-      letter-spacing: .2px;
-    }
-    .hh-sub{
-      margin: 0 0 12px;
-      font-weight: 820;
-      color: rgba(20,17,14,.72);
-      font-size: 13.2px;
-      line-height: 1.38;
-    }
-    .hh-panel h4{
-      text-transform: uppercase;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
-      font-size: 10.6px;
-      letter-spacing: .14em;
-      color: rgba(20,17,14,.62);
-      margin: 16px 0 10px;
-    }
-
-    /* ----- LISTS REMAIN LEFT-ALIGNED ----- */
-    .hh-stack{
-      list-style:none;
-      padding-left:0;
-      margin:0;
-      display:grid;
-      grid-template-columns:1fr;
-      gap:10px;
-    }
-    @media(min-width:860px){
-      .hh-stack{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    .hh-stack li{
-      padding: 11px 12px;
-      background: rgba(255,255,255,.62);
-      border: 1px solid rgba(20,17,14,.12);
-      border-radius: 18px;
-      line-height: 1.25;
-      box-shadow: var(--hh-shadow3);
-      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
-    }
-    .hh-stack li:hover{
-      transform: translateY(-1px);
-      border-color: rgba(192,90,42,.26);
-      box-shadow: 0 14px 30px rgba(0,0,0,.12);
-    }
-
-    .hh-cta{ margin-top: 14px; display:grid; gap:10px; }
-    .hh-btn{
-      background: linear-gradient(135deg, rgba(20,17,14,.92), rgba(20,17,14,.78));
-      color: rgba(245,240,230,.96);
-      padding: 12px 14px;
-      border-radius: 20px;
-      text-decoration:none;
-      font-weight: 950;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      box-shadow: 0 18px 40px rgba(0,0,0,.22);
-      transition: transform .14s ease, box-shadow .14s ease;
-    }
-    .hh-btn:hover{ transform: translateY(-1px); box-shadow: 0 22px 60px rgba(0,0,0,.26); }
-
-    .hh-small{ color: rgba(20,17,14,.70); font-weight: 780; line-height: 1.35; font-size: 13px; }
-
-    .hh-daypanel[hidden]{ display:none; }
-    .hh-daypanel{ animation: hhFadeUp .22s ease-out; }
-    @keyframes hhFadeUp{ from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-
-    /* State card */
-    .hh-state{
-      border: 1px solid rgba(245,240,230,.14);
-      border-radius: var(--hh-radius2);
-      padding: 20px;
-      margin: 14px;
-      background: rgba(0,0,0,.22);
-      color: rgba(245,240,230,.92);
-      box-shadow: var(--hh-shadow2);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      position:relative;
-      overflow:hidden;
-    }
-    .hh-state::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        radial-gradient(700px 280px at 10% 10%, rgba(192,90,42,.22), transparent 60%),
-        radial-gradient(700px 280px at 90% 0%, rgba(42,127,98,.16), transparent 62%);
-      pointer-events:none;
-      opacity:.9;
-    }
-    .hh-state > *{ position:relative; z-index:1; }
-
-    .hh-badge{
-      font-weight: 980;
-      text-transform: uppercase;
-      letter-spacing: .14em;
-      font-size: 11px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(245,240,230,.18);
-      background: rgba(255,255,255,.06);
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-    }
-    .hh-badge::before{
-      content:"";
-      width:8px;height:8px;
-      border-radius: 99px;
-      background: rgba(255,179,90,.92);
-      display:inline-block;
-    }
-    .hh-badge.is-dark::before{ background: rgba(245,240,230,.92); }
-
-    .hh-state-title{
-      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-      font-size: clamp(20px, 2.6vw, 30px);
-      font-weight: 850;
-      letter-spacing: .2px;
-      margin: 10px 0 6px;
-      line-height: 1.08;
-    }
-    .hh-state-msg{
-      font-weight: 780;
-      color: rgba(245,240,230,.74);
-      margin: 0;
-      line-height: 1.35;
-      font-size: 13.2px;
-    }
-
-    /* Advanced */
-    .hh-advanced-top{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:12px;
-      margin: 8px 14px 12px;
-    }
-    .hh-advanced-title{
-      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-      font-size: clamp(18px, 2.2vw, 26px);
-      font-weight: 850;
-      letter-spacing: .2px;
-      color: rgba(245,240,230,.92);
-    }
-    .hh-advanced-disclaimer{
-      font-weight: 780;
-      color: rgba(245,240,230,.68);
-      text-align:right;
-      max-width: 520px;
-      font-size: 12.8px;
-      line-height: 1.35;
-    }
-    .hh-hint{ color: rgba(245,240,230,.62); font-weight: 760; margin: 8px 14px 0; font-size: 12.6px; }
-
-    .hh-adv-carousel{
-      display:flex;
-      gap:14px;
-      overflow-x:auto;
-      padding: 2px 14px 14px;
-      scroll-snap-type:x mandatory;
-      -webkit-overflow-scrolling:touch;
-    }
-    .hh-adv-card{ flex: 0 0 92%; max-width: 720px; scroll-snap-align:start; }
-    @media(min-width:860px){ .hh-adv-card{ flex: 0 0 48%; } }
-    .hh-adv-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:baseline;
-      gap:10px;
-      margin: 0 0 10px;
-      padding: 0 6px;
-      color: rgba(245,240,230,.86);
-    }
-    .hh-adv-dayname{
-      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-      font-size: 18px;
-      font-weight: 850;
-      letter-spacing: .2px;
-    }
-    .hh-adv-date,
-    .hh-adv-hours{ color: rgba(245,240,230,.68); font-weight: 780; font-size: 12.8px; }
-
-    /* Mobile */
-    @media(max-width: 560px){
-      .hh-menu{ padding: 14px 10px 72px; border-radius: 26px; }
-      .hh-daybar{
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        gap: 8px;
-        padding: 8px;
-        border-radius: 20px;
-        margin: 12px;
-        justify-content: flex-start; /* on mobile, keep scrollable left-aligned */
-      }
-      .hh-daybar::-webkit-scrollbar{ display:none; }
-      .hh-tablist{
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        gap: 8px;
-        padding: 8px;
-        border-radius: 20px;
-        top: 74px;
-        margin: 0 12px 12px;
-        justify-content: flex-start;
-      }
-      .hh-tablist::-webkit-scrollbar{ display:none; }
-      .hh-day,
-      .hh-tab{ padding: 8px 10px; font-size: 13px; }
-      .hh-header{ padding: 10px 12px 0; }
-      .hh-panels{ padding: 0 12px 14px; }
-      .hh-panel{ padding: 14px; border-radius: 26px; }
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      .hh-daypanel{ animation:none; }
-      .hh-day, .hh-tab, .hh-stack li, .hh-btn{ transition:none; }
-    }
-
-    /* Click‑for‑description dropdowns */
-    .hh-hintline{
-      margin: 6px 0 10px;
-      font-size: 12.6px;
-      font-weight: 780;
-      color: rgba(20,17,14,.62);
-    }
-    .hh-stack details{
-      background: rgba(255,255,255,.62);
-      border: 1px solid rgba(20,17,14,.12);
-      border-radius: 18px;
-      box-shadow: var(--hh-shadow3);
-      overflow: hidden;
-      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
-    }
-    .hh-stack details:hover{
-      transform: translateY(-1px);
-      border-color: rgba(192,90,42,.26);
-      box-shadow: 0 14px 30px rgba(0,0,0,.12);
-    }
-    .hh-stack summary{
-      list-style: none;
-      cursor: pointer;
-      padding: 11px 12px;
-      font-weight: 860;
-      line-height: 1.25;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .hh-stack summary::-webkit-details-marker{ display:none; }
-    .hh-stack summary::after{
-      content: "＋";
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
-      opacity: .65;
-      flex: 0 0 auto;
-    }
-    .hh-stack details[open] summary::after{ content: "－"; opacity: .8; }
-    .hh-desc{
-      padding: 0 12px 12px;
-      color: rgba(20,17,14,.72);
-      font-size: 12.8px;
-      font-weight: 760;
-      line-height: 1.35;
-    }
-
-    .hh-lunch-unavail{
-      margin: 10px 0 6px;
-      padding: 12px 12px;
-      border-radius: 18px;
-      border: 1px solid rgba(20,17,14,.14);
-      background: rgba(255,255,255,.66);
-      box-shadow: var(--hh-shadow3);
-    }
-    .hh-lunch-unavail-title{
-      margin-top: 8px;
-      font-weight: 880;
-      color: rgba(20,17,14,.82);
-      font-size: 13px;
-      line-height: 1.35;
-    }
-
-
-
-
-    /* ==================== CIRCULAR NAVIGATION (adapted for Hot Headz) ==================== */
-.nav-btn {
-  position: fixed;
-  z-index: 2000;
-  background: #1e1b1b;
-  border: 2px solid var(--hh-accent, #c05a2a);
-  border-radius: 50px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  box-shadow: 0 0 25px rgba(192,90,42,0.5);
-  transition: all 0.2s ease;
-  backdrop-filter: blur(8px);
-}
-
-.nav-btn:hover {
-  transform: scale(1.05);
-  border-color: var(--hh-accent-2, #2a7f62);
-  box-shadow: 0 0 35px var(--hh-accent, #c05a2a);
-}
-
-.btn-icon {
-  font-size: 1.8rem;
-  color: var(--hh-accent, #c05a2a);
-}
-
-.btn-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
-}
-
-.btn-text .main {
-  font-weight: 700;
-  font-size: 1rem;
-  letter-spacing: 2px;
-  color: rgba(255,255,255,0.92);
-}
-
-.btn-text .sub {
-  font-size: 0.65rem;
-  opacity: 0.7;
-  color: rgba(255,255,255,0.7);
-  text-transform: uppercase;
-}
-
-/* left-center button - VERTICAL */
-.nav-btn.left-center {
-  left: 30px;
-  top: 50%;
-  transform: translateY(-50%);
-  flex-direction: column;
-  padding: 1rem 0.5rem;
-  gap: 8px;
-}
-
-.nav-btn.left-center .btn-text {
-  writing-mode: vertical-rl;
-  text-orientation: upright;
-  margin: 0;
-  line-height: 1.2;
-}
-
-.nav-btn.left-center .btn-text .main {
-  font-size: 0.9rem;
-  letter-spacing: normal;
-}
-
-.nav-btn.left-center .btn-text .sub {
-  font-size: 0.6rem;
-  margin-top: 4px;
-}
-
-/* bottom-center button - HORIZONTAL */
-.nav-btn.bottom-center {
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  flex-direction: row;
-  padding: 0.8rem 1.8rem;
-}
-
-/* circular menu overlay */
-.circ-menu-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  background: rgba(0,0,0,0.7);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  backdrop-filter: blur(8px);
-}
-
-.circ-menu-overlay.open {
-  opacity: 1;
-  pointer-events: all;
-}
-
-.circular-menu {
-  width: 360px;
-  height: 360px;
-  border-radius: 50%;
-  background: transparent;
-  border: 2px solid var(--hh-accent, #c05a2a);
-  box-shadow: 0 0 40px rgba(192,90,42,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  transform: scale(0.3);
-  transition: transform 0.3s ease;
-}
-
-.circ-menu-overlay.open .circular-menu {
-  transform: scale(1);
-}
-
-.center-home {
-  width: 70px;
-  height: 70px;
-  background: var(--hh-accent-2, #2a7f62);
-  border: 3px solid var(--hh-accent, #c05a2a);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  font-size: 1.5rem;
-  color: #1a0d0b;
-  box-shadow: 0 0 30px var(--hh-accent, #c05a2a);
-  cursor: pointer;
-  transition: 0.2s;
-  z-index: 1001;
-}
-.center-home:hover {
-  background: var(--hh-accent, #c05a2a);
-  color: white;
-  transform: scale(1.05);
-}
-
-.menu-item {
-  position: absolute;
-  width: 60px;
-  height: 60px;
-  background: #1e1b1b;
-  border: 2px solid var(--hh-accent, #c05a2a);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(255,255,255,0.92);
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  transition: all 0.2s;
-  cursor: pointer;
-  box-shadow: 0 0 15px rgba(0,0,0,0.7);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-130px) rotate(calc(var(--angle) * -1deg));
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 1px;
-  backdrop-filter: blur(4px);
-}
-
-.menu-item:hover {
-  background: var(--hh-accent, #c05a2a);
-  color: black;
-  border-color: var(--hh-accent-2, #2a7f62);
-  transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-140px) rotate(calc(var(--angle) * -1deg));
-  width: 65px;
-  height: 65px;
-}
-
-/* mobile adjustments */
-@media (max-width: 600px) {
-  .nav-btn.left-center {
-    left: 10px;
-    padding: 0.8rem 0.3rem;
+<style>
+  :root{
+    --bg:#04050b;
+    --panel:#071024;
+    --accent:#ff6a3d;
+    --neon:#44e6ff;
+    --muted:#97d7ea;
+    --glass: rgba(255,255,255,0.03);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   }
-  .nav-btn.left-center .btn-icon {
-    font-size: 1.5rem;
+  html,body{height:100%;margin:0;background:
+    radial-gradient(1200px 600px at 10% 10%, #071427 0%, var(--bg) 35%), linear-gradient(180deg, rgba(0,0,0,0.2), rgba(0,0,0,0.4));
+    color:#eaf8ff; overflow:hidden;}
+  .wrap{position:relative;height:100vh;width:100vw;display:flex;align-items:stretch;justify-content:stretch;}
+
+  /* Left: Holographic Canvas */
+  .left{
+    flex:1 1 64%;
+    min-width:420px;
+    position:relative;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:28px;
   }
-  .nav-btn.left-center .btn-text .main {
-    font-size: 0.8rem;
+
+  canvas#holoCanvas{width:100%;height:100%;display:block; border-radius:12px; box-shadow: 0 40px 120px rgba(0,0,0,0.6);}
+
+  /* Right: Controls & Order */
+  .right{
+    width:420px;
+    padding:22px;
+    display:flex;flex-direction:column;gap:16px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-left: 1px solid rgba(255,255,255,0.03);
+    box-shadow: inset -6px 0 30px rgba(0,0,0,0.35);
   }
-  .nav-btn.left-center .btn-text .sub {
-    font-size: 0.5rem;
+  .brand{
+    display:flex;align-items:center;gap:12px;
   }
-  .nav-btn.bottom-center {
-    bottom: 20px;
-    padding: 0.6rem 1.2rem;
+  .brand .logo{
+    width:56px;height:56px;border-radius:10px;background:linear-gradient(90deg,var(--accent),#ff96b6);
+    display:grid;place-items:center;font-weight:800;color:#fff;font-size:18px;box-shadow:0 6px 20px rgba(255,106,61,0.12);
   }
-  .circular-menu {
-    width: 280px;
-    height: 280px;
+  .brand h1{margin:0;font-size:18px;letter-spacing:0.4px}
+  .brand p{margin:0;font-size:12px;color:var(--muted)}
+
+  .controls{display:flex;flex-direction:column;gap:8px}
+  .controls button, .controls input, .controls textarea, .controls select{
+    background:var(--glass);border:1px solid rgba(255,255,255,0.04);color:#dff9ff;padding:10px;border-radius:8px;font-size:13px;
   }
-  .menu-item {
-    width: 50px;
-    height: 50px;
-    font-size: 0.7rem;
-    transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-100px) rotate(calc(var(--angle) * -1deg));
+  .controls .row{display:flex;gap:8px}
+  .controls .row button{flex:1}
+  .btn{
+    background:linear-gradient(90deg,var(--accent),#ff96b6);border:none;color:white;padding:10px 12px;border-radius:8px;cursor:pointer;
+    font-weight:700;box-shadow: 0 8px 30px rgba(255,106,61,0.12);
   }
-  .menu-item:hover {
-    transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-110px) rotate(calc(var(--angle) * -1deg));
-    width: 55px;
-    height: 55px;
+  .muted{color:var(--muted);font-size:13px}
+
+  /* Cart */
+  .cart{
+    flex:1;overflow:auto;padding:10px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+    border:1px solid rgba(255,255,255,0.03)
   }
-  .center-home {
-    width: 60px;
-    height: 60px;
-    font-size: 1.2rem;
+  .cart .item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;margin-bottom:8px;background:rgba(255,255,255,0.02)}
+  .cart .thumb{width:56px;height:40px;border-radius:6px;overflow:hidden;flex-shrink:0;background:#000}
+  .cart h3{margin:0;font-size:15px}
+  .cart p{margin:0;color:var(--muted);font-size:13px}
+
+  /* Importer modal */
+  .importer{
+    padding:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:10px;
+    border:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column;gap:8px;
   }
-}
-    
-  </style>
+
+  /* HUD / small */
+  .hud{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+
+  /* Accessibility */
+  .sr-only{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+
+  /* Responsive */
+  @media (max-width:1100px){
+    .wrap{flex-direction:column}
+    .left{min-height:360px;width:100%}
+    .right{width:100%;height:auto}
+  }
+
+  /* Print */
+  @media print{
+    body *{visibility:hidden}
+    #printable{visibility:visible;position:absolute;left:0;top:0;width:100%}
+  }
+</style>
 </head>
 <body>
-  <!-- Required invisible anchors (optional, for explore nav if used) -->
-  <div id="gen-home" style="position: absolute; top: 0; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
-  <div id="gen-menu" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
-  <div id="gen-delivery" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
-  <div id="gen-order" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
-  <div id="gen-about" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
-  <div id="gen-location" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
-
-
-   <!-- ===== CIRCULAR NAVIGATION BUTTONS ===== -->
-  <!-- Left button removed as requested -->
-
-  <div class="nav-btn bottom-center" id="navBtnBottom">
-    <i class="fas fa-compass btn-icon"></i>
-    <div class="btn-text">
-      <span class="main">NAVIGATION</span>
-      <span class="sub">explore pages</span>
+<div class="wrap" id="app">
+  <div class="left" aria-hidden="false">
+    <canvas id="holoCanvas" role="img" aria-label="Holographic menu display"></canvas>
+    <!-- floating UI -->
+    <div style="position:absolute;left:22px;top:22px;display:flex;gap:8px;align-items:center;z-index:40">
+      <button id="openImport" class="btn" aria-haspopup="dialog" aria-controls="importDialog">Import</button>
+      <button id="downloadBtn" class="btn" title="Download this menu file">Download</button>
+      <button id="voiceBtn" class="btn" title="Start voice order (Ctrl/⌘+V)">🎙️ Voice</button>
+    </div>
+    <div style="position:absolute;right:22px;top:22px;z-index:40">
+      <button id="printBtn" class="btn">Print</button>
     </div>
   </div>
 
-  <!-- CIRCULAR MENU OVERLAY with page links (5 items evenly spaced at 72° increments) -->
-  <div class="circ-menu-overlay" id="circMenuOverlay">
-    <div class="circular-menu">
-      <div class="center-home" id="homeCenter" data-link="index.html"><i class="fas fa-home"></i></div>
-      <div class="menu-item" style="--angle: 0;" data-link="delivery.html">Delivery</div>
-      <div class="menu-item" style="--angle: 72;" data-link="tel:3372211035">Order</div>
-      <div class="menu-item" style="--angle: 144;" data-link="about.html">About</div>
-      <div class="menu-item" style="--angle: 216;" data-link="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634">Location</div>
-      <div class="menu-item" style="--angle: 288;" data-action="share">Share</div>
+  <aside class="right" aria-label="Menu controls and cart">
+    <div class="brand">
+      <div class="logo">HH</div>
+      <div>
+        <h1>Hotheadz Southern Foods</h1>
+        <p class="muted">Holographic Menu • Touch / Voice / Keyboard</p>
+      </div>
     </div>
+
+    <div class="controls" role="region" aria-label="Import & search">
+      <div class="importer" id="importer">
+        <strong>Import menu</strong>
+        <p class="muted">Paste your menu HTML or JSON below or try to fetch the page URL (CORS must allow). The importer uses heuristics to find dish names, prices & descriptions.</p>
+        <input id="menuUrl" placeholder="https://hotheadzsouthernfoods.com/menu.html" aria-label="Menu URL"/>
+        <div class="row">
+          <button id="fetchBtn" class="btn">Fetch URL</button>
+          <button id="pasteBtn" class="btn">Paste HTML/JSON</button>
+        </div>
+        <textarea id="pasteArea" placeholder="Paste menu HTML or JSON here..." rows="6" style="display:none"></textarea>
+        <div style="display:flex;gap:8px">
+          <button id="parseBtn" class="btn" style="flex:1;display:none">Parse & Load</button>
+          <button id="clearBtn" class="btn" style="flex:1;background:#1b2633">Clear</button>
+        </div>
+        <div id="importMsg" class="muted" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <div class="cart" id="cart" role="region" aria-label="Cart">
+      <strong>Order</strong>
+      <div id="cartList" style="margin-top:8px"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+        <div class="muted">Subtotal</div>
+        <div id="subtotal" style="font-weight:800">$0.00</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="checkoutBtn" class="btn" style="flex:1">Checkout</button>
+        <button id="clearCartBtn" class="btn" style="background:#223">Clear</button>
+      </div>
+    </div>
+
+    <div class="hud">
+      <div class="muted">Favorites save here</div>
+      <div id="status" class="muted">Ready</div>
+    </div>
+  </aside>
+</div>
+
+<!-- Import modal (simple inline) -->
+<div id="importDialog" role="dialog" aria-modal="true" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:88%;max-width:860px;z-index:200;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);padding:18px;border-radius:12px">
+  <h2 style="margin-top:0">Import Menu</h2>
+  <p class="muted">Paste the menu page HTML or menu JSON (or enter a URL and attempt to fetch). The importer will try to find items and images. If it can't, paste a cleaned JSON with `[{ "title": "...", "price":"...", "desc":"..." , "img":"..."}]`.</p>
+  <textarea id="dialogPaste" style="width:100%;height:240px;background:var(--glass);color:#eaffff;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03)"></textarea>
+  <div style="display:flex;gap:8px;margin-top:8px">
+    <button id="dialogLoad" class="btn">Load</button>
+    <button id="dialogClose" class="btn" style="background:#223">Close</button>
+    <button id="dialogFetchURL" class="btn">Try Fetch URL</button>
   </div>
+  <div id="dialogMsg" class="muted" style="margin-top:10px"></div>
+</div>
 
-  <!-- ===== MENU HTML ===== -->
-  <div class="hh-menu" role="region" aria-label="Menu" id="hh-menu-root">
+<!-- Printable area template -->
+<div id="printable" style="display:none;padding:20px;background:white;color:black">
+  <h1>Hotheadz Menu</h1>
+  <div id="printContent"></div>
+</div>
 
-    <!-- Sticky top nav -->
-    <div class="hh-stickywrap">
-      <div class="hh-daybar" role="tablist" aria-label="Day selector">
-        <button class="hh-day is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-day-today" id="hhDayBtnToday">Today</button>
-        <button class="hh-day" type="button" role="tab" aria-selected="false" aria-controls="hh-day-tomorrow" id="hhDayBtnTomorrow">Tomorrow</button>
-        <button class="hh-day" type="button" role="tab" aria-selected="false" aria-controls="hh-day-advanced" id="hhDayBtnAdvanced">Advanced Menu</button>
-      </div>
-    </div>
+<!-- ARIA live -->
+<div id="ariaLive" class="sr-only" role="status" aria-live="polite"></div>
 
-    <!-- TODAY -->
-    <div class="hh-daypanel is-active" id="hh-day-today" role="tabpanel" aria-labelledby="hhDayBtnToday">
-      <div class="hh-header">
-        <div class="hh-title" id="hh-today-title">Today’s Menu</div>
-        <div class="hh-updated" id="hh-hours-line">Loading hours…</div>
-        <div class="hh-note" id="hh-hours-note"></div>
-      </div>
+<script>
+/* ============================
+   Data / Defaults
+   ============================ */
+const DEFAULT_MENU = [
+  { id: 'fried-chicken', title: 'Crispy Fried Chicken', price: 12.99, desc: 'Buttermilk-marinated, double-dusted, served with house slaw.', img: '', tags:['featured','spicy'] },
+  { id: 'mac-cheese', title: 'Smoky Mac & Cheese', price: 7.50, desc: 'Creamy cheddar, smoked gouda, with crispy panko.', img:'', tags:['vegetarian'] },
+  { id: 'bbq-ribs', title: 'BBQ St. Louis Ribs', price: 18.50, desc:'Slow-cooked, sticky sweet & spicy glaze.', img:'', tags:['chef-recommend'] },
+  { id: 'cornbread', title: 'Honey Butter Cornbread', price: 3.50, desc:'Warm cornbread with a honey butter glaze.', img:'', tags:['side'] },
+  { id: 'sweet-tea', title: 'Southern Sweet Tea', price: 2.75, desc:'House-brewed with lemon.', img:'', tags:['drink'] },
+];
 
-      <!-- Only show CLOSED at day level -->
-      <div class="hh-state hh-closed" id="hh-today-closed" hidden>
-        <div class="hh-badge">Closed</div>
-        <div class="hh-state-title" id="hh-today-closed-title"></div>
-        <div class="hh-state-msg" id="hh-today-closed-msg"></div>
-      </div>
+const STORAGE_KEY_MENU = 'hotheadz_menu_v1';
+const STORAGE_KEY_CART = 'hotheadz_cart_v1';
+const STORAGE_KEY_USAGE = 'hotheadz_usage_v1';
 
-      <div class="hh-tablist" role="tablist" aria-label="Today categories">
-        <button class="hh-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-today-breakfast" id="hhTabTodayBreakfast">Breakfast</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-lunch" id="hhTabTodayLunch">Lunch</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-crawfish" id="hhTabTodayCrawfish">Crawfish</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-salad" id="hhTabTodaySalad">Salad Bar</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-drinks" id="hhTabTodayDrinks">Drinks</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-dessert" id="hhTabTodayDessert">Dessert</button>
-      </div>
+/* Global app state */
+let menu = [];
+let items3D = [];
+let cart = {};
+let usage = loadUsage();
+const canvas = document.getElementById('holoCanvas');
+let renderer, scene, camera, raycaster, pointer;
+let animReq;
 
-      <div class="hh-panels">
-        <section class="hh-panel is-active" id="hh-today-breakfast" role="tabpanel" aria-labelledby="hhTabTodayBreakfast">
-          <h3>Breakfast</h3>
-          <p class="hh-sub" id="hh-today-breakfast-sub"></p>
-          <h4>Plates</h4>
-          <ul class="hh-stack" id="hh-today-breakfast-plates"></ul>
-          <h4>Available Items</h4>
-          <ul class="hh-stack" id="hh-today-breakfast-items"></ul>
-          <div class="hh-cta">
-            <a class="hh-btn" id="hh-call-btn-today-b" href="#">Call to Order</a>
-            <div class="hh-small" id="hh-delivery-note"></div>
-          </div>
-        </section>
+/* ============================
+   Persistence helpers
+   ============================ */
+function saveMenu(){ try{ localStorage.setItem(STORAGE_KEY_MENU, JSON.stringify(menu)); }catch(e){} }
+function loadMenu(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY_MENU)) || null; }catch(e){ return null; } }
+function saveCart(){ try{ localStorage.setItem(STORAGE_KEY_CART, JSON.stringify(cart)); }catch(e){} }
+function loadCart(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY_CART)) || {}; }catch(e){ return {}; } }
+function loadUsage(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY_USAGE)) || {}; }catch(e){ return {}; } }
+function saveUsage(){ try{ localStorage.setItem(STORAGE_KEY_USAGE, JSON.stringify(usage)); }catch(e){} }
 
-        <section class="hh-panel" id="hh-today-lunch" hidden role="tabpanel" aria-labelledby="hhTabTodayLunch">
-          <h3>Lunch</h3>
-          <p class="hh-sub" id="hh-today-lunch-sub">Loading today’s lunch menu…</p>
+/* ============================
+   Initialization
+   ============================ */
+function init(){
+  // load menu (fallback to default)
+  const saved = loadMenu();
+  menu = saved && saved.length ? saved : DEFAULT_MENU;
+  menu = menu.map((m,i)=> ({ ...m, id: m.id || ('item-'+i), img: m.img || '', price: parseFloat(m.price||m.cost||m.price)|| (m.price===0?0:(m.cost||0)) }));
 
-          <!-- Lunch-only unavailable message -->
-          <div class="hh-lunch-unavail" id="hh-today-lunch-unavail" hidden>
-            <div class="hh-badge is-dark">Unavailable</div>
-            <div class="hh-lunch-unavail-title" id="hh-today-lunch-unavail-title">Lunch menu unavailable.</div>
-          </div>
+  // load cart
+  cart = loadCart();
+  updateCartUI();
 
-          <div id="hh-today-lunch-content" style="display:none">
-            <h4>Plates</h4>
-            <ul class="hh-stack" id="hh-today-lunch-plates"></ul>
+  // setup three.js holo if available
+  initThree();
+  buildHoloItems();
+  animate();
 
-            <h4 id="hh-today-lunch-items-title">Today’s Lunch Items</h4>
-            <div class="hh-hintline" id="hh-today-lunch-hint" hidden></div>
-            <ul class="hh-stack" id="hh-today-lunch-items"></ul>
-          </div>
+  // wire UI
+  document.getElementById('openImport').addEventListener('click', ()=>{ openImport(); });
+  document.getElementById('downloadBtn').addEventListener('click', ()=>{ downloadThisPage(); });
+  document.getElementById('voiceBtn').addEventListener('click', ()=>{ startVoice(); });
+  document.getElementById('printBtn').addEventListener('click', ()=>{ printMenu(); });
 
-          <div class="hh-cta">
-            <a class="hh-btn" id="hh-call-btn-today-l" href="#">Call to Order</a>
-          </div>
-        </section>
+  // importer
+  document.getElementById('fetchBtn').addEventListener('click', fetchURLFromInput);
+  document.getElementById('pasteBtn').addEventListener('click', ()=>{ togglePaste(true); });
+  document.getElementById('parseBtn').addEventListener('click', ()=>{ parsePasteArea(); });
+  document.getElementById('clearBtn').addEventListener('click', ()=>{ document.getElementById('pasteArea').value=''; togglePaste(false); });
 
-        <section class="hh-panel" id="hh-today-crawfish" hidden role="tabpanel" aria-labelledby="hhTabTodayCrawfish">
-          <h3>Crawfish</h3>
-          <p class="hh-sub" id="hh-today-crawfish-sub"></p>
-          <ul class="hh-stack" id="hh-today-crawfish-items"></ul>
-          <div class="hh-cta">
-            <a class="hh-btn" id="hh-call-btn-today-c" href="#">Call to Order</a>
-          </div>
-        </section>
+  // dialog
+  document.getElementById('dialogClose').addEventListener('click', ()=>{ closeDialog(); });
+  document.getElementById('dialogLoad').addEventListener('click', ()=>{ loadDialogPaste(); });
+  document.getElementById('dialogFetchURL').addEventListener('click', ()=>{ dialogTryFetchURL(); });
 
-        <section class="hh-panel" id="hh-today-salad" hidden role="tabpanel" aria-labelledby="hhTabTodaySalad">
-          <h3>Salad Bar</h3>
-          <p class="hh-sub" id="hh-today-salad-sub"></p>
-          <h4>Pricing</h4>
-          <ul class="hh-stack" id="hh-today-salad-pricing"></ul>
-          <h4>Lettuce</h4>
-          <ul class="hh-stack" id="hh-today-salad-lettuce"></ul>
-          <h4>Toppings</h4>
-          <ul class="hh-stack" id="hh-today-salad-toppings"></ul>
-          <h4>Dressing</h4>
-          <ul class="hh-stack" id="hh-today-salad-dressing"></ul>
-        </section>
+  // checkout & cart actions
+  document.getElementById('checkoutBtn').addEventListener('click', ()=>{ alert('Demo: Checkout flow would go here.'); });
+  document.getElementById('clearCartBtn').addEventListener('click', ()=>{ cart={}; saveCart(); updateCartUI(); announce('Cart cleared'); });
 
-        <section class="hh-panel" id="hh-today-drinks" hidden role="tabpanel" aria-labelledby="hhTabTodayDrinks">
-          <h3>Drinks</h3>
-          <ul class="hh-stack" id="hh-today-drinks-items"></ul>
-        </section>
+  // keyboard / voice hotkeys
+  window.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='v'){ e.preventDefault(); startVoice(); } });
+}
 
-        <section class="hh-panel" id="hh-today-dessert" hidden role="tabpanel" aria-labelledby="hhTabTodayDessert">
-          <h3>Dessert</h3>
-          <p class="hh-sub" id="hh-today-dessert-sub"></p>
-          <ul class="hh-stack" id="hh-today-dessert-items"></ul>
-        </section>
-      </div>
-    </div>
+/* ============================
+   Simple announcer
+   ============================ */
+function announce(msg){ const a = document.getElementById('ariaLive'); a.textContent = msg; document.getElementById('status').textContent = msg; }
 
-    <!-- TOMORROW -->
-    <div class="hh-daypanel" id="hh-day-tomorrow" hidden role="tabpanel" aria-labelledby="hhDayBtnTomorrow">
-      <div class="hh-header">
-        <div class="hh-title" id="hh-tomorrow-title">Tomorrow’s Menu</div>
-        <div class="hh-updated" id="hh-hours-line-2">Loading hours…</div>
-        <div class="hh-note" id="hh-hours-note-2"></div>
-      </div>
+/* ============================
+   Importer UI
+   ============================ */
+function openImport(){ document.getElementById('importDialog').style.display='block'; document.getElementById('dialogMsg').textContent=''; }
+function closeDialog(){ document.getElementById('importDialog').style.display='none'; }
+function togglePaste(show){
+  document.getElementById('pasteArea').style.display = show ? 'block' : 'none';
+  document.getElementById('parseBtn').style.display = show ? 'inline-block' : 'none';
+}
+async function fetchURLFromInput(){
+  const url = document.getElementById('menuUrl').value.trim();
+  if(!url){ document.getElementById('importMsg').textContent='Enter a URL first.'; return; }
+  document.getElementById('importMsg').textContent = 'Fetching... (CORS if allowed)';
+  try{
+    const res = await fetch(url);
+    const text = await res.text();
+    // try to parse
+    const parsed = tryParseMenuFromHTML(text, url);
+    if(parsed && parsed.length){
+      menu = parsed; saveMenu(); buildHoloItems(); updateCartUI();
+      document.getElementById('importMsg').textContent = `Imported ${parsed.length} items from ${url}`;
+    } else {
+      document.getElementById('importMsg').textContent = `No items found automatically. Paste HTML into the importer.`;
+    }
+  }catch(e){
+    document.getElementById('importMsg').textContent = 'Fetch failed (CORS or network). Use Paste HTML instead.';
+  }
+}
 
-      <!-- Only show CLOSED at day level -->
-      <div class="hh-state hh-closed" id="hh-tomorrow-closed" hidden>
-        <div class="hh-badge">Closed</div>
-        <div class="hh-state-title" id="hh-tomorrow-closed-title"></div>
-        <div class="hh-state-msg" id="hh-tomorrow-closed-msg"></div>
-      </div>
+function parsePasteArea(){
+  const raw = document.getElementById('pasteArea').value.trim();
+  if(!raw){ document.getElementById('importMsg').textContent='Paste some HTML or JSON first.'; return; }
+  const parsed = tryParseMenuFromHTML(raw);
+  if(parsed && parsed.length){
+    menu = parsed; saveMenu(); buildHoloItems(); updateCartUI();
+    document.getElementById('importMsg').textContent = `Parsed ${parsed.length} items.`;
+  } else {
+    document.getElementById('importMsg').textContent = 'Could not parse. Try simplified JSON: [{ "title":"", "price": 12.3, "desc":"", "img":"" }]';
+  }
+}
 
-      <div class="hh-tablist" role="tablist" aria-label="Tomorrow categories">
-        <button class="hh-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-tomorrow-breakfast" id="hhTabTomorrowBreakfast">Breakfast</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-lunch" id="hhTabTomorrowLunch">Lunch</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-crawfish" id="hhTabTomorrowCrawfish">Crawfish</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-salad" id="hhTabTomorrowSalad">Salad Bar</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-drinks" id="hhTabTomorrowDrinks">Drinks</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-dessert" id="hhTabTomorrowDessert">Dessert</button>
-      </div>
+function loadDialogPaste(){
+  const raw = document.getElementById('dialogPaste').value.trim();
+  if(!raw){ document.getElementById('dialogMsg').textContent='Paste something.'; return; }
+  const parsed = tryParseMenuFromHTML(raw);
+  if(parsed && parsed.length){
+    menu=parsed; saveMenu(); buildHoloItems(); updateCartUI();
+    document.getElementById('dialogMsg').textContent = `Loaded ${parsed.length} items.`;
+  } else {
+    document.getElementById('dialogMsg').textContent = 'Failed to parse. Try JSON array.';
+  }
+}
 
-      <div class="hh-panels">
-        <section class="hh-panel is-active" id="hh-tomorrow-breakfast" role="tabpanel" aria-labelledby="hhTabTomorrowBreakfast">
-          <h3>Breakfast</h3>
-          <p class="hh-sub" id="hh-tomorrow-breakfast-sub"></p>
-          <h4>Plates</h4>
-          <ul class="hh-stack" id="hh-tomorrow-breakfast-plates"></ul>
-          <h4>Available Items</h4>
-          <ul class="hh-stack" id="hh-tomorrow-breakfast-items"></ul>
-          <div class="hh-cta">
-            <a class="hh-btn" id="hh-call-btn-tomorrow-b" href="#">Call to Order</a>
-            <div class="hh-small" id="hh-delivery-note-2"></div>
-          </div>
-        </section>
+async function dialogTryFetchURL(){
+  const txt = document.getElementById('dialogPaste').value.trim();
+  if(!txt){ document.getElementById('dialogMsg').textContent='Paste a URL into the box first.'; return; }
+  let url = txt.split('\n')[0].trim();
+  if(!/^https?:\/\//.test(url)) { document.getElementById('dialogMsg').textContent='Invalid URL'; return; }
+  document.getElementById('dialogMsg').textContent='Fetching...';
+  try{
+    const res = await fetch(url);
+    const text = await res.text();
+    const parsed = tryParseMenuFromHTML(text);
+    if(parsed && parsed.length){ menu=parsed; saveMenu(); buildHoloItems(); updateCartUI(); document.getElementById('dialogMsg').textContent='Imported.'; closeDialog(); }
+    else document.getElementById('dialogMsg').textContent='No items found automatically. Paste HTML.';
+  }catch(e){
+    document.getElementById('dialogMsg').textContent='Fetch failed (CORS). Paste the page HTML instead.';
+  }
+}
 
-        <section class="hh-panel" id="hh-tomorrow-lunch" hidden role="tabpanel" aria-labelledby="hhTabTomorrowLunch">
-          <h3>Lunch</h3>
-          <p class="hh-sub" id="hh-tomorrow-lunch-sub">Loading tomorrow’s lunch menu…</p>
+/* ============================
+   Parsing heuristics
+   ============================ */
+function tryParseMenuFromHTML(text, baseUrl){
+  // Try JSON parse
+  try{
+    const j = JSON.parse(text);
+    if(Array.isArray(j) && j.length && j[0].title) return j.map(normalizeItem);
+  }catch(e){}
 
-          <!-- Lunch-only unavailable message -->
-          <div class="hh-lunch-unavail" id="hh-tomorrow-lunch-unavail" hidden>
-            <div class="hh-badge is-dark">Unavailable</div>
-            <div class="hh-lunch-unavail-title" id="hh-tomorrow-lunch-unavail-title">Lunch menu unavailable.</div>
-          </div>
+  // If it's HTML, use DOMParser
+  if(text.trim().startsWith('<') || /<\w+/.test(text)){
+    try{
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(text, 'text/html');
 
-          <div id="hh-tomorrow-lunch-content" style="display:none">
-            <h4>Plates</h4>
-            <ul class="hh-stack" id="hh-tomorrow-lunch-plates"></ul>
-
-            <h4 id="hh-tomorrow-lunch-items-title">Tomorrow’s Lunch Items</h4>
-            <div class="hh-hintline" id="hh-tomorrow-lunch-hint" hidden></div>
-            <ul class="hh-stack" id="hh-tomorrow-lunch-items"></ul>
-          </div>
-
-          <div class="hh-cta">
-            <a class="hh-btn" id="hh-call-btn-tomorrow-l" href="#">Call to Order</a>
-          </div>
-        </section>
-
-        <section class="hh-panel" id="hh-tomorrow-crawfish" hidden role="tabpanel" aria-labelledby="hhTabTomorrowCrawfish">
-          <h3>Crawfish</h3>
-          <p class="hh-sub" id="hh-tomorrow-crawfish-sub"></p>
-          <ul class="hh-stack" id="hh-tomorrow-crawfish-items"></ul>
-          <div class="hh-cta">
-            <a class="hh-btn" id="hh-call-btn-tomorrow-c" href="#">Call to Order</a>
-          </div>
-        </section>
-
-        <section class="hh-panel" id="hh-tomorrow-salad" hidden role="tabpanel" aria-labelledby="hhTabTomorrowSalad">
-          <h3>Salad Bar</h3>
-          <p class="hh-sub" id="hh-tomorrow-salad-sub"></p>
-          <h4>Pricing</h4>
-          <ul class="hh-stack" id="hh-tomorrow-salad-pricing"></ul>
-          <h4>Lettuce</h4>
-          <ul class="hh-stack" id="hh-tomorrow-salad-lettuce"></ul>
-          <h4>Toppings</h4>
-          <ul class="hh-stack" id="hh-tomorrow-salad-toppings"></ul>
-          <h4>Dressing</h4>
-          <ul class="hh-stack" id="hh-tomorrow-salad-dressing"></ul>
-        </section>
-
-        <section class="hh-panel" id="hh-tomorrow-drinks" hidden role="tabpanel" aria-labelledby="hhTabTomorrowDrinks">
-          <h3>Drinks</h3>
-          <ul class="hh-stack" id="hh-tomorrow-drinks-items"></ul>
-        </section>
-
-        <section class="hh-panel" id="hh-tomorrow-dessert" hidden role="tabpanel" aria-labelledby="hhTabTomorrowDessert">
-          <h3>Dessert</h3>
-          <p class="hh-sub" id="hh-tomorrow-dessert-sub"></p>
-          <ul class="hh-stack" id="hh-tomorrow-dessert-items"></ul>
-        </section>
-      </div>
-    </div>
-
-    <!-- ADVANCED -->
-    <div class="hh-daypanel" id="hh-day-advanced" hidden role="tabpanel" aria-labelledby="hhDayBtnAdvanced">
-      <div class="hh-advanced-top">
-        <div class="hh-advanced-title">Advanced Menu</div>
-        <div class="hh-advanced-disclaimer" id="hh-advanced-disclaimer"></div>
-      </div>
-      <div class="hh-adv-carousel" id="hh-adv-carousel" aria-label="Advanced menu day cards"></div>
-      <div class="hh-hint">Tip: swipe left/right for each day.</div>
-    </div>
-
-    <!-- Error state -->
-    <div class="hh-state" id="hh-load-error" hidden>
-      <div class="hh-badge is-dark">Error</div>
-      <div class="hh-state-title">Menu couldn’t load</div>
-      <p class="hh-state-msg" id="hh-load-error-msg">Please try again in a moment.</p>
-    </div>
-  </div>
-
-  <!-- ===== SCRIPTS ===== -->
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>
-    // AOS init (optional)
-    AOS.init({ once: false, duration: 1000 });
-
-    // ----- MENU SCRIPT (modified to shift days after closing) -----
-    (function(){
-      const DATA_URLS = ["/menu-data.html", "/menu-data/"]; // tries both
-      const $ = (id)=>document.getElementById(id);
-
-      function setText(id, text){ const el=$(id); if(el) el.textContent = text || ""; }
-      function setList(id, items){
-        const ul=$(id); if(!ul) return;
-        ul.innerHTML="";
-        (items||[]).forEach(t=>{
-          const li=document.createElement("li");
-          li.textContent=String(t ?? "");
-          ul.appendChild(li);
-        });
+      // heuristics: look for elements with classes like .menu-item, .dish, .item
+      const selectors = ['.menu-item', '.dish', '.item', '.dish-item', '.menu-row', '.menu-list li', '.food', '.product'];
+      let nodes = [];
+      for(const sel of selectors){
+        const found = Array.from(doc.querySelectorAll(sel));
+        if(found && found.length > nodes.length) nodes = found;
       }
-
-      function escapeHtml(str){
-        return String(str ?? "")
-          .replace(/&/g,"&amp;")
-          .replace(/</g,"&lt;")
-          .replace(/>/g,"&gt;")
-          .replace(/"/g,"&quot;")
-          .replace(/'/g,"&#039;");
+      // fallback: look for .price or currency patterns and extract surrounding text
+      if(nodes.length === 0){
+        // find elements that contain price-like text
+        const cand = Array.from(doc.querySelectorAll('p,div,li'));
+        const priceRegex = /(\$|€)\s?\d{1,3}(?:[.,]\d{1,2})?/;
+        nodes = cand.filter(n => priceRegex.test(n.textContent)).slice(0, 200);
       }
-
-      function normalizeItems(arr){
-        return Array.isArray(arr) ? arr.map(x=>String(x||"").trim()).filter(Boolean) : [];
-      }
-
-      function toISODateLocal(d){
-        const y=d.getFullYear();
-        const m=String(d.getMonth()+1).padStart(2,"0");
-        const day=String(d.getDate()).padStart(2,"0");
-        return `${y}-${m}-${day}`;
-      }
-
-      function formatDateNice(d){
-        return d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
-      }
-
-      function weekdayName(d){
-        return d.toLocaleDateString("en-US",{weekday:"long"});
-      }
-
-      function parseISODateToLocal(iso){
-        const [y,m,d]=String(iso).split("-").map(Number);
-        return new Date(y,(m||1)-1,d||1);
-      }
-
-      function normalizeDateKey(key){
-        const s=String(key||"").trim();
-        const m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-        if(!m) return null;
-        const y=m[1];
-        const mo=String(Number(m[2])).padStart(2,"0");
-        const da=String(Number(m[3])).padStart(2,"0");
-        return `${y}-${mo}-${da}`;
-      }
-
-      function showLoadError(msg){
-        const err = $("hh-load-error");
-        const msgEl = $("hh-load-error-msg");
-        if(msgEl) msgEl.textContent = msg || "Please try again.";
-        if(err) err.hidden = false;
-      }
-
-      async function fetchHtml(url){
-        const res = await fetch(url, { credentials:"same-origin", cache:"no-store" });
-        if(!res.ok) throw new Error(`Fetch failed ${res.status} at ${url}`);
-        return await res.text();
-      }
-
-      function extractJsonFromHtml(html, urlLabel){
-        const doc = new DOMParser().parseFromString(html, "text/html");
-        const script = doc.querySelector("#hh-menu-data");
-        if(!script) throw new Error(`No #hh-menu-data found on ${urlLabel}`);
-        const raw = (script.textContent || "").trim();
-        if(!raw) throw new Error(`#hh-menu-data is empty on ${urlLabel}`);
-        return JSON.parse(raw);
-      }
-
-      async function readData(){
-        // 1) If JSON is on THIS page, use it (great for testing)
-        const local = document.querySelector("#hh-menu-data");
-        if(local && local.textContent.trim()){
-          const data = JSON.parse(local.textContent.trim());
-          return normalizeMenus(data);
+      // Map nodes to items
+      const items = [];
+      nodes.forEach(n=>{
+        // title: header inside node or first strong/b old text
+        let title = (n.querySelector('h3,h2,h4,strong') && n.querySelector('h3,h2,h4,strong').textContent.trim()) ||
+                    (n.querySelector('h3,h2,h4') && n.querySelector('h3,h2,h4').textContent.trim()) ||
+                    (n.querySelector('.title') && n.querySelector('.title').textContent.trim()) ||
+                    (n.querySelector('a') && n.querySelector('a').textContent.trim()) ||
+                    (n.textContent.split('\\n').map(s=>s.trim()).filter(Boolean)[0] || '').trim();
+        // price: find $ or digit sequence inside node
+        const txt = n.textContent;
+        const priceMatch = txt.match(/(\$|€)\s?(\d{1,3}(?:[.,]\d{1,2})?)/);
+        const price = priceMatch ? parseFloat(priceMatch[2].replace(',','.')) : undefined;
+        // desc: next p or span
+        const descEl = n.querySelector('p') || n.querySelector('.desc') || n.querySelector('span');
+        const desc = descEl ? descEl.textContent.trim() : (()=>{ const lines = n.textContent.split('\\n').map(s=>s.trim()).filter(Boolean); return lines.slice(1,3).join(' ').trim(); })();
+        // image: look for img
+        let img = '';
+        const imgEl = n.querySelector('img') || n.querySelector('.thumb img');
+        if(imgEl) img = imgEl.src;
+        // try absolute URL fix
+        if(img && baseUrl && !/^https?:\/\//.test(img)){
+          try{ img = new URL(img, baseUrl).href; }catch(e){}
         }
-
-        // 2) Otherwise fetch from hidden data page (try both URLs)
-        let lastErr = null;
-        for(const url of DATA_URLS){
-          try{
-            const html = await fetchHtml(url);
-            const data = extractJsonFromHtml(html, url);
-            return normalizeMenus(data);
-          }catch(e){
-            lastErr = e;
-          }
-        }
-        throw lastErr || new Error("Menu data could not be read.");
-      }
-
-      function normalizeMenus(data){
-        const rawMenus=data?.menus||{};
-        const normalizedMenus={};
-        Object.keys(rawMenus).forEach(k=>{
-          const nk=normalizeDateKey(k);
-          if(!nk) return;
-          normalizedMenus[nk]=rawMenus[k];
-        });
-        data.menus=normalizedMenus;
-        return data;
-      }
-
-      function findHours(weekly, dayName){
-        return (weekly||[]).find(d => (d.day||"").toLowerCase()===(dayName||"").toLowerCase())
-          || {day:dayName, open:"", close:"", breakfast:"", lunch:""};
-      }
-
-      function getClosure(data, dayName){
-        const c=data?.closures||{};
-        const key=Object.keys(c).find(k => (k||"").toLowerCase()===(dayName||"").toLowerCase());
-        return key ? c[key] : null;
-      }
-
-      function getMenuByDate(data, isoDate){
-        return (data?.menus||{})[isoDate] || null;
-      }
-
-      function normalizeLunchItems(rawItems){
-        const items = Array.isArray(rawItems) ? rawItems : [];
-        return items.map(raw=>{
-          if(raw && typeof raw === "object"){
-            const name = String(raw.name ?? "").trim();
-            const desc = String(raw.desc ?? "").trim();
-            return { name, desc };
-          }
-          const s = String(raw ?? "").trim();
-          if(!s) return null;
-          return { name: s, desc: "" };
-        }).filter(Boolean).filter(x=>x.name);
-      }
-
-      function setDropdownList(listId, items, noDescText){
-        const ul = $(listId); if(!ul) return;
-        ul.innerHTML = "";
-        items.forEach(it=>{
-          const li = document.createElement("li");
-          const details = document.createElement("details");
-          const summary = document.createElement("summary");
-          summary.textContent = it.name;
-
-          const d = document.createElement("div");
-          d.className = "hh-desc";
-          d.textContent = it.desc ? it.desc : (noDescText || "No description for this item.");
-
-          details.appendChild(summary);
-          details.appendChild(d);
-          li.appendChild(details);
-          ul.appendChild(li);
-        });
-      }
-
-      function setCrawfishVisibility(prefix, show){
-        const tab = $(`hhTab${prefix}Crawfish`);
-        const panel = $(`hh-${prefix.toLowerCase()}-crawfish`);
-        if(tab) tab.style.display = show ? "" : "none";
-        if(!show){
-          if(panel) panel.hidden = true;
-          if(tab && tab.classList.contains("is-active")){
-            const breakfastTab = $(`hhTab${prefix}Breakfast`);
-            if(breakfastTab) breakfastTab.click();
-          }
-          return;
-        }
-        if(tab && tab.classList.contains("is-active")){
-          if(panel) panel.hidden = false;
-        }
-      }
-
-      function crawfishFor(data, menu){
-        const def=data?.defaults?.crawfish||{};
-        const c=menu?.crawfish||{};
-        const show=(c.show===false) ? false : true;
-        const subtitle=(c.subtitle ?? def.subtitle ?? "").trim();
-        const items=normalizeItems(c.items ?? def.items ?? []);
-        return {show, subtitle, items};
-      }
-
-      function getLunchAvailability(data, isoDate, todayISO){
-        const msg = data?.settings?.autoClearMessage || "Lunch menu unavailable.";
-        const today=parseISODateToLocal(todayISO);
-        const cur=parseISODateToLocal(isoDate);
-        today.setHours(12,0,0,0);
-        cur.setHours(12,0,0,0);
-
-        if(data?.settings?.autoClearPastDays && cur < today) return { ok:false, msg };
-
-        const menu=getMenuByDate(data, isoDate);
-        if(!menu) return { ok:false, msg };
-
-        const lunch=menu?.lunch || {};
-        if(lunch.show === false) return { ok:false, msg };
-
-        const items = normalizeLunchItems(lunch.items);
-        if(items.length === 0) return { ok:false, msg };
-
-        return { ok:true, msg:"" };
-      }
-
-      function showLunchUnavailable(prefixIdBase, msg){
-        const un = $(`${prefixIdBase}-lunch-unavail`);
-        const unTitle = $(`${prefixIdBase}-lunch-unavail-title`);
-        const content = $(`${prefixIdBase}-lunch-content`);
-        const hint = $(`${prefixIdBase}-lunch-hint`);
-        if(un) un.hidden = false;
-        if(unTitle) unTitle.textContent = msg || "Lunch menu unavailable.";
-        if(content) content.style.display = "none";
-        if(hint) hint.hidden = true;
-      }
-
-      function showLunchAvailable(prefixIdBase){
-        const un = $(`${prefixIdBase}-lunch-unavail`);
-        const content = $(`${prefixIdBase}-lunch-content`);
-        if(un) un.hidden = true;
-        if(content) content.style.display = "";
-      }
-
-      // Helper to parse time string "5:30 AM" to minutes since midnight
-      function parseTimeToMinutes(timeStr) {
-        if (!timeStr) return null;
-        const match = timeStr.match(/(\d+):?(\d*)\s*(AM|PM)/i);
-        if (!match) return null;
-        let hours = parseInt(match[1], 10);
-        const minutes = match[2] ? parseInt(match[2], 10) : 0;
-        const ampm = match[3].toUpperCase();
-        if (ampm === 'PM' && hours !== 12) hours += 12;
-        if (ampm === 'AM' && hours === 12) hours = 0;
-        return hours * 60 + minutes;
-      }
-
-      // Check if current time is past closing for today
-      function isPastClosingToday(weekly, todayName) {
-        const hours = findHours(weekly, todayName);
-        if (!hours.close) return false;
-        const closeMinutes = parseTimeToMinutes(hours.close);
-        if (closeMinutes === null) return false;
-        const now = new Date();
-        const currentMinutes = now.getHours() * 60 + now.getMinutes();
-        return currentMinutes >= closeMinutes;
-      }
-
-      function fillTwoDay(prefixIdBase, labelPrefix, isoDate, data, hours, todayISO){
-        const defaults=data?.defaults||{};
-        const menu=getMenuByDate(data, isoDate) || {};
-
-        // Breakfast
-        const b=menu?.breakfast||{};
-        const bDef=defaults?.breakfast||{};
-        const bHours = hours?.breakfast ? `Breakfast ${hours.breakfast}. ` : "";
-        setText(`${prefixIdBase}-breakfast-sub`, (bHours + ((b.subtitle ?? bDef.subtitle ?? "").trim())).trim());
-        setList(`${prefixIdBase}-breakfast-plates`, normalizeItems(b.plates ?? bDef.plates ?? []));
-        setList(`${prefixIdBase}-breakfast-items`,  normalizeItems(b.items  ?? bDef.items  ?? []));
-
-        // Lunch
-        const l=menu?.lunch||{};
-        const lDef=defaults?.lunch||{};
-        const lHours = hours?.lunch ? `Lunch ${hours.lunch}. ` : "";
-        setText(`${prefixIdBase}-lunch-sub`, (lHours + ((l.subtitle ?? lDef.subtitle ?? "").trim())).trim());
-
-        const lunchAvail = getLunchAvailability(data, isoDate, todayISO);
-        if(!lunchAvail.ok){
-          showLunchUnavailable(prefixIdBase, lunchAvail.msg);
-          setList(`${prefixIdBase}-lunch-plates`, []);
-          const ul = $(`${prefixIdBase}-lunch-items`);
-          if(ul) ul.innerHTML = "";
-        } else {
-          showLunchAvailable(prefixIdBase);
-          setList(`${prefixIdBase}-lunch-plates`, normalizeItems(l.plates ?? lDef.plates ?? []));
-          const items = normalizeLunchItems(l.items);
-          const hint = $(`${prefixIdBase}-lunch-hint`);
-          if(hint){
-            hint.textContent = data?.settings?.clickForDescriptionHint || "Tip: click an item for description.";
-            hint.hidden = (items.length === 0);
-          }
-          setDropdownList(`${prefixIdBase}-lunch-items`, items, data?.settings?.noDescriptionText);
-        }
-
-        // Crawfish
-        const c=crawfishFor(data, menu);
-        setText(`${prefixIdBase}-crawfish-sub`, c.subtitle);
-        setList(`${prefixIdBase}-crawfish-items`, c.items.length ? c.items : ["Call to ask about crawfish availability."]);
-        setCrawfishVisibility(labelPrefix, c.show);
-
-        // Salad
-        const s=menu?.salad||{};
-        const sDef=defaults?.salad||{};
-        setText(`${prefixIdBase}-salad-sub`, (s.subtitle ?? sDef.subtitle ?? "").trim());
-        setList(`${prefixIdBase}-salad-pricing`, normalizeItems(s.items ?? sDef.items ?? []));
-        setList(`${prefixIdBase}-salad-lettuce`,  normalizeItems(s.saladBar?.lettuce  ?? sDef.saladBar?.lettuce  ?? []));
-        setList(`${prefixIdBase}-salad-toppings`, normalizeItems(s.saladBar?.toppings ?? sDef.saladBar?.toppings ?? []));
-        setList(`${prefixIdBase}-salad-dressing`, normalizeItems(s.saladBar?.dressing ?? sDef.saladBar?.dressing ?? []));
-
-        // Drinks
-        const d=menu?.drinks||{};
-        const dDef=defaults?.drinks||{};
-        setList(`${prefixIdBase}-drinks-items`, normalizeItems(d.items ?? dDef.items ?? []));
-
-        // Dessert
-        const ds=menu?.dessert||{};
-        const dsDef=defaults?.dessert||{};
-        setText(`${prefixIdBase}-dessert-sub`, (ds.subtitle ?? dsDef.subtitle ?? "").trim());
-        const desserts=normalizeItems(ds.items ?? []);
-        setList(`${prefixIdBase}-dessert-items`, desserts.length ? desserts : ["(Dessert not posted yet.)"]);
-      }
-
-      function buildAdvancedCarousel(data, todayISO){
-        const wrap=$("hh-adv-carousel");
-        if(!wrap) return;
-        wrap.innerHTML="";
-
-        const weekly=data?.hours?.weekly||[];
-        const lDef=data?.defaults?.lunch||{};
-        const windowDays=Math.max(1, Math.min(31, Number(data?.settings?.advancedWindowDays ?? 7)));
-        const start=parseISODateToLocal(todayISO);
-
-        for(let i=0;i<windowDays;i++){
-          const d=new Date(start);
-          d.setDate(start.getDate()+i);
-          const iso=toISODateLocal(d);
-          const dayName=weekdayName(d);
-          const hours=findHours(weekly, dayName);
-
-          const closure=getClosure(data, dayName);
-          const isClosed=!!closure?.closed;
-          const menu=getMenuByDate(data, iso) || {};
-          const lunch=menu?.lunch||{};
-          const items=normalizeLunchItems(lunch.items);
-
-          let state = { kind:"open", msg:"" };
-          if(isClosed){
-            state = { kind:"closed", msg: closure.message || "See you tomorrow!" };
-          } else {
-            const avail=getLunchAvailability(data, iso, todayISO);
-            if(!avail.ok) state = { kind:"unavailable", msg: avail.msg };
-          }
-
-          const card=document.createElement("article");
-          card.className="hh-adv-card";
-
-          const head=document.createElement("div");
-          head.className="hh-adv-head";
-          head.innerHTML=`
-            <div>
-              <div class="hh-adv-dayname">${escapeHtml(dayName)}</div>
-              <div class="hh-adv-date">${escapeHtml(formatDateNice(d))}</div>
-            </div>
-            <div class="hh-adv-hours">${state.kind==="closed" ? "Closed" : (hours.lunch ? `Lunch ${escapeHtml(hours.lunch)}` : "")}</div>
-          `;
-          card.appendChild(head);
-
-          if(state.kind!=="open"){
-            const st=document.createElement("div");
-            st.className="hh-state";
-            st.innerHTML=`
-              <div class="hh-badge ${state.kind==="unavailable" ? "is-dark" : ""}">${state.kind==="closed" ? "Closed" : "Unavailable"}</div>
-              <div class="hh-state-title">${escapeHtml(dayName)}</div>
-              <p class="hh-state-msg">${escapeHtml(state.msg)}</p>
-            `;
-            card.appendChild(st);
-          } else {
-            const panel=document.createElement("section");
-            panel.className="hh-panel";
-
-            const subtitle=((hours.lunch ? `Lunch ${hours.lunch}. ` : "") + ((lunch.subtitle ?? lDef.subtitle ?? "").trim())).trim();
-            const plates=normalizeItems(lunch.plates ?? lDef.plates ?? []);
-            const hintText=data?.settings?.clickForDescriptionHint || "Tip: click an item for description.";
-            const noDesc=data?.settings?.noDescriptionText || "No description for this item.";
-
-            panel.innerHTML=`
-              <h3>Lunch</h3>
-              <p class="hh-sub">${escapeHtml(subtitle)}</p>
-              <h4>Plates</h4>
-              <ul class="hh-stack">${plates.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>
-              <h4>${escapeHtml(dayName)} Lunch Items</h4>
-              <div class="hh-hintline">${escapeHtml(hintText)}</div>
-              <ul class="hh-stack">
-                ${items.map(it=>{
-                  const d = it.desc ? it.desc : noDesc;
-                  return `<li><details><summary>${escapeHtml(it.name)}</summary><div class="hh-desc">${escapeHtml(d)}</div></details></li>`;
-                }).join("")}
-              </ul>
-            `;
-            card.appendChild(panel);
-          }
-
-          wrap.appendChild(card);
-        }
-      }
-
-      function wireTabs(dayPanelEl){
-        if(!dayPanelEl) return;
-        const tabs=Array.from(dayPanelEl.querySelectorAll(".hh-tab[role='tab']"));
-        const panels=Array.from(dayPanelEl.querySelectorAll(".hh-panel[role='tabpanel']"));
-        if(!tabs.length || !panels.length) return;
-
-        function activateTab(tab){
-          const targetId=tab.getAttribute("aria-controls");
-          tabs.forEach(t=>{
-            const active=(t===tab);
-            t.classList.toggle("is-active", active);
-            t.setAttribute("aria-selected", active ? "true" : "false");
-          });
-          panels.forEach(p=> p.hidden = (p.id !== targetId));
-        }
-        tabs.forEach(tab=> tab.addEventListener("click", ()=> activateTab(tab)));
-      }
-
-      function wireDayTabs(){
-        const dayButtons=Array.from(document.querySelectorAll(".hh-day[role='tab']"));
-        const dayPanels=Array.from(document.querySelectorAll(".hh-daypanel[role='tabpanel']"));
-
-        function activate(btn){
-          const targetId=btn.getAttribute("aria-controls");
-          dayButtons.forEach(b=>{
-            const active=(b===btn);
-            b.classList.toggle("is-active", active);
-            b.setAttribute("aria-selected", active ? "true" : "false");
-          });
-          dayPanels.forEach(p=> p.hidden = (p.id !== targetId));
-        }
-        dayButtons.forEach(btn=> btn.addEventListener("click", ()=> activate(btn)));
-
-        // Return the activate function so we can call it externally
-        return activate;
-      }
-
-      // ---- INIT ----
-      const activateDay = wireDayTabs(); // get the function to programmatically activate a day
-      wireTabs($("hh-day-today"));
-      wireTabs($("hh-day-tomorrow"));
-
-      (async function init(){
-        try{
-          const data = await readData();
-
-          setText("hh-advanced-disclaimer", data?.settings?.advancedDisclaimer || "");
-          if(!data?.settings?.showAdvancedTab){
-            const advBtn=$("hhDayBtnAdvanced");
-            if(advBtn) advBtn.style.display="none";
-          }
-
-          const now = new Date();
-          const calendarTodayISO = toISODateLocal(now);      // actual today's date
-          const calendarTodayName = weekdayName(now);
-
-          const calendarTomorrow = new Date(now); 
-          calendarTomorrow.setDate(now.getDate() + 1);
-          const calendarTomorrowISO = toISODateLocal(calendarTomorrow);
-          const calendarTomorrowName = weekdayName(calendarTomorrow);
-
-          // Default display dates (what we show in Today/Tomorrow tabs)
-          let displayTodayISO = calendarTodayISO;
-          let displayTodayName = calendarTodayName;
-          let displayTomorrowISO = calendarTomorrowISO;
-          let displayTomorrowName = calendarTomorrowName;
-
-          const weekly = data?.hours?.weekly || [];
-          const closureToday = getClosure(data, calendarTodayName);
-
-          // Check if we are past closing time for today (and not already closed)
-          const pastClosing = isPastClosingToday(weekly, calendarTodayName);
-          if (pastClosing && !closureToday?.closed) {
-            // Shift everything forward: Today becomes tomorrow, Tomorrow becomes day after
-            displayTodayISO = calendarTomorrowISO;
-            displayTodayName = calendarTomorrowName;
-
-            const dayAfterTomorrow = new Date(now);
-            dayAfterTomorrow.setDate(now.getDate() + 2);
-            displayTomorrowISO = toISODateLocal(dayAfterTomorrow);
-            displayTomorrowName = weekdayName(dayAfterTomorrow);
-          }
-
-          // Update tab labels
-          setText("hhDayBtnToday", displayTodayName);
-          setText("hhDayBtnTomorrow", displayTomorrowName);
-
-          // Update panel titles
-          setText("hh-today-title", `${displayTodayName} (${formatDateNice(parseISODateToLocal(displayTodayISO))}) Menu`);
-          setText("hh-tomorrow-title", `${displayTomorrowName} (${formatDateNice(parseISODateToLocal(displayTomorrowISO))}) Menu`);
-
-          setText("hh-hours-note", data?.hours?.note || "");
-          setText("hh-hours-note-2", data?.hours?.note || "");
-
-          const hoursToday = findHours(weekly, displayTodayName);
-          const hoursTomorrow = findHours(weekly, displayTomorrowName);
-
-          const closureDisplayToday = getClosure(data, displayTodayName);
-          const closureDisplayTomorrow = getClosure(data, displayTomorrowName);
-
-          const lineToday = closureDisplayToday?.closed ? `${displayTodayName} Hours: Closed`
-            : `${displayTodayName} Hours: ${hoursToday.open} – ${hoursToday.close}` +
-              (hoursToday.breakfast ? ` • Breakfast ${hoursToday.breakfast}` : "") +
-              (hoursToday.lunch ? ` • Lunch ${hoursToday.lunch}` : "");
-
-          const lineTomorrow = closureDisplayTomorrow?.closed ? `${displayTomorrowName} Hours: Closed`
-            : `${displayTomorrowName} Hours: ${hoursTomorrow.open} – ${hoursTomorrow.close}` +
-              (hoursTomorrow.breakfast ? ` • Breakfast ${hoursTomorrow.breakfast}` : "") +
-              (hoursTomorrow.lunch ? ` • Lunch ${hoursTomorrow.lunch}` : "");
-
-          setText("hh-hours-line", lineToday);
-          setText("hh-hours-line-2", lineTomorrow);
-
-          const phone = data?.phoneTel || "#";
-          ["hh-call-btn-today-b","hh-call-btn-today-l","hh-call-btn-today-c",
-           "hh-call-btn-tomorrow-b","hh-call-btn-tomorrow-l","hh-call-btn-tomorrow-c"
-          ].forEach(id=>{ const a=$(id); if(a) a.href=phone; });
-
-          setText("hh-delivery-note", data?.deliveryNote || "");
-          setText("hh-delivery-note-2", data?.deliveryNote || "");
-
-          if(closureDisplayToday?.closed){
-            $("hh-today-closed").hidden=false;
-            setText("hh-today-closed-title", `${displayTodayName} (${displayTodayISO})`);
-            setText("hh-today-closed-msg", closureDisplayToday.message || "See you tomorrow!");
-          } else {
-            $("hh-today-closed").hidden=true;
-          }
-          if(closureDisplayTomorrow?.closed){
-            $("hh-tomorrow-closed").hidden=false;
-            setText("hh-tomorrow-closed-title", `${displayTomorrowName} (${displayTomorrowISO})`);
-            setText("hh-tomorrow-closed-msg", closureDisplayTomorrow.message || "See you tomorrow!");
-          } else {
-            $("hh-tomorrow-closed").hidden=true;
-          }
-
-          // Fill panels with the display dates (shifted if past closing)
-          fillTwoDay("hh-today", "Today", displayTodayISO, data, hoursToday, calendarTodayISO);
-          fillTwoDay("hh-tomorrow", "Tomorrow", displayTomorrowISO, data, hoursTomorrow, calendarTodayISO);
-
-          setText("hh-today-lunch-items-title", `${displayTodayName} Lunch Items`);
-          setText("hh-tomorrow-lunch-items-title", `${displayTomorrowName} Lunch Items`);
-
-          // Ensure the "Today" tab is active (it is by default, but after shift we might want to activate it)
-          // No need – the default active is today panel, and we've updated its content.
-
-          // Build advanced carousel using the actual calendar date (not shifted)
-          buildAdvancedCarousel(data, calendarTodayISO);
-
-        }catch(e){
-          console.error("HOT HEADZ MENU ERROR:", e);
-          setText("hh-hours-line", "Menu unavailable right now.");
-          setText("hh-hours-line-2", "Menu unavailable right now.");
-          showLoadError(String(e && e.message ? e.message : e));
-        }
-      })();
-    })();
-
-    // ----- DOCK SCRIPT -----
-    (function() {
-      const root = document.getElementById('genRoot');
-      const dock = document.getElementById('genDock');
-      if (root && dock) {
-        root.hidden = false;
-        dock.hidden = false;
-      }
-    })();
-  </script>
-
-
-   <!-- Circular menu toggle script with page navigation and share -->
-  <script>
-    (function() {
-      const overlay = document.getElementById('circMenuOverlay');
-      const leftBtn = document.getElementById('navBtnLeft');
-      const bottomBtn = document.getElementById('navBtnBottom');
-      const homeCenter = document.getElementById('homeCenter');
-      const menuItems = document.querySelectorAll('.menu-item');
-
-      function toggleMenu() {
-        overlay.classList.toggle('open');
-      }
-
-      // leftBtn is now removed, so we need to check if it exists before adding listener
-      if (leftBtn) {
-        leftBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          toggleMenu();
-        });
-      }
-
-      bottomBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleMenu();
+        if(!title && !price) return;
+        items.push({ title: title || 'Dish', price: price || 0.00, desc: desc || '', img: img || '', id: (title||'item').toLowerCase().replace(/[^a-z0-9]+/g,'-') });
       });
+      if(items.length) return items.map(normalizeItem);
+    }catch(e){ console.warn('parse failed', e); }
+  }
+  return null;
+}
 
-      overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) {
-          overlay.classList.remove('open');
-        }
-      });
+function normalizeItem(it){
+  return {
+    id: it.id || (it.title||'item').toLowerCase().replace(/[^a-z0-9]+/g,'-') + '-' + Math.random().toString(36).slice(2,6),
+    title: it.title || 'Dish',
+    desc: it.desc || '',
+    price: Number((it.price||it.cost||0).toFixed ? it.price : parseFloat(it.price||0)||0),
+    img: it.img || '',
+    tags: it.tags || []
+  };
+}
 
-      async function sharePage() {
-        const shareData = {
-          title: document.title || 'Hot Headz Southern Foods',
-          text: 'Check out Hot Headz Southern Foods in DeRidder, LA!',
-          url: window.location.href
-        };
-        try {
-          if (navigator.share) {
-            await navigator.share(shareData);
-          } else if (navigator.clipboard && navigator.clipboard.writeText) {
-            await navigator.clipboard.writeText(window.location.href);
-            const shareItem = document.querySelector('.menu-item[data-action="share"]');
-            if (shareItem) {
-              const originalText = shareItem.textContent;
-              shareItem.textContent = 'Copied';
-              setTimeout(() => shareItem.textContent = originalText, 1500);
-            }
-          } else {
-            const temp = document.createElement('input');
-            temp.value = window.location.href;
-            document.body.appendChild(temp);
-            temp.select();
-            document.execCommand('copy');
-            document.body.removeChild(temp);
-            alert('Link copied to clipboard!');
-          }
-        } catch (e) { console.log('Share failed', e); }
+/* ============================
+   Cart UI
+   ============================ */
+function addToCart(id, qty=1){
+  if(!cart[id]) cart[id] = 0;
+  cart[id] += qty;
+  saveCart();
+  announce(`${getItem(id).title} added to order`);
+  updateCartUI();
+}
+function removeFromCart(id){
+  delete cart[id];
+  saveCart();
+  updateCartUI();
+}
+function setQtyCart(id, qty){
+  if(qty <= 0){ removeFromCart(id); return; }
+  cart[id] = qty;
+  saveCart();
+  updateCartUI();
+}
+function updateCartUI(){
+  const list = document.getElementById('cartList');
+  list.innerHTML = '';
+  let subtotal = 0;
+  for(const id in cart){
+    const item = getItem(id);
+    if(!item) continue;
+    const qty = cart[id];
+    subtotal += item.price * qty;
+    const row = document.createElement('div'); row.className='item';
+    row.innerHTML = `
+      <div class="thumb"><img style="width:100%;height:100%;object-fit:cover" src="${item.img || placeholderImg(item.title)}" alt="${escapeHtml(item.title)}"></div>
+      <div style="flex:1">
+        <h3>${escapeHtml(item.title)}</h3>
+        <p class="muted">${escapeHtml(item.desc)}</p>
+      </div>
+      <div style="text-align:right">
+        <div style="font-weight:800">$${(item.price*qty).toFixed(2)}</div>
+        <div style="display:flex;gap:6px;align-items:center;justify-content:flex-end;margin-top:6px">
+          <button class="btn small" data-action="dec" data-id="${id}" style="padding:6px 8px;background:#223">-</button>
+          <div style="min-width:22px;text-align:center">${qty}</div>
+          <button class="btn small" data-action="inc" data-id="${id}" style="padding:6px 8px">+</button>
+        </div>
+      </div>
+    `;
+    list.appendChild(row);
+  }
+  document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);
+  // wire buttons
+  Array.from(list.querySelectorAll('[data-action]')).forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      const id = btn.getAttribute('data-id');
+      const action = btn.getAttribute('data-action');
+      if(action==='inc') addToCart(id,1);
+      if(action==='dec') setQtyCart(id, (cart[id]||1)-1);
+    });
+  });
+}
+
+/* ============================
+   Helper functions
+   ============================ */
+function getItem(id){ return menu.find(m=>m.id===id); }
+function placeholderImg(text){ // small generated data URI using canvas
+  const c = document.createElement('canvas'); c.width=200;c.height=120;const ctx=c.getContext('2d');
+  ctx.fillStyle='#0b1620'; ctx.fillRect(0,0,c.width,c.height);
+  ctx.fillStyle = '#18323b'; ctx.fillRect(0,c.height-34,c.width,34);
+  ctx.fillStyle = '#fff'; ctx.font='bold 20px Inter'; ctx.textAlign='center';
+  ctx.fillText((text||'Dish').slice(0,18), c.width/2, c.height/2+6);
+  return c.toDataURL('image/png');
+}
+function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ============================
+   Three.js Holographic menu
+   ============================ */
+function initThree(){
+  try{
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha:true, antialias:true, powerPreference:'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(canvas.clientWidth || canvas.width, canvas.clientHeight || canvas.height);
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(40, canvas.clientWidth / canvas.clientHeight, 0.1, 4000);
+    camera.position.set(0,0,600);
+
+    // light
+    const amb = new THREE.AmbientLight(0xffffff, 0.6); scene.add(amb);
+    const dir = new THREE.DirectionalLight(0xffffff, 0.6); dir.position.set(0.5,1,0.5); scene.add(dir);
+
+    raycaster = new THREE.Raycaster();
+    pointer = new THREE.Vector2(-9999,-9999);
+    // responsiveness
+    window.addEventListener('resize', onResize);
+    window.addEventListener('mousemove', (e)=>{ pointer.x = (e.clientX / window.innerWidth) * 2 -1; pointer.y = -(e.clientY / window.innerHeight)*2 +1; });
+    window.addEventListener('click', ()=>{ handleClick(); });
+  }catch(e){
+    console.warn('WebGL not available',e);
+    canvas.style.display='none';
+  }
+}
+
+function buildHoloItems(){
+  // clean scene
+  while(scene.children.length > 0) { scene.remove(scene.children[0]); } // simple reset
+  // recreate lights
+  const amb = new THREE.AmbientLight(0xffffff, 0.6); scene.add(amb);
+  const dir = new THREE.DirectionalLight(0xffffff, 0.6); dir.position.set(0.5,1,0.5); scene.add(dir);
+
+  items3D = [];
+  const group = new THREE.Group(); scene.add(group);
+
+  const count = menu.length;
+  const radius = 240;
+  const planeW = 220, planeH = 140;
+
+  menu.forEach((it, idx) => {
+    // create canvas texture for item (image + text)
+    const tex = createDishTexture(it, 1024, 640);
+    const mat = new THREE.MeshBasicMaterial({ map: tex, transparent:true, depthWrite:false, side:THREE.DoubleSide });
+    const geo = new THREE.PlaneGeometry(planeW, planeH, 12, 6);
+    const mesh = new THREE.Mesh(geo, mat);
+
+    const angle = (idx / Math.max(count,1)) * Math.PI*2;
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle*0.7) * 40;
+    const z = Math.sin(angle) * radius * 0.2 - 60;
+    mesh.position.set(x,y,z);
+    mesh.lookAt(0,0,0);
+    mesh.userData = { id: it.id, title: it.title };
+    mesh.scale.set(1,1,1);
+    group.add(mesh);
+    items3D.push({ mesh, tex, item: it, base: { x,y,z, scale:1 } });
+  });
+
+  // ground glow
+  const ringGeo = new THREE.RingGeometry(300, 340, 64);
+  const ringMat = new THREE.MeshBasicMaterial({ color:0x001122, side:THREE.DoubleSide, transparent:true, opacity:0.18 });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.rotation.x = -Math.PI/2;
+  ring.position.y = -140;
+  scene.add(ring);
+}
+
+function createDishTexture(item, w=1024, h=640){
+  const c = document.createElement('canvas'); c.width=w; c.height=h; const ctx=c.getContext('2d');
+  // background
+  ctx.fillStyle = '#06101a'; ctx.fillRect(0,0,w,h);
+  // image area
+  const imgH = Math.floor(h*0.56);
+  if(item.img){
+    // load image (synchronous draw won't work before load), draw placeholder first
+    ctx.fillStyle='#0b1720'; ctx.fillRect(0,0,w,imgH);
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = ()=>{ ctx.drawImage(img, 0, 0, w, imgH); /* update texture */ };
+    img.onerror = ()=>{/* silent */};
+    img.src = item.img;
+  } else {
+    // gradient placeholder
+    const g = ctx.createLinearGradient(0,0,w,0);
+    g.addColorStop(0, '#0b1720'); g.addColorStop(1, '#112a35');
+    ctx.fillStyle = g; ctx.fillRect(0,0,w,imgH);
+    // dish initial
+    ctx.fillStyle = '#fff'; ctx.font='bold 42px Inter'; ctx.textAlign='center';
+    ctx.fillText(item.title || 'Dish', w/2, imgH/2);
+  }
+  // content band
+  ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fillRect(0,imgH,w,h-imgH);
+  // title + price
+  ctx.fillStyle = '#e6fbff'; ctx.font='bold 34px Inter'; ctx.textAlign='left';
+  ctx.fillText(item.title, 28, imgH + 44);
+  ctx.fillStyle = '#ffd8c6'; ctx.font='700 28px Inter'; ctx.textAlign='right';
+  ctx.fillText('$' + Number(item.price||0).toFixed(2), w-28, imgH + 44);
+  // desc
+  ctx.fillStyle = '#cfeff3'; ctx.font='14px Inter'; ctx.textAlign='left';
+  wrapText(ctx, item.desc || '', 28, imgH + 74, w-56, 20);
+  // tags
+  ctx.fillStyle = '#44e6ff'; ctx.font='700 13px Inter';
+  const tags = (item.tags || []).slice(0,3);
+  let tx = 28;
+  tags.forEach(t=>{
+    const tw = ctx.measureText(t).width + 18;
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    roundRectFill(ctx, tx, h-44, tw, 28, 8);
+    ctx.fillStyle = '#bff7ff';
+    ctx.fillText(t.toUpperCase(), tx + 9, h-25);
+    tx += tw + 8;
+  });
+  return new THREE.CanvasTexture(c);
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+  const words = text.split(' ');
+  let line = '';
+  for(let n=0;n<words.length;n++){
+    const testLine = line + words[n] + ' ';
+    const metrics = ctx.measureText(testLine);
+    if(metrics.width > maxWidth && n > 0){
+      ctx.fillText(line, x, y);
+      line = words[n] + ' ';
+      y += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x, y);
+}
+function roundRectFill(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r);
+  ctx.closePath();
+  ctx.fill();
+}
+
+/* Interaction */
+let hovered = null;
+function handleClick(){
+  if(!hovered) return;
+  const id = hovered.userData.id;
+  addToCart(id,1);
+  // small pulse
+  gsap.to(hovered.scale, { x:1.25, y:1.25, duration:0.12, yoyo:true, repeat:1 });
+}
+function onHover(mesh){
+  if(!mesh) return;
+  gsap.to(mesh.position, { z: mesh.position.z - 40, duration:0.35, ease:'expo.out' });
+  gsap.to(mesh.scale, { x:1.12, y:1.12, duration:0.35, ease:'expo.out' });
+  announce(mesh.userData.title + ' focused');
+}
+function onUnhover(mesh){
+  if(!mesh) return;
+  const entry = items3D.find(x=>x.mesh===mesh);
+  if(!entry) return;
+  gsap.to(mesh.position, { x:entry.base.x, y:entry.base.y, z:entry.base.z, duration:0.8, ease:'elastic.out(1,0.6)' });
+  gsap.to(mesh.scale, { x:1, y:1, z:1, duration:0.6, ease:'elastic.out(1,0.6)' });
+}
+
+/* Animation loop */
+function animate(){
+  const t = performance.now() * 0.001;
+  // update shaders / subtle movement
+  items3D.forEach((e, idx)=>{
+    e.mesh.rotation.z = Math.sin(t*0.6 + idx) * 0.02;
+    e.mesh.position.y = e.base.y + Math.sin(t*0.8 + idx) * 6;
+  });
+
+  // raycasting
+  raycaster.setFromCamera(pointer, camera);
+  const intersects = raycaster.intersectObjects(items3D.map(x=>x.mesh));
+  if(intersects.length){
+    const obj = intersects[0].object;
+    if(hovered !== obj){
+      if(hovered) onUnhover(hovered);
+      hovered = obj;
+      onHover(obj);
+    }
+  } else {
+    if(hovered) onUnhover(hovered);
+    hovered = null;
+  }
+
+  // subtle camera orbit
+  camera.position.x = Math.sin(t*0.06)*20;
+  camera.lookAt(0,0,0);
+
+  renderer.render(scene, camera);
+  animReq = requestAnimationFrame(animate);
+}
+
+/* Resize */
+function onResize(){
+  const w = canvas.clientWidth || window.innerWidth * 0.64;
+  const h = canvas.clientHeight || window.innerHeight;
+  renderer.setSize(window.innerWidth * 0.64, window.innerHeight);
+  camera.aspect = (window.innerWidth * 0.64) / window.innerHeight;
+  camera.updateProjectionMatrix();
+}
+
+/* ============================
+   Voice recognition (Add to cart)
+   ============================ */
+let recognition;
+function initVoice(){
+  if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang = 'en-US';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  recognition.onresult = (e)=>{
+    const heard = e.results[0][0].transcript.toLowerCase();
+    announce('Heard: ' + heard);
+    // find matching menu item
+    for(const it of menu){
+      const title = it.title.toLowerCase();
+      if(heard.includes('add') && heard.includes(title.split(' ')[0]) || heard.includes(title) || heard.includes(it.id)){
+        addToCart(it.id, 1);
+        return;
       }
-
-      function navigate(link) {
-        if (!link) return;
-        window.location.href = link;
+      // If user asked "open" show details
+      if(heard.includes('show') && heard.includes(title.split(' ')[0])){
+        // center camera to item
       }
+    }
+    announce('No matching dish found.');
+  };
+  recognition.onerror = (e)=>{ announce('Voice error'); console.warn(e); };
+}
+function startVoice(){
+  if(!recognition) initVoice();
+  if(!recognition) return alert('Voice not supported in this browser.');
+  recognition.start();
+  announce('Listening for order...');
+}
 
-      homeCenter.addEventListener('click', () => {
-        overlay.classList.remove('open');
-        const link = homeCenter.getAttribute('data-link');
-        if (link) navigate(link);
-      });
+/* ============================
+   Utilities: download and print
+   ============================ */
+function downloadThisPage(){
+  // Build a blob of the current page's outerHTML and trigger download.
+  const html = '<!doctype html>\\n' + document.documentElement.outerHTML;
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'hotheadz-holo-menu.html'; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 2000);
+}
 
-      menuItems.forEach(item => {
-        item.addEventListener('click', () => {
-          overlay.classList.remove('open');
-          const link = item.getAttribute('data-link');
-          const action = item.getAttribute('data-action');
-          if (action === 'share') sharePage();
-          else if (link) navigate(link);
-        });
-      });
+function printMenu(){
+  // prepare printable content from menu
+  const pc = document.getElementById('printContent'); pc.innerHTML = '';
+  menu.forEach(m=>{
+    const div = document.createElement('div');
+    div.style.marginBottom = '10px';
+    div.innerHTML = `<h3 style="margin:0">${escapeHtml(m.title)} <span style="float:right">$${m.price.toFixed(2)}</span></h3><p style="margin:6px 0;color:#333">${escapeHtml(m.desc)}</p>`;
+    pc.appendChild(div);
+  });
+  const printable = document.getElementById('printable');
+  printable.style.display = 'block';
+  window.print();
+  printable.style.display = 'none';
+}
 
-      document.querySelector('.circular-menu').addEventListener('click', e => e.stopPropagation());
-    })();
-  </script>
+/* ============================
+   Small utilities
+   ============================ */
+function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ============================
+   Boot
+   ============================ */
+init();
+
+</script>
 </body>
 </html>
