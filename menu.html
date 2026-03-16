@@ -875,7 +875,7 @@
             <button class="builder-action" id="builderClear" type="button">Clear Plate</button>
             <button class="builder-action" id="builderCopy" type="button">Copy Summary</button>
           </div>
-          <div class="builder-note">If an item on the menu-data page has no posted price, it still adds and counts as $0.00 until you add the real price.</div>
+          <div class="builder-note">Prices are parsed from strings like "$12.99" – items without a price show $0.00.</div>
         </div>
       </div>
     </section>
@@ -967,19 +967,19 @@
             { "name": "Side Salad", "desc": "Smaller salad option.", "price": 4.99 }
           ]},
           { "label": "Lettuce", "items": [
-            { "name": "Romaine", "desc": "", "price": 0 },
-            { "name": "Iceberg", "desc": "", "price": 0 }
+            { "name": "Romaine", "desc": "" },
+            { "name": "Iceberg", "desc": "" }
           ]},
           { "label": "Toppings", "items": [
-            { "name": "Tomatoes", "desc": "", "price": 0 },
-            { "name": "Cheese", "desc": "", "price": 0 },
-            { "name": "Croutons", "desc": "", "price": 0 },
-            { "name": "Cucumbers", "desc": "", "price": 0 }
+            { "name": "Tomatoes", "desc": "" },
+            { "name": "Cheese", "desc": "" },
+            { "name": "Croutons", "desc": "" },
+            { "name": "Cucumbers", "desc": "" }
           ]},
           { "label": "Dressing", "items": [
-            { "name": "Ranch", "desc": "", "price": 0 },
-            { "name": "Italian", "desc": "", "price": 0 },
-            { "name": "French", "desc": "", "price": 0 }
+            { "name": "Ranch", "desc": "" },
+            { "name": "Italian", "desc": "" },
+            { "name": "French", "desc": "" }
           ]}
         ]
       },
@@ -1053,6 +1053,16 @@
           .replace(/'/g, "&#039;");
       }
 
+      // parse price from string like "$12.99" or 12.99
+      function parsePrice(value) {
+        if (typeof value === 'number') return value;
+        if (typeof value === 'string') {
+          const match = value.match(/\$?(\d+(?:\.\d{2})?)/);
+          if (match) return parseFloat(match[1]);
+        }
+        return 0;
+      }
+
       function money(n) { return `$${Number(n || 0).toFixed(2)}`; }
 
       function toISODateLocal(d) {
@@ -1074,39 +1084,47 @@
         return JSON.parse(JSON.stringify(obj));
       }
 
+      // ----- DATA NORMALIZATION (with price parsing) -----
       function normalizeFetchedData(raw) {
         const out = clone(raw);
         out.defaults = out.defaults || {};
 
-        const mapLegacyCategory = (name) => {
-          const key = String(name || "").toLowerCase();
-          if (key === "breakfast") return "Breakfast";
-          if (key === "lunch") return "Lunch";
-          if (key === "crawfish") return "Crawfish";
-          if (key === "salad" || key === "salad bar") return "Salad Bar";
-          if (key === "drinks") return "Drinks";
-          if (key === "dessert" || key === "desserts") return "Dessert";
-          return name;
+        const parseItem = (item) => {
+          if (typeof item === 'string') return { name: item, desc: "", price: 0 };
+          return {
+            name: item.name || "",
+            desc: item.desc || "",
+            price: parsePrice(item.price)
+          };
         };
 
         const convertLegacyCategory = (legacy, catName) => {
           if (!legacy) return { subtitle: "", sections: [] };
-          if (legacy.sections) return legacy;
+          if (legacy.sections) {
+            // already in new format – just ensure items have parsed prices
+            legacy.sections = legacy.sections.map(s => ({
+              ...s,
+              items: (s.items || []).map(parseItem)
+            }));
+            return legacy;
+          }
 
           const sections = [];
-          if (Array.isArray(legacy.plates) && legacy.plates.length) sections.push({ label: "Plates", items: legacy.plates });
+          if (Array.isArray(legacy.plates) && legacy.plates.length) {
+            sections.push({ label: "Plates", items: legacy.plates.map(parseItem) });
+          }
           if (Array.isArray(legacy.items) && legacy.items.length) {
             let label = "Items";
             if (catName === "Breakfast") label = "Available Items";
-            if (catName === "Lunch") label = "Today’s Lunch Items";
-            if (catName === "Drinks") label = "Available Drinks";
-            if (catName === "Dessert") label = "Available Desserts";
-            sections.push({ label, items: legacy.items });
+            else if (catName === "Lunch") label = "Today’s Lunch Items";
+            else if (catName === "Drinks") label = "Available Drinks";
+            else if (catName === "Dessert") label = "Available Desserts";
+            sections.push({ label, items: legacy.items.map(parseItem) });
           }
           if (legacy.saladBar) {
-            if (Array.isArray(legacy.saladBar.lettuce) && legacy.saladBar.lettuce.length) sections.push({ label: "Lettuce", items: legacy.saladBar.lettuce.map(x => typeof x === "string" ? { name: x, desc: "", price: 0 } : x) });
-            if (Array.isArray(legacy.saladBar.toppings) && legacy.saladBar.toppings.length) sections.push({ label: "Toppings", items: legacy.saladBar.toppings.map(x => typeof x === "string" ? { name: x, desc: "", price: 0 } : x) });
-            if (Array.isArray(legacy.saladBar.dressing) && legacy.saladBar.dressing.length) sections.push({ label: "Dressing", items: legacy.saladBar.dressing.map(x => typeof x === "string" ? { name: x, desc: "", price: 0 } : x) });
+            if (Array.isArray(legacy.saladBar.lettuce)) sections.push({ label: "Lettuce", items: legacy.saladBar.lettuce.map(x => parseItem(typeof x === 'string' ? { name: x } : x)) });
+            if (Array.isArray(legacy.saladBar.toppings)) sections.push({ label: "Toppings", items: legacy.saladBar.toppings.map(x => parseItem(typeof x === 'string' ? { name: x } : x)) });
+            if (Array.isArray(legacy.saladBar.dressing)) sections.push({ label: "Dressing", items: legacy.saladBar.dressing.map(x => parseItem(typeof x === 'string' ? { name: x } : x)) });
           }
           return { subtitle: legacy.subtitle || "", sections };
         };
@@ -1131,6 +1149,8 @@
         });
         out.menus = normalizedMenus;
 
+        // Ensure phoneTel is a string
+        if (!out.phoneTel) out.phoneTel = "#";
         return out;
       }
 
@@ -1170,28 +1190,24 @@
       }
 
       function renderItemCard(item, category) {
-        const normalizedItem = typeof item === "string"
-          ? { name: item, desc: "", price: 0 }
-          : { name: item?.name || "", desc: item?.desc || "", price: typeof item?.price === "number" ? item.price : 0 };
         const payload = {
-          key: `${category}::${normalizedItem.name}`,
+          key: `${category}::${item.name}`,
           category,
-          name: normalizedItem.name,
-          price: normalizedItem.price
+          name: item.name,
+          price: item.price
         };
-
         const payloadStr = JSON.stringify(payload).replace(/'/g, "&apos;");
 
         return `
           <li class="item-card">
             <div class="item-top">
-              <div class="item-name">${escapeHtml(normalizedItem.name)}</div>
-              <div class="item-price">${money(normalizedItem.price)}</div>
+              <div class="item-name">${escapeHtml(item.name)}</div>
+              <div class="item-price">${item.price ? money(item.price) : '—'}</div>
             </div>
-            ${normalizedItem.desc ? `
+            ${item.desc ? `
               <details class="item-details">
                 <summary>Description</summary>
-                <div class="item-desc">${escapeHtml(normalizedItem.desc)}</div>
+                <div class="item-desc">${escapeHtml(item.desc)}</div>
               </details>
             ` : ""}
             <div class="item-actions">
@@ -1321,11 +1337,6 @@
         els.cubeControls.querySelectorAll("[data-face]").forEach(btn => {
           btn.classList.toggle("active", btn.getAttribute("data-face") === faceName);
         });
-
-        if (alsoOpen && app.currentDay !== "advanced") {
-          app.currentCategory = faceName;
-          updateCategoryVisibility();
-        }
       }
 
       function addToCart(payload) {
