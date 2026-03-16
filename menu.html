@@ -3,1692 +3,1743 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hot Headz Southern Foods – Menu Builder</title>
-  <meta name="description" content="Single-file menu with today/tomorrow/advanced views, cube navigation, and a bottom plate builder (meat/side combo pricing).">
+  <title>Hot Headz Southern Foods – Menu</title>
+  <meta name="description" content="Daily breakfast, lunch, crawfish, salad bar, drinks and desserts – made fresh.">
+
+  <!-- Google Fonts & Font Awesome (same as homepage) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+   <!-- ===== FAVICON / ICONS ===== -->
+<link rel="icon" type="image/webp" href="images/HotHeadzLogo.png">
+<link rel="apple-touch-icon" href="images/HotHeadzLogo.png">
+
+  <!-- ===== OPEN GRAPH ===== -->
+<meta property="og:image" content="images/HotHeadzLogo.png">
+<meta property="og:image:alt" content="Hot Headz Southern Foods logo">
+
+  <!-- ===== TWITTER CARD ===== -->
+<meta name="twitter:image" content="images/HotHeadzLogo.png">
+<meta name="twitter:image:alt" content="Hot Headz Southern Foods logo">
+    
   <style>
-    /* (All your existing CSS remains exactly the same – copy from your previous version) */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; overflow-x: hidden; }
+    /* ---------- RESET / BASE ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      max-width: 100%;
+    }
+    html {
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+    }
     body {
+      background-color: #07060a;
+      color: rgba(255,255,255,0.92);
       font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
+      padding-bottom: 90px;
+    }
+
+    /* ---------- FLOATING DOCK (from homepage) ---------- */
+    :root {
+      --gen-glass: rgba(6,7,10,0.62);
+      --gen-glass-2: rgba(6,7,10,0.78);
+      --gen-border: rgba(255,255,255,0.14);
+      --gen-border-2: rgba(255,255,255,0.22);
+      --gen-text: rgba(255,255,255,0.92);
+      --gen-muted: rgba(255,255,255,0.62);
+      --gen-hotA: rgba(255,120,70,0.82);
+      --gen-hotB: rgba(255,60,140,0.74);
+      --gen-radius-xl: 22px;
+      --gen-radius-lg: 16px;
+      --gen-radius-pill: 999px;
+      --gen-shadow: 0 18px 50px rgba(0,0,0,0.62);
+      --gen-font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    .gen-root, .gen-root * { box-sizing: border-box; font-family: var(--gen-font); }
+    .gen-root {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      pointer-events: none;
+    }
+    /* Explore pill – hidden */
+    .gen-pill {
+      display: none !important;
+    }
+
+    .gen-dock {
+      pointer-events: auto;
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      width: min(660px, calc(100vw - 26px));
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px;
+      border-radius: var(--gen-radius-pill);
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(6,7,10,0.62);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: var(--gen-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .gen-dock-btn {
+      text-decoration: none;
+      color: rgba(255,255,255,0.92);
+      flex: 1 1 0;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.36);
+      padding: 10px 8px;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.08);
+      transition: transform .14s ease, background .14s ease, border-color .14s ease;
+    }
+    .gen-dock-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(0,0,0,0.56);
+      border-color: rgba(255,255,255,0.22);
+    }
+    .gen-dock-ic { font-size: 16px; line-height: 1; }
+    .gen-dock-tx {
+      font-size: 11.5px;
+      font-weight: 900;
+      letter-spacing: -0.1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .gen-dock-cta {
+      background: linear-gradient(90deg, rgba(255,120,70,0.22), rgba(255,60,140,0.16));
+      border-color: rgba(255,255,255,0.20);
+    }
+    .gen-dock-btn.is-active {
+      background: rgba(42,127,98,0.3);
+      border-color: rgba(255,179,90,0.5);
+    }
+
+    @media (max-width: 720px) {
+      .gen-dock { gap: 8px; padding: 9px; }
+      .gen-dock-btn { padding: 10px 6px; }
+      .gen-dock-ic { font-size: 15px; }
+      .gen-dock-tx { font-size: 11px; }
+    }
+    @media (max-width: 380px) {
+      .gen-dock { gap: 6px; padding: 8px; }
+      .gen-dock-tx { display: none; }
+    }
+
+    /* ===== MENU STYLES – paper on dark table, now centered ===== */
+    :root{
+      --hh-accent:#c05a2a;
+      --hh-accent-2:#2a7f62;
+      --hh-ink:#14110e;
+      --hh-muted:rgba(20,17,14,.68);
+      --hh-table:#070604;
+      --hh-table2:#0b0806;
+      --hh-paper:#f6f0e6;
+      --hh-paper2:#efe6d9;
+      --hh-radius: 26px;
+      --hh-radius2: 34px;
+      --hh-pill: 999px;
+      --hh-shadow: 0 26px 90px rgba(0,0,0,.48);
+      --hh-shadow2: 0 16px 48px rgba(0,0,0,.22);
+      --hh-shadow3: 0 10px 24px rgba(0,0,0,.14);
+    }
+
+    .hh-menu{
+      width: 100%;
+      max-width: none;
+      min-height: 100vh;
+      margin: 0;
+      padding: 18px 14px 70px;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: rgba(245,240,230,.94);
+      position: relative;
+      isolation: isolate;
       background:
         radial-gradient(1100px 700px at 16% 14%, rgba(192,90,42,.18), transparent 60%),
         radial-gradient(1000px 700px at 86% 20%, rgba(42,127,98,.14), transparent 64%),
-        linear-gradient(180deg, #070604, #0b0806 42%, #050403);
-      color: rgba(255,255,255,.94);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    :root {
-      --accent: #c05a2a;
-      --accent2: #2a7f62;
-      --paper: #f6f0e6;
-      --paper2: #efe6d9;
-      --ink: #14110e;
-      --radius-xl: 34px;
-      --radius-lg: 22px;
-      --radius-md: 18px;
-      --pill: 999px;
-      --shadow: 0 26px 90px rgba(0,0,0,.48);
-      --shadow2: 0 16px 48px rgba(0,0,0,.22);
-      --shadow3: 0 10px 24px rgba(0,0,0,.14);
-    }
-
-    .wrap {
-      width: min(1400px, calc(100vw - 24px));
-      margin: 0 auto;
-      padding: 18px 0 40px;
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: 340px minmax(0, 1fr);
-      gap: 18px;
-      margin-bottom: 18px;
-    }
-
-    .glass-card {
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: var(--radius-xl);
-      background: rgba(0,0,0,.24);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      box-shadow: var(--shadow2);
-      position: relative;
+        linear-gradient(180deg, var(--hh-table), var(--hh-table2) 42%, #050403);
+      box-shadow: var(--hh-shadow);
       overflow: hidden;
     }
-    .glass-card::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      opacity: .85;
-      background:
-        radial-gradient(700px 280px at 10% 10%, rgba(192,90,42,.18), transparent 60%),
-        radial-gradient(700px 280px at 90% 0%, rgba(42,127,98,.12), transparent 62%);
+    .hh-menu::before{
+      content:"";
+      position:absolute; inset:0;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.20'/%3E%3C/svg%3E");
+      opacity:.12;
+      mix-blend-mode: overlay;
+      pointer-events:none;
+      z-index:0;
     }
-    .glass-card > * { position: relative; z-index: 1; }
+    .hh-menu > *{ position:relative; z-index:1; }
 
-    .intro {
-      padding: 28px;
-      display: grid;
-      gap: 14px;
-      align-content: center;
-    }
-    .intro h1 {
-      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-      font-size: clamp(28px, 4vw, 48px);
-      line-height: .98;
-      letter-spacing: -.03em;
-    }
-    .intro p {
-      color: rgba(255,255,255,.78);
-      font-size: 14px;
-      max-width: 64ch;
-    }
-    .intro-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
-    .intro-stat {
-      padding: 12px;
-      border-radius: 18px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.12);
-    }
-    .intro-stat strong {
-      display: block;
-      color: rgba(255,179,90,.92);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      margin-bottom: 4px;
-    }
-    .intro-stat span {
-      color: rgba(255,255,255,.92);
-      font-weight: 800;
-      font-size: 13px;
-      line-height: 1.25;
-    }
-
-    .cube-card {
-      padding: 20px 18px 18px;
-      display: grid;
-      place-items: center;
-      min-height: 360px;
-    }
-    .cube-head {
+    /* ----- CENTERED HEADER ----- */
+    .hh-header {
+      margin: 10px 0 14px;
+      padding: 14px 14px 0;
       text-align: center;
-      margin-bottom: 10px;
     }
-    .cube-head h2 {
+    .hh-title{
       font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-      font-size: clamp(20px, 2vw, 28px);
-      line-height: 1.05;
-      margin-bottom: 6px;
+      font-size: clamp(20px, 2.2vw, 30px);
+      font-weight: 850;
+      letter-spacing: .2px;
+      line-height: 1.1;
     }
-    .cube-head p {
-      color: rgba(255,255,255,.72);
-      font-size: 13px;
-      max-width: 28ch;
-    }
-    .cube-scene {
-      width: 230px;
-      height: 230px;
-      perspective: 1000px;
-      margin: 12px auto 10px;
-    }
-    .cube {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      transform-style: preserve-3d;
-      transition: transform .8s cubic-bezier(.2,.8,.2,1);
-    }
-    .face {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      text-align: center;
-      padding: 16px;
-      border-radius: 26px;
-      border: 1px solid rgba(255,255,255,.16);
-      color: rgba(255,255,255,.94);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04)),
-        linear-gradient(135deg, rgba(192,90,42,.30), rgba(42,127,98,.12));
-      box-shadow: 0 20px 40px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.10);
-      backdrop-filter: blur(10px);
-      cursor: pointer;
-    }
-    .face i { font-size: 32px; color: rgba(255,179,90,.92); margin-bottom: 10px; display: block; }
-    .face strong { display: block; font-size: 18px; font-weight: 900; margin-bottom: 4px; }
-    .face span { color: rgba(255,255,255,.70); font-size: 12px; font-weight: 700; }
-    .front  { transform: rotateY(0deg) translateZ(115px); }
-    .back   { transform: rotateY(180deg) translateZ(115px); }
-    .right  { transform: rotateY(90deg) translateZ(115px); }
-    .left   { transform: rotateY(-90deg) translateZ(115px); }
-    .top    { transform: rotateX(90deg) translateZ(115px); }
-    .bottom { transform: rotateX(-90deg) translateZ(115px); }
-
-    .cube-controls {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      flex-wrap: wrap;
+    .hh-updated{
       margin-top: 8px;
+      font-weight: 820;
+      color: rgba(245,240,230,.72);
+      font-size: 13.2px;
+      line-height: 1.35;
     }
-    .cube-btn {
-      border: 1px solid rgba(255,255,255,.15);
-      background: rgba(255,255,255,.06);
-      color: rgba(255,255,255,.94);
-      padding: 9px 12px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: .04em;
-      cursor: pointer;
-    }
-    .cube-btn.active,
-    .cube-btn:hover {
-      border-color: rgba(255,179,90,.32);
-      background: linear-gradient(135deg, rgba(192,90,42,.28), rgba(42,127,98,.18));
+    .hh-note{
+      margin-top: 8px;
+      font-weight: 780;
+      color: rgba(245,240,230,.62);
+      font-size: 13px;
+      line-height: 1.35;
     }
 
-    .top-tabs {
-      position: sticky;
-      top: 10px;
-      z-index: 80;
-      margin-bottom: 12px;
-    }
-    .daybar, .catbar {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
+    .hh-stickywrap{ position: sticky; top: 10px; z-index: 90; }
+
+    /* ----- CENTERED DAY BAR ----- */
+    .hh-daybar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content: center;    /* center the day buttons */
+      margin: 14px;
       padding: 10px;
-      border-radius: var(--radius-xl);
-      background: rgba(0,0,0,.28);
-      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--hh-radius2);
+      background: rgba(0,0,0,.30);
+      border: 1px solid rgba(245,240,230,.14);
+      box-shadow: var(--hh-shadow2);
       backdrop-filter: blur(12px);
-      box-shadow: var(--shadow2);
+      -webkit-backdrop-filter: blur(12px);
     }
-    .catbar { margin-top: 10px; position: sticky; top: 86px; z-index: 70; }
-    .tabbtn {
-      border: 1px solid rgba(255,255,255,.14);
+
+    .hh-day,
+    .hh-tab{
+      border: 1px solid rgba(245,240,230,.14);
       background: rgba(255,255,255,.06);
-      color: rgba(255,255,255,.92);
+      color: rgba(245,240,230,.92);
       padding: 10px 14px;
-      border-radius: var(--pill);
+      border-radius: var(--hh-pill);
       font-weight: 900;
       cursor: pointer;
+      transition: transform .14s ease, box-shadow .14s ease, background .14s ease, border-color .14s ease;
       white-space: nowrap;
       box-shadow: 0 10px 22px rgba(0,0,0,.25);
     }
-    .tabbtn.active,
-    .tabbtn:hover {
+    .hh-day:hover,
+    .hh-tab:hover{ transform: translateY(-1px); border-color: rgba(255,179,90,.28); }
+
+    .hh-day.is-active{
       border-color: rgba(192,90,42,.45);
       background: linear-gradient(180deg, rgba(192,90,42,.26), rgba(0,0,0,.22));
     }
 
-    .day-panel[hidden], .cat-panel[hidden] { display: none; }
+    /* ----- CENTERED CATEGORY TABS ----- */
+    .hh-tablist{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content: center;    /* center category tabs */
+      margin: 0 14px 12px;
+      position: sticky;
+      top: 86px;
+      z-index: 80;
+      padding: 10px;
+      border-radius: var(--hh-radius2);
+      background: rgba(0,0,0,.24);
+      border: 1px solid rgba(245,240,230,.14);
+      box-shadow: var(--hh-shadow2);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .hh-tab.is-active{
+      border-color: rgba(192,90,42,.50);
+      background: linear-gradient(135deg, rgba(192,90,42,.32), rgba(42,127,98,.18));
+    }
 
-    .menu-panel {
-      background: linear-gradient(180deg, var(--paper), var(--paper2));
-      color: var(--ink);
+    .hh-panels{ padding: 0 14px 16px; }
+
+    .hh-panel{
+      background: linear-gradient(180deg, var(--hh-paper), var(--hh-paper2));
+      color: var(--hh-ink);
       border: 1px solid rgba(20,17,14,.14);
-      border-radius: var(--radius-xl);
+      border-radius: var(--hh-radius2);
       padding: 18px;
-      box-shadow: var(--shadow2);
+      box-shadow: var(--hh-shadow2);
       position: relative;
       overflow: hidden;
     }
-    .menu-panel::before {
-      content: "";
-      position: absolute;
-      inset: auto -30% -55% -30%;
+    .hh-panel::before{
+      content:"";
+      position:absolute;
+      inset:auto -30% -55% -30%;
       height: 240px;
-      pointer-events: none;
-      transform: rotate(-6deg);
       background:
         radial-gradient(circle at 30% 45%, rgba(192,90,42,.18), transparent 62%),
         radial-gradient(circle at 70% 55%, rgba(42,127,98,.12), transparent 64%);
+      transform: rotate(-6deg);
+      pointer-events:none;
     }
-    .menu-panel > * { position: relative; z-index: 1; }
+    .hh-panel > *{ position:relative; z-index:1; }
 
-    .menu-head {
-      text-align: center;
-      margin-bottom: 14px;
-    }
-    .menu-title {
-      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-      font-size: clamp(20px, 2.4vw, 30px);
-      font-weight: 850;
-      line-height: 1.1;
-      margin-bottom: 8px;
-    }
-    .menu-subhead {
-      color: rgba(20,17,14,.72);
-      font-size: 13px;
-      font-weight: 780;
-      line-height: 1.35;
-    }
-
-    .section-title {
+    .hh-panel h3{
       margin: 0 0 8px;
       font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
       font-size: clamp(18px, 2vw, 24px);
       font-weight: 850;
+      letter-spacing: .2px;
     }
-    .section-sub {
+    .hh-sub{
       margin: 0 0 12px;
       font-weight: 820;
       color: rgba(20,17,14,.72);
       font-size: 13.2px;
       line-height: 1.38;
     }
-    .list-heading {
+    .hh-panel h4{
       text-transform: uppercase;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
       font-size: 10.6px;
       letter-spacing: .14em;
       color: rgba(20,17,14,.62);
       margin: 16px 0 10px;
     }
 
-    .item-grid {
-      list-style: none;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      margin: 0;
-      padding: 0;
+    /* ----- LISTS REMAIN LEFT-ALIGNED ----- */
+    .hh-stack{
+      list-style:none;
+      padding-left:0;
+      margin:0;
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
     }
-    @media (min-width: 860px) {
-      .item-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    @media(min-width:860px){
+      .hh-stack{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
-
-    .item-card {
-      padding: 12px;
+    .hh-stack li{
+      padding: 11px 12px;
       background: rgba(255,255,255,.62);
       border: 1px solid rgba(20,17,14,.12);
       border-radius: 18px;
-      box-shadow: var(--shadow3);
-      display: grid;
-      gap: 10px;
-      align-items: start;
-    }
-    .item-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .item-name {
-      font-weight: 860;
-      color: rgba(20,17,14,.92);
       line-height: 1.25;
+      box-shadow: var(--hh-shadow3);
+      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
     }
-    .item-price {
-      color: var(--accent);
-      font-weight: 950;
-      font-size: 13px;
-      white-space: nowrap;
-    }
-    .item-desc {
-      color: rgba(20,17,14,.70);
-      font-size: 12.6px;
-      line-height: 1.35;
-    }
-    details.item-details summary {
-      list-style: none;
-      cursor: pointer;
-      font-weight: 860;
-      line-height: 1.25;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    details.item-details summary::-webkit-details-marker { display: none; }
-    details.item-details summary::after {
-      content: "＋";
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
-      opacity: .65;
-      flex: 0 0 auto;
-    }
-    details.item-details[open] summary::after { content: "－"; opacity: .8; }
-
-    .item-actions {
-      display: grid;
-      grid-template-columns: auto 1fr auto auto;
-      gap: 8px;
-      align-items: center;
-    }
-    .tag {
-      padding: 7px 10px;
-      border-radius: 999px;
-      background: rgba(20,17,14,.08);
-      border: 1px solid rgba(20,17,14,.12);
-      color: rgba(20,17,14,.68);
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-    }
-    .plus-btn,
-    .add-btn {
-      border-radius: 999px;
-      font-weight: 900;
-      font-size: 12px;
-      text-transform: uppercase;
-      cursor: pointer;
-      border: 1px solid rgba(192,90,42,.24);
-      color: rgba(20,17,14,.92);
-      background: linear-gradient(135deg, rgba(192,90,42,.15), rgba(42,127,98,.10));
-    }
-    .plus-btn {
-      width: 34px;
-      height: 34px;
-      padding: 0;
-      font-size: 18px;
-      display: grid;
-      place-items: center;
-    }
-    .add-btn { padding: 8px 14px; letter-spacing: .06em; justify-self: end; }
-
-    .status-card {
-      margin-bottom: 12px;
-      padding: 14px 16px;
-      border-radius: 20px;
-      border: 1px solid rgba(20,17,14,.14);
-      background: rgba(255,255,255,.66);
-      box-shadow: var(--shadow3);
-      color: rgba(20,17,14,.82);
+    .hh-stack li:hover{
+      transform: translateY(-1px);
+      border-color: rgba(192,90,42,.26);
+      box-shadow: 0 14px 30px rgba(0,0,0,.12);
     }
 
-    .advanced-row {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-    }
-    .advanced-title {
-      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-      font-size: clamp(18px, 2.2vw, 26px);
-      font-weight: 850;
-      color: rgba(255,255,255,.92);
-    }
-    .advanced-note {
-      font-size: 12.8px;
-      color: rgba(255,255,255,.68);
-      max-width: 560px;
-      text-align: right;
-    }
-    .advanced-carousel {
-      display: flex;
-      gap: 14px;
-      overflow-x: auto;
-      padding-bottom: 14px;
-      scroll-snap-type: x mandatory;
-    }
-    .advanced-card {
-      flex: 0 0 92%;
-      max-width: 760px;
-      scroll-snap-align: start;
-    }
-    @media (min-width: 860px) {
-      .advanced-card { flex: 0 0 48%; }
-    }
-    .advanced-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: baseline;
-      padding: 0 6px;
-      margin-bottom: 10px;
-      color: rgba(255,255,255,.86);
-    }
-    .advanced-day {
-      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-      font-size: 18px;
-      font-weight: 850;
-    }
-    .advanced-date,
-    .advanced-hours {
-      color: rgba(255,255,255,.68);
-      font-size: 12.8px;
-      font-weight: 780;
-    }
-
-    .call-row {
-      margin-top: 14px;
-      display: grid;
-      gap: 10px;
-    }
-    .call-btn {
+    .hh-cta{ margin-top: 14px; display:grid; gap:10px; }
+    .hh-btn{
       background: linear-gradient(135deg, rgba(20,17,14,.92), rgba(20,17,14,.78));
       color: rgba(245,240,230,.96);
       padding: 12px 14px;
       border-radius: 20px;
-      text-decoration: none;
+      text-decoration:none;
       font-weight: 950;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
       box-shadow: 0 18px 40px rgba(0,0,0,.22);
+      transition: transform .14s ease, box-shadow .14s ease;
     }
+    .hh-btn:hover{ transform: translateY(-1px); box-shadow: 0 22px 60px rgba(0,0,0,.26); }
 
-    .menu-fab {
-      position: fixed;
-      z-index: 2000;
-      background: #1e1b1b;
-      border: 2px solid var(--accent);
-      border-radius: 50px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      box-shadow: 0 0 25px rgba(192,90,42,0.5);
-      transition: all 0.2s ease;
-      backdrop-filter: blur(8px);
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: .8rem 1.8rem;
-    }
-    .menu-fab:hover {
-      transform: translateX(-50%) scale(1.05);
-      border-color: var(--accent2);
-      box-shadow: 0 0 35px var(--accent);
-    }
-    .menu-fab i { font-size: 1.6rem; color: var(--accent); }
-    .fab-text { display: flex; flex-direction: column; line-height: 1.2; }
-    .fab-text .main { font-weight: 700; font-size: 1rem; letter-spacing: 2px; color: rgba(255,255,255,.92); }
-    .fab-text .sub { font-size: 0.65rem; opacity: 0.7; color: rgba(255,255,255,.7); text-transform: uppercase; }
+    .hh-small{ color: rgba(20,17,14,.70); font-weight: 780; line-height: 1.35; font-size: 13px; }
 
-    .nav-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 2500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-      background: rgba(0,0,0,0.7);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      backdrop-filter: blur(8px);
-    }
-    .nav-overlay.open { opacity: 1; pointer-events: all; }
-    .nav-wheel {
-      width: 360px;
-      height: 360px;
-      border-radius: 50%;
-      border: 2px solid var(--accent);
-      box-shadow: 0 0 40px rgba(192,90,42,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      transform: scale(0.3);
-      transition: transform 0.3s ease;
-    }
-    .nav-overlay.open .nav-wheel { transform: scale(1); }
-    .nav-home {
-      width: 70px;
-      height: 70px;
-      background: var(--accent2);
-      border: 3px solid var(--accent);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      font-size: 1.5rem;
-      color: #1a0d0b;
-      box-shadow: 0 0 30px var(--accent);
-      cursor: pointer;
-      z-index: 1001;
-    }
-    .nav-item {
-      position: absolute;
-      width: 60px;
-      height: 60px;
-      background: #1e1b1b;
-      border: 2px solid var(--accent);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: rgba(255,255,255,.92);
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      text-align: center;
-      transition: all 0.2s;
-      cursor: pointer;
-      box-shadow: 0 0 15px rgba(0,0,0,0.7);
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-130px) rotate(calc(var(--angle) * -1deg));
-      letter-spacing: .04em;
-      padding: 6px;
-    }
-    .nav-item:hover {
-      background: var(--accent);
-      color: black;
-      border-color: var(--accent2);
-      transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-140px) rotate(calc(var(--angle) * -1deg));
-      width: 65px;
-      height: 65px;
-    }
+    .hh-daypanel[hidden]{ display:none; }
+    .hh-daypanel{ animation: hhFadeUp .22s ease-out; }
+    @keyframes hhFadeUp{ from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
 
-    .builder-section {
-      margin-top: 18px;
-      margin-bottom: 90px;
-    }
-    .builder-shell {
-      background: rgba(10,10,15,0.96);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-    .builder-summary {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 14px 20px;
-      cursor: pointer;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-    .builder-stats {
-      display: flex;
-      gap: 24px;
-      font-size: 14px;
-      flex-wrap: wrap;
-    }
-    .builder-stats span {
-      font-weight: 900;
-      color: rgba(255,179,90,.95);
-    }
-    .builder-toggle {
-      background: rgba(255,255,255,0.1);
-      border: none;
-      color: white;
-      width: 40px;
-      height: 40px;
-      border-radius: 999px;
-      font-size: 18px;
-      cursor: pointer;
-      flex: 0 0 auto;
-    }
-    .builder-content {
-      max-height: 420px;
-      overflow-y: auto;
-      padding: 0 20px 20px;
-    }
-    .builder-shell.collapsed .builder-content { display: none; }
-    .cart-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin: 16px 0 14px;
-    }
-    .cart-empty {
+    /* State card */
+    .hh-state{
+      border: 1px solid rgba(245,240,230,.14);
+      border-radius: var(--hh-radius2);
       padding: 20px;
-      text-align: center;
-      color: rgba(255,255,255,0.5);
-      border: 1px dashed rgba(255,255,255,0.2);
-      border-radius: 20px;
+      margin: 14px;
+      background: rgba(0,0,0,.22);
+      color: rgba(245,240,230,.92);
+      box-shadow: var(--hh-shadow2);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      position:relative;
+      overflow:hidden;
     }
-    .cart-item {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 20px;
-      padding: 12px;
+    .hh-state::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(700px 280px at 10% 10%, rgba(192,90,42,.22), transparent 60%),
+        radial-gradient(700px 280px at 90% 0%, rgba(42,127,98,.16), transparent 62%);
+      pointer-events:none;
+      opacity:.9;
     }
-    .cart-item-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 8px;
-    }
-    .cart-item-name { font-weight: 800; }
-    .cart-item-price { color: var(--accent); font-weight: 900; }
-    .cart-item-meta {
+    .hh-state > *{ position:relative; z-index:1; }
+
+    .hh-badge{
+      font-weight: 980;
+      text-transform: uppercase;
+      letter-spacing: .14em;
       font-size: 11px;
-      color: rgba(255,255,255,0.5);
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      margin-top: 2px;
-    }
-    .cart-item-actions {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .qty-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .qty-btn {
-      width: 32px;
-      height: 32px;
+      padding: 7px 12px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: white;
-      font-weight: 900;
-      cursor: pointer;
+      border: 1px solid rgba(245,240,230,.18);
+      background: rgba(255,255,255,.06);
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
     }
-    .qty-value {
-      min-width: 20px;
-      text-align: center;
-      font-weight: 900;
+    .hh-badge::before{
+      content:"";
+      width:8px;height:8px;
+      border-radius: 99px;
+      background: rgba(255,179,90,.92);
+      display:inline-block;
     }
-    .remove-btn {
-      background: rgba(255,80,80,0.2);
-      border: 1px solid rgba(255,80,80,0.3);
-      color: #ff8a8a;
-      padding: 6px 14px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 900;
-      text-transform: uppercase;
-      cursor: pointer;
+    .hh-badge.is-dark::before{ background: rgba(245,240,230,.92); }
+
+    .hh-state-title{
+      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+      font-size: clamp(20px, 2.6vw, 30px);
+      font-weight: 850;
+      letter-spacing: .2px;
+      margin: 10px 0 6px;
+      line-height: 1.08;
     }
-    .builder-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
-    .builder-action {
-      flex: 1;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: white;
-      padding: 12px;
-      border-radius: 999px;
-      font-weight: 900;
-      text-transform: uppercase;
-      cursor: pointer;
-    }
-    .builder-note {
-      margin-top: 10px;
-      font-size: 11px;
-      color: rgba(255,255,255,0.4);
-      text-align: center;
+    .hh-state-msg{
+      font-weight: 780;
+      color: rgba(245,240,230,.74);
+      margin: 0;
+      line-height: 1.35;
+      font-size: 13.2px;
     }
 
-    @media (max-width: 1100px) {
-      .hero { grid-template-columns: 1fr; }
+    /* Advanced */
+    .hh-advanced-top{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      margin: 8px 14px 12px;
     }
+    .hh-advanced-title{
+      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+      font-size: clamp(18px, 2.2vw, 26px);
+      font-weight: 850;
+      letter-spacing: .2px;
+      color: rgba(245,240,230,.92);
+    }
+    .hh-advanced-disclaimer{
+      font-weight: 780;
+      color: rgba(245,240,230,.68);
+      text-align:right;
+      max-width: 520px;
+      font-size: 12.8px;
+      line-height: 1.35;
+    }
+    .hh-hint{ color: rgba(245,240,230,.62); font-weight: 760; margin: 8px 14px 0; font-size: 12.6px; }
 
-    @media (max-width: 700px) {
-      .daybar, .catbar {
+    .hh-adv-carousel{
+      display:flex;
+      gap:14px;
+      overflow-x:auto;
+      padding: 2px 14px 14px;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+    }
+    .hh-adv-card{ flex: 0 0 92%; max-width: 720px; scroll-snap-align:start; }
+    @media(min-width:860px){ .hh-adv-card{ flex: 0 0 48%; } }
+    .hh-adv-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap:10px;
+      margin: 0 0 10px;
+      padding: 0 6px;
+      color: rgba(245,240,230,.86);
+    }
+    .hh-adv-dayname{
+      font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+      font-size: 18px;
+      font-weight: 850;
+      letter-spacing: .2px;
+    }
+    .hh-adv-date,
+    .hh-adv-hours{ color: rgba(245,240,230,.68); font-weight: 780; font-size: 12.8px; }
+
+    /* Mobile */
+    @media(max-width: 560px){
+      .hh-menu{ padding: 14px 10px 72px; border-radius: 26px; }
+      .hh-daybar{
         flex-wrap: nowrap;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 8px;
+        padding: 8px;
+        border-radius: 20px;
+        margin: 12px;
+        justify-content: flex-start; /* on mobile, keep scrollable left-aligned */
+      }
+      .hh-daybar::-webkit-scrollbar{ display:none; }
+      .hh-tablist{
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 8px;
+        padding: 8px;
+        border-radius: 20px;
+        top: 74px;
+        margin: 0 12px 12px;
         justify-content: flex-start;
       }
-      .daybar::-webkit-scrollbar,
-      .catbar::-webkit-scrollbar { display: none; }
-      .intro-grid,
-      .builder-stats { grid-template-columns: 1fr; }
-      .menu-fab {
-        padding: .65rem 1.2rem;
-      }
-      .menu-fab i { font-size: 1.4rem; }
-      .fab-text .main { font-size: .86rem; }
-      .nav-wheel { width: 280px; height: 280px; }
-      .nav-item {
-        width: 50px;
-        height: 50px;
-        font-size: 0.62rem;
-        transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-100px) rotate(calc(var(--angle) * -1deg));
-      }
-      .nav-item:hover {
-        transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-110px) rotate(calc(var(--angle) * -1deg));
-        width: 55px;
-        height: 55px;
-      }
-      .nav-home { width: 60px; height: 60px; font-size: 1.2rem; }
-      .cube-scene { width: 190px; height: 190px; }
-      .face { display: none; }
-      .face.mobile-visible { display: grid; position: relative; inset: auto; }
-      .builder-summary {
-        padding: 10px 12px;
-        align-items: flex-start;
-      }
-      .builder-stats {
-        gap: 10px;
-        font-size: 12px;
-      }
-      .item-actions {
-        grid-template-columns: auto auto 1fr auto;
-      }
+      .hh-tablist::-webkit-scrollbar{ display:none; }
+      .hh-day,
+      .hh-tab{ padding: 8px 10px; font-size: 13px; }
+      .hh-header{ padding: 10px 12px 0; }
+      .hh-panels{ padding: 0 12px 14px; }
+      .hh-panel{ padding: 14px; border-radius: 26px; }
     }
+
+    @media (prefers-reduced-motion: reduce){
+      .hh-daypanel{ animation:none; }
+      .hh-day, .hh-tab, .hh-stack li, .hh-btn{ transition:none; }
+    }
+
+    /* Click‑for‑description dropdowns */
+    .hh-hintline{
+      margin: 6px 0 10px;
+      font-size: 12.6px;
+      font-weight: 780;
+      color: rgba(20,17,14,.62);
+    }
+    .hh-stack details{
+      background: rgba(255,255,255,.62);
+      border: 1px solid rgba(20,17,14,.12);
+      border-radius: 18px;
+      box-shadow: var(--hh-shadow3);
+      overflow: hidden;
+      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+    }
+    .hh-stack details:hover{
+      transform: translateY(-1px);
+      border-color: rgba(192,90,42,.26);
+      box-shadow: 0 14px 30px rgba(0,0,0,.12);
+    }
+    .hh-stack summary{
+      list-style: none;
+      cursor: pointer;
+      padding: 11px 12px;
+      font-weight: 860;
+      line-height: 1.25;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .hh-stack summary::-webkit-details-marker{ display:none; }
+    .hh-stack summary::after{
+      content: "＋";
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      opacity: .65;
+      flex: 0 0 auto;
+    }
+    .hh-stack details[open] summary::after{ content: "－"; opacity: .8; }
+    .hh-desc{
+      padding: 0 12px 12px;
+      color: rgba(20,17,14,.72);
+      font-size: 12.8px;
+      font-weight: 760;
+      line-height: 1.35;
+    }
+
+    .hh-lunch-unavail{
+      margin: 10px 0 6px;
+      padding: 12px 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(20,17,14,.14);
+      background: rgba(255,255,255,.66);
+      box-shadow: var(--hh-shadow3);
+    }
+    .hh-lunch-unavail-title{
+      margin-top: 8px;
+      font-weight: 880;
+      color: rgba(20,17,14,.82);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+
+
+
+    /* ==================== CIRCULAR NAVIGATION (adapted for Hot Headz) ==================== */
+.nav-btn {
+  position: fixed;
+  z-index: 2000;
+  background: #1e1b1b;
+  border: 2px solid var(--hh-accent, #c05a2a);
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  box-shadow: 0 0 25px rgba(192,90,42,0.5);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.nav-btn:hover {
+  transform: scale(1.05);
+  border-color: var(--hh-accent-2, #2a7f62);
+  box-shadow: 0 0 35px var(--hh-accent, #c05a2a);
+}
+
+.btn-icon {
+  font-size: 1.8rem;
+  color: var(--hh-accent, #c05a2a);
+}
+
+.btn-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.btn-text .main {
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.92);
+}
+
+.btn-text .sub {
+  font-size: 0.65rem;
+  opacity: 0.7;
+  color: rgba(255,255,255,0.7);
+  text-transform: uppercase;
+}
+
+/* left-center button - VERTICAL */
+.nav-btn.left-center {
+  left: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  flex-direction: column;
+  padding: 1rem 0.5rem;
+  gap: 8px;
+}
+
+.nav-btn.left-center .btn-text {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.nav-btn.left-center .btn-text .main {
+  font-size: 0.9rem;
+  letter-spacing: normal;
+}
+
+.nav-btn.left-center .btn-text .sub {
+  font-size: 0.6rem;
+  margin-top: 4px;
+}
+
+/* bottom-center button - HORIZONTAL */
+.nav-btn.bottom-center {
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  flex-direction: row;
+  padding: 0.8rem 1.8rem;
+}
+
+/* circular menu overlay */
+.circ-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background: rgba(0,0,0,0.7);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.circ-menu-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.circular-menu {
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: transparent;
+  border: 2px solid var(--hh-accent, #c05a2a);
+  box-shadow: 0 0 40px rgba(192,90,42,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transform: scale(0.3);
+  transition: transform 0.3s ease;
+}
+
+.circ-menu-overlay.open .circular-menu {
+  transform: scale(1);
+}
+
+.center-home {
+  width: 70px;
+  height: 70px;
+  background: var(--hh-accent-2, #2a7f62);
+  border: 3px solid var(--hh-accent, #c05a2a);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1.5rem;
+  color: #1a0d0b;
+  box-shadow: 0 0 30px var(--hh-accent, #c05a2a);
+  cursor: pointer;
+  transition: 0.2s;
+  z-index: 1001;
+}
+.center-home:hover {
+  background: var(--hh-accent, #c05a2a);
+  color: white;
+  transform: scale(1.05);
+}
+
+.menu-item {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: #1e1b1b;
+  border: 2px solid var(--hh-accent, #c05a2a);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.92);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(0,0,0,0.7);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-130px) rotate(calc(var(--angle) * -1deg));
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 1px;
+  backdrop-filter: blur(4px);
+}
+
+.menu-item:hover {
+  background: var(--hh-accent, #c05a2a);
+  color: black;
+  border-color: var(--hh-accent-2, #2a7f62);
+  transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-140px) rotate(calc(var(--angle) * -1deg));
+  width: 65px;
+  height: 65px;
+}
+
+/* mobile adjustments */
+@media (max-width: 600px) {
+  .nav-btn.left-center {
+    left: 10px;
+    padding: 0.8rem 0.3rem;
+  }
+  .nav-btn.left-center .btn-icon {
+    font-size: 1.5rem;
+  }
+  .nav-btn.left-center .btn-text .main {
+    font-size: 0.8rem;
+  }
+  .nav-btn.left-center .btn-text .sub {
+    font-size: 0.5rem;
+  }
+  .nav-btn.bottom-center {
+    bottom: 20px;
+    padding: 0.6rem 1.2rem;
+  }
+  .circular-menu {
+    width: 280px;
+    height: 280px;
+  }
+  .menu-item {
+    width: 50px;
+    height: 50px;
+    font-size: 0.7rem;
+    transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-100px) rotate(calc(var(--angle) * -1deg));
+  }
+  .menu-item:hover {
+    transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-110px) rotate(calc(var(--angle) * -1deg));
+    width: 55px;
+    height: 55px;
+  }
+  .center-home {
+    width: 60px;
+    height: 60px;
+    font-size: 1.2rem;
+  }
+}
+    
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <section class="hero">
-      <article class="glass-card cube-card">
-        <div class="cube-head">
-          <h2>Spinning Menu Cube</h2>
-          <p>Cube categories stay synced with the same menu categories loaded from your menu-data page.</p>
-        </div>
+  <!-- Required invisible anchors (optional, for explore nav if used) -->
+  <div id="gen-home" style="position: absolute; top: 0; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-menu" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-delivery" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-order" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-about" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
+  <div id="gen-location" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
 
-        <div class="cube-scene">
-          <div class="cube" id="menuCube">
-            <div class="face front mobile-visible" data-face="Breakfast"><div><i class="fas fa-egg"></i><strong>Breakfast</strong><span>morning menu</span></div></div>
-            <div class="face right" data-face="Lunch"><div><i class="fas fa-drumstick-bite"></i><strong>Lunch</strong><span>plates and sides</span></div></div>
-            <div class="face back" data-face="Crawfish"><div><i class="fas fa-fish"></i><strong>Crawfish</strong><span>seasonal draw</span></div></div>
-            <div class="face left" data-face="Salad Bar"><div><i class="fas fa-leaf"></i><strong>Salad Bar</strong><span>fresh options</span></div></div>
-            <div class="face top" data-face="Drinks"><div><i class="fas fa-glass-whiskey"></i><strong>Drinks</strong><span>cold extras</span></div></div>
-            <div class="face bottom" data-face="Dessert"><div><i class="fas fa-cookie-bite"></i><strong>Dessert</strong><span>sweet finish</span></div></div>
-          </div>
-        </div>
 
-        <div class="cube-controls" id="cubeControls">
-          <button class="cube-btn active" data-face="Breakfast" type="button">Breakfast</button>
-          <button class="cube-btn" data-face="Lunch" type="button">Lunch</button>
-          <button class="cube-btn" data-face="Crawfish" type="button">Crawfish</button>
-          <button class="cube-btn" data-face="Salad Bar" type="button">Salad Bar</button>
-          <button class="cube-btn" data-face="Drinks" type="button">Drinks</button>
-          <button class="cube-btn" data-face="Dessert" type="button">Dessert</button>
-        </div>
-      </article>
+   <!-- ===== CIRCULAR NAVIGATION BUTTONS ===== -->
+  <!-- Left button removed as requested -->
 
-      <article class="glass-card intro">
-        <h1>Reads from your menu-data page and uses combo pricing for meats & sides.</h1>
-        <p>
-          This version expects the Lunch category to have <strong>meats</strong> and <strong>sides</strong> arrays.
-          All other categories use individual prices. The plate builder calculates totals based on meat/side counts.
-        </p>
-        <div class="intro-grid">
-          <div class="intro-stat"><strong>Data source</strong><span>menu-data page first</span></div>
-          <div class="intro-stat"><strong>Pricing</strong><span>combo for meats/sides</span></div>
-          <div class="intro-stat"><strong>Builder</strong><span>below menu content</span></div>
-        </div>
-      </article>
-    </section>
-
-    <div class="top-tabs">
-      <div class="daybar" id="dayBar" role="tablist" aria-label="Day selector">
-        <button class="tabbtn active" type="button" data-day="today">Today</button>
-        <button class="tabbtn" type="button" data-day="tomorrow">Tomorrow</button>
-        <button class="tabbtn" type="button" data-day="advanced">Advanced Menu</button>
-      </div>
-      <div class="catbar" id="catBar" role="tablist" aria-label="Category selector">
-        <button class="tabbtn active" type="button" data-cat="Breakfast">Breakfast</button>
-        <button class="tabbtn" type="button" data-cat="Lunch">Lunch</button>
-        <button class="tabbtn" type="button" data-cat="Crawfish">Crawfish</button>
-        <button class="tabbtn" type="button" data-cat="Salad Bar">Salad Bar</button>
-        <button class="tabbtn" type="button" data-cat="Drinks">Drinks</button>
-        <button class="tabbtn" type="button" data-cat="Dessert">Dessert</button>
-      </div>
-    </div>
-
-    <section class="day-panel" id="day-today"></section>
-    <section class="day-panel" id="day-tomorrow" hidden></section>
-
-    <section class="day-panel" id="day-advanced" hidden>
-      <div class="advanced-row">
-        <div class="advanced-title">Advanced Menu</div>
-        <div class="advanced-note" id="advancedNote"></div>
-      </div>
-      <div class="advanced-carousel" id="advancedCarousel"></div>
-    </section>
-
-    <section class="builder-section">
-      <div class="builder-shell" id="builderShell">
-        <div class="builder-summary" id="builderSummary">
-          <div class="builder-stats">
-            <div>Meats: <span id="builderMeatCount">0</span></div>
-            <div>Sides: <span id="builderSideCount">0</span></div>
-            <div>Extras: <span id="builderExtraCount">0</span></div>
-            <div>Total: <span id="builderTotal">$0.00</span></div>
-          </div>
-          <button class="builder-toggle" id="builderToggle" type="button" aria-label="Toggle plate builder">▼</button>
-        </div>
-        <div class="builder-content" id="builderContent">
-          <div class="cart-list" id="cartList">
-            <div class="cart-empty" id="cartEmpty">Your plate is empty. Tap + or Add on any item.</div>
-          </div>
-          <div class="builder-actions">
-            <button class="builder-action" id="builderClear" type="button">Clear Plate</button>
-            <button class="builder-action" id="builderCopy" type="button">Copy Summary</button>
-          </div>
-          <div class="builder-note">
-            <strong>Lunch combo:</strong> 1 meat + 2 sides $12.99, 2 meats + 2 sides $15.99, 3 meats + 2 sides $19.99. Extra sides $2.99 each.<br>
-            Drinks and other items add their own price.
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <button class="menu-fab" id="menuFab" type="button" aria-label="Open navigation">
-    <i class="fas fa-compass"></i>
-    <div class="fab-text">
+  <div class="nav-btn bottom-center" id="navBtnBottom">
+    <i class="fas fa-compass btn-icon"></i>
+    <div class="btn-text">
       <span class="main">NAVIGATION</span>
       <span class="sub">explore pages</span>
     </div>
-  </button>
+  </div>
 
-  <div class="nav-overlay" id="navOverlay">
-    <div class="nav-wheel">
-      <div class="nav-home" id="navHome" data-link="index.html"><i class="fas fa-home"></i></div>
-      <div class="nav-item" style="--angle: 0;" data-link="delivery.html">Delivery</div>
-      <div class="nav-item" style="--angle: 72;" data-link="tel:3372211035">Order</div>
-      <div class="nav-item" style="--angle: 144;" data-link="about.html">About</div>
-      <div class="nav-item" style="--angle: 216;" data-link="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634">Location</div>
-      <div class="nav-item" style="--angle: 288;" data-action="share">Share</div>
+  <!-- CIRCULAR MENU OVERLAY with page links (5 items evenly spaced at 72° increments) -->
+  <div class="circ-menu-overlay" id="circMenuOverlay">
+    <div class="circular-menu">
+      <div class="center-home" id="homeCenter" data-link="index.html"><i class="fas fa-home"></i></div>
+      <div class="menu-item" style="--angle: 0;" data-link="delivery.html">Delivery</div>
+      <div class="menu-item" style="--angle: 72;" data-link="tel:3372211035">Order</div>
+      <div class="menu-item" style="--angle: 144;" data-link="about.html">About</div>
+      <div class="menu-item" style="--angle: 216;" data-link="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634">Location</div>
+      <div class="menu-item" style="--angle: 288;" data-action="share">Share</div>
     </div>
   </div>
 
-  <!-- Fallback menu data – shows the new structure for Lunch -->
-  <script id="hh-menu-data-fallback" type="application/json">
-  {
-    "phoneTel": "tel:3372211035",
-    "deliveryNote": "Call now for pickup or questions.",
-    "hours": {
-      "note": "Fallback sample data – update with your real menu-data.html file.",
-      "weekly": [
-        { "day": "Sunday", "open": "6:00 AM", "close": "2:00 PM", "breakfast": "6:00 AM - 10:30 AM", "lunch": "10:30 AM - 2:00 PM" },
-        { "day": "Monday", "open": "5:30 AM", "close": "3:00 PM", "breakfast": "5:30 AM - 10:30 AM", "lunch": "10:30 AM - 3:00 PM" },
-        { "day": "Tuesday", "open": "5:30 AM", "close": "3:00 PM", "breakfast": "5:30 AM - 10:30 AM", "lunch": "10:30 AM - 3:00 PM" },
-        { "day": "Wednesday", "open": "5:30 AM", "close": "3:00 PM", "breakfast": "5:30 AM - 10:30 AM", "lunch": "10:30 AM - 3:00 PM" },
-        { "day": "Thursday", "open": "5:30 AM", "close": "3:00 PM", "breakfast": "5:30 AM - 10:30 AM", "lunch": "10:30 AM - 3:00 PM" },
-        { "day": "Friday", "open": "5:30 AM", "close": "4:00 PM", "breakfast": "5:30 AM - 10:30 AM", "lunch": "10:30 AM - 4:00 PM" },
-        { "day": "Saturday", "open": "6:00 AM", "close": "2:00 PM", "breakfast": "6:00 AM - 10:30 AM", "lunch": "10:30 AM - 2:00 PM" }
-      ]
-    },
-    "settings": {
-      "advancedWindowDays": 7,
-      "advancedDisclaimer": "Fallback sample data – external menu-data page not found.",
-      "clickForDescriptionHint": "Tip: click an item for description.",
-      "noDescriptionText": "Description coming soon."
-    },
-    "defaults": {
-      "Breakfast": {
-        "subtitle": "Hot breakfast favorites made fresh.",
-        "sections": [
-          { "label": "Plates", "items": [
-            { "name": "2 Egg Plate", "desc": "Eggs, toast, grits, and your choice of breakfast meat.", "price": 8.99 },
-            { "name": "Pancake Plate", "desc": "Pancakes, eggs, and breakfast meat.", "price": 9.49 }
-          ]},
-          { "label": "Available Items", "items": [
-            { "name": "Breakfast Burrito", "desc": "Egg, cheese, and sausage wrapped hot and ready.", "price": 7.99 },
-            { "name": "Sausage Biscuit", "desc": "A quick hot breakfast sandwich.", "price": 3.99 }
-          ]}
-        ]
-      },
-      "Lunch": {
-        "subtitle": "Choose your meats and sides – combo pricing applies.",
-        "meats": [
-          { "name": "Pulled Pork", "desc": "Slow‑smoked pulled pork." },
-          { "name": "Fried Chicken", "desc": "Crispy fried chicken." },
-          { "name": "Beef Brisket", "desc": "Tender smoked brisket." }
-        ],
-        "sides": [
-          { "name": "French Fries", "desc": "Golden crispy fries." },
-          { "name": "Mac & Cheese", "desc": "Creamy baked mac." },
-          { "name": "Cole Slaw", "desc": "Cool crunchy slaw." },
-          { "name": "Baked Beans", "desc": "Sweet smoky beans." }
-        ]
-      },
-      "Crawfish": {
-        "subtitle": "Call for seasonal crawfish availability.",
-        "sections": [
-          { "label": "Available", "items": [
-            { "name": "Crawfish by the Pound", "desc": "Seasonal crawfish special.", "price": 5.99 }
-          ]}
-        ]
-      },
-      "Salad Bar": {
-        "subtitle": "Fresh salad bar options.",
-        "sections": [
-          { "label": "Pricing", "items": [
-            { "name": "Salad Bar", "desc": "Full salad bar access.", "price": 9.99 },
-            { "name": "Side Salad", "desc": "Smaller salad option.", "price": 4.99 }
-          ]},
-          { "label": "Lettuce", "items": [
-            { "name": "Romaine" },
-            { "name": "Iceberg" }
-          ]},
-          { "label": "Toppings", "items": [
-            { "name": "Tomatoes" },
-            { "name": "Cheese" },
-            { "name": "Croutons" },
-            { "name": "Cucumbers" }
-          ]},
-          { "label": "Dressing", "items": [
-            { "name": "Ranch" },
-            { "name": "Italian" },
-            { "name": "French" }
-          ]}
-        ]
-      },
-      "Drinks": {
-        "subtitle": "Cold drinks and extras.",
-        "sections": [
-          { "label": "Available Drinks", "items": [
-            { "name": "Sweet Tea", "desc": "Cold southern sweet tea.", "price": 2.49 },
-            { "name": "Coke", "desc": "Classic fountain drink.", "price": 2.59 },
-            { "name": "Water", "desc": "Bottled water.", "price": 1.49 }
-          ]}
-        ]
-      },
-      "Dessert": {
-        "subtitle": "Save room for dessert.",
-        "sections": [
-          { "label": "Available Desserts", "items": [
-            { "name": "Banana Pudding", "desc": "House favorite southern dessert.", "price": 4.49 },
-            { "name": "Slice of Cake", "desc": "Daily rotating cake slice.", "price": 4.99 }
-          ]}
-        ]
-      }
-    },
-    "menus": {}
-  }
-  </script>
+  <!-- ===== MENU HTML ===== -->
+  <div class="hh-menu" role="region" aria-label="Menu" id="hh-menu-root">
 
-  <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      const menuDataUrls = ["/menu-data.html", "/menu-data/"];
-      const categoryOrder = ["Breakfast", "Lunch", "Crawfish", "Salad Bar", "Drinks", "Dessert"];
+    <!-- Sticky top nav -->
+    <div class="hh-stickywrap">
+      <div class="hh-daybar" role="tablist" aria-label="Day selector">
+        <button class="hh-day is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-day-today" id="hhDayBtnToday">Today</button>
+        <button class="hh-day" type="button" role="tab" aria-selected="false" aria-controls="hh-day-tomorrow" id="hhDayBtnTomorrow">Tomorrow</button>
+        <button class="hh-day" type="button" role="tab" aria-selected="false" aria-controls="hh-day-advanced" id="hhDayBtnAdvanced">Advanced Menu</button>
+      </div>
+    </div>
 
-      const els = {
-        dayBar: document.getElementById("dayBar"),
-        catBar: document.getElementById("catBar"),
-        today: document.getElementById("day-today"),
-        tomorrow: document.getElementById("day-tomorrow"),
-        advanced: document.getElementById("day-advanced"),
-        advancedCarousel: document.getElementById("advancedCarousel"),
-        advancedNote: document.getElementById("advancedNote"),
-        cube: document.getElementById("menuCube"),
-        cubeControls: document.getElementById("cubeControls"),
-        menuFab: document.getElementById("menuFab"),
-        navOverlay: document.getElementById("navOverlay"),
-        navHome: document.getElementById("navHome"),
-        builderShell: document.getElementById("builderShell"),
-        builderSummary: document.getElementById("builderSummary"),
-        builderToggle: document.getElementById("builderToggle"),
-        builderMeatCount: document.getElementById("builderMeatCount"),
-        builderSideCount: document.getElementById("builderSideCount"),
-        builderExtraCount: document.getElementById("builderExtraCount"),
-        builderTotal: document.getElementById("builderTotal"),
-        cartList: document.getElementById("cartList"),
-        cartEmpty: document.getElementById("cartEmpty"),
-        builderClear: document.getElementById("builderClear"),
-        builderCopy: document.getElementById("builderCopy")
-      };
+    <!-- TODAY -->
+    <div class="hh-daypanel is-active" id="hh-day-today" role="tabpanel" aria-labelledby="hhDayBtnToday">
+      <div class="hh-header">
+        <div class="hh-title" id="hh-today-title">Today’s Menu</div>
+        <div class="hh-updated" id="hh-hours-line">Loading hours…</div>
+        <div class="hh-note" id="hh-hours-note"></div>
+      </div>
 
-      const app = {
-        currentDay: "today",
-        currentCategory: "Breakfast",
-        cart: [], // items stored with { key, name, category, type, price (for standalone) }
-        data: null,
-        // Combo pricing
-        comboPrices: { meat1: 12.99, meat2: 15.99, meat3: 19.99, extraSide: 2.99 },
-        limits: { maxMeats: 3, maxSides: 5 }
-      };
+      <!-- Only show CLOSED at day level -->
+      <div class="hh-state hh-closed" id="hh-today-closed" hidden>
+        <div class="hh-badge">Closed</div>
+        <div class="hh-state-title" id="hh-today-closed-title"></div>
+        <div class="hh-state-msg" id="hh-today-closed-msg"></div>
+      </div>
 
-      function escapeHtml(str) {
-        return String(str ?? "")
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#039;");
-      }
+      <div class="hh-tablist" role="tablist" aria-label="Today categories">
+        <button class="hh-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-today-breakfast" id="hhTabTodayBreakfast">Breakfast</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-lunch" id="hhTabTodayLunch">Lunch</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-crawfish" id="hhTabTodayCrawfish">Crawfish</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-salad" id="hhTabTodaySalad">Salad Bar</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-drinks" id="hhTabTodayDrinks">Drinks</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-dessert" id="hhTabTodayDessert">Dessert</button>
+      </div>
 
-      function parsePrice(value) {
-        if (typeof value === 'number') return value;
-        if (typeof value === 'string') {
-          const match = value.match(/\$?(\d+(?:\.\d{2})?)/);
-          return match ? parseFloat(match[1]) : 0;
-        }
-        return 0;
-      }
-
-      function money(n) { return `$${Number(n || 0).toFixed(2)}`; }
-
-      function toISODateLocal(d) {
-        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-      }
-
-      function formatDateNice(d) {
-        return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-      }
-
-      function weekdayName(d) {
-        return d.toLocaleDateString("en-US", { weekday: "long" });
-      }
-
-      function clone(obj) {
-        return JSON.parse(JSON.stringify(obj));
-      }
-
-      // ----- Normalize data to our internal structure -----
-      function normalizeFetchedData(raw) {
-        const out = clone(raw);
-        out.defaults = out.defaults || {};
-
-        // Normalize a single item (could be string or object)
-        const parseItem = (item) => {
-          if (typeof item === 'string') return { name: item, desc: "", price: 0 };
-          return {
-            name: item.name || "",
-            desc: item.desc || "",
-            price: parsePrice(item.price)
-          };
-        };
-
-        // Convert a category (non‑Lunch) to sections format
-        const convertRegularCategory = (legacy, catName) => {
-          if (!legacy) return { subtitle: "", sections: [] };
-          if (legacy.sections) {
-            // already in new format – just ensure items are parsed
-            legacy.sections = legacy.sections.map(s => ({
-              label: s.label,
-              items: (s.items || []).map(parseItem)
-            }));
-            return legacy;
-          }
-          // legacy: may have plates, items, saladBar etc.
-          const sections = [];
-          if (Array.isArray(legacy.plates) && legacy.plates.length) {
-            sections.push({ label: "Plates", items: legacy.plates.map(parseItem) });
-          }
-          if (Array.isArray(legacy.items) && legacy.items.length) {
-            let label = "Items";
-            if (catName === "Breakfast") label = "Available Items";
-            else if (catName === "Drinks") label = "Available Drinks";
-            else if (catName === "Dessert") label = "Available Desserts";
-            sections.push({ label, items: legacy.items.map(parseItem) });
-          }
-          if (legacy.saladBar) {
-            if (Array.isArray(legacy.saladBar.lettuce))
-              sections.push({ label: "Lettuce", items: legacy.saladBar.lettuce.map(x => parseItem(typeof x === 'string' ? { name: x } : x)) });
-            if (Array.isArray(legacy.saladBar.toppings))
-              sections.push({ label: "Toppings", items: legacy.saladBar.toppings.map(x => parseItem(typeof x === 'string' ? { name: x } : x)) });
-            if (Array.isArray(legacy.saladBar.dressing))
-              sections.push({ label: "Dressing", items: legacy.saladBar.dressing.map(x => parseItem(typeof x === 'string' ? { name: x } : x)) });
-          }
-          return { subtitle: legacy.subtitle || "", sections };
-        };
-
-        // Convert Lunch: expects meats and sides arrays (each item may have name, desc)
-        const convertLunch = (legacy) => {
-          if (!legacy) return { subtitle: "", meats: [], sides: [] };
-          // if already has meats/sides, just ensure items are objects
-          if (Array.isArray(legacy.meats) || Array.isArray(legacy.sides)) {
-            return {
-              subtitle: legacy.subtitle || "",
-              meats: (legacy.meats || []).map(m => typeof m === 'string' ? { name: m, desc: "" } : { name: m.name || "", desc: m.desc || "" }),
-              sides: (legacy.sides || []).map(s => typeof s === 'string' ? { name: s, desc: "" } : { name: s.name || "", desc: s.desc || "" })
-            };
-          }
-          // fallback: if legacy has sections, try to extract? better to return empty
-          return { subtitle: legacy.subtitle || "", meats: [], sides: [] };
-        };
-
-        // Build defaults
-        const normalizedDefaults = {};
-        categoryOrder.forEach(cat => {
-          const direct = out.defaults[cat];
-          const legacy = out.defaults[cat.toLowerCase()] || out.defaults[cat === "Salad Bar" ? "salad" : cat];
-          if (cat === "Lunch") {
-            normalizedDefaults[cat] = convertLunch(direct || legacy || {});
-          } else {
-            normalizedDefaults[cat] = convertRegularCategory(direct || legacy || {}, cat);
-          }
-        });
-        out.defaults = normalizedDefaults;
-
-        // Process menus (daily overrides) similarly
-        const normalizedMenus = {};
-        Object.entries(out.menus || {}).forEach(([dateKey, dayMenu]) => {
-          const dateBucket = {};
-          categoryOrder.forEach(cat => {
-            const legacyKey = cat === "Salad Bar" ? "salad" : cat.toLowerCase();
-            const rawCat = dayMenu?.[cat] || dayMenu?.[legacyKey];
-            if (rawCat) {
-              if (cat === "Lunch") {
-                dateBucket[cat] = convertLunch(rawCat);
-              } else {
-                dateBucket[cat] = convertRegularCategory(rawCat, cat);
-              }
-            }
-          });
-          normalizedMenus[dateKey] = dateBucket;
-        });
-        out.menus = normalizedMenus;
-
-        if (!out.phoneTel) out.phoneTel = "#";
-        return out;
-      }
-
-      async function fetchExternalMenuData() {
-        for (const url of menuDataUrls) {
-          try {
-            const res = await fetch(url, { credentials: "same-origin", cache: "no-store" });
-            if (!res.ok) continue;
-            const html = await res.text();
-            const doc = new DOMParser().parseFromString(html, "text/html");
-            const script = doc.querySelector("#hh-menu-data, #hh-menu-data-fallback");
-            if (!script) continue;
-            const raw = JSON.parse(script.textContent.trim());
-            return normalizeFetchedData(raw);
-          } catch (err) {}
-        }
-        return null;
-      }
-
-      function getFallbackData() {
-        const raw = JSON.parse(document.getElementById("hh-menu-data-fallback").textContent);
-        return normalizeFetchedData(raw);
-      }
-
-      function getMenuForDate(isoDate) {
-        const defaults = app.data.defaults || {};
-        const specific = (app.data.menus && app.data.menus[isoDate]) ? app.data.menus[isoDate] : {};
-        const out = {};
-        categoryOrder.forEach(cat => {
-          if (cat === "Lunch") {
-            out[cat] = clone(defaults[cat] || { subtitle: "", meats: [], sides: [] });
-            if (specific[cat]) {
-              if (specific[cat].subtitle) out[cat].subtitle = specific[cat].subtitle;
-              if (Array.isArray(specific[cat].meats)) out[cat].meats = specific[cat].meats;
-              if (Array.isArray(specific[cat].sides)) out[cat].sides = specific[cat].sides;
-            }
-          } else {
-            out[cat] = clone(defaults[cat] || { subtitle: "", sections: [] });
-            if (specific[cat]) {
-              if (specific[cat].subtitle) out[cat].subtitle = specific[cat].subtitle;
-              if (Array.isArray(specific[cat].sections)) out[cat].sections = specific[cat].sections;
-            }
-          }
-        });
-        return out;
-      }
-
-      // Render a single item card – for Lunch meats/sides we set price = 0 (combo pricing)
-      function renderItemCard(item, category, type = null) {
-        let payload;
-        if (category === "Lunch" && (type === 'meat' || type === 'side')) {
-          payload = {
-            key: `Lunch-${type}-${item.name}`,
-            category: "Lunch",
-            name: item.name,
-            type: type,        // 'meat' or 'side'
-            price: 0            // combo pricing applied later
-          };
-        } else {
-          // standalone item from other categories
-          payload = {
-            key: `${category}-${item.name}`,
-            category,
-            name: item.name,
-            type: 'standalone',
-            price: item.price || 0
-          };
-        }
-        const payloadStr = JSON.stringify(payload).replace(/'/g, "&apos;");
-
-        return `
-          <li class="item-card">
-            <div class="item-top">
-              <div class="item-name">${escapeHtml(item.name)}</div>
-              ${category === "Lunch" && (type === 'meat' || type === 'side') ? '' : `<div class="item-price">${item.price ? money(item.price) : '—'}</div>`}
-            </div>
-            ${item.desc ? `
-              <details class="item-details">
-                <summary>Description</summary>
-                <div class="item-desc">${escapeHtml(item.desc)}</div>
-              </details>
-            ` : ""}
-            <div class="item-actions">
-              <button class="plus-btn" type="button" data-add='${payloadStr}'>+</button>
-              <span class="tag">${escapeHtml(category)}${type ? ` (${type})` : ''}</span>
-              <span></span>
-              <button class="add-btn" type="button" data-add='${payloadStr}'>Add</button>
-            </div>
-          </li>
-        `;
-      }
-
-      function renderCategoryPanel(dayLabel, dateObj, categoryName, categoryData) {
-        let contentHtml = '';
-        if (categoryName === "Lunch") {
-          // Render meats and sides
-          const meats = categoryData.meats || [];
-          const sides = categoryData.sides || [];
-          contentHtml = `
-            <h4 class="list-heading">Meats</h4>
-            <ul class="item-grid">
-              ${meats.map(item => renderItemCard(item, "Lunch", 'meat')).join('')}
-            </ul>
-            <h4 class="list-heading">Sides</h4>
-            <ul class="item-grid">
-              ${sides.map(item => renderItemCard(item, "Lunch", 'side')).join('')}
-            </ul>
-          `;
-        } else {
-          // Regular categories with sections
-          contentHtml = (categoryData.sections || []).map(section => `
-            <h4 class="list-heading">${escapeHtml(section.label || "Items")}</h4>
-            <ul class="item-grid">
-              ${(section.items || []).map(item => renderItemCard(item, categoryName)).join('')}
-            </ul>
-          `).join('');
-        }
-
-        return `
-          <div class="menu-panel cat-panel" data-cat-panel="${escapeHtml(categoryName)}" ${categoryName === app.currentCategory ? "" : "hidden"}>
-            <div class="menu-head">
-              <div class="menu-title">${escapeHtml(dayLabel)} (${escapeHtml(formatDateNice(dateObj))})</div>
-              <div class="menu-subhead">${escapeHtml(categoryName)} • ${escapeHtml(categoryData.subtitle || "")}</div>
-            </div>
-            <h3 class="section-title">${escapeHtml(categoryName)}</h3>
-            <p class="section-sub">${escapeHtml(categoryData.subtitle || "")}</p>
-            ${contentHtml || '<div class="status-card">Nothing posted yet for this category.</div>'}
-            <div class="call-row">
-              <a class="call-btn" href="${escapeHtml(app.data.phoneTel || "#")}"><i class="fas fa-phone"></i> Call to Order</a>
-            </div>
+      <div class="hh-panels">
+        <section class="hh-panel is-active" id="hh-today-breakfast" role="tabpanel" aria-labelledby="hhTabTodayBreakfast">
+          <h3>Breakfast</h3>
+          <p class="hh-sub" id="hh-today-breakfast-sub"></p>
+          <h4>Plates</h4>
+          <ul class="hh-stack" id="hh-today-breakfast-plates"></ul>
+          <h4>Available Items</h4>
+          <ul class="hh-stack" id="hh-today-breakfast-items"></ul>
+          <div class="hh-cta">
+            <a class="hh-btn" id="hh-call-btn-today-b" href="#">Call to Order</a>
+            <div class="hh-small" id="hh-delivery-note"></div>
           </div>
-        `;
+        </section>
+
+        <section class="hh-panel" id="hh-today-lunch" hidden role="tabpanel" aria-labelledby="hhTabTodayLunch">
+          <h3>Lunch</h3>
+          <p class="hh-sub" id="hh-today-lunch-sub">Loading today’s lunch menu…</p>
+
+          <!-- Lunch-only unavailable message -->
+          <div class="hh-lunch-unavail" id="hh-today-lunch-unavail" hidden>
+            <div class="hh-badge is-dark">Unavailable</div>
+            <div class="hh-lunch-unavail-title" id="hh-today-lunch-unavail-title">Lunch menu unavailable.</div>
+          </div>
+
+          <div id="hh-today-lunch-content" style="display:none">
+            <h4>Plates</h4>
+            <ul class="hh-stack" id="hh-today-lunch-plates"></ul>
+
+            <h4 id="hh-today-lunch-items-title">Today’s Lunch Items</h4>
+            <div class="hh-hintline" id="hh-today-lunch-hint" hidden></div>
+            <ul class="hh-stack" id="hh-today-lunch-items"></ul>
+          </div>
+
+          <div class="hh-cta">
+            <a class="hh-btn" id="hh-call-btn-today-l" href="#">Call to Order</a>
+          </div>
+        </section>
+
+        <section class="hh-panel" id="hh-today-crawfish" hidden role="tabpanel" aria-labelledby="hhTabTodayCrawfish">
+          <h3>Crawfish</h3>
+          <p class="hh-sub" id="hh-today-crawfish-sub"></p>
+          <ul class="hh-stack" id="hh-today-crawfish-items"></ul>
+          <div class="hh-cta">
+            <a class="hh-btn" id="hh-call-btn-today-c" href="#">Call to Order</a>
+          </div>
+        </section>
+
+        <section class="hh-panel" id="hh-today-salad" hidden role="tabpanel" aria-labelledby="hhTabTodaySalad">
+          <h3>Salad Bar</h3>
+          <p class="hh-sub" id="hh-today-salad-sub"></p>
+          <h4>Pricing</h4>
+          <ul class="hh-stack" id="hh-today-salad-pricing"></ul>
+          <h4>Lettuce</h4>
+          <ul class="hh-stack" id="hh-today-salad-lettuce"></ul>
+          <h4>Toppings</h4>
+          <ul class="hh-stack" id="hh-today-salad-toppings"></ul>
+          <h4>Dressing</h4>
+          <ul class="hh-stack" id="hh-today-salad-dressing"></ul>
+        </section>
+
+        <section class="hh-panel" id="hh-today-drinks" hidden role="tabpanel" aria-labelledby="hhTabTodayDrinks">
+          <h3>Drinks</h3>
+          <ul class="hh-stack" id="hh-today-drinks-items"></ul>
+        </section>
+
+        <section class="hh-panel" id="hh-today-dessert" hidden role="tabpanel" aria-labelledby="hhTabTodayDessert">
+          <h3>Dessert</h3>
+          <p class="hh-sub" id="hh-today-dessert-sub"></p>
+          <ul class="hh-stack" id="hh-today-dessert-items"></ul>
+        </section>
+      </div>
+    </div>
+
+    <!-- TOMORROW -->
+    <div class="hh-daypanel" id="hh-day-tomorrow" hidden role="tabpanel" aria-labelledby="hhDayBtnTomorrow">
+      <div class="hh-header">
+        <div class="hh-title" id="hh-tomorrow-title">Tomorrow’s Menu</div>
+        <div class="hh-updated" id="hh-hours-line-2">Loading hours…</div>
+        <div class="hh-note" id="hh-hours-note-2"></div>
+      </div>
+
+      <!-- Only show CLOSED at day level -->
+      <div class="hh-state hh-closed" id="hh-tomorrow-closed" hidden>
+        <div class="hh-badge">Closed</div>
+        <div class="hh-state-title" id="hh-tomorrow-closed-title"></div>
+        <div class="hh-state-msg" id="hh-tomorrow-closed-msg"></div>
+      </div>
+
+      <div class="hh-tablist" role="tablist" aria-label="Tomorrow categories">
+        <button class="hh-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-tomorrow-breakfast" id="hhTabTomorrowBreakfast">Breakfast</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-lunch" id="hhTabTomorrowLunch">Lunch</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-crawfish" id="hhTabTomorrowCrawfish">Crawfish</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-salad" id="hhTabTomorrowSalad">Salad Bar</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-drinks" id="hhTabTomorrowDrinks">Drinks</button>
+        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-dessert" id="hhTabTomorrowDessert">Dessert</button>
+      </div>
+
+      <div class="hh-panels">
+        <section class="hh-panel is-active" id="hh-tomorrow-breakfast" role="tabpanel" aria-labelledby="hhTabTomorrowBreakfast">
+          <h3>Breakfast</h3>
+          <p class="hh-sub" id="hh-tomorrow-breakfast-sub"></p>
+          <h4>Plates</h4>
+          <ul class="hh-stack" id="hh-tomorrow-breakfast-plates"></ul>
+          <h4>Available Items</h4>
+          <ul class="hh-stack" id="hh-tomorrow-breakfast-items"></ul>
+          <div class="hh-cta">
+            <a class="hh-btn" id="hh-call-btn-tomorrow-b" href="#">Call to Order</a>
+            <div class="hh-small" id="hh-delivery-note-2"></div>
+          </div>
+        </section>
+
+        <section class="hh-panel" id="hh-tomorrow-lunch" hidden role="tabpanel" aria-labelledby="hhTabTomorrowLunch">
+          <h3>Lunch</h3>
+          <p class="hh-sub" id="hh-tomorrow-lunch-sub">Loading tomorrow’s lunch menu…</p>
+
+          <!-- Lunch-only unavailable message -->
+          <div class="hh-lunch-unavail" id="hh-tomorrow-lunch-unavail" hidden>
+            <div class="hh-badge is-dark">Unavailable</div>
+            <div class="hh-lunch-unavail-title" id="hh-tomorrow-lunch-unavail-title">Lunch menu unavailable.</div>
+          </div>
+
+          <div id="hh-tomorrow-lunch-content" style="display:none">
+            <h4>Plates</h4>
+            <ul class="hh-stack" id="hh-tomorrow-lunch-plates"></ul>
+
+            <h4 id="hh-tomorrow-lunch-items-title">Tomorrow’s Lunch Items</h4>
+            <div class="hh-hintline" id="hh-tomorrow-lunch-hint" hidden></div>
+            <ul class="hh-stack" id="hh-tomorrow-lunch-items"></ul>
+          </div>
+
+          <div class="hh-cta">
+            <a class="hh-btn" id="hh-call-btn-tomorrow-l" href="#">Call to Order</a>
+          </div>
+        </section>
+
+        <section class="hh-panel" id="hh-tomorrow-crawfish" hidden role="tabpanel" aria-labelledby="hhTabTomorrowCrawfish">
+          <h3>Crawfish</h3>
+          <p class="hh-sub" id="hh-tomorrow-crawfish-sub"></p>
+          <ul class="hh-stack" id="hh-tomorrow-crawfish-items"></ul>
+          <div class="hh-cta">
+            <a class="hh-btn" id="hh-call-btn-tomorrow-c" href="#">Call to Order</a>
+          </div>
+        </section>
+
+        <section class="hh-panel" id="hh-tomorrow-salad" hidden role="tabpanel" aria-labelledby="hhTabTomorrowSalad">
+          <h3>Salad Bar</h3>
+          <p class="hh-sub" id="hh-tomorrow-salad-sub"></p>
+          <h4>Pricing</h4>
+          <ul class="hh-stack" id="hh-tomorrow-salad-pricing"></ul>
+          <h4>Lettuce</h4>
+          <ul class="hh-stack" id="hh-tomorrow-salad-lettuce"></ul>
+          <h4>Toppings</h4>
+          <ul class="hh-stack" id="hh-tomorrow-salad-toppings"></ul>
+          <h4>Dressing</h4>
+          <ul class="hh-stack" id="hh-tomorrow-salad-dressing"></ul>
+        </section>
+
+        <section class="hh-panel" id="hh-tomorrow-drinks" hidden role="tabpanel" aria-labelledby="hhTabTomorrowDrinks">
+          <h3>Drinks</h3>
+          <ul class="hh-stack" id="hh-tomorrow-drinks-items"></ul>
+        </section>
+
+        <section class="hh-panel" id="hh-tomorrow-dessert" hidden role="tabpanel" aria-labelledby="hhTabTomorrowDessert">
+          <h3>Dessert</h3>
+          <p class="hh-sub" id="hh-tomorrow-dessert-sub"></p>
+          <ul class="hh-stack" id="hh-tomorrow-dessert-items"></ul>
+        </section>
+      </div>
+    </div>
+
+    <!-- ADVANCED -->
+    <div class="hh-daypanel" id="hh-day-advanced" hidden role="tabpanel" aria-labelledby="hhDayBtnAdvanced">
+      <div class="hh-advanced-top">
+        <div class="hh-advanced-title">Advanced Menu</div>
+        <div class="hh-advanced-disclaimer" id="hh-advanced-disclaimer"></div>
+      </div>
+      <div class="hh-adv-carousel" id="hh-adv-carousel" aria-label="Advanced menu day cards"></div>
+      <div class="hh-hint">Tip: swipe left/right for each day.</div>
+    </div>
+
+    <!-- Error state -->
+    <div class="hh-state" id="hh-load-error" hidden>
+      <div class="hh-badge is-dark">Error</div>
+      <div class="hh-state-title">Menu couldn’t load</div>
+      <p class="hh-state-msg" id="hh-load-error-msg">Please try again in a moment.</p>
+    </div>
+  </div>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    // AOS init (optional)
+    AOS.init({ once: false, duration: 1000 });
+
+    // ----- MENU SCRIPT (modified to shift days after closing) -----
+    (function(){
+      const DATA_URLS = ["/menu-data.html", "/menu-data/"]; // tries both
+      const $ = (id)=>document.getElementById(id);
+
+      function setText(id, text){ const el=$(id); if(el) el.textContent = text || ""; }
+      function setList(id, items){
+        const ul=$(id); if(!ul) return;
+        ul.innerHTML="";
+        (items||[]).forEach(t=>{
+          const li=document.createElement("li");
+          li.textContent=String(t ?? "");
+          ul.appendChild(li);
+        });
       }
 
-      function renderDayPanel(container, dateObj) {
-        const iso = toISODateLocal(dateObj);
-        const menu = getMenuForDate(iso);
-        const dayLabel = weekdayName(dateObj);
-        container.innerHTML = categoryOrder.map(cat => renderCategoryPanel(dayLabel, dateObj, cat, menu[cat])).join("");
+      function escapeHtml(str){
+        return String(str ?? "")
+          .replace(/&/g,"&amp;")
+          .replace(/</g,"&lt;")
+          .replace(/>/g,"&gt;")
+          .replace(/"/g,"&quot;")
+          .replace(/'/g,"&#039;");
       }
 
-      function renderAdvanced() {
-        els.advancedNote.textContent = app.data.settings?.advancedDisclaimer || "";
-        const days = Number(app.data.settings?.advancedWindowDays || 7);
-        const start = new Date();
-        const cards = [];
-        for (let i = 0; i < days; i++) {
-          const d = new Date(start);
-          d.setDate(start.getDate() + i);
-          const menu = getMenuForDate(toISODateLocal(d));
-          const lunch = menu["Lunch"] || { subtitle: "", meats: [], sides: [] };
-          cards.push(`
-            <article class="advanced-card">
-              <div class="advanced-head">
-                <div>
-                  <div class="advanced-day">${escapeHtml(weekdayName(d))}</div>
-                  <div class="advanced-date">${escapeHtml(formatDateNice(d))}</div>
-                </div>
-                <div class="advanced-hours">${escapeHtml((app.data.hours?.weekly || []).find(x => x.day === weekdayName(d))?.lunch || "")}</div>
-              </div>
-              <div class="menu-panel">
-                <h3 class="section-title">Lunch</h3>
-                <p class="section-sub">${escapeHtml(lunch.subtitle || "")}</p>
-                <h4 class="list-heading">Meats</h4>
-                <ul class="item-grid">
-                  ${(lunch.meats || []).map(item => renderItemCard(item, "Lunch", 'meat')).join('')}
-                </ul>
-                <h4 class="list-heading">Sides</h4>
-                <ul class="item-grid">
-                  ${(lunch.sides || []).map(item => renderItemCard(item, "Lunch", 'side')).join('')}
-                </ul>
-              </div>
-            </article>
-          `);
+      function normalizeItems(arr){
+        return Array.isArray(arr) ? arr.map(x=>String(x||"").trim()).filter(Boolean) : [];
+      }
+
+      function toISODateLocal(d){
+        const y=d.getFullYear();
+        const m=String(d.getMonth()+1).padStart(2,"0");
+        const day=String(d.getDate()).padStart(2,"0");
+        return `${y}-${m}-${day}`;
+      }
+
+      function formatDateNice(d){
+        return d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+      }
+
+      function weekdayName(d){
+        return d.toLocaleDateString("en-US",{weekday:"long"});
+      }
+
+      function parseISODateToLocal(iso){
+        const [y,m,d]=String(iso).split("-").map(Number);
+        return new Date(y,(m||1)-1,d||1);
+      }
+
+      function normalizeDateKey(key){
+        const s=String(key||"").trim();
+        const m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+        if(!m) return null;
+        const y=m[1];
+        const mo=String(Number(m[2])).padStart(2,"0");
+        const da=String(Number(m[3])).padStart(2,"0");
+        return `${y}-${mo}-${da}`;
+      }
+
+      function showLoadError(msg){
+        const err = $("hh-load-error");
+        const msgEl = $("hh-load-error-msg");
+        if(msgEl) msgEl.textContent = msg || "Please try again.";
+        if(err) err.hidden = false;
+      }
+
+      async function fetchHtml(url){
+        const res = await fetch(url, { credentials:"same-origin", cache:"no-store" });
+        if(!res.ok) throw new Error(`Fetch failed ${res.status} at ${url}`);
+        return await res.text();
+      }
+
+      function extractJsonFromHtml(html, urlLabel){
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const script = doc.querySelector("#hh-menu-data");
+        if(!script) throw new Error(`No #hh-menu-data found on ${urlLabel}`);
+        const raw = (script.textContent || "").trim();
+        if(!raw) throw new Error(`#hh-menu-data is empty on ${urlLabel}`);
+        return JSON.parse(raw);
+      }
+
+      async function readData(){
+        // 1) If JSON is on THIS page, use it (great for testing)
+        const local = document.querySelector("#hh-menu-data");
+        if(local && local.textContent.trim()){
+          const data = JSON.parse(local.textContent.trim());
+          return normalizeMenus(data);
         }
-        els.advancedCarousel.innerHTML = cards.join("");
-      }
 
-      function updateDayVisibility() {
-        els.today.hidden = app.currentDay !== "today";
-        els.tomorrow.hidden = app.currentDay !== "tomorrow";
-        els.advanced.hidden = app.currentDay !== "advanced";
-      }
-
-      function updateCategoryVisibility() {
-        const targets = app.currentDay === "today"
-          ? els.today.querySelectorAll("[data-cat-panel]")
-          : els.tomorrow.querySelectorAll("[data-cat-panel]");
-
-        targets.forEach(panel => {
-          panel.hidden = panel.getAttribute("data-cat-panel") !== app.currentCategory;
-        });
-
-        els.catBar.querySelectorAll("[data-cat]").forEach(btn => {
-          btn.classList.toggle("active", btn.getAttribute("data-cat") === app.currentCategory);
-        });
-
-        rotateCubeTo(app.currentCategory, false);
-      }
-
-      function updateDayButtons() {
-        els.dayBar.querySelectorAll("[data-day]").forEach(btn => {
-          btn.classList.toggle("active", btn.getAttribute("data-day") === app.currentDay);
-        });
-      }
-
-      function rotateCubeTo(faceName, alsoOpen = true) {
-        const map = {
-          "Breakfast": { x: 0, y: 0 },
-          "Lunch": { x: 0, y: -90 },
-          "Crawfish": { x: 0, y: -180 },
-          "Salad Bar": { x: 0, y: 90 },
-          "Drinks": { x: -90, y: 0 },
-          "Dessert": { x: 90, y: 0 }
-        };
-        const face = map[faceName];
-        if (!face) return;
-
-        if (window.innerWidth <= 700) {
-          document.querySelectorAll(".face").forEach(el => el.classList.remove("mobile-visible"));
-          const mobile = Array.from(document.querySelectorAll(".face")).find(el => el.getAttribute("data-face") === faceName);
-          if (mobile) mobile.classList.add("mobile-visible");
-        } else {
-          els.cube.style.transform = `rotateX(${face.x}deg) rotateY(${face.y}deg)`;
-        }
-
-        els.cubeControls.querySelectorAll("[data-face]").forEach(btn => {
-          btn.classList.toggle("active", btn.getAttribute("data-face") === faceName);
-        });
-      }
-
-      // ----- PLATE BUILDER LOGIC -----
-      function addToCart(payload) {
-        // Check limits for meats/sides
-        if (payload.type === 'meat') {
-          const meatCount = app.cart.filter(i => i.type === 'meat').reduce((sum, i) => sum + i.qty, 0);
-          if (meatCount >= app.limits.maxMeats) {
-            alert(`You can only add up to ${app.limits.maxMeats} meats.`);
-            return;
+        // 2) Otherwise fetch from hidden data page (try both URLs)
+        let lastErr = null;
+        for(const url of DATA_URLS){
+          try{
+            const html = await fetchHtml(url);
+            const data = extractJsonFromHtml(html, url);
+            return normalizeMenus(data);
+          }catch(e){
+            lastErr = e;
           }
         }
-        if (payload.type === 'side') {
-          const sideCount = app.cart.filter(i => i.type === 'side').reduce((sum, i) => sum + i.qty, 0);
-          if (sideCount >= app.limits.maxSides) {
-            alert(`You can only add up to ${app.limits.maxSides} sides.`);
-            return;
-          }
-        }
-
-        const existing = app.cart.find(i => i.key === payload.key);
-        if (existing) {
-          // Check if increasing would exceed limit
-          let newMeat = app.cart.filter(i => i.type === 'meat').reduce((sum, i) => sum + i.qty, 0);
-          let newSide = app.cart.filter(i => i.type === 'side').reduce((sum, i) => sum + i.qty, 0);
-          if (payload.type === 'meat') newMeat += 1;
-          if (payload.type === 'side') newSide += 1;
-          if (payload.type === 'meat' && newMeat > app.limits.maxMeats) {
-            alert(`You can only add up to ${app.limits.maxMeats} meats.`);
-            return;
-          }
-          if (payload.type === 'side' && newSide > app.limits.maxSides) {
-            alert(`You can only add up to ${app.limits.maxSides} sides.`);
-            return;
-          }
-          existing.qty += 1;
-        } else {
-          app.cart.push({ ...payload, qty: 1 });
-        }
-        renderCart();
+        throw lastErr || new Error("Menu data could not be read.");
       }
 
-      function renderCart() {
-        const meats = app.cart.filter(i => i.type === 'meat').reduce((sum, i) => sum + i.qty, 0);
-        const sides = app.cart.filter(i => i.type === 'side').reduce((sum, i) => sum + i.qty, 0);
-        const extras = app.cart.filter(i => i.type === 'standalone').reduce((sum, i) => sum + i.qty, 0);
-
-        els.builderMeatCount.textContent = meats;
-        els.builderSideCount.textContent = sides;
-        els.builderExtraCount.textContent = extras;
-
-        // Calculate total
-        let total = 0;
-        if (meats > 0) {
-          if (meats === 1) total += app.comboPrices.meat1;
-          else if (meats === 2) total += app.comboPrices.meat2;
-          else total += app.comboPrices.meat3;
-          if (sides > 2) total += (sides - 2) * app.comboPrices.extraSide;
-        } else {
-          // no meats, sides charged at extra side rate
-          total += sides * app.comboPrices.extraSide;
-        }
-        // Add standalone items
-        app.cart.forEach(i => {
-          if (i.type === 'standalone') total += i.price * i.qty;
+      function normalizeMenus(data){
+        const rawMenus=data?.menus||{};
+        const normalizedMenus={};
+        Object.keys(rawMenus).forEach(k=>{
+          const nk=normalizeDateKey(k);
+          if(!nk) return;
+          normalizedMenus[nk]=rawMenus[k];
         });
+        data.menus=normalizedMenus;
+        return data;
+      }
 
-        els.builderTotal.textContent = money(total);
+      function findHours(weekly, dayName){
+        return (weekly||[]).find(d => (d.day||"").toLowerCase()===(dayName||"").toLowerCase())
+          || {day:dayName, open:"", close:"", breakfast:"", lunch:""};
+      }
 
-        // Render cart items
-        els.cartList.querySelectorAll(".cart-item").forEach(node => node.remove());
-        if (app.cart.length === 0) {
-          els.cartEmpty.style.display = "";
+      function getClosure(data, dayName){
+        const c=data?.closures||{};
+        const key=Object.keys(c).find(k => (k||"").toLowerCase()===(dayName||"").toLowerCase());
+        return key ? c[key] : null;
+      }
+
+      function getMenuByDate(data, isoDate){
+        return (data?.menus||{})[isoDate] || null;
+      }
+
+      function normalizeLunchItems(rawItems){
+        const items = Array.isArray(rawItems) ? rawItems : [];
+        return items.map(raw=>{
+          if(raw && typeof raw === "object"){
+            const name = String(raw.name ?? "").trim();
+            const desc = String(raw.desc ?? "").trim();
+            return { name, desc };
+          }
+          const s = String(raw ?? "").trim();
+          if(!s) return null;
+          return { name: s, desc: "" };
+        }).filter(Boolean).filter(x=>x.name);
+      }
+
+      function setDropdownList(listId, items, noDescText){
+        const ul = $(listId); if(!ul) return;
+        ul.innerHTML = "";
+        items.forEach(it=>{
+          const li = document.createElement("li");
+          const details = document.createElement("details");
+          const summary = document.createElement("summary");
+          summary.textContent = it.name;
+
+          const d = document.createElement("div");
+          d.className = "hh-desc";
+          d.textContent = it.desc ? it.desc : (noDescText || "No description for this item.");
+
+          details.appendChild(summary);
+          details.appendChild(d);
+          li.appendChild(details);
+          ul.appendChild(li);
+        });
+      }
+
+      function setCrawfishVisibility(prefix, show){
+        const tab = $(`hhTab${prefix}Crawfish`);
+        const panel = $(`hh-${prefix.toLowerCase()}-crawfish`);
+        if(tab) tab.style.display = show ? "" : "none";
+        if(!show){
+          if(panel) panel.hidden = true;
+          if(tab && tab.classList.contains("is-active")){
+            const breakfastTab = $(`hhTab${prefix}Breakfast`);
+            if(breakfastTab) breakfastTab.click();
+          }
           return;
         }
-        els.cartEmpty.style.display = "none";
+        if(tab && tab.classList.contains("is-active")){
+          if(panel) panel.hidden = false;
+        }
+      }
 
-        app.cart.forEach((item, index) => {
-          const row = document.createElement("div");
-          row.className = "cart-item";
-          let priceDisplay = '';
-          if (item.type === 'standalone') {
-            priceDisplay = money(item.price * item.qty);
+      function crawfishFor(data, menu){
+        const def=data?.defaults?.crawfish||{};
+        const c=menu?.crawfish||{};
+        const show=(c.show===false) ? false : true;
+        const subtitle=(c.subtitle ?? def.subtitle ?? "").trim();
+        const items=normalizeItems(c.items ?? def.items ?? []);
+        return {show, subtitle, items};
+      }
+
+      function getLunchAvailability(data, isoDate, todayISO){
+        const msg = data?.settings?.autoClearMessage || "Lunch menu unavailable.";
+        const today=parseISODateToLocal(todayISO);
+        const cur=parseISODateToLocal(isoDate);
+        today.setHours(12,0,0,0);
+        cur.setHours(12,0,0,0);
+
+        if(data?.settings?.autoClearPastDays && cur < today) return { ok:false, msg };
+
+        const menu=getMenuByDate(data, isoDate);
+        if(!menu) return { ok:false, msg };
+
+        const lunch=menu?.lunch || {};
+        if(lunch.show === false) return { ok:false, msg };
+
+        const items = normalizeLunchItems(lunch.items);
+        if(items.length === 0) return { ok:false, msg };
+
+        return { ok:true, msg:"" };
+      }
+
+      function showLunchUnavailable(prefixIdBase, msg){
+        const un = $(`${prefixIdBase}-lunch-unavail`);
+        const unTitle = $(`${prefixIdBase}-lunch-unavail-title`);
+        const content = $(`${prefixIdBase}-lunch-content`);
+        const hint = $(`${prefixIdBase}-lunch-hint`);
+        if(un) un.hidden = false;
+        if(unTitle) unTitle.textContent = msg || "Lunch menu unavailable.";
+        if(content) content.style.display = "none";
+        if(hint) hint.hidden = true;
+      }
+
+      function showLunchAvailable(prefixIdBase){
+        const un = $(`${prefixIdBase}-lunch-unavail`);
+        const content = $(`${prefixIdBase}-lunch-content`);
+        if(un) un.hidden = true;
+        if(content) content.style.display = "";
+      }
+
+      // Helper to parse time string "5:30 AM" to minutes since midnight
+      function parseTimeToMinutes(timeStr) {
+        if (!timeStr) return null;
+        const match = timeStr.match(/(\d+):?(\d*)\s*(AM|PM)/i);
+        if (!match) return null;
+        let hours = parseInt(match[1], 10);
+        const minutes = match[2] ? parseInt(match[2], 10) : 0;
+        const ampm = match[3].toUpperCase();
+        if (ampm === 'PM' && hours !== 12) hours += 12;
+        if (ampm === 'AM' && hours === 12) hours = 0;
+        return hours * 60 + minutes;
+      }
+
+      // Check if current time is past closing for today
+      function isPastClosingToday(weekly, todayName) {
+        const hours = findHours(weekly, todayName);
+        if (!hours.close) return false;
+        const closeMinutes = parseTimeToMinutes(hours.close);
+        if (closeMinutes === null) return false;
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        return currentMinutes >= closeMinutes;
+      }
+
+      function fillTwoDay(prefixIdBase, labelPrefix, isoDate, data, hours, todayISO){
+        const defaults=data?.defaults||{};
+        const menu=getMenuByDate(data, isoDate) || {};
+
+        // Breakfast
+        const b=menu?.breakfast||{};
+        const bDef=defaults?.breakfast||{};
+        const bHours = hours?.breakfast ? `Breakfast ${hours.breakfast}. ` : "";
+        setText(`${prefixIdBase}-breakfast-sub`, (bHours + ((b.subtitle ?? bDef.subtitle ?? "").trim())).trim());
+        setList(`${prefixIdBase}-breakfast-plates`, normalizeItems(b.plates ?? bDef.plates ?? []));
+        setList(`${prefixIdBase}-breakfast-items`,  normalizeItems(b.items  ?? bDef.items  ?? []));
+
+        // Lunch
+        const l=menu?.lunch||{};
+        const lDef=defaults?.lunch||{};
+        const lHours = hours?.lunch ? `Lunch ${hours.lunch}. ` : "";
+        setText(`${prefixIdBase}-lunch-sub`, (lHours + ((l.subtitle ?? lDef.subtitle ?? "").trim())).trim());
+
+        const lunchAvail = getLunchAvailability(data, isoDate, todayISO);
+        if(!lunchAvail.ok){
+          showLunchUnavailable(prefixIdBase, lunchAvail.msg);
+          setList(`${prefixIdBase}-lunch-plates`, []);
+          const ul = $(`${prefixIdBase}-lunch-items`);
+          if(ul) ul.innerHTML = "";
+        } else {
+          showLunchAvailable(prefixIdBase);
+          setList(`${prefixIdBase}-lunch-plates`, normalizeItems(l.plates ?? lDef.plates ?? []));
+          const items = normalizeLunchItems(l.items);
+          const hint = $(`${prefixIdBase}-lunch-hint`);
+          if(hint){
+            hint.textContent = data?.settings?.clickForDescriptionHint || "Tip: click an item for description.";
+            hint.hidden = (items.length === 0);
+          }
+          setDropdownList(`${prefixIdBase}-lunch-items`, items, data?.settings?.noDescriptionText);
+        }
+
+        // Crawfish
+        const c=crawfishFor(data, menu);
+        setText(`${prefixIdBase}-crawfish-sub`, c.subtitle);
+        setList(`${prefixIdBase}-crawfish-items`, c.items.length ? c.items : ["Call to ask about crawfish availability."]);
+        setCrawfishVisibility(labelPrefix, c.show);
+
+        // Salad
+        const s=menu?.salad||{};
+        const sDef=defaults?.salad||{};
+        setText(`${prefixIdBase}-salad-sub`, (s.subtitle ?? sDef.subtitle ?? "").trim());
+        setList(`${prefixIdBase}-salad-pricing`, normalizeItems(s.items ?? sDef.items ?? []));
+        setList(`${prefixIdBase}-salad-lettuce`,  normalizeItems(s.saladBar?.lettuce  ?? sDef.saladBar?.lettuce  ?? []));
+        setList(`${prefixIdBase}-salad-toppings`, normalizeItems(s.saladBar?.toppings ?? sDef.saladBar?.toppings ?? []));
+        setList(`${prefixIdBase}-salad-dressing`, normalizeItems(s.saladBar?.dressing ?? sDef.saladBar?.dressing ?? []));
+
+        // Drinks
+        const d=menu?.drinks||{};
+        const dDef=defaults?.drinks||{};
+        setList(`${prefixIdBase}-drinks-items`, normalizeItems(d.items ?? dDef.items ?? []));
+
+        // Dessert
+        const ds=menu?.dessert||{};
+        const dsDef=defaults?.dessert||{};
+        setText(`${prefixIdBase}-dessert-sub`, (ds.subtitle ?? dsDef.subtitle ?? "").trim());
+        const desserts=normalizeItems(ds.items ?? []);
+        setList(`${prefixIdBase}-dessert-items`, desserts.length ? desserts : ["(Dessert not posted yet.)"]);
+      }
+
+      function buildAdvancedCarousel(data, todayISO){
+        const wrap=$("hh-adv-carousel");
+        if(!wrap) return;
+        wrap.innerHTML="";
+
+        const weekly=data?.hours?.weekly||[];
+        const lDef=data?.defaults?.lunch||{};
+        const windowDays=Math.max(1, Math.min(31, Number(data?.settings?.advancedWindowDays ?? 7)));
+        const start=parseISODateToLocal(todayISO);
+
+        for(let i=0;i<windowDays;i++){
+          const d=new Date(start);
+          d.setDate(start.getDate()+i);
+          const iso=toISODateLocal(d);
+          const dayName=weekdayName(d);
+          const hours=findHours(weekly, dayName);
+
+          const closure=getClosure(data, dayName);
+          const isClosed=!!closure?.closed;
+          const menu=getMenuByDate(data, iso) || {};
+          const lunch=menu?.lunch||{};
+          const items=normalizeLunchItems(lunch.items);
+
+          let state = { kind:"open", msg:"" };
+          if(isClosed){
+            state = { kind:"closed", msg: closure.message || "See you tomorrow!" };
           } else {
-            // meat/side – price not shown individually, will be part of combo total
-            priceDisplay = '—';
+            const avail=getLunchAvailability(data, iso, todayISO);
+            if(!avail.ok) state = { kind:"unavailable", msg: avail.msg };
           }
-          row.innerHTML = `
-            <div class="cart-item-top">
-              <div>
-                <div class="cart-item-name">${escapeHtml(item.name)}</div>
-                <div class="cart-item-meta">${escapeHtml(item.category)}${item.type ? ` (${item.type})` : ''}</div>
-              </div>
-              <div class="cart-item-price">${priceDisplay}</div>
+
+          const card=document.createElement("article");
+          card.className="hh-adv-card";
+
+          const head=document.createElement("div");
+          head.className="hh-adv-head";
+          head.innerHTML=`
+            <div>
+              <div class="hh-adv-dayname">${escapeHtml(dayName)}</div>
+              <div class="hh-adv-date">${escapeHtml(formatDateNice(d))}</div>
             </div>
-            <div class="cart-item-actions">
-              <div class="qty-controls">
-                <button class="qty-btn" type="button" data-cart-action="minus" data-index="${index}">−</button>
-                <span class="qty-value">${item.qty}</span>
-                <button class="qty-btn" type="button" data-cart-action="plus" data-index="${index}">+</button>
-              </div>
-              <button class="remove-btn" type="button" data-cart-action="remove" data-index="${index}">Remove</button>
-            </div>
+            <div class="hh-adv-hours">${state.kind==="closed" ? "Closed" : (hours.lunch ? `Lunch ${escapeHtml(hours.lunch)}` : "")}</div>
           `;
-          els.cartList.appendChild(row);
-        });
+          card.appendChild(head);
+
+          if(state.kind!=="open"){
+            const st=document.createElement("div");
+            st.className="hh-state";
+            st.innerHTML=`
+              <div class="hh-badge ${state.kind==="unavailable" ? "is-dark" : ""}">${state.kind==="closed" ? "Closed" : "Unavailable"}</div>
+              <div class="hh-state-title">${escapeHtml(dayName)}</div>
+              <p class="hh-state-msg">${escapeHtml(state.msg)}</p>
+            `;
+            card.appendChild(st);
+          } else {
+            const panel=document.createElement("section");
+            panel.className="hh-panel";
+
+            const subtitle=((hours.lunch ? `Lunch ${hours.lunch}. ` : "") + ((lunch.subtitle ?? lDef.subtitle ?? "").trim())).trim();
+            const plates=normalizeItems(lunch.plates ?? lDef.plates ?? []);
+            const hintText=data?.settings?.clickForDescriptionHint || "Tip: click an item for description.";
+            const noDesc=data?.settings?.noDescriptionText || "No description for this item.";
+
+            panel.innerHTML=`
+              <h3>Lunch</h3>
+              <p class="hh-sub">${escapeHtml(subtitle)}</p>
+              <h4>Plates</h4>
+              <ul class="hh-stack">${plates.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>
+              <h4>${escapeHtml(dayName)} Lunch Items</h4>
+              <div class="hh-hintline">${escapeHtml(hintText)}</div>
+              <ul class="hh-stack">
+                ${items.map(it=>{
+                  const d = it.desc ? it.desc : noDesc;
+                  return `<li><details><summary>${escapeHtml(it.name)}</summary><div class="hh-desc">${escapeHtml(d)}</div></details></li>`;
+                }).join("")}
+              </ul>
+            `;
+            card.appendChild(panel);
+          }
+
+          wrap.appendChild(card);
+        }
       }
 
-      function copyCartSummary() {
-        const lines = app.cart.map(item => `${item.qty}x ${item.name} (${item.type || 'item'})`);
-        const total = els.builderTotal.textContent;
-        const text = lines.length ? `Hot Headz Plate\n\n${lines.join("\n")}\n\nTotal: ${total}` : "Your plate is empty.";
-        navigator.clipboard.writeText(text).then(() => {
-          const old = els.builderCopy.textContent;
-          els.builderCopy.textContent = "Copied";
-          setTimeout(() => { els.builderCopy.textContent = old; }, 1200);
-        }).catch(() => {});
+      function wireTabs(dayPanelEl){
+        if(!dayPanelEl) return;
+        const tabs=Array.from(dayPanelEl.querySelectorAll(".hh-tab[role='tab']"));
+        const panels=Array.from(dayPanelEl.querySelectorAll(".hh-panel[role='tabpanel']"));
+        if(!tabs.length || !panels.length) return;
+
+        function activateTab(tab){
+          const targetId=tab.getAttribute("aria-controls");
+          tabs.forEach(t=>{
+            const active=(t===tab);
+            t.classList.toggle("is-active", active);
+            t.setAttribute("aria-selected", active ? "true" : "false");
+          });
+          panels.forEach(p=> p.hidden = (p.id !== targetId));
+        }
+        tabs.forEach(tab=> tab.addEventListener("click", ()=> activateTab(tab)));
       }
 
-      // ----- Navigation wheel -----
-      function initNavigationWheel() {
-        els.menuFab.addEventListener("click", (e) => {
+      function wireDayTabs(){
+        const dayButtons=Array.from(document.querySelectorAll(".hh-day[role='tab']"));
+        const dayPanels=Array.from(document.querySelectorAll(".hh-daypanel[role='tabpanel']"));
+
+        function activate(btn){
+          const targetId=btn.getAttribute("aria-controls");
+          dayButtons.forEach(b=>{
+            const active=(b===btn);
+            b.classList.toggle("is-active", active);
+            b.setAttribute("aria-selected", active ? "true" : "false");
+          });
+          dayPanels.forEach(p=> p.hidden = (p.id !== targetId));
+        }
+        dayButtons.forEach(btn=> btn.addEventListener("click", ()=> activate(btn)));
+
+        // Return the activate function so we can call it externally
+        return activate;
+      }
+
+      // ---- INIT ----
+      const activateDay = wireDayTabs(); // get the function to programmatically activate a day
+      wireTabs($("hh-day-today"));
+      wireTabs($("hh-day-tomorrow"));
+
+      (async function init(){
+        try{
+          const data = await readData();
+
+          setText("hh-advanced-disclaimer", data?.settings?.advancedDisclaimer || "");
+          if(!data?.settings?.showAdvancedTab){
+            const advBtn=$("hhDayBtnAdvanced");
+            if(advBtn) advBtn.style.display="none";
+          }
+
+          const now = new Date();
+          const calendarTodayISO = toISODateLocal(now);      // actual today's date
+          const calendarTodayName = weekdayName(now);
+
+          const calendarTomorrow = new Date(now); 
+          calendarTomorrow.setDate(now.getDate() + 1);
+          const calendarTomorrowISO = toISODateLocal(calendarTomorrow);
+          const calendarTomorrowName = weekdayName(calendarTomorrow);
+
+          // Default display dates (what we show in Today/Tomorrow tabs)
+          let displayTodayISO = calendarTodayISO;
+          let displayTodayName = calendarTodayName;
+          let displayTomorrowISO = calendarTomorrowISO;
+          let displayTomorrowName = calendarTomorrowName;
+
+          const weekly = data?.hours?.weekly || [];
+          const closureToday = getClosure(data, calendarTodayName);
+
+          // Check if we are past closing time for today (and not already closed)
+          const pastClosing = isPastClosingToday(weekly, calendarTodayName);
+          if (pastClosing && !closureToday?.closed) {
+            // Shift everything forward: Today becomes tomorrow, Tomorrow becomes day after
+            displayTodayISO = calendarTomorrowISO;
+            displayTodayName = calendarTomorrowName;
+
+            const dayAfterTomorrow = new Date(now);
+            dayAfterTomorrow.setDate(now.getDate() + 2);
+            displayTomorrowISO = toISODateLocal(dayAfterTomorrow);
+            displayTomorrowName = weekdayName(dayAfterTomorrow);
+          }
+
+          // Update tab labels
+          setText("hhDayBtnToday", displayTodayName);
+          setText("hhDayBtnTomorrow", displayTomorrowName);
+
+          // Update panel titles
+          setText("hh-today-title", `${displayTodayName} (${formatDateNice(parseISODateToLocal(displayTodayISO))}) Menu`);
+          setText("hh-tomorrow-title", `${displayTomorrowName} (${formatDateNice(parseISODateToLocal(displayTomorrowISO))}) Menu`);
+
+          setText("hh-hours-note", data?.hours?.note || "");
+          setText("hh-hours-note-2", data?.hours?.note || "");
+
+          const hoursToday = findHours(weekly, displayTodayName);
+          const hoursTomorrow = findHours(weekly, displayTomorrowName);
+
+          const closureDisplayToday = getClosure(data, displayTodayName);
+          const closureDisplayTomorrow = getClosure(data, displayTomorrowName);
+
+          const lineToday = closureDisplayToday?.closed ? `${displayTodayName} Hours: Closed`
+            : `${displayTodayName} Hours: ${hoursToday.open} – ${hoursToday.close}` +
+              (hoursToday.breakfast ? ` • Breakfast ${hoursToday.breakfast}` : "") +
+              (hoursToday.lunch ? ` • Lunch ${hoursToday.lunch}` : "");
+
+          const lineTomorrow = closureDisplayTomorrow?.closed ? `${displayTomorrowName} Hours: Closed`
+            : `${displayTomorrowName} Hours: ${hoursTomorrow.open} – ${hoursTomorrow.close}` +
+              (hoursTomorrow.breakfast ? ` • Breakfast ${hoursTomorrow.breakfast}` : "") +
+              (hoursTomorrow.lunch ? ` • Lunch ${hoursTomorrow.lunch}` : "");
+
+          setText("hh-hours-line", lineToday);
+          setText("hh-hours-line-2", lineTomorrow);
+
+          const phone = data?.phoneTel || "#";
+          ["hh-call-btn-today-b","hh-call-btn-today-l","hh-call-btn-today-c",
+           "hh-call-btn-tomorrow-b","hh-call-btn-tomorrow-l","hh-call-btn-tomorrow-c"
+          ].forEach(id=>{ const a=$(id); if(a) a.href=phone; });
+
+          setText("hh-delivery-note", data?.deliveryNote || "");
+          setText("hh-delivery-note-2", data?.deliveryNote || "");
+
+          if(closureDisplayToday?.closed){
+            $("hh-today-closed").hidden=false;
+            setText("hh-today-closed-title", `${displayTodayName} (${displayTodayISO})`);
+            setText("hh-today-closed-msg", closureDisplayToday.message || "See you tomorrow!");
+          } else {
+            $("hh-today-closed").hidden=true;
+          }
+          if(closureDisplayTomorrow?.closed){
+            $("hh-tomorrow-closed").hidden=false;
+            setText("hh-tomorrow-closed-title", `${displayTomorrowName} (${displayTomorrowISO})`);
+            setText("hh-tomorrow-closed-msg", closureDisplayTomorrow.message || "See you tomorrow!");
+          } else {
+            $("hh-tomorrow-closed").hidden=true;
+          }
+
+          // Fill panels with the display dates (shifted if past closing)
+          fillTwoDay("hh-today", "Today", displayTodayISO, data, hoursToday, calendarTodayISO);
+          fillTwoDay("hh-tomorrow", "Tomorrow", displayTomorrowISO, data, hoursTomorrow, calendarTodayISO);
+
+          setText("hh-today-lunch-items-title", `${displayTodayName} Lunch Items`);
+          setText("hh-tomorrow-lunch-items-title", `${displayTomorrowName} Lunch Items`);
+
+          // Ensure the "Today" tab is active (it is by default, but after shift we might want to activate it)
+          // No need – the default active is today panel, and we've updated its content.
+
+          // Build advanced carousel using the actual calendar date (not shifted)
+          buildAdvancedCarousel(data, calendarTodayISO);
+
+        }catch(e){
+          console.error("HOT HEADZ MENU ERROR:", e);
+          setText("hh-hours-line", "Menu unavailable right now.");
+          setText("hh-hours-line-2", "Menu unavailable right now.");
+          showLoadError(String(e && e.message ? e.message : e));
+        }
+      })();
+    })();
+
+    // ----- DOCK SCRIPT -----
+    (function() {
+      const root = document.getElementById('genRoot');
+      const dock = document.getElementById('genDock');
+      if (root && dock) {
+        root.hidden = false;
+        dock.hidden = false;
+      }
+    })();
+  </script>
+
+
+   <!-- Circular menu toggle script with page navigation and share -->
+  <script>
+    (function() {
+      const overlay = document.getElementById('circMenuOverlay');
+      const leftBtn = document.getElementById('navBtnLeft');
+      const bottomBtn = document.getElementById('navBtnBottom');
+      const homeCenter = document.getElementById('homeCenter');
+      const menuItems = document.querySelectorAll('.menu-item');
+
+      function toggleMenu() {
+        overlay.classList.toggle('open');
+      }
+
+      // leftBtn is now removed, so we need to check if it exists before adding listener
+      if (leftBtn) {
+        leftBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          els.navOverlay.classList.toggle("open");
-        });
-
-        els.navOverlay.addEventListener("click", (e) => {
-          if (e.target === els.navOverlay) els.navOverlay.classList.remove("open");
-        });
-
-        document.querySelector(".nav-wheel").addEventListener("click", (e) => e.stopPropagation());
-
-        els.navHome.addEventListener("click", () => {
-          els.navOverlay.classList.remove("open");
-          const link = els.navHome.getAttribute("data-link");
-          if (link) window.location.href = link;
-        });
-
-        document.querySelectorAll(".nav-item").forEach(item => {
-          item.addEventListener("click", async () => {
-            els.navOverlay.classList.remove("open");
-            const link = item.getAttribute("data-link");
-            const action = item.getAttribute("data-action");
-            if (action === "share") {
-              try {
-                if (navigator.share) {
-                  await navigator.share({ title: document.title, text: "Check out Hot Headz Southern Foods!", url: window.location.href });
-                } else {
-                  await navigator.clipboard.writeText(window.location.href);
-                }
-              } catch (err) {}
-            } else if (link) {
-              window.location.href = link;
-            }
-          });
+          toggleMenu();
         });
       }
 
-      // ----- Event binding -----
-      function bindEvents() {
-        els.dayBar.addEventListener("click", (e) => {
-          const btn = e.target.closest("[data-day]");
-          if (!btn) return;
-          app.currentDay = btn.getAttribute("data-day");
-          updateDayButtons();
-          updateDayVisibility();
-        });
+      bottomBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMenu();
+      });
 
-        els.catBar.addEventListener("click", (e) => {
-          const btn = e.target.closest("[data-cat]");
-          if (!btn) return;
-          app.currentCategory = btn.getAttribute("data-cat");
-          updateCategoryVisibility();
-        });
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('open');
+        }
+      });
 
-        els.cubeControls.addEventListener("click", (e) => {
-          const btn = e.target.closest("[data-face]");
-          if (!btn) return;
-          app.currentCategory = btn.getAttribute("data-face");
-          updateCategoryVisibility();
-        });
-
-        document.querySelectorAll(".face").forEach(face => {
-          face.addEventListener("click", () => {
-            app.currentCategory = face.getAttribute("data-face");
-            updateCategoryVisibility();
-          });
-        });
-
-        document.addEventListener("click", (e) => {
-          const addBtn = e.target.closest("[data-add]");
-          if (addBtn) {
-            const payload = JSON.parse(addBtn.getAttribute("data-add").replace(/&apos;/g, "'"));
-            addToCart(payload);
+      async function sharePage() {
+        const shareData = {
+          title: document.title || 'Hot Headz Southern Foods',
+          text: 'Check out Hot Headz Southern Foods in DeRidder, LA!',
+          url: window.location.href
+        };
+        try {
+          if (navigator.share) {
+            await navigator.share(shareData);
+          } else if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(window.location.href);
+            const shareItem = document.querySelector('.menu-item[data-action="share"]');
+            if (shareItem) {
+              const originalText = shareItem.textContent;
+              shareItem.textContent = 'Copied';
+              setTimeout(() => shareItem.textContent = originalText, 1500);
+            }
+          } else {
+            const temp = document.createElement('input');
+            temp.value = window.location.href;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            alert('Link copied to clipboard!');
           }
-
-          const cartBtn = e.target.closest("[data-cart-action]");
-          if (cartBtn) {
-            const index = Number(cartBtn.getAttribute("data-index"));
-            const action = cartBtn.getAttribute("data-cart-action");
-            const item = app.cart[index];
-            if (!item) return;
-            if (action === "plus") {
-              // check limits before increasing
-              let newMeat = app.cart.filter(i => i.type === 'meat').reduce((sum, i) => sum + i.qty, 0);
-              let newSide = app.cart.filter(i => i.type === 'side').reduce((sum, i) => sum + i.qty, 0);
-              if (item.type === 'meat') newMeat += 1;
-              if (item.type === 'side') newSide += 1;
-              if (item.type === 'meat' && newMeat > app.limits.maxMeats) {
-                alert(`You can only add up to ${app.limits.maxMeats} meats.`);
-                return;
-              }
-              if (item.type === 'side' && newSide > app.limits.maxSides) {
-                alert(`You can only add up to ${app.limits.maxSides} sides.`);
-                return;
-              }
-              item.qty += 1;
-            }
-            if (action === "minus") {
-              item.qty -= 1;
-              if (item.qty <= 0) app.cart.splice(index, 1);
-            }
-            if (action === "remove") app.cart.splice(index, 1);
-            renderCart();
-          }
-        });
-
-        els.builderSummary.addEventListener("click", (e) => {
-          if (e.target.closest("button")) return;
-          els.builderShell.classList.toggle("collapsed");
-          els.builderToggle.textContent = els.builderShell.classList.contains("collapsed") ? "▲" : "▼";
-        });
-
-        els.builderToggle.addEventListener("click", () => {
-          els.builderShell.classList.toggle("collapsed");
-          els.builderToggle.textContent = els.builderShell.classList.contains("collapsed") ? "▲" : "▼";
-        });
-
-        els.builderClear.addEventListener("click", () => {
-          app.cart = [];
-          renderCart();
-        });
-
-        els.builderCopy.addEventListener("click", copyCartSummary);
-
-        window.addEventListener("resize", () => {
-          rotateCubeTo(app.currentCategory, false);
-        });
+        } catch (e) { console.log('Share failed', e); }
       }
 
-      // ----- Initialisation -----
-      async function init() {
-        app.data = await fetchExternalMenuData() || getFallbackData();
-
-        const today = new Date();
-        const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1);
-
-        renderDayPanel(els.today, today);
-        renderDayPanel(els.tomorrow, tomorrow);
-        renderAdvanced();
-
-        updateDayVisibility();
-        updateDayButtons();
-        updateCategoryVisibility();
-        renderCart();
-        rotateCubeTo("Breakfast", false);
-
-        bindEvents();
-        initNavigationWheel();
+      function navigate(link) {
+        if (!link) return;
+        window.location.href = link;
       }
 
-      init();
-    });
+      homeCenter.addEventListener('click', () => {
+        overlay.classList.remove('open');
+        const link = homeCenter.getAttribute('data-link');
+        if (link) navigate(link);
+      });
+
+      menuItems.forEach(item => {
+        item.addEventListener('click', () => {
+          overlay.classList.remove('open');
+          const link = item.getAttribute('data-link');
+          const action = item.getAttribute('data-action');
+          if (action === 'share') sharePage();
+          else if (link) navigate(link);
+        });
+      });
+
+      document.querySelector('.circular-menu').addEventListener('click', e => e.stopPropagation());
+    })();
   </script>
 </body>
 </html>
