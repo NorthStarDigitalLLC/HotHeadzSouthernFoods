@@ -1,2157 +1,627 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hot Headz Southern Foods — Future Hub Menu</title>
-  <meta name="description" content="A future-forward, easy-to-use menu hub powered by menu-data.html." />
-  <meta name="theme-color" content="#0b0908" />
-  <style>
-    :root{
-      --bg:#090706;
-      --bg-2:#120d0b;
-      --bg-3:#1a1310;
-      --paper:#f6efe5;
-      --paper-2:#efe3d1;
-      --ink:#18120e;
-      --ink-soft:rgba(24,18,14,.7);
-      --white:rgba(255,248,240,.95);
-      --muted:rgba(255,248,240,.7);
-      --line:rgba(255,255,255,.12);
-      --line-soft:rgba(255,255,255,.08);
-      --line-dark:rgba(24,18,14,.12);
-      --brand:#c76634;
-      --brand-2:#2f876d;
-      --brand-3:#ffb873;
-      --ok:#48d599;
-      --danger:#ff7b7b;
-      --shadow-1:0 10px 24px rgba(0,0,0,.18);
-      --shadow-2:0 18px 50px rgba(0,0,0,.28);
-      --shadow-3:0 30px 90px rgba(0,0,0,.42);
-      --radius-sm:14px;
-      --radius-md:18px;
-      --radius-lg:26px;
-      --radius-xl:34px;
-      --radius-pill:999px;
-      --site-max:1380px;
-      --topbar-h:84px;
-      --hub-size:170px;
-      --orbit-size:520px;
-      --node-size:100px;
-      --transition:.22s ease;
-      --font:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      --font-serif:ui-serif, Georgia, Cambria, "Times New Roman", serif;
-    }
-
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      font-family:var(--font);
-      color:var(--white);
-      background:
-        radial-gradient(1000px 620px at 12% 10%, rgba(199,102,52,.15), transparent 60%),
-        radial-gradient(1000px 620px at 88% 14%, rgba(47,135,109,.12), transparent 62%),
-        linear-gradient(180deg, #090706, #070505 100%);
-      min-height:100vh;
-      overflow-x:hidden;
-    }
-
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      opacity:.06;
-      mix-blend-mode:overlay;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");
-    }
-
-    a{color:inherit;text-decoration:none}
-    img{display:block;max-width:100%}
-    button,input{font:inherit}
-
-    .container{
-      width:min(var(--site-max), calc(100vw - 20px));
-      margin-inline:auto;
-      position:relative;
-      z-index:1;
-    }
-
-    .topbar{
-      position:sticky;
-      top:0;
-      z-index:1000;
-      backdrop-filter:blur(18px);
-      -webkit-backdrop-filter:blur(18px);
-      border-bottom:1px solid var(--line);
-      background:rgba(8,6,5,.76);
-    }
-
-    .topbar-inner{
-      min-height:var(--topbar-h);
-      display:grid;
-      grid-template-columns:auto 1fr auto;
-      gap:14px;
-      align-items:center;
-      padding:14px 0;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      min-width:0;
-    }
-
-    .brand-mark{
-      width:52px;
-      height:52px;
-      border-radius:18px;
-      display:grid;
-      place-items:center;
-      font-weight:950;
-      letter-spacing:-.05em;
-      color:#fff;
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), transparent 30%),
-        linear-gradient(135deg, var(--brand), #8f431d 62%, #2a150d);
-      box-shadow:var(--shadow-2);
-    }
-
-    .brand-name{
-      font-size:15px;
-      font-weight:950;
-      letter-spacing:-.02em;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-
-    .brand-sub{
-      font-size:12px;
-      color:var(--muted);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-
-    .status-pill{
-      justify-self:center;
-      min-width:min(100%, 620px);
-      max-width:100%;
-      padding:12px 16px;
-      border-radius:var(--radius-pill);
-      border:1px solid var(--line);
-      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      box-shadow:var(--shadow-1);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:12px;
-      flex-wrap:wrap;
-      text-align:center;
-    }
-
-    .live-dot{
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background:var(--ok);
-      box-shadow:0 0 12px var(--ok);
-      animation:pulse 1.6s infinite;
-      flex:0 0 auto;
-    }
-
-    .live-dot.closed{
-      background:var(--danger);
-      box-shadow:0 0 12px var(--danger);
-      animation:none;
-    }
-
-    @keyframes pulse{
-      0%{opacity:1;transform:scale(1)}
-      50%{opacity:.42;transform:scale(.88)}
-      100%{opacity:1;transform:scale(1)}
-    }
-
-    .status-main{
-      font-weight:950;
-      letter-spacing:-.02em;
-    }
-
-    .status-sub{
-      color:var(--muted);
-      font-size:13px;
-      font-weight:800;
-    }
-
-    .top-actions{
-      display:flex;
-      gap:10px;
-      justify-content:flex-end;
-      align-items:center;
-      flex-wrap:wrap;
-    }
-
-    .btn,
-    .tiny-btn,
-    .chip-btn,
-    .dock-btn{
-      border:none;
-      cursor:pointer;
-      transition:transform var(--transition), border-color var(--transition), background var(--transition), box-shadow var(--transition);
-    }
-
-    .btn:hover,
-    .tiny-btn:hover,
-    .chip-btn:hover,
-    .dock-btn:hover{
-      transform:translateY(-1px);
-    }
-
-    .btn{
-      min-height:46px;
-      padding:12px 16px;
-      border-radius:18px;
-      border:1px solid var(--line);
-      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      box-shadow:var(--shadow-1);
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      color:var(--white);
-      font-weight:950;
-      white-space:nowrap;
-    }
-
-    .btn.primary{
-      background:linear-gradient(135deg, rgba(199,102,52,.32), rgba(47,135,109,.18));
-      border-color:rgba(255,184,115,.4);
-    }
-
-    .hero{
-      padding:16px 0 12px;
-    }
-
-    .hero-grid{
-      display:grid;
-      grid-template-columns:1.02fr .98fr;
-      gap:16px;
-      align-items:stretch;
-    }
-
-    .panel{
-      border:1px solid var(--line);
-      border-radius:var(--radius-xl);
-      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      box-shadow:var(--shadow-3), inset 0 1px 0 rgba(255,255,255,.06);
-      backdrop-filter:blur(16px);
-      -webkit-backdrop-filter:blur(16px);
-      position:relative;
-      overflow:hidden;
-    }
-
-    .panel::before{
-      content:"";
-      position:absolute;
-      inset:auto -18% -34% -18%;
-      height:240px;
-      pointer-events:none;
-      background:
-        radial-gradient(circle at 30% 40%, rgba(199,102,52,.18), transparent 60%),
-        radial-gradient(circle at 72% 56%, rgba(47,135,109,.14), transparent 62%);
-      transform:rotate(-5deg);
-    }
-
-    .panel-inner{
-      position:relative;
-      z-index:1;
-      padding:20px;
-      height:100%;
-    }
-
-    .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:var(--radius-pill);
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.06);
-      font-size:11px;
-      font-weight:950;
-      text-transform:uppercase;
-      letter-spacing:.12em;
-      width:max-content;
-      max-width:100%;
-    }
-
-    .eyebrow-dot{
-      width:8px;
-      height:8px;
-      border-radius:50%;
-      background:var(--brand-3);
-      box-shadow:0 0 12px rgba(255,184,115,.7);
-      flex:0 0 auto;
-    }
-
-    .hero-copy-wrap{
-      display:grid;
-      gap:14px;
-      align-content:start;
-      height:100%;
-    }
-
-    .hero-title{
-      margin:0;
-      font-family:var(--font-serif);
-      font-size:clamp(34px, 5.2vw, 72px);
-      line-height:.92;
-      letter-spacing:-.06em;
-      max-width:10.6ch;
-    }
-
-    .hero-copy{
-      margin:0;
-      max-width:58ch;
-      color:var(--muted);
-      font-size:15px;
-      line-height:1.6;
-    }
-
-    .hero-stats{
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0,1fr));
-      gap:10px;
-    }
-
-    .stat{
-      border:1px solid var(--line);
-      border-radius:22px;
-      background:rgba(0,0,0,.18);
-      padding:14px;
-      box-shadow:var(--shadow-1);
-      min-height:96px;
-      display:grid;
-      gap:6px;
-      align-content:start;
-    }
-
-    .stat-k{
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.12em;
-      color:rgba(255,248,240,.5);
-      font-weight:950;
-    }
-
-    .stat-v{
-      font-size:18px;
-      font-weight:950;
-      letter-spacing:-.03em;
-    }
-
-    .stat-copy{
-      font-size:12px;
-      color:var(--muted);
-      line-height:1.45;
-    }
-
-    .hero-bottom{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-top:auto;
-    }
-
-    .hero-note{
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.52;
-      max-width:60ch;
-    }
-
-    .hero-note strong{color:var(--white)}
-
-    .orbit-wrap{
-      height:100%;
-      display:grid;
-      grid-template-rows:auto 1fr auto;
-      gap:12px;
-      align-items:start;
-    }
-
-    .orbit-head{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .orbit-title{
-      margin:0 0 8px;
-      font-family:var(--font-serif);
-      font-size:clamp(28px, 3.8vw, 42px);
-      line-height:.95;
-      letter-spacing:-.05em;
-    }
-
-    .orbit-sub{
-      margin:0;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.55;
-      max-width:44ch;
-    }
-
-    .orbit-stage{
-      min-height:520px;
-      display:grid;
-      place-items:center;
-      position:relative;
-      isolation:isolate;
-    }
-
-    .orbit-stage::before{
-      content:"";
-      position:absolute;
-      width:calc(var(--orbit-size) + 160px);
-      height:calc(var(--orbit-size) + 160px);
-      border-radius:50%;
-      background:
-        radial-gradient(circle, rgba(255,184,115,.08), transparent 46%),
-        radial-gradient(circle, rgba(47,135,109,.08), transparent 66%);
-      filter:blur(12px);
-      z-index:-1;
-      pointer-events:none;
-    }
-
-    .orbit-shell{
-      position:relative;
-      width:var(--orbit-size);
-      height:var(--orbit-size);
-      display:grid;
-      place-items:center;
-      user-select:none;
-    }
-
-    .orbit-rings{
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-    }
-
-    .ring{
-      position:absolute;
-      inset:0;
-      margin:auto;
-      border-radius:50%;
-      border:1px dashed rgba(255,255,255,.08);
-      box-shadow:0 0 0 1px rgba(255,255,255,.02) inset;
-    }
-
-    .ring.r1{
-      width:100%;
-      height:100%;
-      animation:spin 24s linear infinite;
-    }
-
-    .ring.r2{
-      width:76%;
-      height:76%;
-      opacity:.7;
-      animation:spinReverse 18s linear infinite;
-    }
-
-    .ring.r3{
-      width:52%;
-      height:52%;
-      opacity:.52;
-      animation:spin 14s linear infinite;
-    }
-
-    @keyframes spin{
-      from{transform:rotate(0)}
-      to{transform:rotate(360deg)}
-    }
-
-    @keyframes spinReverse{
-      from{transform:rotate(360deg)}
-      to{transform:rotate(0)}
-    }
-
-    .hub{
-      width:var(--hub-size);
-      height:var(--hub-size);
-      border-radius:50%;
-      border:1px solid rgba(255,255,255,.22);
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.22), transparent 28%),
-        radial-gradient(circle at 50% 50%, rgba(255,184,115,.14), transparent 64%),
-        linear-gradient(135deg, rgba(199,102,52,.9), rgba(47,135,109,.54) 80%, rgba(24,18,14,.84));
-      box-shadow:
-        0 34px 90px rgba(0,0,0,.42),
-        0 0 56px rgba(255,184,115,.14),
-        inset 0 0 0 1px rgba(255,255,255,.06);
-      color:#fff;
-      display:grid;
-      place-items:center;
-      text-align:center;
-      position:relative;
-      z-index:5;
-      transition:transform var(--transition), box-shadow var(--transition), border-color var(--transition);
-    }
-
-    .hub:hover{
-      transform:scale(1.02);
-      border-color:rgba(255,184,115,.42);
-      box-shadow:
-        0 38px 96px rgba(0,0,0,.46),
-        0 0 64px rgba(255,184,115,.18),
-        inset 0 0 0 1px rgba(255,255,255,.08);
-    }
-
-    .hub-top{
-      font-size:12px;
-      text-transform:uppercase;
-      letter-spacing:.18em;
-      font-weight:950;
-      margin-bottom:4px;
-    }
-
-    .hub-main{
-      font-family:var(--font-serif);
-      font-size:clamp(28px, 4vw, 44px);
-      line-height:.9;
-      letter-spacing:-.06em;
-      margin-bottom:4px;
-    }
-
-    .hub-sub{
-      font-size:12px;
-      font-weight:900;
-      letter-spacing:.08em;
-      opacity:.94;
-    }
-
-    .orbit-node{
-      position:absolute;
-      width:var(--node-size);
-      height:var(--node-size);
-      border-radius:50%;
-      padding:10px;
-      border:1px solid rgba(255,255,255,.16);
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), transparent 32%),
-        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-      box-shadow:var(--shadow-2);
-      display:grid;
-      place-items:center;
-      text-align:center;
-      transform:translate(-50%, -50%) scale(.82);
-      opacity:0;
-      pointer-events:none;
-      transition:transform .34s cubic-bezier(.2,.8,.2,1), opacity .24s ease, border-color var(--transition), background var(--transition);
-      backdrop-filter:blur(12px);
-      -webkit-backdrop-filter:blur(12px);
-    }
-
-    .orbit-shell.open .orbit-node{
-      opacity:1;
-      pointer-events:auto;
-      transform:translate(-50%, -50%) scale(1);
-    }
-
-    .orbit-node:hover{
-      transform:translate(-50%, -50%) scale(1.08);
-      border-color:rgba(255,184,115,.44);
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.2), transparent 32%),
-        linear-gradient(135deg, rgba(199,102,52,.22), rgba(47,135,109,.14));
-    }
-
-    .orbit-node.active{
-      border-color:rgba(255,184,115,.54);
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.2), transparent 32%),
-        linear-gradient(135deg, rgba(199,102,52,.28), rgba(47,135,109,.18));
-    }
-
-    .node-emoji{
-      font-size:26px;
-      line-height:1;
-      margin-bottom:6px;
-    }
-
-    .node-label{
-      font-size:12px;
-      font-weight:950;
-      line-height:1.12;
-      text-transform:uppercase;
-      letter-spacing:.02em;
-    }
-
-    .orbit-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:center;
-    }
-
-    .tiny-btn{
-      min-height:44px;
-      padding:10px 14px;
-      border-radius:16px;
-      border:1px solid var(--line);
-      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      box-shadow:var(--shadow-1);
-      color:var(--white);
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      font-size:13px;
-      font-weight:950;
-      white-space:nowrap;
-    }
-
-    .results-section{
-      padding:8px 0 120px;
-    }
-
-    .results-panel{
-      border:1px solid var(--line);
-      border-radius:var(--radius-xl);
-      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      backdrop-filter:blur(16px);
-      -webkit-backdrop-filter:blur(16px);
-      box-shadow:var(--shadow-3), inset 0 1px 0 rgba(255,255,255,.06);
-      overflow:hidden;
-      position:relative;
-    }
-
-    .results-panel::before{
-      content:"";
-      position:absolute;
-      inset:auto -18% -34% -18%;
-      height:240px;
-      pointer-events:none;
-      background:
-        radial-gradient(circle at 30% 40%, rgba(199,102,52,.18), transparent 60%),
-        radial-gradient(circle at 72% 56%, rgba(47,135,109,.14), transparent 62%);
-      transform:rotate(-5deg);
-    }
-
-    .results-inner{
-      position:relative;
-      z-index:1;
-      padding:18px;
-      display:grid;
-      gap:14px;
-    }
-
-    .results-head{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:wrap;
-    }
-
-    .results-title{
-      margin:0 0 8px;
-      font-family:var(--font-serif);
-      font-size:clamp(28px, 4vw, 46px);
-      line-height:.95;
-      letter-spacing:-.05em;
-    }
-
-    .results-copy{
-      margin:0;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.55;
-      max-width:60ch;
-    }
-
-    .selected-badge{
-      min-height:44px;
-      padding:10px 12px;
-      border-radius:var(--radius-pill);
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.06);
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      font-size:12px;
-      font-weight:950;
-      text-transform:uppercase;
-      letter-spacing:.12em;
-      white-space:nowrap;
-    }
-
-    .toolbar{
-      position:sticky;
-      top:calc(var(--topbar-h) + 8px);
-      z-index:20;
-      display:grid;
-      grid-template-columns:1fr auto auto auto;
-      gap:10px;
-      align-items:center;
-      padding:10px;
-      border:1px solid var(--line);
-      border-radius:22px;
-      background:rgba(8,6,5,.82);
-      backdrop-filter:blur(16px);
-      -webkit-backdrop-filter:blur(16px);
-      box-shadow:var(--shadow-2);
-    }
-
-    .search-wrap{
-      position:relative;
-      min-width:0;
-    }
-
-    .search-input{
-      width:100%;
-      min-height:50px;
-      padding:13px 44px 13px 16px;
-      border-radius:18px;
-      border:1px solid var(--line);
-      background:rgba(0,0,0,.18);
-      color:var(--white);
-      outline:none;
-      box-shadow:var(--shadow-1);
-    }
-
-    .search-input::placeholder{color:rgba(255,248,240,.42)}
-
-    .search-icon{
-      position:absolute;
-      right:14px;
-      top:50%;
-      transform:translateY(-50%);
-      color:rgba(255,248,240,.42);
-      pointer-events:none;
-    }
-
-    .category-strip{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-
-    .chip-btn{
-      min-height:40px;
-      padding:8px 12px;
-      border-radius:var(--radius-pill);
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.05);
-      color:var(--white);
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      font-size:12px;
-      font-weight:950;
-      text-transform:uppercase;
-      letter-spacing:.08em;
-    }
-
-    .chip-btn.active{
-      border-color:rgba(255,184,115,.42);
-      background:linear-gradient(135deg, rgba(199,102,52,.24), rgba(47,135,109,.14));
-    }
-
-    .results-meta{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .results-summary,
-    .count-summary{
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.5;
-      font-weight:800;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0,1fr));
-      gap:12px;
-      align-content:start;
-    }
-
-    .item-card{
-      border:1px solid var(--line);
-      border-radius:26px;
-      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      box-shadow:var(--shadow-1);
-      overflow:hidden;
-      transition:transform var(--transition), border-color var(--transition), box-shadow var(--transition);
-    }
-
-    .item-card:hover{
-      transform:translateY(-1px);
-      border-color:rgba(255,184,115,.32);
-      box-shadow:var(--shadow-2);
-    }
-
-    .item-btn{
-      width:100%;
-      text-align:left;
-      color:inherit;
-      background:none;
-      border:none;
-      padding:0;
-      cursor:pointer;
-    }
-
-    .item-top{
-      display:grid;
-      grid-template-columns:auto 1fr auto;
-      gap:12px;
-      align-items:start;
-      padding:16px 16px 10px;
-    }
-
-    .item-icon{
-      width:48px;
-      height:48px;
-      border-radius:18px;
-      display:grid;
-      place-items:center;
-      font-size:24px;
-      background:linear-gradient(135deg, rgba(199,102,52,.22), rgba(47,135,109,.14));
-      border:1px solid var(--line);
-      box-shadow:var(--shadow-1);
-      flex:0 0 auto;
-    }
-
-    .item-name{
-      font-size:17px;
-      font-weight:950;
-      letter-spacing:-.03em;
-      margin:0 0 6px;
-      line-height:1.08;
-    }
-
-    .item-desc{
-      margin:0;
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.52;
-      display:-webkit-box;
-      -webkit-line-clamp:3;
-      -webkit-box-orient:vertical;
-      overflow:hidden;
-    }
-
-    .item-price{
-      font-size:18px;
-      font-weight:950;
-      letter-spacing:-.03em;
-      white-space:nowrap;
-      padding-top:3px;
-    }
-
-    .item-bottom{
-      padding:0 16px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .tags{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-
-    .tag{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:6px 9px;
-      border-radius:var(--radius-pill);
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.05);
-      color:var(--muted);
-      font-size:11px;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.08em;
-    }
-
-    .item-view{
-      min-height:34px;
-      padding:0 12px;
-      border-radius:var(--radius-pill);
-      border:1px solid rgba(255,184,115,.2);
-      background:linear-gradient(135deg, rgba(199,102,52,.18), rgba(47,135,109,.10));
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      font-size:12px;
-      font-weight:950;
-      text-transform:uppercase;
-      letter-spacing:.1em;
-      white-space:nowrap;
-    }
-
-    .empty{
-      min-height:260px;
-      border:1px dashed rgba(255,255,255,.14);
-      border-radius:28px;
-      background:rgba(255,255,255,.04);
-      display:grid;
-      place-items:center;
-      text-align:center;
-      padding:24px;
-      color:var(--muted);
-    }
-
-    .empty strong{
-      display:block;
-      margin-bottom:8px;
-      color:var(--white);
-      font-size:18px;
-    }
-
-    .detail-overlay{
-      position:fixed;
-      inset:0;
-      z-index:2000;
-      display:none;
-    }
-
-    .detail-overlay.open{display:block}
-
-    .detail-backdrop{
-      position:absolute;
-      inset:0;
-      background:rgba(0,0,0,.72);
-      backdrop-filter:blur(10px);
-      -webkit-backdrop-filter:blur(10px);
-    }
-
-    .detail-sheet{
-      position:absolute;
-      right:10px;
-      top:10px;
-      bottom:10px;
-      width:min(470px, calc(100vw - 20px));
-      border-radius:34px;
-      border:1px solid var(--line);
-      background:linear-gradient(180deg, var(--paper), var(--paper-2));
-      color:var(--ink);
-      box-shadow:0 34px 90px rgba(0,0,0,.4);
-      overflow:hidden;
-      transform:translateX(102%);
-      transition:transform .34s cubic-bezier(.2,.8,.2,1);
-    }
-
-    .detail-overlay.open .detail-sheet{
-      transform:translateX(0);
-    }
-
-    .detail-sheet::before{
-      content:"";
-      position:absolute;
-      inset:auto -18% -34% -18%;
-      height:240px;
-      background:
-        radial-gradient(circle at 30% 40%, rgba(199,102,52,.18), transparent 60%),
-        radial-gradient(circle at 72% 56%, rgba(47,135,109,.14), transparent 62%);
-      transform:rotate(-5deg);
-    }
-
-    .detail-inner{
-      position:relative;
-      z-index:1;
-      height:100%;
-      display:grid;
-      grid-template-rows:auto auto auto 1fr auto;
-      gap:16px;
-      padding:20px;
-    }
-
-    .detail-close{
-      position:absolute;
-      top:14px;
-      right:14px;
-      width:42px;
-      height:42px;
-      border-radius:14px;
-      border:1px solid var(--line-dark);
-      background:rgba(255,255,255,.72);
-      display:grid;
-      place-items:center;
-      color:var(--ink);
-      font-weight:950;
-      box-shadow:var(--shadow-1);
-    }
-
-    .detail-top{
-      padding-top:34px;
-      display:grid;
-      gap:10px;
-    }
-
-    .detail-eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:var(--radius-pill);
-      border:1px solid var(--line-dark);
-      background:rgba(255,255,255,.68);
-      color:var(--ink);
-      width:max-content;
-      max-width:100%;
-      font-size:11px;
-      font-weight:950;
-      text-transform:uppercase;
-      letter-spacing:.12em;
-    }
-
-    .detail-title{
-      margin:0;
-      font-family:var(--font-serif);
-      font-size:clamp(34px, 5vw, 52px);
-      line-height:.92;
-      letter-spacing:-.06em;
-    }
-
-    .detail-desc{
-      margin:0;
-      color:var(--ink-soft);
-      font-size:15px;
-      line-height:1.6;
-    }
-
-    .detail-price-row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .detail-price{
-      font-size:34px;
-      font-weight:950;
-      letter-spacing:-.05em;
-    }
-
-    .detail-tags{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-
-    .detail-tag{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:8px 10px;
-      border-radius:var(--radius-pill);
-      border:1px solid var(--line-dark);
-      background:rgba(255,255,255,.68);
-      font-size:11px;
-      font-weight:950;
-      text-transform:uppercase;
-      letter-spacing:.1em;
-    }
-
-    .detail-grid{
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0,1fr));
-      gap:12px;
-    }
-
-    .detail-box{
-      border:1px solid var(--line-dark);
-      border-radius:24px;
-      background:rgba(255,255,255,.68);
-      box-shadow:var(--shadow-1);
-      padding:16px;
-      display:grid;
-      gap:8px;
-      align-content:start;
-    }
-
-    .detail-box-title{
-      font-size:15px;
-      font-weight:950;
-      letter-spacing:-.02em;
-    }
-
-    .detail-box-copy{
-      color:var(--ink-soft);
-      font-size:13px;
-      line-height:1.55;
-    }
-
-    .detail-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .detail-btn{
-      min-height:50px;
-      padding:0 16px;
-      border-radius:20px;
-      border:1px solid var(--line-dark);
-      background:#241813;
-      color:#fff;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      font-weight:950;
-      box-shadow:var(--shadow-2);
-      transition:transform var(--transition), box-shadow var(--transition);
-    }
-
-    .detail-btn:hover{
-      transform:translateY(-1px);
-    }
-
-    .detail-btn.primary{
-      background:linear-gradient(135deg, var(--brand), var(--brand-2));
-      border-color:rgba(255,184,115,.32);
-    }
-
-    .dock{
-      display:none;
-    }
-
-    .toast-wrap{
-      position:fixed;
-      right:12px;
-      bottom:12px;
-      z-index:3000;
-      display:grid;
-      gap:10px;
-      width:min(360px, calc(100vw - 24px));
-      pointer-events:none;
-    }
-
-    .toast{
-      padding:14px 16px;
-      border-radius:18px;
-      border:1px solid var(--line);
-      background:rgba(8,6,5,.92);
-      color:var(--white);
-      box-shadow:var(--shadow-3);
-      font-size:14px;
-      line-height:1.46;
-      opacity:0;
-      transform:translateY(8px);
-      animation:toastIn .22s ease forwards;
-    }
-
-    @keyframes toastIn{
-      to{
-        opacity:1;
-        transform:translateY(0);
-      }
-    }
-
-    .sr-only{
-      position:absolute;
-      width:1px;
-      height:1px;
-      padding:0;
-      margin:-1px;
-      overflow:hidden;
-      clip:rect(0,0,0,0);
-      white-space:nowrap;
-      border:0;
-    }
-
-    @media (max-width: 1220px){
-      .hero-grid{
-        grid-template-columns:1fr;
-      }
-
-      .orbit-stage{
-        min-height:480px;
-      }
-
-      .grid{
-        grid-template-columns:repeat(2, minmax(0,1fr));
-      }
-    }
-
-    @media (max-width: 900px){
-      body{overflow-x:hidden}
-      .topbar-inner{
-        grid-template-columns:1fr;
-        justify-items:start;
-      }
-      .status-pill{justify-self:stretch}
-      .top-actions{justify-content:flex-start}
-      .hero-stats{grid-template-columns:1fr}
-      .toolbar{
-        grid-template-columns:1fr 1fr;
-      }
-      .grid{
-        grid-template-columns:1fr;
-      }
-    }
-
-    @media (max-width: 640px){
-      :root{
-        --topbar-h:72px;
-        --orbit-size:min(92vw, 380px);
-        --hub-size:128px;
-        --node-size:84px;
-      }
-
-      .container{width:calc(100vw - 10px)}
-      .brand-sub{display:none}
-      .toolbar{
-        grid-template-columns:1fr;
-      }
-      .detail-sheet{
-        left:5px;
-        right:5px;
-        top:auto;
-        bottom:5px;
-        width:auto;
-        height:min(82vh, 720px);
-        border-radius:28px 28px 22px 22px;
-        transform:translateY(102%);
-      }
-      .detail-overlay.open .detail-sheet{
-        transform:translateY(0);
-      }
-      .detail-grid{
-        grid-template-columns:1fr;
-      }
-      .dock{
-        position:fixed;
-        left:50%;
-        transform:translateX(-50%);
-        bottom:8px;
-        width:calc(100vw - 10px);
-        z-index:1200;
-        display:grid;
-        grid-template-columns:repeat(4, minmax(0,1fr));
-        gap:8px;
-      }
-      .dock-btn{
-        min-height:56px;
-        padding:10px 8px;
-        border-radius:18px;
-        border:1px solid var(--line);
-        background:rgba(8,6,5,.86);
-        color:var(--white);
-        box-shadow:var(--shadow-2);
-        display:grid;
-        gap:4px;
-        justify-items:center;
-        align-content:center;
-        font-size:11px;
-        font-weight:950;
-        text-align:center;
-      }
-      .dock-emoji{
-        font-size:18px;
-        line-height:1;
-      }
-      .toast-wrap{bottom:84px}
-      .results-section{padding-bottom:104px}
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      html{scroll-behavior:auto}
-      *,
-      *::before,
-      *::after{
-        animation:none !important;
-        transition:none !important;
-      }
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Futuristic Holographic Menu</title>
+
+<!-- External libs -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+
+<style>
+  :root{
+    --bg:#05060a;
+    --accent:#44e6ff;
+    --ghost:#7ff0ff;
+    --glass: rgba(255,255,255,0.06);
+    --menu-size: min(34vh, 520px);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  html,body{height:100%;margin:0;background:radial-gradient(circle at 10% 10%, #071022 0%, var(--bg) 40%), #000;color:#eaf8ff;overflow:hidden}
+  .app{
+    position:relative;width:100%;height:100%;display:flex;align-items:flex-start;justify-content:flex-start;
+  }
+
+  /* Toggle / Hamburger */
+  #menuToggle{
+    position: absolute;
+    left: 24px;
+    top: 24px;
+    width:56px;height:56px;border-radius:14px;border:none;cursor:pointer;
+    background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    box-shadow: 0 6px 30px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+    display:grid;place-items:center;
+    z-index: 30;
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  #menuToggle:focus{outline:3px solid rgba(68,230,255,0.22)}
+  #menuToggle:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(68,230,255,0.06)}
+
+  /* hamburger lines */
+  .ham{
+    width:26px;height:2px;background:linear-gradient(90deg,var(--ghost),var(--accent));
+    position:relative;border-radius:2px;transition: all .35s cubic-bezier(.2,.8,.2,1);
+  }
+  .ham::before,.ham::after{
+    content:"";position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ghost),var(--accent));
+    border-radius:2px;transition: all .35s cubic-bezier(.2,.8,.2,1)
+  }
+  .ham::before{top:-8px}
+  .ham::after{bottom:-8px}
+
+  /* Active hamburger to "X" */
+  #menuToggle.active .ham{transform:rotate(45deg)}
+  #menuToggle.active .ham::before{transform:rotate(-90deg);top:0}
+  #menuToggle.active .ham::after{opacity:0}
+
+  /* Canvas container */
+  #menuCanvas{position:absolute;left:0;top:0;right:0;bottom:0;z-index:10;display:block}
+
+  /* ARIA live region for announcements */
+  #ariaLive{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+
+  /* Fallback radial CSS menu */
+  .fallback-menu{
+    position:absolute;inset:unset;z-index:20;left:24px;top:96px;
+    display:none;flex-direction:column;gap:10px;background:var(--glass);border-radius:12px;padding:12px;backdrop-filter: blur(8px);
+  }
+  .fallback-menu .item{color:#d1f6ff;padding:10px 14px;border-radius:8px;cursor:pointer;border:1px solid rgba(255,255,255,0.04)}
+  .fallback-menu .item:hover{background:linear-gradient(90deg, rgba(68,230,255,0.06), rgba(68,230,255,0.02));transform:translateY(-2px)}
+
+  /* small helpful HUD */
+  .hud{
+    position:absolute;right:28px;bottom:28px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    border-radius:10px;padding:10px 12px;color:#b9f8ff;font-size:13px;z-index:20;border:1px solid rgba(68,230,255,0.06)
+  }
+
+  /* Responsive */
+  @media (max-width:800px){
+    #menuToggle{left:12px;top:12px}
+    .fallback-menu{left:12px;top:68px}
+  }
+
+  /* Accessibility high-contrast mode toggle (example) */
+  .high-contrast body{ --accent:#00ffff; --ghost:#ffffff; background:#000;}
+</style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="container topbar-inner">
-      <div class="brand">
-        <div class="brand-mark">HH</div>
-        <div>
-          <div class="brand-name">Hot Headz Southern Foods</div>
-          <div class="brand-sub">Future hub menu powered by menu-data.html</div>
-        </div>
-      </div>
+  <div class="app" id="app">
+    <button id="menuToggle" aria-expanded="false" aria-controls="holoMenu" aria-label="Open main menu">
+      <span class="ham" aria-hidden="true"></span>
+    </button>
 
-      <div class="status-pill" aria-live="polite">
-        <span class="live-dot" id="liveDot"></span>
-        <span class="status-main" id="liveMain">Checking restaurant status…</span>
-        <span class="status-sub" id="liveSub">Loading timing…</span>
-      </div>
+    <!-- WebGL canvas -->
+    <canvas id="menuCanvas" role="img" aria-label="Holographic site menu visualization"></canvas>
 
-      <div class="top-actions">
-        <button class="btn" id="themeBtn" type="button">◐ Theme</button>
-        <a class="btn" href="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634" target="_blank" rel="noopener">📍 Directions</a>
-        <a class="btn primary" href="tel:3372211035">📞 Call Now</a>
-      </div>
-    </div>
-  </header>
+    <!-- Fallback CSS menu for devices without WebGL -->
+    <nav class="fallback-menu" id="fallbackMenu" role="menu" aria-hidden="true"></nav>
 
-  <section class="hero">
-    <div class="container hero-grid">
-      <section class="panel">
-        <div class="panel-inner hero-copy-wrap">
-          <div class="eyebrow"><span class="eyebrow-dot"></span> simple first look · premium details · real functionality</div>
-          <h1 class="hero-title">A page around the menu, not just a menu floating in space.</h1>
-          <p class="hero-copy">
-            This rebuild is focused on what you asked for: a strong-looking page, a clickable center menu hub, and real scrolling where it helps —
-            without turning the experience into one giant wall of scrolling. The categories orbit at the top, the items live below in a clean results section,
-            and everything still pulls from <strong>menu-data.html</strong> so your daily lunch updates stay easy.
-          </p>
+    <!-- ARIA live for announcements -->
+    <div id="ariaLive" role="status" aria-live="polite"></div>
 
-          <div class="hero-stats">
-            <article class="stat">
-              <div class="stat-k">Start Here</div>
-              <div class="stat-v">Tap Menu</div>
-              <div class="stat-copy">The center button opens the orbit and teaches the interface instantly.</div>
-            </article>
-            <article class="stat">
-              <div class="stat-k">Update Method</div>
-              <div class="stat-v">One Data File</div>
-              <div class="stat-copy">Breakfast, lunch, drinks, dessert, and specials all come from menu-data.html.</div>
-            </article>
-            <article class="stat">
-              <div class="stat-k">Scrolling</div>
-              <div class="stat-v">Helpful Only</div>
-              <div class="stat-copy">You can scroll the page, but the menu itself is not just endless vertical clutter.</div>
-            </article>
-          </div>
-
-          <div class="hero-bottom">
-            <div class="hero-note" id="heroNote">
-              <strong>Goal:</strong> make the page feel futuristic because of shape, depth, glow, spacing, and hierarchy — not because it hides basic actions.
-            </div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap">
-              <button class="tiny-btn" id="surpriseBtn" type="button">🎲 Surprise Me</button>
-              <button class="tiny-btn" id="bestNowBtn" type="button">🕒 Best Right Now</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="panel-inner orbit-wrap">
-          <div class="orbit-head">
-            <div>
-              <div class="eyebrow"><span class="eyebrow-dot"></span> orbit hub</div>
-              <h2 class="orbit-title">Open the menu world.</h2>
-              <p class="orbit-sub">Tap the center. Pick a category. Scroll down into the results when you want detail.</p>
-            </div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap">
-              <button class="tiny-btn" id="openOrbitBtn" type="button">🪐 Open</button>
-              <button class="tiny-btn" id="collapseOrbitBtn" type="button">— Collapse</button>
-            </div>
-          </div>
-
-          <div class="orbit-stage">
-            <div class="orbit-shell" id="orbitShell">
-              <div class="orbit-rings">
-                <div class="ring r1"></div>
-                <div class="ring r2"></div>
-                <div class="ring r3"></div>
-              </div>
-
-              <button class="hub" id="hubButton" type="button" aria-expanded="false" aria-controls="resultsSection">
-                <div>
-                  <div class="hub-top">Open</div>
-                  <div class="hub-main">Menu</div>
-                  <div class="hub-sub" id="hubSub">Tap to reveal categories</div>
-                </div>
-              </button>
-
-              <div id="orbitNodes"></div>
-            </div>
-          </div>
-
-          <div class="orbit-actions" id="orbitActions"></div>
-        </div>
-      </section>
-    </div>
-  </section>
-
-  <section class="results-section" id="resultsSection">
-    <div class="container results-panel">
-      <div class="results-inner">
-        <div class="results-head">
-          <div>
-            <div class="eyebrow"><span class="eyebrow-dot"></span> menu results</div>
-            <h2 class="results-title" id="resultsTitle">Choose a category</h2>
-            <p class="results-copy" id="resultsCopy">Open the center hub or tap a quick category chip to load items from menu-data.html.</p>
-          </div>
-          <div class="selected-badge" id="selectedBadge">No category selected</div>
-        </div>
-
-        <div class="toolbar">
-          <label class="search-wrap">
-            <span class="sr-only">Search menu items</span>
-            <input class="search-input" id="searchInput" type="search" placeholder="Search food, drink, dessert..." />
-            <span class="search-icon">⌕</span>
-          </label>
-          <button class="tiny-btn" id="clearSearchBtn" type="button">Clear</button>
-          <button class="tiny-btn" id="showAllBtn" type="button">Show All</button>
-          <button class="tiny-btn" id="shareBtn" type="button">Share</button>
-        </div>
-
-        <div class="category-strip" id="categoryStrip"></div>
-
-        <div class="results-meta">
-          <div class="results-summary" id="resultsSummary">The menu is waiting for a category selection.</div>
-          <div class="count-summary" id="countSummary"></div>
-        </div>
-
-        <div class="grid" id="resultsGrid"></div>
-      </div>
-    </div>
-  </section>
-
-  <div class="detail-overlay" id="detailOverlay" aria-hidden="true">
-    <div class="detail-backdrop" data-close-detail="true"></div>
-    <aside class="detail-sheet" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
-      <div class="detail-inner">
-        <button class="detail-close" id="detailCloseBtn" type="button" aria-label="Close details">✕</button>
-
-        <div class="detail-top">
-          <div class="detail-eyebrow" id="detailEyebrow">Menu Item</div>
-          <h3 class="detail-title" id="detailTitle">Item Name</h3>
-          <p class="detail-desc" id="detailDesc">Item description goes here.</p>
-        </div>
-
-        <div class="detail-price-row">
-          <div class="detail-price" id="detailPrice">$0.00</div>
-          <div class="detail-tags" id="detailTags"></div>
-        </div>
-
-        <div class="detail-grid">
-          <div class="detail-box">
-            <div class="detail-box-title">Why it works</div>
-            <div class="detail-box-copy" id="detailWhy">Strong recommendation reasoning.</div>
-          </div>
-          <div class="detail-box">
-            <div class="detail-box-title">Order cue</div>
-            <div class="detail-box-copy" id="detailCue">Call and ask for this item by name.</div>
-          </div>
-        </div>
-
-        <div></div>
-
-        <div class="detail-actions">
-          <a class="detail-btn primary" href="tel:3372211035">📞 Call to Order</a>
-          <button class="detail-btn" id="detailRandomBtn" type="button">🎲 Pick Another</button>
-          <a class="detail-btn" href="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634" target="_blank" rel="noopener">📍 Directions</a>
-        </div>
-      </div>
-    </aside>
+    <div class="hud" aria-hidden="true">Say: "Open About" • Click items to visit • Voice & keyboard accessible</div>
   </div>
 
-  <nav class="dock" aria-label="Quick mobile actions">
-    <a class="dock-btn" href="tel:3372211035">
-      <span class="dock-emoji">📞</span>
-      <span>Call</span>
-    </a>
-    <button class="dock-btn" id="dockOpenBtn" type="button">
-      <span class="dock-emoji">🪐</span>
-      <span>Menu</span>
-    </button>
-    <button class="dock-btn" id="dockPickBtn" type="button">
-      <span class="dock-emoji">🎲</span>
-      <span>Pick</span>
-    </button>
-    <button class="dock-btn" id="dockShareBtn" type="button">
-      <span class="dock-emoji">📤</span>
-      <span>Share</span>
-    </button>
-  </nav>
+<script>
+/* =========================
+   Config & menu data
+   ========================= */
+const menuItems = [
+  { id: 'home',    title: 'Home',      color: 0x44e6ff, href: '#home',    icon: '🏠' },
+  { id: 'about',   title: 'About',     color: 0xff66b6, href: '#about',   icon: '🛰️' },
+  { id: 'services',title: 'Services',  color: 0x9bff77, href: '#services',icon: '⚙️' },
+  { id: 'work',    title: 'Work',      color: 0xffb86a, href: '#work',    icon: '💠' },
+  { id: 'blog',    title: 'Blog',      color: 0x9bd6ff, href: '#blog',    icon: '✒️' },
+  { id: 'contact', title: 'Contact',   color: 0xff8cf3, href: '#contact', icon: '✉️' },
+];
 
-  <div class="toast-wrap" id="toastWrap"></div>
+/* Local intelligence key for localStorage */
+const STORAGE_KEY = "holoMenuUsage_v1";
 
-  <script src="menu-data.html"></script>
-  <script>
-    const APP = {
-      phone: "3372211035",
-      phoneDisplay: "(337) 221-1035",
-      categories: {
-        breakfast: { label: "Breakfast", emoji: "🍳", hint: "Fresh morning plates" },
-        lunch:     { label: "Lunch", emoji: "🍽️", hint: "Daily hot plates" },
-        crawfish:  { label: "Crawfish", emoji: "🦞", hint: "Louisiana favorite" },
-        salad:     { label: "Salad", emoji: "🥗", hint: "Fresh and lighter" },
-        drinks:    { label: "Drinks", emoji: "🥤", hint: "Cold add-ons" },
-        dessert:   { label: "Dessert", emoji: "🍰", hint: "Sweet finishers" },
-        specials:  { label: "Specials", emoji: "🔥", hint: "Featured items" },
-        all:       { label: "All Items", emoji: "✨", hint: "Everything loaded" }
+/* =========================
+   Predictive ordering
+   ========================= */
+
+/* We maintain usage data: {id: {freq: n, last: timestamp}}
+   Score = freq * 2 + recencyFactor (0..1)
+*/
+function loadUsage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e) { return {}; }
+}
+function saveUsage(u){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(u)); } catch(e){} }
+function recordClick(id){
+  const u = loadUsage();
+  const now = Date.now();
+  if(!u[id]) u[id] = { freq: 0, last: now };
+  u[id].freq += 1;
+  u[id].last = now;
+  saveUsage(u);
+}
+function scoreId(id){
+  const u = loadUsage();
+  const meta = u[id];
+  if(!meta) return 0;
+  const freqScore = meta.freq;
+  const recencyScore = Math.max(0, 1 - ((Date.now() - meta.last)/(1000*60*60*24*30))); // 30 day decay
+  return freqScore*2 + recencyScore;
+}
+function orderedItems(){
+  return [...menuItems].sort((a,b) => scoreId(b.id) - scoreId(a.id));
+}
+
+/* =========================
+   Utilities
+   ========================= */
+const $ = sel => document.querySelector(sel);
+const $all = sel => Array.from(document.querySelectorAll(sel));
+function announce(text){ $('#ariaLive').textContent = text; }
+
+/* =========================
+   Fallback CSS menu
+   ========================= */
+const fallbackEl = $('#fallbackMenu');
+function createFallback() {
+  fallbackEl.innerHTML = '';
+  const items = orderedItems();
+  items.forEach(it=>{
+    const el = document.createElement('div');
+    el.className = 'item';
+    el.role = 'menuitem';
+    el.tabIndex = 0;
+    el.innerHTML = `<strong style="margin-right:8px">${it.icon}</strong>${it.title}`;
+    el.addEventListener('click', ()=>{
+      recordClick(it.id);
+      announce(`${it.title} opened`);
+      window.location.href = it.href;
+    });
+    el.addEventListener('keydown', (e)=>{
+      if(e.key==='Enter' || e.key===' ') el.click();
+    });
+    fallbackEl.appendChild(el);
+  });
+}
+
+/* =========================
+   WebGL Holo Menu (Three.js)
+   ========================= */
+const canvas = document.getElementById('menuCanvas');
+let renderer, scene, camera, raycaster, pointer, items3D = [], ringGroup, particleGroup, animId;
+let clock = new THREE.Clock();
+
+function initThree(){
+  // Renderer
+  renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true, powerPreference:'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMappingExposure = 1.0;
+
+  // Scene & camera
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(35, window.innerWidth/window.innerHeight, 0.1, 2000);
+  camera.position.set(0, 0, 620);
+
+  // Lighting
+  const amb = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(amb);
+  const dir = new THREE.DirectionalLight(0xffffff, 0.6);
+  dir.position.set(0.5, 1, 0.5);
+  scene.add(dir);
+
+  // Groups
+  ringGroup = new THREE.Group();
+  scene.add(ringGroup);
+  particleGroup = new THREE.Group();
+  scene.add(particleGroup);
+
+  raycaster = new THREE.Raycaster();
+  pointer = new THREE.Vector2(-9999, -9999);
+}
+
+/* Create canvas texture for each menu item (text + icon) */
+function createTextTexture(item, size=512){
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  // background transparent
+  ctx.clearRect(0,0,size,size);
+  // glow gradient
+  const g = ctx.createLinearGradient(0,0,size, size);
+  g.addColorStop(0, 'rgba(255,255,255,0.06)');
+  g.addColorStop(1, 'rgba(68,230,255,0.06)');
+  ctx.fillStyle = g;
+  // rounded background
+  const pad = 28;
+  roundRect(ctx, pad, pad, size-2*pad, size-2*pad, 28);
+  ctx.fill();
+  // title
+  ctx.font = 'bold 44px Inter, Arial';
+  ctx.fillStyle = 'rgba(255,255,255,0.92)';
+  ctx.textAlign = 'center';
+  ctx.fillText(item.title, size/2, size/2 + 10);
+  // icon
+  ctx.font = '48px system-ui, serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.fillText(item.icon, size/2, size/2 - 46);
+  // small subtitle
+  ctx.font = '14px Inter, Arial';
+  ctx.fillStyle = 'rgba(210,255,255,0.6)';
+  ctx.fillText(item.id, size/2, size - 48);
+  const tex = new THREE.CanvasTexture(c);
+  tex.encoding = THREE.sRGBEncoding;
+  tex.needsUpdate = true;
+  return tex;
+}
+
+function roundRect(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+/* Holographic shader material (fragment + vertex) */
+const HoloShader = {
+  uniforms: {
+    uTime: { value: 0 },
+    uTex: { value: null },
+    uColor: { value: new THREE.Color(0x44e6ff) },
+    uOpacity: { value: 0.96 },
+  },
+  vertexShader: `
+    varying vec2 vUv;
+    varying float vWave;
+    uniform float uTime;
+    void main(){
+      vUv = uv;
+      vec3 pos = position;
+      // subtle wavy displacement
+      float wave = sin((uv.x+uTime*0.25)*6.2831)*0.8 + cos((uv.y+uTime*0.5)*3.1415)*0.6;
+      pos.z += wave * 6.0 * (1.0 - uv.y);
+      vWave = wave;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(pos,1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform sampler2D uTex;
+    uniform float uTime;
+    uniform vec3 uColor;
+    uniform float uOpacity;
+    varying vec2 vUv;
+    varying float vWave;
+    // procedural noise (cheap)
+    float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453123); }
+    float noise(vec2 p){
+      vec2 i = floor(p);
+      vec2 f = fract(p);
+      float a = hash(i);
+      float b = hash(i + vec2(1.0, 0.0));
+      float c = hash(i + vec2(0.0, 1.0));
+      float d = hash(i + vec2(1.0, 1.0));
+      vec2 u = f*f*(3.0-2.0*f);
+      return mix(a,b,u.x) + (c-a)*u.y*(1.0-u.x) + (d-b)*u.x*u.y;
+    }
+    void main(){
+      vec4 base = texture2D(uTex, vUv);
+      // scanlines
+      float scan = sin((vUv.y*200.0 + uTime*40.0) * 3.1415) * 0.03;
+      // noisy shimmer
+      float n = noise(vUv*20.0 + uTime*0.7) * 0.12;
+      // tinted glass overlay
+      vec3 tint = uColor * (0.25 + vUv.y*0.75);
+      // fresnel rim
+      float fres = pow(1.0 - abs(vWave)*0.2 - vUv.y, 2.0);
+      vec3 color = mix(base.rgb, tint, 0.38) + n + scan;
+      color += fres * 0.2;
+      float alpha = base.a * uOpacity + 0.02;
+      // holographic edge
+      float edge = smoothstep(0.03, 0.0, min(vUv.x, 1.0 - vUv.x) + min(vUv.y, 1.0 - vUv.y));
+      color += vec3(0.3,0.6,0.7) * (1.0-edge) * 0.18;
+      gl_FragColor = vec4(color, clamp(alpha, 0.02, 1.0));
+    }
+  `
+};
+
+/* Create holographic items and layout them around a ring */
+function buildRing(){
+  // Clear prev
+  items3D.forEach(it=>{
+    it.mesh.geometry.dispose();
+    it.mesh.material.dispose();
+    ringGroup.remove(it.mesh);
+  });
+  items3D = [];
+
+  const items = orderedItems();
+  const count = items.length;
+  const radius = 240;
+  const planeW = 200, planeH = 120;
+
+  items.forEach((it, idx)=>{
+    const tex = createTextTexture(it, 512);
+    const mat = new THREE.ShaderMaterial({
+      ...HoloShader,
+      uniforms: {
+        uTime: { value: 0 },
+        uTex: { value: tex },
+        uColor: { value: new THREE.Color(it.color) },
+        uOpacity: { value: 0.96 }
       },
-      hours: {
-        Monday:    { open: "05:00", close: "15:00", breakfast: "05:00–10:30", lunch: "11:00–14:30", closed: false },
-        Tuesday:   { open: "05:00", close: "15:00", breakfast: "05:00–10:30", lunch: "11:00–14:30", closed: false },
-        Wednesday: { open: "05:00", close: "15:00", breakfast: "05:00–10:30", lunch: "11:00–14:30", closed: false },
-        Thursday:  { open: "05:00", close: "15:00", breakfast: "05:00–10:30", lunch: "11:00–14:30", closed: false },
-        Friday:    { open: "05:00", close: "17:00", breakfast: "05:00–10:30", lunch: "11:00–16:00", closed: false },
-        Saturday:  { open: "07:00", close: "14:00", breakfast: "07:00–10:30", lunch: "11:00–13:30", closed: false },
-        Sunday:    { open: "", close: "", breakfast: "", lunch: "", closed: true }
-      }
-    };
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide
+    });
 
-    const STATE = {
-      rawData: {},
-      normalized: {},
-      selectedCategory: null,
-      currentItems: [],
-      search: "",
-      orbitOpen: false,
-      lightMode: false
-    };
+    const geo = new THREE.PlaneGeometry(planeW, planeH, 12, 6);
+    const mesh = new THREE.Mesh(geo, mat);
+    // position around a subtly tilted ring
+    const angle = (idx / count) * Math.PI*2;
+    const y = Math.sin(angle*0.6) * 40;
+    const x = Math.cos(angle) * radius;
+    const z = Math.sin(angle) * radius*0.18 - 60; // slight forward/back
+    mesh.position.set(x, y, z);
+    mesh.lookAt(0,0,0); // face center
+    mesh.userData = { id: it.id, href: it.href, title: it.title };
+    ringGroup.add(mesh);
+    items3D.push({ item: it, mesh, mat, tex, base: { x,y,z,angle } });
+  });
 
-    const els = {
-      orbitShell: document.getElementById("orbitShell"),
-      orbitNodes: document.getElementById("orbitNodes"),
-      hubButton: document.getElementById("hubButton"),
-      hubSub: document.getElementById("hubSub"),
-      orbitActions: document.getElementById("orbitActions"),
-      openOrbitBtn: document.getElementById("openOrbitBtn"),
-      collapseOrbitBtn: document.getElementById("collapseOrbitBtn"),
-      resultsTitle: document.getElementById("resultsTitle"),
-      resultsCopy: document.getElementById("resultsCopy"),
-      selectedBadge: document.getElementById("selectedBadge"),
-      categoryStrip: document.getElementById("categoryStrip"),
-      searchInput: document.getElementById("searchInput"),
-      clearSearchBtn: document.getElementById("clearSearchBtn"),
-      showAllBtn: document.getElementById("showAllBtn"),
-      shareBtn: document.getElementById("shareBtn"),
-      resultsSummary: document.getElementById("resultsSummary"),
-      countSummary: document.getElementById("countSummary"),
-      resultsGrid: document.getElementById("resultsGrid"),
-      liveDot: document.getElementById("liveDot"),
-      liveMain: document.getElementById("liveMain"),
-      liveSub: document.getElementById("liveSub"),
-      heroNote: document.getElementById("heroNote"),
-      surpriseBtn: document.getElementById("surpriseBtn"),
-      bestNowBtn: document.getElementById("bestNowBtn"),
-      themeBtn: document.getElementById("themeBtn"),
-      detailOverlay: document.getElementById("detailOverlay"),
-      detailCloseBtn: document.getElementById("detailCloseBtn"),
-      detailEyebrow: document.getElementById("detailEyebrow"),
-      detailTitle: document.getElementById("detailTitle"),
-      detailDesc: document.getElementById("detailDesc"),
-      detailPrice: document.getElementById("detailPrice"),
-      detailTags: document.getElementById("detailTags"),
-      detailWhy: document.getElementById("detailWhy"),
-      detailCue: document.getElementById("detailCue"),
-      detailRandomBtn: document.getElementById("detailRandomBtn"),
-      dockOpenBtn: document.getElementById("dockOpenBtn"),
-      dockPickBtn: document.getElementById("dockPickBtn"),
-      dockShareBtn: document.getElementById("dockShareBtn"),
-      toastWrap: document.getElementById("toastWrap")
-    };
+  // particle field (sparse)
+  buildParticleField();
+}
 
-    function safe(value){
-      return String(value ?? "").trim();
+/* Create a modest particle field that reacts to pointer */
+function buildParticleField(){
+  // Clear previous
+  while(particleGroup.children.length) {
+    const c = particleGroup.children.pop();
+    if(c.geometry) c.geometry.dispose();
+    if(c.material) c.material.dispose();
+  }
+  const pts = new THREE.BufferGeometry();
+  const count = 220;
+  const positions = new Float32Array(count*3);
+  for(let i=0;i<count;i++){
+    const r = 280 + Math.random()*380;
+    const theta = Math.random()*Math.PI*2;
+    const vy = (Math.random()-0.5)*120;
+    positions[i*3+0] = Math.cos(theta)*r* (0.2 + Math.random()*1.0);
+    positions[i*3+1] = vy;
+    positions[i*3+2] = Math.sin(theta)*r* (0.2 + Math.random()*1.0);
+  }
+  pts.setAttribute('position', new THREE.BufferAttribute(positions,3));
+  const mat = new THREE.PointsMaterial({ size: 2.6, color: 0x66f0ff, transparent:true, opacity:0.72, depthWrite:false});
+  const points = new THREE.Points(pts,mat);
+  particleGroup.add(points);
+}
+
+/* Interaction: hover & click */
+let hovered = null;
+function handlePointerMove(clientX, clientY){
+  pointer.x = (clientX / window.innerWidth) * 2 - 1;
+  pointer.y = -(clientY / window.innerHeight) * 2 + 1;
+}
+
+function animate(){
+  const t = clock.getElapsedTime();
+  // update shader times
+  items3D.forEach((entry, idx)=>{
+    entry.mat.uniforms.uTime.value = t;
+    // subtle breathing & float
+    entry.mesh.rotation.z = Math.sin(t*0.7 + idx)*0.02;
+    entry.mesh.position.y = entry.base.y + Math.sin(t*0.8 + idx)*6;
+  });
+
+  // raycast
+  raycaster.setFromCamera(pointer, camera);
+  const intersects = raycaster.intersectObjects(items3D.map(e=>e.mesh), true);
+  if(intersects.length){
+    const obj = intersects[0].object;
+    if(hovered !== obj){
+      if(hovered) onUnhover(hovered);
+      hovered = obj;
+      onHover(obj);
     }
-
-    function slug(value){
-      return safe(value).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-    }
-
-    function escapeHtml(value){
-      return safe(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    function parsePrice(value){
-      const num = parseFloat(safe(value).replace(/[^0-9.]/g, ""));
-      return Number.isFinite(num) ? num : null;
-    }
-
-    function money(value){
-      const n = parsePrice(value);
-      return n === null ? (safe(value) || "Ask") : `$${n.toFixed(2)}`;
-    }
-
-    function weekdayName(date){
-      return date.toLocaleDateString("en-US", { weekday: "long" });
-    }
-
-    function minutesFromTime(time){
-      if (!time) return null;
-      if (/^\d{2}:\d{2}$/.test(time)) {
-        const [h, m] = time.split(":").map(Number);
-        return h * 60 + m;
-      }
-      return null;
-    }
-
-    function time12(time){
-      if (!time) return "";
-      if (/^\d{2}:\d{2}$/.test(time)) {
-        const [h, m] = time.split(":").map(Number);
-        const d = new Date();
-        d.setHours(h, m, 0, 0);
-        return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-      }
-      return time;
-    }
-
-    function liveStatus(){
-      const now = new Date();
-      const day = weekdayName(now);
-      const info = APP.hours[day];
-
-      if (!info || info.closed) {
-        return {
-          open: false,
-          main: "Closed Today",
-          sub: "Browse the menu anyway or call for the next service window.",
-          note: "When closed, the page should still feel useful instead of dead."
-        };
-      }
-
-      const current = now.getHours() * 60 + now.getMinutes();
-      const open = minutesFromTime(info.open);
-      const close = minutesFromTime(info.close);
-      const breakfastEnd = info.breakfast ? minutesFromTime(info.breakfast.split("–")[1]) : null;
-      const lunchStart = info.lunch ? minutesFromTime(info.lunch.split("–")[0]) : null;
-      const lunchEnd = info.lunch ? minutesFromTime(info.lunch.split("–")[1]) : null;
-
-      if (open !== null && current < open) {
-        return {
-          open: false,
-          main: "Opening Soon",
-          sub: `Opens at ${time12(info.open)}.`,
-          note: "The restaurant is closed right now, but the next action is still obvious."
-        };
-      }
-
-      if (close !== null && current >= close) {
-        return {
-          open: false,
-          main: "Closed for the Day",
-          sub: "Browse tomorrow’s favorites or call ahead.",
-          note: "After close, the interface should still help people plan their next order."
-        };
-      }
-
-      if (breakfastEnd !== null && current < breakfastEnd) {
-        return {
-          open: true,
-          main: "Open Now · Breakfast",
-          sub: `Breakfast until ${time12(info.breakfast.split("–")[1])}.`,
-          note: "Breakfast is the strongest recommendation right now."
-        };
-      }
-
-      if (lunchStart !== null && current < lunchStart) {
-        return {
-          open: true,
-          main: "Open Now",
-          sub: `Lunch starts at ${time12(info.lunch.split("–")[0])}.`,
-          note: "You are between menu windows, so the page should stay simple and helpful."
-        };
-      }
-
-      if (lunchEnd !== null && current <= lunchEnd) {
-        return {
-          open: true,
-          main: "Open Now · Lunch",
-          sub: `Lunch until ${time12(info.lunch.split("–")[1])}.`,
-          note: "Lunch deserves top billing right now."
-        };
-      }
-
-      return {
-        open: true,
-        main: "Open Now",
-        sub: `Closes at ${time12(info.close)}.`,
-        note: "The restaurant is open, so the page should minimize friction to order."
-      };
-    }
-
-    function suggestedCategory(){
-      const status = liveStatus().main.toLowerCase();
-      if (status.includes("breakfast") && STATE.normalized.breakfast?.length) return "breakfast";
-      if (status.includes("lunch") && STATE.normalized.lunch?.length) return "lunch";
-      if (STATE.normalized.specials?.length) return "specials";
-      if (STATE.normalized.lunch?.length) return "lunch";
-      if (STATE.normalized.breakfast?.length) return "breakfast";
-      return Object.keys(STATE.normalized).find(k => k !== "all" && STATE.normalized[k]?.length) || "all";
-    }
-
-    async function loadMenuData(){
-      if (window.MENU_DATA && typeof window.MENU_DATA === "object") {
-        return window.MENU_DATA;
-      }
-
-      try {
-        const res = await fetch("menu-data.html", { cache: "no-store" });
-        if (!res.ok) throw new Error(`menu-data.html returned ${res.status}`);
-        const html = await res.text();
-
-        const match =
-          html.match(/window\.MENU_DATA\s*=\s*([\s\S]*?);[\s]*<\/script>/i) ||
-          html.match(/window\.MENU_DATA\s*=\s*([\s\S]*?);[\s]*$/i);
-
-        if (match && match[1]) {
-          return new Function(`return (${match[1]});`)();
-        }
-
-        throw new Error("window.MENU_DATA not found");
-      } catch (err) {
-        console.error("MENU DATA LOAD ERROR:", err);
-        return {
-          breakfast: [
-            { name: "Loaded Breakfast Plate", price: "$11.99", desc: "Fallback sample item so the interface still works." },
-            { name: "Pancake Combo", price: "$10.49", desc: "Fallback sample pancake plate." }
-          ],
-          lunch: [
-            { name: "Crawfish Plate", price: "$16.99", desc: "Fallback sample Louisiana crawfish." },
-            { name: "Catfish Plate", price: "$14.99", desc: "Fallback sample fried catfish." }
-          ],
-          drinks: [
-            { name: "Sweet Tea", price: "$2.49", desc: "Fallback sample drink." }
-          ],
-          dessert: [
-            { name: "Bread Pudding", price: "$5.99", desc: "Fallback sample dessert." }
-          ]
-        };
-      }
-    }
-
-    function normalizeData(raw){
-      const out = {};
-      const source = raw && typeof raw === "object" ? raw : {};
-
-      Object.keys(source).forEach((key) => {
-        const list = Array.isArray(source[key]) ? source[key] : [];
-        const categoryKey = slug(key);
-
-        out[categoryKey] = list.map((item, index) => {
-          const rec = item && typeof item === "object" ? item : { name: String(item ?? "") };
-          return {
-            id: `${categoryKey}-${slug(rec.name || rec.title || `item-${index}`)}-${index}`,
-            categoryKey,
-            categoryLabel: APP.categories[categoryKey]?.label || key,
-            emoji: safe(rec.emoji || rec.icon || APP.categories[categoryKey]?.emoji || "🍽️"),
-            name: safe(rec.name || rec.title || `Item ${index + 1}`),
-            desc: safe(rec.desc || rec.description || rec.details),
-            price: safe(rec.price || rec.cost || "Ask"),
-            badge: safe(rec.badge || rec.tag || ""),
-            mood: safe(rec.mood || rec.style || "")
-          };
-        }).filter(item => item.name);
-      });
-
-      out.all = Object.keys(out).filter(k => k !== "all").flatMap(k => out[k]);
-      return out;
-    }
-
-    function renderStatus(){
-      const status = liveStatus();
-      els.liveMain.textContent = status.main;
-      els.liveSub.textContent = status.sub;
-      els.heroNote.innerHTML = `<strong>Right now:</strong> ${escapeHtml(status.note)}`;
-      els.liveDot.classList.toggle("closed", !status.open);
-    }
-
-    function openOrbit(){
-      STATE.orbitOpen = true;
-      els.orbitShell.classList.add("open");
-      els.hubButton.setAttribute("aria-expanded", "true");
-      els.hubSub.textContent = "Tap a category";
-    }
-
-    function closeOrbit(){
-      STATE.orbitOpen = false;
-      els.orbitShell.classList.remove("open");
-      els.hubButton.setAttribute("aria-expanded", "false");
-      els.hubSub.textContent = "Tap to reveal categories";
-    }
-
-    function toggleOrbit(){
-      STATE.orbitOpen ? closeOrbit() : openOrbit();
-    }
-
-    function categoryMeta(key){
-      return APP.categories[key] || { label: key, emoji: "🍽️", hint: "Menu items" };
-    }
-
-    function buildOrbit(){
-      els.orbitNodes.innerHTML = "";
-      els.orbitActions.innerHTML = "";
-
-      const keys = Object.keys(STATE.normalized)
-        .filter(key => key !== "all")
-        .filter(key => (STATE.normalized[key] || []).length);
-
-      const total = keys.length;
-      const shell = els.orbitShell;
-      const radius = Math.max(130, Math.min(220, shell.clientWidth * 0.38));
-      const cx = shell.clientWidth / 2;
-      const cy = shell.clientHeight / 2;
-
-      keys.forEach((key, index) => {
-        const meta = categoryMeta(key);
-        const angle = (-90 + (360 / Math.max(total, 1)) * index) * (Math.PI / 180);
-        const x = cx + Math.cos(angle) * radius;
-        const y = cy + Math.sin(angle) * radius;
-
-        const node = document.createElement("button");
-        node.type = "button";
-        node.className = "orbit-node";
-        node.dataset.category = key;
-        node.style.left = `${x}px`;
-        node.style.top = `${y}px`;
-        node.innerHTML = `
-          <span>
-            <div class="node-emoji">${escapeHtml(meta.emoji)}</div>
-            <div class="node-label">${escapeHtml(meta.label)}</div>
-          </span>
-        `;
-        node.addEventListener("click", () => selectCategory(key, true));
-        els.orbitNodes.appendChild(node);
-
-        const action = document.createElement("button");
-        action.type = "button";
-        action.className = "tiny-btn";
-        action.innerHTML = `${escapeHtml(meta.emoji)} <span>${escapeHtml(meta.label)}</span>`;
-        action.addEventListener("click", () => selectCategory(key, true));
-        els.orbitActions.appendChild(action);
-      });
-
-      buildCategoryStrip(keys);
-    }
-
-    function buildCategoryStrip(keys){
-      els.categoryStrip.innerHTML = "";
-
-      keys.forEach((key) => {
-        const meta = categoryMeta(key);
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "chip-btn" + (STATE.selectedCategory === key ? " active" : "");
-        btn.dataset.category = key;
-        btn.innerHTML = `${escapeHtml(meta.emoji)} <span>${escapeHtml(meta.label)}</span>`;
-        btn.addEventListener("click", () => selectCategory(key, false));
-        els.categoryStrip.appendChild(btn);
-      });
-
-      const allBtn = document.createElement("button");
-      allBtn.type = "button";
-      allBtn.className = "chip-btn" + (STATE.selectedCategory === "all" ? " active" : "");
-      allBtn.dataset.category = "all";
-      allBtn.innerHTML = `✨ <span>All Items</span>`;
-      allBtn.addEventListener("click", () => selectCategory("all", false));
-      els.categoryStrip.appendChild(allBtn);
-    }
-
-    function currentItems(){
-      if (!STATE.selectedCategory) return [];
-      return STATE.normalized[STATE.selectedCategory] || [];
-    }
-
-    function filteredItems(){
-      const items = currentItems();
-      const q = safe(STATE.search).toLowerCase();
-      if (!q) return items;
-
-      return items.filter((item) => {
-        const hay = [item.name, item.desc, item.price, item.badge, item.mood, item.categoryLabel].join(" ").toLowerCase();
-        return hay.includes(q);
-      });
-    }
-
-    function renderSelection(){
-      const key = STATE.selectedCategory;
-
-      document.querySelectorAll(".orbit-node").forEach((node) => {
-        node.classList.toggle("active", node.dataset.category === key);
-      });
-
-      document.querySelectorAll(".chip-btn").forEach((btn) => {
-        btn.classList.toggle("active", btn.dataset.category === key);
-      });
-
-      if (!key) {
-        els.resultsTitle.textContent = "Choose a category";
-        els.resultsCopy.textContent = "Open the center hub or tap a quick category chip to load items from menu-data.html.";
-        els.selectedBadge.textContent = "No category selected";
-        els.resultsSummary.textContent = "The menu is waiting for a category selection.";
-        els.countSummary.textContent = "";
-        return;
-      }
-
-      const meta = categoryMeta(key);
-      const count = filteredItems().length;
-      els.resultsTitle.textContent = meta.label;
-      els.resultsCopy.textContent = `${meta.hint}. Every item here is coming from menu-data.html, so your daily edits stay separate from the interface.`;
-      els.selectedBadge.textContent = `${meta.emoji} ${meta.label}`;
-      els.resultsSummary.textContent = STATE.search
-        ? `Filtering ${meta.label.toLowerCase()} for “${STATE.search}”.`
-        : `Showing ${meta.label.toLowerCase()} items.`;
-      els.countSummary.textContent = `${count} item${count === 1 ? "" : "s"}`;
-    }
-
-    function itemCard(item){
-      const meta = categoryMeta(item.categoryKey);
-      return `
-        <article class="item-card">
-          <button class="item-btn" data-item-id="${escapeHtml(item.id)}" type="button">
-            <div class="item-top">
-              <div class="item-icon">${escapeHtml(item.emoji || meta.emoji)}</div>
-              <div>
-                <h3 class="item-name">${escapeHtml(item.name)}</h3>
-                <p class="item-desc">${escapeHtml(item.desc || "Call for details.")}</p>
-              </div>
-              <div class="item-price">${escapeHtml(money(item.price))}</div>
-            </div>
-            <div class="item-bottom">
-              <div class="tags">
-                ${item.badge ? `<span class="tag">🏷️ ${escapeHtml(item.badge)}</span>` : ""}
-                ${item.mood ? `<span class="tag">✨ ${escapeHtml(item.mood)}</span>` : ""}
-                <span class="tag">${escapeHtml(meta.emoji)} ${escapeHtml(meta.label)}</span>
-              </div>
-              <span class="item-view">View Item</span>
-            </div>
-          </button>
-        </article>
-      `;
-    }
-
-    function renderGrid(){
-      if (!STATE.selectedCategory) {
-        els.resultsGrid.innerHTML = `
-          <div class="empty" style="grid-column:1 / -1;">
-            <div>
-              <strong>Start with the menu hub.</strong>
-              Tap the center button, choose a category, and the matching items will appear here.
-            </div>
-          </div>
-        `;
-        return;
-      }
-
-      const items = filteredItems();
-      STATE.currentItems = items.slice();
-
-      if (!items.length) {
-        els.resultsGrid.innerHTML = `
-          <div class="empty" style="grid-column:1 / -1;">
-            <div>
-              <strong>No items matched.</strong>
-              Clear the search or switch categories.
-            </div>
-          </div>
-        `;
-        return;
-      }
-
-      els.resultsGrid.innerHTML = items.map(itemCard).join("");
-
-      els.resultsGrid.querySelectorAll("[data-item-id]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const item = items.find(entry => entry.id === btn.dataset.itemId);
-          if (item) openDetail(item);
-        });
-      });
-    }
-
-    function selectCategory(key, jump){
-      if (!STATE.normalized[key]) return;
-      STATE.selectedCategory = key;
-      renderSelection();
-      renderGrid();
-
-      if (jump) {
-        document.getElementById("resultsSection").scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }
-
-    function openDetail(item){
-      const meta = categoryMeta(item.categoryKey);
-      els.detailEyebrow.textContent = `${meta.emoji} ${meta.label}`;
-      els.detailTitle.textContent = item.name;
-      els.detailDesc.textContent = item.desc || "Call the restaurant for more details.";
-      els.detailPrice.textContent = money(item.price);
-
-      els.detailTags.innerHTML = [
-        item.badge ? `<span class="detail-tag">🏷️ ${escapeHtml(item.badge)}</span>` : "",
-        item.mood ? `<span class="detail-tag">✨ ${escapeHtml(item.mood)}</span>` : "",
-        `<span class="detail-tag">${escapeHtml(meta.emoji)} ${escapeHtml(meta.label)}</span>`
-      ].filter(Boolean).join("");
-
-      els.detailWhy.textContent = item.badge
-        ? `${item.name} stands out because it is marked as ${item.badge.toLowerCase()}. It works well as a fast recommendation.`
-        : `${item.name} works because the interface makes the choice feel direct and easy to act on.`;
-
-      els.detailCue.textContent = `Call ${APP.phoneDisplay} and ask for “${item.name}.” Since the page is powered by menu-data.html, this name should always match your latest update.`;
-
-      els.detailOverlay.classList.add("open");
-      els.detailOverlay.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-    }
-
-    function closeDetail(){
-      els.detailOverlay.classList.remove("open");
-      els.detailOverlay.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-    }
-
-    function randomPick(){
-      const pool = filteredItems().length
-        ? filteredItems()
-        : currentItems().length
-          ? currentItems()
-          : STATE.normalized.all || [];
-
-      if (!pool.length) {
-        toast("No items are loaded yet.");
-        return;
-      }
-
-      const item = pool[Math.floor(Math.random() * pool.length)];
-      openDetail(item);
-    }
-
-    async function sharePage(){
-      const shareData = {
-        title: document.title,
-        text: "Check out the Hot Headz Southern Foods menu.",
-        url: location.href
-      };
-
-      try {
-        if (navigator.share) {
-          await navigator.share(shareData);
-          toast("Shared successfully.");
+  } else {
+    if(hovered) onUnhover(hovered);
+    hovered = null;
+  }
+
+  // animate camera slight orbit to look alive
+  const camTargetX = Math.sin(t*0.06) * 10;
+  gsap.to(camera.position, { duration: 0.6, x: camTargetX, ease: "sine.inOut" });
+  camera.lookAt(0,0,0);
+
+  renderer.render(scene, camera);
+  animId = requestAnimationFrame(animate);
+}
+
+function onHover(mesh){
+  // bring forward & scale up
+  gsap.to(mesh.position, { z: mesh.position.z - 36, duration:0.35, ease:"expo.out" });
+  gsap.to(mesh.scale, { x:1.18, y:1.18, z:1.18, duration:0.35, ease:"expo.out" });
+  // glow increase
+  gsap.to(mesh.material.uniforms.uOpacity, { value: 1.0, duration:0.28 });
+  announce(`${mesh.userData.title} focused`);
+}
+function onUnhover(mesh){
+  const original = items3D.find(e=>e.mesh===mesh).base;
+  gsap.to(mesh.position, { x: original.x, y: original.y, z: original.z, duration:0.6, ease:"elastic.out(1,0.6)" });
+  gsap.to(mesh.scale, { x:1, y:1, z:1, duration:0.6, ease:"elastic.out(1,0.6)" });
+  gsap.to(mesh.material.uniforms.uOpacity, { value: 0.96, duration:0.6 });
+}
+
+/* Click handler: record and navigate (simulate SPA friendly) */
+function handleClick(){
+  if(!hovered) return;
+  const id = hovered.userData.id;
+  recordClick(id);
+  // animate feedback
+  gsap.to(hovered.scale, { x:1.4, y:1.4, duration:0.18, yoyo:true, repeat:1, ease:'power3.inOut' });
+  announce(`${hovered.userData.title} opened`);
+  // For demo navigate by hash or call function; real site should route properly
+  setTimeout(()=>{ window.location.href = hovered.userData.href; }, 240);
+  // Rebuild ring to reflect personalization reorder
+  setTimeout(()=>{ buildRing(); }, 520);
+}
+
+/* Responsiveness & fallback */
+function onResize(){
+  const w = window.innerWidth, h = window.innerHeight;
+  renderer.setSize(w,h);
+  camera.aspect = w/h;
+  camera.updateProjectionMatrix();
+}
+
+/* Pause animation when page hidden */
+document.addEventListener('visibilitychange', ()=>{
+  if(document.hidden){ cancelAnimationFrame(animId); } else { clock.start(); animate(); }
+});
+
+/* =========================
+   Voice recognition (Web Speech API)
+   ========================= */
+let recognition;
+function initVoice(){
+  if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang = 'en-US';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  recognition.onresult = (e)=>{
+    const spoken = e.results[0][0].transcript.toLowerCase();
+    announce(`Heard: ${spoken}`);
+    // Try to match "open/about/contact"
+    for(const it of menuItems){
+      if(spoken.includes(it.title.toLowerCase()) || spoken.includes(it.id.toLowerCase())){
+        // animate to that item and click
+        const found = items3D.find(entry => entry.item.id === it.id);
+        if(found){
+          // move pointer to its position (visual)
+          handlePointerMove(window.innerWidth/2 + (found.mesh.position.x*1.1), window.innerHeight/2 - (found.mesh.position.y*1.1));
+          gsap.delayedCall(0.2, ()=>{ hovered = found.mesh; handleClick(); });
           return;
         }
-
-        if (navigator.clipboard) {
-          await navigator.clipboard.writeText(location.href);
-          toast("Link copied to clipboard.");
-          return;
-        }
-
-        toast("Share is not available on this device.");
-      } catch {
-        toast("Share cancelled.");
       }
     }
+    announce('No match found in menu.');
+  };
+  recognition.onend = ()=>{/* UI status could go here */};
+  recognition.onerror = (e)=>{ console.warn('Speech error', e); };
+}
 
-    function toast(message){
-      const el = document.createElement("div");
-      el.className = "toast";
-      el.textContent = message;
-      els.toastWrap.appendChild(el);
+function startVoice(){
+  if(!recognition) return alert('Voice not supported in this browser.');
+  recognition.start();
+  announce('Listening...');
+}
 
-      setTimeout(() => {
-        el.style.opacity = "0";
-        el.style.transform = "translateY(6px)";
-        setTimeout(() => el.remove(), 220);
-      }, 2400);
+/* =========================
+   Init & event wiring
+   ========================= */
+let webglAvailable = true;
+function start(){
+  // Check WebGL support
+  try{
+    const gl = canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if(!gl) throw 'no gl';
+  } catch(e){ webglAvailable = false; }
+
+  if(!webglAvailable){
+    $('#menuCanvas').style.display = 'none';
+    fallbackEl.style.display = 'flex';
+    fallbackEl.setAttribute('aria-hidden', 'false');
+    createFallback();
+    return;
+  }
+
+  initThree();
+  createFallback(); // fallback hidden but useful for smaller screens and semantics
+  buildRing();
+  animate();
+  initVoice();
+
+  // Events
+  window.addEventListener('resize', onResize);
+  window.addEventListener('mousemove', (e)=>{ handlePointerMove(e.clientX, e.clientY); });
+  window.addEventListener('touchmove', (e)=>{ if(e.touches && e.touches[0]) handlePointerMove(e.touches[0].clientX, e.touches[0].clientY); });
+
+  // click mapping
+  window.addEventListener('click', (e)=>{
+    // avoid clicks on the hamburger or on fallback controls
+    if(e.target.closest('#menuToggle')) return;
+    handleClick();
+  });
+
+  // keyboard navigation: arrows to cycle through items, enter to open
+  let idx = 0;
+  document.addEventListener('keydown', (e)=>{
+    const count = items3D.length;
+    if(count === 0) return;
+    if(e.key === 'ArrowRight' || e.key === 'ArrowDown'){ idx = (idx+1)%count; focusIdx(idx); e.preventDefault(); }
+    if(e.key === 'ArrowLeft' || e.key === 'ArrowUp'){ idx = (idx-1+count)%count; focusIdx(idx); e.preventDefault(); }
+    if(e.key === 'Enter' || e.key === ' '){ hovered = items3D[idx].mesh; handleClick(); e.preventDefault(); }
+    if(e.key === 'v' && (e.ctrlKey || e.metaKey)){ startVoice(); e.preventDefault(); } // quick voice hotkey
+  });
+
+  function focusIdx(i){
+    idx = i;
+    const entry = items3D[idx];
+    if(entry){
+      // move pointer visually toward it
+      const rect = canvas.getBoundingClientRect();
+      const x = rect.left + rect.width/2 + entry.mesh.position.x*1.05;
+      const y = rect.top + rect.height/2 - entry.mesh.position.y*1.05;
+      handlePointerMove(x, y);
+      hovered = entry.mesh;
+      onHover(entry.mesh);
     }
+  }
+}
 
-    function applyTheme(){
-      if (!STATE.lightMode) {
-        document.body.style.background = "";
-        return;
-      }
+/* =========================
+   Toggle menu visibility & UI
+   ========================= */
+const btn = $('#menuToggle');
+btn.addEventListener('click', ()=>{
+  const active = btn.classList.toggle('active');
+  btn.setAttribute('aria-expanded', active ? 'true' : 'false');
+  $('#fallbackMenu').style.display = (!webglAvailable && active) ? 'flex' : 'none';
+  // when opening: animate camera zoom in and wake animations
+  if(active){
+    gsap.to(camera.position, { z: 520, duration: 0.6, ease:'expo.out' });
+    $('#fallbackMenu').setAttribute('aria-hidden', 'false');
+    announce('Menu opened');
+  } else {
+    gsap.to(camera.position, { z: 620, duration: 0.6, ease:'expo.in' });
+    $('#fallbackMenu').setAttribute('aria-hidden', 'true');
+    announce('Menu closed');
+  }
+});
+/* Quick double-click / long-press on toggle to start voice */
+let pressTimer;
+btn.addEventListener('mousedown', ()=>{ pressTimer = setTimeout(()=> startVoice(), 700); });
+btn.addEventListener('mouseup', ()=>{ clearTimeout(pressTimer); });
+btn.addEventListener('touchstart', ()=>{ pressTimer = setTimeout(()=> startVoice(), 700); });
+btn.addEventListener('touchend', ()=>{ clearTimeout(pressTimer); });
 
-      document.body.style.background = "linear-gradient(180deg, #f8f2e9, #efe3d2 56%, #e8d8c2 100%)";
-    }
+/* =========================
+   Start everything
+   ========================= */
+start();
+/* initial fallback creation */
+createFallback();
 
-    function toggleTheme(){
-      STATE.lightMode = !STATE.lightMode;
-      applyTheme();
-      toast(STATE.lightMode ? "Light theme enabled." : "Dark theme enabled.");
-    }
-
-    function bindEvents(){
-      els.hubButton.addEventListener("click", toggleOrbit);
-      els.openOrbitBtn.addEventListener("click", openOrbit);
-      els.collapseOrbitBtn.addEventListener("click", closeOrbit);
-      els.clearSearchBtn.addEventListener("click", () => {
-        STATE.search = "";
-        els.searchInput.value = "";
-        renderSelection();
-        renderGrid();
-      });
-      els.showAllBtn.addEventListener("click", () => selectCategory("all", false));
-      els.shareBtn.addEventListener("click", sharePage);
-      els.surpriseBtn.addEventListener("click", randomPick);
-      els.bestNowBtn.addEventListener("click", () => {
-        const key = suggestedCategory();
-        selectCategory(key, true);
-        toast(`Showing ${categoryMeta(key).label.toLowerCase()} for right now.`);
-      });
-      els.searchInput.addEventListener("input", (e) => {
-        STATE.search = e.target.value.trim();
-        renderSelection();
-        renderGrid();
-      });
-      els.themeBtn.addEventListener("click", toggleTheme);
-      els.detailCloseBtn.addEventListener("click", closeDetail);
-      els.detailRandomBtn.addEventListener("click", randomPick);
-      els.dockOpenBtn?.addEventListener("click", openOrbit);
-      els.dockPickBtn?.addEventListener("click", randomPick);
-      els.dockShareBtn?.addEventListener("click", sharePage);
-
-      document.querySelectorAll("[data-close-detail='true']").forEach((node) => {
-        node.addEventListener("click", closeDetail);
-      });
-
-      window.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") closeDetail();
-      });
-
-      window.addEventListener("resize", buildOrbit);
-    }
-
-    async function init(){
-      renderStatus();
-      const raw = await loadMenuData();
-      STATE.rawData = raw;
-      STATE.normalized = normalizeData(raw);
-      buildOrbit();
-      bindEvents();
-
-      const initial = suggestedCategory();
-      selectCategory(initial, false);
-
-      if (window.innerWidth >= 900) {
-        openOrbit();
-      }
-
-      toast("Menu loaded from menu-data.html.");
-    }
-
-    init();
-  </script>
+</script>
 </body>
 </html>
