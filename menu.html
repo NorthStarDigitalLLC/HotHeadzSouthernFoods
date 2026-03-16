@@ -1261,12 +1261,12 @@
   </div>
 
   <!-- ===== SCRIPTS ===== -->
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
     // AOS init (optional)
     AOS.init({ once: false, duration: 1000 });
 
-    // ----- MENU SCRIPT (modified to add plate builder) -----
+    // ----- MENU SCRIPT (with extra null checks) -----
     (function(){
       const DATA_URLS = ["/menu-data.html", "/menu-data/"]; // tries both
       const $ = (id)=>document.getElementById(id);
@@ -1534,8 +1534,10 @@
           if (item.type === 'meat') meatQty += item.qty;
           else if (item.type === 'side') sideQty += item.qty;
         });
-        $("builderMeatCount").textContent = meatQty;
-        $("builderSideCount").textContent = sideQty;
+        const meatSpan = $("builderMeatCount");
+        if (meatSpan) meatSpan.textContent = meatQty;
+        const sideSpan = $("builderSideCount");
+        if (sideSpan) sideSpan.textContent = sideQty;
 
         // Calculate total
         let total = 0;
@@ -1556,46 +1558,49 @@
           }
         });
 
-        $("builderTotal").textContent = `$${total.toFixed(2)}`;
-        $("builderHandleCount").textContent = plateState.items.reduce((s, i) => s + i.qty, 0);
+        const totalSpan = $("builderTotal");
+        if (totalSpan) totalSpan.textContent = `$${total.toFixed(2)}`;
+        const handleCount = $("builderHandleCount");
+        if (handleCount) handleCount.textContent = plateState.items.reduce((s, i) => s + i.qty, 0);
 
         // Render list
-        list.querySelectorAll(".builder-item").forEach(el => el.remove());
-        if (plateState.items.length === 0) {
-          empty.style.display = "";
-          return;
-        }
-        empty.style.display = "none";
-
-        plateState.items.forEach((item, index) => {
-          const row = document.createElement("div");
-          row.className = "builder-item";
-          let priceDisplay = '';
-          if (item.type === 'standalone' && item.pricePerUnit) {
-            priceDisplay = `$${(item.pricePerUnit * item.qty).toFixed(2)}`;
-          } else {
-            // For meats/sides, we don't display per-item price, just contribute to counts
-            priceDisplay = '';
+        if (list) {
+          list.querySelectorAll(".builder-item").forEach(el => el.remove());
+          if (plateState.items.length === 0) {
+            if (empty) empty.style.display = "";
+            return;
           }
-          row.innerHTML = `
-            <div class="builder-item-top">
-              <div>
-                <div class="builder-item-name">${escapeHtml(item.name)}</div>
-                <div class="builder-item-meta">${item.type}</div>
+          if (empty) empty.style.display = "none";
+
+          plateState.items.forEach((item, index) => {
+            const row = document.createElement("div");
+            row.className = "builder-item";
+            let priceDisplay = '';
+            if (item.type === 'standalone' && item.pricePerUnit) {
+              priceDisplay = `$${(item.pricePerUnit * item.qty).toFixed(2)}`;
+            } else {
+              priceDisplay = '';
+            }
+            row.innerHTML = `
+              <div class="builder-item-top">
+                <div>
+                  <div class="builder-item-name">${escapeHtml(item.name)}</div>
+                  <div class="builder-item-meta">${item.type}</div>
+                </div>
+                <div class="builder-item-price">${priceDisplay}</div>
               </div>
-              <div class="builder-item-price">${priceDisplay}</div>
-            </div>
-            <div class="builder-item-actions">
-              <div class="qty-controls">
-                <button class="qty-btn" data-index="${index}" data-action="decrease">−</button>
-                <span class="qty-value">${item.qty}</span>
-                <button class="qty-btn" data-index="${index}" data-action="increase">+</button>
+              <div class="builder-item-actions">
+                <div class="qty-controls">
+                  <button class="qty-btn" data-index="${index}" data-action="decrease">−</button>
+                  <span class="qty-value">${item.qty}</span>
+                  <button class="qty-btn" data-index="${index}" data-action="increase">+</button>
+                </div>
+                <button class="remove-btn" data-index="${index}" data-action="remove">Remove</button>
               </div>
-              <button class="remove-btn" data-index="${index}" data-action="remove">Remove</button>
-            </div>
-          `;
-          list.appendChild(row);
-        });
+            `;
+            list.appendChild(row);
+          });
+        }
       }
 
       function addToPlate(item) {
@@ -1606,8 +1611,10 @@
           plateState.items.push({ ...item, qty: 1, id: Date.now() + Math.random() });
         }
         updatePlateUI();
-        $("plateBuilderRoot").classList.remove("is-collapsed");
-        $("builderHandle").setAttribute("aria-expanded", "true");
+        const root = $("plateBuilderRoot");
+        if (root) root.classList.remove("is-collapsed");
+        const handle = $("builderHandle");
+        if (handle) handle.setAttribute("aria-expanded", "true");
       }
 
       // Meat keywords for classification
@@ -1712,11 +1719,8 @@
             hint.textContent = data?.settings?.clickForDescriptionHint || "Tip: click an item for description.";
             hint.hidden = (items.length === 0);
           }
-          // Use dropdown for lunch items with description, but also add Add button via renderPricedList? We'll keep dropdown and add button separately.
-          // For simplicity, we'll just render lunch items with add buttons (no dropdown) – can be enhanced later.
-          // We'll use a separate function that adds both.
           setDropdownList(`${prefixIdBase}-lunch-items`, items, data?.settings?.noDescriptionText);
-          // Add "Add" buttons next to each item? We'll do a separate pass.
+          // Add "Add" buttons next to each item in the dropdown
           setTimeout(() => {
             const lunchItemsUl = $(`${prefixIdBase}-lunch-items`);
             if (lunchItemsUl) {
@@ -1862,7 +1866,7 @@
             t.classList.toggle("is-active", active);
             t.setAttribute("aria-selected", active ? "true" : "false");
           });
-          panels.forEach(p=> p.hidden = (p.id !== targetId));
+          panels.forEach(p=> { if(p) p.hidden = (p.id !== targetId); });
         }
         tabs.forEach(tab=> tab.addEventListener("click", ()=> activateTab(tab)));
       }
@@ -1878,7 +1882,7 @@
             b.classList.toggle("is-active", active);
             b.setAttribute("aria-selected", active ? "true" : "false");
           });
-          dayPanels.forEach(p=> p.hidden = (p.id !== targetId));
+          dayPanels.forEach(p=> { if(p) p.hidden = (p.id !== targetId); });
         }
         dayButtons.forEach(btn=> btn.addEventListener("click", ()=> activate(btn)));
 
@@ -1907,16 +1911,19 @@
         }
       });
 
-      $("builderClear")?.addEventListener("click", () => {
+      const clearBtn = $("builderClear");
+      if (clearBtn) clearBtn.addEventListener("click", () => {
         plateState.items = [];
         updatePlateUI();
       });
 
-      $("builderCopy")?.addEventListener("click", async () => {
+      const copyBtn = $("builderCopy");
+      if (copyBtn) copyBtn.addEventListener("click", async () => {
         const meatQty = plateState.items.filter(i => i.type === 'meat').reduce((s,i)=>s+i.qty,0);
         const sideQty = plateState.items.filter(i => i.type === 'side').reduce((s,i)=>s+i.qty,0);
         const lines = plateState.items.map(i => `${i.qty}x ${i.name} (${i.type})`);
-        const total = $("builderTotal").textContent;
+        const totalSpan = $("builderTotal");
+        const total = totalSpan ? totalSpan.textContent : "$0.00";
         const text = `Hot Headz Plate\n${lines.join("\n")}\nMeats: ${meatQty}, Sides: ${sideQty}\nTotal: ${total}`;
         try {
           await navigator.clipboard.writeText(text);
@@ -1924,14 +1931,20 @@
         } catch {}
       });
 
-      $("builderClose")?.addEventListener("click", () => {
-        $("plateBuilderRoot").classList.add("is-collapsed");
-        $("builderHandle").setAttribute("aria-expanded", "false");
+      const closeBtn = $("builderClose");
+      if (closeBtn) closeBtn.addEventListener("click", () => {
+        const root = $("plateBuilderRoot");
+        if (root) root.classList.add("is-collapsed");
+        const handle = $("builderHandle");
+        if (handle) handle.setAttribute("aria-expanded", "false");
       });
 
-      $("builderHandle")?.addEventListener("click", () => {
-        $("plateBuilderRoot").classList.toggle("is-collapsed");
-        $("builderHandle").setAttribute("aria-expanded", String(!$("plateBuilderRoot").classList.contains("is-collapsed")));
+      const handleBtn = $("builderHandle");
+      if (handleBtn) handleBtn.addEventListener("click", () => {
+        const root = $("plateBuilderRoot");
+        if (root) root.classList.toggle("is-collapsed");
+        const expanded = root ? !root.classList.contains("is-collapsed") : false;
+        handleBtn.setAttribute("aria-expanded", String(expanded));
       });
 
       // ---- INIT ----
@@ -2018,20 +2031,15 @@
           setText("hh-delivery-note", data?.deliveryNote || "");
           setText("hh-delivery-note-2", data?.deliveryNote || "");
 
-          if(closureDisplayToday?.closed){
-            $("hh-today-closed").hidden=false;
-            setText("hh-today-closed-title", `${displayTodayName} (${displayTodayISO})`);
-            setText("hh-today-closed-msg", closureDisplayToday.message || "See you tomorrow!");
-          } else {
-            $("hh-today-closed").hidden=true;
-          }
-          if(closureDisplayTomorrow?.closed){
-            $("hh-tomorrow-closed").hidden=false;
-            setText("hh-tomorrow-closed-title", `${displayTomorrowName} (${displayTomorrowISO})`);
-            setText("hh-tomorrow-closed-msg", closureDisplayTomorrow.message || "See you tomorrow!");
-          } else {
-            $("hh-tomorrow-closed").hidden=true;
-          }
+          const todayClosed = $("hh-today-closed");
+          if (todayClosed) todayClosed.hidden = !closureDisplayToday?.closed;
+          setText("hh-today-closed-title", closureDisplayToday?.closed ? `${displayTodayName} (${displayTodayISO})` : "");
+          setText("hh-today-closed-msg", closureDisplayToday?.message || "See you tomorrow!");
+
+          const tomorrowClosed = $("hh-tomorrow-closed");
+          if (tomorrowClosed) tomorrowClosed.hidden = !closureDisplayTomorrow?.closed;
+          setText("hh-tomorrow-closed-title", closureDisplayTomorrow?.closed ? `${displayTomorrowName} (${displayTomorrowISO})` : "");
+          setText("hh-tomorrow-closed-msg", closureDisplayTomorrow?.message || "See you tomorrow!");
 
           // Fill panels with the display dates (shifted if past closing)
           fillTwoDay("hh-today", "Today", displayTodayISO, data, hoursToday, calendarTodayISO);
@@ -2063,91 +2071,6 @@
         root.hidden = false;
         dock.hidden = false;
       }
-    })();
-  </script>
-
-  <!-- Circular menu toggle script with page navigation and share -->
-  <script>
-    (function() {
-      const overlay = document.getElementById('circMenuOverlay');
-      const leftBtn = document.getElementById('navBtnLeft');
-      const bottomBtn = document.getElementById('navBtnBottom');
-      const homeCenter = document.getElementById('homeCenter');
-      const menuItems = document.querySelectorAll('.menu-item');
-
-      function toggleMenu() {
-        overlay.classList.toggle('open');
-      }
-
-      if (leftBtn) {
-        leftBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          toggleMenu();
-        });
-      }
-
-      bottomBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleMenu();
-      });
-
-      overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) {
-          overlay.classList.remove('open');
-        }
-      });
-
-      async function sharePage() {
-        const shareData = {
-          title: document.title || 'Hot Headz Southern Foods',
-          text: 'Check out Hot Headz Southern Foods in DeRidder, LA!',
-          url: window.location.href
-        };
-        try {
-          if (navigator.share) {
-            await navigator.share(shareData);
-          } else if (navigator.clipboard && navigator.clipboard.writeText) {
-            await navigator.clipboard.writeText(window.location.href);
-            const shareItem = document.querySelector('.menu-item[data-action="share"]');
-            if (shareItem) {
-              const originalText = shareItem.textContent;
-              shareItem.textContent = 'Copied';
-              setTimeout(() => shareItem.textContent = originalText, 1500);
-            }
-          } else {
-            const temp = document.createElement('input');
-            temp.value = window.location.href;
-            document.body.appendChild(temp);
-            temp.select();
-            document.execCommand('copy');
-            document.body.removeChild(temp);
-            alert('Link copied to clipboard!');
-          }
-        } catch (e) { console.log('Share failed', e); }
-      }
-
-      function navigate(link) {
-        if (!link) return;
-        window.location.href = link;
-      }
-
-      homeCenter.addEventListener('click', () => {
-        overlay.classList.remove('open');
-        const link = homeCenter.getAttribute('data-link');
-        if (link) navigate(link);
-      });
-
-      menuItems.forEach(item => {
-        item.addEventListener('click', () => {
-          overlay.classList.remove('open');
-          const link = item.getAttribute('data-link');
-          const action = item.getAttribute('data-action');
-          if (action === 'share') sharePage();
-          else if (link) navigate(link);
-        });
-      });
-
-      document.querySelector('.circular-menu').addEventListener('click', e => e.stopPropagation());
     })();
   </script>
 </body>
