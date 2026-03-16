@@ -4,12 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hot Headz Southern Foods – Menu Builder</title>
-  <meta name="description" content="Single-file menu with today/tomorrow/advanced views, cube navigation, and a bottom plate builder.">
+  <meta name="description" content="Single-file menu with today/tomorrow/advanced views, cube navigation, and a bottom plate builder (meat/side combo pricing).">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
+    /* (All your existing CSS remains exactly the same – copy from your previous version) */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; overflow-x: hidden; }
     body {
@@ -616,7 +617,7 @@
     }
     .builder-stats {
       display: flex;
-      gap: 20px;
+      gap: 24px;
       font-size: 14px;
       flex-wrap: wrap;
     }
@@ -817,15 +818,15 @@
       </article>
 
       <article class="glass-card intro">
-        <h1>Reads from your menu-data page and keeps the builder below the menu.</h1>
+        <h1>Reads from your menu-data page and uses combo pricing for meats & sides.</h1>
         <p>
-          This version tries your menu-data page first, then only falls back to embedded sample data if that page is unavailable.
-          The builder is no longer fixed while scrolling — it sits as a normal section below the menu content.
+          This version expects the Lunch category to have <strong>meats</strong> and <strong>sides</strong> arrays.
+          All other categories use individual prices. The plate builder calculates totals based on meat/side counts.
         </p>
         <div class="intro-grid">
           <div class="intro-stat"><strong>Data source</strong><span>menu-data page first</span></div>
-          <div class="intro-stat"><strong>Cube</strong><span>same categories as menu</span></div>
-          <div class="intro-stat"><strong>Builder position</strong><span>stuck below menu content</span></div>
+          <div class="intro-stat"><strong>Pricing</strong><span>combo for meats/sides</span></div>
+          <div class="intro-stat"><strong>Builder</strong><span>below menu content</span></div>
         </div>
       </article>
     </section>
@@ -861,8 +862,9 @@
       <div class="builder-shell" id="builderShell">
         <div class="builder-summary" id="builderSummary">
           <div class="builder-stats">
-            <div>Items: <span id="builderItemsCount">0</span></div>
-            <div>Unique: <span id="builderUniqueCount">0</span></div>
+            <div>Meats: <span id="builderMeatCount">0</span></div>
+            <div>Sides: <span id="builderSideCount">0</span></div>
+            <div>Extras: <span id="builderExtraCount">0</span></div>
             <div>Total: <span id="builderTotal">$0.00</span></div>
           </div>
           <button class="builder-toggle" id="builderToggle" type="button" aria-label="Toggle plate builder">▼</button>
@@ -875,7 +877,10 @@
             <button class="builder-action" id="builderClear" type="button">Clear Plate</button>
             <button class="builder-action" id="builderCopy" type="button">Copy Summary</button>
           </div>
-          <div class="builder-note">Prices are parsed from strings like "$12.99" – items without a price show $0.00.</div>
+          <div class="builder-note">
+            <strong>Lunch combo:</strong> 1 meat + 2 sides $12.99, 2 meats + 2 sides $15.99, 3 meats + 2 sides $19.99. Extra sides $2.99 each.<br>
+            Drinks and other items add their own price.
+          </div>
         </div>
       </div>
     </section>
@@ -900,12 +905,13 @@
     </div>
   </div>
 
+  <!-- Fallback menu data – shows the new structure for Lunch -->
   <script id="hh-menu-data-fallback" type="application/json">
   {
     "phoneTel": "tel:3372211035",
     "deliveryNote": "Call now for pickup or questions.",
     "hours": {
-      "note": "Fallback sample data is included so the page still works if menu-data cannot be reached.",
+      "note": "Fallback sample data – update with your real menu-data.html file.",
       "weekly": [
         { "day": "Sunday", "open": "6:00 AM", "close": "2:00 PM", "breakfast": "6:00 AM - 10:30 AM", "lunch": "10:30 AM - 2:00 PM" },
         { "day": "Monday", "open": "5:30 AM", "close": "3:00 PM", "breakfast": "5:30 AM - 10:30 AM", "lunch": "10:30 AM - 3:00 PM" },
@@ -918,7 +924,7 @@
     },
     "settings": {
       "advancedWindowDays": 7,
-      "advancedDisclaimer": "Fallback sample data is active because the external menu-data page was not found.",
+      "advancedDisclaimer": "Fallback sample data – external menu-data page not found.",
       "clickForDescriptionHint": "Tip: click an item for description.",
       "noDescriptionText": "Description coming soon."
     },
@@ -937,18 +943,17 @@
         ]
       },
       "Lunch": {
-        "subtitle": "Plate lunches and daily favorites.",
-        "sections": [
-          { "label": "Plates", "items": [
-            { "name": "Daily Plate Lunch", "desc": "Main dish with two sides and bread.", "price": 12.99 },
-            { "name": "Fried Chicken Plate", "desc": "Crispy fried chicken with two sides.", "price": 13.99 }
-          ]},
-          { "label": "Today’s Lunch Items", "items": [
-            { "name": "Burger", "desc": "Classic burger hot off the grill.", "price": 8.49 },
-            { "name": "Cheeseburger", "desc": "Burger with melted cheese and fixings.", "price": 8.99 },
-            { "name": "Fries", "desc": "Golden crispy fries.", "price": 2.99 },
-            { "name": "Mac and Cheese", "desc": "Creamy baked-style mac.", "price": 3.49 }
-          ]}
+        "subtitle": "Choose your meats and sides – combo pricing applies.",
+        "meats": [
+          { "name": "Pulled Pork", "desc": "Slow‑smoked pulled pork." },
+          { "name": "Fried Chicken", "desc": "Crispy fried chicken." },
+          { "name": "Beef Brisket", "desc": "Tender smoked brisket." }
+        ],
+        "sides": [
+          { "name": "French Fries", "desc": "Golden crispy fries." },
+          { "name": "Mac & Cheese", "desc": "Creamy baked mac." },
+          { "name": "Cole Slaw", "desc": "Cool crunchy slaw." },
+          { "name": "Baked Beans", "desc": "Sweet smoky beans." }
         ]
       },
       "Crawfish": {
@@ -967,19 +972,19 @@
             { "name": "Side Salad", "desc": "Smaller salad option.", "price": 4.99 }
           ]},
           { "label": "Lettuce", "items": [
-            { "name": "Romaine", "desc": "" },
-            { "name": "Iceberg", "desc": "" }
+            { "name": "Romaine" },
+            { "name": "Iceberg" }
           ]},
           { "label": "Toppings", "items": [
-            { "name": "Tomatoes", "desc": "" },
-            { "name": "Cheese", "desc": "" },
-            { "name": "Croutons", "desc": "" },
-            { "name": "Cucumbers", "desc": "" }
+            { "name": "Tomatoes" },
+            { "name": "Cheese" },
+            { "name": "Croutons" },
+            { "name": "Cucumbers" }
           ]},
           { "label": "Dressing", "items": [
-            { "name": "Ranch", "desc": "" },
-            { "name": "Italian", "desc": "" },
-            { "name": "French", "desc": "" }
+            { "name": "Ranch" },
+            { "name": "Italian" },
+            { "name": "French" }
           ]}
         ]
       },
@@ -1028,8 +1033,9 @@
         builderShell: document.getElementById("builderShell"),
         builderSummary: document.getElementById("builderSummary"),
         builderToggle: document.getElementById("builderToggle"),
-        builderItemsCount: document.getElementById("builderItemsCount"),
-        builderUniqueCount: document.getElementById("builderUniqueCount"),
+        builderMeatCount: document.getElementById("builderMeatCount"),
+        builderSideCount: document.getElementById("builderSideCount"),
+        builderExtraCount: document.getElementById("builderExtraCount"),
         builderTotal: document.getElementById("builderTotal"),
         cartList: document.getElementById("cartList"),
         cartEmpty: document.getElementById("cartEmpty"),
@@ -1040,8 +1046,11 @@
       const app = {
         currentDay: "today",
         currentCategory: "Breakfast",
-        cart: [],
-        data: null
+        cart: [], // items stored with { key, name, category, type, price (for standalone) }
+        data: null,
+        // Combo pricing
+        comboPrices: { meat1: 12.99, meat2: 15.99, meat3: 19.99, extraSide: 2.99 },
+        limits: { maxMeats: 3, maxSides: 5 }
       };
 
       function escapeHtml(str) {
@@ -1053,12 +1062,11 @@
           .replace(/'/g, "&#039;");
       }
 
-      // parse price from string like "$12.99" or 12.99
       function parsePrice(value) {
         if (typeof value === 'number') return value;
         if (typeof value === 'string') {
           const match = value.match(/\$?(\d+(?:\.\d{2})?)/);
-          if (match) return parseFloat(match[1]);
+          return match ? parseFloat(match[1]) : 0;
         }
         return 0;
       }
@@ -1066,10 +1074,7 @@
       function money(n) { return `$${Number(n || 0).toFixed(2)}`; }
 
       function toISODateLocal(d) {
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, "0");
-        const day = String(d.getDate()).padStart(2, "0");
-        return `${y}-${m}-${day}`;
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
       }
 
       function formatDateNice(d) {
@@ -1084,11 +1089,12 @@
         return JSON.parse(JSON.stringify(obj));
       }
 
-      // ----- DATA NORMALIZATION (with price parsing) -----
+      // ----- Normalize data to our internal structure -----
       function normalizeFetchedData(raw) {
         const out = clone(raw);
         out.defaults = out.defaults || {};
 
+        // Normalize a single item (could be string or object)
         const parseItem = (item) => {
           if (typeof item === 'string') return { name: item, desc: "", price: 0 };
           return {
@@ -1098,17 +1104,18 @@
           };
         };
 
-        const convertLegacyCategory = (legacy, catName) => {
+        // Convert a category (non‑Lunch) to sections format
+        const convertRegularCategory = (legacy, catName) => {
           if (!legacy) return { subtitle: "", sections: [] };
           if (legacy.sections) {
-            // already in new format – just ensure items have parsed prices
+            // already in new format – just ensure items are parsed
             legacy.sections = legacy.sections.map(s => ({
-              ...s,
+              label: s.label,
               items: (s.items || []).map(parseItem)
             }));
             return legacy;
           }
-
+          // legacy: may have plates, items, saladBar etc.
           const sections = [];
           if (Array.isArray(legacy.plates) && legacy.plates.length) {
             sections.push({ label: "Plates", items: legacy.plates.map(parseItem) });
@@ -1116,40 +1123,68 @@
           if (Array.isArray(legacy.items) && legacy.items.length) {
             let label = "Items";
             if (catName === "Breakfast") label = "Available Items";
-            else if (catName === "Lunch") label = "Today’s Lunch Items";
             else if (catName === "Drinks") label = "Available Drinks";
             else if (catName === "Dessert") label = "Available Desserts";
             sections.push({ label, items: legacy.items.map(parseItem) });
           }
           if (legacy.saladBar) {
-            if (Array.isArray(legacy.saladBar.lettuce)) sections.push({ label: "Lettuce", items: legacy.saladBar.lettuce.map(x => parseItem(typeof x === 'string' ? { name: x } : x)) });
-            if (Array.isArray(legacy.saladBar.toppings)) sections.push({ label: "Toppings", items: legacy.saladBar.toppings.map(x => parseItem(typeof x === 'string' ? { name: x } : x)) });
-            if (Array.isArray(legacy.saladBar.dressing)) sections.push({ label: "Dressing", items: legacy.saladBar.dressing.map(x => parseItem(typeof x === 'string' ? { name: x } : x)) });
+            if (Array.isArray(legacy.saladBar.lettuce))
+              sections.push({ label: "Lettuce", items: legacy.saladBar.lettuce.map(x => parseItem(typeof x === 'string' ? { name: x } : x)) });
+            if (Array.isArray(legacy.saladBar.toppings))
+              sections.push({ label: "Toppings", items: legacy.saladBar.toppings.map(x => parseItem(typeof x === 'string' ? { name: x } : x)) });
+            if (Array.isArray(legacy.saladBar.dressing))
+              sections.push({ label: "Dressing", items: legacy.saladBar.dressing.map(x => parseItem(typeof x === 'string' ? { name: x } : x)) });
           }
           return { subtitle: legacy.subtitle || "", sections };
         };
 
+        // Convert Lunch: expects meats and sides arrays (each item may have name, desc)
+        const convertLunch = (legacy) => {
+          if (!legacy) return { subtitle: "", meats: [], sides: [] };
+          // if already has meats/sides, just ensure items are objects
+          if (Array.isArray(legacy.meats) || Array.isArray(legacy.sides)) {
+            return {
+              subtitle: legacy.subtitle || "",
+              meats: (legacy.meats || []).map(m => typeof m === 'string' ? { name: m, desc: "" } : { name: m.name || "", desc: m.desc || "" }),
+              sides: (legacy.sides || []).map(s => typeof s === 'string' ? { name: s, desc: "" } : { name: s.name || "", desc: s.desc || "" })
+            };
+          }
+          // fallback: if legacy has sections, try to extract? better to return empty
+          return { subtitle: legacy.subtitle || "", meats: [], sides: [] };
+        };
+
+        // Build defaults
         const normalizedDefaults = {};
         categoryOrder.forEach(cat => {
           const direct = out.defaults[cat];
           const legacy = out.defaults[cat.toLowerCase()] || out.defaults[cat === "Salad Bar" ? "salad" : cat];
-          normalizedDefaults[cat] = convertLegacyCategory(direct || legacy || {}, cat);
+          if (cat === "Lunch") {
+            normalizedDefaults[cat] = convertLunch(direct || legacy || {});
+          } else {
+            normalizedDefaults[cat] = convertRegularCategory(direct || legacy || {}, cat);
+          }
         });
         out.defaults = normalizedDefaults;
 
+        // Process menus (daily overrides) similarly
         const normalizedMenus = {};
         Object.entries(out.menus || {}).forEach(([dateKey, dayMenu]) => {
           const dateBucket = {};
           categoryOrder.forEach(cat => {
             const legacyKey = cat === "Salad Bar" ? "salad" : cat.toLowerCase();
             const rawCat = dayMenu?.[cat] || dayMenu?.[legacyKey];
-            if (rawCat) dateBucket[cat] = convertLegacyCategory(rawCat, cat);
+            if (rawCat) {
+              if (cat === "Lunch") {
+                dateBucket[cat] = convertLunch(rawCat);
+              } else {
+                dateBucket[cat] = convertRegularCategory(rawCat, cat);
+              }
+            }
           });
           normalizedMenus[dateKey] = dateBucket;
         });
         out.menus = normalizedMenus;
 
-        // Ensure phoneTel is a string
         if (!out.phoneTel) out.phoneTel = "#";
         return out;
       }
@@ -1180,29 +1215,52 @@
         const specific = (app.data.menus && app.data.menus[isoDate]) ? app.data.menus[isoDate] : {};
         const out = {};
         categoryOrder.forEach(cat => {
-          out[cat] = clone(defaults[cat] || { subtitle: "", sections: [] });
-          if (specific[cat]) {
-            if (specific[cat].subtitle) out[cat].subtitle = specific[cat].subtitle;
-            if (Array.isArray(specific[cat].sections)) out[cat].sections = specific[cat].sections;
+          if (cat === "Lunch") {
+            out[cat] = clone(defaults[cat] || { subtitle: "", meats: [], sides: [] });
+            if (specific[cat]) {
+              if (specific[cat].subtitle) out[cat].subtitle = specific[cat].subtitle;
+              if (Array.isArray(specific[cat].meats)) out[cat].meats = specific[cat].meats;
+              if (Array.isArray(specific[cat].sides)) out[cat].sides = specific[cat].sides;
+            }
+          } else {
+            out[cat] = clone(defaults[cat] || { subtitle: "", sections: [] });
+            if (specific[cat]) {
+              if (specific[cat].subtitle) out[cat].subtitle = specific[cat].subtitle;
+              if (Array.isArray(specific[cat].sections)) out[cat].sections = specific[cat].sections;
+            }
           }
         });
         return out;
       }
 
-      function renderItemCard(item, category) {
-        const payload = {
-          key: `${category}::${item.name}`,
-          category,
-          name: item.name,
-          price: item.price
-        };
+      // Render a single item card – for Lunch meats/sides we set price = 0 (combo pricing)
+      function renderItemCard(item, category, type = null) {
+        let payload;
+        if (category === "Lunch" && (type === 'meat' || type === 'side')) {
+          payload = {
+            key: `Lunch-${type}-${item.name}`,
+            category: "Lunch",
+            name: item.name,
+            type: type,        // 'meat' or 'side'
+            price: 0            // combo pricing applied later
+          };
+        } else {
+          // standalone item from other categories
+          payload = {
+            key: `${category}-${item.name}`,
+            category,
+            name: item.name,
+            type: 'standalone',
+            price: item.price || 0
+          };
+        }
         const payloadStr = JSON.stringify(payload).replace(/'/g, "&apos;");
 
         return `
           <li class="item-card">
             <div class="item-top">
               <div class="item-name">${escapeHtml(item.name)}</div>
-              <div class="item-price">${item.price ? money(item.price) : '—'}</div>
+              ${category === "Lunch" && (type === 'meat' || type === 'side') ? '' : `<div class="item-price">${item.price ? money(item.price) : '—'}</div>`}
             </div>
             ${item.desc ? `
               <details class="item-details">
@@ -1212,7 +1270,7 @@
             ` : ""}
             <div class="item-actions">
               <button class="plus-btn" type="button" data-add='${payloadStr}'>+</button>
-              <span class="tag">${escapeHtml(category)}</span>
+              <span class="tag">${escapeHtml(category)}${type ? ` (${type})` : ''}</span>
               <span></span>
               <button class="add-btn" type="button" data-add='${payloadStr}'>Add</button>
             </div>
@@ -1221,12 +1279,30 @@
       }
 
       function renderCategoryPanel(dayLabel, dateObj, categoryName, categoryData) {
-        const sectionsHtml = (categoryData.sections || []).map(section => `
-          <h4 class="list-heading">${escapeHtml(section.label || "Items")}</h4>
-          <ul class="item-grid">
-            ${(section.items || []).map(item => renderItemCard(item, categoryName)).join("")}
-          </ul>
-        `).join("");
+        let contentHtml = '';
+        if (categoryName === "Lunch") {
+          // Render meats and sides
+          const meats = categoryData.meats || [];
+          const sides = categoryData.sides || [];
+          contentHtml = `
+            <h4 class="list-heading">Meats</h4>
+            <ul class="item-grid">
+              ${meats.map(item => renderItemCard(item, "Lunch", 'meat')).join('')}
+            </ul>
+            <h4 class="list-heading">Sides</h4>
+            <ul class="item-grid">
+              ${sides.map(item => renderItemCard(item, "Lunch", 'side')).join('')}
+            </ul>
+          `;
+        } else {
+          // Regular categories with sections
+          contentHtml = (categoryData.sections || []).map(section => `
+            <h4 class="list-heading">${escapeHtml(section.label || "Items")}</h4>
+            <ul class="item-grid">
+              ${(section.items || []).map(item => renderItemCard(item, categoryName)).join('')}
+            </ul>
+          `).join('');
+        }
 
         return `
           <div class="menu-panel cat-panel" data-cat-panel="${escapeHtml(categoryName)}" ${categoryName === app.currentCategory ? "" : "hidden"}>
@@ -1236,7 +1312,7 @@
             </div>
             <h3 class="section-title">${escapeHtml(categoryName)}</h3>
             <p class="section-sub">${escapeHtml(categoryData.subtitle || "")}</p>
-            ${sectionsHtml || '<div class="status-card">Nothing posted yet for this category.</div>'}
+            ${contentHtml || '<div class="status-card">Nothing posted yet for this category.</div>'}
             <div class="call-row">
               <a class="call-btn" href="${escapeHtml(app.data.phoneTel || "#")}"><i class="fas fa-phone"></i> Call to Order</a>
             </div>
@@ -1260,7 +1336,7 @@
           const d = new Date(start);
           d.setDate(start.getDate() + i);
           const menu = getMenuForDate(toISODateLocal(d));
-          const lunch = menu["Lunch"] || { subtitle: "", sections: [] };
+          const lunch = menu["Lunch"] || { subtitle: "", meats: [], sides: [] };
           cards.push(`
             <article class="advanced-card">
               <div class="advanced-head">
@@ -1273,12 +1349,14 @@
               <div class="menu-panel">
                 <h3 class="section-title">Lunch</h3>
                 <p class="section-sub">${escapeHtml(lunch.subtitle || "")}</p>
-                ${(lunch.sections || []).map(section => `
-                  <h4 class="list-heading">${escapeHtml(section.label || "Items")}</h4>
-                  <ul class="item-grid">
-                    ${(section.items || []).map(item => renderItemCard(item, "Lunch")).join("")}
-                  </ul>
-                `).join("")}
+                <h4 class="list-heading">Meats</h4>
+                <ul class="item-grid">
+                  ${(lunch.meats || []).map(item => renderItemCard(item, "Lunch", 'meat')).join('')}
+                </ul>
+                <h4 class="list-heading">Sides</h4>
+                <ul class="item-grid">
+                  ${(lunch.sides || []).map(item => renderItemCard(item, "Lunch", 'side')).join('')}
+                </ul>
               </div>
             </article>
           `);
@@ -1339,41 +1417,98 @@
         });
       }
 
+      // ----- PLATE BUILDER LOGIC -----
       function addToCart(payload) {
-        const existing = app.cart.find(item => item.key === payload.key);
-        if (existing) existing.qty += 1;
-        else app.cart.push({ ...payload, qty: 1 });
+        // Check limits for meats/sides
+        if (payload.type === 'meat') {
+          const meatCount = app.cart.filter(i => i.type === 'meat').reduce((sum, i) => sum + i.qty, 0);
+          if (meatCount >= app.limits.maxMeats) {
+            alert(`You can only add up to ${app.limits.maxMeats} meats.`);
+            return;
+          }
+        }
+        if (payload.type === 'side') {
+          const sideCount = app.cart.filter(i => i.type === 'side').reduce((sum, i) => sum + i.qty, 0);
+          if (sideCount >= app.limits.maxSides) {
+            alert(`You can only add up to ${app.limits.maxSides} sides.`);
+            return;
+          }
+        }
+
+        const existing = app.cart.find(i => i.key === payload.key);
+        if (existing) {
+          // Check if increasing would exceed limit
+          let newMeat = app.cart.filter(i => i.type === 'meat').reduce((sum, i) => sum + i.qty, 0);
+          let newSide = app.cart.filter(i => i.type === 'side').reduce((sum, i) => sum + i.qty, 0);
+          if (payload.type === 'meat') newMeat += 1;
+          if (payload.type === 'side') newSide += 1;
+          if (payload.type === 'meat' && newMeat > app.limits.maxMeats) {
+            alert(`You can only add up to ${app.limits.maxMeats} meats.`);
+            return;
+          }
+          if (payload.type === 'side' && newSide > app.limits.maxSides) {
+            alert(`You can only add up to ${app.limits.maxSides} sides.`);
+            return;
+          }
+          existing.qty += 1;
+        } else {
+          app.cart.push({ ...payload, qty: 1 });
+        }
         renderCart();
       }
 
       function renderCart() {
-        const totalItems = app.cart.reduce((sum, item) => sum + item.qty, 0);
-        const uniqueItems = app.cart.length;
-        const totalPrice = app.cart.reduce((sum, item) => sum + (item.qty * Number(item.price || 0)), 0);
+        const meats = app.cart.filter(i => i.type === 'meat').reduce((sum, i) => sum + i.qty, 0);
+        const sides = app.cart.filter(i => i.type === 'side').reduce((sum, i) => sum + i.qty, 0);
+        const extras = app.cart.filter(i => i.type === 'standalone').reduce((sum, i) => sum + i.qty, 0);
 
-        els.builderItemsCount.textContent = totalItems;
-        els.builderUniqueCount.textContent = uniqueItems;
-        els.builderTotal.textContent = money(totalPrice);
+        els.builderMeatCount.textContent = meats;
+        els.builderSideCount.textContent = sides;
+        els.builderExtraCount.textContent = extras;
 
+        // Calculate total
+        let total = 0;
+        if (meats > 0) {
+          if (meats === 1) total += app.comboPrices.meat1;
+          else if (meats === 2) total += app.comboPrices.meat2;
+          else total += app.comboPrices.meat3;
+          if (sides > 2) total += (sides - 2) * app.comboPrices.extraSide;
+        } else {
+          // no meats, sides charged at extra side rate
+          total += sides * app.comboPrices.extraSide;
+        }
+        // Add standalone items
+        app.cart.forEach(i => {
+          if (i.type === 'standalone') total += i.price * i.qty;
+        });
+
+        els.builderTotal.textContent = money(total);
+
+        // Render cart items
         els.cartList.querySelectorAll(".cart-item").forEach(node => node.remove());
-
-        if (!app.cart.length) {
+        if (app.cart.length === 0) {
           els.cartEmpty.style.display = "";
           return;
         }
-
         els.cartEmpty.style.display = "none";
 
         app.cart.forEach((item, index) => {
           const row = document.createElement("div");
           row.className = "cart-item";
+          let priceDisplay = '';
+          if (item.type === 'standalone') {
+            priceDisplay = money(item.price * item.qty);
+          } else {
+            // meat/side – price not shown individually, will be part of combo total
+            priceDisplay = '—';
+          }
           row.innerHTML = `
             <div class="cart-item-top">
               <div>
                 <div class="cart-item-name">${escapeHtml(item.name)}</div>
-                <div class="cart-item-meta">${escapeHtml(item.category)}</div>
+                <div class="cart-item-meta">${escapeHtml(item.category)}${item.type ? ` (${item.type})` : ''}</div>
               </div>
-              <div class="cart-item-price">${money(item.qty * Number(item.price || 0))}</div>
+              <div class="cart-item-price">${priceDisplay}</div>
             </div>
             <div class="cart-item-actions">
               <div class="qty-controls">
@@ -1389,9 +1524,9 @@
       }
 
       function copyCartSummary() {
-        const lines = app.cart.map(item => `${item.qty}x ${item.name} — ${money(item.qty * Number(item.price || 0))}`);
-        const totalPrice = app.cart.reduce((sum, item) => sum + (item.qty * Number(item.price || 0)), 0);
-        const text = lines.length ? `Hot Headz Plate\n\n${lines.join("\n")}\n\nTotal: ${money(totalPrice)}` : "Your plate is empty.";
+        const lines = app.cart.map(item => `${item.qty}x ${item.name} (${item.type || 'item'})`);
+        const total = els.builderTotal.textContent;
+        const text = lines.length ? `Hot Headz Plate\n\n${lines.join("\n")}\n\nTotal: ${total}` : "Your plate is empty.";
         navigator.clipboard.writeText(text).then(() => {
           const old = els.builderCopy.textContent;
           els.builderCopy.textContent = "Copied";
@@ -1399,6 +1534,7 @@
         }).catch(() => {});
       }
 
+      // ----- Navigation wheel -----
       function initNavigationWheel() {
         els.menuFab.addEventListener("click", (e) => {
           e.stopPropagation();
@@ -1437,6 +1573,7 @@
         });
       }
 
+      // ----- Event binding -----
       function bindEvents() {
         els.dayBar.addEventListener("click", (e) => {
           const btn = e.target.closest("[data-day]");
@@ -1480,9 +1617,27 @@
             const action = cartBtn.getAttribute("data-cart-action");
             const item = app.cart[index];
             if (!item) return;
-            if (action === "plus") item.qty += 1;
-            if (action === "minus") item.qty -= 1;
-            if (action === "remove" || item.qty <= 0) app.cart.splice(index, 1);
+            if (action === "plus") {
+              // check limits before increasing
+              let newMeat = app.cart.filter(i => i.type === 'meat').reduce((sum, i) => sum + i.qty, 0);
+              let newSide = app.cart.filter(i => i.type === 'side').reduce((sum, i) => sum + i.qty, 0);
+              if (item.type === 'meat') newMeat += 1;
+              if (item.type === 'side') newSide += 1;
+              if (item.type === 'meat' && newMeat > app.limits.maxMeats) {
+                alert(`You can only add up to ${app.limits.maxMeats} meats.`);
+                return;
+              }
+              if (item.type === 'side' && newSide > app.limits.maxSides) {
+                alert(`You can only add up to ${app.limits.maxSides} sides.`);
+                return;
+              }
+              item.qty += 1;
+            }
+            if (action === "minus") {
+              item.qty -= 1;
+              if (item.qty <= 0) app.cart.splice(index, 1);
+            }
+            if (action === "remove") app.cart.splice(index, 1);
             renderCart();
           }
         });
@@ -1510,6 +1665,7 @@
         });
       }
 
+      // ----- Initialisation -----
       async function init() {
         app.data = await fetchExternalMenuData() || getFallbackData();
 
