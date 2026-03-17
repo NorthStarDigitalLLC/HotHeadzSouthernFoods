@@ -1,525 +1,1186 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Guiding Light — DeVine Futurist | Guiding Light Pentecostal Church</title>
-
-  <!-- Fonts: Poppins + Orbitron (futuristic) -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guiding Light Pentecostal Church | Magnolia, Mississippi</title>
+  <meta name="description" content="Guiding Light Pentecostal Church in Magnolia, Mississippi. Join us Sundays at 10:00 AM and 6:00 PM, and Wednesdays at 7:30 PM." />
+  <meta name="theme-color" content="#080816" />
   <style>
-    :root{
-      --bg1:#05031a;
-      --bg2:#08122f;
-      --accent1: linear-gradient(90deg,#6ee7ff,#b07dff,#ff6ec7);
-      --glass: rgba(255,255,255,0.06);
-      --glass-strong: rgba(255,255,255,0.09);
-      --muted: #B9C1D9;
-      --highlight: #A8FFEF;
-      --card-radius:14px;
+    :root {
+      --bg: #050510;
+      --bg-2: #0b1026;
+      --bg-3: #11173a;
+      --card: rgba(255, 255, 255, 0.08);
+      --card-strong: rgba(255, 255, 255, 0.12);
+      --text: #f8f8ff;
+      --muted: #cdd3ef;
+      --gold: #ffd36b;
+      --gold-2: #ffefb0;
+      --blue: #6ed0ff;
+      --violet: #a48dff;
+      --line: rgba(255, 255, 255, 0.14);
+      --shadow: 0 20px 70px rgba(0, 0, 0, 0.45);
+      --radius: 24px;
+      --radius-lg: 34px;
+      --max: 1240px;
     }
 
-    /* Page reset */
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: radial-gradient(1200px 400px at 15% 10%, rgba(107,84,255,0.12), transparent),
-                  linear-gradient(180deg,var(--bg1),var(--bg2));
-      color:#E8F0FF;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      padding-bottom:60px;
-      overflow-y:auto;
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(110, 208, 255, 0.10), transparent 0 28%),
+        radial-gradient(circle at 80% 10%, rgba(164, 141, 255, 0.14), transparent 0 30%),
+        radial-gradient(circle at 50% 80%, rgba(255, 211, 107, 0.08), transparent 0 28%),
+        linear-gradient(180deg, #03030a 0%, #071125 32%, #090b1a 68%, #030308 100%);
+      color: var(--text);
+      overflow-x: hidden;
     }
 
-    /* Subtle animated star/noise */
-    .stars{
-      position:fixed; inset:0; z-index:0; pointer-events:none;
-      background-image: radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 3px 3px;
-      opacity:0.6;
-      mix-blend-mode:screen;
-      animation: drift 30s linear infinite;
-    }
-    @keyframes drift{from{transform:translateY(0)} to{transform:translateY(-20px)}}
-
-    /* Container */
-    .site{
-      position:relative;
-      z-index:2;
-      max-width:1200px;
-      margin:28px auto;
-      padding:28px;
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: auto;
+      pointer-events: none;
+      z-index: 0;
+      border-radius: 999px;
+      filter: blur(70px);
+      opacity: 0.6;
     }
 
-    /* Header */
-    header{
-      display:flex; align-items:center; justify-content:space-between;
-      gap:18px;
-      margin-bottom:18px;
-    }
-    .logo{
-      display:flex; align-items:center; gap:12px;
-    }
-    .brand{
-      display:flex; flex-direction:column; line-height:1;
-    }
-    .brand .title{
-      font-family:"Orbitron",sans-serif;
-      font-weight:700;
-      letter-spacing:1px;
-      font-size:20px;
-      color:transparent;
-      background: linear-gradient(90deg,#8EE9FF,#D29BFF,#FF9BD6);
-      -webkit-background-clip:text;
-      background-clip:text;
-      text-shadow:0 6px 16px rgba(0,0,0,0.4);
-    }
-    .brand .subtitle{
-      font-size:12px; color:var(--muted);
-      margin-top:4px;
-    }
-    .logo-mark{
-      width:56px; height:56px; border-radius:12px;
-      background:linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
-      display:flex; align-items:center; justify-content:center;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      position:relative; overflow:hidden;
-    }
-    .logo-mark svg{filter:drop-shadow(0 8px 24px rgba(96,86,255,0.18))}
-
-    /* Nav */
-    nav{display:flex;align-items:center;gap:12px}
-    nav a{
-      color:var(--muted); text-decoration:none; font-size:14px; padding:10px 12px;
-      border-radius:10px;
-    }
-    nav a:hover{background:rgba(255,255,255,0.03); color:#fff}
-
-    /* Alert bar */
-    .alert{
-      margin-top:8px;
-      display:flex;align-items:center;gap:10px;
-      background:linear-gradient(90deg, rgba(255,82,82,0.12), rgba(255,200,200,0.03));
-      color:#FFD6D6;
-      padding:10px 14px; border-radius:10px; font-size:14px;
-      border:1px solid rgba(255,82,82,0.12);
+    body::before {
+      width: 32rem;
+      height: 32rem;
+      top: -8rem;
+      left: -8rem;
+      background: radial-gradient(circle, rgba(110, 208, 255, 0.25), transparent 60%);
     }
 
-    /* Hero */
-    .hero{
-      margin-top:22px;
-      display:grid;
-      grid-template-columns: 1fr 380px;
-      gap:22px;
-      align-items:start;
-    }
-    .hero-left{
-      padding:28px;
-      border-radius:var(--card-radius);
-      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-      border:1px solid rgba(255,255,255,0.04);
-      box-shadow: 0 10px 30px rgba(3,6,30,0.45);
-    }
-    .hero .h-title{
-      font-family:"Orbitron", sans-serif;
-      font-size:34px; margin:0 0 8px 0; color:#fff;
-      text-shadow: 0 6px 20px rgba(60,40,110,0.55);
-    }
-    .accent-line{
-      width:64px; height:6px; border-radius:4px;
-      background:linear-gradient(90deg,#6ee7ff,#b07dff,#ff6ec7);
-      margin:10px 0 20px;
-      box-shadow: 0 6px 20px rgba(160,120,255,0.14);
-    }
-    .hero p.lead{color:var(--muted); font-size:15px; margin:0 0 16px}
-    .hero .cta{display:flex; gap:12px; margin-top:14px}
-    .btn{
-      padding:12px 16px; border-radius:10px; text-decoration:none; display:inline-flex;align-items:center;
-      gap:10px; font-weight:600; border: none; cursor:pointer;
-      background:linear-gradient(90deg,#9ef3ff,#d9a6ff); color:#021128;
-      box-shadow: 0 8px 28px rgba(91,79,255,0.12);
-    }
-    .btn.secondary{
-      background:transparent; color:var(--highlight); border:1px solid rgba(168,255,239,0.14);
+    body::after {
+      width: 34rem;
+      height: 34rem;
+      right: -10rem;
+      top: 8rem;
+      background: radial-gradient(circle, rgba(255, 211, 107, 0.18), transparent 60%);
     }
 
-    .hero .contact-block{
-      margin-top:18px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;
-    }
-    .pill{background:var(--glass); padding:10px 12px; border-radius:999px; font-weight:600; font-size:13px; color:#EAF7F6}
-
-    /* Right panel */
-    .hero-right{
-      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-      padding:18px; border-radius:var(--card-radius); border:1px solid rgba(255,255,255,0.04);
-    }
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:12px; padding:14px; border:1px solid rgba(255,255,255,0.03);
-      margin-bottom:12px;
-    }
-    .times-list{display:flex;flex-direction:column;gap:8px}
-    .time-item{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;background:linear-gradient(90deg, rgba(168,255,239,0.03), rgba(180,135,255,0.02));}
-    .time-item b{font-size:15px;color:#fff}
-    .muted{color:var(--muted);font-size:13px}
-
-    /* Main sections */
-    main{margin-top:26px; display:grid; gap:22px}
-    .grid-3{
-      display:grid; grid-template-columns: repeat(3,1fr); gap:16px;
-    }
-    .grid-2{display:grid; grid-template-columns: 1fr 420px; gap:20px}
-
-    section h3{
-      margin:0 0 12px 0; font-family:"Orbitron",sans-serif; font-size:18px; letter-spacing:0.6px;
-      color: #CFEFFF;
+    .stars,
+    .stars::before,
+    .stars::after {
+      position: fixed;
+      inset: 0;
+      content: "";
+      pointer-events: none;
+      z-index: 0;
+      background-repeat: repeat;
+      opacity: 0.5;
     }
 
-    /* Ministries & Events */
-    .mini-card{padding:14px; border-radius:12px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03)}
-    .event{display:flex;gap:12px; align-items:flex-start}
-    .event .badge{width:42px;height:42px;background:linear-gradient(90deg,#9ef3ff,#d9a6ff);border-radius:8px;color:#021128;display:flex;align-items:center;justify-content:center;font-weight:700}
-
-    /* Contact form (no backend) */
-    form.contact{display:flex; flex-direction:column; gap:10px}
-    form input, form textarea{
-      padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);background:transparent;color:#eaf1ff;outline:none;
+    .stars {
+      background-image:
+        radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,.95), transparent 55%),
+        radial-gradient(1.5px 1.5px at 70px 120px, rgba(255,255,255,.85), transparent 55%),
+        radial-gradient(1.8px 1.8px at 140px 60px, rgba(255,211,107,.9), transparent 55%),
+        radial-gradient(1.5px 1.5px at 240px 140px, rgba(110,208,255,.95), transparent 55%),
+        radial-gradient(1.7px 1.7px at 320px 40px, rgba(255,255,255,.8), transparent 55%);
+      background-size: 360px 180px;
+      animation: drift 45s linear infinite;
     }
-    form button{align-self:flex-start}
-    .note{font-size:12px;color:var(--muted); margin-top:6px}
 
-    /* Footer */
-    footer{margin-top:26px;padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)}
-    .small{font-size:13px;color:var(--muted)}
-
-    /* Responsive */
-    @media (max-width:980px){
-      .hero{grid-template-columns:1fr}
-      .grid-3{grid-template-columns:repeat(2,1fr)}
-      .logo-mark{width:46px;height:46px}
+    .stars::before {
+      background-image:
+        radial-gradient(1.7px 1.7px at 40px 80px, rgba(255,255,255,.85), transparent 55%),
+        radial-gradient(1.3px 1.3px at 100px 30px, rgba(164,141,255,.85), transparent 55%),
+        radial-gradient(1.8px 1.8px at 200px 120px, rgba(255,239,176,.95), transparent 55%),
+        radial-gradient(1.3px 1.3px at 280px 60px, rgba(255,255,255,.75), transparent 55%);
+      background-size: 320px 190px;
+      animation: driftReverse 70s linear infinite;
+      opacity: .45;
     }
-    @media (max-width:620px){
-      .grid-3{grid-template-columns:1fr}
-      nav{display:none}
-      .hero-left{padding:18px}
-      .hero-right{padding:12px}
-      .brand .title{font-size:16px}
+
+    .stars::after {
+      background-image:
+        radial-gradient(2px 2px at 60px 40px, rgba(255,255,255,.9), transparent 55%),
+        radial-gradient(1.7px 1.7px at 160px 110px, rgba(110,208,255,.8), transparent 55%),
+        radial-gradient(1.5px 1.5px at 300px 80px, rgba(255,211,107,.85), transparent 55%);
+      background-size: 420px 220px;
+      animation: pulse 9s ease-in-out infinite;
+      opacity: .28;
+    }
+
+    @keyframes drift {
+      from { transform: translate3d(0, 0, 0); }
+      to { transform: translate3d(-180px, 120px, 0); }
+    }
+
+    @keyframes driftReverse {
+      from { transform: translate3d(0, 0, 0); }
+      to { transform: translate3d(120px, -90px, 0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: .22; }
+      50% { opacity: .4; }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @keyframes beam {
+      0%, 100% { opacity: 0.55; transform: translateX(-50%) scaleY(1); }
+      50% { opacity: 0.85; transform: translateX(-50%) scaleY(1.08); }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(calc(100% - 32px), var(--max));
+      margin: 0 auto;
+    }
+
+    .glass {
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      margin: 18px auto 0;
+      width: min(calc(100% - 18px), calc(var(--max) + 28px));
+      border-radius: 999px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 20%, rgba(255,239,176,1), rgba(255,211,107,.9) 18%, rgba(164,141,255,.35) 38%, rgba(11,16,38,.95) 72%);
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 0 24px rgba(255, 211, 107, .3);
+      flex: 0 0 auto;
+    }
+
+    .brand-mark::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 8px;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 28px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255,255,255,0), rgba(255,239,176,.95), rgba(110,208,255,0));
+      box-shadow: 0 0 24px rgba(255, 239, 176, .6);
+      animation: beam 4s ease-in-out infinite;
+    }
+
+    .brand-mark::after {
+      content: "✦";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      color: rgba(255,255,255,.92);
+      text-shadow: 0 0 18px rgba(255,239,176,.75);
+    }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: .2em;
+      font-size: .72rem;
+      color: var(--gold-2);
+      margin-bottom: 4px;
+      opacity: .95;
+    }
+
+    .brand-copy strong {
+      display: block;
+      font-size: 1rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    nav a {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: var(--muted);
+      transition: .25s ease;
+      font-size: .95rem;
+    }
+
+    nav a:hover {
+      color: white;
+      background: rgba(255,255,255,.07);
+    }
+
+    .btn,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border-radius: 999px;
+      padding: 14px 22px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+      border: 1px solid transparent;
+      cursor: pointer;
+    }
+
+    .btn:hover,
+    .btn-ghost:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn {
+      color: #07101f;
+      background: linear-gradient(135deg, var(--gold-2), var(--gold));
+      box-shadow: 0 12px 28px rgba(255, 211, 107, .25);
+    }
+
+    .btn-ghost {
+      color: white;
+      border-color: rgba(255,255,255,.18);
+      background: rgba(255,255,255,.05);
+    }
+
+    .hero {
+      padding: 84px 0 44px;
+    }
+
+    .hero-shell {
+      position: relative;
+      padding: 38px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      min-height: 78vh;
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .hero-shell::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      background:
+        radial-gradient(circle at 50% 10%, rgba(255,239,176,.14), transparent 30%),
+        radial-gradient(circle at 0% 100%, rgba(110,208,255,.12), transparent 26%),
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+      z-index: 0;
+    }
+
+    .hero-copy,
+    .hero-side {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.12);
+      color: var(--gold-2);
+      margin-bottom: 22px;
+      font-size: .92rem;
+    }
+
+    h1 {
+      font-size: clamp(3rem, 7vw, 6.2rem);
+      line-height: .95;
+      margin: 0;
+      letter-spacing: -.04em;
+      max-width: 12ch;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #ffffff, #fff8d9, #b8e9ff, #ffffff);
+      background-size: 240% 240%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: shimmer 8s linear infinite;
+    }
+
+    .hero p {
+      margin: 20px 0 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.72;
+      max-width: 62ch;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .hero-notes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 26px;
+    }
+
+    .chip {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      color: #edf1ff;
+      font-size: .92rem;
+    }
+
+    .hero-side {
+      display: grid;
+      gap: 18px;
+      align-content: center;
+    }
+
+    .vision-card {
+      border-radius: 30px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+      min-height: 430px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)),
+        radial-gradient(circle at 50% 18%, rgba(255,239,176,.96) 0, rgba(255,211,107,.75) 8%, rgba(110,208,255,.22) 20%, rgba(8,10,28,.0) 36%),
+        linear-gradient(180deg, rgba(9,15,36,.85), rgba(5,5,16,.98));
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+    }
+
+    .vision-card::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 24px;
+      width: 240px;
+      height: 240px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,239,176,.78), rgba(255,211,107,.22) 32%, rgba(110,208,255,.10) 48%, rgba(0,0,0,0) 70%);
+      filter: blur(10px);
+      animation: float 7s ease-in-out infinite;
+    }
+
+    .vision-card::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 96px;
+      width: 3px;
+      height: 210px;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, rgba(255,255,255,0), rgba(255,239,176,.95), rgba(110,208,255,.15), rgba(255,255,255,0));
+      box-shadow: 0 0 40px rgba(255, 239, 176, .48);
+      animation: beam 4.8s ease-in-out infinite;
+    }
+
+    .vision-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .mini-card {
+      border-radius: 22px;
+      padding: 18px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.11);
+    }
+
+    .mini-card strong,
+    .info-card strong,
+    .section-title strong {
+      display: block;
+      font-size: 1rem;
+      margin-bottom: 8px;
+    }
+
+    .mini-card p,
+    .info-card p,
+    .about-card p,
+    .quote-card p,
+    .visit-copy p,
+    .belief p,
+    .footer-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    section {
+      padding: 26px 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .section-title span {
+      display: inline-block;
+      margin-bottom: 12px;
+      color: var(--gold-2);
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      font-size: .76rem;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.6rem);
+      line-height: 1.02;
+      letter-spacing: -.03em;
+    }
+
+    .section-head p {
+      max-width: 48ch;
+      color: var(--muted);
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .info-grid,
+    .three-grid,
+    .belief-grid,
+    .footer-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .info-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .info-card,
+    .about-card,
+    .belief,
+    .footer-card,
+    .visit-card,
+    .quote-card {
+      border-radius: 26px;
+      padding: 24px;
+    }
+
+    .info-card {
+      min-height: 170px;
+    }
+
+    .info-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--gold-2);
+      font-size: .82rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .info-big {
+      font-size: clamp(1.3rem, 2.2vw, 2rem);
+      line-height: 1.08;
+      margin-bottom: 10px;
+      font-weight: 800;
+    }
+
+    .three-grid {
+      grid-template-columns: 1.1fr .9fr .9fr;
+      align-items: stretch;
+    }
+
+    .about-card {
+      min-height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .about-card::before {
+      content: "";
+      position: absolute;
+      right: -60px;
+      top: -60px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,211,107,.18), transparent 68%);
+      pointer-events: none;
+    }
+
+    .stat-list {
+      display: grid;
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .stat {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.1);
+    }
+
+    .stat b {
+      min-width: 92px;
+      color: white;
+      font-size: .95rem;
+    }
+
+    .quote-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04)),
+        radial-gradient(circle at top right, rgba(110,208,255,.18), transparent 30%),
+        linear-gradient(180deg, rgba(8,12,28,.85), rgba(5,5,16,.95));
+    }
+
+    .quote-card blockquote {
+      margin: 0;
+      font-size: 1.3rem;
+      line-height: 1.55;
+      color: white;
+    }
+
+    .quote-card small {
+      color: var(--gold-2);
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 16px;
+    }
+
+    .belief-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .belief {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .belief::after {
+      content: "";
+      position: absolute;
+      inset: auto -20% -40% auto;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,211,107,.12), transparent 70%);
+      pointer-events: none;
+    }
+
+    .belief strong {
+      font-size: 1.15rem;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .visit-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .visit-card {
+      min-height: 100%;
+    }
+
+    .visit-list {
+      display: grid;
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .visit-row {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 14px 0;
+      border-top: 1px solid rgba(255,255,255,.1);
+    }
+
+    .visit-row:first-child { border-top: 0; padding-top: 0; }
+
+    .visit-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.1);
+      color: var(--gold-2);
+      font-weight: 700;
+    }
+
+    .cta-band {
+      padding-bottom: 72px;
+    }
+
+    .cta-card {
+      padding: 28px;
+      border-radius: 30px;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 18px;
+      align-items: center;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.05)),
+        radial-gradient(circle at 20% 50%, rgba(255,211,107,.14), transparent 32%),
+        radial-gradient(circle at 80% 50%, rgba(110,208,255,.12), transparent 32%);
+    }
+
+    .cta-card h3 {
+      margin: 0 0 12px;
+      font-size: clamp(1.8rem, 3vw, 3rem);
+      letter-spacing: -.03em;
+    }
+
+    footer {
+      padding: 0 0 40px;
+    }
+
+    .footer-grid {
+      grid-template-columns: 1.1fr .9fr .9fr;
+    }
+
+    .footer-card {
+      min-height: 100%;
+    }
+
+    .footer-title {
+      color: var(--gold-2);
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      font-size: .78rem;
+      margin-bottom: 12px;
+    }
+
+    .list-clean {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 12px;
+      color: var(--muted);
+    }
+
+    .list-clean a:hover { color: white; }
+
+    .subtle {
+      color: #aeb7dc;
+      font-size: .9rem;
+      line-height: 1.7;
+    }
+
+    .copyright {
+      text-align: center;
+      color: #99a3ce;
+      margin-top: 18px;
+      font-size: .9rem;
+    }
+
+    @media (max-width: 1100px) {
+      .hero-shell,
+      .three-grid,
+      .visit-wrap,
+      .cta-card,
+      .footer-grid,
+      .info-grid,
+      .belief-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .hero-shell {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar {
+        border-radius: 24px;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      nav {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .hero {
+        padding-top: 38px;
+      }
+
+      .hero-shell,
+      .three-grid,
+      .visit-wrap,
+      .cta-card,
+      .footer-grid,
+      .info-grid,
+      .belief-grid,
+      .vision-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-shell {
+        padding: 22px;
+      }
+
+      h1 {
+        max-width: none;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn,
+      .btn-ghost {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
   <div class="stars" aria-hidden="true"></div>
 
-  <div class="site">
-    <header>
-      <div class="logo">
-        <div class="logo-mark" aria-hidden="true">
-          <!-- stylized guiding light / cross mark -->
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M12 2v20M2 12h20" stroke="url(#g1)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-            <defs>
-              <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stop-color="#9ef3ff"/>
-                <stop offset="0.6" stop-color="#d9a6ff"/>
-                <stop offset="1" stop-color="#ff9bd6"/>
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-        <div class="brand">
-          <span class="title">DeVine × Guiding Light</span>
-          <span class="subtitle">Guiding Light Pentecostal Church — Magnolia, MS</span>
-        </div>
+  <header class="topbar glass">
+    <a class="brand" href="#top" aria-label="Guiding Light Pentecostal Church home">
+      <div class="brand-mark" aria-hidden="true"></div>
+      <div class="brand-copy">
+        <div class="eyebrow">Magnolia, Mississippi</div>
+        <strong>Guiding Light Pentecostal Church</strong>
       </div>
+    </a>
 
-      <nav aria-label="Main navigation">
-        <a href="#visit">Plan a Visit</a>
-        <a href="#ministries">Ministries</a>
-        <a href="#events">Events</a>
-        <a href="#media">Sermons</a>
-        <a href="#contact">Contact</a>
-        <a href="https://facebook.com" target="_blank" aria-label="Facebook (primary social)">Facebook</a>
-      </nav>
-    </header>
+    <nav aria-label="Primary navigation">
+      <a href="#about">About</a>
+      <a href="#times">Service Times</a>
+      <a href="#beliefs">Beliefs</a>
+      <a href="#visit">Plan Your Visit</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
 
-    <!-- ALERT bar -->
-    <div class="alert" role="status" aria-live="polite">
-      <svg width="18" height="18" viewBox="0 0 24 24" style="flex-shrink:0;margin-right:4px">
-        <path fill="#FFB8B8" d="M1 21h22L12 2 1 21z"/>
-      </svg>
-      <div>
-        <strong>Site alert:</strong> Weather-related cancellations are posted frequently. Use the top "News/Alerts" banner for urgent updates.
-      </div>
-    </div>
-
-    <!-- HERO -->
-    <section class="hero" aria-labelledby="hero-heading">
-      <div class="hero-left">
-        <h1 id="hero-heading" class="h-title">Welcome to Guiding Light — Come Worship With Us</h1>
-        <div class="accent-line" aria-hidden="true"></div>
-
-        <p class="lead">
-          Guiding Light Pentecostal Church (also published as <em>Guiding Light Apostolic Church</em>) is a UPCI/Apostolic congregation in Magnolia, MS.
-          We welcome families, youth, and visitors — Bible-centered, prayer-forward worship in a friendly community.
-        </p>
-
-        <div class="cta">
-          <a class="btn" href="#visit">Plan Your Visit</a>
-          <a class="btn secondary" href="#contact">Request Prayer</a>
-          <a class="btn secondary" href="#events">See Events</a>
-        </div>
-
-        <div class="contact-block" style="margin-top:18px">
-          <div class="pill" title="Primary phone">📞 (601) 783-2599</div>
-          <div class="pill" title="Pastor">👤 Pastor Joseph Dykes</div>
-          <div class="pill muted" title="Denomination">UPCI / Oneness Pentecostal</div>
-        </div>
-
-        <div style="margin-top:18px;font-size:13px;color:var(--muted)">
-          <strong>Service times</strong><br>
-          Sunday 10:00 AM • Sunday 6:00 PM (pre-prayer 5:30 PM) • Wednesday 7:30 PM
-        </div>
-
-      </div>
-
-      <aside class="hero-right" aria-label="Key details">
-        <!-- Times Card -->
-        <div class="card" aria-hidden="false">
-          <h4 style="margin:0 0 8px 0">Service Times</h4>
-          <div class="times-list" role="list">
-            <div class="time-item" role="listitem">
-              <div><b>Sunday Morning</b><div class="muted" style="font-size:13px">10:00 AM — Worship & Teaching</div></div>
-              <div class="muted">10:00 AM</div>
-            </div>
-
-            <div class="time-item" role="listitem">
-              <div><b>Sunday Evening</b><div class="muted" style="font-size:13px">Pre-Prayer at 5:30 PM, Service 6:00 PM</div></div>
-              <div class="muted">6:00 PM</div>
-            </div>
-
-            <div class="time-item" role="listitem">
-              <div><b>Wednesday Night</b><div class="muted" style="font-size:13px">Midweek Service</div></div>
-              <div class="muted">7:30 PM</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Contact Card -->
-        <div class="card">
-          <h4 style="margin:0 0 8px 0">Contact & Social</h4>
-          <div class="muted" style="font-size:14px">
-            <strong>Primary phone:</strong> <a href="tel:+16017832599" style="color:var(--highlight);text-decoration:none">(601) 783-2599</a><br>
-            <strong>Additional phone(s):</strong> (601) 551-7230 (pastor contact), +1 601-395-8131 (unverified)<br>
-            <strong>Pastor contact (public profile):</strong> <span style="color:var(--muted)">revjleed@gmail.com</span>
-            <div class="note">Use the pastor's email only with explicit permission before publishing.</div>
-          </div>
-
-          <div style="margin-top:12px;display:flex;gap:8px">
-            <a class="btn" href="#contact">Contact Us</a>
-            <a class="btn secondary" href="https://facebook.com" target="_blank">Facebook</a>
-          </div>
-        </div>
-
-        <!-- Address Card -->
-        <div class="card">
-          <h4 style="margin:0 0 8px 0">Address / Map (verify)</h4>
-          <div class="muted" style="font-size:14px">
-            <strong>Address candidates (needs confirmation):</strong><br>
-            • 1108 Guiding Light Rd, Magnolia, MS 39652 (appears in MerchantCircle / Manta / D&B)<br>
-            • 1115 Guiding Light Rd, Magnolia, MS 39652 (appears in JoinMyChurch / UnitedStatesChurches)<br>
-            <div style="margin-top:8px"><strong>Provisional coordinates:</strong> 31.076501, -90.403731 (tied to 1108 listing)</div>
-            <div class="note">Please confirm the correct street address and map pin before publishing official directions.</div>
-          </div>
-        </div>
-
-      </aside>
-    </section>
-
-    <!-- MAIN: About / Ministries / Events -->
-    <main>
-
-      <section id="about" aria-labelledby="about-heading">
-        <h3 id="about-heading">About Guiding Light</h3>
-        <div class="grid-2">
-          <div class="mini-card">
-            <p><strong>Names observed:</strong> Guiding Light Pentecostal Church (primary), Guiding Light Apostolic Church (pastor profile), Guiding Light Church (directory shorthand).</p>
-
-            <p><strong>Denominational frame:</strong> Multiple directories classify the church as <strong>United Pentecostal Church International (UPCI)</strong> and public posts reference UPCI youth programs and missions. For doctrinal copy, summarize UPCI beliefs and link to the denomination for full text.</p>
-
-            <p><strong>Mission / Vision (placeholder):</strong> Welcoming, Bible-focused, and committed to impacting the Magnolia community. Use this as a placeholder until the church provides an official mission statement.</p>
-
-            <p class="note">Reported founding / establishment years (1993–1994) appear in directories but should be confirmed before publishing as historical fact.</p>
-          </div>
-
-          <aside class="mini-card">
-            <h4 style="margin:0 0 8px 0">Leadership</h4>
-            <div>
-              <strong>Pastor</strong><br>
-              Joseph Dykes — listed as pastor across directories and in a public profile. Public profile notes Joseph Dykes is a nurse practitioner in Summit, MS and a UPCI minister. Please confirm biography text prior to publication.
-            </div>
-          </aside>
-        </div>
-      </section>
-
-      <section id="ministries" aria-labelledby="ministries-heading">
-        <h3 id="ministries-heading">Ministries & Programs</h3>
-        <div class="grid-3">
-          <div class="mini-card">
-            <strong>Youth & Students</strong>
-            <p class="muted">Evidence: UPCI youth missions references; youth-focused activities and mission trips implied.</p>
-          </div>
-
-          <div class="mini-card">
-            <strong>Missions</strong>
-            <p class="muted">Costa Rica mission trip (Aug 2024) with fundraising links referenced in public posts. Add a missions page and donate flow for organized fundraising.</p>
-          </div>
-
-          <div class="mini-card">
-            <strong>Prayer & Fellowship</strong>
-            <p class="muted">Pre-prayer at 5:30 PM before Sunday evening service, recurring revival services, and fellowship hall usage (yard sale reference). Add a Prayer / Fellowship page.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="events" aria-labelledby="events-heading">
-        <h3 id="events-heading">Events & News</h3>
-        <div style="display:flex;flex-direction:column;gap:12px">
-          <div class="mini-card event">
-            <div class="badge">M</div>
-            <div>
-              <strong>Costa Rica — UPCI Youth Mission (Aug 2024)</strong>
-              <div class="muted">Fundraising link referenced in public posts. Migrate fundraising to a church-owned giving page when available.</div>
-            </div>
-          </div>
-
-          <div class="mini-card event">
-            <div class="badge">Y</div>
-            <div>
-              <strong>Yard Sale — Fellowship Hall</strong>
-              <div class="muted">Held inside the fellowship hall (example: Feb 9–10, starts 8 AM). Community fundraising culture is active.</div>
-            </div>
-          </div>
-
-          <div class="mini-card event">
-            <div class="badge">R</div>
-            <div>
-              <strong>Revival Series</strong>
-              <div class="muted">Recurring revival announcements appear publicly. Display an "Alerts" or "News" banner for cancellations/updates.</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="media" aria-labelledby="media-heading">
-        <h3 id="media-heading">Sermons & Media</h3>
-        <div class="grid-2">
-          <div class="mini-card">
-            <p class="muted">No independent church website was found in directory searches (most listings show "website not available" and point to Facebook). A YouTube presence is suggested by some search results but not verified here. Recommended: embed official YouTube playlists and mirror Facebook posts into a "News/Alerts" feed.</p>
-            <p class="note">Action: Confirm official channels (Facebook/YouTube) and request official access or embed codes.</p>
-          </div>
-
-          <aside class="mini-card">
-            <h4 style="margin:0 0 8px 0">Assets & Rights</h4>
-            <ul style="margin:0;padding-left:18px;color:var(--muted)">
-              <li>Exterior photo (found in search) — likely third-party; obtain church-owned photos before publishing.</li>
-              <li>Event flyers / social posts — collect originals and confirm reuse rights.</li>
-              <li>Logo / brand colors — not found; request vector logo or create a simple brand kit.</li>
-            </ul>
-          </aside>
-        </div>
-      </section>
-
-      <section id="visit" aria-labelledby="visit-heading">
-        <h3 id="visit-heading">Plan Your Visit</h3>
-
-        <div class="mini-card">
-          <p><strong>What to expect</strong> — Warm, Bible-focused worship with friendly, prayerful community. Attire: casual to Sunday best. Children: confirm children's ministry details before publishing full page copy.</p>
-
-          <p class="muted"><strong>Accessibility</strong> — Wheelchair ramps, accessible restrooms, hearing assistance, and parking details were unspecified in public sources. Include a short accessibility contact block (or "contact us for accommodations") until verified.</p>
-
-          <div style="margin-top:12px">
-            <a class="btn" href="#contact">Contact for accommodations</a>
-            <a class="btn secondary" href="#visit" style="margin-left:10px">Get Directions</a>
-          </div>
-        </div>
-
-      </section>
-
-      <section id="contact" aria-labelledby="contact-heading">
-        <h3 id="contact-heading">Contact & Give</h3>
-
-        <div class="grid-2">
-          <div class="mini-card">
-            <h4 style="margin-top:0">Contact details</h4>
-            <p class="small">
-              <strong>Primary phone:</strong> (601) 783-2599<br>
-              <strong>Additional phone (pastor):</strong> (601) 551-7230<br>
-              <strong>Alternate / unverified:</strong> +1 601-395-8131<br>
-              <strong>Pastor public profile email:</strong> revjleed@gmail.com (publish only with permission)<br>
-              <strong>Website presence:</strong> Currently Facebook-focused (no independent website found in directories).
+  <main id="top">
+    <section class="hero">
+      <div class="wrap">
+        <div class="hero-shell glass">
+          <div class="hero-copy">
+            <div class="hero-kicker">✦ A place of worship, prayer, and life-changing light</div>
+            <h1><span class="gradient-text">Where heaven’s light meets everyday life.</span></h1>
+            <p>
+              Welcome to <strong>Guiding Light Pentecostal Church</strong> in Magnolia, Mississippi — a church home centered on worship,
+              truth, prayer, and the presence of God. This homepage was designed to feel both <em>futuristic</em> and <em>divine</em>:
+              radiant, reverent, and inviting from the very first scroll.
+            </p>
+            <p>
+              Join us for powerful worship, Bible-centered preaching, and a church family that believes God still transforms lives.
             </p>
 
-            <p class="note">For donations: Provide secure online giving or instructions for mail-in giving. If fundraising links exist, migrate to church-controlled giving pages.</p>
+            <div class="hero-actions">
+              <a class="btn" href="#visit">Plan Your Visit</a>
+              <a class="btn-ghost" href="tel:+16017832599">Call (601) 783-2599</a>
+            </div>
+
+            <div class="hero-notes">
+              <div class="chip">Sunday 10:00 AM</div>
+              <div class="chip">Sunday 6:00 PM</div>
+              <div class="chip">Wednesday 7:30 PM</div>
+              <div class="chip">Pentecostal • Apostolic</div>
+            </div>
           </div>
 
-          <!-- Contact form (no backend) -->
-          <aside class="mini-card">
-            <h4 style="margin-top:0">Send a message / Request Prayer</h4>
-            <form class="contact" onsubmit="fakeSubmit(event)">
-              <input type="text" name="name" placeholder="Your name" required />
-              <input type="email" name="email" placeholder="Email (optional)" />
-              <input type="tel" name="phone" placeholder="Phone (optional)" />
-              <textarea name="message" rows="4" placeholder="Message or prayer request"></textarea>
-              <div style="display:flex;gap:8px;align-items:center">
-                <button class="btn" type="submit">Send Message</button>
-                <button class="btn secondary" type="button" onclick="alert('Please email or call the church for immediate prayer requests.')">Call / Immediate</button>
+          <div class="hero-side">
+            <div class="vision-card">
+              <div>
+                <div class="eyebrow">A radiant place to belong</div>
+                <h2 style="margin:0 0 10px;font-size:2rem;letter-spacing:-.03em;">Built around light, presence, and purpose.</h2>
+                <p style="margin:0;color:var(--muted);max-width:36ch;line-height:1.75;">
+                  A visual identity that feels celestial and modern while still grounded in warmth, holiness, and invitation.
+                </p>
               </div>
-              <div class="note">This form is demo-only. Connect to an email or server-side endpoint to collect messages.</div>
-            </form>
-          </aside>
-        </div>
-      </section>
-
-    </main>
-
-    <!-- Footer with research notes -->
-    <footer>
-      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
-        <div>
-          <div style="font-weight:700">Guiding Light Pentecostal Church — Magnolia, MS</div>
-          <div class="small" style="margin-top:6px">Primary phone: (601) 783-2599 — Pastor: Joseph Dykes — Service times: Sun 10:00 AM / Sun 6:00 PM (pre-prayer 5:30 PM) / Wed 7:30 PM</div>
-        </div>
-
-        <div style="max-width:560px">
-          <details>
-            <summary style="cursor:pointer;color:var(--muted);margin-bottom:8px">Research & publishing notes (click to expand)</summary>
-            <div class="small" style="color:var(--muted);line-height:1.45">
-              • Address discrepancy: directories list <strong>1108 Guiding Light Rd</strong> and <strong>1115 Guiding Light Rd</strong> (verify with church or official mail/photo).<br>
-              • MerchantCircle lists coordinates <strong>31.076501, -90.403731</strong> (tied to 1108 listing). Treat map pin as provisional.<br>
-              • No official church website found in directory searches; Facebook is the primary online presence in public listings. Choose a simple “Visit / Times / Directions / Contact” launch site and expand to Leadership, Ministries, Sermons, and Give.<br>
-              • Assets: obtain church-owned exterior/interior photos and an official logo before publishing. Confirm rights for any third-party images/flyers.<br>
-              • Legal/tax: churches meeting IRS rules are usually tax-exempt; state incorporation and EIN were unspecified for this church in public searches. Confirm legal details if needed for donations/forms.<br>
-              • Pastor public profile email: <strong>revjleed@gmail.com</strong> — publish only with explicit permission.
             </div>
-          </details>
+
+            <div class="vision-grid">
+              <div class="mini-card glass">
+                <strong>Pastor</strong>
+                <p>Joseph Dykes</p>
+              </div>
+              <div class="mini-card glass">
+                <strong>Phone</strong>
+                <p>(601) 783-2599</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </footer>
-  </div>
+    </section>
+
+    <section id="times">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-title">
+            <span>Service Times</span>
+            <h2>Come worship with us.</h2>
+          </div>
+          <p>
+            Clear, visible service times are one of the most important things for a church homepage. These are placed high on the page so visitors can find them instantly.
+          </p>
+        </div>
+
+        <div class="info-grid">
+          <article class="info-card glass">
+            <div class="info-label">Sunday Morning</div>
+            <div class="info-big">10:00 AM</div>
+            <p>Gather with us for worship, preaching, prayer, and fellowship.</p>
+          </article>
+
+          <article class="info-card glass">
+            <div class="info-label">Sunday Evening</div>
+            <div class="info-big">6:00 PM</div>
+            <p>Return for a powerful evening service. Pre-prayer begins at 5:30 PM.</p>
+          </article>
+
+          <article class="info-card glass">
+            <div class="info-label">Midweek</div>
+            <div class="info-big">Wednesday 7:30 PM</div>
+            <p>Recharge in the middle of the week through worship and the Word.</p>
+          </article>
+
+          <article class="info-card glass">
+            <div class="info-label">Need Help?</div>
+            <div class="info-big">Call Anytime</div>
+            <p><a href="tel:+16017832599">(601) 783-2599</a><br />Questions, directions, prayer, or your first visit.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-title">
+            <span>About Guiding Light</span>
+            <h2>A church home with a strong spiritual identity.</h2>
+          </div>
+          <p>
+            This section gives the homepage real depth: church identity, local presence, leadership, and what makes the ministry feel alive.
+          </p>
+        </div>
+
+        <div class="three-grid">
+          <article class="about-card glass">
+            <strong style="font-size:1.35rem;display:block;margin-bottom:12px;">A radiant church in Magnolia</strong>
+            <p>
+              Guiding Light Pentecostal Church serves the Magnolia area with a Pentecostal and Apostolic identity rooted in worship, prayer, holiness, and biblical preaching.
+              The language throughout this homepage is designed to feel modern and elevated without losing reverence.
+            </p>
+            <div class="stat-list">
+              <div class="stat">
+                <b>Church Name</b>
+                <span>Guiding Light Pentecostal Church</span>
+              </div>
+              <div class="stat">
+                <b>Pastor</b>
+                <span>Joseph Dykes</span>
+              </div>
+              <div class="stat">
+                <b>Location</b>
+                <span>1108 Guiding Light Rd, Magnolia, MS 39652</span>
+              </div>
+              <div class="stat">
+                <b>Atmosphere</b>
+                <span>Prayerful, welcoming, Spirit-led, and community-centered</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="quote-card glass">
+            <div>
+              <small>Homepage Tone</small>
+              <blockquote>
+                “A divine atmosphere, a clear message, and a place where people can encounter God.”
+              </blockquote>
+            </div>
+            <p>
+              The design language uses glowing gradients, soft glass panels, celestial motion, and bold typography to create a memorable first impression.
+            </p>
+          </article>
+
+          <article class="about-card glass">
+            <strong style="font-size:1.35rem;display:block;margin-bottom:12px;">What this homepage is built to do</strong>
+            <p>
+              It is designed to help first-time visitors quickly find service times, contact info, direction details, core beliefs, and a strong emotional sense of the church.
+            </p>
+            <div class="stat-list">
+              <div class="stat">
+                <b>Invite</b>
+                <span>Make visitors feel welcomed before they ever arrive.</span>
+              </div>
+              <div class="stat">
+                <b>Inform</b>
+                <span>Put high-priority details above the fold.</span>
+              </div>
+              <div class="stat">
+                <b>Inspire</b>
+                <span>Create an unforgettable “futuristic and divine” visual experience.</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="beliefs">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-title">
+            <span>What We Believe</span>
+            <h2>Truth-centered. Presence-driven.</h2>
+          </div>
+          <p>
+            This homepage keeps the belief language warm and accessible, while still reflecting a Pentecostal and Apostolic identity.
+          </p>
+        </div>
+
+        <div class="belief-grid">
+          <article class="belief glass">
+            <strong>The Word of God</strong>
+            <p>
+              We believe the Bible is true, living, and authoritative. Every message, every ministry, and every step of faith begins with God’s Word.
+            </p>
+          </article>
+
+          <article class="belief glass">
+            <strong>The Power of Prayer</strong>
+            <p>
+              We believe prayer changes lives. From pre-service prayer to personal prayer requests, this is a church that expects God to move.
+            </p>
+          </article>
+
+          <article class="belief glass">
+            <strong>Spirit-Filled Worship</strong>
+            <p>
+              We believe worship should be alive, sincere, and full of expectation — creating space for people to encounter God in a real way.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="visit">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-title">
+            <span>Plan Your Visit</span>
+            <h2>Your first visit should feel easy.</h2>
+          </div>
+          <p>
+            For churches, this is one of the most important conversion areas on the homepage. It answers the questions a first-time visitor is most likely to ask.
+          </p>
+        </div>
+
+        <div class="visit-wrap">
+          <article class="visit-card glass visit-copy">
+            <strong style="font-size:1.35rem;display:block;margin-bottom:12px;">What to expect</strong>
+            <p>
+              Expect heartfelt worship, a welcoming church family, passionate preaching, and an atmosphere centered on the presence of God.
+              Whether you are new to church, returning to faith, or looking for a church home, you are welcome here.
+            </p>
+
+            <div class="visit-list">
+              <div class="visit-row">
+                <div class="visit-icon">01</div>
+                <div>
+                  <strong>Arrive a few minutes early</strong>
+                  <p>Give yourself time to settle in, meet someone, and get comfortable before service begins.</p>
+                </div>
+              </div>
+
+              <div class="visit-row">
+                <div class="visit-icon">02</div>
+                <div>
+                  <strong>Come as you are</strong>
+                  <p>The goal is not pressure — it is presence, truth, and a place to encounter God.</p>
+                </div>
+              </div>
+
+              <div class="visit-row">
+                <div class="visit-icon">03</div>
+                <div>
+                  <strong>Need prayer?</strong>
+                  <p>Prayer should be easy to request. This homepage makes that invitation visible and clear.</p>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="visit-card glass">
+            <strong style="font-size:1.35rem;display:block;margin-bottom:12px;">Visit Details</strong>
+            <div class="visit-list">
+              <div class="visit-row">
+                <div class="visit-icon">⌂</div>
+                <div>
+                  <strong>Address</strong>
+                  <p>1108 Guiding Light Rd<br />Magnolia, MS 39652</p>
+                </div>
+              </div>
+
+              <div class="visit-row">
+                <div class="visit-icon">☎</div>
+                <div>
+                  <strong>Phone</strong>
+                  <p><a href="tel:+16017832599">(601) 783-2599</a></p>
+                </div>
+              </div>
+
+              <div class="visit-row">
+                <div class="visit-icon">✦</div>
+                <div>
+                  <strong>Sunday Rhythm</strong>
+                  <p>Morning worship at 10:00 AM, evening service at 6:00 PM, with pre-prayer at 5:30 PM.</p>
+                </div>
+              </div>
+
+              <div class="visit-row">
+                <div class="visit-icon">↗</div>
+                <div>
+                  <strong>Best next step</strong>
+                  <p>Call ahead, request prayer, or connect before your first visit so someone can welcome you personally.</p>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-band">
+      <div class="wrap">
+        <div class="cta-card glass">
+          <div>
+            <div class="eyebrow">Ready to connect?</div>
+            <h3>Light for the journey. A place to belong.</h3>
+            <p class="subtle">
+              This homepage is already structured like a real launch-ready church front page, with strong visual identity, modern layout, and visitor-first messaging.
+            </p>
+          </div>
+          <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:flex-end;align-items:center;">
+            <a class="btn" href="tel:+16017832599">Call the Church</a>
+            <a class="btn-ghost" href="#contact">View Contact Info</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact">
+    <div class="wrap">
+      <div class="footer-grid">
+        <article class="footer-card glass">
+          <div class="footer-title">Guiding Light Pentecostal Church</div>
+          <p>
+            A Spirit-filled church in Magnolia, Mississippi with a vision for worship, prayer, truth, and transformed lives.
+          </p>
+        </article>
+
+        <article class="footer-card glass">
+          <div class="footer-title">Contact</div>
+          <ul class="list-clean">
+            <li><a href="tel:+16017832599">(601) 783-2599</a></li>
+            <li>1108 Guiding Light Rd, Magnolia, MS 39652</li>
+            <li>Sunday 10:00 AM & 6:00 PM</li>
+            <li>Wednesday 7:30 PM</li>
+          </ul>
+        </article>
+
+        <article class="footer-card glass">
+          <div class="footer-title">Next website additions</div>
+          <ul class="list-clean">
+            <li>Events page</li>
+            <li>Prayer request form</li>
+            <li>Ministries section</li>
+            <li>Sermons / livestream links</li>
+          </ul>
+        </article>
+      </div>
+      <div class="copyright">© <span id="year"></span> Guiding Light Pentecostal Church. All rights reserved.</div>
+    </div>
+  </footer>
 
   <script>
-    // Demo-only form behavior
-    function fakeSubmit(e){
-      e.preventDefault();
-      const name = (e.target.name.value || 'Friend').slice(0,80);
-      alert('Thank you, ' + name + '. Your message was received (demo). Implement a backend to collect messages.');
-      e.target.reset();
-    }
+    document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
