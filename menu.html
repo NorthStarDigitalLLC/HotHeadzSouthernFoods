@@ -346,44 +346,73 @@
       margin-top: 6px;
       font-weight: 700;
     }
-    .modal-backdrop {
+    .flash-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.68);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
       display: none;
-      align-items: center;
-      justify-content: center;
+      place-items: center;
       z-index: 200;
+      background: radial-gradient(circle at center, rgba(255,140,90,.18), rgba(0,0,0,.72));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       padding: 18px;
     }
-    .modal-backdrop.show { display: flex; pointer-events: auto; }
-    .modal {
-      width: min(520px, calc(100vw - 24px));
-      border-radius: 28px;
+    .flash-overlay.show { display: grid; }
+    .flash-card {
+      width: min(560px, calc(100vw - 24px));
+      border-radius: 30px;
       background:
-        radial-gradient(500px 180px at 0% 0%, rgba(255,140,90,.16), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.05));
-      border: 1px solid rgba(255,255,255,.16);
-      box-shadow: 0 20px 60px rgba(0,0,0,.4);
-      padding: 22px;
+        radial-gradient(500px 200px at 0% 0%, rgba(255,140,90,.24), transparent 60%),
+        radial-gradient(500px 220px at 100% 100%, rgba(60,220,170,.18), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 0 60px rgba(255,149,91,.22), 0 20px 60px rgba(0,0,0,.45);
+      padding: 24px;
       text-align: center;
+      animation: flashPop .32s ease;
     }
-    .modal-title {
-      font-size: 28px;
+    @keyframes flashPop {
+      0% { transform: scale(.92); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .flash-title {
+      font-size: 30px;
       font-weight: 900;
       color: #ffb35a;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
+      letter-spacing: -.03em;
+      text-align: center;
     }
-    .modal-text {
-      color: rgba(255,255,255,.82);
+    .flash-text {
+      color: rgba(255,255,255,.86);
       font-size: 15px;
-      line-height: 1.5;
+      line-height: 1.6;
       margin-bottom: 16px;
-      font-weight: 600;
+      font-weight: 700;
+      text-align: center;
     }
-    .modal button { pointer-events: auto; }
+    .flash-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 66px;
+      height: 66px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255,160,90,.9), rgba(200,90,44,.95));
+      color: #fff;
+      font-weight: 900;
+      font-size: 26px;
+      box-shadow: 0 0 30px rgba(255,149,91,.45);
+      margin-bottom: 12px;
+    }
+    .flash-sub {
+      color: rgba(255,255,255,.68);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      text-align: center;
+    }
     .statusbar {
       display: inline-flex;
       gap: 10px;
@@ -1378,26 +1407,9 @@
         }));
         document.querySelector(".circular-menu")?.addEventListener("click", e => e.stopPropagation());
         const modalEl = $("luckModal");
-        const modalClose = $("luckModalClose");
-        const closeModal = (e) => {
-          if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-          }
-          hideLuckModal(true);
-        };
-        modalClose?.addEventListener("pointerup", closeModal);
-        modalClose?.addEventListener("click", closeModal);
-        modalEl?.querySelector(".modal")?.addEventListener("pointerup", (e) => e.stopPropagation());
-        modalEl?.querySelector(".modal")?.addEventListener("click", (e) => e.stopPropagation());
-        modalEl?.addEventListener("pointerup", (e) => {
-          if (e.target === modalEl) hideLuckModal(true);
-        });
-        modalEl?.addEventListener("click", (e) => {
-          if (e.target === modalEl) hideLuckModal(true);
-        });
+        modalEl?.addEventListener("click", () => hideLuckModal());
         window.addEventListener("keydown", (e) => {
-          if (e.key === "Escape") hideLuckModal(true);
+          if (e.key === "Escape") hideLuckModal();
         });
       }
 
@@ -1442,13 +1454,13 @@
     })();
   </script>
 
-  <div class="modal-backdrop" id="luckModal">
-    <div class="modal">
-      <div class="modal-title" id="luckModalTitle">Currently closed</div>
-      <div class="modal-text" id="luckModalText"></div>
-      <button class="actionbtn primary" id="luckModalClose">Got it</button>
+  <div class="flash-overlay" id="luckModal">
+    <div class="flash-card">
+      <div class="flash-count" id="luckCountdown">5</div>
+      <div class="flash-title" id="luckModalTitle">Currently closed</div>
+      <div class="flash-text" id="luckModalText"></div>
+      <div class="flash-sub">Closing automatically</div>
     </div>
   </div>
-
 </body>
 </html>
