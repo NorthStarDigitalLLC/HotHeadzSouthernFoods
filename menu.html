@@ -294,6 +294,12 @@
       opacity: 0.7;
       font-style: italic;
     }
+    /* spacer to guarantee scrollability */
+    .hh-cube-spacer {
+      height: 50px;
+      width: 100%;
+      flex-shrink: 0;
+    }
     .hh-view-toggle {
       display: flex;
       gap: 8px;
@@ -1182,7 +1188,7 @@
 
           buildAdvancedCarousel(data, calendarTodayISO);
 
-          // ========== CUBE INTEGRATION WITH LOCK (FIXED SCROLLING) ==========
+          // ========== CUBE INTEGRATION WITH LOCK + SCROLL FIX ==========
           initDayCube('today', displayTodayISO, data, hoursToday, calendarTodayISO);
           initDayCube('tomorrow', displayTomorrowISO, data, hoursTomorrow, calendarTodayISO);
           initAdvancedCube(data, calendarTodayISO);
@@ -1244,6 +1250,8 @@
           if (!cat.items?.length && !cat.plates?.length && !cat.lettuce?.length) {
             content += `<div class="hh-cube-unavail">(no items)</div>`;
           }
+          // Add spacer to force scrollability
+          content += `<div class="hh-cube-spacer"></div>`;
           face.innerHTML = content;
         });
 
@@ -1308,12 +1316,12 @@
             if (locked) {
               lockBtn.innerHTML = '<i class="fas fa-unlock-alt"></i> Unlock';
               lockBtn.classList.add('locked');
-              wrapper.style.touchAction = 'auto'; // directly set touch-action
+              wrapper.style.touchAction = 'auto'; // allow scrolling
               wrapper.style.cursor = 'default';
             } else {
               lockBtn.innerHTML = '<i class="fas fa-lock"></i> Lock';
               lockBtn.classList.remove('locked');
-              wrapper.style.touchAction = 'none';
+              wrapper.style.touchAction = 'none'; // prevent scrolling while dragging
               wrapper.style.cursor = 'grab';
             }
           });
@@ -1380,7 +1388,7 @@
             if (!face) continue;
             const day = daysArray[startIdx + i];
             if (!day) {
-              face.innerHTML = `<div style="opacity:0.5; text-align:center; margin-top:40px;">— no menu —</div>`;
+              face.innerHTML = `<div style="opacity:0.5; text-align:center; margin-top:40px;">— no menu —</div><div class="hh-cube-spacer"></div>`;
               continue;
             }
             let content = `<div class="hh-cube-category">${escapeHtml(day.dayName)}</div>
@@ -1402,6 +1410,8 @@
                 content += `<div class="hh-cube-unavail">(no items)</div>`;
               }
             }
+            // Add spacer to force scrollability
+            content += `<div class="hh-cube-spacer"></div>`;
             face.innerHTML = content;
           }
         }
