@@ -447,17 +447,34 @@
     }
     .swipe-track::-webkit-scrollbar { display: none; }
 
-    .advanced-grid {
+    .advanced-tabs {
       width: min(1100px, calc(100vw - 28px));
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-      padding: 8px 4px 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      padding: 8px 4px 6px;
     }
-    @media (min-width: 900px) {
-      .advanced-grid {
-        grid-template-columns: 1fr 1fr;
-      }
+    .advanced-tab {
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .02em;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+    .advanced-tab.active {
+      background: linear-gradient(180deg, rgba(192,90,42,.75), rgba(160,65,28,.92));
+      border-color: rgba(255,200,130,.5);
+      box-shadow: 0 10px 22px rgba(192,90,42,.22);
+    }
+    .advanced-card-wrap {
+      width: min(760px, calc(100vw - 28px));
+      padding: 8px 4px 10px;
     }
     .swipe-card {
       position: relative;
@@ -661,7 +678,8 @@
         <div class="subline" id="advancedDisclaimer"></div>
       </div>
       <div class="swipe-shell">
-        <div class="advanced-grid" id="advancedTrack"></div>
+        <div class="advanced-tabs" id="advancedTabs"></div>
+        <div class="advanced-card-wrap" id="advancedTrack"></div>
       </div>
     </section>
 
@@ -1255,14 +1273,17 @@
         });
       }
 
-      function buildAdvanced(data, todayISO) {
+      function buildAdvanced(data, startISO) {
+        const tabs = $("advancedTabs");
         const track = $("advancedTrack");
-        if (!track) return;
+        if (!track || !tabs) return;
+        tabs.innerHTML = "";
         track.innerHTML = "";
-        setText("advancedDisclaimer", "Showing the next 7 days starting from today.");
-        const start = parseISODateToLocal(todayISO);
+        setText("advancedDisclaimer", "Showing the next 7 days starting from the next active menu day.");
+        const start = parseISODateToLocal(startISO);
         const lDef = data?.defaults?.lunch || {};
         const days = 7;
+        const cards = [];
 
         for (let i = 0; i < days; i++) {
           const d = new Date(start);
@@ -1274,8 +1295,14 @@
           const closure = getClosure(data, dayName);
           const dayMenu = getMenuByDate(data, iso);
 
+          const tab = document.createElement("button");
+          tab.className = "advanced-tab" + (i === 0 ? " active" : "");
+          tab.type = "button";
+          tab.textContent = `${dayName.slice(0,3)} ${d.getMonth()+1}/${d.getDate()}`;
+          tabs.appendChild(tab);
+
           const card = document.createElement("article");
-          card.className = "swipe-card active";
+          card.className = "swipe-card active" + (i === 0 ? "" : " hide");
 
           if (!dayMenu) {
             card.innerHTML = `
@@ -1287,31 +1314,39 @@
                 <li>Unable to fetch the menu for this day.</li>
               </ul>
             `;
-            track.appendChild(card);
-            continue;
+          } else {
+            const lunch = dayMenu?.lunch || {};
+            const plates = normalizeItems(lunch.plates ?? lDef.plates ?? []);
+            const items = normalizeLunchItems(lunch.items ?? []);
+            card.innerHTML = `
+              <div class="card-meta">${escapeHtml(formatDateNice(d))}</div>
+              <div class="cat-title">${escapeHtml(dayName)}</div>
+              <div class="subline">${closure?.closed ? "Closed" : (hours.lunch ? `Lunch ${escapeHtml(hours.lunch)}` : "")}</div>
+              ${
+                closure?.closed
+                  ? `<div class="section-label">Status</div><ul class="list"><li>${escapeHtml(closure.message || "Closed")}</li></ul>`
+                  : `
+                    <div class="section-label">Plates</div>
+                    <ul class="list">${plates.length ? plates.map(x => `<li>${escapeHtml(x)}</li>`).join("") : `<li>Unable to fetch the menu for this day.</li>`}</ul>
+                    <div class="section-label">Lunch Items</div>
+                    <ul class="list">${items.length ? items.map(x => `<li>${escapeHtml(x.name)}</li>`).join("") : `<li>Unable to fetch the menu for this day.</li>`}</ul>
+                  `
+              }
+            `;
           }
 
-          const lunch = dayMenu?.lunch || {};
-          const plates = normalizeItems(lunch.plates ?? lDef.plates ?? []);
-          const items = normalizeLunchItems(lunch.items ?? []);
-
-          card.innerHTML = `
-            <div class="card-meta">${escapeHtml(formatDateNice(d))}</div>
-            <div class="cat-title">${escapeHtml(dayName)}</div>
-            <div class="subline">${closure?.closed ? "Closed" : (hours.lunch ? `Lunch ${escapeHtml(hours.lunch)}` : "")}</div>
-            ${
-              closure?.closed
-                ? `<div class="section-label">Status</div><ul class="list"><li>${escapeHtml(closure.message || "Closed")}</li></ul>`
-                : `
-                  <div class="section-label">Plates</div>
-                  <ul class="list">${plates.length ? plates.map(x => `<li>${escapeHtml(x)}</li>`).join("") : `<li>Unable to fetch the menu for this day.</li>`}</ul>
-                  <div class="section-label">Lunch Items</div>
-                  <ul class="list">${items.length ? items.map(x => `<li>${escapeHtml(x.name)}</li>`).join("") : `<li>Unable to fetch the menu for this day.</li>`}</ul>
-                `
-            }
-          `;
           track.appendChild(card);
+          cards.push({tab, card});
         }
+
+        cards.forEach((entry, idx) => {
+          entry.tab.addEventListener("click", () => {
+            cards.forEach((item, i) => {
+              item.tab.classList.toggle("active", i === idx);
+              item.card.classList.toggle("hide", i !== idx);
+            });
+          });
+        });
       }
 
       function initPanel(prefix, data, isoDate, displayName) {
@@ -1420,7 +1455,7 @@
 
           initPanel("today", data, displayTodayISO, displayTodayName);
           initPanel("tomorrow", data, displayTomorrowISO, displayTomorrowName);
-          buildAdvanced(data, todayISO);
+          buildAdvanced(data, displayTodayISO);
         } catch (e) {
           console.error(e);
           showLoadError(String(e?.message || e));
