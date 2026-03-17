@@ -3,254 +3,492 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Hot Headz Southern Foods – Spin Wheel Menu</title>
-  <meta name="description" content="Daily breakfast, lunch, crawfish, salad bar, drinks and desserts – now with a spin wheel!" />
-
+  <title>Hot Headz Southern Foods – Future Menu</title>
+  <meta name="description" content="Hot Headz Southern Foods interactive future menu" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; max-width: 100%; }
-    html { scroll-behavior: smooth; overflow-x: hidden; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { overflow-x: hidden; }
     body {
-      background-color: #07060a;
-      color: rgba(255,255,255,0.92);
-      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-      line-height: 1.5;
+      font-family: Inter, system-ui, sans-serif;
+      color: rgba(255,255,255,.94);
+      background:
+        radial-gradient(900px 600px at 10% 10%, rgba(255,110,70,.18), transparent 60%),
+        radial-gradient(900px 600px at 90% 0%, rgba(42,127,98,.16), transparent 60%),
+        linear-gradient(180deg, #070604, #0b0806 45%, #050403);
+      min-height: 100vh;
       padding-bottom: 90px;
     }
+    .app {
+      min-height: 100vh;
+      padding: 18px 14px 80px;
+      position: relative;
+      isolation: isolate;
+    }
+    .app::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .1;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");
+    }
+    .app > * { position: relative; z-index: 1; }
 
-    :root {
-      --hh-accent:#c05a2a;
-      --hh-accent-2:#2a7f62;
-      --hh-table:#070604;
-      --hh-table2:#0b0806;
-      --hh-radius2: 34px;
-      --hh-pill: 999px;
-      --hh-shadow: 0 26px 90px rgba(0,0,0,.48);
-      --hh-shadow2: 0 16px 48px rgba(0,0,0,.22);
+    .daybar, .glassbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      padding: 10px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 16px 40px rgba(0,0,0,.28);
+    }
+    .sticky { position: sticky; top: 10px; z-index: 20; margin-bottom: 14px; }
+
+    .pill, .viewbtn, .actionbtn, .daybtn {
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      border-radius: 999px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: .18s ease;
+      white-space: nowrap;
+    }
+    .pill:hover, .viewbtn:hover, .actionbtn:hover, .daybtn:hover { transform: translateY(-1px); }
+    .daybtn, .viewbtn { padding: 10px 16px; }
+    .actionbtn { padding: 12px 18px; }
+    .daybtn.active, .viewbtn.active, .actionbtn.primary {
+      background: linear-gradient(180deg, rgba(192,90,42,.75), rgba(160,65,28,.92));
+      border-color: rgba(255,200,130,.5);
+      box-shadow: 0 10px 28px rgba(192,90,42,.32);
+    }
+    .actionbtn.secondary {
+      background: linear-gradient(180deg, rgba(42,127,98,.5), rgba(20,70,52,.86));
+      border-color: rgba(146,255,212,.35);
     }
 
-    .hh-menu {
-      width: 100%; min-height: 100vh; margin: 0; padding: 18px 14px 70px;
-      color: rgba(245,240,230,.94); position: relative; isolation: isolate;
-      background: radial-gradient(1100px 700px at 16% 14%, rgba(192,90,42,.18), transparent 60%),
-                  radial-gradient(1000px 700px at 86% 20%, rgba(42,127,98,.14), transparent 64%),
-                  linear-gradient(180deg, var(--hh-table), var(--hh-table2) 42%, #050403);
-      box-shadow: var(--hh-shadow); overflow: hidden;
+    .header {
+      text-align: center;
+      padding: 10px 8px 0;
+      margin-bottom: 12px;
     }
-    .hh-menu::before {
-      content:""; position:absolute; inset:0;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.20'/%3E%3C/svg%3E");
-      opacity:.12; mix-blend-mode: overlay; pointer-events:none; z-index:0;
+    .title {
+      font-size: clamp(24px, 3.2vw, 34px);
+      font-weight: 900;
+      line-height: 1.06;
+      letter-spacing: -.03em;
     }
-    .hh-menu > * { position: relative; z-index: 1; }
+    .subline {
+      margin-top: 10px;
+      color: rgba(255,255,255,.76);
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .note {
+      margin-top: 8px;
+      color: rgba(255,255,255,.6);
+      font-size: 13px;
+      font-weight: 600;
+    }
 
-    .hh-header { margin: 10px 0 14px; padding: 14px 14px 0; text-align: center; }
-    .hh-title { font-family: ui-serif, Georgia, Cambria, serif; font-size: clamp(20px, 2.2vw, 30px); font-weight: 850; line-height: 1.1; }
-    .hh-updated { margin-top: 8px; font-weight: 820; color: rgba(245,240,230,.72); font-size: 13.2px; }
-    .hh-note { margin-top: 8px; font-weight: 780; color: rgba(245,240,230,.62); font-size: 13px; }
-    .hh-stickywrap { position: sticky; top: 10px; z-index: 90; }
+    .panel[hidden] { display: none !important; }
 
-    .hh-daybar {
-      display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin:14px; padding:10px;
-      border-radius: var(--hh-radius2); background: rgba(0,0,0,.30); border:1px solid rgba(245,240,230,.14);
-      box-shadow: var(--hh-shadow2); backdrop-filter: blur(12px);
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin: 16px 0 8px;
     }
-    .hh-day {
-      border:1px solid rgba(245,240,230,.14); background: rgba(255,255,255,.06); color: rgba(245,240,230,.92);
-      padding:10px 14px; border-radius: var(--hh-pill); font-weight:900; cursor:pointer;
-      transition: transform .14s ease, box-shadow .14s ease, background .14s ease, border-color .14s ease;
-      white-space: nowrap; box-shadow: 0 10px 22px rgba(0,0,0,.25);
-    }
-    .hh-day:hover { transform: translateY(-1px); border-color: rgba(255,179,90,.28); }
-    .hh-day.is-active { border-color: rgba(192,90,42,.45); background: linear-gradient(180deg, rgba(192,90,42,.26), rgba(0,0,0,.22)); }
 
-    .hh-view-toggle { display:flex; gap:10px; justify-content:center; margin:14px 14px 8px; }
-    .hh-view-btn {
-      background: rgba(0,0,0,0.3); border: 1px solid rgba(255,179,90,0.3); color:white;
-      padding:8px 24px; border-radius:40px; font-weight:600; cursor:pointer; transition:.2s; font-size:15px;
+    .wheel-stage {
+      display: grid;
+      gap: 18px;
+      justify-items: center;
+      margin-top: 16px;
     }
-    .hh-view-btn.active { background: rgba(192,90,42,0.7); border-color: #c05a2a; }
-
-    .hh-wheel-container { margin:20px 0 30px; display:flex; flex-direction:column; align-items:center; }
-    .wheel-wrapper {
-      position:relative; width:280px; height:280px; margin:10px auto; touch-action:none; cursor:grab; user-select:none;
+    .wheel-wrap {
+      width: 300px;
+      height: 300px;
+      position: relative;
+      touch-action: none;
+      user-select: none;
+      cursor: grab;
     }
-    .wheel-wrapper:active { cursor:grabbing; }
+    .wheel-wrap.dragging { cursor: grabbing; }
+    .wheel-arrow {
+      position: absolute;
+      left: 50%;
+      top: -2px;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 16px solid transparent;
+      border-right: 16px solid transparent;
+      border-top: 22px solid #ffb35a;
+      z-index: 5;
+      filter: drop-shadow(0 0 8px rgba(255,179,90,.8));
+    }
     .wheel {
-      position:absolute; width:100%; height:100%; border-radius:50%; background: rgba(20,20,20,0.7);
-      border:3px solid #c05a2a; box-shadow:0 0 30px rgba(192,90,42,0.5); transition: transform 0.18s ease-out;
-      will-change: transform; display:flex; align-items:center; justify-content:center; backdrop-filter: blur(4px);
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 3px solid rgba(255,161,102,.86);
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,.08), transparent 30%),
+        radial-gradient(circle at 50% 50%, rgba(255,128,76,.08), transparent 62%),
+        rgba(13,12,12,.84);
+      box-shadow:
+        0 0 0 8px rgba(255,255,255,.03) inset,
+        0 0 34px rgba(192,90,42,.34),
+        0 18px 40px rgba(0,0,0,.45);
+      will-change: transform;
+      overflow: visible;
     }
     .wheel-item {
-      position:absolute; width:70px; height:70px; left:50%; top:50%; margin-left:-35px; margin-top:-35px;
-      background:#2a2a2a; border:2px solid #c05a2a; border-radius:50%; display:flex; align-items:center; justify-content:center;
-      font-weight:700; font-size:14px; text-align:center; color:#fff; box-shadow:0 0 15px rgba(0,0,0,0.7);
-      transition: border 0.2s, transform 0.2s, background 0.2s, box-shadow 0.2s; pointer-events:none; word-break: break-word;
-      padding:4px; line-height:1.2; backdrop-filter: blur(2px);
+      position: absolute;
+      width: 78px;
+      height: 78px;
+      left: 50%;
+      top: 50%;
+      margin-left: -39px;
+      margin-top: -39px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,161,102,.7);
+      background: linear-gradient(180deg, rgba(48,48,48,.95), rgba(22,22,22,.95));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.12;
+      padding: 7px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.5);
+      transform-origin: center center;
+      color: #fff;
+      pointer-events: none;
+      will-change: transform;
     }
     .wheel-item.selected {
-      border-color:#ffb35a; background:#c05a2a; transform: scale(1.1); box-shadow:0 0 25px #c05a2a;
+      background: linear-gradient(180deg, rgba(220,105,48,.98), rgba(170,70,32,.98));
+      border-color: #ffd4a1;
+      box-shadow: 0 0 26px rgba(255,149,91,.55);
     }
     .wheel-center {
-      width:20px; height:20px; background:#c05a2a; border-radius:50%; position:absolute; top:50%; left:50%;
-      transform:translate(-50%, -50%); z-index:10; border:2px solid white;
-    }
-    .selected-indicator {
-      position:absolute; top:-5px; left:50%; transform:translateX(-50%); width:0; height:0;
-      border-left:15px solid transparent; border-right:15px solid transparent; border-top:20px solid #c05a2a;
-      filter: drop-shadow(0 0 8px #c05a2a); z-index:15;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      background: #ffb35a;
+      border: 2px solid #fff;
+      z-index: 4;
+      box-shadow: 0 0 18px rgba(255,179,90,.7);
     }
 
-    .hh-category-panel {
-      background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); border:1px solid rgba(255,179,90,0.4); border-radius:30px;
-      padding:20px; margin:20px 14px; width:calc(100% - 28px); max-width:600px; box-shadow:0 10px 30px rgba(0,0,0,0.6);
+    .glasscard {
+      width: min(680px, calc(100vw - 28px));
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 28px;
+      padding: 20px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 18px 50px rgba(0,0,0,.35);
     }
-    .hh-category-title { font-size:24px; font-weight:800; color:#ffb35a; margin-bottom:12px; border-bottom:2px solid rgba(255,179,90,0.3); padding-bottom:6px; }
-    .hh-subcat-title { font-weight:700; color: rgba(255,255,255,0.8); margin:16px 0 8px; text-transform: uppercase; font-size:14px; letter-spacing:1px; }
-    .hh-category-items, .hh-cube-items { list-style:none; padding:0; margin:0 0 12px; }
-    .hh-category-items li, .hh-cube-items li {
-      background: rgba(255,255,240,0.1); border-left:4px solid #c05a2a; padding:10px 12px; margin-bottom:6px;
-      border-radius:12px; font-size:15px; color:#efe6d9; word-break: break-word;
+    .glasscard.pulse {
+      animation: pulseCard .85s ease 1;
     }
-    .hh-category-items li details, .hh-cube-items li details { background: transparent; }
-    .hh-category-items li summary, .hh-cube-items li summary { font-weight:600; cursor:pointer; }
-    .hh-category-items .hh-desc, .hh-cube-items .hh-desc { margin-top:6px; font-size:13px; color:#ccc; padding-left:8px; }
+    @keyframes pulseCard {
+      0% { transform: scale(1); box-shadow: 0 18px 50px rgba(0,0,0,.35); }
+      50% { transform: scale(1.015); box-shadow: 0 0 42px rgba(255,149,91,.35), 0 18px 50px rgba(0,0,0,.42); }
+      100% { transform: scale(1); }
+    }
 
-    .hh-cube-controls { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:14px 14px 8px; }
-    .hh-cube-btn {
-      background: rgba(0,0,0,0.4); border:1px solid rgba(255,179,90,0.4); color: rgba(255,255,255,0.9);
-      padding:6px 14px; border-radius:40px; font-weight:600; font-size:14px; cursor:pointer; backdrop-filter: blur(5px); transition:0.2s;
+    .cat-title {
+      font-size: clamp(24px, 4vw, 32px);
+      font-weight: 900;
+      color: #ffb35a;
+      margin-bottom: 8px;
+      border-bottom: 2px solid rgba(255,179,90,.24);
+      padding-bottom: 8px;
     }
-    .hh-cube-btn:hover { background: rgba(192,90,42,0.5); border-color:#c05a2a; transform: scale(1.02); }
-    .hh-cube-btn.rotate-mode { background: rgba(192,90,42,0.7); border-color:#c05a2a; }
+    .section-label {
+      margin: 14px 0 8px;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.68);
+    }
+    .list { list-style: none; display: grid; gap: 8px; }
+    .list li {
+      background: rgba(255,255,255,.06);
+      border-left: 4px solid #c05a2a;
+      border-radius: 14px;
+      padding: 11px 12px;
+      color: #f0e6d8;
+      font-size: 15px;
+    }
+    .list details summary {
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .desc {
+      margin-top: 7px;
+      color: rgba(255,255,255,.78);
+      font-size: 13px;
+      padding-left: 4px;
+    }
 
-    .hh-cube-wrapper {
-      perspective:1200px; margin:10px auto 30px; display:flex; justify-content:center; align-items:center; touch-action:auto;
-      cursor:default; pointer-events:none;
+    .swipe-shell {
+      margin-top: 20px;
+      display: grid;
+      gap: 10px;
+      justify-items: center;
     }
-    .hh-cube-wrapper.rotate-mode { pointer-events:auto; touch-action:none; cursor:grab; }
-    .hh-cube-wrapper.rotate-mode:active { cursor:grabbing; }
-    .hh-cube-container {
-      width:240px; height:240px; position:relative; transform-style: preserve-3d; transform: rotateX(-10deg) rotateY(20deg) scale(1);
-      transition: transform 0.1s ease; will-change: transform;
+    .swipe-head {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
     }
-    @media (min-width: 600px) { .hh-cube-container { width:280px; height:280px; } }
+    .swipe-track {
+      width: min(760px, calc(100vw - 28px));
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      padding: 8px 4px 10px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .swipe-track::-webkit-scrollbar { display: none; }
+    .swipe-card {
+      position: relative;
+      flex: 0 0 100%;
+      scroll-snap-align: center;
+      min-height: 420px;
+      border-radius: 30px;
+      padding: 22px;
+      overflow: hidden;
+      background:
+        radial-gradient(500px 240px at 10% 0%, rgba(255,148,92,.18), transparent 60%),
+        radial-gradient(500px 240px at 100% 100%, rgba(68,224,170,.14), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border: 1px solid rgba(255,255,255,.15);
+      box-shadow: 0 24px 60px rgba(0,0,0,.36);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+    .swipe-card.active {
+      box-shadow: 0 0 40px rgba(255,149,91,.24), 0 24px 60px rgba(0,0,0,.42);
+    }
+    .swipe-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,.1) 45%, transparent 70%);
+      transform: translateX(-120%);
+      animation: hologram 7s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes hologram {
+      to { transform: translateX(120%); }
+    }
+    .card-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      font-weight: 900;
+      color: rgba(255,255,255,.7);
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      margin-bottom: 10px;
+    }
 
-    .hh-cube-face {
-      position:absolute; width:100%; height:100%; background: rgba(30,25,20,0.95); border:2px solid #c05a2a; border-radius:14px;
-      box-shadow:0 0 20px rgba(192,90,42,0.3); backdrop-filter: blur(4px); display:flex; flex-direction:column;
-      padding:8px 6px; overflow:hidden; -webkit-overflow-scrolling:auto; backface-visibility: visible; color:#efe6d9;
-      font-size:10px; line-height:1.12; transform: rotateY(0deg) translateZ(120px); pointer-events:auto;
+    .state {
+      width: min(760px, calc(100vw - 28px));
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 28px;
+      padding: 20px;
+      background: rgba(255,255,255,.05);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 16px 44px rgba(0,0,0,.26);
     }
-    @media (min-width: 600px) { .hh-cube-face { transform: rotateY(0deg) translateZ(140px); padding:10px; font-size:11px; } }
-    .hh-cube-face.front  { transform: rotateY(  0deg) translateZ(120px); }
-    .hh-cube-face.back   { transform: rotateY(180deg) translateZ(120px); }
-    .hh-cube-face.right  { transform: rotateY( 90deg) translateZ(120px); }
-    .hh-cube-face.left   { transform: rotateY(-90deg) translateZ(120px); }
-    .hh-cube-face.top    { transform: rotateX( 90deg) translateZ(120px); }
-    .hh-cube-face.bottom { transform: rotateX(-90deg) translateZ(120px); }
-    @media (min-width: 600px) {
-      .hh-cube-face.front  { transform: rotateY(  0deg) translateZ(140px); }
-      .hh-cube-face.back   { transform: rotateY(180deg) translateZ(140px); }
-      .hh-cube-face.right  { transform: rotateY( 90deg) translateZ(140px); }
-      .hh-cube-face.left   { transform: rotateY(-90deg) translateZ(140px); }
-      .hh-cube-face.top    { transform: rotateX( 90deg) translateZ(140px); }
-      .hh-cube-face.bottom { transform: rotateX(-90deg) translateZ(140px); }
-    }
-    .hh-cube-category { font-weight:800; font-size:1.05em; color:#ffb35a; margin-bottom:4px; border-bottom:1px solid rgba(255,179,90,0.3); padding-bottom:2px; }
-    .hh-cube-unavail { opacity:0.7; font-style:italic; }
-    .hh-cube-items.compact li { padding:5px 7px; margin-bottom:4px; font-size:11px; }
-    .hh-cube-more { opacity:.8; font-size:10px; margin-top:2px; text-align:center; }
-    .hidden { display:none !important; }
-
-    .hh-adv-carousel { display:flex; gap:14px; overflow-x:auto; padding:2px 14px 14px; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; }
-    .hh-adv-card {
-      flex: 0 0 92%; max-width:720px; scroll-snap-align:start; border-radius:24px; background:rgba(0,0,0,.26);
-      border:1px solid rgba(245,240,230,.12); padding:16px; box-shadow: var(--hh-shadow2);
-    }
-    @media (min-width:860px) { .hh-adv-card { flex: 0 0 48%; } }
-    .hh-adv-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:12px; }
-    .hh-adv-dayname { font-size:20px; font-weight:800; color:#ffb35a; }
-    .hh-adv-date { color: rgba(245,240,230,.72); font-weight:700; }
-    .hh-adv-hours { font-weight:800; color: rgba(255,255,255,.86); text-align:right; }
-    .hh-panel { border-radius:20px; padding:14px; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); }
-    .hh-panel h3, .hh-panel h4 { margin-bottom:8px; }
-    .hh-panel h3 { color:#ffb35a; }
-    .hh-sub { margin-bottom:12px; color: rgba(255,255,255,.8); }
-    .hh-stack { list-style:none; padding:0; margin:0 0 14px; }
-    .hh-stack li {
-      background: rgba(255,255,240,0.08); border-left:4px solid #c05a2a; padding:10px 12px; margin-bottom:6px; border-radius:12px;
-    }
-    .hh-hintline, .hh-hint { text-align:center; color: rgba(255,255,255,.72); margin:8px 0; }
 
     .nav-btn {
-      position: fixed; z-index: 2000; background: #1e1b1b; border: 2px solid var(--hh-accent); border-radius: 50px; display: flex;
-      align-items: center; gap: 12px; cursor: pointer; box-shadow: 0 0 25px rgba(192,90,42,0.5); transition: all 0.2s ease; backdrop-filter: blur(8px);
+      position: fixed; z-index: 90; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: rgba(25,25,25,.92); border: 2px solid #c05a2a; border-radius: 999px;
+      display: flex; align-items: center; gap: 12px; cursor: pointer;
+      box-shadow: 0 0 25px rgba(192,90,42,0.32); transition: .2s ease; backdrop-filter: blur(8px);
+      padding: 12px 20px;
     }
-    .nav-btn:hover { transform: scale(1.05); border-color: var(--hh-accent-2); box-shadow: 0 0 35px var(--hh-accent); }
-    .btn-icon { font-size: 1.8rem; color: var(--hh-accent); }
-    .btn-text { display: flex; flex-direction: column; line-height: 1.2; }
-    .btn-text .main { font-weight: 700; font-size: 1rem; letter-spacing: 2px; color: rgba(255,255,255,0.92); }
-    .btn-text .sub { font-size: 0.65rem; opacity: 0.7; color: rgba(255,255,255,0.7); text-transform: uppercase; }
-    .nav-btn.bottom-center { bottom: 30px; left: 50%; transform: translateX(-50%); flex-direction: row; padding: 0.8rem 1.8rem; }
-    .circ-menu-overlay { position: fixed; inset: 0; z-index: 2500; display: flex; align-items: center; justify-content: center; pointer-events: none; background: rgba(0,0,0,0.7); opacity: 0; transition: opacity 0.3s ease; backdrop-filter: blur(8px); }
+    .nav-btn:hover { transform: translateX(-50%) scale(1.04); }
+    .btn-icon { font-size: 1.5rem; color: #c05a2a; }
+    .btn-text .main { font-weight: 800; letter-spacing: .12em; font-size: .92rem; }
+    .btn-text .sub { font-size: .62rem; opacity: .7; text-transform: uppercase; }
+    .circ-menu-overlay {
+      position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center;
+      pointer-events: none; background: rgba(0,0,0,.7); opacity: 0; transition: opacity .3s ease; backdrop-filter: blur(8px);
+    }
     .circ-menu-overlay.open { opacity: 1; pointer-events: all; }
     .circular-menu {
-      width: 360px; height: 360px; border-radius: 50%; background: transparent; border: 2px solid var(--hh-accent);
-      box-shadow: 0 0 40px rgba(192,90,42,0.5); display: flex; align-items: center; justify-content: center; position: relative; transform: scale(0.3); transition: transform 0.3s ease;
+      width: 300px; height: 300px; border-radius: 50%; border: 2px solid #c05a2a;
+      box-shadow: 0 0 40px rgba(192,90,42,.4); display: flex; align-items: center; justify-content: center;
+      position: relative; transform: scale(.6); transition: transform .25s ease;
     }
     .circ-menu-overlay.open .circular-menu { transform: scale(1); }
     .center-home {
-      width: 70px; height: 70px; background: var(--hh-accent-2); border: 3px solid var(--hh-accent); border-radius: 50%; display: flex;
-      align-items: center; justify-content: center; font-weight: 900; font-size: 1.5rem; color: #1a0d0b; box-shadow: 0 0 30px var(--hh-accent); cursor: pointer; transition: 0.2s; z-index: 1001;
+      width: 74px; height: 74px; background: #2a7f62; border: 3px solid #c05a2a; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer;
+      box-shadow: 0 0 30px rgba(192,90,42,.4); z-index: 2;
     }
-    .center-home:hover { background: var(--hh-accent); color: white; transform: scale(1.05); }
     .menu-item {
-      position: absolute; width: 60px; height: 60px; background: #1e1b1b; border: 2px solid var(--hh-accent); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.92); font-size: 0.8rem; font-weight: 600;
-      text-transform: uppercase; transition: all 0.2s; cursor: pointer; box-shadow: 0 0 15px rgba(0,0,0,0.7);
-      top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-130px) rotate(calc(var(--angle) * -1deg));
-      letter-spacing: 1px; backdrop-filter: blur(4px); text-align:center; padding:6px;
-    }
-    .menu-item:hover {
-      background: var(--hh-accent); color: black; border-color: var(--hh-accent-2);
-      transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-140px) rotate(calc(var(--angle) * -1deg)); width: 65px; height: 65px;
-    }
-    @media (max-width: 600px) {
-      .nav-btn.bottom-center { bottom: 20px; padding: 0.6rem 1.2rem; }
-      .circular-menu { width: 280px; height: 280px; }
+      position: absolute;
+      width: 66px; height: 66px;
+      background: #1e1b1b; border: 2px solid #c05a2a; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; text-align: center; padding: 6px;
+      color: #fff; font-size: .72rem; font-weight: 700; text-transform: uppercase;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-110px) rotate(calc(var(--angle) * -1deg));
+      cursor: pointer;
     }
 
-    .hh-state {
-      border:1px solid rgba(245,240,230,.14); border-radius: var(--hh-radius2); padding:20px; margin:14px;
-      background: rgba(0,0,0,.22); color: rgba(245,240,230,.92); box-shadow: var(--hh-shadow2); backdrop-filter: blur(12px); position:relative; overflow:hidden;
-    }
-    .hh-state::after {
-      content:""; position:absolute; inset:0; background: radial-gradient(700px 280px at 10% 10%, rgba(192,90,42,.22), transparent 60%), radial-gradient(700px 280px at 90% 0%, rgba(42,127,98,.16), transparent 62%); pointer-events:none; opacity:.9;
-    }
-    .hh-state > * { position:relative; z-index:1; }
-    .hh-badge {
-      font-weight:980; text-transform:uppercase; letter-spacing:.14em; font-size:11px; padding:7px 12px; border-radius:999px;
-      border:1px solid rgba(245,240,230,.18); background: rgba(255,255,255,.06); display:inline-flex; align-items:center; gap:8px;
-    }
-    .hh-badge::before { content:""; width:8px; height:8px; border-radius:99px; background: rgba(255,179,90,.92); display:inline-block; }
-    .hh-badge.is-dark::before { background: rgba(245,240,230,.92); }
-
-    .hh-advanced-top { text-align:center; padding:8px 14px 0; }
-    .hh-advanced-title { font-size: 28px; font-weight: 900; color:#ffb35a; }
-    .hh-advanced-disclaimer { margin-top:8px; color: rgba(255,255,255,.72); }
+    .hide { display: none !important; }
   </style>
 </head>
 <body>
-  <div class="nav-btn bottom-center" id="navBtnBottom">
-    <i class="fas fa-compass btn-icon"></i>
-    <div class="btn-text"><span class="main">NAVIGATION</span><span class="sub">explore pages</span></div>
+  <div class="app">
+    <div class="sticky">
+      <div class="daybar" role="tablist" aria-label="Day selector">
+        <button class="daybtn active" type="button" role="tab" aria-controls="panel-today" aria-selected="true" id="dayBtnToday">Today</button>
+        <button class="daybtn" type="button" role="tab" aria-controls="panel-tomorrow" aria-selected="false" id="dayBtnTomorrow">Tomorrow</button>
+        <button class="daybtn" type="button" role="tab" aria-controls="panel-advanced" aria-selected="false" id="dayBtnAdvanced">Advanced Menu</button>
+      </div>
+    </div>
+
+    <section class="panel" id="panel-today" role="tabpanel" aria-labelledby="dayBtnToday">
+      <div class="header">
+        <div class="title" id="todayTitle">Today’s Menu</div>
+        <div class="subline" id="todayHours">Loading hours…</div>
+        <div class="note" id="todayNote"></div>
+      </div>
+      <div class="toolbar">
+        <button class="viewbtn active" id="todayViewWheel">Future Wheel</button>
+        <button class="viewbtn" id="todayViewSwipe">Hologram Cards</button>
+        <button class="actionbtn primary" id="todayAIBtn"><i class="fas fa-sparkles"></i> What should I eat?</button>
+      </div>
+      <div id="todayWheelView">
+        <div class="wheel-stage">
+          <div class="wheel-wrap" id="todayWheelWrap">
+            <div class="wheel-arrow"></div>
+            <div class="wheel" id="todayWheel"></div>
+            <div class="wheel-center"></div>
+          </div>
+          <div class="glasscard" id="todayDetailCard">
+            <div class="cat-title" id="todayDetailTitle"></div>
+            <div id="todayDetailContent"></div>
+          </div>
+        </div>
+      </div>
+      <div id="todaySwipeView" class="hide">
+        <div class="swipe-shell">
+          <div class="swipe-head">
+            <button class="pill" id="todayPrevCard"><i class="fas fa-chevron-left"></i></button>
+            <div class="subline" id="todayCardStatus">Swipe categories</div>
+            <button class="pill" id="todayNextCard"><i class="fas fa-chevron-right"></i></button>
+          </div>
+          <div class="swipe-track" id="todaySwipeTrack"></div>
+        </div>
+      </div>
+      <div class="state hide" id="todayClosed">
+        <div class="title" style="font-size:24px;">Closed</div>
+        <div class="subline" id="todayClosedMsg"></div>
+      </div>
+    </section>
+
+    <section class="panel hide" id="panel-tomorrow" role="tabpanel" aria-labelledby="dayBtnTomorrow">
+      <div class="header">
+        <div class="title" id="tomorrowTitle">Tomorrow’s Menu</div>
+        <div class="subline" id="tomorrowHours">Loading hours…</div>
+        <div class="note" id="tomorrowNote"></div>
+      </div>
+      <div class="toolbar">
+        <button class="viewbtn active" id="tomorrowViewWheel">Future Wheel</button>
+        <button class="viewbtn" id="tomorrowViewSwipe">Hologram Cards</button>
+        <button class="actionbtn primary" id="tomorrowAIBtn"><i class="fas fa-sparkles"></i> What should I eat?</button>
+      </div>
+      <div id="tomorrowWheelView">
+        <div class="wheel-stage">
+          <div class="wheel-wrap" id="tomorrowWheelWrap">
+            <div class="wheel-arrow"></div>
+            <div class="wheel" id="tomorrowWheel"></div>
+            <div class="wheel-center"></div>
+          </div>
+          <div class="glasscard" id="tomorrowDetailCard">
+            <div class="cat-title" id="tomorrowDetailTitle"></div>
+            <div id="tomorrowDetailContent"></div>
+          </div>
+        </div>
+      </div>
+      <div id="tomorrowSwipeView" class="hide">
+        <div class="swipe-shell">
+          <div class="swipe-head">
+            <button class="pill" id="tomorrowPrevCard"><i class="fas fa-chevron-left"></i></button>
+            <div class="subline" id="tomorrowCardStatus">Swipe categories</div>
+            <button class="pill" id="tomorrowNextCard"><i class="fas fa-chevron-right"></i></button>
+          </div>
+          <div class="swipe-track" id="tomorrowSwipeTrack"></div>
+        </div>
+      </div>
+      <div class="state hide" id="tomorrowClosed">
+        <div class="title" style="font-size:24px;">Closed</div>
+        <div class="subline" id="tomorrowClosedMsg"></div>
+      </div>
+    </section>
+
+    <section class="panel hide" id="panel-advanced" role="tabpanel" aria-labelledby="dayBtnAdvanced">
+      <div class="header">
+        <div class="title">Advanced Menu Forecast</div>
+        <div class="subline" id="advancedDisclaimer"></div>
+      </div>
+      <div class="swipe-shell">
+        <div class="swipe-track" id="advancedTrack"></div>
+      </div>
+    </section>
+
+    <div class="state hide" id="loadError">
+      <div class="title" style="font-size:24px;">Menu couldn’t load</div>
+      <div class="subline" id="loadErrorMsg">Try again in a moment.</div>
+    </div>
   </div>
 
+  <div class="nav-btn" id="navBtnBottom">
+    <i class="fas fa-compass btn-icon"></i>
+    <div class="btn-text"><div class="main">NAVIGATION</div><div class="sub">explore pages</div></div>
+  </div>
   <div class="circ-menu-overlay" id="circMenuOverlay">
     <div class="circular-menu">
       <div class="center-home" id="homeCenter" data-link="index.html"><i class="fas fa-home"></i></div>
@@ -262,172 +500,9 @@
     </div>
   </div>
 
-  <div class="hh-menu" role="region" aria-label="Menu" id="hh-menu-root">
-    <div class="hh-stickywrap">
-      <div class="hh-daybar" role="tablist" aria-label="Day selector">
-        <button class="hh-day is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-day-today" id="hhDayBtnToday">Today</button>
-        <button class="hh-day" type="button" role="tab" aria-selected="false" aria-controls="hh-day-tomorrow" id="hhDayBtnTomorrow">Tomorrow</button>
-        <button class="hh-day" type="button" role="tab" aria-selected="false" aria-controls="hh-day-advanced" id="hhDayBtnAdvanced">Advanced Menu</button>
-      </div>
-    </div>
-
-    <div class="hh-daypanel is-active" id="hh-day-today" role="tabpanel" aria-labelledby="hhDayBtnToday">
-      <div class="hh-header">
-        <div class="hh-title" id="hh-today-title">Today’s Menu</div>
-        <div class="hh-updated" id="hh-hours-line">Loading hours…</div>
-        <div class="hh-note" id="hh-hours-note"></div>
-      </div>
-
-      <div class="hh-view-toggle" id="viewToggleToday">
-        <button class="hh-view-btn active" id="viewTodayWheelBtn">Wheel</button>
-        <button class="hh-view-btn" id="viewTodayCubeBtn">3D Cube</button>
-      </div>
-
-      <div id="todayWheelContainer">
-        <div class="hh-wheel-container">
-          <div class="wheel-wrapper" id="todayWheelWrapper">
-            <div class="selected-indicator"></div>
-            <div class="wheel" id="todayWheel"><div class="wheel-center"></div></div>
-          </div>
-          <div class="hh-category-panel" id="todayCategoryPanel">
-            <div class="hh-category-title" id="todayCategoryTitle">Breakfast</div>
-            <div id="todayCategoryContent"></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="todayCubeContainer" class="hidden">
-        <div class="hh-cube-controls">
-          <button class="hh-cube-btn" id="todayCubeZoomOut"><i class="fas fa-search-minus"></i></button>
-          <button class="hh-cube-btn" id="todayCubeReset"><i class="fas fa-undo-alt"></i> Reset</button>
-          <button class="hh-cube-btn" id="todayCubeRotate"><i class="fas fa-rotate-right"></i> Rotate</button>
-          <button class="hh-cube-btn" id="todayCubeZoomIn"><i class="fas fa-search-plus"></i></button>
-        </div>
-        <div class="hh-cube-wrapper" id="todayCubeWrapper">
-          <div class="hh-cube-container" id="todayCube">
-            <div class="hh-cube-face front" id="todayFace0"></div>
-            <div class="hh-cube-face back" id="todayFace1"></div>
-            <div class="hh-cube-face right" id="todayFace2"></div>
-            <div class="hh-cube-face left" id="todayFace3"></div>
-            <div class="hh-cube-face top" id="todayFace4"></div>
-            <div class="hh-cube-face bottom" id="todayFace5"></div>
-          </div>
-        </div>
-        <div class="hh-hint">Scroll normally • Tap Rotate to spin</div>
-      </div>
-
-      <div class="hh-state hh-closed" id="hh-today-closed" hidden>
-        <div class="hh-badge">Closed</div>
-        <div class="hh-state-title" id="hh-today-closed-title"></div>
-        <div class="hh-state-msg" id="hh-today-closed-msg"></div>
-      </div>
-    </div>
-
-    <div class="hh-daypanel" id="hh-day-tomorrow" hidden role="tabpanel" aria-labelledby="hhDayBtnTomorrow">
-      <div class="hh-header">
-        <div class="hh-title" id="hh-tomorrow-title">Tomorrow’s Menu</div>
-        <div class="hh-updated" id="hh-hours-line-2">Loading hours…</div>
-        <div class="hh-note" id="hh-hours-note-2"></div>
-      </div>
-
-      <div class="hh-view-toggle" id="viewToggleTomorrow">
-        <button class="hh-view-btn active" id="viewTomorrowWheelBtn">Wheel</button>
-        <button class="hh-view-btn" id="viewTomorrowCubeBtn">3D Cube</button>
-      </div>
-
-      <div id="tomorrowWheelContainer">
-        <div class="hh-wheel-container">
-          <div class="wheel-wrapper" id="tomorrowWheelWrapper">
-            <div class="selected-indicator"></div>
-            <div class="wheel" id="tomorrowWheel"><div class="wheel-center"></div></div>
-          </div>
-          <div class="hh-category-panel" id="tomorrowCategoryPanel">
-            <div class="hh-category-title" id="tomorrowCategoryTitle">Breakfast</div>
-            <div id="tomorrowCategoryContent"></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="tomorrowCubeContainer" class="hidden">
-        <div class="hh-cube-controls">
-          <button class="hh-cube-btn" id="tomorrowCubeZoomOut"><i class="fas fa-search-minus"></i></button>
-          <button class="hh-cube-btn" id="tomorrowCubeReset"><i class="fas fa-undo-alt"></i> Reset</button>
-          <button class="hh-cube-btn" id="tomorrowCubeRotate"><i class="fas fa-rotate-right"></i> Rotate</button>
-          <button class="hh-cube-btn" id="tomorrowCubeZoomIn"><i class="fas fa-search-plus"></i></button>
-        </div>
-        <div class="hh-cube-wrapper" id="tomorrowCubeWrapper">
-          <div class="hh-cube-container" id="tomorrowCube">
-            <div class="hh-cube-face front" id="tomorrowFace0"></div>
-            <div class="hh-cube-face back" id="tomorrowFace1"></div>
-            <div class="hh-cube-face right" id="tomorrowFace2"></div>
-            <div class="hh-cube-face left" id="tomorrowFace3"></div>
-            <div class="hh-cube-face top" id="tomorrowFace4"></div>
-            <div class="hh-cube-face bottom" id="tomorrowFace5"></div>
-          </div>
-        </div>
-        <div class="hh-hint">Scroll normally • Tap Rotate to spin</div>
-      </div>
-
-      <div class="hh-state hh-closed" id="hh-tomorrow-closed" hidden>
-        <div class="hh-badge">Closed</div>
-        <div class="hh-state-title" id="hh-tomorrow-closed-title"></div>
-        <div class="hh-state-msg" id="hh-tomorrow-closed-msg"></div>
-      </div>
-    </div>
-
-    <div class="hh-daypanel" id="hh-day-advanced" hidden role="tabpanel" aria-labelledby="hhDayBtnAdvanced">
-      <div class="hh-advanced-top">
-        <div class="hh-advanced-title">Advanced Menu</div>
-        <div class="hh-advanced-disclaimer" id="hh-advanced-disclaimer"></div>
-      </div>
-
-      <div class="hh-view-toggle">
-        <button class="hh-view-btn active" id="viewCarouselBtn">Carousel</button>
-        <button class="hh-view-btn" id="viewCubeBtn">3D Cube</button>
-      </div>
-
-      <div class="hh-adv-carousel" id="hh-adv-carousel" aria-label="Advanced menu day cards"></div>
-
-      <div id="cubeViewContainer" class="hidden">
-        <div class="hh-cube-controls">
-          <button class="hh-cube-btn" id="cubePrevGroup"><i class="fas fa-chevron-left"></i> Prev 6</button>
-          <button class="hh-cube-btn" id="cubeZoomOut"><i class="fas fa-search-minus"></i></button>
-          <button class="hh-cube-btn" id="cubeReset"><i class="fas fa-undo-alt"></i> Reset</button>
-          <button class="hh-cube-btn" id="cubeRotate"><i class="fas fa-rotate-right"></i> Rotate</button>
-          <button class="hh-cube-btn" id="cubeZoomIn"><i class="fas fa-search-plus"></i></button>
-          <button class="hh-cube-btn" id="cubeNextGroup">Next 6 <i class="fas fa-chevron-right"></i></button>
-        </div>
-        <div class="hh-cube-wrapper" id="cubeWrapper">
-          <div class="hh-cube-container" id="cubeContainer">
-            <div class="hh-cube-face front" id="face0"></div>
-            <div class="hh-cube-face back" id="face1"></div>
-            <div class="hh-cube-face right" id="face2"></div>
-            <div class="hh-cube-face left" id="face3"></div>
-            <div class="hh-cube-face top" id="face4"></div>
-            <div class="hh-cube-face bottom" id="face5"></div>
-          </div>
-        </div>
-        <div class="hh-hint">Scroll normally • Tap Rotate to spin</div>
-      </div>
-
-      <div class="hh-hint">Tip: switch to 3D cube for a spinning experience.</div>
-    </div>
-
-    <div class="hh-state" id="hh-load-error" hidden>
-      <div class="hh-badge is-dark">Error</div>
-      <div class="hh-state-title">Menu couldn’t load</div>
-      <p class="hh-state-msg" id="hh-load-error-msg">Please try again in a moment.</p>
-    </div>
-  </div>
-
   <script>
     (function () {
-      const $ = (id) => document.getElementById(id);
-
-      function setText(id, text) {
-        const el = $(id);
-        if (el) el.textContent = text || "";
-      }
+      const $ = id => document.getElementById(id);
 
       function escapeHtml(str) {
         return String(str ?? "")
@@ -437,149 +512,34 @@
           .replace(/"/g, "&quot;")
           .replace(/'/g, "&#039;");
       }
-
-      function normalizeItems(arr) {
-        return Array.isArray(arr) ? arr.map(x => String(x || "").trim()).filter(Boolean) : [];
+      function setText(id, text) { const el = $(id); if (el) el.textContent = text || ""; }
+      function normalizeItems(arr) { return Array.isArray(arr) ? arr.map(x => String(x || "").trim()).filter(Boolean) : []; }
+      function normalizeLunchItems(arr) {
+        const items = Array.isArray(arr) ? arr : [];
+        return items.map(raw => {
+          if (raw && typeof raw === "object") return { name: String(raw.name || "").trim(), desc: String(raw.desc || "").trim() };
+          const s = String(raw || "").trim();
+          if (!s) return null;
+          return { name: s, desc: "" };
+        }).filter(Boolean).filter(x => x.name);
       }
-
       function toISODateLocal(d) {
         const y = d.getFullYear();
         const m = String(d.getMonth() + 1).padStart(2, "0");
         const day = String(d.getDate()).padStart(2, "0");
         return `${y}-${m}-${day}`;
       }
-
-      function formatDateNice(d) {
-        return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-      }
-
-      function weekdayName(d) {
-        return d.toLocaleDateString("en-US", { weekday: "long" });
-      }
-
+      function formatDateNice(d) { return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); }
+      function weekdayName(d) { return d.toLocaleDateString("en-US", { weekday: "long" }); }
       function parseISODateToLocal(iso) {
         const [y, m, d] = String(iso).split("-").map(Number);
         return new Date(y, (m || 1) - 1, d || 1);
       }
-
       function normalizeDateKey(key) {
-        const s = String(key || "").trim();
-        const m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+        const m = String(key || "").trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
         if (!m) return null;
-        const y = m[1];
-        const mo = String(Number(m[2])).padStart(2, "0");
-        const da = String(Number(m[3])).padStart(2, "0");
-        return `${y}-${mo}-${da}`;
+        return `${m[1]}-${String(Number(m[2])).padStart(2, "0")}-${String(Number(m[3])).padStart(2, "0")}`;
       }
-
-      function showLoadError(msg) {
-        const err = $("hh-load-error");
-        const msgEl = $("hh-load-error-msg");
-        if (msgEl) msgEl.textContent = msg || "Please try again.";
-        if (err) err.hidden = false;
-      }
-
-      async function fetchHtml(url) {
-        const res = await fetch(url, { credentials: "same-origin", cache: "no-store" });
-        if (!res.ok) throw new Error(`Fetch failed ${res.status} at ${url}`);
-        return await res.text();
-      }
-
-      function extractJsonFromHtml(html, urlLabel) {
-        const doc = new DOMParser().parseFromString(html, "text/html");
-        const script = doc.querySelector("#hh-menu-data");
-        if (!script) throw new Error(`No #hh-menu-data found on ${urlLabel}`);
-        const raw = (script.textContent || "").trim();
-        if (!raw) throw new Error(`#hh-menu-data is empty on ${urlLabel}`);
-        return JSON.parse(raw);
-      }
-
-      async function readData() {
-        const DATA_URLS = ["menu-data.html", "./menu-data.html", "/menu-data.html"];
-        let lastErr = null;
-        for (const url of DATA_URLS) {
-          try {
-            const html = await fetchHtml(url);
-            const data = extractJsonFromHtml(html, url);
-            return normalizeMenus(data);
-          } catch (e) {
-            lastErr = e;
-          }
-        }
-        throw lastErr || new Error("Menu data could not be read from menu-data.html.");
-      }
-
-      function normalizeMenus(data) {
-        const rawMenus = data?.menus || {};
-        const normalizedMenus = {};
-        Object.keys(rawMenus).forEach(k => {
-          const nk = normalizeDateKey(k);
-          if (!nk) return;
-          normalizedMenus[nk] = rawMenus[k];
-        });
-        data.menus = normalizedMenus;
-        return data;
-      }
-
-      function findHours(weekly, dayName) {
-        return (weekly || []).find(d => (d.day || "").toLowerCase() === (dayName || "").toLowerCase())
-          || { day: dayName, open: "", close: "", breakfast: "", lunch: "" };
-      }
-
-      function getClosure(data, dayName) {
-        const c = data?.closures || {};
-        const key = Object.keys(c).find(k => (k || "").toLowerCase() === (dayName || "").toLowerCase());
-        return key ? c[key] : null;
-      }
-
-      function getMenuByDate(data, isoDate) {
-        return (data?.menus || {})[isoDate] || null;
-      }
-
-      function normalizeLunchItems(rawItems) {
-        const items = Array.isArray(rawItems) ? rawItems : [];
-        return items.map(raw => {
-          if (raw && typeof raw === "object") {
-            const name = String(raw.name ?? "").trim();
-            const desc = String(raw.desc ?? "").trim();
-            return { name, desc };
-          }
-          const s = String(raw ?? "").trim();
-          if (!s) return null;
-          return { name: s, desc: "" };
-        }).filter(Boolean).filter(x => x.name);
-      }
-
-      function crawfishFor(data, menu) {
-        const def = data?.defaults?.crawfish || {};
-        const c = menu?.crawfish || {};
-        const show = (c.show === false) ? false : true;
-        const subtitle = (c.subtitle ?? def.subtitle ?? "").trim();
-        const items = normalizeItems(c.items ?? def.items ?? []);
-        return { show, subtitle, items };
-      }
-
-      function getLunchAvailability(data, isoDate, todayISO) {
-        const msg = data?.settings?.autoClearMessage || "Lunch menu unavailable.";
-        const today = parseISODateToLocal(todayISO);
-        const cur = parseISODateToLocal(isoDate);
-        today.setHours(12, 0, 0, 0);
-        cur.setHours(12, 0, 0, 0);
-
-        if (data?.settings?.autoClearPastDays && cur < today) return { ok: false, msg };
-
-        const menu = getMenuByDate(data, isoDate);
-        if (!menu) return { ok: false, msg };
-
-        const lunch = menu?.lunch || {};
-        if (lunch.show === false) return { ok: false, msg };
-
-        const items = normalizeLunchItems(lunch.items);
-        if (items.length === 0) return { ok: false, msg };
-
-        return { ok: true, msg: "" };
-      }
-
       function parseTimeToMinutes(timeStr) {
         if (!timeStr) return null;
         const match = timeStr.match(/(\d+):?(\d*)\s*(AM|PM)/i);
@@ -587,589 +547,530 @@
         let hours = parseInt(match[1], 10);
         const minutes = match[2] ? parseInt(match[2], 10) : 0;
         const ampm = match[3].toUpperCase();
-        if (ampm === 'PM' && hours !== 12) hours += 12;
-        if (ampm === 'AM' && hours === 12) hours = 0;
+        if (ampm === "PM" && hours !== 12) hours += 12;
+        if (ampm === "AM" && hours === 12) hours = 0;
         return hours * 60 + minutes;
       }
-
+      function findHours(weekly, dayName) {
+        return (weekly || []).find(d => (d.day || "").toLowerCase() === (dayName || "").toLowerCase()) ||
+          { day: dayName, open: "", close: "", breakfast: "", lunch: "" };
+      }
+      function getClosure(data, dayName) {
+        const c = data?.closures || {};
+        const key = Object.keys(c).find(k => k.toLowerCase() === String(dayName || "").toLowerCase());
+        return key ? c[key] : null;
+      }
+      function getMenuByDate(data, isoDate) { return (data?.menus || {})[isoDate] || null; }
+      function crawfishFor(data, menu) {
+        const def = data?.defaults?.crawfish || {};
+        const c = menu?.crawfish || {};
+        return {
+          show: c.show === false ? false : true,
+          subtitle: String(c.subtitle ?? def.subtitle ?? "").trim(),
+          items: normalizeItems(c.items ?? def.items ?? [])
+        };
+      }
       function isPastClosingToday(weekly, todayName) {
         const hours = findHours(weekly, todayName);
-        if (!hours.close) return false;
         const closeMinutes = parseTimeToMinutes(hours.close);
-        if (closeMinutes === null) return false;
+        if (closeMinutes == null) return false;
         const now = new Date();
-        const currentMinutes = now.getHours() * 60 + now.getMinutes();
-        return currentMinutes >= closeMinutes;
+        return (now.getHours() * 60 + now.getMinutes()) >= closeMinutes;
+      }
+      function showLoadError(msg) {
+        $("loadError").classList.remove("hide");
+        setText("loadErrorMsg", msg || "Try again in a moment.");
       }
 
-      function buildAdvancedCarousel(data, todayISO) {
-        const wrap = $("hh-adv-carousel");
-        if (!wrap) return;
-        wrap.innerHTML = "";
-
-        const weekly = data?.hours?.weekly || [];
-        const lDef = data?.defaults?.lunch || {};
-        const windowDays = Math.max(1, Math.min(31, Number(data?.settings?.advancedWindowDays ?? 7)));
-        const start = parseISODateToLocal(todayISO);
-
-        for (let i = 0; i < windowDays; i++) {
-          const d = new Date(start);
-          d.setDate(start.getDate() + i);
-          const iso = toISODateLocal(d);
-          const dayName = weekdayName(d);
-          const hours = findHours(weekly, dayName);
-          const closure = getClosure(data, dayName);
-          const isClosed = !!closure?.closed;
-          const menu = getMenuByDate(data, iso) || {};
-          const lunch = menu?.lunch || {};
-          const items = normalizeLunchItems(lunch.items);
-
-          let state = { kind: "open", msg: "" };
-          if (isClosed) state = { kind: "closed", msg: closure.message || "See you tomorrow!" };
-          else {
-            const avail = getLunchAvailability(data, iso, todayISO);
-            if (!avail.ok) state = { kind: "unavailable", msg: avail.msg };
-          }
-
-          const card = document.createElement("article");
-          card.className = "hh-adv-card";
-
-          const head = document.createElement("div");
-          head.className = "hh-adv-head";
-          head.innerHTML = `
-            <div>
-              <div class="hh-adv-dayname">${escapeHtml(dayName)}</div>
-              <div class="hh-adv-date">${escapeHtml(formatDateNice(d))}</div>
-            </div>
-            <div class="hh-adv-hours">${state.kind === "closed" ? "Closed" : (hours.lunch ? `Lunch ${escapeHtml(hours.lunch)}` : "")}</div>
-          `;
-          card.appendChild(head);
-
-          if (state.kind !== "open") {
-            const st = document.createElement("div");
-            st.className = "hh-state";
-            st.innerHTML = `
-              <div class="hh-badge ${state.kind === "unavailable" ? "is-dark" : ""}">${state.kind === "closed" ? "Closed" : "Unavailable"}</div>
-              <div class="hh-state-title">${escapeHtml(dayName)}</div>
-              <p class="hh-state-msg">${escapeHtml(state.msg)}</p>
-            `;
-            card.appendChild(st);
-          } else {
-            const panel = document.createElement("section");
-            panel.className = "hh-panel";
-            const subtitle = ((hours.lunch ? `Lunch ${hours.lunch}. ` : "") + ((lunch.subtitle ?? lDef.subtitle ?? "").trim())).trim();
-            const plates = normalizeItems(lunch.plates ?? lDef.plates ?? []);
-            const hintText = data?.settings?.clickForDescriptionHint || "Tip: click an item for description.";
-            const noDesc = data?.settings?.noDescriptionText || "No description for this item.";
-
-            panel.innerHTML = `
-              <h3>Lunch</h3>
-              <p class="hh-sub">${escapeHtml(subtitle)}</p>
-              <h4>Plates</h4>
-              <ul class="hh-stack">${plates.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>
-              <h4>${escapeHtml(dayName)} Lunch Items</h4>
-              <div class="hh-hintline">${escapeHtml(hintText)}</div>
-              <ul class="hh-stack">
-                ${items.map(it => {
-                  const d = it.desc ? it.desc : noDesc;
-                  return `<li><details><summary>${escapeHtml(it.name)}</summary><div class="hh-desc">${escapeHtml(d)}</div></details></li>`;
-                }).join("")}
-              </ul>
-            `;
-            card.appendChild(panel);
-          }
-
-          wrap.appendChild(card);
-        }
+      async function fetchHtml(url) {
+        const res = await fetch(url, { credentials: "same-origin", cache: "no-store" });
+        if (!res.ok) throw new Error(`Fetch failed ${res.status} at ${url}`);
+        return await res.text();
       }
-
-      function wireDayTabs() {
-        const dayButtons = Array.from(document.querySelectorAll(".hh-day[role='tab']"));
-        const dayPanels = Array.from(document.querySelectorAll(".hh-daypanel[role='tabpanel']"));
-
-        function activate(btn) {
-          const targetId = btn.getAttribute("aria-controls");
-          dayButtons.forEach(b => {
-            const active = b === btn;
-            b.classList.toggle("is-active", active);
-            b.setAttribute("aria-selected", active ? "true" : "false");
-          });
-          dayPanels.forEach(p => p.hidden = p.id !== targetId);
-        }
-
-        dayButtons.forEach(btn => btn.addEventListener("click", () => activate(btn)));
-        return activate;
+      function extractJsonFromHtml(html, label) {
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const script = doc.querySelector("#hh-menu-data");
+        if (!script) throw new Error(`No #hh-menu-data found on ${label}`);
+        const raw = (script.textContent || "").trim();
+        if (!raw) throw new Error(`#hh-menu-data is empty on ${label}`);
+        return JSON.parse(raw);
       }
-
-      function renderCategoryItems(category, titleEl, contentEl, data) {
-        titleEl.textContent = category.name;
-        let html = "";
-
-        if (category.name === "Breakfast" || category.name === "Lunch") {
-          if (category.plates && category.plates.length) {
-            html += '<div class="hh-subcat-title">Plates</div><ul class="hh-category-items">';
-            category.plates.forEach(p => html += `<li>${escapeHtml(p)}</li>`);
-            html += '</ul>';
-          }
-          if (category.items && category.items.length) {
-            html += '<div class="hh-subcat-title">Available Items</div><ul class="hh-category-items">';
-            category.items.forEach(it => {
-              if (typeof it === 'string') html += `<li>${escapeHtml(it)}</li>`;
-              else if (it.name) html += `<li><details><summary>${escapeHtml(it.name)}</summary><div class="hh-desc">${escapeHtml(it.desc || data?.settings?.noDescriptionText || '')}</div></details></li>`;
+      async function readData() {
+        const urls = ["menu-data.html", "./menu-data.html", "/menu-data.html"];
+        let lastErr = null;
+        for (const url of urls) {
+          try {
+            const html = await fetchHtml(url);
+            const data = extractJsonFromHtml(html, url);
+            const rawMenus = data?.menus || {};
+            const normalizedMenus = {};
+            Object.keys(rawMenus).forEach(k => {
+              const nk = normalizeDateKey(k);
+              if (nk) normalizedMenus[nk] = rawMenus[k];
             });
-            html += '</ul>';
+            data.menus = normalizedMenus;
+            return data;
+          } catch (e) {
+            lastErr = e;
           }
-        } else if (category.name === "Crawfish") {
-          if (category.items && category.items.length) {
-            html += '<ul class="hh-category-items">';
-            category.items.forEach(it => html += `<li>${escapeHtml(it)}</li>`);
-            html += '</ul>';
-          } else html += '<div class="hh-cube-unavail">(no items)</div>';
-        } else if (category.name === "Salad Bar") {
-          if (category.pricing?.length) {
-            html += '<div class="hh-subcat-title">Pricing</div><ul class="hh-category-items">';
-            category.pricing.forEach(p => html += `<li>${escapeHtml(p)}</li>`);
-            html += '</ul>';
-          }
-          if (category.lettuce?.length) {
-            html += '<div class="hh-subcat-title">Lettuce</div><ul class="hh-category-items">';
-            category.lettuce.forEach(l => html += `<li>${escapeHtml(l)}</li>`);
-            html += '</ul>';
-          }
-          if (category.toppings?.length) {
-            html += '<div class="hh-subcat-title">Toppings</div><ul class="hh-category-items">';
-            category.toppings.forEach(t => html += `<li>${escapeHtml(t)}</li>`);
-            html += '</ul>';
-          }
-          if (category.dressing?.length) {
-            html += '<div class="hh-subcat-title">Dressing</div><ul class="hh-category-items">';
-            category.dressing.forEach(d => html += `<li>${escapeHtml(d)}</li>`);
-            html += '</ul>';
-          }
-        } else {
-          if (category.items && category.items.length) {
-            html += '<ul class="hh-category-items">';
-            category.items.forEach(it => html += `<li>${escapeHtml(it)}</li>`);
-            html += '</ul>';
-          } else html += '<div class="hh-cube-unavail">(no items)</div>';
         }
-
-        contentEl.innerHTML = html || '<div class="hh-cube-unavail">No items for this category.</div>';
+        throw lastErr || new Error("Menu data could not be read from menu-data.html.");
       }
 
-      
-      function initWheelForDay(dayId, isoDate, data) {
-        const wrapper = $(`${dayId}WheelWrapper`);
-        const wheel = $(`${dayId}Wheel`);
-        const categoryTitle = $(`${dayId}CategoryTitle`);
-        const categoryContent = $(`${dayId}CategoryContent`);
-        if (!wrapper || !wheel || !categoryTitle || !categoryContent) return;
-
+      function buildCategoryData(data, isoDate) {
         const menu = getMenuByDate(data, isoDate) || {};
         const defaults = data?.defaults || {};
-
-        const categories = [];
-        const catMap = {
-          Breakfast: {
+        const lunchItems = normalizeLunchItems(menu.lunch?.items ?? defaults.lunch?.items ?? []);
+        const cats = [
+          {
+            name: "Breakfast",
+            meta: "Morning favorites",
             plates: normalizeItems(menu.breakfast?.plates ?? defaults.breakfast?.plates ?? []),
             items: normalizeItems(menu.breakfast?.items ?? defaults.breakfast?.items ?? [])
           },
-          Lunch: {
+          {
+            name: "Lunch",
+            meta: "Daily plates",
             plates: normalizeItems(menu.lunch?.plates ?? defaults.lunch?.plates ?? []),
-            items: normalizeLunchItems(menu.lunch?.items ?? defaults.lunch?.items ?? [])
-          },
-          Crawfish: { items: crawfishFor(data, menu).items },
-          "Salad Bar": {
+            items: lunchItems
+          }
+        ];
+        const crawfish = crawfishFor(data, menu);
+        if (crawfish.show) cats.push({ name: "Crawfish", meta: "Seasonal special", items: crawfish.items });
+        cats.push(
+          {
+            name: "Salad Bar",
+            meta: "Build your own",
             pricing: normalizeItems(menu.salad?.items ?? defaults.salad?.items ?? []),
             lettuce: normalizeItems(menu.salad?.saladBar?.lettuce ?? defaults.salad?.saladBar?.lettuce ?? []),
             toppings: normalizeItems(menu.salad?.saladBar?.toppings ?? defaults.salad?.saladBar?.toppings ?? []),
             dressing: normalizeItems(menu.salad?.saladBar?.dressing ?? defaults.salad?.saladBar?.dressing ?? [])
           },
-          Drinks: { items: normalizeItems(menu.drinks?.items ?? defaults.drinks?.items ?? []) },
-          Dessert: { items: normalizeItems(menu.dessert?.items ?? defaults.dessert?.items ?? []) }
-        };
+          {
+            name: "Drinks",
+            meta: "Cold & hot",
+            items: normalizeItems(menu.drinks?.items ?? defaults.drinks?.items ?? [])
+          },
+          {
+            name: "Dessert",
+            meta: "Sweet finish",
+            items: normalizeItems(menu.dessert?.items ?? defaults.dessert?.items ?? [])
+          }
+        );
+        return cats.filter(cat => {
+          return (cat.plates && cat.plates.length) ||
+                 (cat.items && cat.items.length) ||
+                 (cat.pricing && cat.pricing.length) ||
+                 (cat.lettuce && cat.lettuce.length) ||
+                 (cat.toppings && cat.toppings.length) ||
+                 (cat.dressing && cat.dressing.length);
+        });
+      }
 
-        for (const [name, content] of Object.entries(catMap)) {
-          if (name === 'Crawfish' && !crawfishFor(data, menu).show) continue;
-          categories.push({ name, ...content });
+      function renderCategoryContent(cat, data) {
+        let html = "";
+        if (cat.plates?.length) {
+          html += `<div class="section-label">Plates</div><ul class="list">${cat.plates.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
+        }
+        if (cat.items?.length) {
+          html += `<div class="section-label">Items</div><ul class="list">` + cat.items.map(it => {
+            if (typeof it === "string") return `<li>${escapeHtml(it)}</li>`;
+            return `<li><details><summary>${escapeHtml(it.name)}</summary><div class="desc">${escapeHtml(it.desc || data?.settings?.noDescriptionText || "No description for this item.")}</div></details></li>`;
+          }).join("") + `</ul>`;
+        }
+        if (cat.pricing?.length) html += `<div class="section-label">Pricing</div><ul class="list">${cat.pricing.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
+        if (cat.lettuce?.length) html += `<div class="section-label">Lettuce</div><ul class="list">${cat.lettuce.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
+        if (cat.toppings?.length) html += `<div class="section-label">Toppings</div><ul class="list">${cat.toppings.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
+        if (cat.dressing?.length) html += `<div class="section-label">Dressing</div><ul class="list">${cat.dressing.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
+        return html || `<div class="subline">No items available.</div>`;
+      }
+
+      function initSwipe(prefix, categories, data) {
+        const track = $(`${prefix}SwipeTrack`);
+        const status = $(`${prefix}CardStatus`);
+        const prev = $(`${prefix}PrevCard`);
+        const next = $(`${prefix}NextCard`);
+        if (!track) return;
+
+        track.innerHTML = categories.map((cat, i) => `
+          <article class="swipe-card${i === 0 ? ' active' : ''}" data-index="${i}">
+            <div class="card-meta">${escapeHtml(cat.meta || "Menu category")}</div>
+            <div class="cat-title">${escapeHtml(cat.name)}</div>
+            ${renderCategoryContent(cat, data)}
+          </article>
+        `).join("");
+
+        const cards = Array.from(track.querySelectorAll(".swipe-card"));
+
+        function activeIndex() {
+          const left = track.scrollLeft;
+          const width = track.clientWidth || 1;
+          return Math.round(left / width);
         }
 
-        if (!categories.length) {
-          wheel.innerHTML = '<div class="wheel-center"></div>';
-          categoryTitle.textContent = 'No categories';
-          categoryContent.innerHTML = '<div class="hh-cube-unavail">No items available.</div>';
-          return;
+        function updateStatus() {
+          const idx = Math.max(0, Math.min(categories.length - 1, activeIndex()));
+          setText(`${prefix}CardStatus`, `${categories[idx]?.name || ""} • ${idx + 1} / ${categories.length}`);
+          cards.forEach((card, i) => card.classList.toggle("active", i === idx));
         }
 
-        const N = categories.length;
-        const angleStep = 360 / N;
-        const radius = 120;
-        const topOffset = -90;
+        function goTo(idx) {
+          const clamped = Math.max(0, Math.min(categories.length - 1, idx));
+          track.scrollTo({ left: clamped * track.clientWidth, behavior: "smooth" });
+          window.setTimeout(updateStatus, 220);
+        }
 
-        wheel.innerHTML = '<div class="wheel-center"></div>';
+        prev?.addEventListener("click", () => goTo(activeIndex() - 1));
+        next?.addEventListener("click", () => goTo(activeIndex() + 1));
+        track.addEventListener("scroll", () => requestAnimationFrame(updateStatus));
+        window.addEventListener("resize", updateStatus);
 
-        categories.forEach((cat, i) => {
-          const baseAngle = topOffset + (i * angleStep);
-          const item = document.createElement('div');
-          item.className = 'wheel-item';
-          item.textContent = cat.name;
-          item.dataset.index = String(i);
-          // text stays upright while the category moves around the wheel
-          item.style.transform = `rotate(${baseAngle}deg) translate(${radius}px) rotate(${-baseAngle}deg)`;
-          wheel.appendChild(item);
+        cards.forEach(card => {
+          card.addEventListener("pointermove", e => {
+            const rect = card.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width - 0.5) * 10;
+            const y = ((e.clientY - rect.top) / rect.height - 0.5) * -10;
+            card.style.transform = `perspective(1000px) rotateY(${x}deg) rotateX(${y}deg)`;
+          });
+          card.addEventListener("pointerleave", () => {
+            card.style.transform = "perspective(1000px) rotateY(0deg) rotateX(0deg)";
+          });
         });
 
-        const wheelItems = Array.from(wheel.querySelectorAll('.wheel-item'));
-        let currentAngle = 0;
-        let selectedIndex = 0;
+        updateStatus();
+
+        return {
+          selectByName(name) {
+            const idx = categories.findIndex(c => c.name === name);
+            if (idx >= 0) {
+              goTo(idx);
+              const card = cards[idx];
+              if (card) {
+                card.classList.add("pulse");
+                setTimeout(() => card.classList.remove("pulse"), 900);
+              }
+            }
+          }
+        };
+      }
+
+      function initWheel(prefix, categories, data) {
+        const wrap = $(`${prefix}WheelWrap`);
+        const wheel = $(`${prefix}Wheel`);
+        const detailTitle = $(`${prefix}DetailTitle`);
+        const detailContent = $(`${prefix}DetailContent`);
+        const detailCard = $(`${prefix}DetailCard`);
+        if (!wrap || !wheel || !detailTitle || !detailContent) return null;
+
+        const N = categories.length;
+        const step = 360 / N;
+        const radius = 112;
+        const topAngle = -90;
+
+        wheel.innerHTML = "";
+
+        const items = categories.map((cat, i) => {
+          const el = document.createElement("div");
+          el.className = "wheel-item";
+          el.textContent = cat.name;
+          el.dataset.index = String(i);
+          wheel.appendChild(el);
+          return el;
+        });
+
+        let angle = 0;
+        let velocity = 0;
         let dragging = false;
         let lastPointerAngle = 0;
-        let rafId = 0;
+        let animating = false;
+        let selected = 0;
+        let raf = 0;
 
-        function shortestSignedDelta(a, b) {
+        function shortestDelta(a, b) {
           let diff = a - b;
           while (diff > 180) diff -= 360;
           while (diff < -180) diff += 360;
           return diff;
         }
-
-        function getPointerAngleDeg(e) {
-          const rect = wrapper.getBoundingClientRect();
-          const centerX = rect.left + rect.width / 2;
-          const centerY = rect.top + rect.height / 2;
-          const clientX = e.clientX;
-          const clientY = e.clientY;
-          return Math.atan2(clientY - centerY, clientX - centerX) * 180 / Math.PI;
+        function pointerAngle(e) {
+          const rect = wrap.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+          return Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
         }
-
-        function getSelectedIndexFromWheelAngle(wheelAngle) {
-          let bestIdx = 0;
+        function selectedIndex() {
+          let best = 0;
           let bestDiff = Infinity;
           for (let i = 0; i < N; i++) {
-            const itemAngle = topOffset + (i * angleStep) + wheelAngle;
-            const diff = Math.abs(shortestSignedDelta(itemAngle, topOffset));
+            const a = topAngle + i * step + angle;
+            const diff = Math.abs(shortestDelta(a, topAngle));
             if (diff < bestDiff) {
               bestDiff = diff;
-              bestIdx = i;
+              best = i;
             }
           }
-          return bestIdx;
+          return best;
         }
-
-        function paint() {
-          rafId = 0;
-          wheel.style.transform = `rotate(${currentAngle}deg)`;
-          const idx = getSelectedIndexFromWheelAngle(currentAngle);
-          if (idx !== selectedIndex || !categoryContent.innerHTML) {
-            selectedIndex = idx;
-            wheelItems.forEach((item, i) => item.classList.toggle('selected', i === idx));
-            renderCategoryItems(categories[idx], categoryTitle, categoryContent, data);
+        function render(force=false) {
+          wheel.style.transform = `rotate(${angle}deg)`;
+          items.forEach((item, i) => {
+            const base = topAngle + i * step;
+            const xform = `rotate(${base}deg) translate(${radius}px) rotate(${-base - angle}deg)`;
+            item.style.transform = xform;
+          });
+          const idx = selectedIndex();
+          if (force || idx !== selected) {
+            selected = idx;
+            items.forEach((item, i) => item.classList.toggle("selected", i === idx));
+            detailTitle.textContent = categories[idx].name;
+            detailContent.innerHTML = renderCategoryContent(categories[idx], data);
+            detailCard.classList.add("pulse");
+            setTimeout(() => detailCard.classList.remove("pulse"), 520);
           }
         }
-
-        function requestPaint() {
-          if (!rafId) rafId = requestAnimationFrame(paint);
-        }
-
-        function snapToNearest() {
-          const snappedIndex = getSelectedIndexFromWheelAngle(currentAngle);
-          currentAngle = -(snappedIndex * angleStep);
-          wheel.style.transition = 'transform 0.2s ease-out';
-          wheel.style.transform = `rotate(${currentAngle}deg)`;
-          selectedIndex = snappedIndex;
-          wheelItems.forEach((item, i) => item.classList.toggle('selected', i === snappedIndex));
-          renderCategoryItems(categories[snappedIndex], categoryTitle, categoryContent, data);
-          window.setTimeout(() => {
-            wheel.style.transition = 'none';
-          }, 200);
-        }
-
-        function onPointerDown(e) {
-          e.preventDefault();
-          dragging = true;
-          lastPointerAngle = getPointerAngleDeg(e);
-          wheel.style.transition = 'none';
-          wrapper.setPointerCapture?.(e.pointerId);
-        }
-
-        function onPointerMove(e) {
-          if (!dragging) return;
-          e.preventDefault();
-          const angle = getPointerAngleDeg(e);
-          const delta = shortestSignedDelta(angle, lastPointerAngle);
-          lastPointerAngle = angle;
-          currentAngle += delta;
-          requestPaint();
-        }
-
-        function onPointerUp(e) {
-          if (!dragging) return;
-          dragging = false;
-          wrapper.releasePointerCapture?.(e.pointerId);
-          snapToNearest();
-        }
-
-        wrapper.addEventListener('pointerdown', onPointerDown, { passive: false });
-        wrapper.addEventListener('pointermove', onPointerMove, { passive: false });
-        wrapper.addEventListener('pointerup', onPointerUp);
-        wrapper.addEventListener('pointercancel', onPointerUp);
-
-        requestPaint();
-      }
-
-
-      function cubeList(items, maxItems = 4) {
-        const arr = Array.isArray(items) ? items.filter(Boolean) : [];
-        return { visible: arr.slice(0, maxItems), remaining: Math.max(0, arr.length - maxItems), total: arr.length };
-      }
-
-      function renderCubeSection(title, items, maxItems = 4) {
-        const info = cubeList(items, maxItems);
-        if (!info.total) return "";
-        return `
-          <div class="hh-subcat-title">${escapeHtml(title)}</div>
-          <ul class="hh-cube-items compact">
-            ${info.visible.map(x => `<li>${escapeHtml(x)}</li>`).join("")}
-          </ul>
-          ${info.remaining ? `<div class="hh-cube-more">+ ${info.remaining} more</div>` : ""}
-        `;
-      }
-
-      function buildCubeFaceHtml(category) {
-        let html = `<div class="hh-cube-category">${escapeHtml(category.name)}</div>`;
-
-        if (category.name === 'Breakfast' || category.name === 'Lunch') {
-          html += renderCubeSection('Plates', category.plates, 3);
-          const names = (category.items || []).map(it => typeof it === 'string' ? it : (it?.name || '')).filter(Boolean);
-          html += renderCubeSection('Items', names, 4);
-        } else if (category.name === 'Crawfish') {
-          html += renderCubeSection('Available', category.items || [], 4);
-        } else if (category.name === 'Salad Bar') {
-          html += renderCubeSection('Pricing', category.pricing || [], 2);
-          html += renderCubeSection('Lettuce', category.lettuce || [], 2);
-          html += renderCubeSection('Toppings', category.toppings || [], 4);
-          html += renderCubeSection('Dressing', category.dressing || [], 3);
-        } else {
-          html += renderCubeSection('Available', category.items || [], 5);
-        }
-
-        if (!category.plates?.length && !category.items?.length && !category.pricing?.length && !category.lettuce?.length && !category.toppings?.length && !category.dressing?.length) {
-          html += `<div class="hh-cube-unavail">(no items)</div>`;
-        }
-
-        return html;
-      }
-
-function getCubeCategoriesForDate(isoDate, data) {
-        const menu = getMenuByDate(data, isoDate) || {};
-        const defaults = data?.defaults || {};
-        const categories = [
-          {
-            name: 'Breakfast',
-            plates: normalizeItems(menu.breakfast?.plates ?? defaults.breakfast?.plates ?? []),
-            items: normalizeItems(menu.breakfast?.items ?? defaults.breakfast?.items ?? [])
-          },
-          {
-            name: 'Lunch',
-            plates: normalizeItems(menu.lunch?.plates ?? defaults.lunch?.plates ?? []),
-            items: normalizeLunchItems(menu.lunch?.items ?? defaults.lunch?.items ?? [])
+        function tick() {
+          raf = 0;
+          if (!dragging) {
+            angle += velocity;
+            velocity *= 0.965;
+            if (Math.abs(velocity) < 0.02) {
+              const target = -(selectedIndex() * step);
+              const delta = shortestDelta(target, angle);
+              angle += delta * 0.16;
+              if (Math.abs(delta) < 0.2) {
+                angle = target;
+                velocity = 0;
+                render(true);
+                animating = false;
+                return;
+              }
+            }
           }
-        ];
-
-        const crawfish = crawfishFor(data, menu);
-        if (crawfish.show) categories.push({ name: 'Crawfish', items: crawfish.items });
-
-        categories.push(
-          {
-            name: 'Salad Bar',
-            pricing: normalizeItems(menu.salad?.items ?? defaults.salad?.items ?? []),
-            lettuce: normalizeItems(menu.salad?.saladBar?.lettuce ?? defaults.salad?.saladBar?.lettuce ?? []),
-            toppings: normalizeItems(menu.salad?.saladBar?.toppings ?? defaults.salad?.saladBar?.toppings ?? []),
-            dressing: normalizeItems(menu.salad?.saladBar?.dressing ?? defaults.salad?.saladBar?.dressing ?? [])
-          },
-          { name: 'Drinks', items: normalizeItems(menu.drinks?.items ?? defaults.drinks?.items ?? []) },
-          { name: 'Dessert', items: normalizeItems(menu.dessert?.items ?? defaults.dessert?.items ?? []) }
-        );
-
-        return categories.slice(0, 6);
-      }
-
-      function wireCubeInteraction(cubeId, wrapperId, zoomInId, zoomOutId, resetId, rotateId) {
-        const cube = $(cubeId);
-        const wrapper = $(wrapperId);
-        const zoomInBtn = $(zoomInId);
-        const zoomOutBtn = $(zoomOutId);
-        const resetBtn = $(resetId);
-        const rotateBtn = $(rotateId);
-        if (!cube || !wrapper) return;
-
-        let rotX = -10, rotY = 20, scale = 1, rotateMode = false, dragging = false;
-        let startX = 0, startY = 0, startRotX = rotX, startRotY = rotY;
-
-        function render() { cube.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(${scale})`; }
-
-        function onStart(e) {
-          if (!rotateMode) return;
+          render();
+          animating = true;
+          raf = requestAnimationFrame(tick);
+        }
+        function ensureAnim() {
+          if (!raf) raf = requestAnimationFrame(tick);
+        }
+        function onDown(e) {
           e.preventDefault();
           dragging = true;
-          const point = e.touches ? e.touches[0] : e;
-          startX = point.clientX;
-          startY = point.clientY;
-          startRotX = rotX;
-          startRotY = rotY;
+          wrap.classList.add("dragging");
+          velocity = 0;
+          lastPointerAngle = pointerAngle(e);
+          wrap.setPointerCapture?.(e.pointerId);
+          ensureAnim();
         }
-
         function onMove(e) {
-          if (!dragging || !rotateMode) return;
+          if (!dragging) return;
           e.preventDefault();
-          const point = e.touches ? e.touches[0] : e;
-          const dx = point.clientX - startX;
-          const dy = point.clientY - startY;
-          rotY = startRotY + dx * 0.4;
-          rotX = startRotX - dy * 0.4;
+          const a = pointerAngle(e);
+          const delta = shortestDelta(a, lastPointerAngle);
+          lastPointerAngle = a;
+          angle += delta;
+          velocity = delta;
           render();
         }
-
-        function onEnd() { dragging = false; }
-
-        zoomInBtn?.addEventListener('click', () => { scale = Math.min(1.8, scale + 0.1); render(); });
-        zoomOutBtn?.addEventListener('click', () => { scale = Math.max(0.7, scale - 0.1); render(); });
-        resetBtn?.addEventListener('click', () => { rotX = -10; rotY = 20; scale = 1; render(); });
-        rotateBtn?.addEventListener('click', () => {
-          rotateMode = !rotateMode;
-          wrapper.classList.toggle('rotate-mode', rotateMode);
-          rotateBtn.classList.toggle('rotate-mode', rotateMode);
-        });
-
-        wrapper.addEventListener('mousedown', onStart);
-        window.addEventListener('mousemove', onMove);
-        window.addEventListener('mouseup', onEnd);
-        wrapper.addEventListener('touchstart', onStart, { passive: false });
-        window.addEventListener('touchmove', onMove, { passive: false });
-        window.addEventListener('touchend', onEnd);
-        render();
-      }
-
-      function initDayCube(dayId, isoDate, data) {
-        const categories = getCubeCategoriesForDate(isoDate, data);
-        for (let i = 0; i < 6; i++) {
-          const face = $(`${dayId}Face${i}`);
-          if (!face) continue;
-          const cat = categories[i];
-          face.innerHTML = cat ? buildCubeFaceHtml(cat) : `<div class="hh-cube-category">Empty</div><div class="hh-cube-unavail">(no content)</div>`;
+        function onUp(e) {
+          if (!dragging) return;
+          dragging = false;
+          wrap.classList.remove("dragging");
+          wrap.releasePointerCapture?.(e.pointerId);
+          ensureAnim();
         }
 
-        wireCubeInteraction(`${dayId}Cube`, `${dayId}CubeWrapper`, `${dayId}CubeZoomIn`, `${dayId}CubeZoomOut`, `${dayId}CubeReset`, `${dayId}CubeRotate`);
+        wrap.addEventListener("pointerdown", onDown, { passive: false });
+        wrap.addEventListener("pointermove", onMove, { passive: false });
+        wrap.addEventListener("pointerup", onUp);
+        wrap.addEventListener("pointercancel", onUp);
+
+        render(true);
+
+        return {
+          aiPick() {
+            const idx = Math.floor(Math.random() * categories.length);
+            velocity = 12 + Math.random() * 8;
+            const target = -(idx * step);
+            const start = performance.now();
+            const startAngle = angle;
+            const extraTurns = 720 + Math.random() * 360;
+            const endAngle = target + extraTurns;
+            function animate(now) {
+              const t = Math.min(1, (now - start) / 2400);
+              const ease = 1 - Math.pow(1 - t, 3);
+              angle = startAngle + (endAngle - startAngle) * ease;
+              velocity = 0;
+              render();
+              if (t < 1) requestAnimationFrame(animate);
+              else {
+                angle = target;
+                render(true);
+                const cat = categories[idx];
+                detailCard.classList.add("pulse");
+                setTimeout(() => detailCard.classList.remove("pulse"), 900);
+              }
+            }
+            requestAnimationFrame(animate);
+            return categories[idx];
+          },
+          selectByName(name) {
+            const idx = categories.findIndex(c => c.name === name);
+            if (idx >= 0) {
+              angle = -(idx * step);
+              render(true);
+            }
+          }
+        };
       }
 
-      function initAdvancedCube(data, todayISO) {
-        const start = parseISODateToLocal(todayISO);
-        const faces = [$('face0'), $('face1'), $('face2'), $('face3'), $('face4'), $('face5')];
-        const groups = [];
-        const windowDays = Math.max(6, Math.min(31, Number(data?.settings?.advancedWindowDays ?? 7)));
+      function setupViewToggle(prefix) {
+        const wheelBtn = $(`${prefix}ViewWheel`);
+        const swipeBtn = $(`${prefix}ViewSwipe`);
+        const wheelView = $(`${prefix}WheelView`);
+        const swipeView = $(`${prefix}SwipeView`);
+        wheelBtn?.addEventListener("click", () => {
+          wheelBtn.classList.add("active");
+          swipeBtn?.classList.remove("active");
+          wheelView?.classList.remove("hide");
+          swipeView?.classList.add("hide");
+        });
+        swipeBtn?.addEventListener("click", () => {
+          swipeBtn.classList.add("active");
+          wheelBtn?.classList.remove("active");
+          swipeView?.classList.remove("hide");
+          wheelView?.classList.add("hide");
+        });
+      }
 
-        for (let i = 0; i < windowDays; i++) {
+      function setupDayTabs() {
+        const buttons = [$("dayBtnToday"), $("dayBtnTomorrow"), $("dayBtnAdvanced")];
+        const panels = [$("panel-today"), $("panel-tomorrow"), $("panel-advanced")];
+        buttons.forEach((btn, i) => {
+          btn?.addEventListener("click", () => {
+            buttons.forEach((b, bi) => {
+              b.classList.toggle("active", bi === i);
+              b.setAttribute("aria-selected", bi === i ? "true" : "false");
+            });
+            panels.forEach((p, pi) => p.classList.toggle("hide", pi !== i));
+          });
+        });
+      }
+
+      function buildAdvanced(data, todayISO) {
+        const track = $("advancedTrack");
+        if (!track) return;
+        track.innerHTML = "";
+        setText("advancedDisclaimer", data?.settings?.advancedDisclaimer || "");
+        const start = parseISODateToLocal(todayISO);
+        const weekly = data?.hours?.weekly || [];
+        const lDef = data?.defaults?.lunch || {};
+        const days = Math.max(1, Math.min(31, Number(data?.settings?.advancedWindowDays ?? 7)));
+
+        for (let i = 0; i < days; i++) {
           const d = new Date(start);
           d.setDate(start.getDate() + i);
           const iso = toISODateLocal(d);
-          const dayName = weekdayName(d);
-          const menu = getMenuByDate(data, iso) || {};
-          groups.push({
-            name: `${dayName} (${formatDateNice(d)})`,
-            items: normalizeLunchItems(menu.lunch?.items ?? []).map(x => x.name || x)
-          });
+          const name = weekdayName(d);
+          const hours = findHours(weekly, name);
+          const closure = getClosure(data, name);
+          const lunch = (getMenuByDate(data, iso) || {}).lunch || {};
+          const plates = normalizeItems(lunch.plates ?? lDef.plates ?? []);
+          const items = normalizeLunchItems(lunch.items ?? []);
+          const card = document.createElement("article");
+          card.className = "swipe-card";
+          card.innerHTML = `
+            <div class="card-meta">${escapeHtml(formatDateNice(d))}</div>
+            <div class="cat-title">${escapeHtml(name)}</div>
+            <div class="subline">${closure?.closed ? "Closed" : (hours.lunch ? `Lunch ${escapeHtml(hours.lunch)}` : "")}</div>
+            ${closure?.closed
+              ? `<div class="section-label">Status</div><ul class="list"><li>${escapeHtml(closure.message || "Closed")}</li></ul>`
+              : `
+                <div class="section-label">Plates</div><ul class="list">${plates.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>
+                <div class="section-label">Lunch Items</div><ul class="list">${items.map(x => `<li>${escapeHtml(x.name)}</li>`).join("") || `<li>No lunch items posted.</li>`}</ul>
+              `
+            }
+          `;
+          track.appendChild(card);
         }
-
-        let page = 0;
-
-        function renderPage() {
-          const slice = groups.slice(page * 6, page * 6 + 6);
-          for (let i = 0; i < 6; i++) {
-            const face = faces[i];
-            if (!face) continue;
-            const cat = slice[i];
-            face.innerHTML = cat ? buildCubeFaceHtml(cat) : `<div class="hh-cube-category">Empty</div><div class="hh-cube-unavail">(no content)</div>`;
-          }
-        }
-
-        $('cubePrevGroup')?.addEventListener('click', () => { if (page > 0) { page--; renderPage(); } });
-        $('cubeNextGroup')?.addEventListener('click', () => { if ((page + 1) * 6 < groups.length) { page++; renderPage(); } });
-
-        wireCubeInteraction('cubeContainer', 'cubeWrapper', 'cubeZoomIn', 'cubeZoomOut', 'cubeReset', 'cubeRotate');
-        renderPage();
       }
 
-      function setupViewToggles() {
-        const todayWheelBtn = $('viewTodayWheelBtn');
-        const todayCubeBtn = $('viewTodayCubeBtn');
-        const todayWheel = $('todayWheelContainer');
-        const todayCube = $('todayCubeContainer');
-        todayWheelBtn?.addEventListener('click', () => {
-          todayWheelBtn.classList.add('active');
-          todayCubeBtn?.classList.remove('active');
-          todayWheel?.classList.remove('hidden');
-          todayCube?.classList.add('hidden');
-        });
-        todayCubeBtn?.addEventListener('click', () => {
-          todayCubeBtn.classList.add('active');
-          todayWheelBtn?.classList.remove('active');
-          todayWheel?.classList.add('hidden');
-          todayCube?.classList.remove('hidden');
-        });
+      function initPanel(prefix, data, isoDate, displayName, calendarTodayISO) {
+        const weekly = data?.hours?.weekly || [];
+        const hours = findHours(weekly, displayName);
+        const closure = getClosure(data, displayName);
 
-        const tomorrowWheelBtn = $('viewTomorrowWheelBtn');
-        const tomorrowCubeBtn = $('viewTomorrowCubeBtn');
-        const tomorrowWheel = $('tomorrowWheelContainer');
-        const tomorrowCube = $('tomorrowCubeContainer');
-        tomorrowWheelBtn?.addEventListener('click', () => {
-          tomorrowWheelBtn.classList.add('active');
-          tomorrowCubeBtn?.classList.remove('active');
-          tomorrowWheel?.classList.remove('hidden');
-          tomorrowCube?.classList.add('hidden');
-        });
-        tomorrowCubeBtn?.addEventListener('click', () => {
-          tomorrowCubeBtn.classList.add('active');
-          tomorrowWheelBtn?.classList.remove('active');
-          tomorrowWheel?.classList.add('hidden');
-          tomorrowCube?.classList.remove('hidden');
-        });
+        setText(`${prefix}Title`, `${displayName} (${formatDateNice(parseISODateToLocal(isoDate))}) Menu`);
+        setText(`${prefix}Hours`,
+          closure?.closed
+            ? `${displayName} Hours: Closed`
+            : `${displayName} Hours: ${hours.open} – ${hours.close}` +
+              (hours.breakfast ? ` • Breakfast ${hours.breakfast}` : "") +
+              (hours.lunch ? ` • Lunch ${hours.lunch}` : "")
+        );
+        setText(`${prefix}Note`, data?.hours?.note || "");
 
-        const carouselBtn = $('viewCarouselBtn');
-        const cubeBtn = $('viewCubeBtn');
-        const carousel = $('hh-adv-carousel');
-        const cubeView = $('cubeViewContainer');
-        carouselBtn?.addEventListener('click', () => {
-          carouselBtn.classList.add('active');
-          cubeBtn?.classList.remove('active');
-          carousel?.classList.remove('hidden');
-          cubeView?.classList.add('hidden');
-        });
-        cubeBtn?.addEventListener('click', () => {
-          cubeBtn.classList.add('active');
-          carouselBtn?.classList.remove('active');
-          carousel?.classList.add('hidden');
-          cubeView?.classList.remove('hidden');
+        if (closure?.closed) {
+          $(`${prefix}Closed`).classList.remove("hide");
+          setText(`${prefix}ClosedMsg`, closure.message || "See you next time!");
+        } else {
+          $(`${prefix}Closed`).classList.add("hide");
+        }
+
+        const cats = buildCategoryData(data, isoDate);
+        const wheelApi = initWheel(prefix, cats, data);
+        const swipeApi = initSwipe(prefix, cats, data);
+
+        setupViewToggle(prefix);
+
+        $(`${prefix}AIBtn`)?.addEventListener("click", () => {
+          const picked = wheelApi?.aiPick();
+          if (picked) swipeApi?.selectByName(picked.name);
         });
       }
 
-      const activateDay = wireDayTabs();
+      function initNav() {
+        const overlay = $("circMenuOverlay");
+        const navBtn = $("navBtnBottom");
+        const home = $("homeCenter");
+        const items = Array.from(document.querySelectorAll(".menu-item"));
+        if (!overlay || !navBtn || !home) return;
+        navBtn.addEventListener("click", e => { e.stopPropagation(); overlay.classList.toggle("open"); });
+        overlay.addEventListener("click", e => { if (e.target === overlay) overlay.classList.remove("open"); });
+        home.addEventListener("click", () => {
+          overlay.classList.remove("open");
+          const link = home.getAttribute("data-link");
+          if (link) window.location.href = link;
+        });
+        async function sharePage() {
+          const data = { title: document.title, text: "Check out Hot Headz!", url: window.location.href };
+          try {
+            if (navigator.share) await navigator.share(data);
+            else if (navigator.clipboard) { await navigator.clipboard.writeText(window.location.href); alert("Link copied!"); }
+          } catch (_) {}
+        }
+        items.forEach(item => item.addEventListener("click", () => {
+          overlay.classList.remove("open");
+          const action = item.getAttribute("data-action");
+          const link = item.getAttribute("data-link");
+          if (action === "share") sharePage();
+          else if (link) window.location.href = link;
+        }));
+        document.querySelector(".circular-menu")?.addEventListener("click", e => e.stopPropagation());
+      }
+
+      setupDayTabs();
+      initNav();
 
       (async function init() {
         try {
           const data = await readData();
-          setText('hh-advanced-disclaimer', data?.settings?.advancedDisclaimer || '');
-          if (!data?.settings?.showAdvancedTab) {
-            const advBtn = $('hhDayBtnAdvanced');
-            if (advBtn) advBtn.style.display = 'none';
-          }
-
           const now = new Date();
           const calendarTodayISO = toISODateLocal(now);
           const calendarTodayName = weekdayName(now);
-          const calendarTomorrow = new Date(now);
-          calendarTomorrow.setDate(now.getDate() + 1);
-          const calendarTomorrowISO = toISODateLocal(calendarTomorrow);
-          const calendarTomorrowName = weekdayName(calendarTomorrow);
+          const tomorrow = new Date(now); tomorrow.setDate(now.getDate() + 1);
+          const calendarTomorrowISO = toISODateLocal(tomorrow);
+          const calendarTomorrowName = weekdayName(tomorrow);
 
           let displayTodayISO = calendarTodayISO;
           let displayTodayName = calendarTodayName;
@@ -1181,105 +1082,22 @@ function getCubeCategoriesForDate(isoDate, data) {
           if (isPastClosingToday(weekly, calendarTodayName) && !closureToday?.closed) {
             displayTodayISO = calendarTomorrowISO;
             displayTodayName = calendarTomorrowName;
-            const dayAfterTomorrow = new Date(now);
-            dayAfterTomorrow.setDate(now.getDate() + 2);
-            displayTomorrowISO = toISODateLocal(dayAfterTomorrow);
-            displayTomorrowName = weekdayName(dayAfterTomorrow);
+            const dayAfter = new Date(now); dayAfter.setDate(now.getDate() + 2);
+            displayTomorrowISO = toISODateLocal(dayAfter);
+            displayTomorrowName = weekdayName(dayAfter);
           }
 
-          setText('hhDayBtnToday', displayTodayName);
-          setText('hhDayBtnTomorrow', displayTomorrowName);
-          setText('hh-today-title', `${displayTodayName} (${formatDateNice(parseISODateToLocal(displayTodayISO))}) Menu`);
-          setText('hh-tomorrow-title', `${displayTomorrowName} (${formatDateNice(parseISODateToLocal(displayTomorrowISO))}) Menu`);
-          setText('hh-hours-note', data?.hours?.note || '');
-          setText('hh-hours-note-2', data?.hours?.note || '');
+          setText("dayBtnToday", displayTodayName);
+          setText("dayBtnTomorrow", displayTomorrowName);
 
-          const hoursToday = findHours(weekly, displayTodayName);
-          const hoursTomorrow = findHours(weekly, displayTomorrowName);
-          const closureDisplayToday = getClosure(data, displayTodayName);
-          const closureDisplayTomorrow = getClosure(data, displayTomorrowName);
-
-          const lineToday = closureDisplayToday?.closed ? `${displayTodayName} Hours: Closed`
-            : `${displayTodayName} Hours: ${hoursToday.open} – ${hoursToday.close}` +
-              (hoursToday.breakfast ? ` • Breakfast ${hoursToday.breakfast}` : '') +
-              (hoursToday.lunch ? ` • Lunch ${hoursToday.lunch}` : '');
-
-          const lineTomorrow = closureDisplayTomorrow?.closed ? `${displayTomorrowName} Hours: Closed`
-            : `${displayTomorrowName} Hours: ${hoursTomorrow.open} – ${hoursTomorrow.close}` +
-              (hoursTomorrow.breakfast ? ` • Breakfast ${hoursTomorrow.breakfast}` : '') +
-              (hoursTomorrow.lunch ? ` • Lunch ${hoursTomorrow.lunch}` : '');
-
-          setText('hh-hours-line', lineToday);
-          setText('hh-hours-line-2', lineTomorrow);
-
-          if (closureDisplayToday?.closed) {
-            $('hh-today-closed').hidden = false;
-            setText('hh-today-closed-title', `${displayTodayName} (${displayTodayISO})`);
-            setText('hh-today-closed-msg', closureDisplayToday.message || 'See you tomorrow!');
-          } else $('hh-today-closed').hidden = true;
-
-          if (closureDisplayTomorrow?.closed) {
-            $('hh-tomorrow-closed').hidden = false;
-            setText('hh-tomorrow-closed-title', `${displayTomorrowName} (${displayTomorrowISO})`);
-            setText('hh-tomorrow-closed-msg', closureDisplayTomorrow.message || 'See you tomorrow!');
-          } else $('hh-tomorrow-closed').hidden = true;
-
-          buildAdvancedCarousel(data, calendarTodayISO);
-          initWheelForDay('today', displayTodayISO, data);
-          initWheelForDay('tomorrow', displayTomorrowISO, data);
-          initDayCube('today', displayTodayISO, data);
-          initDayCube('tomorrow', displayTomorrowISO, data);
-          initAdvancedCube(data, calendarTodayISO);
-          setupViewToggles();
-          activateDay($('hhDayBtnToday'));
+          initPanel("today", data, displayTodayISO, displayTodayName, calendarTodayISO);
+          initPanel("tomorrow", data, displayTomorrowISO, displayTomorrowName, calendarTodayISO);
+          buildAdvanced(data, calendarTodayISO);
         } catch (e) {
-          console.error('HOT HEADZ MENU ERROR:', e);
-          setText('hh-hours-line', 'Menu unavailable right now.');
-          setText('hh-hours-line-2', 'Menu unavailable right now.');
-          showLoadError(String(e && e.message ? e.message : e));
+          console.error(e);
+          showLoadError(String(e?.message || e));
         }
       })();
-    })();
-
-    (function() {
-      const overlay = document.getElementById('circMenuOverlay');
-      const bottomBtn = document.getElementById('navBtnBottom');
-      const homeCenter = document.getElementById('homeCenter');
-      const menuItems = document.querySelectorAll('.menu-item');
-      if (!overlay || !bottomBtn || !homeCenter) return;
-
-      function toggleMenu() { overlay.classList.toggle('open'); }
-      bottomBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
-
-      async function sharePage() {
-        const shareData = { title: document.title, text: 'Check out Hot Headz!', url: window.location.href };
-        try {
-          if (navigator.share) await navigator.share(shareData);
-          else if (navigator.clipboard) {
-            await navigator.clipboard.writeText(window.location.href);
-            alert('Link copied!');
-          } else alert('Copy manually: ' + window.location.href);
-        } catch (e) {}
-      }
-
-      homeCenter.addEventListener('click', () => {
-        overlay.classList.remove('open');
-        const link = homeCenter.getAttribute('data-link');
-        if (link) window.location.href = link;
-      });
-
-      menuItems.forEach(item => {
-        item.addEventListener('click', () => {
-          overlay.classList.remove('open');
-          const link = item.getAttribute('data-link');
-          const action = item.getAttribute('data-action');
-          if (action === 'share') sharePage();
-          else if (link) window.location.href = link;
-        });
-      });
-
-      document.querySelector('.circular-menu')?.addEventListener('click', e => e.stopPropagation());
     })();
   </script>
 </body>
