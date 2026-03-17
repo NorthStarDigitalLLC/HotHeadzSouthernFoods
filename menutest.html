@@ -1,506 +1,486 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Guiding Light — A Beacon in Magnolia | Guiding Light Pentecostal Church</title>
-  <meta name="description" content="Guiding Light Pentecostal Church — UPCI / Apostolic congregation in Magnolia, MS. Come Sundays at 10AM & 6PM (pre-prayer 5:30PM) and Wednesdays at 7:30PM.">
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Choose Your Path — Guiding Light Portal</title>
+  <meta name="description" content="Choose a path: Home, Visit, Ministries, Events, Sermons, Give, Contact. Guiding Light Pentecostal Church — Magnolia, MS.">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     :root{
       --bg1:#03021a; --bg2:#061033;
-      --neon-a: #9ef3ff; --neon-b: #d9a6ff; --neon-c:#ff9bd6;
-      --muted: #b9c7e6; --glass:rgba(255,255,255,0.04);
-      --maxW:1200px; --radius:16px;
+      --neon-a:#9ef3ff; --neon-b:#d9a6ff; --neon-c:#ff9bd6;
+      --muted:#bfcbe6; --glass:rgba(255,255,255,0.04);
+      --accent:linear-gradient(90deg,var(--neon-a),var(--neon-b),var(--neon-c));
+      --maxW:1200px;
     }
     *{box-sizing:border-box}
     html,body{height:100%;margin:0;font-family:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,Arial;color:#EAF4FF;background:
-      radial-gradient(900px 350px at 10% 5%, rgba(158,243,255,0.03), transparent),
+      radial-gradient(900px 300px at 10% 8%, rgba(158,243,255,0.03), transparent),
       linear-gradient(180deg,var(--bg1),var(--bg2));-webkit-font-smoothing:antialiased}
-    a{color:var(--neon-a); text-decoration:none}
-    .wrap{max-width:var(--maxW);margin:28px auto;padding:22px;position:relative;z-index:2}
+    a{color:var(--neon-a)}
+    .wrap{min-height:100vh;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;max-width:var(--maxW);margin:0 auto;padding:28px}
+
     header{display:flex;align-items:center;justify-content:space-between;gap:12px}
     .brand{display:flex;align-items:center;gap:12px}
-    .logo{
-      width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));
-      display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.06);
-      box-shadow:0 12px 40px rgba(0,0,0,0.6);
-    }
-    .brand h1{font-family:"Orbitron",sans-serif;font-size:18px;margin:0;background:linear-gradient(90deg,var(--neon-a),var(--neon-b),var(--neon-c));-webkit-background-clip:text;background-clip:text;color:transparent}
-    nav{display:flex;gap:12px;align-items:center}
-    nav a{font-weight:700;color:var(--muted);padding:8px 10px;border-radius:10px}
-    nav a:hover{color:#fff;background:rgba(255,255,255,0.03)}
-    /* Hero */
-    .hero{
-      margin-top:22px;display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:stretch;
-      min-height:540px;position:relative;overflow:visible;
-    }
-    /* Nebula / background */
+    .logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.06)}
+    .title{font-family:"Orbitron",sans-serif;font-size:18px;background:var(--accent);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .sub{font-size:12px;color:var(--muted)}
+
+    /* Full-screen portal area */
+    .portal-wrap{flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;margin-top:24px}
+    /* ambient nebula */
     .nebula{
-      position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;opacity:0.9;
+      position:absolute;inset:-20% -10% -20% -10%;z-index:0;pointer-events:none;
       background:
-        radial-gradient(600px 200px at 8% 10%, rgba(217,166,255,0.06), transparent),
-        radial-gradient(500px 180px at 70% 30%, rgba(158,243,255,0.05), transparent),
-        radial-gradient(350px 140px at 48% 70%, rgba(255,155,214,0.03), transparent);
-      filter:blur(24px);
-      border-radius:20px;
-    }
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:var(--radius);padding:28px;border:1px solid rgba(255,255,255,0.04);
-      box-shadow:0 24px 60px rgba(3,6,30,0.6);
+        radial-gradient(500px 200px at 10% 8%, rgba(217,166,255,0.06), transparent),
+        radial-gradient(400px 150px at 80% 30%, rgba(158,243,255,0.05), transparent),
+        radial-gradient(300px 120px at 48% 70%, rgba(255,155,214,0.03), transparent);
+      filter:blur(40px);
+      transform:scale(1.05);
     }
 
-    /* left hero content — bold and cinematic */
-    .hero-left{position:relative;padding:34px;overflow:visible}
-    .kicker{display:inline-block;padding:6px 12px;border-radius:999px;background:linear-gradient(90deg,var(--neon-a),var(--neon-b));color:#021128;font-weight:800}
-    .hero-title{font-family:"Orbitron",sans-serif;font-size:46px;line-height:1;margin:12px 0;color:#fff;text-shadow:0 18px 60px rgba(90,60,180,0.24)}
-    .hero-sub{color:var(--muted);font-size:16px;max-width:68%}
-    .cta-row{display:flex;gap:14px;margin-top:20px;flex-wrap:wrap}
-    .btn{
-      padding:14px 18px;border-radius:12px;font-weight:800;border:none;cursor:pointer;background:linear-gradient(90deg,var(--neon-a),var(--neon-b));
-      color:#021128;box-shadow:0 16px 60px rgba(158,243,255,0.08);
-      transition:transform .18s ease;
-    }
-    .btn:hover{transform:translateY(-6px)}
-    .btn.ghost{background:transparent;color:var(--neon-a);border:1px solid rgba(158,243,255,0.08)}
-    .meta-row{display:flex;gap:12px;align-items:center;margin-top:18px;flex-wrap:wrap}
-    .pill{background:var(--glass);padding:8px 12px;border-radius:999px;font-weight:700;color:#EAF4FF;font-size:13px}
-
-    /* Beacon area (the "unexpected" interactive centerpiece) */
-    .beacon-wrap{position:relative;display:flex;flex-direction:column;align-items:center;gap:18px;justify-content:center;height:100%}
-    .beacon{
-      width:320px;height:320px;border-radius:999px;display:grid;place-items:center;position:relative;
-      background: radial-gradient(circle at 30% 30%, rgba(158,243,255,0.08), transparent 25%),
-                  linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border:1px solid rgba(255,255,255,0.05);
-      box-shadow: 0 30px 90px rgba(2,6,30,0.7), inset 0 6px 24px rgba(255,255,255,0.02);
-      transform:translateZ(0);
-      overflow:visible;
-      transition:transform .3s ease;
-    }
-    .beacon .core{
-      width:120px;height:120px;border-radius:999px;background:conic-gradient(from 90deg,var(--neon-a),var(--neon-b),var(--neon-c));
-      filter: blur(8px);
-      box-shadow:0 18px 60px rgba(217,166,255,0.12), 0 0 40px rgba(158,243,255,0.08);
-      transform:scale(0.95);
-      transition:transform .35s ease, filter .35s ease;
-    }
-    .beacon .label{
-      position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-weight:800;color:#021128;background:#fff;padding:8px 12px;border-radius:999px;font-size:13px;
-      box-shadow:0 8px 24px rgba(0,0,0,0.25)
-    }
-    /* orbiting fact pills */
-    .orbit{
-      position:absolute;inset:0;pointer-events:none;
-    }
-    .fact{
-      position:absolute;padding:8px 12px;border-radius:10px;background:linear-gradient(90deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));
-      color:var(--muted);font-weight:700;border:1px solid rgba(255,255,255,0.03);font-size:13px;backdrop-filter:blur(4px);
-      transition:transform .24s ease, opacity .2s;
-      cursor:pointer;pointer-events:auto;
-    }
-    /* style specific facts (placed by inline styles for precise coordinates) */
-    .fact strong{display:block;color:#EAF4FF;font-weight:800}
-    .hint{font-size:12px;color:var(--muted);margin-top:6px}
-
-    /* right column small info stack */
-    .hero-right{display:flex;flex-direction:column;gap:14px;height:100%}
-    .info{padding:16px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)}
-    .info h3{margin:0 0 6px 0;font-family:"Orbitron",sans-serif;color:#CFEFFF}
-    .info p{margin:6px 0;color:var(--muted);font-size:14px}
-
-    /* small interactive footer area for publishing notes */
-    footer{margin-top:28px;padding:16px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);color:var(--muted)}
-    .research{font-size:13px;line-height:1.45;color:var(--muted)}
-    .research strong{color:#fff}
-
-    /* Call to action fixed phone button */
-    .call-cta{
-      position:fixed;right:18px;bottom:18px;padding:12px 14px;border-radius:999px;background:linear-gradient(90deg,var(--neon-a),var(--neon-b));color:#021128;font-weight:900;border:none;box-shadow:0 18px 60px rgba(158,243,255,0.06);z-index:999}
+    .portal{
+      position:relative;z-index:4;width:860px;max-width:92vw;height:620px;display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:stretch;
+      padding:28px;border-radius:18px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.04);box-shadow: 0 40px 120px rgba(0,0,0,0.6);
     }
 
-    /* small responsive */
+    /* left: beacon & orbit */
+    .beacon-area{position:relative;display:flex;align-items:center;justify-content:center}
+    .beacon-stage{position:relative;width:420px;height:420px;border-radius:999px;display:grid;place-items:center;background:
+      radial-gradient(circle at 30% 30%, rgba(158,243,255,0.06), transparent 15%),
+      linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.04)}
+    .core{
+      width:140px;height:140px;border-radius:999px;background:conic-gradient(from 90deg,var(--neon-a),var(--neon-b),var(--neon-c));
+      filter:blur(8px);box-shadow:0 30px 90px rgba(2,6,30,0.6),inset 0 6px 24px rgba(255,255,255,0.02);
+      display:grid;place-items:center;font-weight:800;color:#021128;font-family:"Orbitron";font-size:14px;
+      transition:transform .25s ease;
+    }
+    .portal-tag{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:#fff;padding:8px 14px;border-radius:999px;color:#021128;font-weight:800;box-shadow:0 12px 40px rgba(0,0,0,0.25)}
+
+    /* orbiter items */
+    .orbit{position:absolute;inset:0;pointer-events:none}
+    .portal-item{
+      position:absolute;width:120px;height:60px;border-radius:12px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;
+      color:#EAF4FF;font-size:13px;padding:6px;cursor:pointer;pointer-events:auto;backdrop-filter: blur(4px);
+      transition:transform .22s ease, box-shadow .22s ease, opacity .18s;
+    }
+    .portal-item .picon{font-size:18px;margin-bottom:6px}
+    .portal-item .plabel{font-weight:800;font-size:13px}
+    .portal-item:focus{outline:3px solid rgba(158,243,255,0.14);transform:translateY(-8px)}
+    .portal-item:hover{transform:translateY(-8px);box-shadow:0 20px 40px rgba(0,0,0,0.4)}
+
+    /* right: preview / actions */
+    .preview{padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)}
+    .preview h3{margin:6px 0 10px 0;font-family:"Orbitron",sans-serif;color:#CFEFFF}
+    .preview p{color:var(--muted);font-size:14px;line-height:1.45}
+    .preview .actions{display:flex;gap:10px;margin-top:12px}
+    .preview .btn{padding:10px 14px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--neon-a),var(--neon-b));color:#021128;font-weight:800;cursor:pointer}
+    .preview .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+
+    /* bottom info strip */
+    .info-strip{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;margin-top:18px;border-radius:12px;background:linear-gradient(90deg,rgba(0,0,0,0.25),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);font-size:13px}
+    .info-left{display:flex;gap:12px;align-items:center}
+    .info-right{color:var(--muted)}
+
+    /* warp overlay */
+    .warp-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 45%, rgba(255,255,255,0.06), rgba(0,0,0,0.85));backdrop-filter: blur(6px)}
+    .warp-box{padding:28px;border-radius:16px;background:linear-gradient(90deg,var(--neon-a),var(--neon-b));color:#021128;font-weight:900;font-family:"Orbitron";font-size:18px;box-shadow:0 40px 120px rgba(2,6,30,0.6)}
+    .warp-progress{width:260px;height:10px;background:rgba(0,0,0,0.12);border-radius:999px;margin-top:14px;overflow:hidden}
+    .warp-bar{height:100%;width:0;background:#021128}
+
+    /* fallback accessible list */
+    .fallback{margin-top:18px;color:var(--muted);font-size:14px}
+    .fallback a{display:inline-block;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.02);margin-right:8px;color:var(--muted)}
+    .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
     @media(max-width:980px){
-      .hero{grid-template-columns:1fr;min-height:700px}
-      .hero-sub{max-width:100%}
-      .beacon{width:280px;height:280px}
-      .beacon .core{width:100px;height:100px}
-      nav{display:none}
+      .portal{grid-template-columns:1fr;gap:14px;height:auto;padding:18px}
+      .beacon-stage{width:320px;height:320px}
+      .portal-item{width:110px}
     }
     @media(max-width:620px){
-      .beacon{width:220px;height:220px}
-      .hero-title{font-size:28px}
-      .hero-left{padding:20px}
+      .beacon-stage{width:260px;height:260px}
+      .portal-item{width:100px;height:54px;font-size:12px}
+      .warp-box{font-size:15px;padding:18px}
     }
   </style>
 </head>
 <body>
-  <div class="wrap" role="main" aria-labelledby="site-heading">
+  <div class="wrap" role="main" aria-labelledby="portal-heading">
     <header>
-      <div class="brand" aria-hidden="false">
+      <div class="brand">
         <div class="logo" aria-hidden="true">
-          <!-- Stylized cross mark -->
-          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M12 2v20M2 12h20" stroke="url(#g1)" stroke-width="1.6" stroke-linecap="round"/><defs>
-              <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stop-color="#9ef3ff"/>
-                <stop offset="0.6" stop-color="#d9a6ff"/>
-                <stop offset="1" stop-color="#ff9bd6"/>
-              </linearGradient>
-            </defs>
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 2v20M2 12h20" stroke="url(#g1)" stroke-width="1.6" stroke-linecap="round" />
+            <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9ef3ff"/><stop offset="0.6" stop-color="#d9a6ff"/><stop offset="1" stop-color="#ff9bd6"/></linearGradient></defs>
           </svg>
         </div>
         <div>
-          <h1 id="site-heading">DeVine — Guiding Light</h1>
-          <div style="font-size:12px;color:var(--muted)">Guiding Light Pentecostal Church — Magnolia, MS</div>
+          <div class="title" id="portal-heading">DeVine — Guiding Light</div>
+          <div class="sub">Choose your path — be welcomed into worship, prayer, and community</div>
         </div>
       </div>
 
-      <nav aria-label="Primary">
-        <a href="#visit">Plan a Visit</a>
-        <a href="#ministries">Ministries</a>
-        <a href="#events">Events</a>
-        <a href="#notes">Research Notes</a>
-      </nav>
+      <div class="sub" style="color:var(--muted)">Primary phone: (601) 783-2599 • Pastor: Joseph Dykes</div>
     </header>
 
-    <div class="nebula" aria-hidden="true"></div>
+    <div class="portal-wrap" aria-hidden="false">
+      <div class="nebula" aria-hidden="true"></div>
 
-    <section class="hero" aria-label="Landing hero">
-      <!-- Left cinematic content -->
-      <div class="hero-left card" role="region" aria-labelledby="hero-title">
-        <span class="kicker">A Beacon in Magnolia</span>
-        <h2 id="hero-title" class="hero-title">Find your light. Show up. Be known.</h2>
-        <p class="hero-sub">
-          Guiding Light Pentecostal Church — a UPCI/Apostolic congregation in Magnolia, Mississippi.
-          Bold worship. Fierce prayer. Real people. We invite you to experience worship, prayer and mission that changes lives.
-        </p>
+      <div class="portal" role="region" aria-label="Choose a path">
+        <div class="beacon-area" aria-hidden="false">
+          <div class="beacon-stage" aria-hidden="false">
+            <div class="core" id="coreLabel" aria-hidden="true">GUIDING LIGHT</div>
+            <div class="portal-tag">Tap a portal →</div>
 
-        <div class="cta-row" role="group" aria-label="Primary actions">
-          <button class="btn" id="joinBtn" aria-controls="visit" title="Join us this week">Join Us This Week</button>
-          <button class="btn ghost" id="planBtn" onclick="scrollTo('visit')">Plan Your Visit</button>
-          <button class="btn ghost" id="prayBtn" onclick="scrollTo('contact')">Request Prayer</button>
-        </div>
+            <div class="orbit" id="orbitArea" aria-hidden="false">
+              <!-- Portal items (JS will position them) -->
+              <div tabindex="0" role="button" class="portal-item" data-key="home" id="it-home" aria-label="Home">
+                <div class="picon">🏠</div><div class="plabel">Home</div>
+              </div>
 
-        <div class="meta-row" aria-hidden="false">
-          <div class="pill">📞 (601) 783-2599</div>
-          <div class="pill">👤 Pastor: Joseph Dykes</div>
-          <div class="pill">⛪ UPCI • Oneness Pentecostal</div>
-        </div>
+              <div tabindex="0" role="button" class="portal-item" data-key="visit" id="it-visit" aria-label="Plan a Visit">
+                <div class="picon">📍</div><div class="plabel">Plan a Visit</div>
+              </div>
 
-        <div style="margin-top:18px;color:var(--muted)">
-          <strong style="color:#fff">Service times:</strong> Sunday 10:00 AM • Sunday 6:00 PM (pre-prayer 5:30 PM) • Wednesday 7:30 PM
-        </div>
+              <div tabindex="0" role="button" class="portal-item" data-key="ministries" id="it-ministries" aria-label="Ministries">
+                <div class="picon">🙌</div><div class="plabel">Ministries</div>
+              </div>
 
-        <div style="margin-top:16px;color:var(--muted);font-size:14px">
-          <em style="color:#fff">This page is designed to get you here — whether it's your first visit or your next step.</em>
-        </div>
-      </div>
+              <div tabindex="0" role="button" class="portal-item" data-key="events" id="it-events" aria-label="Events">
+                <div class="picon">📅</div><div class="plabel">Events</div>
+              </div>
 
-      <!-- Beacon (interactive) -->
-      <aside class="hero-right card beacon-wrap" role="complementary" aria-label="Interactive beacon">
-        <div class="beacon" id="beacon" aria-hidden="false" title="Hover or tap to reveal the beacon facts">
-          <div class="core" id="beaconCore" aria-hidden="true"></div>
-          <div class="label">Guiding Light</div>
+              <div tabindex="0" role="button" class="portal-item" data-key="sermons" id="it-sermons" aria-label="Sermons / Media">
+                <div class="picon">🎞️</div><div class="plabel">Sermons</div>
+              </div>
 
-          <!-- orbit area -->
-          <div class="orbit" aria-hidden="true">
-            <!-- facts positioned around the beacon -->
-            <div class="fact" id="fact1" style="left:8%;top:12%;" tabindex="0" role="button" aria-pressed="false">
-              <strong>Primary phone</strong>
-              <div class="hint">(601) 783-2599</div>
-            </div>
+              <div tabindex="0" role="button" class="portal-item" data-key="give" id="it-give" aria-label="Give">
+                <div class="picon">💝</div><div class="plabel">Give</div>
+              </div>
 
-            <div class="fact" id="fact2" style="right:6%;top:12%;" tabindex="0" role="button" aria-pressed="false">
-              <strong>Pastor</strong>
-              <div class="hint">Joseph Dykes</div>
-            </div>
+              <div tabindex="0" role="button" class="portal-item" data-key="contact" id="it-contact" aria-label="Contact">
+                <div class="picon">✉️</div><div class="plabel">Contact</div>
+              </div>
 
-            <div class="fact" id="fact3" style="left:6%;bottom:14%;" tabindex="0" role="button" aria-pressed="false">
-              <strong>Service times</strong>
-              <div class="hint">Sun 10AM • Sun 6PM (5:30PM pre-prayer) • Wed 7:30PM</div>
-            </div>
+              <div tabindex="0" role="button" class="portal-item" data-key="facebook" id="it-facebook" aria-label="Facebook">
+                <div class="picon">📘</div><div class="plabel">Facebook</div>
+              </div>
 
-            <div class="fact" id="fact4" style="right:8%;bottom:18%;" tabindex="0" role="button" aria-pressed="false">
-              <strong>Addresses (verify)</strong>
-              <div class="hint">1108 OR 1115 Guiding Light Rd, Magnolia, MS 39652</div>
-            </div>
-
-            <div class="fact" id="fact5" style="left:45%;top:-8%;transform:translateX(-50%);" tabindex="0" role="button" aria-pressed="false">
-              <strong>Provisional coords</strong>
-              <div class="hint">31.076501, -90.403731</div>
-            </div>
-
-            <div class="fact" id="fact6" style="left:48%;bottom:-6%;transform:translateX(-50%);" tabindex="0" role="button" aria-pressed="false">
-              <strong>Pastor email (public)</strong>
-              <div class="hint">revjleed@gmail.com (publish only with permission)</div>
             </div>
           </div>
         </div>
 
-        <!-- small info stack -->
-        <div class="info" aria-hidden="false">
-          <h3>Next Service</h3>
-          <div id="nextName" style="font-weight:800;color:#fff">—</div>
-          <div id="nextCountdown" class="small" style="margin-top:6px;color:var(--muted)">Calculating...</div>
-        </div>
+        <div class="preview" aria-live="polite" id="preview">
+          <h3 id="previewTitle">Welcome</h3>
+          <p id="previewBody">Hover or focus a portal to preview the page. Use arrow keys to move between portals and press Enter to go. This portal preserves the church's key information — phone, service times, and research notes are visible below.</p>
 
-        <div class="info" aria-hidden="false">
-          <h3>Quick contacts</h3>
-          <p><strong>Primary phone:</strong> <a href="tel:+16017832599">(601) 783-2599</a><br>
-          <strong>Additional (pastor listing):</strong> (601) 551-7230<br>
-          <strong>Unverified:</strong> +1 601-395-8131</p>
-          <p class="small"><strong>Note:</strong> Pastor public profile email <strong>revjleed@gmail.com</strong> — publish only with explicit permission from the pastor.</p>
-        </div>
-
-      </aside>
-    </section>
-
-    <!-- a short emotional story block -->
-    <section style="margin-top:28px" aria-label="Why come to Guiding Light">
-      <div class="card">
-        <h2 style="font-family:Orbitron, sans-serif;margin:0 0 8px 0;color:#CFEFFF">Why people come</h2>
-        <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:12px">
-          <div style="flex:1;min-width:220px;padding:14px;border-radius:12px;background:linear-gradient(90deg,rgba(158,243,255,0.03),rgba(217,166,255,0.02));font-weight:700">
-            <div style="font-size:16px">Transformative Worship</div>
-            <div style="margin-top:8px;color:var(--muted)">Heartfelt music, biblical preaching, and a culture of genuine praise.</div>
-          </div>
-
-          <div style="flex:1;min-width:220px;padding:14px;border-radius:12px;background:linear-gradient(90deg,rgba(255,155,214,0.02),rgba(158,243,255,0.02));font-weight:700">
-            <div style="font-size:16px">Prayer that moves</div>
-            <div style="margin-top:8px;color:var(--muted)">Pre-prayer, community prayer, and personal ministry following services.</div>
-          </div>
-
-          <div style="flex:1;min-width:220px;padding:14px;border-radius:12px;background:linear-gradient(90deg,rgba(217,166,255,0.02),rgba(158,243,255,0.02));font-weight:700">
-            <div style="font-size:16px">Family & Mission</div>
-            <div style="margin-top:8px;color:var(--muted)">Youth missions (Costa Rica Aug 2024), yard sales, revival nights, and neighbor care.</div>
+          <div class="actions" id="previewActions" aria-hidden="true">
+            <button class="btn" id="openPortal">Enter</button>
+            <button class="btn ghost" id="infoBtn">Research Notes</button>
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- short entrance to plan/visit and map reveal -->
-    <section id="visit" style="margin-top:28px">
-      <div class="card">
-        <h2 style="font-family:Orbitron;margin:0 0 8px 0;color:#CFEFFF">Plan Your Visit</h2>
-        <div style="display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start;">
-          <div>
-            <p style="color:var(--muted)">What to expect: warm welcome, Bible-focused worship, and practical care. Attire: come as you are. Children are welcome — confirm children's ministry details with staff. Accessibility: wheelchair ramps, accessible restrooms, hearing assistance and parking were <strong>unspecified in public sources</strong>; contact us for accommodations.</p>
+    </div>
 
-            <ul style="color:var(--muted)">
-              <li><strong>Service times:</strong> Sunday 10:00 AM • Sunday 6:00 PM (pre-prayer 5:30 PM) • Wednesday 7:30 PM</li>
-              <li><strong>Regional directions:</strong> From I-55 / Magnolia Exit (Exit 10), take Hwy 48 east and follow local connectors to Guiding Light Rd. Confirm exact directions after address verification.</li>
-            </ul>
-
-            <div style="margin-top:12px;display:flex;gap:10px">
-              <button class="btn" onclick="scrollTo('contact')">Contact for Accommodations</button>
-              <button class="btn ghost" onclick="openMap()">Reveal Map (Provisional)</button>
-            </div>
-          </div>
-
-          <aside style="padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)">
-            <h3 style="margin:0 0 8px 0;font-family:Orbitron;color:#CFEFFF">Map (provisional)</h3>
-            <div style="color:var(--muted);font-size:13px">MerchantCircle lists coordinates tied to a 1108 listing. Confirm address before publishing directions.</div>
-            <div style="margin-top:10px;font-weight:700;color:#fff">Provisional coordinates: <br><span style="font-weight:900">31.076501, -90.403731</span></div>
-            <div style="margin-top:10px;color:#ffcfb5;font-weight:800">Addresses found in directories: 1108 OR 1115 Guiding Light Rd, Magnolia, MS 39652 — please verify.</div>
-          </aside>
-        </div>
-      </div>
-    </section>
-
-    <!-- contact / give -->
-    <section id="contact" style="margin-top:28px">
-      <div class="card">
-        <h2 style="font-family:Orbitron;margin:0 0 6px 0;color:#CFEFFF">Contact & Give</h2>
-        <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:12px">
-          <div style="flex:1;min-width:280px">
-            <p style="color:var(--muted)"><strong>Primary phone:</strong> (601) 783-2599<br>
-            <strong>Pastor (directory):</strong> (601) 551-7230<br>
-            <strong>Unverified:</strong> +1 601-395-8131<br>
-            <strong>Pastor public profile email:</strong> revjleed@gmail.com — publish only with explicit permission from the pastor.</p>
-            <div style="margin-top:8px"><a class="btn" href="tel:+16017832599">Call (601) 783-2599</a></div>
-          </div>
-
-          <div style="flex:1;min-width:280px">
-            <h3 style="margin-top:0;font-family:Orbitron;color:#CFEFFF">Give</h3>
-            <p style="color:var(--muted)">Use a secure giving platform (Stripe/PayPal/ChurchGiving) or mail-in giving instructions. If social fundraising links exist, migrate them to a church-controlled giving page. <em style="color:#fff">Action: provide a giving link to make the button live.</em></p>
-            <div style="margin-top:8px"><button class="btn ghost" onclick="alert('Please supply the church giving link to make this live')">Give Online</button></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Research notes (explicit) -->
-    <section id="notes" style="margin-top:28px">
-      <div class="card">
-        <h2 style="font-family:Orbitron;margin:0 0 8px 0;color:#CFEFFF">Research & Publishing Notes</h2>
-        <div class="research">
-          • <strong>Address discrepancy:</strong> directories list <strong>1108 Guiding Light Rd</strong> and <strong>1115 Guiding Light Rd</strong>. Confirm via church or official signage before publishing the address.<br>
-          • <strong>Provisional coordinates:</strong> MerchantCircle lists <strong>31.076501, -90.403731</strong> tied to the 1108 listing — treat as provisional.<br>
-          • <strong>Service times:</strong> Sun 10:00 AM; Sun 6:00 PM (pre-prayer 5:30 PM); Wed 7:30 PM (sourced from directories and mirrored posts). Make times editable in the CMS for quick changes.<br>
-          • <strong>Contact data:</strong> Primary phone (601) 783-2599; additional pastor contact (601) 551-7230; unverified +1 601-395-8131. Pastor public-profile email: <strong>revjleed@gmail.com</strong> — <em>do not publish without permission.</em><br>
-          • <strong>Assets:</strong> exterior photos and event flyers found in public searches are likely third-party — obtain church-owned photos and official logo files before publishing. <br>
-          • <strong>Legal/tax:</strong> churches meeting IRS guidance are typically tax-exempt; state incorporation/EIN were not confirmed in public searches — verify for donation compliance.
-        </div>
-      </div>
-    </section>
-
-    <footer style="margin-top:22px">
-      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;align-items:center">
+    <!-- bottom info strip -->
+    <div class="info-strip" role="contentinfo">
+      <div class="info-left">
         <div style="font-weight:800">Guiding Light Pentecostal Church — Magnolia, MS</div>
-        <div style="color:var(--muted)">Primary phone: (601) 783-2599 • Pastor: Joseph Dykes • Services: Sun 10AM / Sun 6PM (pre-prayer 5:30PM) / Wed 7:30PM</div>
+        <div style="color:var(--muted);font-size:13px">Primary phone: (601) 783-2599 • Services: Sun 10AM / Sun 6PM (pre-prayer 5:30PM) / Wed 7:30PM</div>
       </div>
-    </footer>
+      <div class="info-right">
+        <button class="btn" id="contactQuick">Contact</button>
+        <button class="btn ghost" id="notesQuick">Research notes</button>
+      </div>
+    </div>
+
+    <!-- Accessible fallback links -->
+    <div class="fallback" aria-hidden="false">
+      <span class="sr-only">Direct links:</span>
+      <a href="/home.html" id="fb-home">Home</a>
+      <a href="/visit.html" id="fb-visit">Plan a Visit</a>
+      <a href="/ministries.html" id="fb-ministries">Ministries</a>
+      <a href="/events.html" id="fb-events">Events</a>
+      <a href="/sermons.html" id="fb-sermons">Sermons</a>
+      <a href="/give.html" id="fb-give">Give</a>
+      <a href="/contact.html" id="fb-contact">Contact</a>
+      <a href="https://facebook.com" target="_blank" rel="noopener">Facebook</a>
+    </div>
+
+    <!-- Research modal (hidden) -->
+    <div id="researchModal" role="dialog" aria-modal="true" aria-hidden="true" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;">
+      <div style="background:linear-gradient(180deg,#021128,#08203a);padding:22px;border-radius:12px;color:#EAF4FF;max-width:760px;margin:18px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 30px 80px rgba(0,0,0,0.6)">
+        <h2 style="font-family:Orbitron;margin:0 0 8px 0;color:#CFEFFF">Research & Publishing Notes</h2>
+        <div style="font-size:14px;line-height:1.5;color:var(--muted)">
+          <ul>
+            <li><strong>Address discrepancy:</strong> directories list <strong>1108 Guiding Light Rd</strong> and <strong>1115 Guiding Light Rd</strong>. Confirm via church or signage before publishing.</li>
+            <li><strong>Provisional coords:</strong> 31.076501, -90.403731 (MerchantCircle, tied to 1108). Treat map pin as provisional.</li>
+            <li><strong>Service times:</strong> Sun 10:00 AM; Sun 6:00 PM (pre-prayer 5:30 PM); Wed 7:30 PM (sourced from business directories and mirrored posts).</li>
+            <li><strong>Contact:</strong> Primary phone (601) 783-2599; additional pastor contact (601) 551-7230; unverified +1 601-395-8131. Pastor public profile email: <strong>revjleed@gmail.com</strong> — publish only with permission.</li>
+            <li><strong>Assets:</strong> Exterior photo and event images found in public searches are likely third-party — request church-owned photos and the official logo.</li>
+            <li><strong>Legal:</strong> IRS tax-exempt guidance for churches applies; state incorporation/EIN were not confirmed here.</li>
+          </ul>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:10px;justify-content:flex-end">
+          <button id="closeResearch" style="padding:10px 12px;border-radius:8px;background:linear-gradient(90deg,var(--neon-a),var(--neon-b));border:none;color:#021128;font-weight:800">Close</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- fixed call -->
-  <button class="call-cta" onclick="location.href='tel:+16017832599'" aria-label="Call Guiding Light">(601) 783-2599</button>
-
+  <!-- warp overlay template (inserted by JS) -->
   <script>
-    /***********************
-     * Dynamic next service
-     * Picks next of: Sun 10:00, Sun 18:00 (pre-prayer 17:30), Wed 19:30
-     ***********************/
-    function nextService(){
-      const now = new Date();
-      function nextOf(weekday, hour, minute=0){
-        const d = new Date(now);
-        const diff = (weekday - d.getDay() + 7) % 7;
-        d.setDate(d.getDate() + (diff || 0));
-        d.setHours(hour, minute, 0, 0);
-        if(d <= now) d.setDate(d.getDate() + 7); // already passed => next week
-        return d;
-      }
-      const services = [
-        {name:'Sunday Morning', time: nextOf(0,10,0)},
-        {name:'Sunday Evening (6:00 PM)', time: nextOf(0,18,0)},
-        {name:'Wednesday Night', time: nextOf(3,19,30)}
-      ];
-      services.sort((a,b)=>a.time - b.time);
-      return services[0];
-    }
+    /* ==== Config: change routes to your real pages/URLs ==== */
+    const routes = {
+      "home": "/home.html",
+      "visit": "/visit.html",
+      "ministries": "/ministries.html",
+      "events": "/events.html",
+      "sermons": "/sermons.html",
+      "give": "/give.html",
+      "contact": "/contact.html",
+      "facebook": "https://facebook.com" // open externally
+    };
 
-    function pad(n){return n<10?'0'+n:n}
-    function updateCountdown(){
-      const ns = nextService();
-      const target = ns.time;
-      const now = new Date();
-      const diff = target - now;
-      const nameEl = document.getElementById('nextName');
-      const outEl = document.getElementById('nextCountdown');
-      if(!nameEl || !outEl) return;
-      nameEl.textContent = ns.name;
-      if(diff <= 0){
-        outEl.textContent = 'Starting soon';
-        return;
+    /* Portal items configuration for preview text */
+    const portalMeta = {
+      home: {
+        title: "Home — Welcome",
+        body: "A warm, inviting landing page that highlights service times, 'what to expect', and a hero designed to make you show up.",
+      },
+      visit: {
+        title: "Plan a Visit",
+        body: "Service times, directions, accessibility notes, what to expect, and contact for accommodations. Pre-prayer: 5:30 PM before the 6:00 PM service.",
+      },
+      ministries: {
+        title: "Ministries",
+        body: "Youth & Students (UPCI youth missions), Missions (Costa Rica Aug 2024), Prayer groups, Fellowship and outreach programs.",
+      },
+      events: {
+        title: "Events",
+        body: "Featured: Costa Rica UPCI Youth mission fundraising, yard sales (fellowship hall), and revival series. Include an alerts / cancellations banner for weather.",
+      },
+      sermons: {
+        title: "Sermons & Media",
+        body: "Embed YouTube playlists or Facebook videos. No independent website was found in searches — Facebook is currently the primary presence.",
+      },
+      give: {
+        title: "Give",
+        body: "Secure online giving options (Stripe/PayPal/ChurchGiving) or mail-in giving instructions. Migrate social fundraising links to church-owned giving pages.",
+      },
+      contact: {
+        title: "Contact",
+        body: "Primary phone: (601) 783-2599. Pastor: Joseph Dykes. Pastor public-profile email: revjleed@gmail.com (publish only with permission).",
+      },
+      facebook: {
+        title: "Facebook",
+        body: "Guiding Light's primary public presence is Facebook. Embed feed or link directly to build social proof and a News/Alerts feed.",
       }
-      const days = Math.floor(diff/86400000);
-      const hours = Math.floor((diff%86400000)/3600000);
-      const mins = Math.floor((diff%3600000)/60000);
-      const secs = Math.floor((diff%60000)/1000);
-      let out = (days>0?days+'d ':'') + pad(hours)+'h '+pad(mins)+'m '+pad(secs)+'s';
-      outEl.textContent = out;
-    }
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
+    };
 
-    /***********************
-     * Beacon interactivity
-     ***********************/
-    const beacon = document.getElementById('beacon');
-    const beaconCore = document.getElementById('beaconCore');
-    const facts = Array.from(document.querySelectorAll('.fact'));
-    // simple floating / subtle orbit animation
-    let t = 0;
-    function animateOrbit(){
-      t += 0.016;
-      facts.forEach((f, i)=>{
-        // gentle orbit offset to keep things lively
-        const angle = t * (0.3 + i*0.05) + (i*1.8);
-        const radiusX = 110 + 10*Math.sin(t*0.7 + i);
-        const radiusY = 78 + 8*Math.cos(t*0.9 + i);
-        // compute central coords of beacon
-        const rect = beacon.getBoundingClientRect();
-        // factor coords relative to beacon
-        const cx = rect.width/2, cy = rect.height/2;
-        // place around center
-        const x = cx + Math.cos(angle) * radiusX - (f.offsetWidth || 0)/2;
-        const y = cy + Math.sin(angle) * radiusY - (f.offsetHeight || 0)/2;
-        f.style.transform = `translate(${x}px, ${y}px)`;
+    /* ==== Interaction logic ==== */
+    const items = Array.from(document.querySelectorAll('.portal-item'));
+    const previewTitle = document.getElementById('previewTitle');
+    const previewBody = document.getElementById('previewBody');
+    const previewActions = document.getElementById('previewActions');
+    const openPortalBtn = document.getElementById('openPortal');
+    const infoBtn = document.getElementById('infoBtn');
+
+    let selectedIndex = 0;
+
+    // Position the orbiting items in a pleasing ring around the core
+    function positionOrbit(){
+      const center = document.querySelector('.beacon-stage').getBoundingClientRect();
+      const cx = center.left + center.width/2;
+      const cy = center.top + center.height/2;
+      const rX = center.width/2 - 70;
+      const rY = center.height/2 - 90;
+      items.forEach((el, i) => {
+        const angle = (i / items.length) * Math.PI * 2;
+        // start positions slightly randomized for natural motion
+        const x = center.width/2 + Math.cos(angle) * rX - el.offsetWidth/2;
+        const y = center.height/2 + Math.sin(angle) * rY - el.offsetHeight/2;
+        el.style.transform = `translate(${x}px, ${y}px)`;
       });
-      requestAnimationFrame(animateOrbit);
     }
-    // start orbit after layout
-    requestAnimationFrame(()=>{ animateOrbit(); });
 
-    // Hover / tap interactions
-    facts.forEach(f=>{
-      function highlight(){
-        beacon.style.transform = 'scale(1.03) translateY(-6px)';
-        beaconCore.style.transform = 'scale(1.12)'; beaconCore.style.filter = 'blur(6px)';
-        f.style.transform += ' scale(1.08)';
-        f.style.opacity = '1';
-      }
-      function unhighlight(){
-        beacon.style.transform = '';
-        beaconCore.style.transform = '';
-        f.style.opacity = '0.98';
-      }
-      f.addEventListener('mouseenter', highlight);
-      f.addEventListener('focus', highlight);
-      f.addEventListener('mouseleave', unhighlight);
-      f.addEventListener('blur', unhighlight);
-      f.addEventListener('click', ()=>{ // quick info popup
-        alert(f.querySelector('strong').innerText + '\\n' + f.querySelector('.hint').innerText);
+    // call after layout
+    window.addEventListener('load', positionOrbit);
+    window.addEventListener('resize', () => setTimeout(positionOrbit, 120));
+
+    // Hover/focus behavior
+    items.forEach((el, idx) => {
+      const key = el.dataset.key;
+      el.addEventListener('mouseenter', () => selectIndex(idx, true));
+      el.addEventListener('focus', () => selectIndex(idx, true));
+      el.addEventListener('click', () => goToRoute(key));
+      el.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToRoute(key); }
       });
-      f.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' ') f.click(); });
     });
 
-    // beacon core pulse on pointer move
-    document.addEventListener('pointermove', (e)=>{
-      const rect = beacon.getBoundingClientRect();
-      const dx = e.clientX - (rect.left + rect.width/2);
-      const dy = e.clientY - (rect.top + rect.height/2);
-      const dist = Math.min(1, Math.sqrt(dx*dx + dy*dy) / 300);
-      beaconCore.style.transform = `scale(${1 + (0.08 * (1-dist))})`;
-      beaconCore.style.filter = `blur(${8 - (6 * (1-dist))}px)`;
+    // initial select
+    function selectIndex(i, announce=false){
+      selectedIndex = (i + items.length) % items.length;
+      items.forEach((el, idx) => {
+        if(idx === selectedIndex){
+          el.style.zIndex = 10;
+          el.style.opacity = 1;
+          el.style.transform = el.style.transform + ' scale(1.04)';
+        } else {
+          el.style.zIndex = 2;
+          el.style.opacity = 0.9;
+          // reset other transforms roughly
+          el.style.transform = el.style.transform.replace(' scale(1.04)','');
+        }
+      });
+      // update preview
+      const key = items[selectedIndex].dataset.key;
+      const meta = portalMeta[key];
+      previewTitle.textContent = meta.title;
+      previewBody.textContent = meta.body;
+      previewActions.style.display = 'flex';
+      // accessible announcement if needed
+      if(announce) {
+        previewTitle.setAttribute('aria-live','polite');
+      }
+    }
+    selectIndex(0);
+
+    // Keyboard navigation: arrow keys to move around items, Enter to open
+    window.addEventListener('keydown', (e) => {
+      if(['ArrowLeft','ArrowUp','ArrowRight','ArrowDown'].includes(e.key)){
+        e.preventDefault();
+        if(e.key === 'ArrowLeft' || e.key === 'ArrowUp') selectIndex(selectedIndex - 1, true);
+        if(e.key === 'ArrowRight' || e.key === 'ArrowDown') selectIndex(selectedIndex + 1, true);
+      } else if(e.key === 'Enter') {
+        const key = items[selectedIndex].dataset.key;
+        goToRoute(key);
+      } else if (e.key === 'Escape') {
+        closeResearch();
+      }
     });
 
-    // warp join animation (surprising)
-    document.getElementById('joinBtn').addEventListener('click', ()=>{
+    // Warp transition and redirection
+    function goToRoute(key){
+      const url = routes[key] || '/';
+      // open external links directly (facebook has full url)
+      const external = url.startsWith('http');
+      showWarp(key, url, external);
+    }
+
+    function showWarp(key, url, external=false){
+      // create overlay
       const overlay = document.createElement('div');
-      overlay.style.position='fixed';overlay.style.inset=0;overlay.style.zIndex=9999;overlay.style.background='radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12), rgba(0,0,0,0.85))';
-      overlay.style.display='flex';overlay.style.alignItems='center';overlay.style.justifyContent='center';
-      overlay.innerHTML = '<div style="text-align:center;color:#021128;background:linear-gradient(90deg,var(--neon-a),var(--neon-b));padding:28px;border-radius:20px;font-weight:900;font-family:Orbitron, sans-serif">Warping you to Guiding Light...<div style="height:18px"></div><div style="width:220px;height:10px;border-radius:999px;background:rgba(0,0,0,0.12);overflow:hidden"><div id="bar" style="height:100%;width:0%;background:#021128"></div></div></div>';
+      overlay.className = 'warp-overlay';
+      overlay.innerHTML = '<div class="warp-box" role="status" aria-live="polite"><div style="font-size:20px">Opening <span style="font-family:Orbitron">' + (portalMeta[key].title) + '</span></div><div style="height:10px"></div><div class="warp-progress"><div class="warp-bar" id="warpBar"></div></div><div style="height:12px"></div><div style="font-size:12px;color:#021128;font-weight:700">See you soon.</div></div>';
       document.body.appendChild(overlay);
-      let p=0;
-      const bar = document.getElementById('bar');
-      const timer = setInterval(()=>{
-        p += Math.random()*12;
-        bar.style.width = Math.min(100,p)+'%';
-        if(p>=100){ clearInterval(timer); setTimeout(()=>{
-          overlay.innerHTML = '<div style="color:#fff;font-family:Orbitron;font-size:18px">See you Sunday — Welcome.</div>';
-          setTimeout(()=>{ overlay.remove(); scrollTo('visit'); }, 900);
-        },300); }
-      },120);
-    });
-
-    // join keyboard accessible
-    document.getElementById('joinBtn').addEventListener('keydown', (e)=>{ if(e.key==='Enter') document.getElementById('joinBtn').click(); });
-    // other simple helpers
-    function scrollTo(id){ document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'}) }
-    document.getElementById('planBtn').addEventListener('click', ()=> scrollTo('visit'));
-    document.getElementById('prayBtn').addEventListener('click', ()=> scrollTo('contact'));
-
-    // open provisional google map in new window / modal
-    function openMap(){
-      window.open('https://www.google.com/maps?q=31.076501,-90.403731', '_blank', 'noopener');
+      // animate bar pseudo-randomly
+      const bar = document.getElementById('warpBar');
+      let p = 0;
+      const t = setInterval(() => {
+        p += Math.random()*18;
+        if(p>100) p = 100;
+        bar.style.width = p + '%';
+        if(p >= 100) {
+          clearInterval(t);
+          setTimeout(()=> {
+            // if external open new tab, else redirect
+            if(external){
+              window.open(url, '_blank', 'noopener');
+              overlay.remove();
+            } else {
+              // navigate (simulate brief delay to feel cinematic)
+              window.location.href = url;
+            }
+          }, 450);
+        }
+      }, 120);
     }
 
-    // Expose openMap globally
-    window.openMap = openMap;
+    // preview open button (also supports keyboard)
+    openPortalBtn.addEventListener('click', () => {
+      const key = items[selectedIndex].dataset.key;
+      goToRoute(key);
+    });
+
+    // quick notes / contact triggers
+    const researchModal = document.getElementById('researchModal');
+    document.getElementById('notesQuick').addEventListener('click', openResearch);
+    document.getElementById('infoBtn').addEventListener('click', openResearch);
+    document.getElementById('closeResearch').addEventListener('click', closeResearch);
+    function openResearch(){
+      researchModal.style.display = 'flex';
+      researchModal.setAttribute('aria-hidden','false');
+    }
+    function closeResearch(){
+      researchModal.style.display = 'none';
+      researchModal.setAttribute('aria-hidden','true');
+    }
+    // contact quick
+    document.getElementById('contactQuick').addEventListener('click', ()=> {
+      // default goes to /contact.html — change as needed
+      const url = routes.contact || '/contact.html';
+      // if external open new
+      if(url.startsWith('http')) window.open(url,'_blank','noopener');
+      else window.location.href = url;
+    });
+
+    // mobile: tapping orbit area picks nearest item
+    const orbitArea = document.getElementById('orbitArea');
+    orbitArea.addEventListener('pointerdown', (e) => {
+      // find nearest item center to pointer
+      const pointerX = e.clientX;
+      const pointerY = e.clientY;
+      let best = null;
+      let bestDist = Infinity;
+      items.forEach(it => {
+        const r = it.getBoundingClientRect();
+        const cx = r.left + r.width/2;
+        const cy = r.top + r.height/2;
+        const dist = Math.hypot(cx - pointerX, cy - pointerY);
+        if(dist < bestDist){ bestDist = dist; best = it; }
+      });
+      if(best && bestDist < 220){
+        best.focus();
+        best.click();
+      }
+    });
+
+    // For safety: if routes are still placeholders, open in same tab but show a warning; developer can change.
+    // Also bind fallback direct anchors to routes
+    document.getElementById('fb-home').href = routes.home || '/home.html';
+    document.getElementById('fb-visit').href = routes.visit || '/visit.html';
+    document.getElementById('fb-ministries').href = routes.ministries || '/ministries.html';
+    document.getElementById('fb-events').href = routes.events || '/events.html';
+    document.getElementById('fb-sermons').href = routes.sermons || '/sermons.html';
+    document.getElementById('fb-give').href = routes.give || '/give.html';
+    document.getElementById('fb-contact').href = routes.contact || '/contact.html';
+
+    // small visual motion for the core responding to pointer
+    document.addEventListener('pointermove', (e) => {
+      const core = document.querySelector('.core');
+      const rect = core.getBoundingClientRect();
+      const dx = (e.clientX - (rect.left + rect.width/2)) / 240;
+      const dy = (e.clientY - (rect.top + rect.height/2)) / 240;
+      core.style.transform = `translate(${dx*6}px, ${dy*6}px) scale(1.02)`;
+    });
+
+    // make selection visible at load (re-run to position corrected transforms)
+    setTimeout(()=>selectIndex(0,false), 300);
+
+    // accessible announcement: describe essential facts to screen readers
+    const sr = document.createElement('div'); sr.className='sr-only';
+    sr.innerHTML = 'Guiding Light — Primary phone (601) 783-2599. Services Sunday 10am & 6pm, Wednesday 7:30pm. Address candidates 1108 or 1115 Guiding Light Rd (verify).';
+    document.body.appendChild(sr);
+
   </script>
 </body>
 </html>
