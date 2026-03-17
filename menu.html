@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hot Headz — Standalone Hologram Menu (menu-data powered)</title>
-  <meta name="description" content="Standalone floating hologram menu powered by menu-data.html JSON data." />
+  <title>Hot Headz — Standalone Hologram Menu</title>
+  <meta name="description" content="Standalone floating hologram menu powered by menu-data.html with day selection and advanced menu view." />
   <meta name="theme-color" content="#05060b" />
   <style>
     :root{
@@ -50,6 +50,7 @@
     }
 
     button{font:inherit;cursor:pointer}
+    a{color:inherit;text-decoration:none}
 
     .app{
       position:relative;
@@ -59,13 +60,19 @@
       isolation:isolate;
     }
 
-    .status{
+    .topbar{
       position:fixed;
-      top:18px;
+      top:14px;
       left:50%;
       transform:translateX(-50%);
-      z-index:50;
-      min-width:min(92vw, 760px);
+      z-index:70;
+      width:min(96vw, 1180px);
+      display:grid;
+      gap:10px;
+    }
+
+    .status{
+      min-width:100%;
       padding:12px 16px;
       border-radius:var(--pill);
       border:1px solid var(--line);
@@ -73,12 +80,20 @@
       backdrop-filter:blur(18px);
       -webkit-backdrop-filter:blur(18px);
       box-shadow:0 16px 40px rgba(0,0,0,.26);
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      align-items:center;
+      gap:12px;
+    }
+
+    .status-center{
       display:flex;
       align-items:center;
       justify-content:center;
       gap:12px;
       flex-wrap:wrap;
       text-align:center;
+      min-width:0;
     }
 
     .dot{
@@ -106,12 +121,94 @@
     .status-main{
       font-weight:900;
       letter-spacing:-.02em;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:100%;
     }
 
     .status-sub{
       color:var(--muted);
       font-size:13px;
       font-weight:700;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:100%;
+    }
+
+    .nav-btn{
+      min-height:44px;
+      min-width:44px;
+      padding:0 14px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      color:var(--ink);
+      box-shadow:0 12px 30px rgba(0,0,0,.18);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      font-size:14px;
+      font-weight:900;
+      transition:transform .2s ease, border-color .2s ease, background .2s ease;
+    }
+
+    .nav-btn:hover{ transform:translateY(-1px); }
+
+    .day-strip{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+      padding:10px;
+      border-radius:24px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      box-shadow:0 14px 36px rgba(0,0,0,.22);
+    }
+
+    .day-chip,
+    .mini-btn,
+    .crumb{
+      min-height:44px;
+      padding:10px 14px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      color:var(--ink);
+      box-shadow:0 12px 30px rgba(0,0,0,.18);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      font-size:13px;
+      font-weight:900;
+      white-space:nowrap;
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+      transition:transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+
+    .day-chip:hover,
+    .mini-btn:hover,
+    .crumb:hover{
+      transform:translateY(-1px);
+    }
+
+    .day-chip.active,
+    .crumb.active,
+    .mini-btn.primary{
+      border-color:rgba(68,230,255,.28);
+      background:linear-gradient(135deg, rgba(255,106,61,.22), rgba(68,230,255,.12));
+    }
+
+    .day-chip.subtle{
+      opacity:.88;
     }
 
     .viewport{
@@ -296,42 +393,6 @@
       justify-content:center;
       gap:10px;
       flex-wrap:wrap;
-    }
-
-    .mini-btn,
-    .crumb{
-      min-height:46px;
-      padding:11px 15px;
-      border-radius:16px;
-      border:1px solid var(--line);
-      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      color:var(--ink);
-      box-shadow:0 12px 30px rgba(0,0,0,.25);
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      font-size:13px;
-      font-weight:900;
-      white-space:nowrap;
-      backdrop-filter:blur(14px);
-      -webkit-backdrop-filter:blur(14px);
-      transition:transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
-    }
-
-    .mini-btn:hover,
-    .crumb:hover{
-      transform:translateY(-1px);
-    }
-
-    .mini-btn.primary{
-      background:linear-gradient(135deg, rgba(255,106,61,.28), rgba(68,230,255,.14));
-      border-color:rgba(68,230,255,.24);
-    }
-
-    .crumb.active{
-      border-color:rgba(68,230,255,.28);
-      background:linear-gradient(135deg, rgba(255,106,61,.22), rgba(68,230,255,.12));
     }
 
     .detail{
@@ -519,6 +580,145 @@
       border-color:rgba(68,230,255,.20);
     }
 
+    .advanced{
+      position:fixed;
+      inset:0;
+      z-index:1800;
+      display:none;
+    }
+
+    .advanced.open{display:block}
+
+    .advanced-backdrop{
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,.54);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+    }
+
+    .advanced-sheet{
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform:translate(-50%, -50%) scale(.96);
+      width:min(960px, calc(100vw - 20px));
+      max-height:min(84vh, 820px);
+      border-radius:34px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(7,10,16,.96), rgba(8,12,20,.94));
+      box-shadow:0 34px 90px rgba(0,0,0,.42);
+      overflow:hidden;
+      transition:transform .24s ease, opacity .24s ease;
+      opacity:0;
+    }
+
+    .advanced.open .advanced-sheet{
+      transform:translate(-50%, -50%) scale(1);
+      opacity:1;
+    }
+
+    .advanced-inner{
+      padding:18px;
+      display:grid;
+      gap:14px;
+      max-height:min(84vh, 820px);
+    }
+
+    .advanced-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .advanced-title{
+      margin:0 0 6px;
+      font-size:clamp(28px, 4vw, 42px);
+      line-height:.95;
+      letter-spacing:-.05em;
+      font-weight:900;
+    }
+
+    .advanced-copy{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.55;
+      max-width:56ch;
+    }
+
+    .advanced-grid{
+      overflow:auto;
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:12px;
+      padding-right:4px;
+    }
+
+    .advanced-card{
+      border-radius:24px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      box-shadow:0 14px 34px rgba(0,0,0,.18);
+      padding:16px;
+      display:grid;
+      gap:10px;
+    }
+
+    .advanced-card-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .advanced-day{
+      font-size:22px;
+      line-height:1;
+      letter-spacing:-.04em;
+      font-weight:900;
+      margin:0 0 4px;
+    }
+
+    .advanced-date{
+      color:var(--muted);
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .advanced-pill{
+      min-height:34px;
+      padding:0 10px;
+      border-radius:var(--pill);
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.06);
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:11px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.10em;
+      white-space:nowrap;
+    }
+
+    .advanced-list{
+      display:grid;
+      gap:8px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+    }
+
+    .advanced-list div{
+      padding:10px 12px;
+      border-radius:16px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.06);
+    }
+
     .toast-wrap{
       position:fixed;
       right:12px;
@@ -557,9 +757,22 @@
         --card-h:min(118vw, 430px);
       }
 
+      .topbar{
+        top:8px;
+        width:calc(100vw - 10px);
+      }
+
       .status{
-        top:10px;
-        min-width:calc(100vw - 12px);
+        grid-template-columns:auto 1fr auto;
+      }
+
+      .day-strip{
+        display:grid;
+        grid-template-columns:repeat(3, minmax(0, 1fr));
+      }
+
+      .day-chip.advanced-trigger{
+        grid-column:1 / -1;
       }
 
       .hud{
@@ -575,7 +788,8 @@
       }
 
       .mini-btn,
-      .crumb{
+      .crumb,
+      .day-chip{
         min-height:56px;
         padding:10px 8px;
         text-align:center;
@@ -600,6 +814,14 @@
         grid-template-columns:1fr;
       }
 
+      .advanced-grid{
+        grid-template-columns:1fr;
+      }
+
+      .advanced-sheet{
+        width:calc(100vw - 10px);
+      }
+
       .toast-wrap{
         bottom:144px;
       }
@@ -617,10 +839,20 @@
 </head>
 <body>
   <div class="app">
-    <div class="status" aria-live="polite">
-      <span class="dot" id="liveDot"></span>
-      <span class="status-main" id="liveMain">Checking restaurant status…</span>
-      <span class="status-sub" id="liveSub">Loading timing…</span>
+    <div class="topbar">
+      <div class="status" aria-live="polite">
+        <button class="nav-btn" id="dayPrevBtn" type="button" aria-label="Previous day">←</button>
+
+        <div class="status-center">
+          <span class="dot" id="liveDot"></span>
+          <span class="status-main" id="liveMain">Checking restaurant status…</span>
+          <span class="status-sub" id="liveSub">Loading timing…</span>
+        </div>
+
+        <button class="nav-btn" id="dayNextBtn" type="button" aria-label="Next day">→</button>
+      </div>
+
+      <div class="day-strip" id="dayStrip"></div>
     </div>
 
     <div class="viewport">
@@ -679,17 +911,34 @@
     </aside>
   </div>
 
+  <div class="advanced" id="advanced">
+    <div class="advanced-backdrop" data-close-advanced="true"></div>
+    <section class="advanced-sheet" role="dialog" aria-modal="true" aria-labelledby="advancedTitle">
+      <div class="advanced-inner">
+        <div class="advanced-top">
+          <div>
+            <h3 class="advanced-title" id="advancedTitle">Advanced Menu</h3>
+            <p class="advanced-copy" id="advancedCopy">Lunch posted 1–2 days early is subject to change.</p>
+          </div>
+          <button class="nav-btn" id="advancedCloseBtn" type="button" aria-label="Close advanced menu">✕</button>
+        </div>
+
+        <div class="advanced-grid" id="advancedGrid"></div>
+      </div>
+    </section>
+  </div>
+
   <div class="toast-wrap" id="toastWrap"></div>
 
   <script>
     const APP = {
       categoryMeta: {
         breakfast: { label: "Breakfast", emoji: "🍳", desc: "Same daily breakfast served at opening." },
-        lunch: { label: "Lunch", emoji: "🍽️", desc: "Daily lunch menu for the current day." },
+        lunch: { label: "Lunch", emoji: "🍽️", desc: "Daily lunch menu for the selected day." },
         crawfish: { label: "Crawfish", emoji: "🦞", desc: "Crawfish timing and availability." },
         salad: { label: "Salad Bar", emoji: "🥗", desc: "Salad bar choices and pricing." },
         drinks: { label: "Drinks", emoji: "🥤", desc: "Cold drinks and coffee." },
-        dessert: { label: "Dessert", emoji: "🍰", desc: "Dessert for the current day." }
+        dessert: { label: "Dessert", emoji: "🍰", desc: "Dessert for the selected day." }
       }
     };
 
@@ -700,7 +949,9 @@
       selectedCategory: null,
       categoryCarousel: [],
       itemCarousel: [],
-      index: 0
+      index: 0,
+      selectedDateIndex: 0,
+      availableDates: []
     };
 
     const els = {
@@ -724,7 +975,14 @@
       detailCue: document.getElementById("detailCue"),
       detailBackBtn: document.getElementById("detailBackBtn"),
       detailRandomBtn: document.getElementById("detailRandomBtn"),
-      toastWrap: document.getElementById("toastWrap")
+      toastWrap: document.getElementById("toastWrap"),
+      dayPrevBtn: document.getElementById("dayPrevBtn"),
+      dayNextBtn: document.getElementById("dayNextBtn"),
+      dayStrip: document.getElementById("dayStrip"),
+      advanced: document.getElementById("advanced"),
+      advancedGrid: document.getElementById("advancedGrid"),
+      advancedCopy: document.getElementById("advancedCopy"),
+      advancedCloseBtn: document.getElementById("advancedCloseBtn")
     };
 
     function safe(v){ return String(v ?? "").trim(); }
@@ -742,11 +1000,18 @@
       return Number.isFinite(n) ? `$${n.toFixed(2)}` : (safe(v) || "Ask");
     }
     function weekdayName(date){ return date.toLocaleDateString("en-US", { weekday: "long" }); }
+    function formatDate(date){
+      return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    }
     function isoDateLocal(date){
       const y = date.getFullYear();
       const m = String(date.getMonth()+1).padStart(2, "0");
       const d = String(date.getDate()).padStart(2, "0");
       return `${y}-${m}-${d}`;
+    }
+    function parseISODate(iso){
+      const [y,m,d] = safe(iso).split("-").map(Number);
+      return new Date(y, (m || 1) - 1, d || 1);
     }
     function parseTimeToMinutes(timeStr){
       if(!timeStr) return null;
@@ -773,9 +1038,7 @@
 
     async function loadHHMenuData(){
       const embedded = document.querySelector("#hh-menu-data");
-      if (embedded) {
-        return JSON.parse(embedded.textContent.trim());
-      }
+      if (embedded) return JSON.parse(embedded.textContent.trim());
 
       const res = await fetch("menu-data.html", { cache: "no-store" });
       if (!res.ok) throw new Error("menu-data.html not found");
@@ -796,36 +1059,74 @@
       return key ? closures[key] : null;
     }
 
-    function getDisplayDates(raw){
+    function computeAvailableDates(raw){
       const now = new Date();
-      const todayName = weekdayName(now);
       const todayISO = isoDateLocal(now);
+      const todayName = weekdayName(now);
       const todaysHours = findHours(raw, todayName);
       const closure = closureFor(raw, todayName);
-      let displayDate = todayISO;
-      let displayName = todayName;
+      let startDate = now;
 
       if (!closure?.closed && todaysHours?.close) {
         const closeMinutes = parseTimeToMinutes(todaysHours.close);
         const currentMinutes = now.getHours() * 60 + now.getMinutes();
         if (closeMinutes !== null && currentMinutes >= closeMinutes) {
-          const tomorrow = new Date(now);
-          tomorrow.setDate(now.getDate() + 1);
-          displayDate = isoDateLocal(tomorrow);
-          displayName = weekdayName(tomorrow);
+          startDate = new Date(now);
+          startDate.setDate(now.getDate() + 1);
         }
       }
 
-      return { todayISO, todayName, displayDate, displayName };
+      const startISO = isoDateLocal(startDate);
+      const menuKeys = Object.keys(raw?.menus || {}).sort();
+      const windowDays = Math.max(1, Math.min(31, Number(raw?.settings?.advancedWindowDays || 7)));
+      const dates = [];
+
+      for (let i = 0; i < windowDays; i++) {
+        const d = new Date(startDate);
+        d.setDate(startDate.getDate() + i);
+        const iso = isoDateLocal(d);
+        const hasExplicitMenu = !!raw?.menus?.[iso];
+        const dayName = weekdayName(d);
+        const hours = findHours(raw, dayName);
+        const closureInfo = closureFor(raw, dayName);
+        dates.push({
+          iso,
+          label: formatDate(d),
+          weekday: dayName,
+          relativeLabel: i === 0 ? "Today" : i === 1 ? "Tomorrow" : i === 2 ? "Day After" : "",
+          hasExplicitMenu,
+          hours,
+          closureInfo
+        });
+      }
+
+      if (!dates.find(d => d.iso === todayISO) && raw?.menus?.[todayISO]) {
+        dates.unshift({
+          iso: todayISO,
+          label: formatDate(now),
+          weekday: todayName,
+          relativeLabel: "Today",
+          hasExplicitMenu: true,
+          hours: todaysHours,
+          closureInfo: closure
+        });
+      }
+
+      return dates;
     }
 
-    function normalizeData(raw){
+    function selectedDate(){
+      return STATE.availableDates[STATE.selectedDateIndex] || null;
+    }
+
+    function normalizeData(raw, selectedISO){
       const out = {};
-      const { displayDate } = getDisplayDates(raw);
+      const selectedDateObj = parseISODate(selectedISO);
+      const selectedDayName = weekdayName(selectedDateObj);
       const defaults = raw?.defaults || {};
-      const menuForDay = raw?.menus?.[displayDate] || {};
+      const menuForDay = raw?.menus?.[selectedISO] || {};
       const deliveryNote = raw?.deliveryNote || "";
-      const hours = findHours(raw, getDisplayDates(raw).displayName);
+      const hours = findHours(raw, selectedDayName);
 
       const breakfastDefaults = defaults.breakfast || {};
       out.breakfast = [];
@@ -878,7 +1179,7 @@
             desc: safe(item.desc),
             price: "",
             badge: "Daily",
-            mood: displayDate,
+            mood: selectedISO,
             emoji: "🍽️"
           });
         });
@@ -890,7 +1191,7 @@
           desc: "Check back later for the daily lunch menu.",
           price: "",
           badge: "Status",
-          mood: displayDate,
+          mood: selectedISO,
           emoji: "🍽️"
         });
       }
@@ -991,7 +1292,7 @@
             desc: safe(dessertDefaults.subtitle || "Today’s dessert."),
             price: "",
             badge: "Today",
-            mood: displayDate,
+            mood: selectedISO,
             emoji: "🍰"
           });
         });
@@ -1012,23 +1313,87 @@
     }
 
     function renderStatus(raw){
-      const { displayDate, displayName } = getDisplayDates(raw);
-      const closure = closureFor(raw, displayName);
-      const hours = findHours(raw, displayName);
+      const sel = selectedDate();
+      if (!sel) return;
+      const closure = sel.closureInfo;
+      const hours = sel.hours;
 
       if (closure?.closed) {
-        els.liveMain.textContent = `${displayName} · Closed`;
-        els.liveSub.textContent = closure.message || "See you tomorrow!";
+        els.liveMain.textContent = `${sel.weekday} · ${sel.label}`;
+        els.liveSub.textContent = closure.message || "Closed";
         els.liveDot.classList.add("closed");
         return;
       }
 
-      const note = raw?.hours?.note ? ` · ${raw.hours.note}` : "";
       const breakfast = hours?.breakfast ? `Breakfast ${hours.breakfast}` : "";
       const lunch = hours?.lunch ? `Lunch ${hours.lunch}` : "";
-      els.liveMain.textContent = `${displayName} · ${displayDate}`;
-      els.liveSub.textContent = `${hours?.open || ""} – ${hours?.close || ""}${breakfast ? " · " + breakfast : ""}${lunch ? " · " + lunch : ""}${note}`;
+      const relative = sel.relativeLabel ? `${sel.relativeLabel} · ` : "";
+      els.liveMain.textContent = `${relative}${sel.weekday} · ${sel.label}`;
+      els.liveSub.textContent = `${hours?.open || ""} – ${hours?.close || ""}${breakfast ? " · " + breakfast : ""}${lunch ? " · " + lunch : ""}`;
       els.liveDot.classList.remove("closed");
+    }
+
+    function renderDayStrip(){
+      els.dayStrip.innerHTML = "";
+      const sel = selectedDate();
+
+      STATE.availableDates.slice(0, 3).forEach((d, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "day-chip" + (idx === STATE.selectedDateIndex ? " active" : "") + (d.relativeLabel ? "" : " subtle");
+        btn.innerHTML = `<span>${escapeHtml(d.relativeLabel || d.weekday)}</span><span>${escapeHtml(d.label)}</span>`;
+        btn.addEventListener("click", () => {
+          selectDateByIndex(idx);
+        });
+        els.dayStrip.appendChild(btn);
+      });
+
+      const advancedBtn = document.createElement("button");
+      advancedBtn.type = "button";
+      advancedBtn.className = "day-chip advanced-trigger";
+      advancedBtn.textContent = "Advanced Menu";
+      advancedBtn.addEventListener("click", openAdvanced);
+      els.dayStrip.appendChild(advancedBtn);
+
+      els.dayPrevBtn.disabled = STATE.selectedDateIndex <= 0;
+      els.dayNextBtn.disabled = STATE.selectedDateIndex >= STATE.availableDates.length - 1;
+      els.dayPrevBtn.style.opacity = els.dayPrevBtn.disabled ? ".45" : "1";
+      els.dayNextBtn.style.opacity = els.dayNextBtn.disabled ? ".45" : "1";
+    }
+
+    function renderAdvanced(){
+      els.advancedGrid.innerHTML = "";
+      els.advancedCopy.textContent = safe(STATE.raw?.settings?.advancedDisclaimer || "Lunch posted in advance is subject to change.");
+
+      STATE.availableDates.forEach((d, idx) => {
+        const menuForDay = STATE.raw?.menus?.[d.iso] || {};
+        const lunchItems = menuForDay?.lunch?.items || [];
+        const dessertItems = menuForDay?.dessert?.items || [];
+        const hours = d.hours;
+        const closure = d.closureInfo;
+
+        const card = document.createElement("article");
+        card.className = "advanced-card";
+        card.innerHTML = `
+          <div class="advanced-card-top">
+            <div>
+              <div class="advanced-day">${escapeHtml(d.weekday)}</div>
+              <div class="advanced-date">${escapeHtml(d.label)}</div>
+            </div>
+            <div class="advanced-pill">${escapeHtml(d.relativeLabel || "Planned")}</div>
+          </div>
+          <div class="advanced-list">
+            <div>${closure?.closed ? escapeHtml(closure.message || "Closed") : escapeHtml((hours?.open || "") + " – " + (hours?.close || ""))}</div>
+            <div>Lunch: ${lunchItems.length ? escapeHtml(lunchItems.slice(0, 3).map(i => i.name).join(", ")) : "Not posted"}</div>
+            <div>Dessert: ${dessertItems.length ? escapeHtml(dessertItems.join(", ")) : "Not posted"}</div>
+          </div>
+        `;
+        card.addEventListener("click", () => {
+          closeAdvanced();
+          selectDateByIndex(idx);
+        });
+        els.advancedGrid.appendChild(card);
+      });
     }
 
     function categoryCards(){
@@ -1160,6 +1525,29 @@
       renderCrumbs();
     }
 
+    function rebuildForDate(){
+      const sel = selectedDate();
+      if (!sel) return;
+      STATE.normalized = normalizeData(STATE.raw, sel.iso);
+      STATE.categoryCarousel = categoryCards();
+      STATE.mode = "categories";
+      STATE.selectedCategory = null;
+      STATE.itemCarousel = [];
+      STATE.index = 0;
+      renderStatus(STATE.raw);
+      renderDayStrip();
+      renderCarousel();
+      renderCrumbs();
+      renderAdvanced();
+    }
+
+    function selectDateByIndex(idx){
+      if (idx < 0 || idx >= STATE.availableDates.length) return;
+      STATE.selectedDateIndex = idx;
+      rebuildForDate();
+      toast(`Showing ${STATE.availableDates[idx].weekday}.`);
+    }
+
     function cycle(step){
       const list = activeList();
       if (!list.length) return;
@@ -1209,7 +1597,7 @@
         ? `${item.name} stands out because it is marked as ${item.badge.toLowerCase()}.`
         : `${item.name} works because the front hologram makes it the obvious next choice.`;
 
-      els.detailCue.textContent = `Call (337) 221-1035 and ask for “${item.name}.” This page is reading the hidden JSON from menu-data.html.`;
+      els.detailCue.textContent = `Call (337) 221-1035 and ask for “${item.name}.” This page reads the hidden JSON from menu-data.html for the selected day.`;
 
       els.detail.classList.add("open");
       els.detail.setAttribute("aria-hidden", "false");
@@ -1218,6 +1606,14 @@
     function closeDetail(){
       els.detail.classList.remove("open");
       els.detail.setAttribute("aria-hidden", "true");
+    }
+
+    function openAdvanced(){
+      els.advanced.classList.add("open");
+    }
+
+    function closeAdvanced(){
+      els.advanced.classList.remove("open");
     }
 
     function randomFromCurrent(){
@@ -1238,20 +1634,29 @@
       els.detailCloseBtn.addEventListener("click", closeDetail);
       els.detailBackBtn.addEventListener("click", () => {
         closeDetail();
-        if (STATE.mode === "items") return;
-        backToCategories();
+        if (STATE.mode === "items") backToCategories();
       });
       els.detailRandomBtn.addEventListener("click", randomFromCurrent);
+      els.dayPrevBtn.addEventListener("click", () => selectDateByIndex(STATE.selectedDateIndex - 1));
+      els.dayNextBtn.addEventListener("click", () => selectDateByIndex(STATE.selectedDateIndex + 1));
+      els.advancedCloseBtn.addEventListener("click", closeAdvanced);
 
       document.querySelectorAll("[data-close-detail='true']").forEach((node) => {
         node.addEventListener("click", closeDetail);
+      });
+
+      document.querySelectorAll("[data-close-advanced='true']").forEach((node) => {
+        node.addEventListener("click", closeAdvanced);
       });
 
       window.addEventListener("keydown", (e) => {
         if (e.key === "ArrowLeft") cycle(-1);
         if (e.key === "ArrowRight") cycle(1);
         if (e.key === "Enter") openFront();
-        if (e.key === "Escape") closeDetail();
+        if (e.key === "Escape") {
+          closeDetail();
+          closeAdvanced();
+        }
       });
     }
 
@@ -1259,11 +1664,9 @@
       try {
         const raw = await loadHHMenuData();
         STATE.raw = raw;
-        STATE.normalized = normalizeData(raw);
-        STATE.categoryCarousel = categoryCards();
-        renderStatus(raw);
+        STATE.availableDates = computeAvailableDates(raw);
         bind();
-        renderCarousel();
+        rebuildForDate();
         toast("menu-data.html loaded.");
       } catch (err) {
         console.error(err);
