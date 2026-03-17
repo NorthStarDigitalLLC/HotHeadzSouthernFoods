@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hot Headz — Standalone Hologram Menu</title>
-  <meta name="description" content="Standalone floating hologram menu powered by menu-data.html" />
+  <title>Hot Headz — Standalone Hologram Menu (menu-data powered)</title>
+  <meta name="description" content="Standalone floating hologram menu powered by menu-data.html JSON data." />
   <meta name="theme-color" content="#05060b" />
   <style>
     :root{
@@ -49,8 +49,7 @@
       background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");
     }
 
-    button,input{font:inherit}
-    button{cursor:pointer}
+    button{font:inherit;cursor:pointer}
 
     .app{
       position:relative;
@@ -66,7 +65,7 @@
       left:50%;
       transform:translateX(-50%);
       z-index:50;
-      min-width:min(92vw, 720px);
+      min-width:min(92vw, 760px);
       padding:12px 16px;
       border-radius:var(--pill);
       border:1px solid var(--line);
@@ -357,7 +356,7 @@
       right:10px;
       top:10px;
       bottom:10px;
-      width:min(480px, calc(100vw - 20px));
+      width:min(500px, calc(100vw - 20px));
       border-radius:36px;
       border:1px solid var(--line);
       background:linear-gradient(180deg, rgba(248,252,255,.96), rgba(235,245,255,.94));
@@ -682,30 +681,20 @@
 
   <div class="toast-wrap" id="toastWrap"></div>
 
-  <script src="menu-data.html"></script>
   <script>
     const APP = {
       categoryMeta: {
-        breakfast: { label: "Breakfast", emoji: "🍳", desc: "Morning plates and breakfast favorites." },
-        lunch: { label: "Lunch", emoji: "🍽️", desc: "Daily lunch selections and hot plates." },
-        crawfish: { label: "Crawfish", emoji: "🦞", desc: "Crawfish selections and seasonal favorites." },
-        salad: { label: "Salad", emoji: "🥗", desc: "Fresh salads and lighter choices." },
-        drinks: { label: "Drinks", emoji: "🥤", desc: "Cold drinks and add-ons." },
-        dessert: { label: "Dessert", emoji: "🍰", desc: "Sweet finishers and desserts." },
-        specials: { label: "Specials", emoji: "🔥", desc: "Special features and featured plates." }
-      },
-      hours: {
-        Monday:    { open: "05:00", close: "15:00", breakfast: "05:00–10:30", lunch: "11:00–14:30", closed: false },
-        Tuesday:   { open: "05:00", close: "15:00", breakfast: "05:00–10:30", lunch: "11:00–14:30", closed: false },
-        Wednesday: { open: "05:00", close: "15:00", breakfast: "05:00–10:30", lunch: "11:00–14:30", closed: false },
-        Thursday:  { open: "05:00", close: "15:00", breakfast: "05:00–10:30", lunch: "11:00–14:30", closed: false },
-        Friday:    { open: "05:00", close: "17:00", breakfast: "05:00–10:30", lunch: "11:00–16:00", closed: false },
-        Saturday:  { open: "07:00", close: "14:00", breakfast: "07:00–10:30", lunch: "11:00–13:30", closed: false },
-        Sunday:    { open: "", close: "", breakfast: "", lunch: "", closed: true }
+        breakfast: { label: "Breakfast", emoji: "🍳", desc: "Same daily breakfast served at opening." },
+        lunch: { label: "Lunch", emoji: "🍽️", desc: "Daily lunch menu for the current day." },
+        crawfish: { label: "Crawfish", emoji: "🦞", desc: "Crawfish timing and availability." },
+        salad: { label: "Salad Bar", emoji: "🥗", desc: "Salad bar choices and pricing." },
+        drinks: { label: "Drinks", emoji: "🥤", desc: "Cold drinks and coffee." },
+        dessert: { label: "Dessert", emoji: "🍰", desc: "Dessert for the current day." }
       }
     };
 
     const STATE = {
+      raw: null,
       normalized: {},
       mode: "categories",
       selectedCategory: null,
@@ -753,19 +742,23 @@
       return Number.isFinite(n) ? `$${n.toFixed(2)}` : (safe(v) || "Ask");
     }
     function weekdayName(date){ return date.toLocaleDateString("en-US", { weekday: "long" }); }
-    function mins(t){
-      if (!t || !/^\d{2}:\d{2}$/.test(t)) return null;
-      const [h, m] = t.split(":").map(Number);
+    function isoDateLocal(date){
+      const y = date.getFullYear();
+      const m = String(date.getMonth()+1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+    function parseTimeToMinutes(timeStr){
+      if(!timeStr) return null;
+      const match = safe(timeStr).match(/(\d+):(\d+)\s*(AM|PM)/i);
+      if(!match) return null;
+      let h = parseInt(match[1], 10);
+      const m = parseInt(match[2], 10);
+      const ampm = match[3].toUpperCase();
+      if(ampm === "PM" && h !== 12) h += 12;
+      if(ampm === "AM" && h === 12) h = 0;
       return h * 60 + m;
     }
-    function time12(t){
-      if (!t || !/^\d{2}:\d{2}$/.test(t)) return t || "";
-      const [h, m] = t.split(":").map(Number);
-      const d = new Date();
-      d.setHours(h, m, 0, 0);
-      return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-    }
-
     function toast(message){
       const el = document.createElement("div");
       el.className = "toast";
@@ -778,104 +771,271 @@
       }, 2400);
     }
 
-    function currentCategoryMeta(key){
-      return APP.categoryMeta[key] || { label: key, emoji: "🍽️", desc: "Menu category" };
+    async function loadHHMenuData(){
+      const embedded = document.querySelector("#hh-menu-data");
+      if (embedded) {
+        return JSON.parse(embedded.textContent.trim());
+      }
+
+      const res = await fetch("menu-data.html", { cache: "no-store" });
+      if (!res.ok) throw new Error("menu-data.html not found");
+      const html = await res.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const script = doc.querySelector("#hh-menu-data");
+      if (!script) throw new Error("#hh-menu-data not found");
+      return JSON.parse(script.textContent.trim());
     }
 
-    function liveStatus(){
+    function findHours(raw, dayName){
+      return (raw?.hours?.weekly || []).find(entry => safe(entry.day).toLowerCase() === safe(dayName).toLowerCase()) || null;
+    }
+
+    function closureFor(raw, dayName){
+      const closures = raw?.closures || {};
+      const key = Object.keys(closures).find(k => safe(k).toLowerCase() === safe(dayName).toLowerCase());
+      return key ? closures[key] : null;
+    }
+
+    function getDisplayDates(raw){
       const now = new Date();
-      const day = weekdayName(now);
-      const info = APP.hours[day];
+      const todayName = weekdayName(now);
+      const todayISO = isoDateLocal(now);
+      const todaysHours = findHours(raw, todayName);
+      const closure = closureFor(raw, todayName);
+      let displayDate = todayISO;
+      let displayName = todayName;
 
-      if (!info || info.closed) {
-        return {
-          open: false,
-          main: "Closed Today",
-          sub: "Browse the menu holograms or plan your next order."
-        };
-      }
-
-      const current = now.getHours() * 60 + now.getMinutes();
-      const open = mins(info.open);
-      const close = mins(info.close);
-      const breakfastEnd = info.breakfast ? mins(info.breakfast.split("–")[1]) : null;
-      const lunchStart = info.lunch ? mins(info.lunch.split("–")[0]) : null;
-      const lunchEnd = info.lunch ? mins(info.lunch.split("–")[1]) : null;
-
-      if (open !== null && current < open) return { open: false, main: "Opening Soon", sub: `Opens at ${time12(info.open)}.` };
-      if (close !== null && current >= close) return { open: false, main: "Closed for the Day", sub: "Browse tomorrow’s favorites." };
-      if (breakfastEnd !== null && current < breakfastEnd) return { open: true, main: "Open Now · Breakfast", sub: `Breakfast until ${time12(info.breakfast.split("–")[1])}.` };
-      if (lunchStart !== null && current < lunchStart) return { open: true, main: "Open Now", sub: `Lunch starts at ${time12(info.lunch.split("–")[0])}.` };
-      if (lunchEnd !== null && current <= lunchEnd) return { open: true, main: "Open Now · Lunch", sub: `Lunch until ${time12(info.lunch.split("–")[1])}.` };
-      return { open: true, main: "Open Now", sub: `Closes at ${time12(info.close)}.` };
-    }
-
-    function renderStatus(){
-      const s = liveStatus();
-      els.liveMain.textContent = s.main;
-      els.liveSub.textContent = s.sub;
-      els.liveDot.classList.toggle("closed", !s.open);
-    }
-
-    async function loadMenuData(){
-      if (window.MENU_DATA && typeof window.MENU_DATA === "object") return window.MENU_DATA;
-
-      try{
-        const res = await fetch("menu-data.html", { cache: "no-store" });
-        if (!res.ok) throw new Error("menu-data.html not found");
-        const html = await res.text();
-        const match =
-          html.match(/window\.MENU_DATA\s*=\s*([\s\S]*?);[\s]*<\/script>/i) ||
-          html.match(/window\.MENU_DATA\s*=\s*([\s\S]*?);[\s]*$/i);
-
-        if (match && match[1]) {
-          return new Function(`return (${match[1]});`)();
+      if (!closure?.closed && todaysHours?.close) {
+        const closeMinutes = parseTimeToMinutes(todaysHours.close);
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        if (closeMinutes !== null && currentMinutes >= closeMinutes) {
+          const tomorrow = new Date(now);
+          tomorrow.setDate(now.getDate() + 1);
+          displayDate = isoDateLocal(tomorrow);
+          displayName = weekdayName(tomorrow);
         }
-        throw new Error("window.MENU_DATA not found");
-      }catch(err){
-        console.error(err);
-        return {
-          breakfast: [
-            { name: "Loaded Breakfast Plate", price: "$11.99", desc: "Fallback sample item." }
-          ],
-          lunch: [
-            { name: "Crawfish Plate", price: "$16.99", desc: "Fallback sample item." },
-            { name: "Catfish Plate", price: "$14.99", desc: "Fallback sample item." }
-          ],
-          drinks: [
-            { name: "Sweet Tea", price: "$2.49", desc: "Fallback sample item." }
-          ]
-        };
       }
+
+      return { todayISO, todayName, displayDate, displayName };
     }
 
     function normalizeData(raw){
       const out = {};
-      Object.keys(raw || {}).forEach((key) => {
-        const arr = Array.isArray(raw[key]) ? raw[key] : [];
-        const categoryKey = slug(key);
-        out[categoryKey] = arr.map((item, idx) => {
-          const rec = item && typeof item === "object" ? item : { name: String(item ?? "") };
-          return {
-            id: `${categoryKey}-${slug(rec.name || rec.title || `item-${idx}`)}-${idx}`,
-            categoryKey,
-            name: safe(rec.name || rec.title || `Item ${idx + 1}`),
-            desc: safe(rec.desc || rec.description || ""),
-            price: safe(rec.price || rec.cost || "Ask"),
-            badge: safe(rec.badge || rec.tag || ""),
-            mood: safe(rec.mood || ""),
-            emoji: safe(rec.emoji || rec.icon || currentCategoryMeta(categoryKey).emoji || "🍽️")
-          };
-        }).filter(item => item.name);
+      const { displayDate } = getDisplayDates(raw);
+      const defaults = raw?.defaults || {};
+      const menuForDay = raw?.menus?.[displayDate] || {};
+      const deliveryNote = raw?.deliveryNote || "";
+      const hours = findHours(raw, getDisplayDates(raw).displayName);
+
+      const breakfastDefaults = defaults.breakfast || {};
+      out.breakfast = [];
+      (breakfastDefaults.plates || []).forEach((plate, idx) => {
+        out.breakfast.push({
+          id: `breakfast-plate-${idx}`,
+          categoryKey: "breakfast",
+          name: safe(plate),
+          desc: safe(breakfastDefaults.subtitle || "") || "Breakfast plate.",
+          price: plate,
+          badge: "Plate",
+          mood: hours?.breakfast || "",
+          emoji: "🍳"
+        });
       });
+      (breakfastDefaults.items || []).forEach((item, idx) => {
+        out.breakfast.push({
+          id: `breakfast-item-${idx}`,
+          categoryKey: "breakfast",
+          name: safe(item),
+          desc: "Available with breakfast service.",
+          price: "",
+          badge: "Breakfast",
+          mood: deliveryNote,
+          emoji: "🍳"
+        });
+      });
+
+      const lunchDefaults = defaults.lunch || {};
+      const lunchDay = menuForDay.lunch || {};
+      out.lunch = [];
+      (lunchDefaults.plates || []).forEach((plate, idx) => {
+        out.lunch.push({
+          id: `lunch-plate-${idx}`,
+          categoryKey: "lunch",
+          name: safe(plate),
+          desc: safe(lunchDefaults.subtitle || "") || "Lunch pricing.",
+          price: plate,
+          badge: "Plate",
+          mood: hours?.lunch || "",
+          emoji: "🍽️"
+        });
+      });
+      if (Array.isArray(lunchDay.items) && lunchDay.show !== false) {
+        lunchDay.items.forEach((item, idx) => {
+          out.lunch.push({
+            id: `lunch-day-${idx}`,
+            categoryKey: "lunch",
+            name: safe(item.name),
+            desc: safe(item.desc),
+            price: "",
+            badge: "Daily",
+            mood: displayDate,
+            emoji: "🍽️"
+          });
+        });
+      } else {
+        out.lunch.push({
+          id: "lunch-unavailable",
+          categoryKey: "lunch",
+          name: safe(raw?.settings?.autoClearMessage || "Lunch menu unavailable."),
+          desc: "Check back later for the daily lunch menu.",
+          price: "",
+          badge: "Status",
+          mood: displayDate,
+          emoji: "🍽️"
+        });
+      }
+
+      const crawfishDefaults = defaults.crawfish || {};
+      const crawfishDay = menuForDay.crawfish || {};
+      out.crawfish = [];
+      if (crawfishDay.show !== false) {
+        (crawfishDefaults.items || []).forEach((item, idx) => {
+          out.crawfish.push({
+            id: `crawfish-${idx}`,
+            categoryKey: "crawfish",
+            name: safe(item),
+            desc: safe(crawfishDefaults.subtitle || "Call for current crawfish details."),
+            price: "",
+            badge: "Crawfish",
+            mood: "",
+            emoji: "🦞"
+          });
+        });
+      }
+
+      const saladDefaults = defaults.salad || {};
+      out.salad = [];
+      (saladDefaults.items || []).forEach((item, idx) => {
+        out.salad.push({
+          id: `salad-price-${idx}`,
+          categoryKey: "salad",
+          name: safe(item),
+          desc: safe(saladDefaults.subtitle || "Salad bar pricing."),
+          price: "",
+          badge: "Pricing",
+          mood: "",
+          emoji: "🥗"
+        });
+      });
+      (saladDefaults.saladBar?.lettuce || []).forEach((item, idx) => {
+        out.salad.push({
+          id: `salad-lettuce-${idx}`,
+          categoryKey: "salad",
+          name: safe(item),
+          desc: "Lettuce choice.",
+          price: "",
+          badge: "Lettuce",
+          mood: "",
+          emoji: "🥗"
+        });
+      });
+      (saladDefaults.saladBar?.toppings || []).forEach((item, idx) => {
+        out.salad.push({
+          id: `salad-top-${idx}`,
+          categoryKey: "salad",
+          name: safe(item),
+          desc: "Salad topping.",
+          price: "",
+          badge: "Topping",
+          mood: "",
+          emoji: "🥗"
+        });
+      });
+      (saladDefaults.saladBar?.dressing || []).forEach((item, idx) => {
+        out.salad.push({
+          id: `salad-dressing-${idx}`,
+          categoryKey: "salad",
+          name: safe(item),
+          desc: "Dressing choice.",
+          price: "",
+          badge: "Dressing",
+          mood: "",
+          emoji: "🥗"
+        });
+      });
+
+      const drinkDefaults = defaults.drinks || {};
+      out.drinks = [];
+      (drinkDefaults.items || []).forEach((item, idx) => {
+        out.drinks.push({
+          id: `drink-${idx}`,
+          categoryKey: "drinks",
+          name: safe(item),
+          desc: "Available drink selection.",
+          price: "",
+          badge: "Drink",
+          mood: "",
+          emoji: "🥤"
+        });
+      });
+
+      const dessertDefaults = defaults.dessert || {};
+      const dessertDay = menuForDay.dessert || {};
+      out.dessert = [];
+      if (Array.isArray(dessertDay.items) && dessertDay.items.length) {
+        dessertDay.items.forEach((item, idx) => {
+          out.dessert.push({
+            id: `dessert-day-${idx}`,
+            categoryKey: "dessert",
+            name: safe(item),
+            desc: safe(dessertDefaults.subtitle || "Today’s dessert."),
+            price: "",
+            badge: "Today",
+            mood: displayDate,
+            emoji: "🍰"
+          });
+        });
+      } else {
+        out.dessert.push({
+          id: "dessert-unposted",
+          categoryKey: "dessert",
+          name: "(Dessert not posted yet.)",
+          desc: safe(dessertDefaults.subtitle || "Dessert changes daily."),
+          price: "",
+          badge: "Status",
+          mood: "",
+          emoji: "🍰"
+        });
+      }
+
       return out;
+    }
+
+    function renderStatus(raw){
+      const { displayDate, displayName } = getDisplayDates(raw);
+      const closure = closureFor(raw, displayName);
+      const hours = findHours(raw, displayName);
+
+      if (closure?.closed) {
+        els.liveMain.textContent = `${displayName} · Closed`;
+        els.liveSub.textContent = closure.message || "See you tomorrow!";
+        els.liveDot.classList.add("closed");
+        return;
+      }
+
+      const note = raw?.hours?.note ? ` · ${raw.hours.note}` : "";
+      const breakfast = hours?.breakfast ? `Breakfast ${hours.breakfast}` : "";
+      const lunch = hours?.lunch ? `Lunch ${hours.lunch}` : "";
+      els.liveMain.textContent = `${displayName} · ${displayDate}`;
+      els.liveSub.textContent = `${hours?.open || ""} – ${hours?.close || ""}${breakfast ? " · " + breakfast : ""}${lunch ? " · " + lunch : ""}${note}`;
+      els.liveDot.classList.remove("closed");
     }
 
     function categoryCards(){
       return Object.keys(STATE.normalized)
         .filter(key => (STATE.normalized[key] || []).length)
         .map((key) => {
-          const meta = currentCategoryMeta(key);
+          const meta = APP.categoryMeta[key] || { label: key, emoji: "🍽️", desc: "Menu category" };
           return {
             id: key,
             type: "category",
@@ -928,7 +1088,7 @@
       els.crumbs.appendChild(home);
 
       if (STATE.selectedCategory) {
-        const meta = currentCategoryMeta(STATE.selectedCategory);
+        const meta = APP.categoryMeta[STATE.selectedCategory] || { label: STATE.selectedCategory, emoji: "🍽️" };
         const cat = document.createElement("button");
         cat.type = "button";
         cat.className = "crumb" + (STATE.mode === "items" ? " active" : "");
@@ -1033,7 +1193,7 @@
     }
 
     function openDetail(item){
-      const meta = currentCategoryMeta(item.categoryKey);
+      const meta = APP.categoryMeta[item.categoryKey] || { label: item.categoryKey, emoji: "🍽️" };
       els.detailEyebrow.textContent = `${meta.emoji} ${meta.label}`;
       els.detailTitle.textContent = item.name;
       els.detailDesc.textContent = item.desc || "Call the restaurant for more details.";
@@ -1049,7 +1209,7 @@
         ? `${item.name} stands out because it is marked as ${item.badge.toLowerCase()}.`
         : `${item.name} works because the front hologram makes it the obvious next choice.`;
 
-      els.detailCue.textContent = `Call (337) 221-1035 and ask for “${item.name}.” This page is reading from menu-data.html.`;
+      els.detailCue.textContent = `Call (337) 221-1035 and ask for “${item.name}.” This page is reading the hidden JSON from menu-data.html.`;
 
       els.detail.classList.add("open");
       els.detail.setAttribute("aria-hidden", "false");
@@ -1068,20 +1228,6 @@
       }
       STATE.index = Math.floor(Math.random() * list.length);
       renderCarousel();
-    }
-
-    function bestNow(){
-      const status = liveStatus().main.toLowerCase();
-      let key = null;
-      if (status.includes("breakfast") && STATE.normalized.breakfast?.length) key = "breakfast";
-      else if (status.includes("lunch") && STATE.normalized.lunch?.length) key = "lunch";
-      else if (STATE.normalized.specials?.length) key = "specials";
-      else key = Object.keys(STATE.normalized).find(k => STATE.normalized[k]?.length) || null;
-
-      if (key) {
-        enterCategory(key);
-        toast(`Showing ${currentCategoryMeta(key).label.toLowerCase()} for right now.`);
-      }
     }
 
     function bind(){
@@ -1106,18 +1252,23 @@
         if (e.key === "ArrowRight") cycle(1);
         if (e.key === "Enter") openFront();
         if (e.key === "Escape") closeDetail();
-        if (e.key.toLowerCase() === "b") bestNow();
       });
     }
 
     async function init(){
-      renderStatus();
-      const raw = await loadMenuData();
-      STATE.normalized = normalizeData(raw);
-      STATE.categoryCarousel = categoryCards();
-      bind();
-      renderCarousel();
-      toast("Standalone hologram menu loaded.");
+      try {
+        const raw = await loadHHMenuData();
+        STATE.raw = raw;
+        STATE.normalized = normalizeData(raw);
+        STATE.categoryCarousel = categoryCards();
+        renderStatus(raw);
+        bind();
+        renderCarousel();
+        toast("menu-data.html loaded.");
+      } catch (err) {
+        console.error(err);
+        toast("Could not read menu-data.html.");
+      }
     }
 
     init();
