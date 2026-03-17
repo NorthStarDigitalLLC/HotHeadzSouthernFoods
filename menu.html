@@ -1,271 +1,189 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Restaurant Menu</title>
-<style>
-  /* ---- Basic styles (feel free to customize colors / fonts) ---- */
-  :root {
-    --accent:#c0392b;
-    --muted:#777;
-    --max-w:1100px;
-    --bg:#fff;
-    --card:#fafafa;
-  }
-  body { font-family: "Inter", "Helvetica Neue", Arial, sans-serif; margin:0; background: #fff; color:#222; }
-  .restaurant-menu { max-width:var(--max-w); margin:2rem auto; padding:2rem; background:var(--bg); }
-  .menu-loading { text-align:center; color:var(--muted); margin:2rem 0; }
-  .menu-title { text-align:center; margin-bottom:1.5rem; font-size:1.6rem; font-weight:700; color:var(--accent); }
-  .menu-category { margin-bottom:2rem; }
-  .menu-category h3 { margin:0 0 .9rem 0; font-size:1.25rem; border-bottom:2px dashed #eee; padding-bottom:.45rem; color:#333; }
-  .menu-items { display:grid; grid-template-columns:1fr; gap:.6rem 1.2rem; }
-  @media(min-width:760px){ .menu-items { grid-template-columns:1fr 1fr; } }
-  .menu-item { display:flex; justify-content:space-between; align-items:flex-start; padding:.6rem 0; border-bottom:1px solid #f0f0f0; }
-  .menu-item .left { max-width:78%; }
-  .menu-item h4 { margin:0; font-size:1rem; font-weight:600; color:#111; }
-  .menu-item .desc { margin:.28rem 0 0 0; color:var(--muted); font-size:.92rem; line-height:1.35; }
-  .menu-item .price { font-weight:700; color:#111; margin-left:1rem; white-space:nowrap; }
-  .menu-item .meta { display:flex; gap:12px; align-items:center; }
-  .no-menu { color:var(--muted); text-align:center; padding:1.2rem; border:1px dashed #eee; border-radius:6px; background:var(--card); }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Restaurant Menu</title>
+  <style>
+    /* Basic styling – customize to your taste */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f8f8f8;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #b22222;
+    }
+    .menu-section {
+      margin-bottom: 40px;
+    }
+    .category-title {
+      font-size: 2rem;
+      border-bottom: 2px solid #b22222;
+      padding-bottom: 5px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .menu-item {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .menu-item:hover {
+      transform: translateY(-5px);
+    }
+    .item-name {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #b22222;
+      margin-bottom: 5px;
+    }
+    .item-description {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 10px;
+    }
+    .item-price {
+      font-weight: bold;
+      color: #2e8b57;
+    }
+    .error-message {
+      color: red;
+      text-align: center;
+      padding: 20px;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      font-size: 1.2rem;
+      color: #999;
+    }
+  </style>
 </head>
 <body>
+  <h1>Our Menu</h1>
+  <div id="menu-container" class="loading">Loading menu...</div>
 
-<div id="restaurant-menu" class="restaurant-menu" aria-live="polite">
-  <div class="menu-loading">Loading menu…</div>
-</div>
+  <script>
+    // Replace with the actual path to your menu-data.html
+    const DATA_URL = 'menu-data.html';
 
-<script>
-(async function(){
-  const menuContainer = document.getElementById('restaurant-menu');
-  const MENU_SOURCE = '/menu-data.html'; // change if your file lives at a different path
-  function extractPrice(text){
-    if(!text) return null;
-    const m = text.match(/(\$\s?\d{1,3}(?:[,\d]{0,3})?(?:\.\d{2})?|\d+\.\d{2})/);
-    return m ? m[0].trim() : null;
-  }
+    // Function to extract menu items from the fetched HTML
+    function parseMenuData(htmlString) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlString, 'text/html');
 
-  function cleanText(el){
-    if(!el) return '';
-    return el.textContent.replace(/\s+/g,' ').trim();
-  }
+      // --- ADJUST THIS PART TO MATCH YOUR HTML STRUCTURE ---
+      // Example: assume each menu item is inside an element with class 'menu-item'
+      // and contains:
+      // - .item-name for the name
+      // - .item-description for description (optional)
+      // - .item-price for price
+      // - data-category attribute for category (or a parent category element)
+      const items = [];
+      const itemElements = doc.querySelectorAll('.menu-item'); // change selector
 
-  function createNodeFromString(htmlString){
-    const temp = document.createElement('div');
-    temp.innerHTML = htmlString;
-    return temp.firstElementChild;
-  }
+      itemElements.forEach(el => {
+        const name = el.querySelector('.item-name')?.textContent.trim() || 'Unknown';
+        const description = el.querySelector('.item-description')?.textContent.trim() || '';
+        const price = el.querySelector('.item-price')?.textContent.trim() || '';
+        // Get category from a data attribute or a parent category element
+        const category = el.dataset.category || 'Other'; // fallback
 
-  function renderMenu(categories){
-    menuContainer.innerHTML = '';
-    // optional title
-    const title = document.createElement('div');
-    title.className = 'menu-title';
-    title.textContent = 'Our Menu';
-    menuContainer.appendChild(title);
+        items.push({
+          name,
+          description,
+          price,
+          category
+        });
+      });
+      // -----------------------------------------------------
 
-    if(!categories || !categories.length){
-      const none = document.createElement('div');
-      none.className = 'no-menu';
-      none.textContent = 'Sorry — we couldn\'t find any menu items in menu-data.html. Try adjusting the selectors or ensure the file is reachable.';
-      menuContainer.appendChild(none);
-      return;
+      return items;
     }
 
-    categories.forEach(cat => {
-      const catWrap = document.createElement('section');
-      catWrap.className = 'menu-category';
-      const h = document.createElement('h3');
-      h.textContent = cat.name || 'Uncategorized';
-      catWrap.appendChild(h);
-
-      const itemsWrap = document.createElement('div');
-      itemsWrap.className = 'menu-items';
-
-      (cat.items || []).forEach(it => {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'menu-item';
-
-        const left = document.createElement('div');
-        left.className = 'left';
-
-        const nameEl = document.createElement('h4');
-        nameEl.textContent = it.name || '';
-        left.appendChild(nameEl);
-
-        if(it.desc){
-          const desc = document.createElement('div');
-          desc.className = 'desc';
-          desc.textContent = it.desc;
-          left.appendChild(desc);
+    // Group items by category
+    function groupByCategory(items) {
+      return items.reduce((acc, item) => {
+        if (!acc[item.category]) {
+          acc[item.category] = [];
         }
+        acc[item.category].push(item);
+        return acc;
+      }, {});
+    }
 
-        const meta = document.createElement('div');
-        meta.className = 'meta';
+    // Render the menu into the container
+    function renderMenu(menuContainer, groupedItems) {
+      menuContainer.innerHTML = ''; // clear loading
 
-        const price = document.createElement('div');
-        price.className = 'price';
-        price.textContent = it.price || '';
-        meta.appendChild(price);
+      for (const [category, items] of Object.entries(groupedItems)) {
+        const section = document.createElement('div');
+        section.className = 'menu-section';
 
-        itemDiv.appendChild(left);
-        itemDiv.appendChild(meta);
+        const title = document.createElement('h2');
+        title.className = 'category-title';
+        title.textContent = category;
+        section.appendChild(title);
 
-        itemsWrap.appendChild(itemDiv);
-      });
+        const grid = document.createElement('div');
+        grid.className = 'menu-grid';
 
-      catWrap.appendChild(itemsWrap);
-      menuContainer.appendChild(catWrap);
-    });
-  }
+        items.forEach(item => {
+          const itemDiv = document.createElement('div');
+          itemDiv.className = 'menu-item';
 
-  function parseCategoryElements(catElems){
-    const cats = [];
-    catElems.forEach(catEl => {
-      // category name
-      let name = null;
-      // common heading inside category
-      const heading = catEl.querySelector('h1,h2,h3') || catEl.querySelector('.category-title, .menu-category-title');
-      if(heading) name = cleanText(heading);
+          itemDiv.innerHTML = `
+            <div class="item-name">${item.name}</div>
+            <div class="item-description">${item.description}</div>
+            <div class="item-price">${item.price}</div>
+          `;
 
-      // find item nodes inside
-      let itemNodes = Array.from(catEl.querySelectorAll('.menu-item, .item, li, article'));
-      // fallback: if there are direct p tags that look like items
-      if(!itemNodes.length){
-        const pCandidates = Array.from(catEl.querySelectorAll('p')).filter(p => p.textContent.trim().length>0);
-        if(pCandidates.length) itemNodes = pCandidates;
+          grid.appendChild(itemDiv);
+        });
+
+        section.appendChild(grid);
+        menuContainer.appendChild(section);
       }
+    }
 
-      const items = itemNodes.map(node => {
-        // name
-        let iname = null;
-        let idesc = null;
-        let iprice = null;
+    // Fetch and display the menu
+    async function loadMenu() {
+      const menuContainer = document.getElementById('menu-container');
 
-        const nameEl = node.querySelector('.item-name, .name, h3, h4, strong, b');
-        if(nameEl) iname = cleanText(nameEl);
-
-        const descEl = node.querySelector('.description, .desc, p, small');
-        if(descEl) idesc = cleanText(descEl);
-
-        const priceEl = node.querySelector('.price, .amount, span');
-        if(priceEl) iprice = extractPrice(cleanText(priceEl)) || cleanText(priceEl);
-
-        // fallback parsing if not found
-        if(!iname){
-          const text = cleanText(node);
-          const priceFromText = extractPrice(text);
-          if(priceFromText) iprice = iprice || priceFromText;
-          // remove price chunk and any separators for name
-          let tmp = text;
-          if(priceFromText) tmp = tmp.replace(priceFromText, '');
-          // try to split name and desc with "—" or "-" or "–"
-          const parts = tmp.split(/—|–|-{1}/).map(p=>p.trim()).filter(Boolean);
-          if(parts.length){
-            iname = parts[0];
-            if(parts.length>1 && !idesc) idesc = parts.slice(1).join(' — ');
-          } else {
-            // ultimate fallback: first 40 chars as name
-            iname = tmp.split('\n')[0].trim().slice(0,80);
-          }
+      try {
+        const response = await fetch(DATA_URL);
+        if (!response.ok) {
+          throw new Error(`Failed to load menu data: ${response.status}`);
+        }
+        const html = await response.text();
+        const items = parseMenuData(html);
+        
+        if (items.length === 0) {
+          menuContainer.innerHTML = '<p class="error-message">No menu items found.</p>';
+          return;
         }
 
-        return { name: iname || '', desc: idesc || '', price: iprice || '' };
-      });
-
-      cats.push({ name: name || 'Uncategorized', items });
-    });
-    return cats;
-  }
-
-  function parseByHeadings(doc){
-    const headings = Array.from(doc.querySelectorAll('h1,h2,h3'));
-    if(!headings.length) return [];
-    const cats = [];
-    for(let i=0;i<headings.length;i++){
-      const heading = headings[i];
-      const nextHeaderIndex = headings.findIndex(h => h.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING && (h.tagName <= heading.tagName));
-      // collect nodes between this heading and the next heading at same or higher level
-      let nodes = [];
-      let el = heading.nextElementSibling;
-      while(el && !(el.tagName && /H[1-3]/i.test(el.tagName)) ){
-        nodes.push(el);
-        el = el.nextElementSibling;
+        const grouped = groupByCategory(items);
+        renderMenu(menuContainer, grouped);
+      } catch (error) {
+        console.error(error);
+        menuContainer.innerHTML = `<p class="error-message">Error loading menu: ${error.message}</p>`;
       }
-      // combine into a temporary wrapper to query items
-      const tmp = document.createElement('div');
-      nodes.forEach(n=> tmp.appendChild(n.cloneNode(true)));
-      // find items inside tmp
-      let itemNodes = Array.from(tmp.querySelectorAll('.menu-item, .item, li, article, p'));
-      // very naive: treat each li/p as an item
-      const items = itemNodes.map(node=>{
-        let nameEl = node.querySelector('.item-name, .name, h3, h4, strong, b');
-        let iname = nameEl ? cleanText(nameEl) : null;
-        let desc = node.querySelector('.description, .desc, p, small') ? cleanText(node.querySelector('.description, .desc, p, small')) : null;
-        const text = cleanText(node);
-        const price = extractPrice(text);
-        if(!iname){
-          // try split by price or dash
-          let t = text;
-          if(price) t = t.replace(price,'').trim();
-          const parts = t.split(/—|–|-{1}/).map(p=>p.trim()).filter(Boolean);
-          iname = parts[0] || t.slice(0,60);
-          if(parts.length>1 && !desc) desc = parts.slice(1).join(' — ');
-        }
-        return { name: iname||'', desc: desc||'', price: price||'' };
-      });
-
-      cats.push({ name: cleanText(heading) || 'Uncategorized', items });
-    }
-    return cats;
-  }
-
-  try{
-    const resp = await fetch(MENU_SOURCE);
-    if(!resp.ok) throw new Error('Failed to fetch menu-data.html: ' + resp.status);
-    const htmlText = await resp.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlText, 'text/html');
-
-    // Strategy A: look for explicit category blocks
-    let catElems = Array.from(doc.querySelectorAll('.menu-category, .menu-section, .category, section.menu, section[class*="menu"], div.menu'));
-    if(catElems.length){
-      const cats = parseCategoryElements(catElems);
-      renderMenu(cats);
-      return;
     }
 
-    // Strategy B: look for top-level lists grouped by headings (h2/h3)
-    const catsByHeadings = parseByHeadings(doc);
-    if(catsByHeadings.length){
-      renderMenu(catsByHeadings);
-      return;
-    }
-
-    // Strategy C: If nothing, try to find any sensible list of items
-    const anyItems = Array.from(doc.querySelectorAll('.menu-item, .item, li')).filter(n => cleanText(n).length>0);
-    if(anyItems.length){
-      const items = anyItems.map(node => {
-        const nameEl = node.querySelector('.item-name, .name, strong, b') || node.querySelector('h3,h4');
-        const name = nameEl ? cleanText(nameEl) : (cleanText(node).split('\n')[0].slice(0,80));
-        const desc = node.querySelector('.description, .desc, p, small') ? cleanText(node.querySelector('.description, .desc, p, small')) : '';
-        const price = extractPrice(cleanText(node)) || '';
-        return { name, desc, price };
-      });
-      renderMenu([{ name:'Menu', items }]);
-      return;
-    }
-
-    // fallback: nothing found
-    renderMenu([]);
-  }catch(err){
-    menuContainer.innerHTML = '<div class="no-menu">Error loading menu: ' + (err && err.message ? err.message : 'Unknown error') + '</div>';
-    console.error(err);
-  }
-
-})();
-</script>
-
+    // Start the process
+    loadMenu();
+  </script>
 </body>
 </html>
