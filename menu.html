@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Hot Headz Southern Foods – 3D Cube Menu with Lock</title>
-  <meta name="description" content="Daily breakfast, lunch, crawfish, salad bar, drinks and desserts – now in 3D!">
+  <title>Hot Headz Southern Foods – 3D Cube Menu with Lock (Scrolling Fixed)</title>
 
   <!-- Google Fonts & Font Awesome -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -220,12 +219,9 @@
       align-items: center;
       touch-action: none; /* default: prevent scrolling while dragging */
     }
-    .hh-cube-wrapper.can-scroll {
-      touch-action: auto; /* allow scrolling inside */
-    }
     .hh-cube-container {
-      width: 220px;
-      height: 220px;
+      width: 240px;
+      height: 240px;
       position: relative;
       transform-style: preserve-3d;
       transform: rotateX(-10deg) rotateY(20deg) scale(1);
@@ -233,7 +229,7 @@
       will-change: transform;
     }
     @media (min-width: 600px) {
-      .hh-cube-container { width: 260px; height: 260px; }
+      .hh-cube-container { width: 280px; height: 280px; }
     }
     .hh-cube-face {
       position: absolute;
@@ -247,30 +243,30 @@
       display: flex;
       flex-direction: column;
       padding: 8px 6px;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
+      overflow-y: scroll; /* force scrollbar */
+      -webkit-overflow-scrolling: touch;
       backface-visibility: visible;
       color: #efe6d9;
       font-size: 11px;
       line-height: 1.2;
-      transform: rotateY(0deg) translateZ(110px);
+      transform: rotateY(0deg) translateZ(120px);
     }
     @media (min-width: 600px) {
-      .hh-cube-face { transform: rotateY(0deg) translateZ(130px); padding: 10px; font-size: 12px; }
+      .hh-cube-face { transform: rotateY(0deg) translateZ(140px); padding: 10px; font-size: 12px; }
     }
-    .hh-cube-face.front  { transform: rotateY(  0deg) translateZ(110px); }
-    .hh-cube-face.back   { transform: rotateY(180deg) translateZ(110px); }
-    .hh-cube-face.right  { transform: rotateY( 90deg) translateZ(110px); }
-    .hh-cube-face.left   { transform: rotateY(-90deg) translateZ(110px); }
-    .hh-cube-face.top    { transform: rotateX( 90deg) translateZ(110px); }
-    .hh-cube-face.bottom { transform: rotateX(-90deg) translateZ(110px); }
+    .hh-cube-face.front  { transform: rotateY(  0deg) translateZ(120px); }
+    .hh-cube-face.back   { transform: rotateY(180deg) translateZ(120px); }
+    .hh-cube-face.right  { transform: rotateY( 90deg) translateZ(120px); }
+    .hh-cube-face.left   { transform: rotateY(-90deg) translateZ(120px); }
+    .hh-cube-face.top    { transform: rotateX( 90deg) translateZ(120px); }
+    .hh-cube-face.bottom { transform: rotateX(-90deg) translateZ(120px); }
     @media (min-width: 600px) {
-      .hh-cube-face.front  { transform: rotateY(  0deg) translateZ(130px); }
-      .hh-cube-face.back   { transform: rotateY(180deg) translateZ(130px); }
-      .hh-cube-face.right  { transform: rotateY( 90deg) translateZ(130px); }
-      .hh-cube-face.left   { transform: rotateY(-90deg) translateZ(130px); }
-      .hh-cube-face.top    { transform: rotateX( 90deg) translateZ(130px); }
-      .hh-cube-face.bottom { transform: rotateX(-90deg) translateZ(130px); }
+      .hh-cube-face.front  { transform: rotateY(  0deg) translateZ(140px); }
+      .hh-cube-face.back   { transform: rotateY(180deg) translateZ(140px); }
+      .hh-cube-face.right  { transform: rotateY( 90deg) translateZ(140px); }
+      .hh-cube-face.left   { transform: rotateY(-90deg) translateZ(140px); }
+      .hh-cube-face.top    { transform: rotateX( 90deg) translateZ(140px); }
+      .hh-cube-face.bottom { transform: rotateX(-90deg) translateZ(140px); }
     }
     .hh-cube-category {
       font-weight: 800;
@@ -1186,7 +1182,7 @@
 
           buildAdvancedCarousel(data, calendarTodayISO);
 
-          // ========== CUBE INTEGRATION WITH LOCK ==========
+          // ========== CUBE INTEGRATION WITH LOCK (FIXED SCROLLING) ==========
           initDayCube('today', displayTodayISO, data, hoursToday, calendarTodayISO);
           initDayCube('tomorrow', displayTomorrowISO, data, hoursTomorrow, calendarTodayISO);
           initAdvancedCube(data, calendarTodayISO);
@@ -1199,7 +1195,7 @@
         }
       })();
 
-      // ----- CUBE FUNCTIONS WITH LOCK (FIXED SCROLLING) -----
+      // ----- CUBE FUNCTIONS WITH LOCK (SCROLLING FIXED) -----
       function initDayCube(dayId, isoDate, data, hours, todayISO) {
         const cube = document.getElementById(`${dayId}Cube`);
         if (!cube) return;
@@ -1312,12 +1308,12 @@
             if (locked) {
               lockBtn.innerHTML = '<i class="fas fa-unlock-alt"></i> Unlock';
               lockBtn.classList.add('locked');
-              wrapper.classList.add('can-scroll');
+              wrapper.style.touchAction = 'auto'; // directly set touch-action
               wrapper.style.cursor = 'default';
             } else {
               lockBtn.innerHTML = '<i class="fas fa-lock"></i> Lock';
               lockBtn.classList.remove('locked');
-              wrapper.classList.remove('can-scroll');
+              wrapper.style.touchAction = 'none';
               wrapper.style.cursor = 'grab';
             }
           });
@@ -1464,12 +1460,12 @@
             if (locked) {
               lockBtn.innerHTML = '<i class="fas fa-unlock-alt"></i> Unlock';
               lockBtn.classList.add('locked');
-              wrapper.classList.add('can-scroll');
+              wrapper.style.touchAction = 'auto';
               wrapper.style.cursor = 'default';
             } else {
               lockBtn.innerHTML = '<i class="fas fa-lock"></i> Lock';
               lockBtn.classList.remove('locked');
-              wrapper.classList.remove('can-scroll');
+              wrapper.style.touchAction = 'none';
               wrapper.style.cursor = 'grab';
             }
           });
