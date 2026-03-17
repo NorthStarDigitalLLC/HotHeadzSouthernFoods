@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hotheadz — Hologram Menu v2</title>
+  <title>Hotheadz — Hologram Menu v3 (Combo Pricing)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -113,17 +113,17 @@
     <section class="stage-wrap" aria-label="Hologram menu stage">
       <div class="glow-orb"></div><div class="beam"></div><div class="grid-overlay"></div><div class="floor"></div><div class="scanlines"></div><div class="vignette"></div>
       <div class="topbar">
-        <div class="brand"><div class="logo">HH</div><div><h1>Hotheadz Southern Foods</h1><p>Front card + circular stack behind it • categories first, items second</p></div></div>
+        <div class="brand"><div class="logo">HH</div><div><h1>Hotheadz Southern Foods</h1><p>Hologram menu with combo pricing – meats & sides</p></div></div>
         <div class="bar-actions"><button class="ghost-btn" id="reloadDataBtn">Reload menu-data.html</button><button class="ghost-btn" id="homeBtn">Categories</button><button class="ghost-btn" id="printBtn">Print</button><button class="btn" id="downloadBtn">Download file</button></div>
       </div>
       <div class="carousel-shell"><div class="ring-scene" id="ringScene" aria-live="polite"></div></div>
-      <div class="hero-copy"><div class="eyebrow" id="eyebrow">Hologram mode</div><h2 id="heroTitle">Browse categories</h2><p id="heroText">The front card is active. The rest stay in a circle behind it. Rotate left or right, then open a category to bring its menu items to the front of the ring.</p></div>
+      <div class="hero-copy"><div class="eyebrow" id="eyebrow">Hologram mode</div><h2 id="heroTitle">Browse categories</h2><p id="heroText">The front card is active. Use the ring to explore. Open a category to see its meats, sides, and other items.</p></div>
       <div class="ring-controls" aria-label="Carousel controls"><button class="ghost-btn" id="prevBtn" aria-label="Previous">◀</button><div class="counter" id="counter">1 / 1</div><button class="ghost-btn" id="nextBtn" aria-label="Next">▶</button><button class="chip-btn" id="actionBtn">Open</button></div>
     </section>
     <aside class="side" aria-label="Controls and order">
       <div class="panel">
         <h3>Data source</h3>
-        <div class="muted tiny">This version reads from <strong>menu-data.html</strong>. Keep all breakfast, lunch, drinks, specials, and other categories there. It tries JSON first, then script data, then HTML blocks.</div>
+        <div class="muted tiny">This version reads from <strong>menu-data.html</strong> (with meats & sides for Lunch).</div>
         <div class="search-row"><input class="input" id="dataUrlInput" value="menu-data.html" aria-label="Menu data URL" /></div>
         <div class="toolbar-grid"><button class="btn" id="loadBtn">Load source</button><button class="ghost-btn" id="useDemoBtn">Use demo data</button></div>
         <div class="status" id="statusText">Ready.</div>
@@ -132,57 +132,698 @@
         <div class="stats"><div class="stat"><div class="k">Categories</div><div class="v" id="statCategories">0</div></div><div class="stat"><div class="k">Items in view</div><div class="v" id="statItems">0</div></div></div>
       </div>
       <div class="panel"><h4>Search current view</h4><div class="search-row"><input id="searchInput" placeholder="Search categories or menu items" aria-label="Search current view" /></div></div>
-      <div class="panel" style="flex:1;display:flex;flex-direction:column;min-height:0"><h4>Order</h4><div class="cart-list" id="cartList"></div><div class="subtotal"><span>Subtotal</span><span id="subtotal">$0.00</span></div><div class="toolbar-grid"><button class="btn" id="checkoutBtn">Checkout</button><button class="ghost-btn" id="clearCartBtn">Clear cart</button></div></div>
+      <div class="panel" style="flex:1;display:flex;flex-direction:column;min-height:0">
+        <h4>Order builder <span style="color:var(--cyan);font-size:11px">(meats ≤3, sides ≤5)</span></h4>
+        <div class="stats" style="margin-top:0;margin-bottom:12px">
+          <div class="stat"><div class="k">Meats</div><div class="v" id="meatCount">0</div></div>
+          <div class="stat"><div class="k">Sides</div><div class="v" id="sideCount">0</div></div>
+        </div>
+        <div class="cart-list" id="cartList"></div>
+        <div class="subtotal"><span>Total</span><span id="subtotal">$0.00</span></div>
+        <div class="toolbar-grid"><button class="btn" id="checkoutBtn">Checkout</button><button class="ghost-btn" id="clearCartBtn">Clear cart</button></div>
+      </div>
     </aside>
   </div>
   <div id="printable" style="display:none"></div><div id="ariaLive" class="sr-only" aria-live="polite"></div>
   <script>
-    const STORAGE={dataUrl:'hotheadz_data_url_v2',cart:'hotheadz_cart_v2',cachedData:'hotheadz_menu_cache_v2'};
-    const DEMO_SOURCE={categories:[{id:'breakfast',title:'Breakfast',desc:'Biscuits, grits, early plates, and grab-and-go favorites.',badge:'Morning',image:'',tags:['biscuits','grits','eggs'],items:[{id:'biscuit-combo',title:'Biscuit Combo',desc:'Fluffy biscuit, eggs, sausage, and cheesy grits.',price:10.99,image:'',tags:['best seller']},{id:'chicken-waffle',title:'Chicken & Waffle',desc:'Crispy chicken over a warm waffle with syrup butter.',price:12.5,image:'',tags:['featured']},{id:'breakfast-plate',title:'Country Breakfast Plate',desc:'Eggs, bacon, toast, potatoes, and house jelly.',price:11.75,image:'',tags:['classic']}]},{id:'lunch',title:'Lunch',desc:'Daily lunch plates and Southern comfort staples.',badge:'Today',image:'',tags:['plates','daily menu'],items:[{id:'fried-chicken-plate',title:'Fried Chicken Plate',desc:'Crispy chicken, slaw, mac and cheese, and cornbread.',price:14.99,image:'',tags:['signature']},{id:'bbq-rib-plate',title:'BBQ Rib Plate',desc:'Sticky sweet heat ribs with beans and potato salad.',price:18.5,image:'',tags:['chef pick']},{id:'catfish-plate',title:'Catfish Plate',desc:'Cornmeal catfish with fries and remoulade.',price:15.25,image:'',tags:['seafood']}]},{id:'drinks',title:'Drinks',desc:'House brews, cold cans, tea, lemonade, and more.',badge:'Cold',image:'',tags:['tea','soda','refreshers'],items:[{id:'sweet-tea',title:'Southern Sweet Tea',desc:'Fresh brewed, lemon optional.',price:2.75,image:'',tags:['house']},{id:'lemonade',title:'Fresh Lemonade',desc:'Bright, tart, and lightly sweetened.',price:3.25,image:'',tags:['fresh']},{id:'bottled-water',title:'Bottled Water',desc:'Cold bottled water.',price:1.75,image:'',tags:['simple']}]},{id:'desserts',title:'Desserts',desc:'Sweet finishers baked for the soul.',badge:'Sweet',image:'',tags:['cakes','pies'],items:[{id:'banana-pudding',title:'Banana Pudding',desc:'Creamy banana pudding topped with wafers.',price:5.5,image:'',tags:['popular']},{id:'peach-cobbler',title:'Peach Cobbler',desc:'Warm cobbler with buttery crumble.',price:6.25,image:'',tags:['warm']}]}]};
-    const state={source:null,categories:[],currentCategoryId:null,view:'categories',ringIndex:0,ringEntries:[],filteredEntries:[],cart:loadJSON(STORAGE.cart,{}),dataUrl:localStorage.getItem(STORAGE.dataUrl)||'menu-data.html'};
-    const els={ringScene:document.getElementById('ringScene'),counter:document.getElementById('counter'),heroTitle:document.getElementById('heroTitle'),heroText:document.getElementById('heroText'),eyebrow:document.getElementById('eyebrow'),actionBtn:document.getElementById('actionBtn'),status:document.getElementById('statusText'),cartList:document.getElementById('cartList'),subtotal:document.getElementById('subtotal'),pathbar:document.getElementById('pathbar'),searchInput:document.getElementById('searchInput'),statCategories:document.getElementById('statCategories'),statItems:document.getElementById('statItems'),dataUrlInput:document.getElementById('dataUrlInput'),printable:document.getElementById('printable'),ariaLive:document.getElementById('ariaLive')};
-    function loadJSON(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
-    function saveJSON(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch{}}
-    function announce(msg){els.ariaLive.textContent=msg;els.status.textContent=msg}
-    function currency(n){return '$'+Number(n||0).toFixed(2)}
-    function slug(s){return String(s||'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}
-    function escapeHtml(s){return String(s||'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-    function normalizeItem(item,categoryTitle=''){const priceValue=typeof item.price==='string'?parseFloat(item.price.replace(/[^0-9.]/g,'')):Number(item.price||item.cost||0);return{id:item.id||slug(item.title||item.name||Math.random().toString(36).slice(2)),title:item.title||item.name||'Untitled item',desc:item.desc||item.description||item.summary||'',price:Number.isFinite(priceValue)?priceValue:0,image:item.image||item.img||item.photo||'',tags:Array.isArray(item.tags)?item.tags:inferTags(item,categoryTitle),badge:item.badge||categoryTitle||'Menu Item',categoryId:item.categoryId||slug(categoryTitle)}}
-    function normalizeCategory(category){const title=category.title||category.name||category.category||'Category';const items=Array.isArray(category.items)?category.items.map(item=>normalizeItem(item,title)):[];return{id:category.id||slug(title),title,desc:category.desc||category.description||`${title} menu`,badge:category.badge||'Category',image:category.image||category.img||category.photo||firstImage(items),tags:Array.isArray(category.tags)?category.tags:inferCategoryTags(title,items),items}}
-    function firstImage(items){return (items.find(i=>i.image)||{}).image||''}
-    function inferTags(item,categoryTitle=''){const tags=[];if(categoryTitle)tags.push(categoryTitle);if(item.featured)tags.push('featured');if(item.spicy)tags.push('spicy');if(item.vegetarian)tags.push('vegetarian');return tags.filter(Boolean).slice(0,3)}
-    function inferCategoryTags(title,items){const tags=[title];if(items.length)tags.push(items.length+' items');return tags.slice(0,3)}
-    function setSourceData(raw,originLabel='data'){const normalized=normalizeSource(raw);state.source=normalized;state.categories=normalized.categories;saveJSON(STORAGE.cachedData,normalized);state.currentCategoryId=null;state.view='categories';state.ringIndex=0;els.statCategories.textContent=String(state.categories.length);refreshEntries();renderPath();renderCart();updateHero();announce(`Loaded ${state.categories.length} categories from ${originLabel}.`)}
-    function normalizeSource(raw){if(Array.isArray(raw?.categories))return{categories:raw.categories.map(normalizeCategory)};if(Array.isArray(raw?.menu))return{categories:raw.menu.map(normalizeCategory)};if(Array.isArray(raw)){if(raw.length&&raw[0]?.items)return{categories:raw.map(normalizeCategory)};const grouped={};raw.forEach(entry=>{const cat=entry.category||entry.section||'Menu';grouped[cat]??={title:cat,items:[]};grouped[cat].items.push(entry)});return{categories:Object.values(grouped).map(normalizeCategory)}}return{categories:DEMO_SOURCE.categories.map(normalizeCategory)}}
-    async function loadMenuData(url){const finalUrl=url||state.dataUrl||'menu-data.html';state.dataUrl=finalUrl;localStorage.setItem(STORAGE.dataUrl,finalUrl);els.dataUrlInput.value=finalUrl;announce(`Loading ${finalUrl}...`);const res=await fetch(finalUrl,{cache:'no-store'});if(!res.ok)throw new Error(`HTTP ${res.status}`);const text=await res.text();const parsed=parseMenuDataText(text,finalUrl);setSourceData(parsed,finalUrl)}
-    function parseMenuDataText(text,baseUrl=''){const trimmed=text.trim();try{return JSON.parse(trimmed)}catch{}const parser=new DOMParser();const doc=parser.parseFromString(trimmed,'text/html');const jsonBlocks=Array.from(doc.querySelectorAll('script[type="application/json"], script[type="application/ld+json"], template[data-menu-json], script[data-menu]'));for(const block of jsonBlocks){const raw=(block.textContent||'').trim();if(!raw)continue;try{return JSON.parse(raw)}catch{}}const scriptText=Array.from(doc.scripts).map(s=>s.textContent||'').join('\n\n');const candidates=extractJsonCandidates(scriptText);for(const candidate of candidates){try{return JSON.parse(candidate)}catch{}}const htmlParsed=parseMenuFromHtmlBlocks(doc,baseUrl);if(htmlParsed.categories.length)return htmlParsed;throw new Error('Could not parse menu-data.html. Provide JSON, a data script, or structured HTML blocks.')}
-    function extractJsonCandidates(text){const out=[];const patterns=[/(?:window\.|const\s+|let\s+|var\s+)?(?:menuData|MENU_DATA|menu|MENU)\s*=\s*(\{[\s\S]*?\}|\[[\s\S]*?\]);?/g,/(?:window\.|const\s+|let\s+|var\s+)?(?:categories|CATEGORIES)\s*=\s*(\[[\s\S]*?\]);?/g];for(const pattern of patterns){let match;while((match=pattern.exec(text))){out.push(match[1])}}return out}
-    function parseMenuFromHtmlBlocks(doc,baseUrl=''){const categoryMap=new Map();const sectionSelectors=['[data-menu-category]','.menu-category','.menu-section','section[data-category]','section[id]','.category'];let sections=[];for(const sel of sectionSelectors){const found=Array.from(doc.querySelectorAll(sel));if(found.length>sections.length)sections=found}if(!sections.length){const menuItems=Array.from(doc.querySelectorAll('[data-item], .menu-item, .item, .dish, li, article'));menuItems.forEach(node=>{const catName=node.getAttribute('data-category')||'Menu';if(!categoryMap.has(catName))categoryMap.set(catName,{title:catName,items:[]});const parsed=parseItemNode(node,catName,baseUrl);if(parsed)categoryMap.get(catName).items.push(parsed)})}else{sections.forEach(section=>{const title=section.getAttribute('data-menu-category')||section.getAttribute('data-category')||section.getAttribute('aria-label')||(section.querySelector('h1,h2,h3,h4,.title,.heading')?.textContent||section.id||'Menu').trim();if(!categoryMap.has(title))categoryMap.set(title,{title,desc:'',image:'',items:[]});const bucket=categoryMap.get(title);bucket.desc||=(section.querySelector('p,.desc,.description')?.textContent||'').trim();const sectionImg=section.querySelector('img');if(sectionImg&&!bucket.image)bucket.image=absolutize(sectionImg.getAttribute('src')||'',baseUrl);const nodes=Array.from(section.querySelectorAll('[data-item], .menu-item, .item, .dish, li, article')).filter(n=>n!==section);nodes.forEach(node=>{const parsed=parseItemNode(node,title,baseUrl);if(parsed)bucket.items.push(parsed)})})}const categories=Array.from(categoryMap.values()).map(cat=>normalizeCategory(cat)).filter(cat=>cat.items.length||cat.title);return{categories}}
-    function parseItemNode(node,categoryTitle,baseUrl=''){const text=(node.textContent||'').replace(/\s+/g,' ').trim();if(!text)return null;const title=node.getAttribute('data-title')||node.querySelector('h2,h3,h4,strong,.item-title,.title,.name')?.textContent?.trim()||text.split('$')[0].split('·')[0].slice(0,60).trim();if(!title)return null;const desc=node.getAttribute('data-desc')||node.querySelector('p,.desc,.description,.summary')?.textContent?.trim()||'';const priceMatch=(node.getAttribute('data-price')||text).match(/\$\s*([0-9]+(?:\.[0-9]{1,2})?)/);const price=priceMatch?parseFloat(priceMatch[1]):0;const img=node.querySelector('img')?.getAttribute('src')||node.getAttribute('data-image')||'';return normalizeItem({id:node.getAttribute('data-id')||slug(title),title,desc,price,image:absolutize(img,baseUrl),tags:[node.getAttribute('data-tag'),categoryTitle].filter(Boolean)},categoryTitle)}
-    function absolutize(path,base){if(!path)return '';try{return new URL(path,base||location.href).href}catch{return path}}
-    function currentCategory(){return state.categories.find(c=>c.id===state.currentCategoryId)||null}
-    function baseEntries(){if(state.view==='items'){const cat=currentCategory();return cat?cat.items:[]}return state.categories}
-    function refreshEntries(){const q=els.searchInput.value.trim().toLowerCase();state.ringEntries=baseEntries();state.filteredEntries=q?state.ringEntries.filter(entry=>[entry.title,entry.desc,...(entry.tags||[])].join(' ').toLowerCase().includes(q)):state.ringEntries.slice();if(state.ringIndex>=state.filteredEntries.length)state.ringIndex=0;renderRing();updateHero();renderPath();els.statItems.textContent=String(state.filteredEntries.length);syncViewButtons()}
-    function renderRing(){const entries=state.filteredEntries;els.ringScene.innerHTML='';if(!entries.length){els.ringScene.innerHTML='<div style="position:absolute;inset:50% auto auto 50%;transform:translate(-50%,-50%);padding:18px 22px;border-radius:20px;background:rgba(10,21,36,.8);border:1px solid rgba(255,255,255,.08);box-shadow:0 24px 60px rgba(0,0,0,.4)">No items in this view.</div>';els.counter.textContent='0 / 0';return}const total=entries.length;const radius=Math.min(window.innerWidth<760?260:360,300+total*8);entries.forEach((entry,idx)=>{const relative=((idx-state.ringIndex)%total+total)%total;const signed=relative>total/2?relative-total:relative;const angle=(Math.PI*2/total)*signed;const x=Math.sin(angle)*radius;const z=Math.cos(angle)*-1*Number(getComputedStyle(document.documentElement).getPropertyValue('--ringDepth').replace('px','')||340);const scale=signed===0?1:Math.max(.72,1-Math.abs(signed)*.08);const opacity=signed===0?1:Math.max(.28,1-Math.abs(signed)*.16);const tilt=signed===0?0:signed*-8;const y=signed===0?-20:Math.abs(signed)*10;const card=document.createElement('article');card.className='ring-card'+(signed===0?' is-front':'');card.style.transform=`translate3d(calc(-50% + ${x}px), calc(-50% + ${y}px), ${z}px) rotateY(${tilt}deg) scale(${scale})`;card.style.opacity=opacity;card.style.filter=signed===0?'none':`blur(${Math.min(Math.abs(signed)*1.6,6)}px)`;card.style.zIndex=String(1000-Math.abs(signed));const isCategory=state.view==='categories';const image=entry.image||'';card.innerHTML=`<div class="card-image">${image?`<img src="${escapeHtml(image)}" alt="${escapeHtml(entry.title)}">`:`<div class="placeholder">${escapeHtml(entry.title)}</div>`}<div class="badge-row"><div class="card-badge">${escapeHtml(entry.badge||(isCategory?'Category':'Menu item'))}</div><div class="card-price">${isCategory?`${entry.items?.length||0} items`:currency(entry.price)}</div></div></div><div class="card-body"><div class="card-kicker">${isCategory?'Category portal':'Selected item'}</div><div class="card-title">${escapeHtml(entry.title)}</div><div class="card-desc">${escapeHtml(entry.desc||(isCategory?'Open this category to see all available dishes.':'No description yet.'))}</div><div class="tag-row">${(entry.tags||[]).slice(0,4).map(tag=>`<span class="tag">${escapeHtml(tag)}</span>`).join('')}</div><div class="card-actions">${signed===0?(isCategory?'<button class="btn" data-action="open">Open category</button><button class="ghost-btn" data-action="next">Next</button>':'<button class="btn" data-action="add">Add to order</button><button class="ghost-btn" data-action="back">Back</button>'):'<button class="ghost-btn" data-action="focus">Bring forward</button>'}</div></div>`;card.addEventListener('click',evt=>{const targetAction=evt.target.closest('[data-action]')?.dataset.action;if(targetAction){handleCardAction(targetAction,idx);return}if(idx!==state.ringIndex){state.ringIndex=idx;renderRing();updateHero()}else{primaryAction()}});els.ringScene.appendChild(card)});els.counter.textContent=`${state.ringIndex+1} / ${entries.length}`;updateActionButton()}
-    function handleCardAction(action,idx){if(typeof idx==='number'&&idx!==state.ringIndex)state.ringIndex=idx;if(action==='focus'||action==='next'){rotate(1);return}if(action==='open'){openFrontCategory();return}if(action==='add'){addFrontItemToCart();return}if(action==='back')goHome()}
-    function updateHero(){const entries=state.filteredEntries;const entry=entries[state.ringIndex]||null;if(state.view==='categories'){els.eyebrow.textContent='Category hologram';els.heroTitle.textContent=entry?entry.title:'Browse categories';els.heroText.textContent=entry?`${entry.desc||'Open this category to see its menu items.'} ${entry.items?.length||0} item${(entry.items?.length||0)===1?'':'s'} inside.`:'Use the ring to browse categories.'}else{const cat=currentCategory();els.eyebrow.textContent=cat?`${cat.title} menu`:'Item hologram';els.heroTitle.textContent=entry?entry.title:'Browse items';els.heroText.textContent=entry?`${entry.desc||'Select this item to add it to the order.'} ${currency(entry.price)}.`:'Open a category to browse items.'}}
-    function updateActionButton(){els.actionBtn.textContent=state.view==='categories'?'Open':'Add to cart'}
-    function syncViewButtons(){document.querySelectorAll('[data-view]').forEach(btn=>btn.classList.toggle('active',btn.dataset.view===state.view))}
-    function renderPath(){const bits=['Hotheadz'];if(state.view==='categories')bits.push('Categories');else{const cat=currentCategory();bits.push('Categories');if(cat)bits.push(cat.title)}els.pathbar.innerHTML=bits.map(bit=>`<span class="crumb">${escapeHtml(bit)}</span>`).join('')}
-    function rotate(direction){const entries=state.filteredEntries;if(!entries.length)return;state.ringIndex=(state.ringIndex+direction+entries.length)%entries.length;renderRing();updateHero()}
-    function primaryAction(){if(state.view==='categories')openFrontCategory();else addFrontItemToCart()}
-    function openFrontCategory(){const entry=state.filteredEntries[state.ringIndex];if(!entry)return;state.currentCategoryId=entry.id;state.view='items';state.ringIndex=0;refreshEntries();announce(`${entry.title} opened.`)}
-    function goHome(){state.view='categories';state.currentCategoryId=null;state.ringIndex=0;refreshEntries();announce('Returned to categories.')}
-    function addFrontItemToCart(){const entry=state.filteredEntries[state.ringIndex];if(!entry)return;state.cart[entry.id]??={...entry,qty:0};state.cart[entry.id].qty+=1;saveJSON(STORAGE.cart,state.cart);renderCart();announce(`${entry.title} added to cart.`)}
-    function renderCart(){const values=Object.values(state.cart);if(!values.length){els.cartList.innerHTML='<div class="muted tiny">No items in the order yet.</div>';els.subtotal.textContent=currency(0);return}els.cartList.innerHTML=values.map(item=>`<div class="cart-item"><div class="cart-thumb">${item.image?`<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}">`:`<img src="${placeholderImage(item.title)}" alt="${escapeHtml(item.title)}">`}</div><div><div class="cart-name">${escapeHtml(item.title)}</div><div class="cart-desc">${escapeHtml(item.desc||'')}</div><div class="qty"><button class="ghost-btn" data-cart="dec" data-id="${escapeHtml(item.id)}">−</button><span>${item.qty}</span><button class="ghost-btn" data-cart="inc" data-id="${escapeHtml(item.id)}">+</button></div></div><div style="font-weight:800">${currency(item.qty*item.price)}</div></div>`).join('');const subtotal=values.reduce((sum,item)=>sum+item.qty*item.price,0);els.subtotal.textContent=currency(subtotal)}
-    function changeQty(id,delta){const item=state.cart[id];if(!item)return;item.qty+=delta;if(item.qty<=0)delete state.cart[id];saveJSON(STORAGE.cart,state.cart);renderCart()}
-    function placeholderImage(text){const c=document.createElement('canvas');c.width=300;c.height=220;const ctx=c.getContext('2d');const grad=ctx.createLinearGradient(0,0,300,220);grad.addColorStop(0,'#183447');grad.addColorStop(1,'#0b1220');ctx.fillStyle=grad;ctx.fillRect(0,0,300,220);ctx.fillStyle='rgba(81,235,255,.12)';ctx.beginPath();ctx.arc(220,40,70,0,Math.PI*2);ctx.fill();ctx.fillStyle='#f3fdff';ctx.textAlign='center';ctx.font='bold 28px Inter, sans-serif';wrapText(ctx,text||'Menu item',150,108,220,32);return c.toDataURL('image/png')}
-    function wrapText(ctx,text,x,y,maxWidth,lineHeight){const words=String(text).split(/\s+/);let line='';let cy=y;for(let i=0;i<words.length;i++){const test=line+words[i]+' ';if(ctx.measureText(test).width>maxWidth&&i>0){ctx.fillText(line.trim(),x,cy);line=words[i]+' ';cy+=lineHeight}else line=test}ctx.fillText(line.trim(),x,cy)}
-    function printMenu(){const categories=state.categories;els.printable.innerHTML=`<h1 style="margin:0 0 16px">Hotheadz Southern Foods</h1>${categories.map(cat=>`<section style="margin-bottom:18px"><h2 style="margin:0 0 8px">${escapeHtml(cat.title)}</h2><p style="margin:0 0 10px;color:#444">${escapeHtml(cat.desc||'')}</p>${(cat.items||[]).map(item=>`<div style="padding:8px 0;border-bottom:1px solid #ddd"><strong>${escapeHtml(item.title)}</strong><span style="float:right">${currency(item.price)}</span><div style="margin-top:4px;color:#555">${escapeHtml(item.desc||'')}</div></div>`).join('')}</section>`).join('')}`;window.print()}
-    function downloadFile(){const blob=new Blob(['<!doctype html>\n'+document.documentElement.outerHTML],{type:'text/html'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='hotheadz-hologram-menu-v2.html';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200)}
-    function bindEvents(){document.getElementById('prevBtn').addEventListener('click',()=>rotate(-1));document.getElementById('nextBtn').addEventListener('click',()=>rotate(1));els.actionBtn.addEventListener('click',primaryAction);document.getElementById('homeBtn').addEventListener('click',goHome);document.getElementById('downloadBtn').addEventListener('click',downloadFile);document.getElementById('printBtn').addEventListener('click',printMenu);document.getElementById('loadBtn').addEventListener('click',async()=>{try{await loadMenuData(els.dataUrlInput.value.trim())}catch(err){fallbackFromError(err)}});document.getElementById('reloadDataBtn').addEventListener('click',async()=>{try{await loadMenuData(els.dataUrlInput.value.trim())}catch(err){fallbackFromError(err)}});document.getElementById('useDemoBtn').addEventListener('click',()=>setSourceData(DEMO_SOURCE,'demo data'));document.getElementById('checkoutBtn').addEventListener('click',()=>alert('Demo checkout placeholder.'));document.getElementById('clearCartBtn').addEventListener('click',()=>{state.cart={};saveJSON(STORAGE.cart,state.cart);renderCart();announce('Cart cleared.')});els.searchInput.addEventListener('input',refreshEntries);els.dataUrlInput.addEventListener('change',()=>{state.dataUrl=els.dataUrlInput.value.trim()||'menu-data.html';localStorage.setItem(STORAGE.dataUrl,state.dataUrl)});document.querySelectorAll('[data-view]').forEach(btn=>btn.addEventListener('click',()=>{if(btn.dataset.view==='categories')goHome();if(btn.dataset.view==='items'&&currentCategory()){state.view='items';state.ringIndex=0;refreshEntries();announce(`${currentCategory().title} items shown.`)}}));document.addEventListener('click',evt=>{const t=evt.target.closest('[data-cart]');if(!t)return;const id=t.dataset.id;const type=t.dataset.cart;changeQty(id,type==='inc'?1:-1)});window.addEventListener('keydown',evt=>{if(evt.key==='ArrowLeft')rotate(-1);if(evt.key==='ArrowRight')rotate(1);if(evt.key==='Enter')primaryAction();if(evt.key==='Escape')goHome()});let touchStartX=0;els.ringScene.addEventListener('touchstart',e=>touchStartX=e.changedTouches[0].clientX,{passive:true});els.ringScene.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-touchStartX;if(Math.abs(dx)>40)rotate(dx>0?-1:1)},{passive:true})}
-    function fallbackFromError(err){console.error(err);const cached=loadJSON(STORAGE.cachedData,null);if(cached?.categories?.length){setSourceData(cached,'cached data');announce(`Could not reload source. Using cached data. ${err.message||err}`);return}setSourceData(DEMO_SOURCE,'demo data');announce(`Could not load menu-data.html. Using demo data. ${err.message||err}`)}
-    async function boot(){bindEvents();els.dataUrlInput.value=state.dataUrl;try{await loadMenuData(state.dataUrl)}catch(err){fallbackFromError(err)}renderCart()}
+    // -------------------- SETUP --------------------
+    const STORAGE={dataUrl:'hotheadz_data_url_v3',cart:'hotheadz_cart_v3',cachedData:'hotheadz_menu_cache_v3'};
+    // Combo pricing (adjust as needed)
+    const COMBO_PRICES = { meat1:12.99, meat2:15.99, meat3:19.99, extraSide:2.99 };
+    const MAX_MEATS = 3, MAX_SIDES = 5;
+
+    // Fallback demo data (in case menu-data.html cannot be loaded)
+    const DEMO_SOURCE = {
+      categories: [
+        { id:'breakfast', title:'Breakfast', desc:'Biscuits, grits, early plates.', badge:'Morning', items:[
+            { id:'biscuit-combo', title:'Biscuit Combo', desc:'Fluffy biscuit, eggs, sausage, cheesy grits.', price:10.99, tags:['best seller'] },
+            { id:'chicken-waffle', title:'Chicken & Waffle', desc:'Crispy chicken over a warm waffle.', price:12.5, tags:['featured'] }
+        ]},
+        { id:'lunch', title:'Lunch', desc:'Choose meats & sides – combo pricing.', badge:'Today', meats:[
+            { name:'Pulled Pork' }, { name:'Fried Chicken' }, { name:'Beef Brisket' }
+          ], sides:[
+            { name:'French Fries' }, { name:'Mac & Cheese' }, { name:'Cole Slaw' }
+        ]},
+        { id:'drinks', title:'Drinks', desc:'House brews, tea, lemonade.', items:[
+            { id:'sweet-tea', title:'Sweet Tea', price:2.49 },
+            { id:'coke', title:'Coke', price:2.59 }
+        ]}
+      ]
+    };
+
+    // -------------------- GLOBAL STATE --------------------
+    const state = {
+      source: null,
+      categories: [],          // normalized categories
+      currentCategoryId: null,
+      view: 'categories',
+      ringIndex: 0,
+      ringEntries: [],
+      filteredEntries: [],
+      cart: loadJSON(STORAGE.cart, {}),  // { id: { id, name, type, price, qty, category } }
+      dataUrl: localStorage.getItem(STORAGE.dataUrl) || 'menu-data.html'
+    };
+
+    const els = {
+      ringScene: document.getElementById('ringScene'),
+      counter: document.getElementById('counter'),
+      heroTitle: document.getElementById('heroTitle'),
+      heroText: document.getElementById('heroText'),
+      eyebrow: document.getElementById('eyebrow'),
+      actionBtn: document.getElementById('actionBtn'),
+      status: document.getElementById('statusText'),
+      cartList: document.getElementById('cartList'),
+      subtotal: document.getElementById('subtotal'),
+      meatCount: document.getElementById('meatCount'),
+      sideCount: document.getElementById('sideCount'),
+      pathbar: document.getElementById('pathbar'),
+      searchInput: document.getElementById('searchInput'),
+      statCategories: document.getElementById('statCategories'),
+      statItems: document.getElementById('statItems'),
+      dataUrlInput: document.getElementById('dataUrlInput'),
+      printable: document.getElementById('printable'),
+      ariaLive: document.getElementById('ariaLive')
+    };
+
+    // -------------------- HELPER FUNCTIONS --------------------
+    function loadJSON(key, fallback) {
+      try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
+    }
+    function saveJSON(key, value) {
+      try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+    }
+    function announce(msg) {
+      els.ariaLive.textContent = msg;
+      els.status.textContent = msg;
+    }
+    function currency(n) { return '$' + Number(n||0).toFixed(2); }
+    function slug(s) { return String(s||'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+    function escapeHtml(s) {
+      return String(s||'').replace(/[&<>\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+    }
+
+    // -------------------- NORMALIZE MENU DATA (Hot Headz format) --------------------
+    // Convert raw menu-data (with defaults/menus) into an array of category objects
+    // Each category: { id, title, desc, badge, items: array of { id, title, desc, price, type, image? } }
+    function normalizeMenuData(raw) {
+      // Use defaults as base, then merge daily menus? For simplicity, we'll just use defaults for now.
+      // In a full implementation you'd merge with today's date. For this demo, we'll use defaults.
+      const def = raw.defaults || {};
+      const cats = [];
+
+      // Breakfast
+      if (def.breakfast) {
+        const items = [];
+        // plates
+        (def.breakfast.plates || []).forEach(p => {
+          if (typeof p === 'string') {
+            const price = parseFloat(p.match(/\$([0-9.]+)/)?.[1] || 0);
+            items.push({ id: slug(p), title: p.replace(/\$[0-9.]+/,'').trim(), desc: '', price, type: 'breakfast' });
+          } else if (p.name) {
+            items.push({ id: slug(p.name), title: p.name, desc: p.desc || '', price: parseFloat(p.price) || 0, type: 'breakfast' });
+          }
+        });
+        // items
+        (def.breakfast.items || []).forEach(i => {
+          if (typeof i === 'string') {
+            const price = parseFloat(i.match(/\$([0-9.]+)/)?.[1] || 0);
+            items.push({ id: slug(i), title: i.replace(/\$[0-9.]+/,'').trim(), desc: '', price, type: 'breakfast' });
+          } else if (i.name) {
+            items.push({ id: slug(i.name), title: i.name, desc: i.desc || '', price: parseFloat(i.price) || 0, type: 'breakfast' });
+          }
+        });
+        cats.push({
+          id: 'breakfast',
+          title: 'Breakfast',
+          desc: def.breakfast.subtitle || 'Morning favorites',
+          badge: 'Morning',
+          items
+        });
+      }
+
+      // Lunch – special: meats and sides as separate items with price 0 (combo pricing)
+      if (def.lunch) {
+        const items = [];
+        // meats
+        (def.lunch.meats || []).forEach(m => {
+          const name = typeof m === 'string' ? m : m.name;
+          items.push({ id: slug('meat-'+name), title: name, desc: (m.desc||''), price: 0, type: 'meat', category: 'Lunch' });
+        });
+        // sides
+        (def.lunch.sides || []).forEach(s => {
+          const name = typeof s === 'string' ? s : s.name;
+          items.push({ id: slug('side-'+name), title: name, desc: (s.desc||''), price: 0, type: 'side', category: 'Lunch' });
+        });
+        // plates (standalone, e.g., child lunch) – treat as standalone items with price
+        (def.lunch.plates || []).forEach(p => {
+          if (typeof p === 'string') {
+            const price = parseFloat(p.match(/\$([0-9.]+)/)?.[1] || 0);
+            items.push({ id: slug(p), title: p.replace(/\$[0-9.]+/,'').trim(), desc: '', price, type: 'plate' });
+          } else if (p.name) {
+            items.push({ id: slug(p.name), title: p.name, desc: p.desc||'', price: parseFloat(p.price)||0, type: 'plate' });
+          }
+        });
+        cats.push({
+          id: 'lunch',
+          title: 'Lunch',
+          desc: def.lunch.subtitle || 'Daily lunch – meats & sides combo',
+          badge: 'Today',
+          items
+        });
+      }
+
+      // Crawfish
+      if (def.crawfish) {
+        const items = (def.crawfish.items || []).map(i => {
+          if (typeof i === 'string') {
+            const price = parseFloat(i.match(/\$([0-9.]+)/)?.[1] || 0);
+            return { id: slug(i), title: i.replace(/\$[0-9.]+/,'').trim(), desc: '', price, type: 'crawfish' };
+          } else if (i.name) {
+            return { id: slug(i.name), title: i.name, desc: i.desc||'', price: parseFloat(i.price)||0, type: 'crawfish' };
+          }
+        }).filter(Boolean);
+        cats.push({
+          id: 'crawfish',
+          title: 'Crawfish',
+          desc: def.crawfish.subtitle || 'Seasonal',
+          badge: 'Seafood',
+          items
+        });
+      }
+
+      // Salad Bar
+      if (def.salad) {
+        const items = [];
+        (def.salad.items || []).forEach(i => {
+          if (typeof i === 'string') {
+            const price = parseFloat(i.match(/\$([0-9.]+)/)?.[1] || 0);
+            items.push({ id: slug(i), title: i.replace(/\$[0-9.]+/,'').trim(), desc: '', price, type: 'salad' });
+          } else if (i.name) {
+            items.push({ id: slug(i.name), title: i.name, desc: i.desc||'', price: parseFloat(i.price)||0, type: 'salad' });
+          }
+        });
+        // toppings etc. can be added as items with price 0 (display only) – we'll skip for now
+        cats.push({
+          id: 'salad-bar',
+          title: 'Salad Bar',
+          desc: def.salad.subtitle || 'Fresh options',
+          badge: 'Salad',
+          items
+        });
+      }
+
+      // Drinks
+      if (def.drinks) {
+        const items = (def.drinks.items || []).map(i => {
+          if (typeof i === 'string') {
+            const price = parseFloat(i.match(/\$([0-9.]+)/)?.[1] || 0);
+            return { id: slug(i), title: i.replace(/\$[0-9.]+/,'').trim(), desc: '', price, type: 'drink' };
+          } else if (i.name) {
+            return { id: slug(i.name), title: i.name, desc: i.desc||'', price: parseFloat(i.price)||0, type: 'drink' };
+          }
+        }).filter(Boolean);
+        cats.push({
+          id: 'drinks',
+          title: 'Drinks',
+          desc: def.drinks.subtitle || 'Cold extras',
+          badge: 'Drinks',
+          items
+        });
+      }
+
+      // Dessert
+      if (def.dessert) {
+        const items = (def.dessert.items || []).map(i => {
+          if (typeof i === 'string') {
+            const price = parseFloat(i.match(/\$([0-9.]+)/)?.[1] || 0);
+            return { id: slug(i), title: i.replace(/\$[0-9.]+/,'').trim(), desc: '', price, type: 'dessert' };
+          } else if (i.name) {
+            return { id: slug(i.name), title: i.name, desc: i.desc||'', price: parseFloat(i.price)||0, type: 'dessert' };
+          }
+        }).filter(Boolean);
+        cats.push({
+          id: 'dessert',
+          title: 'Dessert',
+          desc: def.dessert.subtitle || 'Sweet finish',
+          badge: 'Dessert',
+          items
+        });
+      }
+
+      return { categories: cats };
+    }
+
+    // -------------------- LOAD MENU DATA FROM menu-data.html --------------------
+    async function loadMenuData(url) {
+      const finalUrl = url || state.dataUrl || 'menu-data.html';
+      state.dataUrl = finalUrl;
+      localStorage.setItem(STORAGE.dataUrl, finalUrl);
+      els.dataUrlInput.value = finalUrl;
+      announce(`Loading ${finalUrl}...`);
+
+      try {
+        const res = await fetch(finalUrl, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+
+        // Try to parse JSON from script tag or directly
+        let raw;
+        // First try: look for a script tag with id="hh-menu-data" or type="application/json"
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, 'text/html');
+        const script = doc.querySelector('#hh-menu-data, script[type="application/json"]');
+        if (script) {
+          raw = JSON.parse(script.textContent.trim());
+        } else {
+          // fallback: treat whole file as JSON
+          raw = JSON.parse(text);
+        }
+
+        const normalized = normalizeMenuData(raw);
+        setSourceData(normalized, finalUrl);
+      } catch (err) {
+        console.error(err);
+        fallbackFromError(err);
+      }
+    }
+
+    function setSourceData(src, originLabel) {
+      state.source = src;
+      state.categories = src.categories || [];
+      saveJSON(STORAGE.cachedData, src);
+      state.currentCategoryId = null;
+      state.view = 'categories';
+      state.ringIndex = 0;
+      els.statCategories.textContent = String(state.categories.length);
+      refreshEntries();
+      renderPath();
+      renderCart();
+      updateHero();
+      announce(`Loaded ${state.categories.length} categories from ${originLabel}.`);
+    }
+
+    function fallbackFromError(err) {
+      const cached = loadJSON(STORAGE.cachedData, null);
+      if (cached?.categories?.length) {
+        setSourceData(cached, 'cached data');
+        announce(`Could not reload source. Using cached data. ${err.message||err}`);
+        return;
+      }
+      // use demo data as last resort
+      setSourceData(DEMO_SOURCE, 'demo data');
+      announce(`Could not load menu-data.html. Using demo data. ${err.message||err}`);
+    }
+
+    // -------------------- RING & UI HELPERS --------------------
+    function currentCategory() {
+      return state.categories.find(c => c.id === state.currentCategoryId) || null;
+    }
+
+    function baseEntries() {
+      if (state.view === 'items') {
+        const cat = currentCategory();
+        return cat ? cat.items : [];
+      }
+      return state.categories;
+    }
+
+    function refreshEntries() {
+      const q = els.searchInput.value.trim().toLowerCase();
+      state.ringEntries = baseEntries();
+      state.filteredEntries = q
+        ? state.ringEntries.filter(e => [e.title, e.desc, ...(e.tags||[])].join(' ').toLowerCase().includes(q))
+        : state.ringEntries.slice();
+      if (state.ringIndex >= state.filteredEntries.length) state.ringIndex = 0;
+      renderRing();
+      updateHero();
+      renderPath();
+      els.statItems.textContent = String(state.filteredEntries.length);
+      syncViewButtons();
+    }
+
+    function renderRing() {
+      const entries = state.filteredEntries;
+      els.ringScene.innerHTML = '';
+      if (!entries.length) {
+        els.ringScene.innerHTML = '<div style="position:absolute;inset:50% auto auto 50%;transform:translate(-50%,-50%);padding:18px 22px;border-radius:20px;background:rgba(10,21,36,.8);border:1px solid rgba(255,255,255,.08);box-shadow:0 24px 60px rgba(0,0,0,.4)">No items in this view.</div>';
+        els.counter.textContent = '0 / 0';
+        return;
+      }
+
+      const total = entries.length;
+      const radius = Math.min(window.innerWidth<760 ? 260 : 360, 300 + total*8);
+
+      entries.forEach((entry, idx) => {
+        const relative = ((idx - state.ringIndex) % total + total) % total;
+        const signed = relative > total/2 ? relative - total : relative;
+        const angle = (Math.PI*2 / total) * signed;
+        const x = Math.sin(angle) * radius;
+        const z = Math.cos(angle) * -1 * parseInt(getComputedStyle(document.documentElement).getPropertyValue('--ringDepth') || '340', 10);
+        const scale = signed === 0 ? 1 : Math.max(0.72, 1 - Math.abs(signed)*0.08);
+        const opacity = signed === 0 ? 1 : Math.max(0.28, 1 - Math.abs(signed)*0.16);
+        const tilt = signed === 0 ? 0 : signed * -8;
+        const y = signed === 0 ? -20 : Math.abs(signed)*10;
+
+        const isCategory = state.view === 'categories';
+        let priceDisplay = '';
+        if (!isCategory) {
+          if (entry.type === 'meat' || entry.type === 'side') {
+            priceDisplay = 'combo';
+          } else {
+            priceDisplay = currency(entry.price);
+          }
+        } else {
+          priceDisplay = `${entry.items?.length || 0} items`;
+        }
+
+        const card = document.createElement('article');
+        card.className = 'ring-card' + (signed===0 ? ' is-front' : '');
+        card.style.transform = `translate3d(calc(-50% + ${x}px), calc(-50% + ${y}px), ${z}px) rotateY(${tilt}deg) scale(${scale})`;
+        card.style.opacity = opacity;
+        card.style.filter = signed===0 ? 'none' : `blur(${Math.min(Math.abs(signed)*1.6,6)}px)`;
+        card.style.zIndex = 1000 - Math.abs(signed);
+
+        const badgeText = isCategory ? (entry.badge || 'Category') : (entry.type || 'Item');
+        const image = entry.image || '';
+
+        card.innerHTML = `
+          <div class="card-image">
+            ${image ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(entry.title)}">` : `<div class="placeholder">${escapeHtml(entry.title)}</div>`}
+            <div class="badge-row">
+              <div class="card-badge">${escapeHtml(badgeText)}</div>
+              <div class="card-price">${escapeHtml(priceDisplay)}</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-kicker">${isCategory ? 'Category portal' : 'Select item'}</div>
+            <div class="card-title">${escapeHtml(entry.title)}</div>
+            <div class="card-desc">${escapeHtml(entry.desc || (isCategory ? 'Open to see dishes.' : 'No description.'))}</div>
+            <div class="tag-row">${(entry.tags||[]).slice(0,4).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
+            <div class="card-actions">
+              ${signed===0
+                ? (isCategory
+                    ? '<button class="btn" data-action="open">Open category</button><button class="ghost-btn" data-action="next">Next</button>'
+                    : '<button class="btn" data-action="add">Add to order</button><button class="ghost-btn" data-action="back">Back</button>')
+                : '<button class="ghost-btn" data-action="focus">Bring forward</button>'}
+            </div>
+          </div>
+        `;
+
+        card.addEventListener('click', evt => {
+          const targetAction = evt.target.closest('[data-action]')?.dataset.action;
+          if (targetAction) {
+            handleCardAction(targetAction, idx);
+            return;
+          }
+          if (idx !== state.ringIndex) {
+            state.ringIndex = idx;
+            renderRing();
+            updateHero();
+          } else {
+            primaryAction();
+          }
+        });
+
+        els.ringScene.appendChild(card);
+      });
+
+      els.counter.textContent = `${state.ringIndex+1} / ${entries.length}`;
+      updateActionButton();
+    }
+
+    function handleCardAction(action, idx) {
+      if (typeof idx === 'number' && idx !== state.ringIndex) state.ringIndex = idx;
+      if (action === 'focus' || action === 'next') { rotate(1); return; }
+      if (action === 'open') { openFrontCategory(); return; }
+      if (action === 'add') { addFrontItemToCart(); return; }
+      if (action === 'back') goHome();
+    }
+
+    function updateHero() {
+      const entries = state.filteredEntries;
+      const entry = entries[state.ringIndex] || null;
+      if (state.view === 'categories') {
+        els.eyebrow.textContent = 'Category hologram';
+        els.heroTitle.textContent = entry ? entry.title : 'Browse categories';
+        els.heroText.textContent = entry ? `${entry.desc||''} ${entry.items?.length||0} items inside.` : 'Use the ring to browse categories.';
+      } else {
+        const cat = currentCategory();
+        els.eyebrow.textContent = cat ? `${cat.title} menu` : 'Item hologram';
+        els.heroTitle.textContent = entry ? entry.title : 'Browse items';
+        els.heroText.textContent = entry ? `${entry.desc||''} ${entry.price>0 ? currency(entry.price) : (entry.type==='meat'||entry.type==='side'?'Combo pricing applies':'')}` : 'Open a category to browse items.';
+      }
+    }
+
+    function updateActionButton() {
+      els.actionBtn.textContent = state.view === 'categories' ? 'Open' : 'Add to cart';
+    }
+
+    function syncViewButtons() {
+      document.querySelectorAll('[data-view]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === state.view);
+      });
+    }
+
+    function renderPath() {
+      const bits = ['Hotheadz'];
+      if (state.view === 'categories') bits.push('Categories');
+      else {
+        const cat = currentCategory();
+        bits.push('Categories');
+        if (cat) bits.push(cat.title);
+      }
+      els.pathbar.innerHTML = bits.map(bit => `<span class="crumb">${escapeHtml(bit)}</span>`).join('');
+    }
+
+    function rotate(direction) {
+      const entries = state.filteredEntries;
+      if (!entries.length) return;
+      state.ringIndex = (state.ringIndex + direction + entries.length) % entries.length;
+      renderRing();
+      updateHero();
+    }
+
+    function primaryAction() {
+      if (state.view === 'categories') openFrontCategory();
+      else addFrontItemToCart();
+    }
+
+    function openFrontCategory() {
+      const entry = state.filteredEntries[state.ringIndex];
+      if (!entry) return;
+      state.currentCategoryId = entry.id;
+      state.view = 'items';
+      state.ringIndex = 0;
+      refreshEntries();
+      announce(`${entry.title} opened.`);
+    }
+
+    function goHome() {
+      state.view = 'categories';
+      state.currentCategoryId = null;
+      state.ringIndex = 0;
+      refreshEntries();
+      announce('Returned to categories.');
+    }
+
+    // -------------------- CART & COMBO PRICING --------------------
+    function addFrontItemToCart() {
+      const entry = state.filteredEntries[state.ringIndex];
+      if (!entry) return;
+
+      // Determine item type
+      const type = entry.type || (state.view === 'items' ? 'standalone' : 'unknown');
+      const id = entry.id;
+      const price = entry.price || 0;
+      const category = currentCategory()?.title || '';
+
+      // Check limits for meats/sides
+      if (type === 'meat') {
+        const meatCount = Object.values(state.cart).filter(i => i.type === 'meat').reduce((sum,i) => sum + i.qty, 0);
+        if (meatCount >= MAX_MEATS) { alert(`You can only add up to ${MAX_MEATS} meats.`); return; }
+      }
+      if (type === 'side') {
+        const sideCount = Object.values(state.cart).filter(i => i.type === 'side').reduce((sum,i) => sum + i.qty, 0);
+        if (sideCount >= MAX_SIDES) { alert(`You can only add up to ${MAX_SIDES} sides.`); return; }
+      }
+
+      if (state.cart[id]) {
+        // Check if increasing would exceed limits
+        let newMeat = Object.values(state.cart).filter(i => i.type === 'meat').reduce((s,i) => s + i.qty, 0);
+        let newSide = Object.values(state.cart).filter(i => i.type === 'side').reduce((s,i) => s + i.qty, 0);
+        if (type === 'meat') newMeat += 1;
+        if (type === 'side') newSide += 1;
+        if (type === 'meat' && newMeat > MAX_MEATS) { alert(`You can only add up to ${MAX_MEATS} meats.`); return; }
+        if (type === 'side' && newSide > MAX_SIDES) { alert(`You can only add up to ${MAX_SIDES} sides.`); return; }
+        state.cart[id].qty += 1;
+      } else {
+        state.cart[id] = { id, name: entry.title, price, type, category, qty: 1 };
+      }
+      saveJSON(STORAGE.cart, state.cart);
+      renderCart();
+      announce(`${entry.title} added.`);
+    }
+
+    function renderCart() {
+      const items = Object.values(state.cart);
+      // Count meats & sides
+      const meatCount = items.filter(i => i.type === 'meat').reduce((s,i) => s + i.qty, 0);
+      const sideCount = items.filter(i => i.type === 'side').reduce((s,i) => s + i.qty, 0);
+      els.meatCount.textContent = meatCount;
+      els.sideCount.textContent = sideCount;
+
+      // Calculate total using combo pricing
+      let total = 0;
+      if (meatCount > 0) {
+        if (meatCount === 1) total += COMBO_PRICES.meat1;
+        else if (meatCount === 2) total += COMBO_PRICES.meat2;
+        else total += COMBO_PRICES.meat3;
+        if (sideCount > 2) total += (sideCount - 2) * COMBO_PRICES.extraSide;
+      } else {
+        total += sideCount * COMBO_PRICES.extraSide; // sides only
+      }
+      // Add standalone items
+      items.forEach(i => {
+        if (i.type !== 'meat' && i.type !== 'side') {
+          total += i.price * i.qty;
+        }
+      });
+
+      els.subtotal.textContent = currency(total);
+
+      if (!items.length) {
+        els.cartList.innerHTML = '<div class="muted tiny">No items in the order yet.</div>';
+        return;
+      }
+
+      els.cartList.innerHTML = items.map(item => `
+        <div class="cart-item">
+          <div class="cart-thumb"><img src="${placeholderImage(item.name)}" alt="${escapeHtml(item.name)}"></div>
+          <div>
+            <div class="cart-name">${escapeHtml(item.name)}</div>
+            <div class="cart-desc">${item.type} ${item.price ? currency(item.price) : ''}</div>
+            <div class="qty">
+              <button class="ghost-btn" data-cart="dec" data-id="${escapeHtml(item.id)}">−</button>
+              <span>${item.qty}</span>
+              <button class="ghost-btn" data-cart="inc" data-id="${escapeHtml(item.id)}">+</button>
+            </div>
+          </div>
+          <div style="font-weight:800">${item.type==='meat'||item.type==='side' ? '' : currency(item.qty*item.price)}</div>
+        </div>
+      `).join('');
+    }
+
+    function changeQty(id, delta) {
+      const item = state.cart[id];
+      if (!item) return;
+      const newQty = item.qty + delta;
+      if (newQty <= 0) {
+        delete state.cart[id];
+      } else {
+        // Check limits before applying
+        let newMeat = Object.values(state.cart).filter(i => i.type === 'meat').reduce((s,i) => s + i.qty, 0);
+        let newSide = Object.values(state.cart).filter(i => i.type === 'side').reduce((s,i) => s + i.qty, 0);
+        if (item.type === 'meat') newMeat += delta;
+        if (item.type === 'side') newSide += delta;
+        if (item.type === 'meat' && newMeat > MAX_MEATS) { alert(`You can only add up to ${MAX_MEATS} meats.`); return; }
+        if (item.type === 'side' && newSide > MAX_SIDES) { alert(`You can only add up to ${MAX_SIDES} sides.`); return; }
+        item.qty = newQty;
+      }
+      saveJSON(STORAGE.cart, state.cart);
+      renderCart();
+    }
+
+    function placeholderImage(text) {
+      const c = document.createElement('canvas'); c.width = 300; c.height = 220;
+      const ctx = c.getContext('2d');
+      const grad = ctx.createLinearGradient(0,0,300,220);
+      grad.addColorStop(0,'#183447'); grad.addColorStop(1,'#0b1220');
+      ctx.fillStyle = grad; ctx.fillRect(0,0,300,220);
+      ctx.fillStyle = '#f3fdff'; ctx.textAlign = 'center';
+      ctx.font = 'bold 28px Inter, sans-serif';
+      ctx.fillText(text?.[0] || '?', 150, 120);
+      return c.toDataURL('image/png');
+    }
+
+    // -------------------- EVENT BINDING --------------------
+    function bindEvents() {
+      document.getElementById('prevBtn').addEventListener('click', () => rotate(-1));
+      document.getElementById('nextBtn').addEventListener('click', () => rotate(1));
+      els.actionBtn.addEventListener('click', primaryAction);
+      document.getElementById('homeBtn').addEventListener('click', goHome);
+      document.getElementById('downloadBtn').addEventListener('click', () => {
+        const blob = new Blob(['<!doctype html>\n'+document.documentElement.outerHTML], {type:'text/html'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'hotheadz-hologram-v3.html';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1200);
+      });
+      document.getElementById('printBtn').addEventListener('click', () => {
+        // simple print placeholder
+        window.print();
+      });
+      document.getElementById('loadBtn').addEventListener('click', async () => {
+        try { await loadMenuData(els.dataUrlInput.value.trim()); } catch(err) { fallbackFromError(err); }
+      });
+      document.getElementById('reloadDataBtn').addEventListener('click', async () => {
+        try { await loadMenuData(els.dataUrlInput.value.trim()); } catch(err) { fallbackFromError(err); }
+      });
+      document.getElementById('useDemoBtn').addEventListener('click', () => setSourceData(DEMO_SOURCE, 'demo data'));
+      document.getElementById('checkoutBtn').addEventListener('click', () => alert('Demo checkout – your total is ' + els.subtotal.textContent));
+      document.getElementById('clearCartBtn').addEventListener('click', () => {
+        state.cart = {};
+        saveJSON(STORAGE.cart, state.cart);
+        renderCart();
+        announce('Cart cleared.');
+      });
+      els.searchInput.addEventListener('input', refreshEntries);
+      els.dataUrlInput.addEventListener('change', () => {
+        state.dataUrl = els.dataUrlInput.value.trim() || 'menu-data.html';
+        localStorage.setItem(STORAGE.dataUrl, state.dataUrl);
+      });
+      document.querySelectorAll('[data-view]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (btn.dataset.view === 'categories') goHome();
+          if (btn.dataset.view === 'items' && currentCategory()) {
+            state.view = 'items';
+            state.ringIndex = 0;
+            refreshEntries();
+            announce(`${currentCategory().title} items shown.`);
+          }
+        });
+      });
+      document.addEventListener('click', evt => {
+        const t = evt.target.closest('[data-cart]');
+        if (!t) return;
+        const id = t.dataset.id;
+        const type = t.dataset.cart;
+        changeQty(id, type === 'inc' ? 1 : -1);
+      });
+      window.addEventListener('keydown', evt => {
+        if (evt.key === 'ArrowLeft') rotate(-1);
+        if (evt.key === 'ArrowRight') rotate(1);
+        if (evt.key === 'Enter') primaryAction();
+        if (evt.key === 'Escape') goHome();
+      });
+      let touchStartX = 0;
+      els.ringScene.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].clientX, {passive:true});
+      els.ringScene.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(dx) > 40) rotate(dx > 0 ? -1 : 1);
+      }, {passive:true});
+    }
+
+    // -------------------- BOOT --------------------
+    async function boot() {
+      bindEvents();
+      els.dataUrlInput.value = state.dataUrl;
+      try {
+        await loadMenuData(state.dataUrl);
+      } catch (err) {
+        fallbackFromError(err);
+      }
+      renderCart();
+    }
     boot();
   </script>
 </body>
