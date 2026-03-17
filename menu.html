@@ -144,7 +144,7 @@
       position:absolute; width:100%; height:100%; background: rgba(30,25,20,0.95); border:2px solid #c05a2a; border-radius:14px;
       box-shadow:0 0 20px rgba(192,90,42,0.3); backdrop-filter: blur(4px); display:flex; flex-direction:column;
       padding:8px 6px; overflow:hidden; -webkit-overflow-scrolling:auto; backface-visibility: visible; color:#efe6d9;
-      font-size:10px; line-height:1.15; transform: rotateY(0deg) translateZ(120px); pointer-events:none;
+      font-size:10px; line-height:1.12; transform: rotateY(0deg) translateZ(120px); pointer-events:auto;
     }
     @media (min-width: 600px) { .hh-cube-face { transform: rotateY(0deg) translateZ(140px); padding:10px; font-size:11px; } }
     .hh-cube-face.front  { transform: rotateY(  0deg) translateZ(120px); }
@@ -161,10 +161,10 @@
       .hh-cube-face.top    { transform: rotateX( 90deg) translateZ(140px); }
       .hh-cube-face.bottom { transform: rotateX(-90deg) translateZ(140px); }
     }
-    .hh-cube-category { font-weight:800; font-size:1.1em; color:#ffb35a; margin-bottom:4px; border-bottom:1px solid rgba(255,179,90,0.3); padding-bottom:2px; }
+    .hh-cube-category { font-weight:800; font-size:1.05em; color:#ffb35a; margin-bottom:4px; border-bottom:1px solid rgba(255,179,90,0.3); padding-bottom:2px; }
     .hh-cube-unavail { opacity:0.7; font-style:italic; }
-    .hh-cube-items.compact li { padding:6px 8px; margin-bottom:4px; font-size:12px; }
-    .hh-cube-more { opacity:.78; font-size:11px; margin-top:4px; text-align:center; }
+    .hh-cube-items.compact li { padding:5px 7px; margin-bottom:4px; font-size:11px; }
+    .hh-cube-more { opacity:.8; font-size:10px; margin-top:2px; text-align:center; }
     .hidden { display:none !important; }
 
     .hh-adv-carousel { display:flex; gap:14px; overflow-x:auto; padding:2px 14px 14px; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; }
@@ -814,6 +814,7 @@
           item.className = 'wheel-item';
           item.textContent = cat.name;
           item.dataset.index = String(i);
+          // text stays upright while the category moves around the wheel
           item.style.transform = `rotate(${baseAngle}deg) translate(${radius}px) rotate(${-baseAngle}deg)`;
           wheel.appendChild(item);
         });
@@ -824,8 +825,6 @@
         let dragging = false;
         let lastPointerAngle = 0;
         let rafId = 0;
-
-        function normalizeDeg(deg) { return ((deg % 360) + 360) % 360; }
 
         function shortestSignedDelta(a, b) {
           let diff = a - b;
@@ -861,11 +860,8 @@
           rafId = 0;
           wheel.style.transform = `rotate(${currentAngle}deg)`;
           const idx = getSelectedIndexFromWheelAngle(currentAngle);
-          if (idx !== selectedIndex) {
+          if (idx !== selectedIndex || !categoryContent.innerHTML) {
             selectedIndex = idx;
-            wheelItems.forEach((item, i) => item.classList.toggle('selected', i === idx));
-            renderCategoryItems(categories[idx], categoryTitle, categoryContent, data);
-          } else if (!categoryContent.innerHTML) {
             wheelItems.forEach((item, i) => item.classList.toggle('selected', i === idx));
             renderCategoryItems(categories[idx], categoryTitle, categoryContent, data);
           }
@@ -917,24 +913,35 @@
         wrapper.addEventListener('pointermove', onPointerMove, { passive: false });
         wrapper.addEventListener('pointerup', onPointerUp);
         wrapper.addEventListener('pointercancel', onPointerUp);
-        wrapper.addEventListener('pointerleave', onPointerUp);
 
-        wheel.style.transition = 'none';
         requestPaint();
       }
 
-function buildCubeFaceHtml(category) {
+
+      function cubeList(items, maxItems = 4) {
+        const arr = Array.isArray(items) ? items.filter(Boolean) : [];
+        return { visible: arr.slice(0, maxItems), remaining: Math.max(0, arr.length - maxItems), total: arr.length };
+      }
+
+      function renderCubeSection(title, items, maxItems = 4) {
+        const info = cubeList(items, maxItems);
+        if (!info.total) return "";
+        return `
+          <div class="hh-subcat-title">${escapeHtml(title)}</div>
+          <ul class="hh-cube-items compact">
+            ${info.visible.map(x => `<li>${escapeHtml(x)}</li>`).join("")}
+          </ul>
+          ${info.remaining ? `<div class="hh-cube-more">+ ${info.remaining} more</div>` : ""}
+        `;
+      }
+
+      function buildCubeFaceHtml(category) {
         let html = `<div class="hh-cube-category">${escapeHtml(category.name)}</div>`;
 
         if (category.name === 'Breakfast' || category.name === 'Lunch') {
           html += renderCubeSection('Plates', category.plates, 3);
-
-          const itemLabels = (category.items || []).map(it => {
-            if (typeof it === 'string') return it;
-            return it?.name || '';
-          }).filter(Boolean);
-
-          html += renderCubeSection('Items', itemLabels, 4);
+          const names = (category.items || []).map(it => typeof it === 'string' ? it : (it?.name || '')).filter(Boolean);
+          html += renderCubeSection('Items', names, 4);
         } else if (category.name === 'Crawfish') {
           html += renderCubeSection('Available', category.items || [], 4);
         } else if (category.name === 'Salad Bar') {
@@ -949,6 +956,7 @@ function buildCubeFaceHtml(category) {
         if (!category.plates?.length && !category.items?.length && !category.pricing?.length && !category.lettuce?.length && !category.toppings?.length && !category.dressing?.length) {
           html += `<div class="hh-cube-unavail">(no items)</div>`;
         }
+
         return html;
       }
 
