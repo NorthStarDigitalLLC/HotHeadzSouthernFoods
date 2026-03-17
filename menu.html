@@ -290,6 +290,38 @@
       text-align: center;
       margin-top: 2px;
     }
+    .closed-note {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: rgba(255,255,255,.82);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .pick-card {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,179,90,.3);
+      background: linear-gradient(180deg, rgba(255,160,90,.12), rgba(255,255,255,.04));
+      box-shadow: 0 10px 26px rgba(0,0,0,.22);
+    }
+    .pick-title {
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.7);
+      margin-bottom: 8px;
+    }
+    .pick-line {
+      font-size: 15px;
+      color: #fff;
+      margin-top: 6px;
+      font-weight: 700;
+    }
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -302,7 +334,7 @@
       z-index: 200;
       padding: 18px;
     }
-    .modal-backdrop.show { display: flex; }
+    .modal-backdrop.show { display: flex; pointer-events: auto; }
     .modal {
       width: min(520px, calc(100vw - 24px));
       border-radius: 28px;
@@ -488,9 +520,9 @@
         <div class="note" id="todayNote"></div>
       </div>
       <div class="toolbar">
-        <button class="viewbtn active" id="todayViewWheel">Orbit Navigator</button>
-        <button class="viewbtn" id="todayViewSwipe">Hologram Cards</button>
-        <button class="actionbtn primary" id="todayAIBtn"><i class="fas fa-sparkles"></i> Chef Signal</button>
+        <button class="viewbtn" id="todayViewWheel">Orbit Navigator</button>
+        <button class="viewbtn active" id="todayViewSwipe">Hologram Cards</button>
+        <button class="actionbtn primary" id="todayAIBtn"><i class="fas fa-sparkles"></i> Choose for Me</button>
       </div>
       <div id="todayWheelView">
         <div class="modehint">Spin the Orbit Navigator to move through the menu.</div>
@@ -502,7 +534,7 @@
           </div>
           <div class="glasscard" id="todayDetailCard">
             <div class="cat-title" id="todayDetailTitle"></div>
-            <div id="todayDetailContent"></div>
+            <div id="todayDetailContent"></div><div id="todayPickCard"></div>
           </div>
         </div>
       </div>
@@ -531,9 +563,9 @@
         <div class="note" id="tomorrowNote"></div>
       </div>
       <div class="toolbar">
-        <button class="viewbtn active" id="tomorrowViewWheel">Orbit Navigator</button>
-        <button class="viewbtn" id="tomorrowViewSwipe">Hologram Cards</button>
-        <button class="actionbtn primary" id="tomorrowAIBtn"><i class="fas fa-sparkles"></i> Chef Signal</button>
+        <button class="viewbtn" id="tomorrowViewWheel">Orbit Navigator</button>
+        <button class="viewbtn active" id="tomorrowViewSwipe">Hologram Cards</button>
+        <button class="actionbtn primary" id="tomorrowAIBtn"><i class="fas fa-sparkles"></i> Choose for Me</button>
       </div>
       <div id="tomorrowWheelView">
         <div class="modehint">Spin the Orbit Navigator to move through the menu.</div>
@@ -545,7 +577,7 @@
           </div>
           <div class="glasscard" id="tomorrowDetailCard">
             <div class="cat-title" id="tomorrowDetailTitle"></div>
-            <div id="tomorrowDetailContent"></div>
+            <div id="tomorrowDetailContent"></div><div id="tomorrowPickCard"></div>
           </div>
         </div>
       </div>
@@ -740,6 +772,48 @@
         setText("luckModalTitle", title);
         setText("luckModalText", text);
         modal.classList.add("show");
+      }
+      function hideLuckModal() {
+        const modal = $("luckModal");
+        if (modal) {
+          modal.classList.remove("show");
+          modal.style.display = "";
+          modal.style.pointerEvents = "";
+        }
+      }
+
+      function pickLunchCombo(cat) {
+        const entries = Array.isArray(cat?.items) ? cat.items.slice() : [];
+        const labels = entries.map(it => typeof it === "string" ? it : (it?.name || "")).filter(Boolean);
+        if (!labels.length) return null;
+
+        const meats = labels.filter(x => /chicken|pork|steak|fish|shrimp|hamburger|roast|sausage|turkey|beef|meatloaf|catfish|tenders|boudin/i.test(x));
+        const sides = labels.filter(x => !/chicken|pork|steak|fish|shrimp|hamburger|roast|sausage|turkey|beef|meatloaf|catfish|tenders|boudin/i.test(x));
+
+        const rand = arr => arr[Math.floor(Math.random() * arr.length)];
+        const meat = meats.length ? rand(meats) : rand(labels);
+        const sidePool = sides.length ? sides.slice() : labels.filter(x => x !== meat);
+        const side1 = sidePool.length ? rand(sidePool) : null;
+        const side2Pool = sidePool.filter(x => x !== side1);
+        const side2 = side2Pool.length ? rand(side2Pool) : (sidePool.length > 1 ? sidePool[0] : null);
+
+        return { meat, sides: [side1, side2].filter(Boolean) };
+      }
+
+      function renderPickCard(prefix, combo, catName) {
+        const el = $(`${prefix}PickCard`);
+        if (!el) return;
+        if (!combo) {
+          el.innerHTML = "";
+          return;
+        }
+        el.innerHTML = `
+          <div class="pick-card">
+            <div class="pick-title">Suggested ${escapeHtml(catName)} Plate</div>
+            <div class="pick-line">Meat: ${escapeHtml(combo.meat || "Chef's choice")}</div>
+            <div class="pick-line">Sides: ${escapeHtml((combo.sides || []).join(" + ") || "Chef's choice")}</div>
+          </div>
+        `;
       }
 
       async function fetchHtml(url) {
@@ -990,17 +1064,11 @@
           const allowed = canShowCategory(cat);
           lockedByHours = !allowed;
           detailTitle.textContent = cat.name;
-          if (allowed) {
-            detailContent.innerHTML = renderCategoryContent(cat, data);
-          } else {
-            detailContent.innerHTML = `
-              <div class="section-label">Unavailable right now</div>
-              <ul class="list">
-                <li>This category is not available at the current hour.</li>
-                <li>${escapeHtml(openingMessageFor(dayName))}</li>
-              </ul>
-            `;
-          }
+          const closedNowNote = isTodayPanel && !allowed
+            ? `<div class="closed-note">This is the ${escapeHtml(dayName)} menu for ${escapeHtml(cat.name)}. They are currently closed for this category. ${escapeHtml(openingMessageFor(dayName))}</div>`
+            : "";
+          detailContent.innerHTML = renderCategoryContent(cat, data) + closedNowNote;
+          renderPickCard(prefix, null, cat.name);
           if (force) {
             detailCard.classList.add("pulse");
             setTimeout(() => detailCard.classList.remove("pulse"), 520);
@@ -1071,7 +1139,7 @@
         }
         function onClick() {
           if (lockedByHours && isTodayPanel) {
-            showLuckModal("Menu route closed right now", `${categories[selected].name} is not available right now. ${openingMessageFor(dayName)}`);
+            showLuckModal("Currently closed", `${categories[selected].name} is not being served right now. ${openingMessageFor(dayName)}`);
           }
         }
 
@@ -1085,13 +1153,18 @@
 
         return {
           aiPick() {
-            const pool = isTodayPanel ? categories.filter(cat => canShowCategory(cat)) : categories.slice();
-            if (!pool.length) {
-              showLuckModal("Menu route closed right now", openingMessageFor(dayName));
+            const lunchCat = categories.find(c => String(c.name).toLowerCase() === "lunch");
+            const targetCat = lunchCat || categories.find(c => canShowCategory(c)) || categories[0];
+            if (!targetCat) {
+              showLuckModal("Currently closed", openingMessageFor(dayName));
               return null;
             }
-            const picked = pool[Math.floor(Math.random() * pool.length)];
-            const idx = categories.findIndex(c => c.name === picked.name);
+            if (isTodayPanel && !canShowCategory(targetCat)) {
+              showLuckModal("Currently closed", `${targetCat.name} is not being served right now. ${openingMessageFor(dayName)}`);
+              return null;
+            }
+            const idx = categories.findIndex(c => c.name === targetCat.name);
+            const combo = pickLunchCombo(targetCat);
             const target = -(idx * step);
             const start = performance.now();
             const startAngle = angle;
@@ -1107,12 +1180,13 @@
               else {
                 angle = target;
                 render(true);
+                renderPickCard(prefix, combo, targetCat.name);
                 detailCard.classList.add("pulse");
                 setTimeout(() => detailCard.classList.remove("pulse"), 900);
               }
             }
             requestAnimationFrame(animate);
-            return picked;
+            return targetCat;
           },
           selectByName(name) {
             const idx = categories.findIndex(c => c.name === name);
@@ -1129,6 +1203,13 @@
         const swipeBtn = $(`${prefix}ViewSwipe`);
         const wheelView = $(`${prefix}WheelView`);
         const swipeView = $(`${prefix}SwipeView`);
+
+        // default to hologram
+        swipeBtn?.classList.add("active");
+        wheelBtn?.classList.remove("active");
+        swipeView?.classList.remove("hide");
+        wheelView?.classList.add("hide");
+
         wheelBtn?.addEventListener("click", () => {
           wheelBtn.classList.add("active");
           swipeBtn?.classList.remove("active");
@@ -1270,17 +1351,25 @@
         document.querySelector(".circular-menu")?.addEventListener("click", e => e.stopPropagation());
         const modalEl = $("luckModal");
         const modalClose = $("luckModalClose");
-        modalClose?.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          modalEl?.classList.remove("show");
-        });
+        const closeModal = (e) => {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          hideLuckModal();
+        };
+        modalClose?.addEventListener("pointerup", closeModal);
+        modalClose?.addEventListener("click", closeModal);
+        modalEl?.querySelector(".modal")?.addEventListener("pointerup", (e) => e.stopPropagation());
         modalEl?.querySelector(".modal")?.addEventListener("click", (e) => e.stopPropagation());
+        modalEl?.addEventListener("pointerup", (e) => {
+          if (e.target === modalEl) hideLuckModal();
+        });
         modalEl?.addEventListener("click", (e) => {
-          if (e.target === modalEl) modalEl.classList.remove("show");
+          if (e.target === modalEl) hideLuckModal();
         });
         window.addEventListener("keydown", (e) => {
-          if (e.key === "Escape") modalEl?.classList.remove("show");
+          if (e.key === "Escape") hideLuckModal();
         });
       }
 
@@ -1327,7 +1416,7 @@
 
   <div class="modal-backdrop" id="luckModal">
     <div class="modal">
-      <div class="modal-title" id="luckModalTitle">Menu route closed right now</div>
+      <div class="modal-title" id="luckModalTitle">Currently closed</div>
       <div class="modal-text" id="luckModalText"></div>
       <button class="actionbtn primary" id="luckModalClose">Got it</button>
     </div>
