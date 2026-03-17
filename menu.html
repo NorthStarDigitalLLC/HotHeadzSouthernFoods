@@ -821,21 +821,57 @@
         return `${dayName} opens at ${hours.open}. Breakfast runs until 10:30 AM, lunch starts at 11:00 AM${hours.crawfish ? `, and crawfish runs ${hours.crawfish}` : ""}.`;
       }
 
+      let luckTimer = null;
+      let luckCountdownTimer = null;
+
       function showLuckModal(title, text) {
         const modal = $("luckModal");
+        const countEl = $("luckCountdown");
+        if (!modal || !countEl) return;
+
         setText("luckModalTitle", title);
         setText("luckModalText", text);
+
+        if (luckTimer) {
+          clearTimeout(luckTimer);
+          luckTimer = null;
+        }
+        if (luckCountdownTimer) {
+          clearInterval(luckCountdownTimer);
+          luckCountdownTimer = null;
+        }
+
+        let remaining = 5;
+        countEl.textContent = String(remaining);
         modal.classList.add("show");
+
+        luckCountdownTimer = setInterval(() => {
+          remaining -= 1;
+          if (remaining > 0) {
+            countEl.textContent = String(remaining);
+          } else {
+            clearInterval(luckCountdownTimer);
+            luckCountdownTimer = null;
+          }
+        }, 1000);
+
+        luckTimer = setTimeout(() => {
+          hideLuckModal();
+        }, 5000);
       }
-      function hideLuckModal(redirect = false) {
+
+      function hideLuckModal() {
         const modal = $("luckModal");
+        if (luckTimer) {
+          clearTimeout(luckTimer);
+          luckTimer = null;
+        }
+        if (luckCountdownTimer) {
+          clearInterval(luckCountdownTimer);
+          luckCountdownTimer = null;
+        }
         if (modal) {
           modal.classList.remove("show");
-          modal.style.display = "";
-          modal.style.pointerEvents = "";
-        }
-        if (redirect) {
-          window.location.href = "https://hotheadzsouthernfoods.com/menu.html";
         }
       }
 
@@ -1407,6 +1443,8 @@
         }));
         document.querySelector(".circular-menu")?.addEventListener("click", e => e.stopPropagation());
         const modalEl = $("luckModal");
+        const flashCard = modalEl?.querySelector(".flash-card");
+        flashCard?.addEventListener("click", (e) => e.stopPropagation());
         modalEl?.addEventListener("click", () => hideLuckModal());
         window.addEventListener("keydown", (e) => {
           if (e.key === "Escape") hideLuckModal();
