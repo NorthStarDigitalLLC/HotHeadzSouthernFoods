@@ -5,184 +5,308 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Our Restaurant Menu</title>
   <style>
-    /* Basic styling – customize to your taste */
+    /* Base styling – customize as you like */
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
       margin: 0;
       padding: 20px;
-      background-color: #f8f8f8;
-      color: #333;
+      background: #faf7f2;
+      color: #2c3e50;
     }
     h1 {
       text-align: center;
-      color: #b22222;
+      font-size: 3rem;
+      color: #c44536;
+      margin-bottom: 0.2rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .subhead {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #7f8c8d;
+      margin-top: 0;
+      margin-bottom: 40px;
+      font-style: italic;
     }
     .menu-section {
-      margin-bottom: 40px;
+      margin-bottom: 50px;
     }
     .category-title {
-      font-size: 2rem;
-      border-bottom: 2px solid #b22222;
-      padding-bottom: 5px;
-      margin-bottom: 20px;
-      text-transform: uppercase;
+      font-size: 2.2rem;
+      border-bottom: 3px solid #c44536;
+      padding-bottom: 8px;
+      margin-bottom: 25px;
+      color: #2c3e50;
+      font-weight: 600;
     }
     .menu-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
     }
     .menu-item {
       background: white;
-      border-radius: 8px;
-      padding: 15px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      transition: transform 0.2s;
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 1px solid #eee;
     }
     .menu-item:hover {
-      transform: translateY(-5px);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.1);
     }
     .item-name {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #b22222;
-      margin-bottom: 5px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #c44536;
+      margin-bottom: 8px;
     }
     .item-description {
-      font-size: 0.9rem;
-      color: #666;
-      margin-bottom: 10px;
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 12px;
+      line-height: 1.4;
     }
     .item-price {
-      font-weight: bold;
-      color: #2e8b57;
+      font-weight: 700;
+      color: #27ae60;
+      font-size: 1.1rem;
+      border-top: 1px dashed #ddd;
+      padding-top: 10px;
     }
-    .error-message {
-      color: red;
-      text-align: center;
-      padding: 20px;
+    .salad-details {
+      background: #f0f0f0;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 15px;
+      font-size: 0.95rem;
     }
-    .loading {
+    .salad-details p {
+      margin: 5px 0;
+    }
+    .error-message, .loading {
       text-align: center;
       padding: 40px;
-      font-size: 1.2rem;
-      color: #999;
+      font-size: 1.3rem;
+    }
+    .loading {
+      color: #95a5a6;
+    }
+    .error-message {
+      color: #e74c3c;
+    }
+    .daily-note {
+      background: #fef9e4;
+      border-left: 6px solid #f39c12;
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      font-style: italic;
     }
   </style>
 </head>
 <body>
   <h1>Our Menu</h1>
+  <div class="subhead">Fresh. Homemade. Delicious.</div>
   <div id="menu-container" class="loading">Loading menu...</div>
 
   <script>
-    // Replace with the actual path to your menu-data.html
+    // Path to your menu-data.html – adjust if needed
     const DATA_URL = 'menu-data.html';
 
-    // Function to extract menu items from the fetched HTML
-    function parseMenuData(htmlString) {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(htmlString, 'text/html');
+    // Helper: get today's date in YYYY-MM-DD format (local time)
+    function getTodayString() {
+      const d = new Date();
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
 
-      // --- ADJUST THIS PART TO MATCH YOUR HTML STRUCTURE ---
-      // Example: assume each menu item is inside an element with class 'menu-item'
-      // and contains:
-      // - .item-name for the name
-      // - .item-description for description (optional)
-      // - .item-price for price
-      // - data-category attribute for category (or a parent category element)
-      const items = [];
-      const itemElements = doc.querySelectorAll('.menu-item'); // change selector
+    // Parse a price string like "$9.99" or "– $12.99"
+    function extractPrice(text) {
+      const match = text.match(/\$?\d+\.?\d*/);
+      return match ? match[0] : '';
+    }
 
-      itemElements.forEach(el => {
-        const name = el.querySelector('.item-name')?.textContent.trim() || 'Unknown';
-        const description = el.querySelector('.item-description')?.textContent.trim() || '';
-        const price = el.querySelector('.item-price')?.textContent.trim() || '';
-        // Get category from a data attribute or a parent category element
-        const category = el.dataset.category || 'Other'; // fallback
+    // Build an array of item objects from various possible formats
+    function buildItem(name, description = '', price = '') {
+      return { name, description, price };
+    }
 
-        items.push({
-          name,
-          description,
-          price,
-          category
-        });
+    // Process the JSON data and return an array of menu sections
+    function processMenuData(data) {
+      const sections = [];
+      const today = getTodayString();
+      const dailyMenu = data.menus[today] || null;
+
+      // ----- 1. Breakfast (static from defaults) -----
+      const breakfast = data.defaults.breakfast;
+      const breakfastItems = [];
+      // Add plates (strings like "Breakfast Plate – $9.99 (1 Meat)")
+      breakfast.plates.forEach(plate => {
+        const price = extractPrice(plate);
+        breakfastItems.push(buildItem(plate, '', price));
       });
-      // -----------------------------------------------------
+      // Add individual items (simple names, no price)
+      breakfast.items.forEach(item => {
+        breakfastItems.push(buildItem(item, '', ''));
+      });
+      sections.push({
+        title: 'Breakfast',
+        items: breakfastItems
+      });
 
-      return items;
+      // ----- 2. Lunch (today's specials + static plates) -----
+      const lunchItems = [];
+      // Static plates from defaults.lunch
+      data.defaults.lunch.plates.forEach(plate => {
+        const price = extractPrice(plate);
+        lunchItems.push(buildItem(plate, '', price));
+      });
+      // Today's lunch items (if available)
+      if (dailyMenu && dailyMenu.lunch && dailyMenu.lunch.show && dailyMenu.lunch.items) {
+        dailyMenu.lunch.items.forEach(item => {
+          // item is { name, desc } – price might be in name, but we keep desc separate
+          lunchItems.push(buildItem(item.name, item.desc || '', ''));
+        });
+      } else {
+        // Optionally add a placeholder or skip
+        lunchItems.push(buildItem('Check back for today’s specials', 'Our lunch menu changes daily. Please visit us to see what’s cooking!', ''));
+      }
+      sections.push({
+        title: 'Lunch',
+        items: lunchItems
+      });
+
+      // ----- 3. Salad (static) -----
+      const salad = data.defaults.salad;
+      const saladItems = [];
+      salad.items.forEach(entry => {
+        const price = extractPrice(entry);
+        saladItems.push(buildItem(entry, '', price));
+      });
+      // Add detailed salad bar info as one descriptive item
+      const saladBar = salad.saladBar;
+      const saladBarDesc = `Lettuce: ${saladBar.lettuce.join(', ')} | Toppings: ${saladBar.toppings.join(', ')} | Dressings: ${saladBar.dressing.join(', ')}`;
+      saladItems.push(buildItem('Salad Bar', saladBarDesc, ''));
+      sections.push({
+        title: 'Salad',
+        items: saladItems
+      });
+
+      // ----- 4. Drinks -----
+      const drinksItems = data.defaults.drinks.items.map(name => buildItem(name, '', ''));
+      sections.push({
+        title: 'Drinks',
+        items: drinksItems
+      });
+
+      // ----- 5. Dessert (today's if available) -----
+      const dessertItems = [];
+      if (dailyMenu && dailyMenu.dessert && dailyMenu.dessert.items) {
+        dailyMenu.dessert.items.forEach(name => {
+          dessertItems.push(buildItem(name, '', ''));
+        });
+      } else {
+        dessertItems.push(buildItem('Ask your server about today’s dessert', '', ''));
+      }
+      sections.push({
+        title: 'Dessert',
+        items: dessertItems
+      });
+
+      // ----- 6. Crawfish (static) -----
+      const crawfishItems = data.defaults.crawfish.items.map(text => buildItem(text, '', ''));
+      sections.push({
+        title: 'Crawfish',
+        items: crawfishItems
+      });
+
+      return sections;
     }
 
-    // Group items by category
-    function groupByCategory(items) {
-      return items.reduce((acc, item) => {
-        if (!acc[item.category]) {
-          acc[item.category] = [];
-        }
-        acc[item.category].push(item);
-        return acc;
-      }, {});
-    }
+    // Render all sections into the container
+    function renderMenu(container, sections) {
+      container.innerHTML = ''; // clear loading
 
-    // Render the menu into the container
-    function renderMenu(menuContainer, groupedItems) {
-      menuContainer.innerHTML = ''; // clear loading
-
-      for (const [category, items] of Object.entries(groupedItems)) {
-        const section = document.createElement('div');
-        section.className = 'menu-section';
+      sections.forEach(section => {
+        const sectionDiv = document.createElement('div');
+        sectionDiv.className = 'menu-section';
 
         const title = document.createElement('h2');
         title.className = 'category-title';
-        title.textContent = category;
-        section.appendChild(title);
+        title.textContent = section.title;
+        sectionDiv.appendChild(title);
 
         const grid = document.createElement('div');
         grid.className = 'menu-grid';
 
-        items.forEach(item => {
+        section.items.forEach(item => {
           const itemDiv = document.createElement('div');
           itemDiv.className = 'menu-item';
 
-          itemDiv.innerHTML = `
-            <div class="item-name">${item.name}</div>
-            <div class="item-description">${item.description}</div>
-            <div class="item-price">${item.price}</div>
-          `;
+          const nameEl = document.createElement('div');
+          nameEl.className = 'item-name';
+          nameEl.textContent = item.name;
+          itemDiv.appendChild(nameEl);
+
+          if (item.description) {
+            const descEl = document.createElement('div');
+            descEl.className = 'item-description';
+            descEl.textContent = item.description;
+            itemDiv.appendChild(descEl);
+          }
+
+          if (item.price) {
+            const priceEl = document.createElement('div');
+            priceEl.className = 'item-price';
+            priceEl.textContent = item.price;
+            itemDiv.appendChild(priceEl);
+          }
 
           grid.appendChild(itemDiv);
         });
 
-        section.appendChild(grid);
-        menuContainer.appendChild(section);
-      }
+        sectionDiv.appendChild(grid);
+        container.appendChild(sectionDiv);
+      });
     }
 
-    // Fetch and display the menu
+    // Fetch menu-data.html, extract JSON, and build the menu
     async function loadMenu() {
-      const menuContainer = document.getElementById('menu-container');
+      const container = document.getElementById('menu-container');
 
       try {
         const response = await fetch(DATA_URL);
         if (!response.ok) {
-          throw new Error(`Failed to load menu data: ${response.status}`);
+          throw new Error(`HTTP ${response.status}`);
         }
         const html = await response.text();
-        const items = parseMenuData(html);
-        
-        if (items.length === 0) {
-          menuContainer.innerHTML = '<p class="error-message">No menu items found.</p>';
-          return;
+
+        // Extract JSON from the script tag with id "hh-menu-data"
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const script = doc.getElementById('hh-menu-data');
+        if (!script) {
+          throw new Error('Could not find menu data script tag.');
         }
 
-        const grouped = groupByCategory(items);
-        renderMenu(menuContainer, grouped);
+        const jsonText = script.textContent;
+        const menuData = JSON.parse(jsonText);
+
+        // Process the data into sections
+        const sections = processMenuData(menuData);
+        renderMenu(container, sections);
+
       } catch (error) {
         console.error(error);
-        menuContainer.innerHTML = `<p class="error-message">Error loading menu: ${error.message}</p>`;
+        container.innerHTML = `<p class="error-message">Error loading menu: ${error.message}</p>`;
       }
     }
 
-    // Start the process
     loadMenu();
   </script>
 </body>
