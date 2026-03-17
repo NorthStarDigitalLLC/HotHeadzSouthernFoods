@@ -259,6 +259,97 @@
       gap: 10px;
       justify-items: center;
     }
+    .chipnav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: min(760px, calc(100vw - 28px));
+      margin-top: 4px;
+    }
+    .chip {
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+    .chip.active {
+      background: linear-gradient(180deg, rgba(192,90,42,.75), rgba(160,65,28,.92));
+      border-color: rgba(255,200,130,.5);
+      box-shadow: 0 10px 22px rgba(192,90,42,.22);
+    }
+    .modehint {
+      color: rgba(255,255,255,.66);
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+      margin-top: 2px;
+    }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.68);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 18px;
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal {
+      width: min(520px, calc(100vw - 24px));
+      border-radius: 28px;
+      background:
+        radial-gradient(500px 180px at 0% 0%, rgba(255,140,90,.16), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: 0 20px 60px rgba(0,0,0,.4);
+      padding: 22px;
+      text-align: center;
+    }
+    .modal-title {
+      font-size: 28px;
+      font-weight: 900;
+      color: #ffb35a;
+      margin-bottom: 8px;
+    }
+    .modal-text {
+      color: rgba(255,255,255,.82);
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+    .statusbar {
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      color: rgba(255,255,255,.74);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+    .statusdot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #5effad;
+      box-shadow: 0 0 12px rgba(94,255,173,.7);
+    }
+    .statusdot.closed {
+      background: #ff8a8a;
+      box-shadow: 0 0 12px rgba(255,138,138,.7);
+    }
     .swipe-head {
       display: flex;
       gap: 10px;
@@ -420,6 +511,8 @@
             <div class="subline" id="todayCardStatus">Swipe categories</div>
             <button class="pill" id="todayNextCard"><i class="fas fa-chevron-right"></i></button>
           </div>
+          <div class="chipnav" id="todayChipNav"></div>
+          <div class="modehint">Tap a category chip or swipe the hologram cards.</div>
           <div class="swipe-track" id="todaySwipeTrack"></div>
         </div>
       </div>
@@ -460,6 +553,8 @@
             <div class="subline" id="tomorrowCardStatus">Swipe categories</div>
             <button class="pill" id="tomorrowNextCard"><i class="fas fa-chevron-right"></i></button>
           </div>
+          <div class="chipnav" id="tomorrowChipNav"></div>
+          <div class="modehint">Tap a category chip or swipe the hologram cards.</div>
           <div class="swipe-track" id="tomorrowSwipeTrack"></div>
         </div>
       </div>
@@ -552,8 +647,7 @@
         return hours * 60 + minutes;
       }
       function findHours(weekly, dayName) {
-        return (weekly || []).find(d => (d.day || "").toLowerCase() === (dayName || "").toLowerCase()) ||
-          { day: dayName, open: "", close: "", breakfast: "", lunch: "" };
+        return getBusinessHours(dayName);
       }
       function getClosure(data, dayName) {
         const c = data?.closures || {};
@@ -580,6 +674,69 @@
       function showLoadError(msg) {
         $("loadError").classList.remove("hide");
         setText("loadErrorMsg", msg || "Try again in a moment.");
+      }
+      function dayOpeningInfo(dayName) {
+        const lower = String(dayName || "").toLowerCase();
+        if (lower === "sunday") return { open: "7:00 AM", close: "3:00 PM", breakfast: "7:00 AM - 10:30 AM", lunch: "11:00 AM - 3:00 PM", crawfish: "" };
+        if (lower === "saturday") return { open: "6:00 AM", close: "2:00 PM", breakfast: "6:00 AM - 10:30 AM", lunch: "11:00 AM - 2:00 PM", crawfish: "4:00 PM - 8:00 PM" };
+        return { open: "5:30 AM", close: "2:00 PM", breakfast: "5:30 AM - 10:30 AM", lunch: "11:00 AM - 2:00 PM", crawfish: false };
+      }
+
+      function getBusinessHours(dayName) {
+        const lower = String(dayName || "").toLowerCase();
+        const open = lower === "sunday" ? "7:00 AM" : (lower === "saturday" ? "6:00 AM" : "5:30 AM");
+        const close = lower === "sunday" ? "3:00 PM" : "2:00 PM";
+        return {
+          day: dayName,
+          open,
+          close,
+          breakfast: `${open} - 10:30 AM`,
+          lunch: `11:00 AM - ${close}`,
+          crawfish: ["thursday","friday","saturday"].includes(lower) ? "4:00 PM - 8:00 PM" : ""
+        };
+      }
+
+      function timeToMinutes12h(timeStr) {
+        if (!timeStr) return null;
+        const m = String(timeStr).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+        if (!m) return null;
+        let h = parseInt(m[1], 10);
+        const min = parseInt(m[2], 10);
+        const ap = m[3].toUpperCase();
+        if (ap === "PM" && h !== 12) h += 12;
+        if (ap === "AM" && h === 12) h = 0;
+        return h * 60 + min;
+      }
+
+      function rangeIncludes(nowMinutes, rangeStr) {
+        if (!rangeStr || !String(rangeStr).includes("-")) return false;
+        const [a, b] = String(rangeStr).split("-").map(s => s.trim());
+        const start = timeToMinutes12h(a);
+        const end = timeToMinutes12h(b);
+        if (start == null || end == null) return false;
+        return nowMinutes >= start && nowMinutes <= end;
+      }
+
+      function categoryOpenNow(catName, dayName, nowDate) {
+        const hours = getBusinessHours(dayName);
+        const mins = nowDate.getHours() * 60 + nowDate.getMinutes();
+        const lower = String(catName || "").toLowerCase();
+        if (lower === "breakfast") return rangeIncludes(mins, hours.breakfast);
+        if (lower === "lunch" || lower === "salad bar" || lower === "drinks" || lower === "dessert") return rangeIncludes(mins, hours.lunch);
+        if (lower === "crawfish") return !!hours.crawfish && rangeIncludes(mins, hours.crawfish);
+        return rangeIncludes(mins, `${hours.open} - ${hours.close}`);
+      }
+
+      function openingMessageFor(dayName) {
+        const hours = getBusinessHours(dayName);
+        return `${dayName} opens at ${hours.open}. Breakfast runs until 10:30 AM, lunch starts at 11:00 AM${hours.crawfish ? `, and crawfish runs ${hours.crawfish}` : ""}.`;
+      }
+
+      function showLuckModal(title, text) {
+        const modal = $("luckModal");
+        setText("luckModalTitle", title);
+        setText("luckModalText", text);
+        modal.classList.add("show");
       }
 
       async function fetchHtml(url) {
@@ -690,6 +847,7 @@
         const status = $(`${prefix}CardStatus`);
         const prev = $(`${prefix}PrevCard`);
         const next = $(`${prefix}NextCard`);
+        const chipNav = $(`${prefix}ChipNav`);
         if (!track) return;
 
         track.innerHTML = categories.map((cat, i) => `
@@ -700,7 +858,14 @@
           </article>
         `).join("");
 
+        if (chipNav) {
+          chipNav.innerHTML = categories.map((cat, i) =>
+            `<button class="chip${i === 0 ? ' active' : ''}" data-index="${i}">${escapeHtml(cat.name)}</button>`
+          ).join("");
+        }
+
         const cards = Array.from(track.querySelectorAll(".swipe-card"));
+        const chips = Array.from((chipNav || document.createElement("div")).querySelectorAll(".chip"));
 
         function activeIndex() {
           const left = track.scrollLeft;
@@ -712,6 +877,7 @@
           const idx = Math.max(0, Math.min(categories.length - 1, activeIndex()));
           setText(`${prefix}CardStatus`, `${categories[idx]?.name || ""} • ${idx + 1} / ${categories.length}`);
           cards.forEach((card, i) => card.classList.toggle("active", i === idx));
+          chips.forEach((chip, i) => chip.classList.toggle("active", i === idx));
         }
 
         function goTo(idx) {
@@ -722,6 +888,7 @@
 
         prev?.addEventListener("click", () => goTo(activeIndex() - 1));
         next?.addEventListener("click", () => goTo(activeIndex() + 1));
+        chips.forEach(chip => chip.addEventListener("click", () => goTo(Number(chip.dataset.index || 0))));
         track.addEventListener("scroll", () => requestAnimationFrame(updateStatus));
         window.addEventListener("resize", updateStatus);
 
@@ -754,7 +921,7 @@
         };
       }
 
-      function initWheel(prefix, categories, data) {
+      function initWheel(prefix, categories, data, dayName, isTodayPanel) {
         const wrap = $(`${prefix}WheelWrap`);
         const wheel = $(`${prefix}Wheel`);
         const detailTitle = $(`${prefix}DetailTitle`);
@@ -782,9 +949,9 @@
         let velocity = 0;
         let dragging = false;
         let lastPointerAngle = 0;
-        let animating = false;
         let selected = 0;
         let raf = 0;
+        let lockedByHours = false;
 
         function shortestDelta(a, b) {
           let diff = a - b;
@@ -811,6 +978,31 @@
           }
           return best;
         }
+        function canShowCategory(cat) {
+          if (!isTodayPanel) return true;
+          return categoryOpenNow(cat.name, dayName, new Date());
+        }
+        function renderDetailFor(idx, force=false) {
+          const cat = categories[idx];
+          const allowed = canShowCategory(cat);
+          lockedByHours = !allowed;
+          detailTitle.textContent = cat.name;
+          if (allowed) {
+            detailContent.innerHTML = renderCategoryContent(cat, data);
+          } else {
+            detailContent.innerHTML = `
+              <div class="section-label">Unavailable right now</div>
+              <ul class="list">
+                <li>This category is not available at the current hour.</li>
+                <li>${escapeHtml(openingMessageFor(dayName))}</li>
+              </ul>
+            `;
+          }
+          if (force) {
+            detailCard.classList.add("pulse");
+            setTimeout(() => detailCard.classList.remove("pulse"), 520);
+          }
+        }
         function render(force=false) {
           wheel.style.transform = `rotate(${angle}deg)`;
           items.forEach((item, i) => {
@@ -822,10 +1014,7 @@
           if (force || idx !== selected) {
             selected = idx;
             items.forEach((item, i) => item.classList.toggle("selected", i === idx));
-            detailTitle.textContent = categories[idx].name;
-            detailContent.innerHTML = renderCategoryContent(categories[idx], data);
-            detailCard.classList.add("pulse");
-            setTimeout(() => detailCard.classList.remove("pulse"), 520);
+            renderDetailFor(idx, true);
           }
         }
         function tick() {
@@ -841,13 +1030,11 @@
                 angle = target;
                 velocity = 0;
                 render(true);
-                animating = false;
                 return;
               }
             }
           }
           render();
-          animating = true;
           raf = requestAnimationFrame(tick);
         }
         function ensureAnim() {
@@ -879,18 +1066,29 @@
           wrap.releasePointerCapture?.(e.pointerId);
           ensureAnim();
         }
+        function onClick() {
+          if (lockedByHours && isTodayPanel) {
+            showLuckModal("Try your luck again tomorrow", `${categories[selected].name} is not available right now. ${openingMessageFor(dayName)}`);
+          }
+        }
 
         wrap.addEventListener("pointerdown", onDown, { passive: false });
         wrap.addEventListener("pointermove", onMove, { passive: false });
         wrap.addEventListener("pointerup", onUp);
         wrap.addEventListener("pointercancel", onUp);
+        detailCard.addEventListener("click", onClick);
 
         render(true);
 
         return {
           aiPick() {
-            const idx = Math.floor(Math.random() * categories.length);
-            velocity = 12 + Math.random() * 8;
+            const pool = isTodayPanel ? categories.filter(cat => canShowCategory(cat)) : categories.slice();
+            if (!pool.length) {
+              showLuckModal("Try your luck again tomorrow", openingMessageFor(dayName));
+              return null;
+            }
+            const picked = pool[Math.floor(Math.random() * pool.length)];
+            const idx = categories.findIndex(c => c.name === picked.name);
             const target = -(idx * step);
             const start = performance.now();
             const startAngle = angle;
@@ -906,13 +1104,12 @@
               else {
                 angle = target;
                 render(true);
-                const cat = categories[idx];
                 detailCard.classList.add("pulse");
                 setTimeout(() => detailCard.classList.remove("pulse"), 900);
               }
             }
             requestAnimationFrame(animate);
-            return categories[idx];
+            return picked;
           },
           selectByName(name) {
             const idx = categories.findIndex(c => c.name === name);
@@ -963,7 +1160,6 @@
         track.innerHTML = "";
         setText("advancedDisclaimer", data?.settings?.advancedDisclaimer || "");
         const start = parseISODateToLocal(todayISO);
-        const weekly = data?.hours?.weekly || [];
         const lDef = data?.defaults?.lunch || {};
         const days = Math.max(1, Math.min(31, Number(data?.settings?.advancedWindowDays ?? 7)));
 
@@ -972,7 +1168,7 @@
           d.setDate(start.getDate() + i);
           const iso = toISODateLocal(d);
           const name = weekdayName(d);
-          const hours = findHours(weekly, name);
+          const hours = getBusinessHours(name);
           const closure = getClosure(data, name);
           const lunch = (getMenuByDate(data, iso) || {}).lunch || {};
           const plates = normalizeItems(lunch.plates ?? lDef.plates ?? []);
@@ -996,19 +1192,31 @@
       }
 
       function initPanel(prefix, data, isoDate, displayName, calendarTodayISO) {
-        const weekly = data?.hours?.weekly || [];
-        const hours = findHours(weekly, displayName);
+        const hours = getBusinessHours(displayName);
         const closure = getClosure(data, displayName);
+        const isTodayPanel = prefix === "today";
 
         setText(`${prefix}Title`, `${displayName} (${formatDateNice(parseISODateToLocal(isoDate))}) Menu`);
         setText(`${prefix}Hours`,
           closure?.closed
             ? `${displayName} Hours: Closed`
             : `${displayName} Hours: ${hours.open} – ${hours.close}` +
-              (hours.breakfast ? ` • Breakfast ${hours.breakfast}` : "") +
-              (hours.lunch ? ` • Lunch ${hours.lunch}` : "")
+              ` • Breakfast ${hours.breakfast}` +
+              ` • Lunch ${hours.lunch}` +
+              (hours.crawfish ? ` • Crawfish ${hours.crawfish}` : "")
         );
         setText(`${prefix}Note`, data?.hours?.note || "");
+
+        const nowStatus = isTodayPanel && !closure?.closed
+          ? (() => {
+              const openNow = rangeIncludes((new Date().getHours()*60 + new Date().getMinutes()), `${hours.open} - ${hours.close}`) ||
+                              (!!hours.crawfish && rangeIncludes((new Date().getHours()*60 + new Date().getMinutes()), hours.crawfish));
+              return `<span class="statusdot ${openNow ? '' : 'closed'}"></span>${openNow ? 'OPEN NOW' : 'CURRENTLY CLOSED'}`;
+            })()
+          : `<span class="statusdot ${closure?.closed ? 'closed' : ''}"></span>${closure?.closed ? 'CLOSED' : 'SCHEDULE READY'}`;
+
+        const noteEl = $(`${prefix}Note`);
+        if (noteEl) noteEl.innerHTML = `${escapeHtml(data?.hours?.note || "")}<div class="statusbar">${nowStatus}</div>`;
 
         if (closure?.closed) {
           $(`${prefix}Closed`).classList.remove("hide");
@@ -1018,7 +1226,7 @@
         }
 
         const cats = buildCategoryData(data, isoDate);
-        const wheelApi = initWheel(prefix, cats, data);
+        const wheelApi = initWheel(prefix, cats, data, displayName, isTodayPanel);
         const swipeApi = initSwipe(prefix, cats, data);
 
         setupViewToggle(prefix);
@@ -1057,6 +1265,8 @@
           else if (link) window.location.href = link;
         }));
         document.querySelector(".circular-menu")?.addEventListener("click", e => e.stopPropagation());
+        $("luckModalClose")?.addEventListener("click", () => $("luckModal").classList.remove("show"));
+        $("luckModal")?.addEventListener("click", e => { if (e.target.id === "luckModal") $("luckModal").classList.remove("show"); });
       }
 
       setupDayTabs();
@@ -1077,9 +1287,8 @@
           let displayTomorrowISO = calendarTomorrowISO;
           let displayTomorrowName = calendarTomorrowName;
 
-          const weekly = data?.hours?.weekly || [];
           const closureToday = getClosure(data, calendarTodayName);
-          if (isPastClosingToday(weekly, calendarTodayName) && !closureToday?.closed) {
+          if (isPastClosingToday([], calendarTodayName) && !closureToday?.closed) {
             displayTodayISO = calendarTomorrowISO;
             displayTodayName = calendarTomorrowName;
             const dayAfter = new Date(now); dayAfter.setDate(now.getDate() + 2);
@@ -1100,5 +1309,14 @@
       })();
     })();
   </script>
+
+  <div class="modal-backdrop" id="luckModal">
+    <div class="modal">
+      <div class="modal-title" id="luckModalTitle">Try your luck again tomorrow</div>
+      <div class="modal-text" id="luckModalText"></div>
+      <button class="actionbtn primary" id="luckModalClose">Got it</button>
+    </div>
+  </div>
+
 </body>
 </html>
