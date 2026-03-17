@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Hot Headz Southern Foods – Complete 3D Cube Menu</title>
+  <title>Hot Headz Southern Foods – 3D Cube Menu with Lock</title>
+  <meta name="description" content="Daily breakfast, lunch, crawfish, salad bar, drinks and desserts – now in 3D!">
 
   <!-- Google Fonts & Font Awesome -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,6 +12,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
+  <!-- FAVICON / ICONS -->
+  <link rel="icon" type="image/webp" href="images/HotHeadzLogo.png">
+  <link rel="apple-touch-icon" href="images/HotHeadzLogo.png">
+
+  <!-- OPEN GRAPH / TWITTER -->
+  <meta property="og:image" content="images/HotHeadzLogo.png">
+  <meta property="og:image:alt" content="Hot Headz Southern Foods logo">
+  <meta name="twitter:image" content="images/HotHeadzLogo.png">
+  <meta name="twitter:image:alt" content="Hot Headz Southern Foods logo">
+  
   <style>
     /* ---------- RESET / BASE ---------- */
     * {
@@ -172,7 +183,7 @@
     .hh-advanced-title{ font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; font-size: clamp(18px, 2.2vw, 26px); font-weight: 850; letter-spacing: .2px; color: rgba(245,240,230,.92); }
     .hh-advanced-disclaimer{ font-weight: 780; color: rgba(245,240,230,.68); text-align:right; max-width: 520px; font-size: 12.8px; line-height: 1.35; }
 
-    /* ===== CUBE STYLES ===== */
+    /* ===== CUBE STYLES (compact with lock) ===== */
     .hh-cube-controls {
       display: flex;
       flex-wrap: wrap;
@@ -207,10 +218,10 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      touch-action: none;
+      touch-action: none; /* default: prevent scrolling while dragging */
     }
     .hh-cube-wrapper.can-scroll {
-      touch-action: auto;
+      touch-action: auto; /* allow scrolling inside */
     }
     .hh-cube-container {
       width: 220px;
@@ -237,7 +248,7 @@
       flex-direction: column;
       padding: 8px 6px;
       overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
+      -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
       backface-visibility: visible;
       color: #efe6d9;
       font-size: 11px;
@@ -312,13 +323,15 @@
     @media(min-width:860px){ .hh-adv-card{ flex: 0 0 48%; } }
     .hidden { display: none !important; }
 
-    /* circular nav */
+    /* circular nav (unchanged) */
     .nav-btn { position: fixed; z-index: 2000; background: #1e1b1b; border: 2px solid var(--hh-accent, #c05a2a); border-radius: 50px; display: flex; align-items: center; gap: 12px; cursor: pointer; box-shadow: 0 0 25px rgba(192,90,42,0.5); transition: all 0.2s ease; backdrop-filter: blur(8px); }
     .nav-btn:hover { transform: scale(1.05); border-color: var(--hh-accent-2, #2a7f62); box-shadow: 0 0 35px var(--hh-accent, #c05a2a); }
     .btn-icon { font-size: 1.8rem; color: var(--hh-accent, #c05a2a); }
     .btn-text { display: flex; flex-direction: column; line-height: 1.2; }
     .btn-text .main { font-weight: 700; font-size: 1rem; letter-spacing: 2px; color: rgba(255,255,255,0.92); }
     .btn-text .sub { font-size: 0.65rem; opacity: 0.7; color: rgba(255,255,255,0.7); text-transform: uppercase; }
+    .nav-btn.left-center { left: 30px; top: 50%; transform: translateY(-50%); flex-direction: column; padding: 1rem 0.5rem; gap: 8px; }
+    .nav-btn.left-center .btn-text { writing-mode: vertical-rl; text-orientation: upright; margin: 0; line-height: 1.2; }
     .nav-btn.bottom-center { bottom: 30px; left: 50%; transform: translateX(-50%); flex-direction: row; padding: 0.8rem 1.8rem; }
     .circ-menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2500; display: flex; align-items: center; justify-content: center; pointer-events: none; background: rgba(0,0,0,0.7); opacity: 0; transition: opacity 0.3s ease; backdrop-filter: blur(8px); }
     .circ-menu-overlay.open { opacity: 1; pointer-events: all; }
@@ -329,6 +342,7 @@
     .menu-item { position: absolute; width: 60px; height: 60px; background: #1e1b1b; border: 2px solid var(--hh-accent, #c05a2a); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.92); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; transition: all 0.2s; cursor: pointer; box-shadow: 0 0 15px rgba(0,0,0,0.7); top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-130px) rotate(calc(var(--angle) * -1deg)); font-family: 'Inter', sans-serif; letter-spacing: 1px; backdrop-filter: blur(4px); }
     .menu-item:hover { background: var(--hh-accent, #c05a2a); color: black; border-color: var(--hh-accent-2, #2a7f62); transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-140px) rotate(calc(var(--angle) * -1deg)); width: 65px; height: 65px; }
     @media (max-width: 600px) {
+      .nav-btn.left-center { left: 10px; padding: 0.8rem 0.3rem; }
       .nav-btn.bottom-center { bottom: 20px; padding: 0.6rem 1.2rem; }
       .circular-menu { width: 280px; height: 280px; }
     }
@@ -365,6 +379,7 @@
         <div class="hh-note" id="hh-hours-note"></div>
       </div>
 
+      <!-- Today's view toggle -->
       <div class="hh-view-toggle" id="viewToggleToday">
         <button class="hh-view-btn active" id="viewTodayStandardBtn">Standard</button>
         <button class="hh-view-btn" id="viewTodayCubeBtn">3D Cube</button>
@@ -376,6 +391,7 @@
         <div class="hh-state-msg" id="hh-today-closed-msg"></div>
       </div>
 
+      <!-- Standard tabbed view -->
       <div class="hh-tablist" role="tablist" aria-label="Today categories">
         <button class="hh-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-today-breakfast" id="hhTabTodayBreakfast">Breakfast</button>
         <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-lunch" id="hhTabTodayLunch">Lunch</button>
@@ -386,6 +402,7 @@
       </div>
 
       <div class="hh-panels" id="todayStandardPanels">
+        <!-- Breakfast panel -->
         <section class="hh-panel is-active" id="hh-today-breakfast" role="tabpanel" aria-labelledby="hhTabTodayBreakfast">
           <h3>Breakfast</h3>
           <p class="hh-sub" id="hh-today-breakfast-sub"></p>
@@ -398,6 +415,7 @@
             <div class="hh-small" id="hh-delivery-note"></div>
           </div>
         </section>
+        <!-- Lunch panel -->
         <section class="hh-panel" id="hh-today-lunch" hidden role="tabpanel" aria-labelledby="hhTabTodayLunch">
           <h3>Lunch</h3>
           <p class="hh-sub" id="hh-today-lunch-sub">Loading today’s lunch menu…</p>
@@ -416,6 +434,7 @@
             <a class="hh-btn" id="hh-call-btn-today-l" href="#">Call to Order</a>
           </div>
         </section>
+        <!-- Crawfish panel -->
         <section class="hh-panel" id="hh-today-crawfish" hidden role="tabpanel" aria-labelledby="hhTabTodayCrawfish">
           <h3>Crawfish</h3>
           <p class="hh-sub" id="hh-today-crawfish-sub"></p>
@@ -424,6 +443,7 @@
             <a class="hh-btn" id="hh-call-btn-today-c" href="#">Call to Order</a>
           </div>
         </section>
+        <!-- Salad panel -->
         <section class="hh-panel" id="hh-today-salad" hidden role="tabpanel" aria-labelledby="hhTabTodaySalad">
           <h3>Salad Bar</h3>
           <p class="hh-sub" id="hh-today-salad-sub"></p>
@@ -436,10 +456,12 @@
           <h4>Dressing</h4>
           <ul class="hh-stack" id="hh-today-salad-dressing"></ul>
         </section>
+        <!-- Drinks panel -->
         <section class="hh-panel" id="hh-today-drinks" hidden role="tabpanel" aria-labelledby="hhTabTodayDrinks">
           <h3>Drinks</h3>
           <ul class="hh-stack" id="hh-today-drinks-items"></ul>
         </section>
+        <!-- Dessert panel -->
         <section class="hh-panel" id="hh-today-dessert" hidden role="tabpanel" aria-labelledby="hhTabTodayDessert">
           <h3>Dessert</h3>
           <p class="hh-sub" id="hh-today-dessert-sub"></p>
@@ -447,7 +469,7 @@
         </section>
       </div>
 
-      <!-- Today's cube -->
+      <!-- Today's 3D cube view (hidden by default) -->
       <div id="todayCubeContainer" class="hidden">
         <div class="hh-cube-controls">
           <button class="hh-cube-btn" id="todayCubeZoomOut"><i class="fas fa-search-minus"></i></button>
@@ -477,6 +499,7 @@
         <div class="hh-note" id="hh-hours-note-2"></div>
       </div>
 
+      <!-- Tomorrow's view toggle -->
       <div class="hh-view-toggle" id="viewToggleTomorrow">
         <button class="hh-view-btn active" id="viewTomorrowStandardBtn">Standard</button>
         <button class="hh-view-btn" id="viewTomorrowCubeBtn">3D Cube</button>
@@ -488,6 +511,7 @@
         <div class="hh-state-msg" id="hh-tomorrow-closed-msg"></div>
       </div>
 
+      <!-- Standard tabbed view -->
       <div class="hh-tablist" role="tablist" aria-label="Tomorrow categories">
         <button class="hh-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-tomorrow-breakfast" id="hhTabTomorrowBreakfast">Breakfast</button>
         <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-lunch" id="hhTabTomorrowLunch">Lunch</button>
@@ -498,6 +522,7 @@
       </div>
 
       <div class="hh-panels" id="tomorrowStandardPanels">
+        <!-- Breakfast panel -->
         <section class="hh-panel is-active" id="hh-tomorrow-breakfast" role="tabpanel" aria-labelledby="hhTabTomorrowBreakfast">
           <h3>Breakfast</h3>
           <p class="hh-sub" id="hh-tomorrow-breakfast-sub"></p>
@@ -510,6 +535,7 @@
             <div class="hh-small" id="hh-delivery-note-2"></div>
           </div>
         </section>
+        <!-- Lunch panel -->
         <section class="hh-panel" id="hh-tomorrow-lunch" hidden role="tabpanel" aria-labelledby="hhTabTomorrowLunch">
           <h3>Lunch</h3>
           <p class="hh-sub" id="hh-tomorrow-lunch-sub">Loading tomorrow’s lunch menu…</p>
@@ -528,6 +554,7 @@
             <a class="hh-btn" id="hh-call-btn-tomorrow-l" href="#">Call to Order</a>
           </div>
         </section>
+        <!-- Crawfish panel -->
         <section class="hh-panel" id="hh-tomorrow-crawfish" hidden role="tabpanel" aria-labelledby="hhTabTomorrowCrawfish">
           <h3>Crawfish</h3>
           <p class="hh-sub" id="hh-tomorrow-crawfish-sub"></p>
@@ -536,6 +563,7 @@
             <a class="hh-btn" id="hh-call-btn-tomorrow-c" href="#">Call to Order</a>
           </div>
         </section>
+        <!-- Salad panel -->
         <section class="hh-panel" id="hh-tomorrow-salad" hidden role="tabpanel" aria-labelledby="hhTabTomorrowSalad">
           <h3>Salad Bar</h3>
           <p class="hh-sub" id="hh-tomorrow-salad-sub"></p>
@@ -548,10 +576,12 @@
           <h4>Dressing</h4>
           <ul class="hh-stack" id="hh-tomorrow-salad-dressing"></ul>
         </section>
+        <!-- Drinks panel -->
         <section class="hh-panel" id="hh-tomorrow-drinks" hidden role="tabpanel" aria-labelledby="hhTabTomorrowDrinks">
           <h3>Drinks</h3>
           <ul class="hh-stack" id="hh-tomorrow-drinks-items"></ul>
         </section>
+        <!-- Dessert panel -->
         <section class="hh-panel" id="hh-tomorrow-dessert" hidden role="tabpanel" aria-labelledby="hhTabTomorrowDessert">
           <h3>Dessert</h3>
           <p class="hh-sub" id="hh-tomorrow-dessert-sub"></p>
@@ -559,7 +589,7 @@
         </section>
       </div>
 
-      <!-- Tomorrow's cube -->
+      <!-- Tomorrow's 3D cube view -->
       <div id="tomorrowCubeContainer" class="hidden">
         <div class="hh-cube-controls">
           <button class="hh-cube-btn" id="tomorrowCubeZoomOut"><i class="fas fa-search-minus"></i></button>
@@ -620,6 +650,7 @@
       <div class="hh-hint">Tip: switch to 3D cube for a spinning experience!</div>
     </div>
 
+    <!-- error state -->
     <div class="hh-state" id="hh-load-error" hidden>
       <div class="hh-badge is-dark">Error</div>
       <div class="hh-state-title">Menu couldn’t load</div>
@@ -627,73 +658,10 @@
     </div>
   </div>
 
-  <!-- ===== SAMPLE DATA SCRIPT (so menu displays immediately) ===== -->
-  <script id="hh-menu-data" type="application/json">
-    {
-      "hours": {
-        "weekly": [
-          { "day": "Monday", "open": "6:00 AM", "close": "8:00 PM", "breakfast": "6:00-10:30", "lunch": "11:00-2:30" },
-          { "day": "Tuesday", "open": "6:00 AM", "close": "8:00 PM", "breakfast": "6:00-10:30", "lunch": "11:00-2:30" },
-          { "day": "Wednesday", "open": "6:00 AM", "close": "8:00 PM", "breakfast": "6:00-10:30", "lunch": "11:00-2:30" },
-          { "day": "Thursday", "open": "6:00 AM", "close": "8:00 PM", "breakfast": "6:00-10:30", "lunch": "11:00-2:30" },
-          { "day": "Friday", "open": "6:00 AM", "close": "9:00 PM", "breakfast": "6:00-10:30", "lunch": "11:00-2:30" },
-          { "day": "Saturday", "open": "7:00 AM", "close": "9:00 PM", "breakfast": "7:00-11:00", "lunch": "11:00-3:00" },
-          { "day": "Sunday", "open": "8:00 AM", "close": "3:00 PM", "breakfast": "8:00-11:00", "lunch": "11:00-3:00" }
-        ],
-        "note": "Hours may vary on holidays."
-      },
-      "defaults": {
-        "breakfast": {
-          "plates": ["2 Eggs any style", "Pancake Stack", "French Toast"],
-          "items": ["Bacon", "Sausage", "Grits", "Biscuits & Gravy"]
-        },
-        "lunch": {
-          "plates": ["Fried Chicken Plate", "Catfish Plate", "Po' Boy"],
-          "items": ["Fried Chicken", "Catfish", "Shrimp Po' Boy", "Crawfish Etouffee"]
-        },
-        "crawfish": {
-          "subtitle": "Seasonal – call ahead!",
-          "items": ["Boiled Crawfish (lb)", "Crawfish Etouffee", "Crawfish Bisque"]
-        },
-        "salad": {
-          "subtitle": "Fresh daily",
-          "items": ["Small $5.99", "Large $8.99"],
-          "saladBar": {
-            "lettuce": ["Iceberg", "Romaine", "Spinach"],
-            "toppings": ["Tomatoes", "Cucumbers", "Carrots", "Cheese", "Croutons"],
-            "dressing": ["Ranch", "Blue Cheese", "Italian", "Honey Mustard"]
-          }
-        },
-        "drinks": {
-          "items": ["Sweet Tea", "Unsweet Tea", "Lemonade", "Soft Drinks", "Coffee"]
-        }
-      },
-      "menus": {
-        "2025-03-17": {
-          "breakfast": { "plates": ["2 Eggs any style", "Pancake Stack"], "items": ["Bacon", "Sausage"] },
-          "lunch": { "plates": ["Fried Chicken Plate"], "items": ["Fried Chicken", "Mashed Potatoes"] },
-          "crawfish": { "show": true, "items": ["Boiled Crawfish"] },
-          "salad": { "items": ["Small $5.99"], "saladBar": { "lettuce": ["Romaine"], "toppings": ["Tomatoes"], "dressing": ["Ranch"] } },
-          "drinks": { "items": ["Sweet Tea"] },
-          "dessert": { "items": ["Pecan Pie"] }
-        }
-      },
-      "settings": {
-        "showAdvancedTab": true,
-        "advancedWindowDays": 14,
-        "autoClearPastDays": true,
-        "autoClearMessage": "Lunch not available for this day.",
-        "clickForDescriptionHint": "Tap item for description"
-      },
-      "phoneTel": "tel:3372211035",
-      "deliveryNote": "Delivery via DoorDash & UberEats"
-    }
-  </script>
-
-  <!-- ===== MAIN SCRIPT ===== -->
+  <!-- ===== SCRIPTS ===== -->
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
-    // ----- FULL MENU SCRIPT (identical to previous, but now with embedded data) -----
+    // ----- ORIGINAL MENU SCRIPT (full, with cube integration) -----
     (function(){
       const DATA_URLS = ["/menu-data.html", "/menu-data/"]; // tries both
       const $ = (id)=>document.getElementById(id);
@@ -1218,7 +1186,7 @@
 
           buildAdvancedCarousel(data, calendarTodayISO);
 
-          // ========== CUBE INTEGRATION ==========
+          // ========== CUBE INTEGRATION WITH LOCK ==========
           initDayCube('today', displayTodayISO, data, hoursToday, calendarTodayISO);
           initDayCube('tomorrow', displayTomorrowISO, data, hoursTomorrow, calendarTodayISO);
           initAdvancedCube(data, calendarTodayISO);
@@ -1231,7 +1199,7 @@
         }
       })();
 
-      // ----- CUBE FUNCTIONS WITH LOCK -----
+      // ----- CUBE FUNCTIONS WITH LOCK (FIXED SCROLLING) -----
       function initDayCube(dayId, isoDate, data, hours, todayISO) {
         const cube = document.getElementById(`${dayId}Cube`);
         if (!cube) return;
@@ -1551,6 +1519,7 @@
         populateCubeFaces(0);
       }
 
+      // Toggle views for Today and Tomorrow
       function setupViewToggles() {
         const todayStandardBtn = document.getElementById('viewTodayStandardBtn');
         const todayCubeBtn = document.getElementById('viewTodayCubeBtn');
@@ -1599,7 +1568,7 @@
       setTimeout(setupViewToggles, 500);
     })();
 
-    // ----- DOCK SCRIPT -----
+    // ----- DOCK SCRIPT (unchanged) -----
     (function() {
       const root = document.getElementById('genRoot');
       const dock = document.getElementById('genDock');
@@ -1609,7 +1578,7 @@
       }
     })();
 
-    // circular menu toggle
+    // circular menu toggle (unchanged)
     (function() {
       const overlay = document.getElementById('circMenuOverlay');
       const bottomBtn = document.getElementById('navBtnBottom');
