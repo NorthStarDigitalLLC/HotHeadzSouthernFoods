@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Hot Headz Southern Foods – Menu with 3D Cube & Lock</title>
+  <title>Hot Headz Southern Foods – Menu with 3D Cube & Rotate Toggle</title>
   <meta name="description" content="Daily breakfast, lunch, crawfish, salad bar, drinks and desserts – now in 3D!">
 
   <!-- Google Fonts & Font Awesome -->
@@ -23,7 +23,7 @@
   <meta name="twitter:image:alt" content="Hot Headz Southern Foods logo">
   
   <style>
-    /* ---------- RESET / BASE (unchanged) ---------- */
+    /* ---------- RESET / BASE ---------- */
     * {
       margin: 0;
       padding: 0;
@@ -42,7 +42,7 @@
       padding-bottom: 90px;
     }
 
-    /* ---------- FLOATING DOCK (unchanged) ---------- */
+    /* ---------- FLOATING DOCK ---------- */
     :root {
       --gen-glass: rgba(6,7,10,0.62);
       --gen-glass-2: rgba(6,7,10,0.78);
@@ -183,7 +183,7 @@
     .hh-advanced-title{ font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; font-size: clamp(18px, 2.2vw, 26px); font-weight: 850; letter-spacing: .2px; color: rgba(245,240,230,.92); }
     .hh-advanced-disclaimer{ font-weight: 780; color: rgba(245,240,230,.68); text-align:right; max-width: 520px; font-size: 12.8px; line-height: 1.35; }
 
-    /* ===== CUBE STYLES (compact with lock) ===== */
+    /* ===== CUBE STYLES (compact with rotate toggle) ===== */
     .hh-cube-controls {
       display: flex;
       flex-wrap: wrap;
@@ -208,9 +208,9 @@
       border-color: #c05a2a;
       transform: scale(1.02);
     }
-    .hh-cube-btn.locked {
-      background: rgba(42,127,98,0.6);
-      border-color: #2a7f62;
+    .hh-cube-btn.rotate-mode {
+      background: rgba(192,90,42,0.7);
+      border-color: #c05a2a;
     }
     .hh-cube-wrapper {
       perspective: 1200px;
@@ -218,7 +218,17 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      touch-action: none; /* default: prevent scrolling while dragging */
+      touch-action: auto; /* allow scrolling by default */
+      cursor: default;
+      pointer-events: none; /* default: pass through to faces */
+    }
+    .hh-cube-wrapper.rotate-mode {
+      pointer-events: auto; /* capture drags */
+      touch-action: none;   /* prevent scrolling while dragging */
+      cursor: grab;
+    }
+    .hh-cube-wrapper.rotate-mode:active {
+      cursor: grabbing;
     }
     .hh-cube-container {
       width: 240px;
@@ -251,6 +261,16 @@
       font-size: 11px;
       line-height: 1.2;
       transform: rotateY(0deg) translateZ(120px);
+    }
+    /* Ensure faces are interactive when wrapper has pointer-events:none */
+    .hh-cube-face {
+      pointer-events: auto;
+    }
+    /* Tiny extra height to ensure scrollability even with little content */
+    .hh-cube-face::after {
+      content: '';
+      display: block;
+      height: 2px;
     }
     @media (min-width: 600px) {
       .hh-cube-face { transform: rotateY(0deg) translateZ(140px); padding: 10px; font-size: 12px; }
@@ -358,7 +378,7 @@
   <div class="nav-btn bottom-center" id="navBtnBottom"><i class="fas fa-compass btn-icon"></i><div class="btn-text"><span class="main">NAVIGATION</span><span class="sub">explore pages</span></div></div>
   <div class="circ-menu-overlay" id="circMenuOverlay"><div class="circular-menu"><div class="center-home" id="homeCenter" data-link="index.html"><i class="fas fa-home"></i></div><div class="menu-item" style="--angle: 0;" data-link="delivery.html">Delivery</div><div class="menu-item" style="--angle: 72;" data-link="tel:3372211035">Order</div><div class="menu-item" style="--angle: 144;" data-link="about.html">About</div><div class="menu-item" style="--angle: 216;" data-link="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634">Location</div><div class="menu-item" style="--angle: 288;" data-action="share">Share</div></div></div>
 
-  <!-- ===== MENU HTML (full, with cubes and lock buttons) ===== -->
+  <!-- ===== MENU HTML (full, with cubes and rotate button) ===== -->
   <div class="hh-menu" role="region" aria-label="Menu" id="hh-menu-root">
     <div class="hh-stickywrap">
       <div class="hh-daybar" role="tablist" aria-label="Day selector">
@@ -388,7 +408,7 @@
         <div class="hh-state-msg" id="hh-today-closed-msg"></div>
       </div>
 
-      <!-- Standard tabbed view (full) -->
+      <!-- Standard tabbed view -->
       <div class="hh-tablist" role="tablist" aria-label="Today categories">
         <button class="hh-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-today-breakfast" id="hhTabTodayBreakfast">Breakfast</button>
         <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-lunch" id="hhTabTodayLunch">Lunch</button>
@@ -471,7 +491,7 @@
         <div class="hh-cube-controls">
           <button class="hh-cube-btn" id="todayCubeZoomOut"><i class="fas fa-search-minus"></i></button>
           <button class="hh-cube-btn" id="todayCubeReset"><i class="fas fa-undo-alt"></i> Reset</button>
-          <button class="hh-cube-btn" id="todayCubeLock"><i class="fas fa-lock"></i> Lock</button>
+          <button class="hh-cube-btn" id="todayCubeRotate"><i class="fas fa-rotate-right"></i> Rotate</button>
           <button class="hh-cube-btn" id="todayCubeZoomIn"><i class="fas fa-search-plus"></i></button>
         </div>
         <div class="hh-cube-wrapper" id="todayCubeWrapper">
@@ -484,7 +504,7 @@
             <div class="hh-cube-face bottom" id="todayFace5"></div>
           </div>
         </div>
-        <div class="hh-hint" style="text-align:center; margin:8px;">Drag to rotate • Lock to scroll</div>
+        <div class="hh-hint" style="text-align:center; margin:8px;">Scroll normally • Tap Rotate to spin</div>
       </div>
     </div>
 
@@ -591,7 +611,7 @@
         <div class="hh-cube-controls">
           <button class="hh-cube-btn" id="tomorrowCubeZoomOut"><i class="fas fa-search-minus"></i></button>
           <button class="hh-cube-btn" id="tomorrowCubeReset"><i class="fas fa-undo-alt"></i> Reset</button>
-          <button class="hh-cube-btn" id="tomorrowCubeLock"><i class="fas fa-lock"></i> Lock</button>
+          <button class="hh-cube-btn" id="tomorrowCubeRotate"><i class="fas fa-rotate-right"></i> Rotate</button>
           <button class="hh-cube-btn" id="tomorrowCubeZoomIn"><i class="fas fa-search-plus"></i></button>
         </div>
         <div class="hh-cube-wrapper" id="tomorrowCubeWrapper">
@@ -604,7 +624,7 @@
             <div class="hh-cube-face bottom" id="tomorrowFace5"></div>
           </div>
         </div>
-        <div class="hh-hint" style="text-align:center; margin:8px;">Drag to rotate • Lock to scroll</div>
+        <div class="hh-hint" style="text-align:center; margin:8px;">Scroll normally • Tap Rotate to spin</div>
       </div>
     </div>
 
@@ -627,7 +647,7 @@
           <button class="hh-cube-btn" id="cubePrevGroup"><i class="fas fa-chevron-left"></i> Prev 6</button>
           <button class="hh-cube-btn" id="cubeZoomOut"><i class="fas fa-search-minus"></i></button>
           <button class="hh-cube-btn" id="cubeReset"><i class="fas fa-undo-alt"></i> Reset</button>
-          <button class="hh-cube-btn" id="cubeLock"><i class="fas fa-lock"></i> Lock</button>
+          <button class="hh-cube-btn" id="cubeRotate"><i class="fas fa-rotate-right"></i> Rotate</button>
           <button class="hh-cube-btn" id="cubeZoomIn"><i class="fas fa-search-plus"></i></button>
           <button class="hh-cube-btn" id="cubeNextGroup">Next 6 <i class="fas fa-chevron-right"></i></button>
         </div>
@@ -641,7 +661,7 @@
             <div class="hh-cube-face bottom" id="face5"></div>
           </div>
         </div>
-        <div class="hh-hint" style="text-align:center; margin:8px;">Drag to rotate • Lock to scroll</div>
+        <div class="hh-hint" style="text-align:center; margin:8px;">Scroll normally • Tap Rotate to spin</div>
       </div>
 
       <div class="hh-hint">Tip: switch to 3D cube for a spinning experience!</div>
@@ -1183,7 +1203,7 @@
 
           buildAdvancedCarousel(data, calendarTodayISO);
 
-          // ========== CUBE INTEGRATION WITH LOCK (POINTER-EVENTS) ==========
+          // ========== CUBE INTEGRATION WITH ROTATE TOGGLE (POINTER-EVENTS) ==========
           initDayCube('today', displayTodayISO, data, hoursToday, calendarTodayISO);
           initDayCube('tomorrow', displayTomorrowISO, data, hoursTomorrow, calendarTodayISO);
           initAdvancedCube(data, calendarTodayISO);
@@ -1196,7 +1216,7 @@
         }
       })();
 
-      // ----- CUBE FUNCTIONS WITH LOCK (POINTER-EVENTS) -----
+      // ----- CUBE FUNCTIONS WITH ROTATE TOGGLE (POINTER-EVENTS) -----
       function initDayCube(dayId, isoDate, data, hours, todayISO) {
         const cube = document.getElementById(`${dayId}Cube`);
         if (!cube) return;
@@ -1251,20 +1271,21 @@
         const wrapper = document.getElementById(`${dayId}CubeWrapper`);
         let rotateX = -10, rotateY = 20, zoom = 1;
         let isDragging = false, lastX, lastY;
-        let locked = false;
+        let rotateMode = false; // default: scroll mode
 
         function setTransform() {
           cube.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${zoom})`;
         }
 
+        // Drag handlers (only active if rotateMode is true)
         function handleMouseDown(e) {
-          if (locked) return;
+          if (!rotateMode) return;
           isDragging = true;
           lastX = e.clientX; lastY = e.clientY;
           wrapper.style.cursor = 'grabbing';
         }
         function handleMouseMove(e) {
-          if (!isDragging || locked) return;
+          if (!isDragging || !rotateMode) return;
           const dx = e.clientX - lastX;
           const dy = e.clientY - lastY;
           rotateY += dx * 0.5;
@@ -1274,15 +1295,15 @@
         }
         function handleMouseUp() {
           isDragging = false;
-          wrapper.style.cursor = locked ? 'default' : 'grab';
+          wrapper.style.cursor = rotateMode ? 'grab' : 'default';
         }
         function handleTouchStart(e) {
-          if (locked) return;
+          if (!rotateMode) return;
           isDragging = true;
           lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
         }
         function handleTouchMove(e) {
-          if (!isDragging || locked) return;
+          if (!isDragging || !rotateMode) return;
           e.preventDefault();
           const dx = e.touches[0].clientX - lastX;
           const dy = e.touches[0].clientY - lastY;
@@ -1302,25 +1323,25 @@
         window.addEventListener('touchmove', handleTouchMove, { passive: false });
         window.addEventListener('touchend', handleTouchEnd);
 
-        const lockBtn = document.getElementById(`${dayId}CubeLock`);
-        if (lockBtn) {
-          lockBtn.addEventListener('click', () => {
-            locked = !locked;
-            if (locked) {
-              lockBtn.innerHTML = '<i class="fas fa-unlock-alt"></i> Unlock';
-              lockBtn.classList.add('locked');
-              // Disable wrapper pointer events so touches go directly to faces
-              wrapper.style.pointerEvents = 'none';
-              wrapper.style.cursor = 'default';
+        // Rotate button toggles mode
+        const rotateBtn = document.getElementById(`${dayId}CubeRotate`);
+        if (rotateBtn) {
+          rotateBtn.addEventListener('click', () => {
+            rotateMode = !rotateMode;
+            if (rotateMode) {
+              rotateBtn.innerHTML = '<i class="fas fa-hand-pointer"></i> Scroll';
+              rotateBtn.classList.add('rotate-mode');
+              wrapper.classList.add('rotate-mode');
             } else {
-              lockBtn.innerHTML = '<i class="fas fa-lock"></i> Lock';
-              lockBtn.classList.remove('locked');
-              wrapper.style.pointerEvents = 'auto';
-              wrapper.style.cursor = 'grab';
+              rotateBtn.innerHTML = '<i class="fas fa-rotate-right"></i> Rotate';
+              rotateBtn.classList.remove('rotate-mode');
+              wrapper.classList.remove('rotate-mode');
+              wrapper.style.cursor = 'default';
             }
           });
         }
 
+        // Zoom and reset
         document.getElementById(`${dayId}CubeZoomIn`).addEventListener('click', () => {
           zoom = Math.min(2, zoom + 0.1);
           setTransform();
@@ -1344,7 +1365,7 @@
         let daysArray = [];
         let rotateX = -10, rotateY = 20;
         let isDragging = false, lastX, lastY;
-        let locked = false;
+        let rotateMode = false;
 
         function buildDaysArrayFromData(data, todayISO) {
           const windowDays = Math.max(1, Math.min(31, Number(data?.settings?.advancedWindowDays ?? 7)));
@@ -1411,13 +1432,13 @@
         const wrapper = document.getElementById('cubeWrapper');
 
         function handleMouseDown(e) {
-          if (locked) return;
+          if (!rotateMode) return;
           isDragging = true;
           lastX = e.clientX; lastY = e.clientY;
           wrapper.style.cursor = 'grabbing';
         }
         function handleMouseMove(e) {
-          if (!isDragging || locked) return;
+          if (!isDragging || !rotateMode) return;
           const dx = e.clientX - lastX;
           const dy = e.clientY - lastY;
           rotateY += dx * 0.5;
@@ -1427,15 +1448,15 @@
         }
         function handleMouseUp() {
           isDragging = false;
-          wrapper.style.cursor = locked ? 'default' : 'grab';
+          wrapper.style.cursor = rotateMode ? 'grab' : 'default';
         }
         function handleTouchStart(e) {
-          if (locked) return;
+          if (!rotateMode) return;
           isDragging = true;
           lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
         }
         function handleTouchMove(e) {
-          if (!isDragging || locked) return;
+          if (!isDragging || !rotateMode) return;
           e.preventDefault();
           const dx = e.touches[0].clientX - lastX;
           const dy = e.touches[0].clientY - lastY;
@@ -1455,20 +1476,19 @@
         window.addEventListener('touchmove', handleTouchMove, { passive: false });
         window.addEventListener('touchend', handleTouchEnd);
 
-        const lockBtn = document.getElementById('cubeLock');
-        if (lockBtn) {
-          lockBtn.addEventListener('click', () => {
-            locked = !locked;
-            if (locked) {
-              lockBtn.innerHTML = '<i class="fas fa-unlock-alt"></i> Unlock';
-              lockBtn.classList.add('locked');
-              wrapper.style.pointerEvents = 'none';
-              wrapper.style.cursor = 'default';
+        const rotateBtn = document.getElementById('cubeRotate');
+        if (rotateBtn) {
+          rotateBtn.addEventListener('click', () => {
+            rotateMode = !rotateMode;
+            if (rotateMode) {
+              rotateBtn.innerHTML = '<i class="fas fa-hand-pointer"></i> Scroll';
+              rotateBtn.classList.add('rotate-mode');
+              wrapper.classList.add('rotate-mode');
             } else {
-              lockBtn.innerHTML = '<i class="fas fa-lock"></i> Lock';
-              lockBtn.classList.remove('locked');
-              wrapper.style.pointerEvents = 'auto';
-              wrapper.style.cursor = 'grab';
+              rotateBtn.innerHTML = '<i class="fas fa-rotate-right"></i> Rotate';
+              rotateBtn.classList.remove('rotate-mode');
+              wrapper.classList.remove('rotate-mode');
+              wrapper.style.cursor = 'default';
             }
           });
         }
