@@ -3,861 +3,976 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hot Headz — hologram menu · advanced</title>
-  <meta name="description" content="Floating hologram menu with day selection, advanced view, and live data from menu-data.html" />
+  <title>Hot Headz — Standalone Hologram Menu X</title>
+  <meta name="description" content="Standalone floating hologram menu powered by menu-data.html with day selection, advanced view, touch gestures, and richer card previews." />
   <meta name="theme-color" content="#05060b" />
   <style>
-    /* ----- design tokens (improved) ----- */
-    * {
-      box-sizing: border-box;
+    :root{
+      --bg:#05060b;
+      --bg2:#0b1020;
+      --ink:#ecfbff;
+      --muted:rgba(236,251,255,.68);
+      --muted2:rgba(236,251,255,.48);
+      --line:rgba(255,255,255,.10);
+      --line2:rgba(255,255,255,.06);
+      --accent:#ff6a3d;
+      --neon:#44e6ff;
+      --violet:#8f6bff;
+      --good:#57e7a7;
+      --warn:#ffc96a;
+      --shadow:0 30px 90px rgba(0,0,0,.42);
+      --radius:30px;
+      --pill:999px;
+      --card-w:min(34vw, 390px);
+      --card-h:min(56vw, 500px);
+      --font:Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    :root {
-      --bg: #05060b;
-      --bg2: #0b1020;
-      --ink: #ecfbff;
-      --muted: rgba(236, 251, 255, 0.68);
-      --line: rgba(255, 255, 255, 0.1);
-      --accent: #ff6a3d;
-      --neon: #44e6ff;
-      --violet: #8f6bff;
-      --good: #57e7a7;
-      --shadow: 0 30px 90px rgba(0, 0, 0, 0.42);
-      --radius: 30px;
-      --pill: 999px;
-      --card-w: min(34vw, 370px);
-      --card-h: min(54vw, 470px);
-      --font: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      --transition: 0.2s ease;
-    }
-
-    html, body {
-      height: 100%;
-    }
-
-    body {
-      margin: 0;
-      font-family: var(--font);
-      color: var(--ink);
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--ink);
       background:
-        radial-gradient(1200px 700px at 10% 10%, rgba(68, 230, 255, 0.1), transparent 60%),
-        radial-gradient(1000px 680px at 90% 20%, rgba(255, 106, 61, 0.12), transparent 58%),
-        radial-gradient(900px 540px at 50% 100%, rgba(143, 107, 255, 0.1), transparent 60%),
+        radial-gradient(1200px 700px at 10% 10%, rgba(68,230,255,.10), transparent 60%),
+        radial-gradient(1000px 680px at 90% 20%, rgba(255,106,61,.12), transparent 58%),
+        radial-gradient(900px 540px at 50% 100%, rgba(143,107,255,.10), transparent 60%),
         linear-gradient(180deg, #04050b 0%, #070910 50%, #04050a 100%);
-      overflow: hidden;
-      position: relative;
+      overflow:hidden;
     }
 
-    /* noise overlay */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0.08;
-      mix-blend-mode: overlay;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.08;
+      mix-blend-mode:overlay;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");
     }
 
-    button {
-      font: inherit;
-      cursor: pointer;
-    }
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    /* ----- app layout ----- */
-    .app {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      isolation: isolate;
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.02), transparent 16%, transparent 84%, rgba(255,255,255,.02));
+      opacity:.6;
     }
 
-    /* top status bar */
-    .topbar {
-      position: fixed;
-      top: 14px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 70;
-      width: min(96vw, 1180px);
-      display: grid;
-      gap: 10px;
+    button{font:inherit;cursor:pointer}
+    a{color:inherit;text-decoration:none}
+
+    .app{
+      position:relative;
+      width:100vw;
+      height:100vh;
+      overflow:hidden;
+      isolation:isolate;
     }
 
-    .status {
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: var(--pill);
-      border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.26);
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: center;
-      gap: 12px;
+    .topbar{
+      position:fixed;
+      top:14px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:80;
+      width:min(96vw, 1240px);
+      display:grid;
+      gap:10px;
     }
 
-    .status-center {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      text-align: center;
-      min-width: 0;
+    .status{
+      min-width:100%;
+      padding:12px 16px;
+      border-radius:var(--pill);
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      box-shadow:0 16px 40px rgba(0,0,0,.26);
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      align-items:center;
+      gap:12px;
     }
 
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--good);
-      box-shadow: 0 0 12px var(--good);
-      animation: pulse 1.6s infinite;
-      flex: 0 0 auto;
-    }
-    .dot.closed {
-      background: var(--accent);
-      box-shadow: 0 0 12px var(--accent);
-      animation: none;
+    .status-center{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+      text-align:center;
+      min-width:0;
     }
 
-    @keyframes pulse {
-      0% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.42; transform: scale(0.86); }
-      100% { opacity: 1; transform: scale(1); }
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--good);
+      box-shadow:0 0 12px var(--good);
+      animation:pulse 1.6s infinite;
+      flex:0 0 auto;
     }
 
-    .status-main {
-      font-weight: 900;
-      letter-spacing: -0.02em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
+    .dot.closed{
+      background:var(--accent);
+      box-shadow:0 0 12px var(--accent);
+      animation:none;
     }
 
-    .status-sub {
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
+    @keyframes pulse{
+      0%{opacity:1;transform:scale(1)}
+      50%{opacity:.42;transform:scale(.86)}
+      100%{opacity:1;transform:scale(1)}
     }
 
-    .nav-btn {
-      min-height: 44px;
-      min-width: 44px;
-      padding: 0 14px;
-      border-radius: 16px;
-      border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
-      color: var(--ink);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-size: 14px;
-      font-weight: 900;
-      transition: transform var(--transition), border-color var(--transition), background var(--transition);
+    .status-main{
+      font-weight:900;
+      letter-spacing:-.02em;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:100%;
     }
-    .nav-btn:hover:not(:disabled) { transform: translateY(-1px); }
-    .nav-btn:disabled { opacity: 0.45; cursor: default; }
 
-    /* day strip */
-    .day-strip {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      padding: 10px;
-      border-radius: 24px;
-      border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03));
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.22);
+    .status-sub{
+      color:var(--muted);
+      font-size:13px;
+      font-weight:700;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:100%;
+    }
+
+    .nav-btn{
+      min-height:44px;
+      min-width:44px;
+      padding:0 14px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      color:var(--ink);
+      box-shadow:0 12px 30px rgba(0,0,0,.18);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      font-size:14px;
+      font-weight:900;
+      transition:transform .2s ease, border-color .2s ease, background .2s ease;
+    }
+
+    .nav-btn:hover{ transform:translateY(-1px); }
+
+    .day-strip{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+      padding:10px;
+      border-radius:24px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      box-shadow:0 14px 36px rgba(0,0,0,.22);
     }
 
     .day-chip,
     .mini-btn,
-    .crumb {
-      min-height: 44px;
-      padding: 10px 14px;
-      border-radius: 16px;
-      border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
-      color: var(--ink);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-size: 13px;
-      font-weight: 900;
-      white-space: nowrap;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      transition: transform var(--transition), border-color var(--transition), background var(--transition), box-shadow var(--transition);
+    .crumb{
+      min-height:44px;
+      padding:10px 14px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      color:var(--ink);
+      box-shadow:0 12px 30px rgba(0,0,0,.18);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      font-size:13px;
+      font-weight:900;
+      white-space:nowrap;
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+      transition:transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
     }
+
     .day-chip:hover,
     .mini-btn:hover,
-    .crumb:hover {
-      transform: translateY(-1px);
+    .crumb:hover{
+      transform:translateY(-1px);
     }
+
     .day-chip.active,
     .crumb.active,
-    .mini-btn.primary {
-      border-color: rgba(68, 230, 255, 0.28);
-      background: linear-gradient(135deg, rgba(255, 106, 61, 0.22), rgba(68, 230, 255, 0.12));
-    }
-    .day-chip.subtle { opacity: 0.88; }
-
-    /* main carousel */
-    .viewport {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      overflow: hidden;
+    .mini-btn.primary{
+      border-color:rgba(68,230,255,.28);
+      background:linear-gradient(135deg, rgba(255,106,61,.22), rgba(68,230,255,.12));
     }
 
-    .glow-floor {
-      position: absolute;
-      left: 50%;
-      bottom: 8vh;
-      transform: translateX(-50%);
-      width: min(76vw, 980px);
-      height: min(22vw, 240px);
-      border-radius: 50%;
+    .day-chip.subtle{
+      opacity:.88;
+    }
+
+    .day-chip small{
+      display:block;
+      color:var(--muted);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.02em;
+    }
+
+    .viewport{
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+      touch-action:pan-y;
+    }
+
+    .glow-floor{
+      position:absolute;
+      left:50%;
+      bottom:8vh;
+      transform:translateX(-50%);
+      width:min(76vw, 980px);
+      height:min(22vw, 240px);
+      border-radius:50%;
       background:
-        radial-gradient(ellipse at center, rgba(68, 230, 255, 0.18), transparent 58%),
-        radial-gradient(ellipse at center, rgba(255, 106, 61, 0.14), transparent 62%);
-      filter: blur(24px);
-      opacity: 0.9;
-      pointer-events: none;
+        radial-gradient(ellipse at center, rgba(68,230,255,.18), transparent 58%),
+        radial-gradient(ellipse at center, rgba(255,106,61,.14), transparent 62%);
+      filter:blur(24px);
+      opacity:.9;
+      pointer-events:none;
     }
 
-    .carousel {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      perspective: 1800px;
-      transform-style: preserve-3d;
+    .carousel{
+      position:relative;
+      width:100%;
+      height:100%;
+      perspective:1800px;
+      transform-style:preserve-3d;
+      user-select:none;
     }
 
-    .card {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: var(--card-w);
-      max-width: 370px;
-      min-width: 260px;
-      height: var(--card-h);
-      min-height: 360px;
-      max-height: 470px;
-      transform-style: preserve-3d;
-      border-radius: 32px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
+    .card{
+      position:absolute;
+      top:50%;
+      left:50%;
+      width:var(--card-w);
+      max-width:390px;
+      min-width:260px;
+      height:var(--card-h);
+      min-height:360px;
+      max-height:500px;
+      transform-style:preserve-3d;
+      border-radius:32px;
+      border:1px solid rgba(255,255,255,.14);
+      background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
       box-shadow:
-        0 30px 90px rgba(0, 0, 0, 0.38),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      overflow: hidden;
-      transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease, filter 0.5s ease, box-shadow 0.4s ease, border-color 0.3s ease;
-      will-change: transform, opacity;
+        0 30px 90px rgba(0,0,0,.38),
+        inset 0 1px 0 rgba(255,255,255,.08);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      overflow:hidden;
+      transition:
+        transform .8s cubic-bezier(.2,.8,.2,1),
+        opacity .5s ease,
+        filter .5s ease,
+        box-shadow .4s ease,
+        border-color .3s ease;
+      will-change:transform, opacity;
     }
 
-    .card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
       background:
-        linear-gradient(135deg, rgba(68, 230, 255, 0.12), transparent 20%, transparent 72%, rgba(255, 106, 61, 0.12)),
-        radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.18), transparent 24%);
-      opacity: 0.95;
+        linear-gradient(135deg, rgba(68,230,255,.12), transparent 20%, transparent 72%, rgba(255,106,61,.12)),
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,.18), transparent 24%);
+      opacity:.95;
     }
 
-    .card.active {
-      border-color: rgba(68, 230, 255, 0.34);
+    .card::after{
+      content:"";
+      position:absolute;
+      inset:auto 10% 6% 10%;
+      height:22%;
+      pointer-events:none;
+      background:radial-gradient(circle at center, rgba(68,230,255,.16), transparent 72%);
+      filter:blur(12px);
+      opacity:.9;
+    }
+
+    .card.active{
+      border-color:rgba(68,230,255,.34);
       box-shadow:
-        0 34px 100px rgba(0, 0, 0, 0.42),
-        0 0 80px rgba(68, 230, 255, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        0 34px 100px rgba(0,0,0,.42),
+        0 0 80px rgba(68,230,255,.08),
+        inset 0 1px 0 rgba(255,255,255,.08);
     }
 
-    .card-btn {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: none;
-      color: inherit;
-      text-align: left;
-      padding: 18px;
-      display: grid;
-      grid-template-rows: auto auto 1fr auto;
-      gap: 14px;
-      cursor: pointer;
+    .card-btn{
+      position:relative;
+      z-index:1;
+      width:100%;
+      height:100%;
+      border:none;
+      background:none;
+      color:inherit;
+      text-align:left;
+      padding:18px;
+      display:grid;
+      grid-template-rows:auto auto auto 1fr auto;
+      gap:12px;
+      cursor:pointer;
     }
 
-    .badge {
-      justify-self: start;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 11px;
-      border-radius: var(--pill);
-      background: rgba(0, 0, 0, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      font-size: 11px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
+    .badge{
+      justify-self:start;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 11px;
+      border-radius:var(--pill);
+      background:rgba(0,0,0,.20);
+      border:1px solid rgba(255,255,255,.12);
+      font-size:11px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.12em;
     }
 
-    .emoji {
-      font-size: 56px;
-      line-height: 1;
-      filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.28));
+    .emoji{
+      font-size:56px;
+      line-height:1;
+      filter:drop-shadow(0 8px 20px rgba(0,0,0,.28));
     }
 
-    .title {
-      font-size: 30px;
-      line-height: 0.94;
-      letter-spacing: -0.05em;
-      font-weight: 900;
-      margin: 0;
-      max-width: 10ch;
+    .title{
+      font-size:30px;
+      line-height:.94;
+      letter-spacing:-.05em;
+      font-weight:900;
+      margin:0;
+      max-width:10ch;
     }
 
-    .desc {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.58;
-      max-width: 34ch;
+    .desc{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.58;
+      max-width:34ch;
     }
 
-    .meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
+    .preview-list{
+      display:grid;
+      gap:8px;
+      align-content:start;
     }
 
-    .count {
-      font-size: 13px;
-      color: var(--muted);
-      font-weight: 800;
+    .preview-pill{
+      padding:8px 10px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.05);
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.32;
+      font-weight:800;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
     }
 
-    .action {
-      min-height: 38px;
-      padding: 0 12px;
-      border-radius: var(--pill);
-      border: 1px solid rgba(68, 230, 255, 0.24);
-      background: linear-gradient(135deg, rgba(255, 106, 61, 0.22), rgba(68, 230, 255, 0.14));
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      white-space: nowrap;
+    .preview-pill strong{
+      color:var(--ink);
+      font-weight:900;
     }
 
-    /* bottom hud */
-    .hud {
-      position: fixed;
-      inset: auto 0 24px 0;
-      z-index: 60;
-      display: grid;
-      gap: 14px;
-      justify-items: center;
-      pointer-events: none;
+    .meta{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .count{
+      font-size:13px;
+      color:var(--muted);
+      font-weight:800;
+    }
+
+    .action{
+      min-height:38px;
+      padding:0 12px;
+      border-radius:var(--pill);
+      border:1px solid rgba(68,230,255,.24);
+      background:linear-gradient(135deg, rgba(255,106,61,.22), rgba(68,230,255,.14));
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:12px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.10em;
+      white-space:nowrap;
+    }
+
+    .hud{
+      position:fixed;
+      inset:auto 0 24px 0;
+      z-index:60;
+      display:grid;
+      gap:14px;
+      justify-items:center;
+      pointer-events:none;
     }
 
     .controls,
-    .crumbs {
-      pointer-events: auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
+    .crumbs{
+      pointer-events:auto;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
     }
 
-    /* detail panel (right drawer) */
-    .detail {
-      position: fixed;
-      inset: 0;
-      z-index: 2000;
-      display: none;
-    }
-    .detail.open { display: block; }
-
-    .detail-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.72);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-
-    .detail-sheet {
-      position: absolute;
-      right: 10px;
-      top: 10px;
-      bottom: 10px;
-      width: min(500px, calc(100vw - 20px));
-      border-radius: 36px;
-      border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(248, 252, 255, 0.96), rgba(235, 245, 255, 0.94));
-      color: #12202b;
-      box-shadow: 0 34px 90px rgba(0, 0, 0, 0.38);
-      overflow: hidden;
-      transform: translateX(102%);
-      transition: transform 0.36s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-    .detail.open .detail-sheet { transform: translateX(0); }
-
-    .detail-inner {
-      height: 100%;
-      padding: 20px;
-      display: grid;
-      grid-template-rows: auto auto auto 1fr auto;
-      gap: 16px;
+    .hint-bar{
+      pointer-events:none;
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:142px;
+      z-index:55;
+      min-height:38px;
+      padding:10px 14px;
+      border-radius:var(--pill);
+      border:1px solid var(--line2);
+      background:rgba(255,255,255,.04);
+      color:var(--muted);
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.02em;
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+      box-shadow:0 10px 24px rgba(0,0,0,.18);
+      white-space:nowrap;
     }
 
-    .detail-close {
-      justify-self: end;
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      background: rgba(255, 255, 255, 0.82);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-      display: grid;
-      place-items: center;
-      color: #12202b;
-      font-weight: 900;
+    .detail{
+      position:fixed;
+      inset:0;
+      z-index:2000;
+      display:none;
     }
 
-    .detail-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      width: max-content;
-      max-width: 100%;
-      border-radius: var(--pill);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      background: rgba(255, 255, 255, 0.7);
-      font-size: 11px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: #12202b;
+    .detail.open{display:block}
+
+    .detail-backdrop{
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,.72);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
     }
 
-    .detail-title {
-      margin: 0;
-      font-size: clamp(34px, 5vw, 52px);
-      line-height: 0.92;
-      letter-spacing: -0.06em;
-      font-weight: 900;
-      color: #12202b;
+    .detail-sheet{
+      position:absolute;
+      right:10px;
+      top:10px;
+      bottom:10px;
+      width:min(520px, calc(100vw - 20px));
+      border-radius:36px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(248,252,255,.96), rgba(235,245,255,.94));
+      color:#12202b;
+      box-shadow:0 34px 90px rgba(0,0,0,.38);
+      overflow:hidden;
+      transform:translateX(102%);
+      transition:transform .36s cubic-bezier(.2,.8,.2,1);
     }
 
-    .detail-desc {
-      margin: 0;
-      color: rgba(18, 32, 43, 0.72);
-      font-size: 15px;
-      line-height: 1.62;
+    .detail.open .detail-sheet{
+      transform:translateX(0);
     }
 
-    .detail-price-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
+    .detail-inner{
+      height:100%;
+      padding:20px;
+      display:grid;
+      grid-template-rows:auto auto auto 1fr auto;
+      gap:16px;
     }
 
-    .detail-price {
-      font-size: 34px;
-      font-weight: 900;
-      letter-spacing: -0.05em;
-      color: #12202b;
+    .detail-close{
+      justify-self:end;
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.08);
+      background:rgba(255,255,255,.82);
+      box-shadow:0 12px 24px rgba(0,0,0,.12);
+      display:grid;
+      place-items:center;
+      color:#12202b;
+      font-weight:900;
     }
 
-    .detail-tags {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+    .detail-eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      width:max-content;
+      max-width:100%;
+      border-radius:var(--pill);
+      border:1px solid rgba(0,0,0,.08);
+      background:rgba(255,255,255,.70);
+      font-size:11px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:#12202b;
     }
 
-    .detail-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 10px;
-      border-radius: var(--pill);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      background: rgba(255, 255, 255, 0.7);
-      color: #12202b;
-      font-size: 11px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+    .detail-title{
+      margin:0;
+      font-size:clamp(34px, 5vw, 52px);
+      line-height:.92;
+      letter-spacing:-.06em;
+      font-weight:900;
+      color:#12202b;
     }
 
-    .detail-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+    .detail-desc{
+      margin:0;
+      color:rgba(18,32,43,.72);
+      font-size:15px;
+      line-height:1.62;
     }
 
-    .detail-box {
-      border-radius: 24px;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      background: rgba(255, 255, 255, 0.7);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-      padding: 16px;
-      display: grid;
-      gap: 8px;
-      align-content: start;
+    .detail-price-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
     }
 
-    .detail-box-title {
-      font-size: 15px;
-      font-weight: 900;
-      letter-spacing: -0.02em;
-      color: #12202b;
+    .detail-price{
+      font-size:34px;
+      font-weight:900;
+      letter-spacing:-.05em;
+      color:#12202b;
     }
 
-    .detail-box-copy {
-      color: rgba(18, 32, 43, 0.72);
-      font-size: 13px;
-      line-height: 1.55;
+    .detail-tags{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
     }
 
-    .detail-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+    .detail-tag{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:8px 10px;
+      border-radius:var(--pill);
+      border:1px solid rgba(0,0,0,.08);
+      background:rgba(255,255,255,.70);
+      color:#12202b;
+      font-size:11px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.1em;
     }
 
-    .detail-btn {
-      min-height: 50px;
-      padding: 0 16px;
-      border-radius: 20px;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      background: #162430;
-      color: #fff;
-      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.18);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      font-weight: 900;
-      cursor: pointer;
-    }
-    .detail-btn.primary {
-      background: linear-gradient(135deg, var(--accent), var(--neon));
-      border-color: rgba(68, 230, 255, 0.2);
+    .detail-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:12px;
     }
 
-    /* advanced modal (centered) */
-    .advanced {
-      position: fixed;
-      inset: 0;
-      z-index: 1800;
-      display: none;
-    }
-    .advanced.open { display: block; }
-
-    .advanced-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.54);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+    .detail-box{
+      border-radius:24px;
+      border:1px solid rgba(0,0,0,.08);
+      background:rgba(255,255,255,.70);
+      box-shadow:0 12px 24px rgba(0,0,0,.10);
+      padding:16px;
+      display:grid;
+      gap:8px;
+      align-content:start;
     }
 
-    .advanced-sheet {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%) scale(0.96);
-      width: min(960px, calc(100vw - 20px));
-      max-height: min(84vh, 820px);
-      border-radius: 34px;
-      border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(7, 10, 16, 0.96), rgba(8, 12, 20, 0.94));
-      box-shadow: 0 34px 90px rgba(0, 0, 0, 0.42);
-      overflow: hidden;
-      transition: transform 0.24s ease, opacity 0.24s ease;
-      opacity: 0;
-    }
-    .advanced.open .advanced-sheet {
-      transform: translate(-50%, -50%) scale(1);
-      opacity: 1;
+    .detail-box-title{
+      font-size:15px;
+      font-weight:900;
+      letter-spacing:-.02em;
+      color:#12202b;
     }
 
-    .advanced-inner {
-      padding: 18px;
-      display: grid;
-      gap: 14px;
-      max-height: min(84vh, 820px);
+    .detail-box-copy{
+      color:rgba(18,32,43,.72);
+      font-size:13px;
+      line-height:1.55;
     }
 
-    .advanced-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
+    .detail-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
     }
 
-    .advanced-title {
-      margin: 0 0 6px;
-      font-size: clamp(28px, 4vw, 42px);
-      line-height: 0.95;
-      letter-spacing: -0.05em;
-      font-weight: 900;
+    .detail-btn{
+      min-height:50px;
+      padding:0 16px;
+      border-radius:20px;
+      border:1px solid rgba(0,0,0,.08);
+      background:#162430;
+      color:#fff;
+      box-shadow:0 18px 38px rgba(0,0,0,.18);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      font-weight:900;
+      cursor:pointer;
     }
 
-    .advanced-copy {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.55;
-      max-width: 56ch;
+    .detail-btn.primary{
+      background:linear-gradient(135deg, var(--accent), var(--neon));
+      border-color:rgba(68,230,255,.20);
     }
 
-    .advanced-grid {
-      overflow: auto;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      padding-right: 4px;
+    .advanced{
+      position:fixed;
+      inset:0;
+      z-index:1800;
+      display:none;
     }
 
-    .advanced-card {
-      border-radius: 24px;
-      border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
-      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
-      padding: 16px;
-      display: grid;
-      gap: 10px;
-      transition: transform var(--transition), border-color var(--transition);
-      cursor: pointer;
-    }
-    .advanced-card:hover {
-      transform: translateY(-2px);
-      border-color: rgba(68, 230, 255, 0.3);
+    .advanced.open{display:block}
+
+    .advanced-backdrop{
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,.54);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
     }
 
-    .advanced-card-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
+    .advanced-sheet{
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform:translate(-50%, -50%) scale(.96);
+      width:min(980px, calc(100vw - 20px));
+      max-height:min(84vh, 820px);
+      border-radius:34px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(7,10,16,.96), rgba(8,12,20,.94));
+      box-shadow:0 34px 90px rgba(0,0,0,.42);
+      overflow:hidden;
+      transition:transform .24s ease, opacity .24s ease;
+      opacity:0;
     }
 
-    .advanced-day {
-      font-size: 22px;
-      line-height: 1;
-      letter-spacing: -0.04em;
-      font-weight: 900;
-      margin: 0 0 4px;
+    .advanced.open .advanced-sheet{
+      transform:translate(-50%, -50%) scale(1);
+      opacity:1;
     }
 
-    .advanced-date {
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 700;
+    .advanced-inner{
+      padding:18px;
+      display:grid;
+      gap:14px;
+      max-height:min(84vh, 820px);
     }
 
-    .advanced-pill {
-      min-height: 34px;
-      padding: 0 10px;
-      border-radius: var(--pill);
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.06);
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      white-space: nowrap;
+    .advanced-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
     }
 
-    .advanced-list {
-      display: grid;
-      gap: 8px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
+    .advanced-title{
+      margin:0 0 6px;
+      font-size:clamp(28px, 4vw, 42px);
+      line-height:.95;
+      letter-spacing:-.05em;
+      font-weight:900;
     }
 
-    .advanced-list div {
-      padding: 10px 12px;
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+    .advanced-copy{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.55;
+      max-width:56ch;
     }
 
-    /* toast / loading */
-    .toast-wrap {
-      position: fixed;
-      right: 12px;
-      bottom: 12px;
-      z-index: 3000;
-      display: grid;
-      gap: 10px;
-      width: min(360px, calc(100vw - 24px));
-      pointer-events: none;
+    .advanced-grid{
+      overflow:auto;
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:12px;
+      padding-right:4px;
     }
 
-    .toast {
-      padding: 14px 16px;
-      border-radius: 18px;
-      border: 1px solid var(--line);
-      background: rgba(6, 7, 11, 0.94);
-      box-shadow: var(--shadow);
-      color: var(--ink);
-      font-size: 14px;
-      line-height: 1.46;
-      opacity: 0;
-      transform: translateY(8px);
-      animation: toastIn 0.22s ease forwards;
+    .advanced-card{
+      border-radius:24px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      box-shadow:0 14px 34px rgba(0,0,0,.18);
+      padding:16px;
+      display:grid;
+      gap:10px;
+      transition:transform .2s ease, border-color .2s ease, background .2s ease;
+      cursor:pointer;
     }
 
-    @keyframes toastIn {
-      to { opacity: 1; transform: translateY(0); }
+    .advanced-card:hover{
+      transform:translateY(-1px);
+      border-color:rgba(68,230,255,.22);
+      background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
     }
 
-    .loading-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(5, 6, 11, 0.7);
-      backdrop-filter: blur(6px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-      font-size: 1.2rem;
-      color: var(--neon);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
+    .advanced-card.active{
+      border-color:rgba(68,230,255,.26);
+      background:linear-gradient(135deg, rgba(255,106,61,.18), rgba(68,230,255,.10));
     }
-    .loading-overlay.visible {
-      opacity: 1;
-      pointer-events: all;
-    }
-    .spinner {
-      width: 48px;
-      height: 48px;
-      border: 4px solid rgba(68, 230, 255, 0.2);
-      border-top-color: var(--neon);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* responsive */
-    @media (max-width: 720px) {
-      :root {
-        --card-w: min(78vw, 340px);
-        --card-h: min(118vw, 430px);
+    .advanced-card-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .advanced-day{
+      font-size:22px;
+      line-height:1;
+      letter-spacing:-.04em;
+      font-weight:900;
+      margin:0 0 4px;
+    }
+
+    .advanced-date{
+      color:var(--muted);
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .advanced-pill{
+      min-height:34px;
+      padding:0 10px;
+      border-radius:var(--pill);
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.06);
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:11px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.10em;
+      white-space:nowrap;
+    }
+
+    .advanced-list{
+      display:grid;
+      gap:8px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+    }
+
+    .advanced-list div{
+      padding:10px 12px;
+      border-radius:16px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.06);
+    }
+
+    .toast-wrap{
+      position:fixed;
+      right:12px;
+      bottom:12px;
+      z-index:3000;
+      display:grid;
+      gap:10px;
+      width:min(360px, calc(100vw - 24px));
+      pointer-events:none;
+    }
+
+    .toast{
+      padding:14px 16px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(6,7,11,.94);
+      box-shadow:var(--shadow);
+      color:var(--ink);
+      font-size:14px;
+      line-height:1.46;
+      opacity:0;
+      transform:translateY(8px);
+      animation:toastIn .22s ease forwards;
+    }
+
+    @keyframes toastIn{
+      to{
+        opacity:1;
+        transform:translateY(0);
       }
-      .topbar { top: 8px; width: calc(100vw - 10px); }
-      .status { grid-template-columns: auto 1fr auto; }
-      .day-strip {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-      }
-      .day-chip.advanced-trigger { grid-column: 1 / -1; }
-      .hud { bottom: 8px; gap: 8px; }
-      .controls, .crumbs {
-        width: calc(100vw - 10px);
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-      }
-      .mini-btn, .crumb, .day-chip {
-        min-height: 56px;
-        padding: 10px 8px;
-        text-align: center;
-      }
-      .detail-sheet {
-        left: 5px;
-        right: 5px;
-        top: auto;
-        bottom: 5px;
-        width: auto;
-        height: min(82vh, 720px);
-        border-radius: 28px 28px 22px 22px;
-        transform: translateY(102%);
-      }
-      .detail.open .detail-sheet { transform: translateY(0); }
-      .detail-grid { grid-template-columns: 1fr; }
-      .advanced-grid { grid-template-columns: 1fr; }
-      .advanced-sheet { width: calc(100vw - 10px); }
-      .toast-wrap { bottom: 144px; }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      * { animation: none !important; transition: none !important; }
+    @media (max-width: 720px){
+      :root{
+        --card-w:min(78vw, 330px);
+        --card-h:min(120vw, 430px);
+      }
+
+      .topbar{
+        top:8px;
+        width:calc(100vw - 10px);
+      }
+
+      .status{
+        padding:10px 12px;
+        gap:8px;
+      }
+
+      .status-center{
+        gap:8px;
+      }
+
+      .status{
+        grid-template-columns:auto 1fr auto;
+      }
+
+      .day-strip{
+        display:grid;
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+      }
+
+      .day-chip.advanced-trigger{
+        grid-column:1 / -1;
+      }
+
+      .hud{
+        bottom:8px;
+        gap:8px;
+      }
+
+      .controls,
+      .crumbs{
+        width:calc(100vw - 10px);
+        display:grid;
+        grid-template-columns:repeat(4, minmax(0, 1fr));
+      }
+
+      .mini-btn,
+      .crumb,
+      .day-chip{
+        min-height:56px;
+        padding:10px 8px;
+        text-align:center;
+      }
+
+      .hint-bar{
+        bottom:146px;
+        width:calc(100vw - 12px);
+        text-align:center;
+        white-space:normal;
+      }
+
+      .detail-sheet{
+        left:5px;
+        right:5px;
+        top:auto;
+        bottom:5px;
+        width:auto;
+        height:min(82vh, 720px);
+        border-radius:28px 28px 22px 22px;
+        transform:translateY(102%);
+      }
+
+      .detail.open .detail-sheet{
+        transform:translateY(0);
+      }
+
+      .detail-grid{
+        grid-template-columns:1fr;
+      }
+
+      .advanced-grid{
+        grid-template-columns:1fr;
+      }
+
+      .advanced-sheet{
+        width:calc(100vw - 10px);
+      }
+
+      .toast-wrap{
+        bottom:144px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *,
+      *::before,
+      *::after{
+        animation:none !important;
+        transition:none !important;
+      }
     }
   </style>
 </head>
 <body>
   <div class="app">
-    <!-- top bar with status and day strip -->
     <div class="topbar">
       <div class="status" aria-live="polite">
         <button class="nav-btn" id="dayPrevBtn" type="button" aria-label="Previous day">←</button>
+
         <div class="status-center">
           <span class="dot" id="liveDot"></span>
-          <span class="status-main" id="liveMain">Loading…</span>
-          <span class="status-sub" id="liveSub"></span>
+          <span class="status-main" id="liveMain">Checking restaurant status…</span>
+          <span class="status-sub" id="liveSub">Loading timing…</span>
         </div>
+
         <button class="nav-btn" id="dayNextBtn" type="button" aria-label="Next day">→</button>
       </div>
+
       <div class="day-strip" id="dayStrip"></div>
     </div>
 
-    <!-- main 3D carousel -->
-    <div class="viewport">
+    <div class="viewport" id="viewport">
       <div class="glow-floor"></div>
       <div class="carousel" id="carousel"></div>
     </div>
 
-    <!-- bottom navigation -->
+    <div class="hint-bar" id="hintBar">Swipe, click arrows, or use keyboard. Enter opens the front card.</div>
+
     <div class="hud">
       <div class="crumbs" id="crumbs"></div>
       <div class="controls">
@@ -869,21 +984,26 @@
     </div>
   </div>
 
-  <!-- detail drawer -->
-  <div class="detail" id="detail" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+  <div class="detail" id="detail">
     <div class="detail-backdrop" data-close-detail="true"></div>
-    <aside class="detail-sheet">
+    <aside class="detail-sheet" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
       <div class="detail-inner">
         <button class="detail-close" id="detailCloseBtn" type="button" aria-label="Close">✕</button>
-        <div><div class="detail-eyebrow" id="detailEyebrow">Menu Item</div></div>
+
+        <div>
+          <div class="detail-eyebrow" id="detailEyebrow">Menu Item</div>
+        </div>
+
         <div>
           <h3 class="detail-title" id="detailTitle">Item</h3>
           <p class="detail-desc" id="detailDesc">Description</p>
         </div>
+
         <div class="detail-price-row">
           <div class="detail-price" id="detailPrice">$0.00</div>
           <div class="detail-tags" id="detailTags"></div>
         </div>
+
         <div class="detail-grid">
           <div class="detail-box">
             <div class="detail-box-title">Why it works</div>
@@ -894,6 +1014,7 @@
             <div class="detail-box-copy" id="detailCue">Cue</div>
           </div>
         </div>
+
         <div class="detail-actions">
           <a class="detail-btn primary" href="tel:3372211035">📞 Call to Order</a>
           <button class="detail-btn" id="detailBackBtn" type="button">← Back</button>
@@ -903,10 +1024,9 @@
     </aside>
   </div>
 
-  <!-- advanced modal (full menu preview) -->
-  <div class="advanced" id="advanced" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="advancedTitle">
+  <div class="advanced" id="advanced">
     <div class="advanced-backdrop" data-close-advanced="true"></div>
-    <section class="advanced-sheet">
+    <section class="advanced-sheet" role="dialog" aria-modal="true" aria-labelledby="advancedTitle">
       <div class="advanced-inner">
         <div class="advanced-top">
           <div>
@@ -915,766 +1035,798 @@
           </div>
           <button class="nav-btn" id="advancedCloseBtn" type="button" aria-label="Close advanced menu">✕</button>
         </div>
+
         <div class="advanced-grid" id="advancedGrid"></div>
       </div>
     </section>
   </div>
 
-  <!-- toast container & loading overlay -->
   <div class="toast-wrap" id="toastWrap"></div>
-  <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
 
   <script>
-    (function() {
-      "use strict";
-
-      // ---------- constants & config ----------
-      const CATEGORY_META = {
-        breakfast: { label: 'Breakfast', emoji: '🍳', desc: 'Same daily breakfast served at opening.' },
-        lunch:     { label: 'Lunch',     emoji: '🍽️', desc: 'Daily lunch menu for the selected day.' },
-        crawfish:  { label: 'Crawfish',  emoji: '🦞', desc: 'Crawfish timing and availability.' },
-        salad:     { label: 'Salad Bar', emoji: '🥗', desc: 'Salad bar choices and pricing.' },
-        drinks:    { label: 'Drinks',    emoji: '🥤', desc: 'Cold drinks and coffee.' },
-        dessert:   { label: 'Dessert',   emoji: '🍰', desc: 'Dessert for the selected day.' }
-      };
-
-      // ---------- state ----------
-      const state = {
-        raw: null,
-        normalized: {},               // key -> array of items
-        mode: 'categories',           // 'categories' or 'items'
-        selectedCategory: null,
-        categoryCarousel: [],          // list of category cards
-        itemCarousel: [],              // list of item cards for current category
-        index: 0,                      // current carousel index
-        selectedDateIndex: 0,
-        availableDates: [],
-        isLoading: true
-      };
-
-      // DOM elements (cached)
-      const els = {
-        liveDot: document.getElementById('liveDot'),
-        liveMain: document.getElementById('liveMain'),
-        liveSub: document.getElementById('liveSub'),
-        carousel: document.getElementById('carousel'),
-        crumbs: document.getElementById('crumbs'),
-        prevBtn: document.getElementById('prevBtn'),
-        openBtn: document.getElementById('openBtn'),
-        nextBtn: document.getElementById('nextBtn'),
-        randomBtn: document.getElementById('randomBtn'),
-        detail: document.getElementById('detail'),
-        detailCloseBtn: document.getElementById('detailCloseBtn'),
-        detailEyebrow: document.getElementById('detailEyebrow'),
-        detailTitle: document.getElementById('detailTitle'),
-        detailDesc: document.getElementById('detailDesc'),
-        detailPrice: document.getElementById('detailPrice'),
-        detailTags: document.getElementById('detailTags'),
-        detailWhy: document.getElementById('detailWhy'),
-        detailCue: document.getElementById('detailCue'),
-        detailBackBtn: document.getElementById('detailBackBtn'),
-        detailRandomBtn: document.getElementById('detailRandomBtn'),
-        toastWrap: document.getElementById('toastWrap'),
-        dayPrevBtn: document.getElementById('dayPrevBtn'),
-        dayNextBtn: document.getElementById('dayNextBtn'),
-        dayStrip: document.getElementById('dayStrip'),
-        advanced: document.getElementById('advanced'),
-        advancedGrid: document.getElementById('advancedGrid'),
-        advancedCopy: document.getElementById('advancedCopy'),
-        advancedCloseBtn: document.getElementById('advancedCloseBtn'),
-        loadingOverlay: document.getElementById('loadingOverlay')
-      };
-
-      // ---------- helpers ----------
-      const safe = (v) => String(v ?? '').trim();
-      const escapeHtml = (v) => safe(v)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-
-      const money = (v) => {
-        const n = parseFloat(safe(v).replace(/[^0-9.]/g, ''));
-        return Number.isFinite(n) ? `$${n.toFixed(2)}` : (safe(v) || 'Ask');
-      };
-
-      const weekdayName = (date) => date.toLocaleDateString('en-US', { weekday: 'long' });
-      const formatDate = (date) => date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-      const isoDateLocal = (date) => {
-        const y = date.getFullYear();
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        const d = String(date.getDate()).padStart(2, '0');
-        return `${y}-${m}-${d}`;
-      };
-      const parseISODate = (iso) => {
-        const [y, m, d] = safe(iso).split('-').map(Number);
-        return new Date(y, (m || 1) - 1, d || 1);
-      };
-
-      const parseTimeToMinutes = (timeStr) => {
-        if (!timeStr) return null;
-        const match = safe(timeStr).match(/(\d+):(\d+)\s*(AM|PM)/i);
-        if (!match) return null;
-        let h = parseInt(match[1], 10);
-        const m = parseInt(match[2], 10);
-        const ampm = match[3].toUpperCase();
-        if (ampm === 'PM' && h !== 12) h += 12;
-        if (ampm === 'AM' && h === 12) h = 0;
-        return h * 60 + m;
-      };
-
-      const toast = (message) => {
-        const el = document.createElement('div');
-        el.className = 'toast';
-        el.textContent = message;
-        els.toastWrap.appendChild(el);
-        setTimeout(() => {
-          el.style.opacity = '0';
-          el.style.transform = 'translateY(6px)';
-          setTimeout(() => el.remove(), 220);
-        }, 2400);
-      };
-
-      // ---------- data loading & parsing ----------
-      async function loadMenuData() {
-        const embedded = document.querySelector('#hh-menu-data');
-        if (embedded) return JSON.parse(embedded.textContent.trim());
-
-        const res = await fetch('menu-data.html', { cache: 'no-store' });
-        if (!res.ok) throw new Error('menu-data.html not found');
-        const html = await res.text();
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        const script = doc.querySelector('#hh-menu-data');
-        if (!script) throw new Error('#hh-menu-data not found');
-        return JSON.parse(script.textContent.trim());
+    const APP = {
+      categoryMeta: {
+        breakfast: { label: "Breakfast", emoji: "🍳", desc: "Same daily breakfast served at opening." },
+        lunch: { label: "Lunch", emoji: "🍽️", desc: "Daily lunch menu for the selected day." },
+        crawfish: { label: "Crawfish", emoji: "🦞", desc: "Crawfish timing and availability." },
+        salad: { label: "Salad Bar", emoji: "🥗", desc: "Salad bar choices and pricing." },
+        drinks: { label: "Drinks", emoji: "🥤", desc: "Cold drinks and coffee." },
+        dessert: { label: "Dessert", emoji: "🍰", desc: "Dessert for the selected day." }
       }
+    };
 
-      function findHours(raw, dayName) {
-        return raw?.hours?.weekly?.find(entry => safe(entry.day).toLowerCase() === safe(dayName).toLowerCase()) || null;
-      }
+    const STATE = {
+      raw: null,
+      normalized: {},
+      mode: "categories",
+      selectedCategory: null,
+      categoryCarousel: [],
+      itemCarousel: [],
+      index: 0,
+      selectedDateIndex: 0,
+      availableDates: [],
+      swipeStartX: null
+    };
 
-      function closureFor(raw, dayName) {
-        const closures = raw?.closures || {};
-        const key = Object.keys(closures).find(k => safe(k).toLowerCase() === safe(dayName).toLowerCase());
-        return key ? closures[key] : null;
-      }
+    const els = {
+      liveDot: document.getElementById("liveDot"),
+      liveMain: document.getElementById("liveMain"),
+      liveSub: document.getElementById("liveSub"),
+      carousel: document.getElementById("carousel"),
+      crumbs: document.getElementById("crumbs"),
+      prevBtn: document.getElementById("prevBtn"),
+      openBtn: document.getElementById("openBtn"),
+      nextBtn: document.getElementById("nextBtn"),
+      randomBtn: document.getElementById("randomBtn"),
+      detail: document.getElementById("detail"),
+      detailCloseBtn: document.getElementById("detailCloseBtn"),
+      detailEyebrow: document.getElementById("detailEyebrow"),
+      detailTitle: document.getElementById("detailTitle"),
+      detailDesc: document.getElementById("detailDesc"),
+      detailPrice: document.getElementById("detailPrice"),
+      detailTags: document.getElementById("detailTags"),
+      detailWhy: document.getElementById("detailWhy"),
+      detailCue: document.getElementById("detailCue"),
+      detailBackBtn: document.getElementById("detailBackBtn"),
+      detailRandomBtn: document.getElementById("detailRandomBtn"),
+      toastWrap: document.getElementById("toastWrap"),
+      dayPrevBtn: document.getElementById("dayPrevBtn"),
+      dayNextBtn: document.getElementById("dayNextBtn"),
+      dayStrip: document.getElementById("dayStrip"),
+      advanced: document.getElementById("advanced"),
+      advancedGrid: document.getElementById("advancedGrid"),
+      advancedCopy: document.getElementById("advancedCopy"),
+      advancedCloseBtn: document.getElementById("advancedCloseBtn"),
+      viewport: document.getElementById("viewport"),
+      hintBar: document.getElementById("hintBar")
+    };
 
-      function computeAvailableDates(raw) {
-        const now = new Date();
-        const todayISO = isoDateLocal(now);
-        const todayName = weekdayName(now);
-        const todaysHours = findHours(raw, todayName);
-        const closure = closureFor(raw, todayName);
-        let startDate = now;
+    function safe(v){ return String(v ?? "").trim(); }
+    function escapeHtml(v){
+      return safe(v)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+    function money(v){
+      const n = parseFloat(safe(v).replace(/[^0-9.]/g, ""));
+      return Number.isFinite(n) ? `$${n.toFixed(2)}` : (safe(v) || "Ask");
+    }
+    function weekdayName(date){ return date.toLocaleDateString("en-US", { weekday: "long" }); }
+    function formatDate(date){ return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); }
+    function isoDateLocal(date){
+      const y = date.getFullYear();
+      const m = String(date.getMonth()+1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+    function parseISODate(iso){
+      const [y,m,d] = safe(iso).split("-").map(Number);
+      return new Date(y, (m || 1) - 1, d || 1);
+    }
+    function parseTimeToMinutes(timeStr){
+      if(!timeStr) return null;
+      const match = safe(timeStr).match(/(\d+):(\d+)\s*(AM|PM)/i);
+      if(!match) return null;
+      let h = parseInt(match[1], 10);
+      const m = parseInt(match[2], 10);
+      const ampm = match[3].toUpperCase();
+      if(ampm === "PM" && h !== 12) h += 12;
+      if(ampm === "AM" && h === 12) h = 0;
+      return h * 60 + m;
+    }
+    function toast(message){
+      const el = document.createElement("div");
+      el.className = "toast";
+      el.textContent = message;
+      els.toastWrap.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = "0";
+        el.style.transform = "translateY(6px)";
+        setTimeout(() => el.remove(), 220);
+      }, 2400);
+    }
 
-        if (!closure?.closed && todaysHours?.close) {
-          const closeMinutes = parseTimeToMinutes(todaysHours.close);
-          const currentMinutes = now.getHours() * 60 + now.getMinutes();
-          if (closeMinutes !== null && currentMinutes >= closeMinutes) {
-            startDate = new Date(now);
-            startDate.setDate(now.getDate() + 1);
-          }
+    async function loadHHMenuData(){
+      const embedded = document.querySelector("#hh-menu-data");
+      if (embedded) return JSON.parse(embedded.textContent.trim());
+
+      const res = await fetch("menu-data.html", { cache: "no-store" });
+      if (!res.ok) throw new Error("menu-data.html not found");
+      const html = await res.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const script = doc.querySelector("#hh-menu-data");
+      if (!script) throw new Error("#hh-menu-data not found");
+      return JSON.parse(script.textContent.trim());
+    }
+
+    function findHours(raw, dayName){
+      return (raw?.hours?.weekly || []).find(entry => safe(entry.day).toLowerCase() === safe(dayName).toLowerCase()) || null;
+    }
+
+    function closureFor(raw, dayName){
+      const closures = raw?.closures || {};
+      const key = Object.keys(closures).find(k => safe(k).toLowerCase() === safe(dayName).toLowerCase());
+      return key ? closures[key] : null;
+    }
+
+    function computeAvailableDates(raw){
+      const now = new Date();
+      const todayName = weekdayName(now);
+      const todaysHours = findHours(raw, todayName);
+      const closure = closureFor(raw, todayName);
+      let startDate = now;
+
+      if (!closure?.closed && todaysHours?.close) {
+        const closeMinutes = parseTimeToMinutes(todaysHours.close);
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        if (closeMinutes !== null && currentMinutes >= closeMinutes) {
+          startDate = new Date(now);
+          startDate.setDate(now.getDate() + 1);
         }
-
-        const startISO = isoDateLocal(startDate);
-        const windowDays = Math.max(1, Math.min(31, Number(raw?.settings?.advancedWindowDays || 7)));
-        const dates = [];
-
-        for (let i = 0; i < windowDays; i++) {
-          const d = new Date(startDate);
-          d.setDate(startDate.getDate() + i);
-          const iso = isoDateLocal(d);
-          const dayName = weekdayName(d);
-          const hours = findHours(raw, dayName);
-          const closureInfo = closureFor(raw, dayName);
-          dates.push({
-            iso,
-            label: formatDate(d),
-            weekday: dayName,
-            relativeLabel: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : i === 2 ? 'Day After' : '',
-            hasExplicitMenu: !!raw?.menus?.[iso],
-            hours,
-            closureInfo
-          });
-        }
-
-        if (!dates.find(d => d.iso === todayISO) && raw?.menus?.[todayISO]) {
-          dates.unshift({
-            iso: todayISO,
-            label: formatDate(now),
-            weekday: todayName,
-            relativeLabel: 'Today',
-            hasExplicitMenu: true,
-            hours: todaysHours,
-            closureInfo: closure
-          });
-        }
-        return dates;
       }
 
-      // build normalized item arrays for a specific date
-      function buildNormalizedData(raw, selectedISO) {
-        const out = {};
-        const selectedDateObj = parseISODate(selectedISO);
-        const selectedDayName = weekdayName(selectedDateObj);
-        const defaults = raw?.defaults || {};
-        const menuForDay = raw?.menus?.[selectedISO] || {};
-        const hours = findHours(raw, selectedDayName);
-        const deliveryNote = raw?.deliveryNote || '';
-
-        // ----- breakfast (from defaults only) -----
-        out.breakfast = [];
-        const bFast = defaults.breakfast || {};
-        (bFast.plates || []).forEach((plate, idx) => {
-          out.breakfast.push({
-            id: `breakfast-plate-${idx}`,
-            categoryKey: 'breakfast',
-            name: safe(plate),
-            desc: safe(bFast.subtitle || 'Breakfast plate'),
-            price: plate,
-            badge: 'Plate',
-            mood: hours?.breakfast || '',
-            emoji: CATEGORY_META.breakfast.emoji
-          });
+      const windowDays = Math.max(1, Math.min(31, Number(raw?.settings?.advancedWindowDays || 7)));
+      const dates = [];
+      for (let i = 0; i < windowDays; i++) {
+        const d = new Date(startDate);
+        d.setDate(startDate.getDate() + i);
+        const iso = isoDateLocal(d);
+        const dayName = weekdayName(d);
+        dates.push({
+          iso,
+          label: formatDate(d),
+          weekday: dayName,
+          relativeLabel: "",
+          hasExplicitMenu: !!raw?.menus?.[iso],
+          hours: findHours(raw, dayName),
+          closureInfo: closureFor(raw, dayName)
         });
-        (bFast.items || []).forEach((item, idx) => {
-          out.breakfast.push({
-            id: `breakfast-item-${idx}`,
-            categoryKey: 'breakfast',
-            name: safe(item),
-            desc: 'Available with breakfast service.',
-            price: '',
-            badge: 'Breakfast',
-            mood: deliveryNote,
-            emoji: CATEGORY_META.breakfast.emoji
-          });
-        });
+      }
+      return dates;
+    }
 
-        // ----- lunch (defaults + daily) -----
-        out.lunch = [];
-        const lunchDefaults = defaults.lunch || {};
-        const lunchDay = menuForDay.lunch || {};
-        (lunchDefaults.plates || []).forEach((plate, idx) => {
+    function selectedDate(){
+      return STATE.availableDates[STATE.selectedDateIndex] || null;
+    }
+
+    function normalizeData(raw, selectedISO){
+      const out = {};
+      const selectedDateObj = parseISODate(selectedISO);
+      const selectedDayName = weekdayName(selectedDateObj);
+      const defaults = raw?.defaults || {};
+      const menuForDay = raw?.menus?.[selectedISO] || {};
+      const deliveryNote = raw?.deliveryNote || "";
+      const hours = findHours(raw, selectedDayName);
+
+      const breakfastDefaults = defaults.breakfast || {};
+      out.breakfast = [];
+      (breakfastDefaults.plates || []).forEach((plate, idx) => {
+        out.breakfast.push({
+          id: `breakfast-plate-${idx}`,
+          categoryKey: "breakfast",
+          name: safe(plate),
+          desc: safe(breakfastDefaults.subtitle || "") || "Breakfast plate.",
+          price: plate,
+          badge: "Plate",
+          mood: hours?.breakfast || "",
+          emoji: "🍳"
+        });
+      });
+      (breakfastDefaults.items || []).forEach((item, idx) => {
+        out.breakfast.push({
+          id: `breakfast-item-${idx}`,
+          categoryKey: "breakfast",
+          name: safe(item),
+          desc: "Available with breakfast service.",
+          price: "",
+          badge: "Breakfast",
+          mood: deliveryNote,
+          emoji: "🍳"
+        });
+      });
+
+      const lunchDefaults = defaults.lunch || {};
+      const lunchDay = menuForDay.lunch || {};
+      out.lunch = [];
+      (lunchDefaults.plates || []).forEach((plate, idx) => {
+        out.lunch.push({
+          id: `lunch-plate-${idx}`,
+          categoryKey: "lunch",
+          name: safe(plate),
+          desc: safe(lunchDefaults.subtitle || "") || "Lunch pricing.",
+          price: plate,
+          badge: "Plate",
+          mood: hours?.lunch || "",
+          emoji: "🍽️"
+        });
+      });
+      if (Array.isArray(lunchDay.items) && lunchDay.show !== false) {
+        lunchDay.items.forEach((item, idx) => {
           out.lunch.push({
-            id: `lunch-plate-${idx}`,
-            categoryKey: 'lunch',
-            name: safe(plate),
-            desc: safe(lunchDefaults.subtitle || 'Lunch pricing'),
-            price: plate,
-            badge: 'Plate',
-            mood: hours?.lunch || '',
-            emoji: CATEGORY_META.lunch.emoji
-          });
-        });
-        if (Array.isArray(lunchDay.items) && lunchDay.show !== false) {
-          lunchDay.items.forEach((item, idx) => {
-            out.lunch.push({
-              id: `lunch-day-${idx}`,
-              categoryKey: 'lunch',
-              name: safe(item.name || item),
-              desc: safe(item.desc || ''),
-              price: item.price || '',
-              badge: 'Daily',
-              mood: selectedISO,
-              emoji: CATEGORY_META.lunch.emoji
-            });
-          });
-        } else {
-          out.lunch.push({
-            id: 'lunch-unavailable',
-            categoryKey: 'lunch',
-            name: safe(raw?.settings?.autoClearMessage || 'Lunch menu unavailable.'),
-            desc: 'Check back later for the daily lunch menu.',
-            price: '',
-            badge: 'Status',
+            id: `lunch-day-${idx}`,
+            categoryKey: "lunch",
+            name: safe(item.name),
+            desc: safe(item.desc),
+            price: "",
+            badge: "Daily",
             mood: selectedISO,
-            emoji: CATEGORY_META.lunch.emoji
+            emoji: "🍽️"
           });
-        }
+        });
+      } else {
+        out.lunch.push({
+          id: "lunch-unavailable",
+          categoryKey: "lunch",
+          name: safe(raw?.settings?.autoClearMessage || "Lunch menu unavailable."),
+          desc: "Check back later for the daily lunch menu.",
+          price: "",
+          badge: "Status",
+          mood: selectedISO,
+          emoji: "🍽️"
+        });
+      }
 
-        // ----- crawfish -----
-        out.crawfish = [];
-        const crawfishDefaults = defaults.crawfish || {};
-        const crawfishDay = menuForDay.crawfish || {};
-        if (crawfishDay.show !== false) {
-          (crawfishDefaults.items || []).forEach((item, idx) => {
-            out.crawfish.push({
-              id: `crawfish-${idx}`,
-              categoryKey: 'crawfish',
-              name: safe(item),
-              desc: safe(crawfishDefaults.subtitle || 'Call for current crawfish details.'),
-              price: '',
-              badge: 'Crawfish',
-              mood: '',
-              emoji: CATEGORY_META.crawfish.emoji
-            });
+      const crawfishDefaults = defaults.crawfish || {};
+      const crawfishDay = menuForDay.crawfish || {};
+      out.crawfish = [];
+      if (crawfishDay.show !== false) {
+        (crawfishDefaults.items || []).forEach((item, idx) => {
+          out.crawfish.push({
+            id: `crawfish-${idx}`,
+            categoryKey: "crawfish",
+            name: safe(item),
+            desc: safe(crawfishDefaults.subtitle || "Call for current crawfish details."),
+            price: "",
+            badge: "Crawfish",
+            mood: "",
+            emoji: "🦞"
           });
-        }
+        });
+      }
 
-        // ----- salad bar -----
-        out.salad = [];
-        const saladDefaults = defaults.salad || {};
-        (saladDefaults.items || []).forEach((item, idx) => {
-          out.salad.push({
-            id: `salad-price-${idx}`,
-            categoryKey: 'salad',
-            name: safe(item),
-            desc: safe(saladDefaults.subtitle || 'Salad bar pricing'),
-            price: '',
-            badge: 'Pricing',
-            mood: '',
-            emoji: CATEGORY_META.salad.emoji
-          });
+      const saladDefaults = defaults.salad || {};
+      out.salad = [];
+      (saladDefaults.items || []).forEach((item, idx) => {
+        out.salad.push({
+          id: `salad-price-${idx}`,
+          categoryKey: "salad",
+          name: safe(item),
+          desc: safe(saladDefaults.subtitle || "Salad bar pricing."),
+          price: "",
+          badge: "Pricing",
+          mood: "",
+          emoji: "🥗"
         });
-        (saladDefaults.saladBar?.lettuce || []).forEach((item, idx) => {
-          out.salad.push({
-            id: `salad-lettuce-${idx}`,
-            categoryKey: 'salad',
-            name: safe(item),
-            desc: 'Lettuce choice.',
-            price: '',
-            badge: 'Lettuce',
-            mood: '',
-            emoji: CATEGORY_META.salad.emoji
-          });
+      });
+      (saladDefaults.saladBar?.lettuce || []).forEach((item, idx) => {
+        out.salad.push({
+          id: `salad-lettuce-${idx}`,
+          categoryKey: "salad",
+          name: safe(item),
+          desc: "Lettuce choice.",
+          price: "",
+          badge: "Lettuce",
+          mood: "",
+          emoji: "🥗"
         });
-        (saladDefaults.saladBar?.toppings || []).forEach((item, idx) => {
-          out.salad.push({
-            id: `salad-top-${idx}`,
-            categoryKey: 'salad',
-            name: safe(item),
-            desc: 'Salad topping.',
-            price: '',
-            badge: 'Topping',
-            mood: '',
-            emoji: CATEGORY_META.salad.emoji
-          });
+      });
+      (saladDefaults.saladBar?.toppings || []).forEach((item, idx) => {
+        out.salad.push({
+          id: `salad-top-${idx}`,
+          categoryKey: "salad",
+          name: safe(item),
+          desc: "Salad topping.",
+          price: "",
+          badge: "Topping",
+          mood: "",
+          emoji: "🥗"
         });
-        (saladDefaults.saladBar?.dressing || []).forEach((item, idx) => {
-          out.salad.push({
-            id: `salad-dressing-${idx}`,
-            categoryKey: 'salad',
-            name: safe(item),
-            desc: 'Dressing choice.',
-            price: '',
-            badge: 'Dressing',
-            mood: '',
-            emoji: CATEGORY_META.salad.emoji
-          });
+      });
+      (saladDefaults.saladBar?.dressing || []).forEach((item, idx) => {
+        out.salad.push({
+          id: `salad-dressing-${idx}`,
+          categoryKey: "salad",
+          name: safe(item),
+          desc: "Dressing choice.",
+          price: "",
+          badge: "Dressing",
+          mood: "",
+          emoji: "🥗"
         });
+      });
 
-        // ----- drinks -----
-        out.drinks = [];
-        const drinkDefaults = defaults.drinks || {};
-        (drinkDefaults.items || []).forEach((item, idx) => {
-          out.drinks.push({
-            id: `drink-${idx}`,
-            categoryKey: 'drinks',
-            name: safe(item),
-            desc: 'Available drink selection.',
-            price: '',
-            badge: 'Drink',
-            mood: '',
-            emoji: CATEGORY_META.drinks.emoji
-          });
+      const drinkDefaults = defaults.drinks || {};
+      out.drinks = [];
+      (drinkDefaults.items || []).forEach((item, idx) => {
+        out.drinks.push({
+          id: `drink-${idx}`,
+          categoryKey: "drinks",
+          name: safe(item),
+          desc: "Available drink selection.",
+          price: "",
+          badge: "Drink",
+          mood: "",
+          emoji: "🥤"
         });
+      });
 
-        // ----- dessert -----
-        out.dessert = [];
-        const dessertDefaults = defaults.dessert || {};
-        const dessertDay = menuForDay.dessert || {};
-        if (Array.isArray(dessertDay.items) && dessertDay.items.length) {
-          dessertDay.items.forEach((item, idx) => {
-            out.dessert.push({
-              id: `dessert-day-${idx}`,
-              categoryKey: 'dessert',
-              name: safe(item),
-              desc: safe(dessertDefaults.subtitle || 'Today’s dessert.'),
-              price: '',
-              badge: 'Today',
-              mood: selectedISO,
-              emoji: CATEGORY_META.dessert.emoji
-            });
-          });
-        } else {
+      const dessertDefaults = defaults.dessert || {};
+      const dessertDay = menuForDay.dessert || {};
+      out.dessert = [];
+      if (Array.isArray(dessertDay.items) && dessertDay.items.length) {
+        dessertDay.items.forEach((item, idx) => {
           out.dessert.push({
-            id: 'dessert-unposted',
-            categoryKey: 'dessert',
-            name: '(Dessert not posted yet.)',
-            desc: safe(dessertDefaults.subtitle || 'Dessert changes daily.'),
-            price: '',
-            badge: 'Status',
-            mood: '',
-            emoji: CATEGORY_META.dessert.emoji
+            id: `dessert-day-${idx}`,
+            categoryKey: "dessert",
+            name: safe(item),
+            desc: safe(dessertDefaults.subtitle || "Today’s dessert."),
+            price: "",
+            badge: "Today",
+            mood: selectedISO,
+            emoji: "🍰"
           });
-        }
-
-        return out;
+        });
+      } else {
+        out.dessert.push({
+          id: "dessert-unposted",
+          categoryKey: "dessert",
+          name: "(Dessert not posted yet.)",
+          desc: safe(dessertDefaults.subtitle || "Dessert changes daily."),
+          price: "",
+          badge: "Status",
+          mood: "",
+          emoji: "🍰"
+        });
       }
 
-      // ---------- render functions ----------
-      function renderStatus() {
-        const sel = state.availableDates[state.selectedDateIndex];
-        if (!sel) return;
-        const closure = sel.closureInfo;
-        const hours = sel.hours;
+      return out;
+    }
 
-        if (closure?.closed) {
-          els.liveMain.textContent = `${sel.weekday} · ${sel.label}`;
-          els.liveSub.textContent = closure.message || 'Closed';
-          els.liveDot.classList.add('closed');
-          return;
-        }
-
-        const breakfast = hours?.breakfast ? `Breakfast ${hours.breakfast}` : '';
-        const lunch = hours?.lunch ? `Lunch ${hours.lunch}` : '';
-        const relative = sel.relativeLabel ? `${sel.relativeLabel} · ` : '';
-        els.liveMain.textContent = `${relative}${sel.weekday} · ${sel.label}`;
-        els.liveSub.textContent = `${hours?.open || ''} – ${hours?.close || ''}${breakfast ? ' · ' + breakfast : ''}${lunch ? ' · ' + lunch : ''}`;
-        els.liveDot.classList.remove('closed');
+    function renderStatus(raw){
+      const sel = selectedDate();
+      if (!sel) return;
+      const closure = sel.closureInfo;
+      const hours = sel.hours;
+      const note = safe(raw?.hours?.note);
+      if (closure?.closed) {
+        els.liveMain.textContent = `${sel.weekday} · ${sel.label}`;
+        els.liveSub.textContent = closure.message || "Closed";
+        els.liveDot.classList.add("closed");
+        return;
       }
 
-      function renderDayStrip() {
-        els.dayStrip.innerHTML = '';
-        const selIdx = state.selectedDateIndex;
-        state.availableDates.slice(0, 3).forEach((d, idx) => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = `day-chip${idx === selIdx ? ' active' : ''}${d.relativeLabel ? '' : ' subtle'}`;
-          btn.innerHTML = `<span>${escapeHtml(d.relativeLabel || d.weekday)}</span><span>${escapeHtml(d.label)}</span>`;
-          btn.addEventListener('click', () => selectDateByIndex(idx));
+      const breakfast = hours?.breakfast ? `Breakfast ${hours.breakfast}` : "";
+      const lunch = hours?.lunch ? `Lunch ${hours.lunch}` : "";
+      els.liveMain.textContent = `${sel.weekday} · ${sel.label}`;
+      els.liveSub.textContent = `${hours?.open || ""} – ${hours?.close || ""}${breakfast ? " · " + breakfast : ""}${lunch ? " · " + lunch : ""}${note ? " · " + note : ""}`;
+      els.liveDot.classList.remove("closed");
+    }
+
+    function renderDayStrip(){
+      els.dayStrip.innerHTML = "";
+
+      (() => {
+        const indices = [];
+        indices.push(STATE.selectedDateIndex);
+        if (STATE.selectedDateIndex + 1 < STATE.availableDates.length) {
+          indices.push(STATE.selectedDateIndex + 1);
+        } else if (STATE.selectedDateIndex - 1 >= 0) {
+          indices.unshift(STATE.selectedDateIndex - 1);
+        }
+        [...new Set(indices)].forEach((realIdx) => {
+          const d = STATE.availableDates[realIdx];
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "day-chip" + (realIdx === STATE.selectedDateIndex ? " active" : "");
+          btn.innerHTML = `<span>${escapeHtml(d.weekday)}</span><small>${escapeHtml(d.label)}</small>`;
+          btn.addEventListener("click", () => {
+            selectDateByIndex(realIdx);
+          });
           els.dayStrip.appendChild(btn);
         });
+      })();
 
-        const advancedBtn = document.createElement('button');
-        advancedBtn.type = 'button';
-        advancedBtn.className = 'day-chip advanced-trigger';
-        advancedBtn.textContent = 'Advanced Menu';
-        advancedBtn.addEventListener('click', openAdvanced);
-        els.dayStrip.appendChild(advancedBtn);
+      const advancedBtn = document.createElement("button");
+      advancedBtn.type = "button";
+      advancedBtn.className = "day-chip advanced-trigger";
+      advancedBtn.innerHTML = `<span>Advanced Menu</span><small>${STATE.availableDates.length} upcoming days</small>`;
+      advancedBtn.addEventListener("click", openAdvanced);
+      els.dayStrip.appendChild(advancedBtn);
 
-        els.dayPrevBtn.disabled = selIdx <= 0;
-        els.dayNextBtn.disabled = selIdx >= state.availableDates.length - 1;
-      }
+      els.dayPrevBtn.disabled = STATE.selectedDateIndex <= 0;
+      els.dayNextBtn.disabled = STATE.selectedDateIndex >= STATE.availableDates.length - 1;
+      els.dayPrevBtn.style.opacity = els.dayPrevBtn.disabled ? ".45" : "1";
+      els.dayNextBtn.style.opacity = els.dayNextBtn.disabled ? ".45" : "1";
+    }
 
-      function renderAdvanced() {
-        els.advancedGrid.innerHTML = '';
-        els.advancedCopy.textContent = safe(state.raw?.settings?.advancedDisclaimer || 'Lunch posted in advance is subject to change.');
+    function renderAdvanced(){
+      els.advancedGrid.innerHTML = "";
+      els.advancedCopy.textContent = "Upcoming lunch menus in order from the current day.";
 
-        state.availableDates.forEach((d, idx) => {
-          const menuForDay = state.raw?.menus?.[d.iso] || {};
-          const lunchItems = menuForDay?.lunch?.items || [];
-          const dessertItems = menuForDay?.dessert?.items || [];
-          const hours = d.hours;
-          const closure = d.closureInfo;
+      STATE.availableDates.forEach((d, idx) => {
+        const menuForDay = STATE.raw?.menus?.[d.iso] || {};
+        const lunchItems = menuForDay?.lunch?.items || [];
+        const hours = d.hours;
+        const closure = d.closureInfo;
 
-          const card = document.createElement('article');
-          card.className = 'advanced-card';
-          card.innerHTML = `
-            <div class="advanced-card-top">
-              <div>
-                <div class="advanced-day">${escapeHtml(d.weekday)}</div>
-                <div class="advanced-date">${escapeHtml(d.label)}</div>
-              </div>
-              <div class="advanced-pill">${escapeHtml(d.relativeLabel || 'Planned')}</div>
+        const card = document.createElement("article");
+        card.className = "advanced-card" + (idx === STATE.selectedDateIndex ? " active" : "");
+        card.innerHTML = `
+          <div class="advanced-card-top">
+            <div>
+              <div class="advanced-day">${escapeHtml(d.weekday)}</div>
+              <div class="advanced-date">${escapeHtml(d.label)}</div>
             </div>
-            <div class="advanced-list">
-              <div>${closure?.closed ? escapeHtml(closure.message || 'Closed') : escapeHtml((hours?.open || '') + ' – ' + (hours?.close || ''))}</div>
-              <div>Lunch: ${lunchItems.length ? escapeHtml(lunchItems.slice(0,3).map(i => i.name).join(', ')) : 'Not posted'}</div>
-              <div>Dessert: ${dessertItems.length ? escapeHtml(dessertItems.join(', ')) : 'Not posted'}</div>
-            </div>
-          `;
-          card.addEventListener('click', () => {
-            closeAdvanced();
-            selectDateByIndex(idx);
-          });
-          els.advancedGrid.appendChild(card);
+            <div class="advanced-pill">${idx === 0 ? "Current" : "Upcoming"}</div>
+          </div>
+          <div class="advanced-list">
+            <div>${closure?.closed ? escapeHtml(closure.message || "Closed") : escapeHtml((hours?.lunch || "Lunch hours unavailable"))}</div>
+            <div>Lunch: ${lunchItems.length ? escapeHtml(lunchItems.map(i => i.name).join(", ")) : "Not posted"}</div>
+          </div>
+        `;
+        card.addEventListener("click", () => {
+          closeAdvanced();
+          selectDateByIndex(idx);
         });
-      }
+        els.advancedGrid.appendChild(card);
+      });
+    }
 
-      function buildCategoryCards() {
-        return Object.keys(state.normalized)
-          .filter(key => (state.normalized[key] || []).length)
-          .map(key => {
-            const meta = CATEGORY_META[key] || { label: key, emoji: '🍽️', desc: 'Menu category' };
-            return {
-              id: key,
-              type: 'category',
-              key,
-              title: meta.label,
-              emoji: meta.emoji,
-              desc: meta.desc,
-              count: state.normalized[key].length
-            };
-          });
-      }
-
-      function buildItemCards(categoryKey) {
-        return (state.normalized[categoryKey] || []).map(item => ({
-          id: item.id,
-          type: 'item',
-          key: item.id,
-          title: item.name,
-          emoji: item.emoji,
-          desc: item.desc || 'Tap to view details.',
-          count: item.price,
-          item
-        }));
-      }
-
-      function activeList() {
-        return state.mode === 'categories' ? state.categoryCarousel : state.itemCarousel;
-      }
-
-      function frontEntry() {
-        const list = activeList();
-        if (!list.length) return null;
-        const index = ((state.index % list.length) + list.length) % list.length;
-        return list[index];
-      }
-
-      function renderCrumbs() {
-        els.crumbs.innerHTML = '';
-        const home = document.createElement('button');
-        home.type = 'button';
-        home.className = `crumb${state.mode === 'categories' ? ' active' : ''}`;
-        home.textContent = '◎ Categories';
-        home.addEventListener('click', () => {
-          state.mode = 'categories';
-          state.index = 0;
-          renderCarousel();
-          renderCrumbs();
+    function categoryCards(){
+      return Object.keys(STATE.normalized)
+        .filter(key => (STATE.normalized[key] || []).length)
+        .map((key) => {
+          const meta = APP.categoryMeta[key] || { label: key, emoji: "🍽️", desc: "Menu category" };
+          const items = STATE.normalized[key] || [];
+          const preview = items.slice(0, 3).map(item => ({
+            left: item.name,
+            right: item.badge || item.mood || ""
+          }));
+          return {
+            id: key,
+            type: "category",
+            key,
+            title: meta.label,
+            emoji: meta.emoji,
+            desc: meta.desc,
+            count: items.length,
+            preview
+          };
         });
-        els.crumbs.appendChild(home);
+    }
 
-        if (state.selectedCategory) {
-          const meta = CATEGORY_META[state.selectedCategory] || { label: state.selectedCategory, emoji: '🍽️' };
-          const cat = document.createElement('button');
-          cat.type = 'button';
-          cat.className = `crumb${state.mode === 'items' ? ' active' : ''}`;
-          cat.textContent = `${meta.emoji} ${meta.label}`;
-          cat.addEventListener('click', () => enterCategory(state.selectedCategory));
-          els.crumbs.appendChild(cat);
-        }
-      }
+    function itemCardsForCategory(key){
+      return (STATE.normalized[key] || []).map((item) => ({
+        id: item.id,
+        type: "item",
+        key: item.id,
+        title: item.name,
+        emoji: item.emoji,
+        desc: item.desc || "Tap to view details.",
+        count: item.price,
+        preview: [
+          { left: item.badge || "Menu Item", right: item.mood || "" },
+          { left: item.desc ? item.desc.slice(0, 72) + (item.desc.length > 72 ? "…" : "") : "Call for details", right: "" }
+        ],
+        item
+      }));
+    }
 
-      function renderCarousel() {
-        const list = activeList();
-        els.carousel.innerHTML = '';
-        if (!list.length) return;
+    function activeList(){
+      return STATE.mode === "categories" ? STATE.categoryCarousel : STATE.itemCarousel;
+    }
 
-        list.forEach((entry, index) => {
-          const relative = index - state.index;
-          const wrapped = ((relative + list.length + Math.floor(list.length / 2)) % list.length) - Math.floor(list.length / 2);
-          const abs = Math.abs(wrapped);
-          const x = wrapped * 150;
-          const z = -abs * 160;
-          const rotateY = wrapped * -18;
-          const scale = wrapped === 0 ? 1 : Math.max(0.72, 1 - abs * 0.12);
-          const opacity = wrapped === 0 ? 1 : Math.max(0.24, 1 - abs * 0.26);
+    function frontEntry(){
+      const list = activeList();
+      if (!list.length) return null;
+      const index = ((STATE.index % list.length) + list.length) % list.length;
+      return list[index];
+    }
 
-          const card = document.createElement('article');
-          card.className = `card${wrapped === 0 ? ' active' : ''}`;
-          card.style.transform = `translate3d(calc(-50% + ${x}px), -50%, ${z}px) rotateY(${rotateY}deg) scale(${scale})`;
-          card.style.opacity = opacity;
-          card.style.filter = wrapped === 0 ? 'none' : `blur(${Math.min(abs * 0.6, 1.4)}px)`;
-          card.style.zIndex = String(100 - abs);
+    function renderCrumbs(){
+      els.crumbs.innerHTML = "";
 
-          const label = entry.type === 'category' ? 'Category' : 'Item';
-          const action = entry.type === 'category' ? 'Open Category' : 'Open Item';
-          const countLabel = entry.type === 'category'
-            ? `${entry.count} item${entry.count === 1 ? '' : 's'}`
-            : money(entry.count);
-
-          card.innerHTML = `
-            <button class="card-btn" type="button">
-              <div class="badge">${label}</div>
-              <div class="emoji">${escapeHtml(entry.emoji)}</div>
-              <div>
-                <h3 class="title">${escapeHtml(entry.title)}</h3>
-                <p class="desc">${escapeHtml(entry.desc || '')}</p>
-              </div>
-              <div class="meta">
-                <div class="count">${escapeHtml(countLabel)}</div>
-                <div class="action">${action}</div>
-              </div>
-            </button>
-          `;
-
-          card.querySelector('button').addEventListener('click', () => {
-            if (wrapped === 0) {
-              openFront();
-            } else {
-              state.index = index;
-              renderCarousel();
-            }
-          });
-
-          els.carousel.appendChild(card);
-        });
+      const home = document.createElement("button");
+      home.type = "button";
+      home.className = "crumb" + (STATE.mode === "categories" ? " active" : "");
+      home.textContent = "◎ Categories";
+      home.addEventListener("click", () => {
+        STATE.mode = "categories";
+        STATE.index = 0;
+        renderCarousel();
         renderCrumbs();
+        updateHint();
+      });
+      els.crumbs.appendChild(home);
+
+      if (STATE.selectedCategory) {
+        const meta = APP.categoryMeta[STATE.selectedCategory] || { label: STATE.selectedCategory, emoji: "🍽️" };
+        const cat = document.createElement("button");
+        cat.type = "button";
+        cat.className = "crumb" + (STATE.mode === "items" ? " active" : "");
+        cat.textContent = `${meta.emoji} ${meta.label}`;
+        cat.addEventListener("click", () => enterCategory(STATE.selectedCategory));
+        els.crumbs.appendChild(cat);
       }
+    }
 
-      // ---------- actions ----------
-      function selectDateByIndex(idx) {
-        if (idx < 0 || idx >= state.availableDates.length) return;
-        state.selectedDateIndex = idx;
-        rebuildForDate();
-        toast(`Showing ${state.availableDates[idx].weekday}.`);
-      }
+    function renderCarousel(){
+      const list = activeList();
+      els.carousel.innerHTML = "";
 
-      function rebuildForDate() {
-        const sel = state.availableDates[state.selectedDateIndex];
-        if (!sel) return;
-        state.normalized = buildNormalizedData(state.raw, sel.iso);
-        state.categoryCarousel = buildCategoryCards();
-        state.mode = 'categories';
-        state.selectedCategory = null;
-        state.itemCarousel = [];
-        state.index = 0;
-        renderStatus();
-        renderDayStrip();
-        renderCarousel();
-        renderAdvanced();   // update advanced view in background
-      }
+      if (!list.length) return;
 
-      function cycle(step) {
-        const list = activeList();
-        if (!list.length) return;
-        state.index = (state.index + step + list.length) % list.length;
-        renderCarousel();
-      }
+      list.forEach((entry, index) => {
+        const relative = index - STATE.index;
+        const wrapped = ((relative + list.length + Math.floor(list.length / 2)) % list.length) - Math.floor(list.length / 2);
 
-      function enterCategory(key) {
-        state.selectedCategory = key;
-        state.mode = 'items';
-        state.itemCarousel = buildItemCards(key);
-        state.index = 0;
-        renderCarousel();
-      }
+        const abs = Math.abs(wrapped);
+        const x = wrapped * 155;
+        const z = -abs * 170;
+        const rotateY = wrapped * -18;
+        const rotateX = abs * 1.6;
+        const scale = wrapped === 0 ? 1 : Math.max(0.72, 1 - abs * 0.12);
+        const opacity = wrapped === 0 ? 1 : Math.max(0.22, 1 - abs * 0.24);
+        const yFloat = wrapped === 0 ? Math.sin(Date.now() / 600) * 2 : 0;
 
-      function backToCategories() {
-        state.mode = 'categories';
-        state.index = 0;
-        renderCarousel();
-      }
+        const card = document.createElement("article");
+        card.className = "card" + (wrapped === 0 ? " active" : "");
+        card.style.transform = `translate3d(calc(-50% + ${x}px), calc(-50% + ${yFloat}px), ${z}px) rotateY(${rotateY}deg) rotateX(${rotateX}deg) scale(${scale})`;
+        card.style.opacity = opacity;
+        card.style.filter = wrapped === 0 ? "none" : "blur(" + Math.min(abs * 0.55, 1.4) + "px)";
+        card.style.zIndex = String(100 - abs);
 
-      function openFront() {
-        const entry = frontEntry();
-        if (!entry) return;
-        if (entry.type === 'category') {
-          enterCategory(entry.key);
-        } else {
-          openDetail(entry.item);
-        }
-      }
+        const label = entry.type === "category" ? "Category" : "Item";
+        const action = entry.type === "category" ? "Open Category" : "Open Item";
+        const countLabel = entry.type === "category"
+          ? `${entry.count} item${entry.count === 1 ? "" : "s"}`
+          : money(entry.count);
 
-      function openDetail(item) {
-        const meta = CATEGORY_META[item.categoryKey] || { label: item.categoryKey, emoji: '🍽️' };
-        els.detailEyebrow.textContent = `${meta.emoji} ${meta.label}`;
-        els.detailTitle.textContent = item.name;
-        els.detailDesc.textContent = item.desc || 'Call the restaurant for more details.';
-        els.detailPrice.textContent = money(item.price);
+        const previewHTML = (entry.preview || []).slice(0, 3).map(p => `
+          <div class="preview-pill">
+            <strong>${escapeHtml(p.left)}</strong>
+            <span>${escapeHtml(p.right || "")}</span>
+          </div>
+        `).join("");
 
-        els.detailTags.innerHTML = [
-          item.badge ? `<span class="detail-tag">🏷️ ${escapeHtml(item.badge)}</span>` : '',
-          item.mood ? `<span class="detail-tag">✨ ${escapeHtml(item.mood)}</span>` : '',
-          `<span class="detail-tag">${escapeHtml(meta.emoji)} ${escapeHtml(meta.label)}</span>`
-        ].filter(Boolean).join('');
+        card.innerHTML = `
+          <button class="card-btn" type="button">
+            <div class="badge">${label}</div>
+            <div class="emoji">${escapeHtml(entry.emoji)}</div>
+            <div>
+              <h3 class="title">${escapeHtml(entry.title)}</h3>
+              <p class="desc">${escapeHtml(entry.desc || "")}</p>
+            </div>
+            <div class="preview-list">${previewHTML}</div>
+            <div class="meta">
+              <div class="count">${escapeHtml(countLabel)}</div>
+              <div class="action">${action}</div>
+            </div>
+          </button>
+        `;
 
-        els.detailWhy.textContent = item.badge
-          ? `${item.name} stands out because it is marked as ${item.badge.toLowerCase()}.`
-          : `${item.name} works because the front hologram makes it the obvious next choice.`;
-
-        els.detailCue.textContent = `Call (337) 221-1035 and ask for “${item.name}.” This page reads the hidden JSON from menu-data.html for the selected day.`;
-
-        els.detail.classList.add('open');
-        els.detail.setAttribute('aria-hidden', 'false');
-      }
-
-      function closeDetail() {
-        els.detail.classList.remove('open');
-        els.detail.setAttribute('aria-hidden', 'true');
-      }
-
-      function openAdvanced() {
-        els.advanced.classList.add('open');
-        els.advanced.setAttribute('aria-hidden', 'false');
-      }
-
-      function closeAdvanced() {
-        els.advanced.classList.remove('open');
-        els.advanced.setAttribute('aria-hidden', 'true');
-      }
-
-      function randomFromCurrent() {
-        const list = activeList();
-        if (!list.length) {
-          toast('Nothing is loaded yet.');
-          return;
-        }
-        state.index = Math.floor(Math.random() * list.length);
-        renderCarousel();
-      }
-
-      // ---------- init & event binding ----------
-      function bindEvents() {
-        els.prevBtn.addEventListener('click', () => cycle(-1));
-        els.nextBtn.addEventListener('click', () => cycle(1));
-        els.openBtn.addEventListener('click', openFront);
-        els.randomBtn.addEventListener('click', randomFromCurrent);
-        els.detailCloseBtn.addEventListener('click', closeDetail);
-        els.detailBackBtn.addEventListener('click', () => {
-          closeDetail();
-          if (state.mode === 'items') backToCategories();
-        });
-        els.detailRandomBtn.addEventListener('click', randomFromCurrent);
-        els.dayPrevBtn.addEventListener('click', () => selectDateByIndex(state.selectedDateIndex - 1));
-        els.dayNextBtn.addEventListener('click', () => selectDateByIndex(state.selectedDateIndex + 1));
-        els.advancedCloseBtn.addEventListener('click', closeAdvanced);
-
-        document.querySelectorAll('[data-close-detail="true"]').forEach(node => {
-          node.addEventListener('click', closeDetail);
-        });
-        document.querySelectorAll('[data-close-advanced="true"]').forEach(node => {
-          node.addEventListener('click', closeAdvanced);
-        });
-
-        window.addEventListener('keydown', (e) => {
-          // ignore if any modal is open
-          if (els.detail.classList.contains('open') || els.advanced.classList.contains('open')) {
-            if (e.key === 'Escape') {
-              closeDetail();
-              closeAdvanced();
-            }
-            return;
+        card.querySelector("button").addEventListener("click", () => {
+          if (wrapped === 0) {
+            openFront();
+          } else {
+            STATE.index = index;
+            renderCarousel();
+            updateHint();
           }
-          if (e.key === 'ArrowLeft') cycle(-1);
-          if (e.key === 'ArrowRight') cycle(1);
-          if (e.key === 'Enter') openFront();
         });
-      }
 
-      async function init() {
-        els.loadingOverlay.classList.add('visible');
-        try {
-          const raw = await loadMenuData();
-          state.raw = raw;
-          state.availableDates = computeAvailableDates(raw);
-          bindEvents();
-          rebuildForDate();
-          toast('menu-data.html loaded.');
-        } catch (err) {
-          console.error(err);
-          toast('Could not read menu-data.html. Check console.');
-        } finally {
-          els.loadingOverlay.classList.remove('visible');
+        els.carousel.appendChild(card);
+      });
+
+      renderCrumbs();
+      updateHint();
+    }
+
+    function rebuildForDate(){
+      const sel = selectedDate();
+      if (!sel) return;
+      STATE.normalized = normalizeData(STATE.raw, sel.iso);
+      STATE.categoryCarousel = categoryCards();
+      STATE.mode = "categories";
+      STATE.selectedCategory = null;
+      STATE.itemCarousel = [];
+      STATE.index = 0;
+      renderStatus(STATE.raw);
+      renderDayStrip();
+      renderCarousel();
+      renderCrumbs();
+      renderAdvanced();
+    }
+
+    function selectDateByIndex(idx){
+      if (idx < 0 || idx >= STATE.availableDates.length) return;
+      STATE.selectedDateIndex = idx;
+      rebuildForDate();
+      toast(`Showing ${STATE.availableDates[idx].weekday}.`);
+    }
+
+    function cycle(step){
+      const list = activeList();
+      if (!list.length) return;
+      STATE.index = (STATE.index + step + list.length) % list.length;
+      renderCarousel();
+    }
+
+    function enterCategory(key){
+      STATE.selectedCategory = key;
+      STATE.mode = "items";
+      STATE.itemCarousel = itemCardsForCategory(key);
+      STATE.index = 0;
+      renderCarousel();
+    }
+
+    function backToCategories(){
+      STATE.mode = "categories";
+      STATE.index = 0;
+      renderCarousel();
+    }
+
+    function openFront(){
+      const entry = frontEntry();
+      if (!entry) return;
+
+      if (entry.type === "category") {
+        enterCategory(entry.key);
+      } else {
+        openDetail(entry.item);
+      }
+    }
+
+    function openDetail(item){
+      const meta = APP.categoryMeta[item.categoryKey] || { label: item.categoryKey, emoji: "🍽️" };
+      const sel = selectedDate();
+      els.detailEyebrow.textContent = `${meta.emoji} ${meta.label}`;
+      els.detailTitle.textContent = item.name;
+      els.detailDesc.textContent = item.desc || "Call the restaurant for more details.";
+      els.detailPrice.textContent = money(item.price);
+
+      els.detailTags.innerHTML = [
+        item.badge ? `<span class="detail-tag">🏷️ ${escapeHtml(item.badge)}</span>` : "",
+        item.mood ? `<span class="detail-tag">✨ ${escapeHtml(item.mood)}</span>` : "",
+        sel ? `<span class="detail-tag">📅 ${escapeHtml(sel.weekday)}</span>` : "",
+        `<span class="detail-tag">${escapeHtml(meta.emoji)} ${escapeHtml(meta.label)}</span>`
+      ].filter(Boolean).join("");
+
+      els.detailWhy.textContent = item.badge
+        ? `${item.name} stands out because it is marked as ${item.badge.toLowerCase()}.`
+        : `${item.name} works because the front hologram makes it the obvious next choice.`;
+
+      els.detailCue.textContent = `Call (337) 221-1035 and ask for “${item.name}.” This page reads the hidden JSON from menu-data.html for the selected day.`;
+
+      els.detail.classList.add("open");
+      els.detail.setAttribute("aria-hidden", "false");
+    }
+
+    function closeDetail(){
+      els.detail.classList.remove("open");
+      els.detail.setAttribute("aria-hidden", "true");
+    }
+
+    function openAdvanced(){
+      els.advanced.classList.add("open");
+    }
+
+    function closeAdvanced(){
+      els.advanced.classList.remove("open");
+    }
+
+    function randomFromCurrent(){
+      const list = activeList();
+      if (!list.length) {
+        toast("Nothing is loaded yet.");
+        return;
+      }
+      STATE.index = Math.floor(Math.random() * list.length);
+      renderCarousel();
+    }
+
+    function updateHint(){
+      const entry = frontEntry();
+      const sel = selectedDate();
+      if (!entry) return;
+      const base = STATE.mode === "categories"
+        ? `Front card: ${entry.title}. Click or press Enter to open it.`
+        : `Front item: ${entry.title}. Click or press Enter for details.`;
+      const day = sel ? `${sel.weekday} · ${sel.label}` : "";
+      els.hintBar.textContent = `${day}${day ? " — " : ""}${base}`;
+    }
+
+    function bindSwipe(){
+      els.viewport.addEventListener("touchstart", (e) => {
+        if (!e.touches[0]) return;
+        STATE.swipeStartX = e.touches[0].clientX;
+      }, { passive: true });
+
+      els.viewport.addEventListener("touchend", (e) => {
+        if (STATE.swipeStartX === null) return;
+        const endX = e.changedTouches[0]?.clientX ?? STATE.swipeStartX;
+        const delta = endX - STATE.swipeStartX;
+        STATE.swipeStartX = null;
+        if (Math.abs(delta) < 36) return;
+        if (delta > 0) cycle(-1);
+        else cycle(1);
+      }, { passive: true });
+    }
+
+    function bind(){
+      els.prevBtn.addEventListener("click", () => cycle(-1));
+      els.nextBtn.addEventListener("click", () => cycle(1));
+      els.openBtn.addEventListener("click", openFront);
+      els.randomBtn.addEventListener("click", randomFromCurrent);
+      els.detailCloseBtn.addEventListener("click", closeDetail);
+      els.detailBackBtn.addEventListener("click", () => {
+        closeDetail();
+        if (STATE.mode === "items") backToCategories();
+      });
+      els.detailRandomBtn.addEventListener("click", randomFromCurrent);
+      els.dayPrevBtn.addEventListener("click", () => selectDateByIndex(STATE.selectedDateIndex - 1));
+      els.dayNextBtn.addEventListener("click", () => selectDateByIndex(STATE.selectedDateIndex + 1));
+      els.advancedCloseBtn.addEventListener("click", closeAdvanced);
+
+      document.querySelectorAll("[data-close-detail='true']").forEach((node) => {
+        node.addEventListener("click", closeDetail);
+      });
+
+      document.querySelectorAll("[data-close-advanced='true']").forEach((node) => {
+        node.addEventListener("click", closeAdvanced);
+      });
+
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") cycle(-1);
+        if (e.key === "ArrowRight") cycle(1);
+        if (e.key === "Enter") openFront();
+        if (e.key === "Escape") {
+          closeDetail();
+          closeAdvanced();
         }
-      }
+      });
 
-      init();
-    })();
+      bindSwipe();
+    }
+
+    async function init(){
+      try {
+        const raw = await loadHHMenuData();
+        STATE.raw = raw;
+        STATE.availableDates = computeAvailableDates(raw);
+        bind();
+        rebuildForDate();
+        toast("Enhanced hologram menu loaded.");
+      } catch (err) {
+        console.error(err);
+        toast("Could not read menu-data.html.");
+      }
+    }
+
+    init();
   </script>
 </body>
 </html>
