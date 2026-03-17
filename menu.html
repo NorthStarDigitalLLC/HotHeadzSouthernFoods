@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Hot Headz Southern Foods – Spin Wheel Menu (works out‑of‑box)</title>
+  <title>Hot Headz Southern Foods – Spin Wheel Menu (fixed)</title>
   <meta name="description" content="Daily breakfast, lunch, crawfish, salad bar, drinks and desserts – now with a spin wheel!">
 
   <!-- Google Fonts & Font Awesome -->
@@ -32,7 +32,7 @@
       padding-bottom: 90px;
     }
 
-    /* ---------- FLOATING DOCK (unchanged, but hidden for simplicity) ---------- */
+    /* ---------- FLOATING DOCK (simplified) ---------- */
     .gen-dock { display: none; }
 
     /* ===== MENU STYLES ===== */
@@ -109,7 +109,7 @@
       width: 280px;
       height: 280px;
       margin: 10px auto;
-      touch-action: none; /* prevent scrolling while rotating */
+      touch-action: none;
       cursor: grab;
     }
     .wheel-wrapper:active {
@@ -150,7 +150,7 @@
       color: #fff;
       box-shadow: 0 0 15px rgba(0,0,0,0.7);
       transition: border 0.2s, transform 0.2s, background 0.2s;
-      pointer-events: none; /* rotate by dragging wrapper */
+      pointer-events: none;
       word-break: break-word;
       padding: 4px;
       line-height: 1.2;
@@ -247,7 +247,7 @@
       padding-left: 8px;
     }
 
-    /* ----- Cube styles (simplified for demo) ----- */
+    /* ----- Cube styles ----- */
     .hh-cube-controls {
       display: flex;
       flex-wrap: wrap;
@@ -377,6 +377,14 @@
     }
     .hidden { display: none !important; }
 
+    /* Advanced carousel */
+    .hh-adv-carousel { display: flex; gap:14px; overflow-x:auto; padding: 2px 14px 14px; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; }
+    .hh-adv-card{ flex: 0 0 92%; max-width: 720px; scroll-snap-align:start; }
+    @media(min-width:860px){ .hh-adv-card{ flex: 0 0 48%; } }
+
+    /* Circular nav (simplified, not used) */
+    .nav-btn, .circ-menu-overlay { display: none; }
+
     /* Error state */
     .hh-state{ border: 1px solid rgba(245,240,230,.14); border-radius: var(--hh-radius2); padding: 20px; margin: 14px; background: rgba(0,0,0,.22); color: rgba(245,240,230,.92); box-shadow: var(--hh-shadow2); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position:relative; overflow:hidden; }
     .hh-state::after{ content:""; position:absolute; inset:0; background: radial-gradient(700px 280px at 10% 10%, rgba(192,90,42,.22), transparent 60%), radial-gradient(700px 280px at 90% 0%, rgba(42,127,98,.16), transparent 62%); pointer-events:none; opacity:.9; }
@@ -384,10 +392,6 @@
     .hh-badge{ font-weight: 980; text-transform: uppercase; letter-spacing: .14em; font-size: 11px; padding: 7px 12px; border-radius: 999px; border: 1px solid rgba(245,240,230,.18); background: rgba(255,255,255,.06); display:inline-flex; align-items:center; gap:8px; }
     .hh-badge::before{ content:""; width:8px;height:8px; border-radius: 99px; background: rgba(255,179,90,.92); display:inline-block; }
     .hh-badge.is-dark::before{ background: rgba(245,240,230,.92); }
-
-    /* Circular nav (simplified, not used) */
-    .nav-btn { display: none; }
-    .circ-menu-overlay { display: none; }
   </style>
 </head>
 <body>
@@ -630,9 +634,10 @@
         </div>
         <div class="hh-hint" style="text-align:center; margin:8px;">Scroll normally • Tap Rotate to spin</div>
       </div>
+
+      <div class="hh-hint">Tip: switch to 3D cube for a spinning experience!</div>
     </div>
 
-    <!-- Error state (visible only if data fails) -->
     <div class="hh-state" id="hh-load-error" hidden>
       <div class="hh-badge is-dark">Error</div>
       <div class="hh-state-title">Menu couldn’t load</div>
@@ -640,14 +645,26 @@
     </div>
   </div>
 
+  <!-- ===== SCRIPTS ===== -->
   <script>
     (function(){
-      // -------------------- HELPER FUNCTIONS --------------------
+      // -------------------- HELPER FUNCTIONS (unchanged) --------------------
       const $ = (id) => document.getElementById(id);
 
       function setText(id, text) {
         const el = $(id);
         if (el) el.textContent = text || "";
+      }
+
+      function setList(id, items) {
+        const ul = $(id);
+        if (!ul) return;
+        ul.innerHTML = "";
+        (items || []).forEach(t => {
+          const li = document.createElement("li");
+          li.textContent = String(t ?? "");
+          ul.appendChild(li);
+        });
       }
 
       function escapeHtml(str) {
@@ -865,7 +882,7 @@
         return activate;
       }
 
-      // -------------------- WHEEL FUNCTIONS --------------------
+      // -------------------- WHEEL FUNCTIONS (FIXED) --------------------
       function initWheelForDay(dayId, isoDate, data, hours, todayISO) {
         const wrapper = $(`${dayId}WheelWrapper`);
         const wheel = $(`${dayId}Wheel`);
@@ -873,11 +890,9 @@
         const categoryContent = $(`${dayId}CategoryContent`);
         if (!wrapper || !wheel) return;
 
-        // Get menu data
         const menu = getMenuByDate(data, isoDate) || {};
         const defaults = data?.defaults || {};
 
-        // Build category list
         const categories = [];
         const catMap = {
           'Breakfast': { 
@@ -905,10 +920,8 @@
           }
         };
 
-        // Filter out empty or hidden categories
         for (let [name, content] of Object.entries(catMap)) {
           if (name === 'Crawfish' && !crawfishFor(data, menu).show) continue;
-          // For salad bar, even if empty we still show something
           categories.push({ name, ...content });
         }
 
@@ -917,11 +930,9 @@
           return;
         }
 
-        // Store categories on wrapper for later use
         wrapper.__categories = categories;
         wrapper.__selectedIndex = 0;
 
-        // Build wheel items
         const N = categories.length;
         const angleStep = 360 / N;
         wheel.innerHTML = '<div class="wheel-center"></div>';
@@ -935,7 +946,6 @@
           wheel.appendChild(item);
         });
 
-        // Rotation state
         let currentAngle = 0;
         let startAngle = 0;
         let isDragging = false;
@@ -951,13 +961,15 @@
 
         function updateWheelRotation(angle) {
           wheel.style.transform = `rotate(${angle}deg)`;
-          // Determine selected index (nearest to -90° i.e. top)
+          // Find the item whose absolute angle is closest to 270° (top)
           let bestIdx = 0;
           let bestDiff = 360;
           for (let i = 0; i < N; i++) {
-            const catAngle = (i * angleStep) % 360;
-            const rotatedCatAngle = (catAngle - angle + 360) % 360;
-            const diff = Math.min(Math.abs(rotatedCatAngle - 270), 360 - Math.abs(rotatedCatAngle - 270));
+            const catAngle = i * angleStep; // original angle of category i
+            // After rotating wheel by `angle`, category's absolute angle = (catAngle - angle) mod 360
+            let absAngle = (catAngle - angle) % 360;
+            if (absAngle < 0) absAngle += 360;
+            const diff = Math.min(Math.abs(absAngle - 270), 360 - Math.abs(absAngle - 270));
             if (diff < bestDiff) {
               bestDiff = diff;
               bestIdx = i;
@@ -965,12 +977,10 @@
           }
           if (bestIdx !== wrapper.__selectedIndex) {
             wrapper.__selectedIndex = bestIdx;
-            // Update selected class
             Array.from(wheel.children).forEach((child, idx) => {
               if (child.classList.contains('wheel-center')) return;
               child.classList.toggle('selected', idx === bestIdx);
             });
-            // Render category items
             renderCategoryItems(categories[bestIdx], categoryTitle, categoryContent, data);
           }
         }
@@ -1000,7 +1010,6 @@
         window.addEventListener('touchmove', onMove, { passive: false });
         window.addEventListener('touchend', onEnd);
 
-        // Initial render
         renderCategoryItems(categories[0], categoryTitle, categoryContent, data);
       }
 
@@ -1064,7 +1073,7 @@
         contentEl.innerHTML = html || '<div class="hh-cube-unavail">No items for this category.</div>';
       }
 
-      // -------------------- CUBE FUNCTIONS (simplified) --------------------
+      // -------------------- CUBE FUNCTIONS (FULL) --------------------
       function initDayCube(dayId, isoDate, data, hours, todayISO) {
         const cube = document.getElementById(`${dayId}Cube`);
         if (!cube) return;
@@ -1202,19 +1211,188 @@
       }
 
       function initAdvancedCube(data, todayISO) {
-        // Simplified – just fill faces with dummy data for demo
         const cubeContainer = document.getElementById('cubeContainer');
         if (!cubeContainer) return;
         const faces = [0,1,2,3,4,5].map(i => document.getElementById(`face${i}`));
-        // ... (full cube advanced would be here, but for demo we just show a message)
-        faces.forEach(face => {
-          face.innerHTML = `<div class="hh-cube-category">Advanced</div><div class="hh-cube-items"><li>Demo: use carousel</li></div>`;
+        let currentStartIndex = 0;
+        let zoomLevel = 1;
+        let daysArray = [];
+        let rotateX = -10, rotateY = 20;
+        let isDragging = false, lastX, lastY;
+        let rotateMode = false;
+
+        function buildDaysArrayFromData(data, todayISO) {
+          const windowDays = Math.max(1, Math.min(31, Number(data?.settings?.advancedWindowDays ?? 7)));
+          const start = parseISODateToLocal(todayISO);
+          const weekly = data?.hours?.weekly || [];
+          const arr = [];
+          for (let i = 0; i < windowDays; i++) {
+            const d = new Date(start);
+            d.setDate(start.getDate() + i);
+            const iso = toISODateLocal(d);
+            const dayName = weekdayName(d);
+            const hours = findHours(weekly, dayName);
+            const closure = getClosure(data, dayName);
+            const menu = getMenuByDate(data, iso) || {};
+            const lunch = menu?.lunch || {};
+            const lDef = data?.defaults?.lunch || {};
+            const items = normalizeLunchItems(lunch.items);
+            const plates = normalizeItems(lunch.plates ?? lDef.plates ?? []);
+            let state = 'open';
+            let msg = '';
+            if (closure?.closed) { state='closed'; msg=closure.message||'Closed'; }
+            else {
+              const avail = getLunchAvailability(data, iso, todayISO);
+              if (!avail.ok) { state='unavailable'; msg=avail.msg; }
+            }
+            arr.push({ iso, dayName, date: d, hours, state, msg, items, plates, subtitle: lunch.subtitle ?? lDef.subtitle ?? '' });
+          }
+          return arr;
+        }
+
+        function populateCubeFaces(startIdx) {
+          if (!daysArray.length) daysArray = buildDaysArrayFromData(data, todayISO);
+          for (let i = 0; i < 6; i++) {
+            const face = faces[i];
+            if (!face) continue;
+            const day = daysArray[startIdx + i];
+            if (!day) {
+              face.innerHTML = `<div style="opacity:0.5; text-align:center; margin-top:40px;">— no menu —</div>`;
+              continue;
+            }
+            let content = `<div class="hh-cube-category">${escapeHtml(day.dayName)}</div>
+                           <div class="hh-cube-date">${escapeHtml(formatDateNice(day.date))}</div>`;
+            if (day.state !== 'open') {
+              content += `<div class="hh-cube-unavail">${day.state==='closed'?'🔴 Closed':'⚠️ Unavailable'}<br>${escapeHtml(day.msg)}</div>`;
+            } else {
+              content += `<div style="font-weight:600;margin:4px 0;color:#ffb35a;">Lunch</div>`;
+              if (day.plates.length) {
+                content += `<div style="font-weight:600;">Plates:</div><ul class="hh-cube-items">`;
+                day.plates.forEach(p => content += `<li>${escapeHtml(p)}</li>`);
+                content += `</ul>`;
+              }
+              if (day.items.length) {
+                content += `<ul class="hh-cube-items">`;
+                day.items.forEach(it => content += `<li title="${escapeHtml(it.desc)}">${escapeHtml(it.name)}</li>`);
+                content += `</ul>`;
+              } else {
+                content += `<div class="hh-cube-unavail">(no items)</div>`;
+              }
+            }
+            face.innerHTML = content;
+          }
+        }
+
+        const wrapper = document.getElementById('cubeWrapper');
+
+        function handleMouseDown(e) {
+          if (!rotateMode) return;
+          isDragging = true;
+          lastX = e.clientX; lastY = e.clientY;
+          wrapper.style.cursor = 'grabbing';
+        }
+        function handleMouseMove(e) {
+          if (!isDragging || !rotateMode) return;
+          const dx = e.clientX - lastX;
+          const dy = e.clientY - lastY;
+          rotateY += dx * 0.5;
+          rotateX -= dy * 0.3;
+          cubeContainer.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${zoomLevel})`;
+          lastX = e.clientX; lastY = e.clientY;
+        }
+        function handleMouseUp() {
+          isDragging = false;
+          wrapper.style.cursor = rotateMode ? 'grab' : 'default';
+        }
+        function handleTouchStart(e) {
+          if (!rotateMode) return;
+          isDragging = true;
+          lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+        }
+        function handleTouchMove(e) {
+          if (!isDragging || !rotateMode) return;
+          e.preventDefault();
+          const dx = e.touches[0].clientX - lastX;
+          const dy = e.touches[0].clientY - lastY;
+          rotateY += dx * 0.5;
+          rotateX -= dy * 0.3;
+          cubeContainer.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${zoomLevel})`;
+          lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+        }
+        function handleTouchEnd() {
+          isDragging = false;
+        }
+
+        wrapper.addEventListener('mousedown', handleMouseDown);
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+        wrapper.addEventListener('touchstart', handleTouchStart);
+        window.addEventListener('touchmove', handleTouchMove, { passive: false });
+        window.addEventListener('touchend', handleTouchEnd);
+
+        const rotateBtn = document.getElementById('cubeRotate');
+        if (rotateBtn) {
+          rotateBtn.addEventListener('click', () => {
+            rotateMode = !rotateMode;
+            if (rotateMode) {
+              rotateBtn.innerHTML = '<i class="fas fa-hand-pointer"></i> Scroll';
+              rotateBtn.classList.add('rotate-mode');
+              wrapper.classList.add('rotate-mode');
+            } else {
+              rotateBtn.innerHTML = '<i class="fas fa-rotate-right"></i> Rotate';
+              rotateBtn.classList.remove('rotate-mode');
+              wrapper.classList.remove('rotate-mode');
+              wrapper.style.cursor = 'default';
+            }
+          });
+        }
+
+        document.getElementById('cubeZoomIn').addEventListener('click', () => {
+          zoomLevel = Math.min(2, zoomLevel + 0.1);
+          cubeContainer.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${zoomLevel})`;
         });
+        document.getElementById('cubeZoomOut').addEventListener('click', () => {
+          zoomLevel = Math.max(0.5, zoomLevel - 0.1);
+          cubeContainer.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${zoomLevel})`;
+        });
+        document.getElementById('cubeReset').addEventListener('click', () => {
+          rotateX = -10; rotateY = 20; zoomLevel = 1;
+          cubeContainer.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${zoomLevel})`;
+        });
+
+        document.getElementById('cubePrevGroup').addEventListener('click', () => {
+          if (currentStartIndex - 6 >= 0) currentStartIndex -= 6;
+          else currentStartIndex = 0;
+          populateCubeFaces(currentStartIndex);
+        });
+        document.getElementById('cubeNextGroup').addEventListener('click', () => {
+          if (daysArray.length && currentStartIndex + 6 < daysArray.length) currentStartIndex += 6;
+          populateCubeFaces(currentStartIndex);
+        });
+
+        const carouselDiv = document.getElementById('hh-adv-carousel');
+        const cubeViewDiv = document.getElementById('cubeViewContainer');
+        document.getElementById('viewCarouselBtn').addEventListener('click', function() {
+          this.classList.add('active');
+          document.getElementById('viewCubeBtn').classList.remove('active');
+          carouselDiv.classList.remove('hidden');
+          cubeViewDiv.classList.add('hidden');
+        });
+        document.getElementById('viewCubeBtn').addEventListener('click', function() {
+          this.classList.add('active');
+          document.getElementById('viewCarouselBtn').classList.remove('active');
+          carouselDiv.classList.add('hidden');
+          cubeViewDiv.classList.remove('hidden');
+          daysArray = buildDaysArrayFromData(data, todayISO);
+          populateCubeFaces(currentStartIndex);
+        });
+
+        daysArray = buildDaysArrayFromData(data, todayISO);
+        populateCubeFaces(0);
       }
 
       // -------------------- VIEW TOGGLES --------------------
       function setupViewToggles() {
-        // Today toggle
         const todayWheelBtn = $('viewTodayWheelBtn');
         const todayCubeBtn = $('viewTodayCubeBtn');
         const todayWheel = $('todayWheelContainer');
@@ -1234,7 +1412,6 @@
           });
         }
 
-        // Tomorrow toggle
         const tomorrowWheelBtn = $('viewTomorrowWheelBtn');
         const tomorrowCubeBtn = $('viewTomorrowCubeBtn');
         const tomorrowWheel = $('tomorrowWheelContainer');
@@ -1253,26 +1430,6 @@
             tomorrowCube.classList.remove('hidden');
           });
         }
-
-        // Advanced toggle
-        const carouselBtn = $('viewCarouselBtn');
-        const cubeBtn = $('viewCubeBtn');
-        const carousel = $('hh-adv-carousel');
-        const cubeView = $('cubeViewContainer');
-        if (carouselBtn && cubeBtn) {
-          carouselBtn.addEventListener('click', () => {
-            carouselBtn.classList.add('active');
-            cubeBtn.classList.remove('active');
-            carousel.classList.remove('hidden');
-            cubeView.classList.add('hidden');
-          });
-          cubeBtn.addEventListener('click', () => {
-            cubeBtn.classList.add('active');
-            carouselBtn.classList.remove('active');
-            carousel.classList.add('hidden');
-            cubeView.classList.remove('hidden');
-          });
-        }
       }
 
       // -------------------- MAIN INIT --------------------
@@ -1280,22 +1437,20 @@
 
       (async function init() {
         try {
-          // Read data – it will use the inline script tag first
+          // Read inline data
           const localScript = document.querySelector("#hh-menu-data");
           let data;
           if (localScript && localScript.textContent.trim()) {
             data = JSON.parse(localScript.textContent.trim());
           } else {
-            // Fallback: use dummy data defined above
-            data = {
-              settings: { advancedDisclaimer: "Check out our upcoming lunch menus!", showAdvancedTab: true },
-              hours: { weekly: [] },
-              defaults: {},
-              menus: {}
-            };
+            throw new Error("No inline menu data found");
           }
 
           setText("hh-advanced-disclaimer", data?.settings?.advancedDisclaimer || "");
+          if (!data?.settings?.showAdvancedTab) {
+            const advBtn = $("hhDayBtnAdvanced");
+            if (advBtn) advBtn.style.display = "none";
+          }
 
           const now = new Date();
           const calendarTodayISO = toISODateLocal(now);
@@ -1340,12 +1495,12 @@
           const closureDisplayTomorrow = getClosure(data, displayTomorrowName);
 
           const lineToday = closureDisplayToday?.closed ? `${displayTodayName} Hours: Closed`
-            : `${displayTodayName} Hours: ${hoursToday.open || '?'} – ${hoursToday.close || '?'}` +
+            : `${displayTodayName} Hours: ${hoursToday.open} – ${hoursToday.close}` +
               (hoursToday.breakfast ? ` • Breakfast ${hoursToday.breakfast}` : "") +
               (hoursToday.lunch ? ` • Lunch ${hoursToday.lunch}` : "");
 
           const lineTomorrow = closureDisplayTomorrow?.closed ? `${displayTomorrowName} Hours: Closed`
-            : `${displayTomorrowName} Hours: ${hoursTomorrow.open || '?'} – ${hoursTomorrow.close || '?'}` +
+            : `${displayTomorrowName} Hours: ${hoursTomorrow.open} – ${hoursTomorrow.close}` +
               (hoursTomorrow.breakfast ? ` • Breakfast ${hoursTomorrow.breakfast}` : "") +
               (hoursTomorrow.lunch ? ` • Lunch ${hoursTomorrow.lunch}` : "");
 
@@ -1369,11 +1524,11 @@
 
           buildAdvancedCarousel(data, calendarTodayISO);
 
-          // Initialize wheels for today and tomorrow
+          // Initialize wheels
           initWheelForDay('today', displayTodayISO, data, hoursToday, calendarTodayISO);
           initWheelForDay('tomorrow', displayTomorrowISO, data, hoursTomorrow, calendarTodayISO);
 
-          // Initialize cube views
+          // Initialize cubes
           initDayCube('today', displayTodayISO, data, hoursToday, calendarTodayISO);
           initDayCube('tomorrow', displayTomorrowISO, data, hoursTomorrow, calendarTodayISO);
           initAdvancedCube(data, calendarTodayISO);
