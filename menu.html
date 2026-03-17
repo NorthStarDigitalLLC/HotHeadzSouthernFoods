@@ -446,6 +446,19 @@
       scrollbar-width: none;
     }
     .swipe-track::-webkit-scrollbar { display: none; }
+
+    .advanced-grid {
+      width: min(1100px, calc(100vw - 28px));
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 8px 4px 10px;
+    }
+    @media (min-width: 900px) {
+      .advanced-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
     .swipe-card {
       position: relative;
       flex: 0 0 100%;
@@ -648,7 +661,7 @@
         <div class="subline" id="advancedDisclaimer"></div>
       </div>
       <div class="swipe-shell">
-        <div class="swipe-track" id="advancedTrack"></div>
+        <div class="advanced-grid" id="advancedTrack"></div>
       </div>
     </section>
 
@@ -1246,7 +1259,7 @@
         const track = $("advancedTrack");
         if (!track) return;
         track.innerHTML = "";
-        setText("advancedDisclaimer", "Showing 7 days starting from the current day.");
+        setText("advancedDisclaimer", "Showing the next 7 days starting from today.");
         const start = parseISODateToLocal(todayISO);
         const lDef = data?.defaults?.lunch || {};
         const days = 7;
@@ -1262,7 +1275,7 @@
           const dayMenu = getMenuByDate(data, iso);
 
           const card = document.createElement("article");
-          card.className = "swipe-card";
+          card.className = "swipe-card active";
 
           if (!dayMenu) {
             card.innerHTML = `
