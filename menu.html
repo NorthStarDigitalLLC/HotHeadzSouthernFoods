@@ -108,8 +108,6 @@
       width: min(760px, 100%);
     }
 
-    .panel[hidden] { display: none !important; }
-
     .toolbar {
       display: flex;
       flex-wrap: wrap;
@@ -256,17 +254,9 @@
       color: #f0e6d8;
       font-size: 15px;
     }
-    .list details {
-      width: 100%;
-    }
-    .list details summary {
-      cursor: pointer;
-      font-weight: 700;
-      list-style: none;
-    }
-    .list details summary::-webkit-details-marker {
-      display: none;
-    }
+    .list details { width: 100%; }
+    .list details summary { cursor: pointer; font-weight: 700; list-style: none; }
+    .list details summary::-webkit-details-marker { display: none; }
     .desc {
       margin-top: 7px;
       color: rgba(255,255,255,.78);
@@ -346,6 +336,7 @@
       margin-top: 6px;
       font-weight: 700;
     }
+
     .flash-overlay {
       position: fixed;
       inset: 0;
@@ -486,9 +477,7 @@
       animation: hologram 7s linear infinite;
       pointer-events: none;
     }
-    @keyframes hologram {
-      to { transform: translateX(120%); }
-    }
+    @keyframes hologram { to { transform: translateX(120%); } }
     .card-meta {
       display: inline-flex;
       align-items: center;
@@ -764,13 +753,6 @@
         $("loadError").classList.remove("hide");
         setText("loadErrorMsg", msg || "Try again in a moment.");
       }
-      function dayOpeningInfo(dayName) {
-        const lower = String(dayName || "").toLowerCase();
-        if (lower === "sunday") return { open: "7:00 AM", close: "3:00 PM", breakfast: "7:00 AM - 10:30 AM", lunch: "11:00 AM - 3:00 PM", crawfish: "" };
-        if (lower === "saturday") return { open: "6:00 AM", close: "2:00 PM", breakfast: "6:00 AM - 10:30 AM", lunch: "11:00 AM - 2:00 PM", crawfish: "4:00 PM - 8:00 PM" };
-        return { open: "5:30 AM", close: "2:00 PM", breakfast: "5:30 AM - 10:30 AM", lunch: "11:00 AM - 2:00 PM", crawfish: false };
-      }
-
       function getBusinessHours(dayName) {
         const lower = String(dayName || "").toLowerCase();
         const open = lower === "sunday" ? "7:00 AM" : (lower === "saturday" ? "6:00 AM" : "5:30 AM");
@@ -784,7 +766,6 @@
           crawfish: ["thursday","friday","saturday"].includes(lower) ? "4:00 PM - 8:00 PM" : ""
         };
       }
-
       function timeToMinutes12h(timeStr) {
         if (!timeStr) return null;
         const m = String(timeStr).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
@@ -796,7 +777,6 @@
         if (ap === "AM" && h === 12) h = 0;
         return h * 60 + min;
       }
-
       function rangeIncludes(nowMinutes, rangeStr) {
         if (!rangeStr || !String(rangeStr).includes("-")) return false;
         const [a, b] = String(rangeStr).split("-").map(s => s.trim());
@@ -805,7 +785,6 @@
         if (start == null || end == null) return false;
         return nowMinutes >= start && nowMinutes <= end;
       }
-
       function categoryOpenNow(catName, dayName, nowDate) {
         const hours = getBusinessHours(dayName);
         const mins = nowDate.getHours() * 60 + nowDate.getMinutes();
@@ -815,7 +794,6 @@
         if (lower === "crawfish") return !!hours.crawfish && rangeIncludes(mins, hours.crawfish);
         return rangeIncludes(mins, `${hours.open} - ${hours.close}`);
       }
-
       function openingMessageFor(dayName) {
         const hours = getBusinessHours(dayName);
         return `${dayName} opens at ${hours.open}. Breakfast runs until 10:30 AM, lunch starts at 11:00 AM${hours.crawfish ? `, and crawfish runs ${hours.crawfish}` : ""}.`;
@@ -823,28 +801,17 @@
 
       let luckTimer = null;
       let luckCountdownTimer = null;
-
       function showLuckModal(title, text) {
         const modal = $("luckModal");
         const countEl = $("luckCountdown");
         if (!modal || !countEl) return;
-
         setText("luckModalTitle", title);
         setText("luckModalText", text);
-
-        if (luckTimer) {
-          clearTimeout(luckTimer);
-          luckTimer = null;
-        }
-        if (luckCountdownTimer) {
-          clearInterval(luckCountdownTimer);
-          luckCountdownTimer = null;
-        }
-
+        if (luckTimer) clearTimeout(luckTimer);
+        if (luckCountdownTimer) clearInterval(luckCountdownTimer);
         let remaining = 5;
         countEl.textContent = String(remaining);
         modal.classList.add("show");
-
         luckCountdownTimer = setInterval(() => {
           remaining -= 1;
           if (remaining > 0) {
@@ -854,12 +821,10 @@
             luckCountdownTimer = null;
           }
         }, 1000);
-
         luckTimer = setTimeout(() => {
           hideLuckModal();
         }, 5000);
       }
-
       function hideLuckModal() {
         const modal = $("luckModal");
         if (luckTimer) {
@@ -870,29 +835,23 @@
           clearInterval(luckCountdownTimer);
           luckCountdownTimer = null;
         }
-        if (modal) {
-          modal.classList.remove("show");
-        }
+        if (modal) modal.classList.remove("show");
       }
 
       function pickLunchCombo(cat) {
         const entries = Array.isArray(cat?.items) ? cat.items.slice() : [];
         const labels = entries.map(it => typeof it === "string" ? it : (it?.name || "")).filter(Boolean);
         if (!labels.length) return null;
-
         const meats = labels.filter(x => /chicken|pork|steak|fish|shrimp|hamburger|roast|sausage|turkey|beef|meatloaf|catfish|tenders|boudin/i.test(x));
         const sides = labels.filter(x => !/chicken|pork|steak|fish|shrimp|hamburger|roast|sausage|turkey|beef|meatloaf|catfish|tenders|boudin/i.test(x));
-
         const rand = arr => arr[Math.floor(Math.random() * arr.length)];
         const meat = meats.length ? rand(meats) : rand(labels);
         const sidePool = sides.length ? sides.slice() : labels.filter(x => x !== meat);
         const side1 = sidePool.length ? rand(sidePool) : null;
         const side2Pool = sidePool.filter(x => x !== side1);
         const side2 = side2Pool.length ? rand(side2Pool) : (sidePool.length > 1 ? sidePool[0] : null);
-
         return { meat, sides: [side1, side2].filter(Boolean) };
       }
-
       function renderPickCard(prefix, combo, catName) {
         const el = $(`${prefix}PickCard`);
         if (!el) return;
@@ -973,32 +932,15 @@
             toppings: normalizeItems(menu.salad?.saladBar?.toppings ?? defaults.salad?.saladBar?.toppings ?? []),
             dressing: normalizeItems(menu.salad?.saladBar?.dressing ?? defaults.salad?.saladBar?.dressing ?? [])
           },
-          {
-            name: "Drinks",
-            meta: "Cold & hot",
-            items: normalizeItems(menu.drinks?.items ?? defaults.drinks?.items ?? [])
-          },
-          {
-            name: "Dessert",
-            meta: "Sweet finish",
-            items: normalizeItems(menu.dessert?.items ?? defaults.dessert?.items ?? [])
-          }
+          { name: "Drinks", meta: "Cold & hot", items: normalizeItems(menu.drinks?.items ?? defaults.drinks?.items ?? []) },
+          { name: "Dessert", meta: "Sweet finish", items: normalizeItems(menu.dessert?.items ?? defaults.dessert?.items ?? []) }
         );
-        return cats.filter(cat => {
-          return (cat.plates && cat.plates.length) ||
-                 (cat.items && cat.items.length) ||
-                 (cat.pricing && cat.pricing.length) ||
-                 (cat.lettuce && cat.lettuce.length) ||
-                 (cat.toppings && cat.toppings.length) ||
-                 (cat.dressing && cat.dressing.length);
-        });
+        return cats.filter(cat => (cat.plates && cat.plates.length) || (cat.items && cat.items.length) || (cat.pricing && cat.pricing.length) || (cat.lettuce && cat.lettuce.length) || (cat.toppings && cat.toppings.length) || (cat.dressing && cat.dressing.length));
       }
 
       function renderCategoryContent(cat, data) {
         let html = "";
-        if (cat.plates?.length) {
-          html += `<div class="section-label">Plates</div><ul class="list">${cat.plates.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
-        }
+        if (cat.plates?.length) html += `<div class="section-label">Plates</div><ul class="list">${cat.plates.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
         if (cat.items?.length) {
           html += `<div class="section-label">Items</div><ul class="list">` + cat.items.map(it => {
             if (typeof it === "string") return `<li>${escapeHtml(it)}</li>`;
@@ -1014,26 +956,20 @@
 
       function initSwipe(prefix, categories, data) {
         const track = $(`${prefix}SwipeTrack`);
-        const status = $(`${prefix}CardStatus`);
         const prev = $(`${prefix}PrevCard`);
         const next = $(`${prefix}NextCard`);
         const chipNav = $(`${prefix}ChipNav`);
         if (!track) return;
-
         track.innerHTML = categories.map((cat, i) => `
-          <article class="swipe-card${i === 0 ? ' active' : ''}" data-index="${i}">
+          <article class="swipe-card${i === 0 ? " active" : ""}" data-index="${i}">
             <div class="card-meta">${escapeHtml(cat.meta || "Menu category")}</div>
             <div class="cat-title">${escapeHtml(cat.name)}</div>
             ${renderCategoryContent(cat, data)}
           </article>
         `).join("");
-
         if (chipNav) {
-          chipNav.innerHTML = categories.map((cat, i) =>
-            `<button class="chip${i === 0 ? ' active' : ''}" data-index="${i}">${escapeHtml(cat.name)}</button>`
-          ).join("");
+          chipNav.innerHTML = categories.map((cat, i) => `<button class="chip${i === 0 ? " active" : ""}" data-index="${i}">${escapeHtml(cat.name)}</button>`).join("");
         }
-
         const cards = Array.from(track.querySelectorAll(".swipe-card"));
         const chips = Array.from((chipNav || document.createElement("div")).querySelectorAll(".chip"));
 
@@ -1042,14 +978,12 @@
           const width = track.clientWidth || 1;
           return Math.round(left / width);
         }
-
         function updateStatus() {
           const idx = Math.max(0, Math.min(categories.length - 1, activeIndex()));
           setText(`${prefix}CardStatus`, `${categories[idx]?.name || ""} • ${idx + 1} / ${categories.length}`);
           cards.forEach((card, i) => card.classList.toggle("active", i === idx));
           chips.forEach((chip, i) => chip.classList.toggle("active", i === idx));
         }
-
         function goTo(idx) {
           const clamped = Math.max(0, Math.min(categories.length - 1, idx));
           track.scrollTo({ left: clamped * track.clientWidth, behavior: "smooth" });
@@ -1073,9 +1007,7 @@
             card.style.transform = "perspective(1000px) rotateY(0deg) rotateX(0deg)";
           });
         });
-
         updateStatus();
-
         return {
           selectByName(name) {
             const idx = categories.findIndex(c => c.name === name);
@@ -1098,30 +1030,21 @@
         const detailContent = $(`${prefix}DetailContent`);
         const detailCard = $(`${prefix}DetailCard`);
         if (!wrap || !wheel || !detailTitle || !detailContent) return null;
-
         const N = categories.length;
         const step = 360 / N;
         const radius = 112;
         const topAngle = -90;
-
         wheel.innerHTML = "";
 
         const items = categories.map((cat, i) => {
           const el = document.createElement("div");
           el.className = "wheel-item";
           el.textContent = cat.name;
-          el.dataset.index = String(i);
           wheel.appendChild(el);
           return el;
         });
 
-        let angle = 0;
-        let velocity = 0;
-        let dragging = false;
-        let lastPointerAngle = 0;
-        let selected = 0;
-        let raf = 0;
-        let lockedByHours = false;
+        let angle = 0, velocity = 0, dragging = false, lastPointerAngle = 0, selected = 0, raf = 0, lockedByHours = false;
 
         function shortestDelta(a, b) {
           let diff = a - b;
@@ -1136,15 +1059,11 @@
           return Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
         }
         function selectedIndex() {
-          let best = 0;
-          let bestDiff = Infinity;
+          let best = 0, bestDiff = Infinity;
           for (let i = 0; i < N; i++) {
             const a = topAngle + i * step + angle;
             const diff = Math.abs(shortestDelta(a, topAngle));
-            if (diff < bestDiff) {
-              bestDiff = diff;
-              best = i;
-            }
+            if (diff < bestDiff) { bestDiff = diff; best = i; }
           }
           return best;
         }
@@ -1171,8 +1090,7 @@
           wheel.style.transform = `rotate(${angle}deg)`;
           items.forEach((item, i) => {
             const base = topAngle + i * step;
-            const xform = `rotate(${base}deg) translate(${radius}px) rotate(${-base - angle}deg)`;
-            item.style.transform = xform;
+            item.style.transform = `rotate(${base}deg) translate(${radius}px) rotate(${-base - angle}deg)`;
           });
           const idx = selectedIndex();
           if (force || idx !== selected) {
@@ -1201,9 +1119,7 @@
           render();
           raf = requestAnimationFrame(tick);
         }
-        function ensureAnim() {
-          if (!raf) raf = requestAnimationFrame(tick);
-        }
+        function ensureAnim() { if (!raf) raf = requestAnimationFrame(tick); }
         function onDown(e) {
           e.preventDefault();
           dragging = true;
@@ -1235,13 +1151,11 @@
             showLuckModal("Currently closed", `${categories[selected].name} is not being served right now. ${openingMessageFor(dayName)}`);
           }
         }
-
         wrap.addEventListener("pointerdown", onDown, { passive: false });
         wrap.addEventListener("pointermove", onMove, { passive: false });
         wrap.addEventListener("pointerup", onUp);
         wrap.addEventListener("pointercancel", onUp);
         detailCard.addEventListener("click", onClick);
-
         render(true);
 
         return {
@@ -1296,13 +1210,10 @@
         const swipeBtn = $(`${prefix}ViewSwipe`);
         const wheelView = $(`${prefix}WheelView`);
         const swipeView = $(`${prefix}SwipeView`);
-
-        // default to hologram
         swipeBtn?.classList.add("active");
         wheelBtn?.classList.remove("active");
         swipeView?.classList.remove("hide");
         wheelView?.classList.add("hide");
-
         wheelBtn?.addEventListener("click", () => {
           wheelBtn.classList.add("active");
           swipeBtn?.classList.remove("active");
@@ -1335,40 +1246,62 @@
         const track = $("advancedTrack");
         if (!track) return;
         track.innerHTML = "";
-        setText("advancedDisclaimer", data?.settings?.advancedDisclaimer || "");
+        setText("advancedDisclaimer", "Showing 7 days starting from the current day.");
         const start = parseISODateToLocal(todayISO);
         const lDef = data?.defaults?.lunch || {};
-        const days = Math.max(1, Math.min(31, Number(data?.settings?.advancedWindowDays ?? 7)));
+        const days = 7;
 
         for (let i = 0; i < days; i++) {
           const d = new Date(start);
           d.setDate(start.getDate() + i);
+
           const iso = toISODateLocal(d);
-          const name = weekdayName(d);
-          const hours = getBusinessHours(name);
-          const closure = getClosure(data, name);
-          const lunch = (getMenuByDate(data, iso) || {}).lunch || {};
-          const plates = normalizeItems(lunch.plates ?? lDef.plates ?? []);
-          const items = normalizeLunchItems(lunch.items ?? []);
+          const dayName = weekdayName(d);
+          const hours = getBusinessHours(dayName);
+          const closure = getClosure(data, dayName);
+          const dayMenu = getMenuByDate(data, iso);
+
           const card = document.createElement("article");
           card.className = "swipe-card";
+
+          if (!dayMenu) {
+            card.innerHTML = `
+              <div class="card-meta">${escapeHtml(formatDateNice(d))}</div>
+              <div class="cat-title">${escapeHtml(dayName)}</div>
+              <div class="subline">${escapeHtml(iso)}</div>
+              <div class="section-label">Status</div>
+              <ul class="list">
+                <li>Unable to fetch the menu for this day.</li>
+              </ul>
+            `;
+            track.appendChild(card);
+            continue;
+          }
+
+          const lunch = dayMenu?.lunch || {};
+          const plates = normalizeItems(lunch.plates ?? lDef.plates ?? []);
+          const items = normalizeLunchItems(lunch.items ?? []);
+
           card.innerHTML = `
             <div class="card-meta">${escapeHtml(formatDateNice(d))}</div>
-            <div class="cat-title">${escapeHtml(name)}</div>
+            <div class="cat-title">${escapeHtml(dayName)}</div>
             <div class="subline">${closure?.closed ? "Closed" : (hours.lunch ? `Lunch ${escapeHtml(hours.lunch)}` : "")}</div>
-            ${closure?.closed
-              ? `<div class="section-label">Status</div><ul class="list"><li>${escapeHtml(closure.message || "Closed")}</li></ul>`
-              : `
-                <div class="section-label">Plates</div><ul class="list">${plates.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>
-                <div class="section-label">Lunch Items</div><ul class="list">${items.map(x => `<li>${escapeHtml(x.name)}</li>`).join("") || `<li>No lunch items posted.</li>`}</ul>
-              `
+            ${
+              closure?.closed
+                ? `<div class="section-label">Status</div><ul class="list"><li>${escapeHtml(closure.message || "Closed")}</li></ul>`
+                : `
+                  <div class="section-label">Plates</div>
+                  <ul class="list">${plates.length ? plates.map(x => `<li>${escapeHtml(x)}</li>`).join("") : `<li>Unable to fetch the menu for this day.</li>`}</ul>
+                  <div class="section-label">Lunch Items</div>
+                  <ul class="list">${items.length ? items.map(x => `<li>${escapeHtml(x.name)}</li>`).join("") : `<li>Unable to fetch the menu for this day.</li>`}</ul>
+                `
             }
           `;
           track.appendChild(card);
         }
       }
 
-      function initPanel(prefix, data, isoDate, displayName, calendarTodayISO) {
+      function initPanel(prefix, data, isoDate, displayName) {
         const hours = getBusinessHours(displayName);
         const closure = getClosure(data, displayName);
         const isTodayPanel = prefix === "today";
@@ -1377,23 +1310,17 @@
         setText(`${prefix}Hours`,
           closure?.closed
             ? `${displayName} Hours: Closed`
-            : `${displayName} Hours: ${hours.open} – ${hours.close}` +
-              ` • Breakfast ${hours.breakfast}` +
-              ` • Lunch ${hours.lunch}` +
-              (hours.crawfish ? ` • Crawfish ${hours.crawfish}` : "")
+            : `${displayName} Hours: ${hours.open} – ${hours.close} • Breakfast ${hours.breakfast} • Lunch ${hours.lunch}${hours.crawfish ? ` • Crawfish ${hours.crawfish}` : ""}`
         );
-        setText(`${prefix}Note`, data?.hours?.note || "");
 
-        const nowStatus = isTodayPanel && !closure?.closed
-          ? (() => {
-              const openNow = rangeIncludes((new Date().getHours()*60 + new Date().getMinutes()), `${hours.open} - ${hours.close}`) ||
-                              (!!hours.crawfish && rangeIncludes((new Date().getHours()*60 + new Date().getMinutes()), hours.crawfish));
-              return `<span class="statusdot ${openNow ? '' : 'closed'}"></span>${openNow ? 'OPEN NOW' : 'CURRENTLY CLOSED'}`;
-            })()
-          : `<span class="statusdot ${closure?.closed ? 'closed' : ''}"></span>${closure?.closed ? 'CLOSED' : 'SCHEDULE READY'}`;
-
+        const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes();
         const noteEl = $(`${prefix}Note`);
-        if (noteEl) noteEl.innerHTML = `${escapeHtml(data?.hours?.note || "")}<div class="statusbar">${nowStatus}</div>`;
+        const openNow = isTodayPanel && !closure?.closed
+          ? (rangeIncludes(nowMinutes, `${hours.open} - ${hours.close}`) || (!!hours.crawfish && rangeIncludes(nowMinutes, hours.crawfish)))
+          : !closure?.closed;
+        if (noteEl) {
+          noteEl.innerHTML = `${escapeHtml(data?.hours?.note || "")}<div class="statusbar"><span class="statusdot ${openNow ? "" : "closed"}"></span>${openNow ? "OPEN NOW" : (closure?.closed ? "CLOSED" : "CURRENTLY CLOSED")}</div>`;
+        }
 
         if (closure?.closed) {
           $(`${prefix}Closed`).classList.remove("hide");
@@ -1405,7 +1332,6 @@
         const cats = buildCategoryData(data, isoDate);
         const wheelApi = initWheel(prefix, cats, data, displayName, isTodayPanel);
         const swipeApi = initSwipe(prefix, cats, data);
-
         setupViewToggle(prefix);
 
         $(`${prefix}AIBtn`)?.addEventListener("click", () => {
@@ -1444,11 +1370,9 @@
         document.querySelector(".circular-menu")?.addEventListener("click", e => e.stopPropagation());
         const modalEl = $("luckModal");
         const flashCard = modalEl?.querySelector(".flash-card");
-        flashCard?.addEventListener("click", (e) => e.stopPropagation());
+        flashCard?.addEventListener("click", e => e.stopPropagation());
         modalEl?.addEventListener("click", () => hideLuckModal());
-        window.addEventListener("keydown", (e) => {
-          if (e.key === "Escape") hideLuckModal();
-        });
+        window.addEventListener("keydown", e => { if (e.key === "Escape") hideLuckModal(); });
       }
 
       setupDayTabs();
@@ -1458,21 +1382,21 @@
         try {
           const data = await readData();
           const now = new Date();
-          const calendarTodayISO = toISODateLocal(now);
-          const calendarTodayName = weekdayName(now);
+          const todayISO = toISODateLocal(now);
+          const todayName = weekdayName(now);
           const tomorrow = new Date(now); tomorrow.setDate(now.getDate() + 1);
-          const calendarTomorrowISO = toISODateLocal(tomorrow);
-          const calendarTomorrowName = weekdayName(tomorrow);
+          const tomorrowISO = toISODateLocal(tomorrow);
+          const tomorrowName = weekdayName(tomorrow);
 
-          let displayTodayISO = calendarTodayISO;
-          let displayTodayName = calendarTodayName;
-          let displayTomorrowISO = calendarTomorrowISO;
-          let displayTomorrowName = calendarTomorrowName;
+          let displayTodayISO = todayISO;
+          let displayTodayName = todayName;
+          let displayTomorrowISO = tomorrowISO;
+          let displayTomorrowName = tomorrowName;
 
-          const closureToday = getClosure(data, calendarTodayName);
-          if (isPastClosingToday([], calendarTodayName) && !closureToday?.closed) {
-            displayTodayISO = calendarTomorrowISO;
-            displayTodayName = calendarTomorrowName;
+          const closureToday = getClosure(data, todayName);
+          if (isPastClosingToday([], todayName) && !closureToday?.closed) {
+            displayTodayISO = tomorrowISO;
+            displayTodayName = tomorrowName;
             const dayAfter = new Date(now); dayAfter.setDate(now.getDate() + 2);
             displayTomorrowISO = toISODateLocal(dayAfter);
             displayTomorrowName = weekdayName(dayAfter);
@@ -1481,9 +1405,9 @@
           setText("dayBtnToday", displayTodayName);
           setText("dayBtnTomorrow", displayTomorrowName);
 
-          initPanel("today", data, displayTodayISO, displayTodayName, calendarTodayISO);
-          initPanel("tomorrow", data, displayTomorrowISO, displayTomorrowName, calendarTodayISO);
-          buildAdvanced(data, calendarTodayISO);
+          initPanel("today", data, displayTodayISO, displayTodayName);
+          initPanel("tomorrow", data, displayTomorrowISO, displayTomorrowName);
+          buildAdvanced(data, todayISO);
         } catch (e) {
           console.error(e);
           showLoadError(String(e?.message || e));
