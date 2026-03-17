@@ -327,6 +327,7 @@
       margin-bottom: 16px;
       font-weight: 600;
     }
+    .modal button { pointer-events: auto; }
     .statusbar {
       display: inline-flex;
       gap: 10px;
@@ -487,11 +488,12 @@
         <div class="note" id="todayNote"></div>
       </div>
       <div class="toolbar">
-        <button class="viewbtn active" id="todayViewWheel">Future Wheel</button>
+        <button class="viewbtn active" id="todayViewWheel">Orbit Navigator</button>
         <button class="viewbtn" id="todayViewSwipe">Hologram Cards</button>
-        <button class="actionbtn primary" id="todayAIBtn"><i class="fas fa-sparkles"></i> What should I eat?</button>
+        <button class="actionbtn primary" id="todayAIBtn"><i class="fas fa-sparkles"></i> Chef Signal</button>
       </div>
       <div id="todayWheelView">
+        <div class="modehint">Spin the Orbit Navigator to move through the menu.</div>
         <div class="wheel-stage">
           <div class="wheel-wrap" id="todayWheelWrap">
             <div class="wheel-arrow"></div>
@@ -529,11 +531,12 @@
         <div class="note" id="tomorrowNote"></div>
       </div>
       <div class="toolbar">
-        <button class="viewbtn active" id="tomorrowViewWheel">Future Wheel</button>
+        <button class="viewbtn active" id="tomorrowViewWheel">Orbit Navigator</button>
         <button class="viewbtn" id="tomorrowViewSwipe">Hologram Cards</button>
-        <button class="actionbtn primary" id="tomorrowAIBtn"><i class="fas fa-sparkles"></i> What should I eat?</button>
+        <button class="actionbtn primary" id="tomorrowAIBtn"><i class="fas fa-sparkles"></i> Chef Signal</button>
       </div>
       <div id="tomorrowWheelView">
+        <div class="modehint">Spin the Orbit Navigator to move through the menu.</div>
         <div class="wheel-stage">
           <div class="wheel-wrap" id="tomorrowWheelWrap">
             <div class="wheel-arrow"></div>
@@ -1068,7 +1071,7 @@
         }
         function onClick() {
           if (lockedByHours && isTodayPanel) {
-            showLuckModal("Try your luck again tomorrow", `${categories[selected].name} is not available right now. ${openingMessageFor(dayName)}`);
+            showLuckModal("Menu route closed right now", `${categories[selected].name} is not available right now. ${openingMessageFor(dayName)}`);
           }
         }
 
@@ -1084,7 +1087,7 @@
           aiPick() {
             const pool = isTodayPanel ? categories.filter(cat => canShowCategory(cat)) : categories.slice();
             if (!pool.length) {
-              showLuckModal("Try your luck again tomorrow", openingMessageFor(dayName));
+              showLuckModal("Menu route closed right now", openingMessageFor(dayName));
               return null;
             }
             const picked = pool[Math.floor(Math.random() * pool.length)];
@@ -1265,8 +1268,20 @@
           else if (link) window.location.href = link;
         }));
         document.querySelector(".circular-menu")?.addEventListener("click", e => e.stopPropagation());
-        $("luckModalClose")?.addEventListener("click", () => $("luckModal").classList.remove("show"));
-        $("luckModal")?.addEventListener("click", e => { if (e.target.id === "luckModal") $("luckModal").classList.remove("show"); });
+        const modalEl = $("luckModal");
+        const modalClose = $("luckModalClose");
+        modalClose?.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          modalEl?.classList.remove("show");
+        });
+        modalEl?.querySelector(".modal")?.addEventListener("click", (e) => e.stopPropagation());
+        modalEl?.addEventListener("click", (e) => {
+          if (e.target === modalEl) modalEl.classList.remove("show");
+        });
+        window.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") modalEl?.classList.remove("show");
+        });
       }
 
       setupDayTabs();
@@ -1312,7 +1327,7 @@
 
   <div class="modal-backdrop" id="luckModal">
     <div class="modal">
-      <div class="modal-title" id="luckModalTitle">Try your luck again tomorrow</div>
+      <div class="modal-title" id="luckModalTitle">Menu route closed right now</div>
       <div class="modal-text" id="luckModalText"></div>
       <button class="actionbtn primary" id="luckModalClose">Got it</button>
     </div>
