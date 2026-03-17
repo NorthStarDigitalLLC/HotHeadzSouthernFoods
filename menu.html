@@ -1336,32 +1336,51 @@
         if (!track) return;
         track.innerHTML = "";
         setText("advancedDisclaimer", data?.settings?.advancedDisclaimer || "");
+
         const start = parseISODateToLocal(todayISO);
-        const lDef = data?.defaults?.lunch || {};
+        const defaults = data?.defaults || {};
+        const lunchDefaults = defaults?.lunch || {};
         const days = Math.max(1, Math.min(31, Number(data?.settings?.advancedWindowDays ?? 7)));
 
         for (let i = 0; i < days; i++) {
           const d = new Date(start);
           d.setDate(start.getDate() + i);
+
           const iso = toISODateLocal(d);
-          const name = weekdayName(d);
-          const hours = getBusinessHours(name);
-          const closure = getClosure(data, name);
-          const lunch = (getMenuByDate(data, iso) || {}).lunch || {};
-          const plates = normalizeItems(lunch.plates ?? lDef.plates ?? []);
-          const items = normalizeLunchItems(lunch.items ?? []);
+          const dayName = weekdayName(d);
+          const hours = getBusinessHours(dayName);
+          const closure = getClosure(data, dayName);
+          const dayMenu = getMenuByDate(data, iso) || {};
+          const lunch = dayMenu?.lunch || {};
+          const plates = normalizeItems(lunch.plates ?? lunchDefaults.plates ?? []);
+          const lunchItems = normalizeLunchItems(lunch.items ?? lunchDefaults.items ?? []);
+
           const card = document.createElement("article");
-          card.className = "swipe-card";
+          card.className = "swipe-card active";
           card.innerHTML = `
             <div class="card-meta">${escapeHtml(formatDateNice(d))}</div>
-            <div class="cat-title">${escapeHtml(name)}</div>
-            <div class="subline">${closure?.closed ? "Closed" : (hours.lunch ? `Lunch ${escapeHtml(hours.lunch)}` : "")}</div>
-            ${closure?.closed
-              ? `<div class="section-label">Status</div><ul class="list"><li>${escapeHtml(closure.message || "Closed")}</li></ul>`
-              : `
-                <div class="section-label">Plates</div><ul class="list">${plates.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>
-                <div class="section-label">Lunch Items</div><ul class="list">${items.map(x => `<li>${escapeHtml(x.name)}</li>`).join("") || `<li>No lunch items posted.</li>`}</ul>
-              `
+            <div class="cat-title">${escapeHtml(dayName)}</div>
+            <div class="subline">
+              ${closure?.closed ? "Closed" : `Lunch ${escapeHtml(hours.lunch || "11:00 AM - 2:00 PM")}`}
+            </div>
+            ${
+              closure?.closed
+                ? `
+                  <div class="section-label">Status</div>
+                  <ul class="list">
+                    <li>${escapeHtml(closure.message || "Closed for the day.")}</li>
+                  </ul>
+                `
+                : `
+                  <div class="section-label">Plates</div>
+                  <ul class="list">
+                    ${plates.length ? plates.map(x => `<li>${escapeHtml(x)}</li>`).join("") : `<li>Plate details coming soon.</li>`}
+                  </ul>
+                  <div class="section-label">Lunch Items</div>
+                  <ul class="list">
+                    ${lunchItems.length ? lunchItems.map(x => `<li>${escapeHtml(x.name)}</li>`).join("") : `<li>No lunch items posted yet.</li>`}
+                  </ul>
+                `
             }
           `;
           track.appendChild(card);
