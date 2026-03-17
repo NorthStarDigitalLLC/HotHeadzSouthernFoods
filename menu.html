@@ -143,10 +143,10 @@
     .hh-cube-face {
       position:absolute; width:100%; height:100%; background: rgba(30,25,20,0.95); border:2px solid #c05a2a; border-radius:14px;
       box-shadow:0 0 20px rgba(192,90,42,0.3); backdrop-filter: blur(4px); display:flex; flex-direction:column;
-      padding:8px 6px; overflow-y:auto; -webkit-overflow-scrolling:touch; backface-visibility: visible; color:#efe6d9;
-      font-size:11px; line-height:1.2; transform: rotateY(0deg) translateZ(120px); pointer-events:auto;
+      padding:8px 6px; overflow:hidden; -webkit-overflow-scrolling:auto; backface-visibility: visible; color:#efe6d9;
+      font-size:10px; line-height:1.15; transform: rotateY(0deg) translateZ(120px); pointer-events:none;
     }
-    @media (min-width: 600px) { .hh-cube-face { transform: rotateY(0deg) translateZ(140px); padding:10px; font-size:12px; } }
+    @media (min-width: 600px) { .hh-cube-face { transform: rotateY(0deg) translateZ(140px); padding:10px; font-size:11px; } }
     .hh-cube-face.front  { transform: rotateY(  0deg) translateZ(120px); }
     .hh-cube-face.back   { transform: rotateY(180deg) translateZ(120px); }
     .hh-cube-face.right  { transform: rotateY( 90deg) translateZ(120px); }
@@ -163,6 +163,8 @@
     }
     .hh-cube-category { font-weight:800; font-size:1.1em; color:#ffb35a; margin-bottom:4px; border-bottom:1px solid rgba(255,179,90,0.3); padding-bottom:2px; }
     .hh-cube-unavail { opacity:0.7; font-style:italic; }
+    .hh-cube-items.compact li { padding:6px 8px; margin-bottom:4px; font-size:12px; }
+    .hh-cube-more { opacity:.78; font-size:11px; margin-top:4px; text-align:center; }
     .hidden { display:none !important; }
 
     .hh-adv-carousel { display:flex; gap:14px; overflow-x:auto; padding:2px 14px 14px; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; }
@@ -755,6 +757,7 @@
         contentEl.innerHTML = html || '<div class="hh-cube-unavail">No items for this category.</div>';
       }
 
+      
       function initWheelForDay(dayId, isoDate, data) {
         const wrapper = $(`${dayId}WheelWrapper`);
         const wheel = $(`${dayId}Wheel`);
@@ -817,24 +820,27 @@
 
         const wheelItems = Array.from(wheel.querySelectorAll('.wheel-item'));
         let currentAngle = 0;
-        let dragStartPointerAngle = 0;
-        let dragStartWheelAngle = 0;
-        let isDragging = false;
+        let selectedIndex = 0;
+        let dragging = false;
+        let lastPointerAngle = 0;
+        let rafId = 0;
+
+        function normalizeDeg(deg) { return ((deg % 360) + 360) % 360; }
+
+        function shortestSignedDelta(a, b) {
+          let diff = a - b;
+          while (diff > 180) diff -= 360;
+          while (diff < -180) diff += 360;
+          return diff;
+        }
 
         function getPointerAngleDeg(e) {
           const rect = wrapper.getBoundingClientRect();
           const centerX = rect.left + rect.width / 2;
           const centerY = rect.top + rect.height / 2;
-          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          const clientX = e.clientX;
+          const clientY = e.clientY;
           return Math.atan2(clientY - centerY, clientX - centerX) * 180 / Math.PI;
-        }
-
-        function normalizeDeg(deg) { return ((deg % 360) + 360) % 360; }
-        function shortestDistanceDeg(a, b) {
-          let diff = normalizeDeg(a - b);
-          if (diff > 180) diff -= 360;
-          return Math.abs(diff);
         }
 
         function getSelectedIndexFromWheelAngle(wheelAngle) {
@@ -842,7 +848,7 @@
           let bestDiff = Infinity;
           for (let i = 0; i < N; i++) {
             const itemAngle = topOffset + (i * angleStep) + wheelAngle;
-            const diff = shortestDistanceDeg(itemAngle, topOffset);
+            const diff = Math.abs(shortestSignedDelta(itemAngle, topOffset));
             if (diff < bestDiff) {
               bestDiff = diff;
               bestIdx = i;
@@ -851,107 +857,93 @@
           return bestIdx;
         }
 
-        function updateSelectedUI(idx) {
-          wheelItems.forEach((item, i) => item.classList.toggle('selected', i === idx));
-          renderCategoryItems(categories[idx], categoryTitle, categoryContent, data);
+        function paint() {
+          rafId = 0;
+          wheel.style.transform = `rotate(${currentAngle}deg)`;
+          const idx = getSelectedIndexFromWheelAngle(currentAngle);
+          if (idx !== selectedIndex) {
+            selectedIndex = idx;
+            wheelItems.forEach((item, i) => item.classList.toggle('selected', i === idx));
+            renderCategoryItems(categories[idx], categoryTitle, categoryContent, data);
+          } else if (!categoryContent.innerHTML) {
+            wheelItems.forEach((item, i) => item.classList.toggle('selected', i === idx));
+            renderCategoryItems(categories[idx], categoryTitle, categoryContent, data);
+          }
         }
 
-        function applyRotation(angle) {
-          currentAngle = angle;
-          wheel.style.transform = `rotate(${currentAngle}deg)`;
-          updateSelectedUI(getSelectedIndexFromWheelAngle(currentAngle));
+        function requestPaint() {
+          if (!rafId) rafId = requestAnimationFrame(paint);
         }
 
         function snapToNearest() {
           const snappedIndex = getSelectedIndexFromWheelAngle(currentAngle);
-          const targetAngle = -(snappedIndex * angleStep);
-          currentAngle = targetAngle;
-          wheel.style.transition = 'transform 0.18s ease-out';
+          currentAngle = -(snappedIndex * angleStep);
+          wheel.style.transition = 'transform 0.2s ease-out';
           wheel.style.transform = `rotate(${currentAngle}deg)`;
-          updateSelectedUI(snappedIndex);
-          setTimeout(() => { wheel.style.transition = 'transform 0.05s linear'; }, 180);
+          selectedIndex = snappedIndex;
+          wheelItems.forEach((item, i) => item.classList.toggle('selected', i === snappedIndex));
+          renderCategoryItems(categories[snappedIndex], categoryTitle, categoryContent, data);
+          window.setTimeout(() => {
+            wheel.style.transition = 'none';
+          }, 200);
         }
 
-        function onStart(e) {
+        function onPointerDown(e) {
           e.preventDefault();
-          isDragging = true;
-          dragStartPointerAngle = getPointerAngleDeg(e);
-          dragStartWheelAngle = currentAngle;
-          wrapper.style.cursor = 'grabbing';
+          dragging = true;
+          lastPointerAngle = getPointerAngleDeg(e);
+          wheel.style.transition = 'none';
+          wrapper.setPointerCapture?.(e.pointerId);
         }
 
-        function onMove(e) {
-          if (!isDragging) return;
+        function onPointerMove(e) {
+          if (!dragging) return;
           e.preventDefault();
-          const pointerAngle = getPointerAngleDeg(e);
-          const delta = pointerAngle - dragStartPointerAngle;
-          applyRotation(dragStartWheelAngle + delta);
+          const angle = getPointerAngleDeg(e);
+          const delta = shortestSignedDelta(angle, lastPointerAngle);
+          lastPointerAngle = angle;
+          currentAngle += delta;
+          requestPaint();
         }
 
-        function onEnd() {
-          if (!isDragging) return;
-          isDragging = false;
-          wrapper.style.cursor = 'grab';
+        function onPointerUp(e) {
+          if (!dragging) return;
+          dragging = false;
+          wrapper.releasePointerCapture?.(e.pointerId);
           snapToNearest();
         }
 
-        wrapper.addEventListener('mousedown', onStart);
-        window.addEventListener('mousemove', onMove);
-        window.addEventListener('mouseup', onEnd);
-        wrapper.addEventListener('touchstart', onStart, { passive: false });
-        window.addEventListener('touchmove', onMove, { passive: false });
-        window.addEventListener('touchend', onEnd);
+        wrapper.addEventListener('pointerdown', onPointerDown, { passive: false });
+        wrapper.addEventListener('pointermove', onPointerMove, { passive: false });
+        wrapper.addEventListener('pointerup', onPointerUp);
+        wrapper.addEventListener('pointercancel', onPointerUp);
+        wrapper.addEventListener('pointerleave', onPointerUp);
 
-        wheel.style.transition = 'transform 0.05s linear';
-        applyRotation(0);
+        wheel.style.transition = 'none';
+        requestPaint();
       }
 
-      function buildCubeFaceHtml(category) {
+function buildCubeFaceHtml(category) {
         let html = `<div class="hh-cube-category">${escapeHtml(category.name)}</div>`;
 
         if (category.name === 'Breakfast' || category.name === 'Lunch') {
-          if (category.plates?.length) {
-            html += `<div class="hh-subcat-title">Plates</div><ul class="hh-cube-items">`;
-            category.plates.forEach(p => html += `<li>${escapeHtml(p)}</li>`);
-            html += `</ul>`;
-          }
-          if (category.items?.length) {
-            html += `<div class="hh-subcat-title">Items</div><ul class="hh-cube-items">`;
-            category.items.forEach(it => {
-              if (typeof it === 'string') html += `<li>${escapeHtml(it)}</li>`;
-              else html += `<li><strong>${escapeHtml(it.name)}</strong>${it.desc ? `<br><span style="opacity:.8">${escapeHtml(it.desc)}</span>` : ''}</li>`;
-            });
-            html += `</ul>`;
-          }
+          html += renderCubeSection('Plates', category.plates, 3);
+
+          const itemLabels = (category.items || []).map(it => {
+            if (typeof it === 'string') return it;
+            return it?.name || '';
+          }).filter(Boolean);
+
+          html += renderCubeSection('Items', itemLabels, 4);
         } else if (category.name === 'Crawfish') {
-          html += `<ul class="hh-cube-items">`;
-          (category.items || []).forEach(it => html += `<li>${escapeHtml(it)}</li>`);
-          html += `</ul>`;
+          html += renderCubeSection('Available', category.items || [], 4);
         } else if (category.name === 'Salad Bar') {
-          if (category.pricing?.length) {
-            html += `<div class="hh-subcat-title">Pricing</div><ul class="hh-cube-items">`;
-            category.pricing.forEach(x => html += `<li>${escapeHtml(x)}</li>`);
-            html += `</ul>`;
-          }
-          if (category.lettuce?.length) {
-            html += `<div class="hh-subcat-title">Lettuce</div><ul class="hh-cube-items">`;
-            category.lettuce.forEach(x => html += `<li>${escapeHtml(x)}</li>`);
-            html += `</ul>`;
-          }
-          if (category.toppings?.length) {
-            html += `<div class="hh-subcat-title">Toppings</div><ul class="hh-cube-items">`;
-            category.toppings.forEach(x => html += `<li>${escapeHtml(x)}</li>`);
-            html += `</ul>`;
-          }
-          if (category.dressing?.length) {
-            html += `<div class="hh-subcat-title">Dressing</div><ul class="hh-cube-items">`;
-            category.dressing.forEach(x => html += `<li>${escapeHtml(x)}</li>`);
-            html += `</ul>`;
-          }
+          html += renderCubeSection('Pricing', category.pricing || [], 2);
+          html += renderCubeSection('Lettuce', category.lettuce || [], 2);
+          html += renderCubeSection('Toppings', category.toppings || [], 4);
+          html += renderCubeSection('Dressing', category.dressing || [], 3);
         } else {
-          html += `<ul class="hh-cube-items">`;
-          (category.items || []).forEach(it => html += `<li>${escapeHtml(it)}</li>`);
-          html += `</ul>`;
+          html += renderCubeSection('Available', category.items || [], 5);
         }
 
         if (!category.plates?.length && !category.items?.length && !category.pricing?.length && !category.lettuce?.length && !category.toppings?.length && !category.dressing?.length) {
@@ -960,7 +952,7 @@
         return html;
       }
 
-      function getCubeCategoriesForDate(isoDate, data) {
+function getCubeCategoriesForDate(isoDate, data) {
         const menu = getMenuByDate(data, isoDate) || {};
         const defaults = data?.defaults || {};
         const categories = [
