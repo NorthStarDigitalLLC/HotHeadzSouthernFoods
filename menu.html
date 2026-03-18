@@ -1397,15 +1397,8 @@ function updateNowBar(prefix, dayName, isoDate) {
   })();
 
   const isActualToday = isoDate === todayISO;
-  const h = getBusinessHours(dayName);
 
-  function fmtSeconds(totalSeconds) {
-    const safe = Math.max(0, totalSeconds);
-    const hrs = Math.floor(safe / 3600);
-    const mins = Math.floor((safe % 3600) / 60);
-    const secs = safe % 60;
-    return `${String(hrs).padStart(2,"0")}:${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
-  }
+  const h = getBusinessHours(dayName);
 
   if (!isActualToday) {
     el.className = "nowbar warn";
@@ -1414,49 +1407,27 @@ function updateNowBar(prefix, dayName, isoDate) {
   }
 
   const now = new Date();
-  const nowSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+  const mins = now.getHours()*60 + now.getMinutes();
 
-  const breakfastEndSeconds = 10 * 3600 + 30 * 60;
-  const lunchStartSeconds = 11 * 3600;
-
-  const openStart = timeToMinutes12h(h.open) * 60;
-  const openEnd = timeToMinutes12h(h.close) * 60;
-  const crawfishRange = h.crawfish && h.crawfish.includes("-") ? h.crawfish.split("-").map(s => s.trim()) : null;
-  const crawfishStart = crawfishRange ? timeToMinutes12h(crawfishRange[0]) * 60 : null;
-  const crawfishEnd = crawfishRange ? timeToMinutes12h(crawfishRange[1]) * 60 : null;
+  const breakfastEnd = 10*60+30;
+  const lunchStart = 11*60;
 
   let text = "";
   let cls = "";
 
-  const duringMainHours = nowSeconds >= openStart && nowSeconds <= openEnd;
-  const duringCrawfish = crawfishStart != null && crawfishEnd != null && nowSeconds >= crawfishStart && nowSeconds <= crawfishEnd;
-
-  if (!duringMainHours && !duringCrawfish) {
+  if (!rangeIncludes(mins, h.open + " - " + h.close) && !(h.crawfish && rangeIncludes(mins, h.crawfish))) {
     text = "Closed • Opens " + h.open;
     cls = "closed";
-  } else if (nowSeconds < breakfastEndSeconds) {
-    const remaining = breakfastEndSeconds - nowSeconds;
-    text = "Breakfast • Ends in " + fmtSeconds(remaining);
-    cls = remaining < 1800 ? "warn" : "open";
-  } else if (nowSeconds < lunchStartSeconds) {
-    const remaining = lunchStartSeconds - nowSeconds;
-    text = "Transition • Lunch starts in " + fmtSeconds(remaining);
-    cls = "warn";
-  } else if (duringCrawfish) {
-    const remaining = crawfishEnd - nowSeconds;
-    text = "Now Serving Crawfish • Ends in " + fmtSeconds(remaining);
-    cls = "open";
-  } else if (nowSeconds >= lunchStartSeconds && nowSeconds <= openEnd) {
-    const remaining = openEnd - nowSeconds;
-    text = "Now Serving Lunch • Ends in " + fmtSeconds(remaining);
-    cls = "open";
-  } else {
-    text = "Closed • Opens " + h.open;
-    cls = "closed";
-  }
-
-  el.className = "nowbar " + cls;
-  el.textContent = text;
+  } else if (mins < breakfastEnd) {
+    const remaining = breakfastEnd - mins;
+    {
+    const hrs = Math.floor(remaining/60);
+    const mins = remaining % 60;
+    const secs = 0;
+    text = "Breakfast • Ends in " + 
+      String(hrs).padStart(2,"0")+":"+
+      String(mins).padStart(2,"0")+":"+
+      String(secs).padStart(2,"0");
 }
     cls = remaining < 30 ? "warn" : "open";
   } else if (mins < lunchStart) {
@@ -1600,11 +1571,6 @@ function initPanel(prefix, data, isoDate, displayName) {
           initPanel("today", data, displayTodayISO, displayTodayName);
           initPanel("tomorrow", data, displayTomorrowISO, displayTomorrowName);
           buildAdvanced(data, displayTodayISO);
-
-          setInterval(() => {
-            updateNowBar("today", displayTodayName, displayTodayISO);
-            updateNowBar("tomorrow", displayTomorrowName, displayTomorrowISO);
-          }, 1000);
         } catch (e) {
           console.error(e);
           showLoadError(String(e?.message || e));
