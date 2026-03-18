@@ -1381,14 +1381,20 @@
       }
 
       
-function updateNowBar(prefix, dayName) {
+function updateNowBar(prefix, dayName, isoDate) {
   const el = document.getElementById(prefix + "Now");
   if (!el) return;
 
-  const isToday = prefix === "today";
+  const todayISO = (function(){
+    const d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+  })();
+
+  const isActualToday = isoDate === todayISO;
+
   const h = getBusinessHours(dayName);
 
-  if (!isToday) {
+  if (!isActualToday) {
     el.className = "nowbar warn";
     el.textContent = dayName + " • Opens at " + h.open;
     return;
@@ -1456,7 +1462,7 @@ function initPanel(prefix, data, isoDate, displayName) {
           $(`${prefix}Closed`).classList.add("hide");
         }
 
-        updateNowBar(prefix, displayName);
+        updateNowBar(prefix, displayName, isoDate);
         const cats = buildCategoryData(data, isoDate);
         const wheelApi = initWheel(prefix, cats, data, displayName, isTodayPanel);
         const swipeApi = initSwipe(prefix, cats, data);
