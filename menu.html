@@ -1446,14 +1446,30 @@ function initPanel(prefix, data, isoDate, displayName) {
             : `${displayName} Hours: ${hours.open} – ${hours.close} • Breakfast ${hours.breakfast} • Lunch ${hours.lunch}${hours.crawfish ? ` • Crawfish ${hours.crawfish}` : ""}`
         );
 
+        const todayISO = toISODateLocal(new Date());
+        const isActualToday = isoDate === todayISO;
         const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes();
+
         const noteEl = $(`${prefix}Note`);
-        const openNow = isTodayPanel && !closure?.closed
-          ? (rangeIncludes(nowMinutes, `${hours.open} - ${hours.close}`) || (!!hours.crawfish && rangeIncludes(nowMinutes, hours.crawfish)))
-          : !closure?.closed;
-        if (noteEl) {
-          noteEl.innerHTML = `${escapeHtml(data?.hours?.note || "")}<div class="statusbar"><span class="statusdot ${openNow ? "" : "closed"}"></span>${openNow ? "OPEN NOW" : (closure?.closed ? "CLOSED" : "CURRENTLY CLOSED")}</div>`;
+        let nowStatus = "";
+
+        if (closure?.closed) {
+          nowStatus = `<span class="statusdot closed"></span> CLOSED`;
+        } else if (!isActualToday) {
+          nowStatus = `<span class="statusdot closed"></span> SCHEDULED`;
+        } else {
+          const openNow =
+            rangeIncludes(nowMinutes, `${hours.open} - ${hours.close}`) ||
+            (!!hours.crawfish && rangeIncludes(nowMinutes, hours.crawfish));
+
+          nowStatus = `<span class="statusdot ${openNow ? "" : "closed"}"></span>${openNow ? "OPEN NOW" : "CURRENTLY CLOSED"}`;
         }
+
+        if (noteEl) {
+          noteEl.innerHTML = `${escapeHtml(data?.hours?.note || "")}<div class="statusbar">${nowStatus}</div>`;
+        }
+
+        updateNowBar(prefix, displayName, isoDate);
 
         if (closure?.closed) {
           $(`${prefix}Closed`).classList.remove("hide");
@@ -1462,7 +1478,6 @@ function initPanel(prefix, data, isoDate, displayName) {
           $(`${prefix}Closed`).classList.add("hide");
         }
 
-        updateNowBar(prefix, displayName, isoDate);
         const cats = buildCategoryData(data, isoDate);
         const wheelApi = initWheel(prefix, cats, data, displayName, isTodayPanel);
         const swipeApi = initSwipe(prefix, cats, data);
