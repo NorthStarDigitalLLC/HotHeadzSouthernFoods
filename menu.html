@@ -1381,9 +1381,17 @@ function updateNowBar(prefix, dayName) {
   const el = document.getElementById(prefix + "Now");
   if (!el) return;
 
+  const isToday = prefix === "today";
+  const h = getBusinessHours(dayName);
+
+  if (!isToday) {
+    el.className = "nowbar warn";
+    el.textContent = "Scheduled • Opens " + h.open + " • Breakfast until 10:30 • Lunch from 11:00";
+    return;
+  }
+
   const now = new Date();
   const mins = now.getHours()*60 + now.getMinutes();
-  const h = getBusinessHours(dayName);
 
   const breakfastEnd = 10*60+30;
   const lunchStart = 11*60;
