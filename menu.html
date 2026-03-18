@@ -872,18 +872,12 @@
         if (luckTimer) clearTimeout(luckTimer);
         if (luckCountdownTimer) clearInterval(luckCountdownTimer);
         let remaining = 5;
-        function formatTime(s){
-          const hrs = Math.floor(s/3600);
-          const mins = Math.floor((s%3600)/60);
-          const secs = s%60;
-          return `${String(hrs).padStart(2,"0")}:${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
-        }
-        countEl.textContent = formatTime(remaining);
+        countEl.textContent = String(remaining);
         modal.classList.add("show");
         luckCountdownTimer = setInterval(() => {
           remaining -= 1;
           if (remaining > 0) {
-            countEl.textContent = formatTime(remaining);
+            countEl.textContent = String(remaining);
           } else {
             clearInterval(luckCountdownTimer);
             luckCountdownTimer = null;
@@ -1391,56 +1385,68 @@ function updateNowBar(prefix, dayName, isoDate) {
   const el = document.getElementById(prefix + "Now");
   if (!el) return;
 
-  const todayISO = (function(){
-    const d = new Date();
-    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
-  })();
-
+  const todayISO = toISODateLocal(new Date());
   const isActualToday = isoDate === todayISO;
-
   const h = getBusinessHours(dayName);
+
+  function fmt(totalSeconds) {
+    const safe = Math.max(0, Math.floor(totalSeconds));
+    const hrs = Math.floor(safe / 3600);
+    const mins = Math.floor((safe % 3600) / 60);
+    const secs = safe % 60;
+    return `${String(hrs).padStart(2,"0")}:${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
+  }
 
   if (!isActualToday) {
     el.className = "nowbar warn";
-    el.textContent = dayName + " • Opens at " + h.open;
+    el.textContent = `${dayName} • Opens at ${h.open}`;
     return;
   }
 
   const now = new Date();
-  const mins = now.getHours()*60 + now.getMinutes();
+  const nowSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
 
-  const breakfastEnd = 10*60+30;
-  const lunchStart = 11*60;
+  const openSeconds = parseTimeToMinutes(h.open) * 60;
+  const closeSeconds = parseTimeToMinutes(h.close) * 60;
+  const breakfastEndSeconds = 10 * 3600 + 30 * 60;
+  const lunchStartSeconds = 11 * 3600;
+
+  let crawfishStartSeconds = null;
+  let crawfishEndSeconds = null;
+  if (h.crawfish && h.crawfish.includes("-")) {
+    const [startText, endText] = h.crawfish.split("-").map(s => s.trim());
+    crawfishStartSeconds = parseTimeToMinutes(startText) * 60;
+    crawfishEndSeconds = parseTimeToMinutes(endText) * 60;
+  }
+
+  const duringMainHours = nowSeconds >= openSeconds && nowSeconds <= closeSeconds;
+  const duringCrawfish = crawfishStartSeconds !== null && crawfishEndSeconds !== null &&
+    nowSeconds >= crawfishStartSeconds && nowSeconds <= crawfishEndSeconds;
 
   let text = "";
   let cls = "";
 
-  if (!rangeIncludes(mins, h.open + " - " + h.close) && !(h.crawfish && rangeIncludes(mins, h.crawfish))) {
-    text = "Closed • Opens " + h.open;
+  if (!duringMainHours && !duringCrawfish) {
+    text = `Closed • Opens ${h.open}`;
     cls = "closed";
-  } else if (mins < breakfastEnd) {
-    const remaining = breakfastEnd - mins;
-    {
-    const hrs = Math.floor(remaining/60);
-    const mins = remaining % 60;
-    const secs = 0;
-    text = "Breakfast • Ends in " + 
-      String(hrs).padStart(2,"0")+":"+
-      String(mins).padStart(2,"0")+":"+
-      String(secs).padStart(2,"0");
-}
-    cls = remaining < 30 ? "warn" : "open";
-  } else if (mins < lunchStart) {
-    text = "Transition • Lunch starts at 11:00 AM";
+  } else if (nowSeconds < breakfastEndSeconds) {
+    const remaining = breakfastEndSeconds - nowSeconds;
+    text = `Breakfast • Ends in ${fmt(remaining)}`;
+    cls = remaining < 1800 ? "warn" : "open";
+  } else if (nowSeconds < lunchStartSeconds) {
+    const remaining = lunchStartSeconds - nowSeconds;
+    text = `Transition • Lunch starts in ${fmt(remaining)}`;
     cls = "warn";
-  } else if (rangeIncludes(mins, h.lunch)) {
-    text = "Now Serving Lunch";
+  } else if (duringMainHours && nowSeconds >= lunchStartSeconds) {
+    const remaining = closeSeconds - nowSeconds;
+    text = `Now Serving Lunch • Ends in ${fmt(remaining)}`;
     cls = "open";
-  } else if (h.crawfish && rangeIncludes(mins, h.crawfish)) {
-    text = "Now Serving Crawfish";
+  } else if (duringCrawfish) {
+    const remaining = crawfishEndSeconds - nowSeconds;
+    text = `Now Serving Crawfish • Ends in ${fmt(remaining)}`;
     cls = "open";
   } else {
-    text = "Closed • Opens " + h.open;
+    text = `Closed • Opens ${h.open}`;
     cls = "closed";
   }
 
@@ -1571,6 +1577,11 @@ function initPanel(prefix, data, isoDate, displayName) {
           initPanel("today", data, displayTodayISO, displayTodayName);
           initPanel("tomorrow", data, displayTomorrowISO, displayTomorrowName);
           buildAdvanced(data, displayTodayISO);
+
+          setInterval(() => {
+            updateNowBar("today", displayTodayName, displayTodayISO);
+            updateNowBar("tomorrow", displayTomorrowName, displayTomorrowISO);
+          }, 1000);
         } catch (e) {
           console.error(e);
           showLoadError(String(e?.message || e));
