@@ -3,952 +3,731 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Francis Smokehouse · Brick Wall Wheel Menu</title>
-  <link rel="icon" type="image/png" href="Images/Smokehouselogo.png" />
-  <link rel="apple-touch-icon" href="Images/Smokehouselogo.png" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <title>Brick Wall Category Wheel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    *{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#0a0707;
-      --brick-a:#7b4134;
-      --brick-b:#8c4a3a;
-      --brick-c:#64342a;
-      --mortar:#241916;
-      --text:#f7efe4;
-      --muted:#ccb29a;
-      --gold:#d8a56c;
-      --ember:#b24a3b;
-      --ember-2:#e07c5b;
-      --glass:rgba(14,10,10,.52);
-      --line:rgba(255,230,205,.10);
-      --serif:'Playfair Display',serif;
-      --sans:'Montserrat',sans-serif;
-      --ease:cubic-bezier(.22,1,.36,1);
+      --brick1:#b96d43;
+      --brick2:#9f5733;
+      --brick3:#7e3f24;
+      --mortar:#d2b7a3;
+      --bg:#24140e;
+      --hole:#05080c;
+      --ring:rgba(255,255,255,.14);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.68);
+      --accent:#ffb95e;
     }
-
-    html,body{height:100%}
+    *{box-sizing:border-box}
     body{
-      overflow:hidden;
-      font-family:var(--sans);
-      color:var(--text);
-      background:
-        radial-gradient(circle at 50% 15%, rgba(224,124,91,.14), transparent 25%),
-        radial-gradient(circle at 18% 20%, rgba(216,165,108,.08), transparent 18%),
-        linear-gradient(180deg,#120c0b,#090707 58%,#0c0808);
-    }
-
-    .scene{
-      position:relative;
+      margin:0;
       min-height:100vh;
+      color:var(--text);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at center, rgba(255,190,120,0.08), transparent 28%),
+        linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.45)),
+        var(--bg);
       overflow:hidden;
     }
 
-    .smoke,
-    .smoke::before,
-    .smoke::after{
-      position:absolute;
-      border-radius:50%;
-      filter:blur(70px);
-      content:"";
-      pointer-events:none;
+    .wall{
+      position:fixed;
+      inset:0;
+      display:grid;
+      grid-template-columns:repeat(12,1fr);
+      gap:6px;
+      padding:10px;
+      z-index:0;
     }
-    .smoke{
-      width:34vw;height:34vw;
-      left:-10vw;top:0;
-      background:radial-gradient(circle, rgba(224,124,91,.12), transparent 65%);
-      animation:driftA 18s ease-in-out infinite alternate;
-    }
-    .smoke::before{
-      width:24vw;height:24vw;
-      left:75vw;top:8vh;
-      background:radial-gradient(circle, rgba(216,165,108,.10), transparent 65%);
-      animation:driftB 20s ease-in-out infinite alternate;
-    }
-    .smoke::after{
-      width:30vw;height:30vw;
-      left:28vw;top:66vh;
-      background:radial-gradient(circle, rgba(178,74,59,.10), transparent 65%);
-      animation:driftC 17s ease-in-out infinite alternate;
-    }
-    @keyframes driftA{from{transform:translate(0,0) scale(1)}to{transform:translate(8vw,4vh) scale(1.15)}}
-    @keyframes driftB{from{transform:translate(0,0) scale(1)}to{transform:translate(-8vw,7vh) scale(1.12)}}
-    @keyframes driftC{from{transform:translate(0,0) scale(1)}to{transform:translate(6vw,-7vh) scale(1.1)}}
-
-    .top-strip{
-      position:absolute;
-      inset:16px 16px auto 16px;
-      z-index:40;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:14px;
-      padding:12px 14px;
-      border-radius:26px;
-      border:1px solid var(--line);
-      background:rgba(10,8,8,.36);
-      backdrop-filter:blur(16px);
-    }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-    }
-    .brand-orb{
-      width:42px;height:42px;border-radius:50%;
-      background:conic-gradient(from 180deg,var(--ember),var(--gold),var(--ember-2),var(--ember));
+    .brick{
       position:relative;
-      box-shadow:0 0 20px rgba(224,124,91,.3);
-      flex:0 0 auto;
+      border-radius:4px;
+      border:1px solid rgba(0,0,0,.18);
+      background:linear-gradient(135deg,var(--brick1),var(--brick2),var(--brick3));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+      min-height:48px;
+      overflow:hidden;
     }
-    .brand-orb::after{
+    .brick::after{
       content:"";
       position:absolute;
-      inset:8px;
-      border-radius:50%;
-      background:#140d0c;
+      inset:0;
+      background:linear-gradient(135deg,rgba(255,255,255,.08),transparent 50%,rgba(0,0,0,.10));
+      border-radius:3px;
     }
-    .brand-copy strong{
-      display:block;
-      font-family:var(--serif);
-      font-size:1.12rem;
-      line-height:.95;
-      letter-spacing:.04em;
+
+    .portal-wrap{
+      position:relative;
+      z-index:2;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:32px 20px 44px;
     }
-    .brand-copy span{
-      display:block;
-      margin-top:4px;
-      font-size:.6rem;
+
+    .headline{
+      text-align:center;
+      margin-bottom:24px;
+      max-width:900px;
+    }
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 14px;
+      border-radius:999px;
+      background:rgba(0,0,0,.24);
+      border:1px solid rgba(255,255,255,.14);
+      font-size:11px;
+      letter-spacing:.28em;
       text-transform:uppercase;
-      letter-spacing:.32em;
+      color:rgba(255,255,255,.68);
+      backdrop-filter:blur(8px);
+    }
+    h1{
+      margin:14px 0 10px;
+      font-size:clamp(2rem,4vw,3.5rem);
+      line-height:1;
+      font-weight:700;
+      letter-spacing:-.03em;
+    }
+    .sub{
+      margin:0 auto;
+      max-width:760px;
       color:var(--muted);
+      line-height:1.7;
+      font-size:15px;
     }
-    .top-meta{
-      font-size:.68rem;
-      text-transform:uppercase;
-      letter-spacing:.20em;
-      color:rgba(247,239,228,.62);
-    }
-    .top-actions{
+
+    .hole{
+      position:relative;
+      width:min(1100px,82vw);
+      height:min(760px,74vh);
+      max-height:760px;
+      border-radius:42px;
+      background:
+        radial-gradient(circle at center, rgba(255,180,110,.05), transparent 45%),
+        radial-gradient(circle at center, rgba(8,12,18,.96), rgba(3,5,8,.99));
+      border:1px solid rgba(79,39,22,.72);
+      box-shadow:
+        0 50px 120px rgba(0,0,0,.65),
+        inset 0 0 70px rgba(255,160,90,.05),
+        inset 0 0 0 16px rgba(86,45,26,.35),
+        inset 0 0 0 36px rgba(44,21,12,.55);
       display:flex;
       align-items:center;
-      gap:10px;
+      justify-content:center;
+      overflow:hidden;
     }
-    .phone{
-      font-size:.82rem;
-      color:var(--muted);
-      white-space:nowrap;
+
+    .fragment{
+      position:absolute;
+      border-radius:4px;
+      border:1px solid rgba(0,0,0,.22);
+      background:linear-gradient(135deg,var(--brick1),var(--brick2),var(--brick3));
+      box-shadow:0 12px 30px rgba(0,0,0,.28);
+      animation:float 7s ease-in-out infinite;
+    }
+    .fragment::after{
+      content:"";
+      position:absolute;
+      inset:2px;
+      border-radius:2px;
+      background:
+        linear-gradient(90deg, rgba(0,0,0,.18) 0 48%, transparent 48% 52%, rgba(255,255,255,.08) 52% 100%);
+      opacity:.4;
+    }
+    @keyframes float{
+      0%,100%{transform:translate(0,0) rotate(var(--rot))}
+      25%{transform:translate(8px,-10px) rotate(calc(var(--rot) + 4deg))}
+      50%{transform:translate(-8px,8px) rotate(calc(var(--rot) - 5deg))}
+      75%{transform:translate(10px,4px) rotate(calc(var(--rot) + 2deg))}
+    }
+
+    .controls{
+      position:absolute;
+      top:24px;
+      left:50%;
+      transform:translateX(-50%);
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      justify-content:center;
+      z-index:5;
+    }
+    .btn{
+      border:none;
+      border-radius:999px;
+      padding:12px 18px;
+      font-size:14px;
+      font-weight:600;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{
+      background:#fff;
+      color:#111827;
+    }
+    .btn-secondary{
+      background:rgba(255,255,255,.06);
+      color:#fff;
+      border:1px solid rgba(255,255,255,.16);
+      backdrop-filter:blur(8px);
+    }
+
+    .stage{
+      position:relative;
+      width:min(520px,88vw);
+      height:min(520px,88vw);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .wheel-shell{
+      position:absolute;
+      inset:50%;
+      width:360px;
+      height:360px;
+      transform:translate(-50%,-50%);
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.04);
+      box-shadow:0 0 80px rgba(255,255,255,.08);
+      backdrop-filter:blur(8px);
+      animation:spin 40s linear infinite;
+    }
+    .wheel-shell::before,
+    .wheel-shell::after{
+      content:"";
+      position:absolute;
+      border-radius:999px;
+      inset:22px;
+      border:1px dashed rgba(255,255,255,.10);
+    }
+    .wheel-shell::after{
+      inset:46px;
+      border-style:solid;
+    }
+    @keyframes spin{
+      from{transform:translate(-50%,-50%) rotate(0)}
+      to{transform:translate(-50%,-50%) rotate(360deg)}
+    }
+
+    .node{
+      position:absolute;
+      width:96px;
+      height:96px;
+      margin:-48px 0 0 -48px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(15,23,42,.85);
+      color:#fff;
+      box-shadow:0 18px 40px rgba(0,0,0,.35);
+      backdrop-filter:blur(10px);
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      text-align:center;
+      padding:10px;
+      transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+      overflow:hidden;
+    }
+    .node:hover{
+      transform:scale(1.08) translateY(-2px);
+      box-shadow:0 22px 50px rgba(0,0,0,.42);
+      border-color:rgba(255,255,255,.26);
+    }
+    .node::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:inherit;
+      background:var(--grad, linear-gradient(135deg, rgba(255,255,255,.1), rgba(255,255,255,.04)));
+      opacity:0;
+      transition:opacity .2s ease;
+    }
+    .node:hover::before{opacity:1}
+    .node > *{position:relative;z-index:1}
+    .node-icon{
+      font-size:20px;
+      line-height:1;
+    }
+    .node-label{
+      font-size:12px;
+      line-height:1.15;
+      font-weight:600;
+    }
+
+    .hub{
+      position:relative;
+      z-index:3;
+      width:144px;
+      height:144px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(2,6,23,.92);
+      box-shadow:0 0 50px rgba(0,0,0,.45);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:20px;
+    }
+    .hub .spark{
+      font-size:18px;
+      margin-bottom:8px;
+      color:#ffd79e;
+    }
+    .hub .main{
+      font-size:14px;
+      font-weight:700;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+    }
+    .hub .minor{
+      margin-top:6px;
+      font-size:10px;
+      letter-spacing:.28em;
+      text-transform:uppercase;
+      color:rgba(255,255,255,.45);
+    }
+
+    .card{
+      width:min(460px,88vw);
+      border-radius:28px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(2,6,23,.82);
+      box-shadow:0 30px 80px rgba(0,0,0,.45);
+      backdrop-filter:blur(10px);
+      animation:cardIn .28s ease;
+    }
+    @keyframes cardIn{
+      from{opacity:0;transform:scale(.9) translateY(8px)}
+      to{opacity:1;transform:scale(1) translateY(0)}
+    }
+    .card-top{
+      height:8px;
+      background:linear-gradient(90deg,#fb923c,#fde68a,#f97316);
+    }
+    .card-body{
+      padding:32px;
     }
     .pill{
       display:inline-flex;
       align-items:center;
-      justify-content:center;
-      gap:8px;
-      padding:12px 14px;
+      padding:6px 10px;
       border-radius:999px;
-      border:1px solid rgba(224,124,91,.34);
-      background:rgba(178,74,59,.12);
-      color:var(--text);
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.14);
+      font-size:11px;
       text-transform:uppercase;
-      letter-spacing:.14em;
-      font-size:.68rem;
-      font-weight:800;
-      cursor:pointer;
-      transition:.22s ease;
+      letter-spacing:.24em;
+      color:rgba(255,255,255,.6);
+      margin-bottom:16px;
     }
-    .pill:hover{
-      transform:translateY(-2px);
-      background:rgba(178,74,59,.18);
-    }
-
-    .wall-wrap{
-      position:absolute;
-      inset:92px 18px 88px;
-      display:grid;
-      place-items:center;
-    }
-
-    .brick-wall{
-      position:relative;
-      width:min(96vw,1520px);
-      height:min(80vh,940px);
-      overflow:hidden;
-      border-radius:44px;
-      border:1px solid rgba(255,230,205,.08);
-      box-shadow:0 36px 100px rgba(0,0,0,.52);
-      background:
-        linear-gradient(var(--mortar) 12px, transparent 12px),
-        linear-gradient(90deg, transparent calc(20% - 6px), var(--mortar) calc(20% - 6px) calc(20% + 6px), transparent calc(20% + 6px)),
-        linear-gradient(90deg, transparent calc(40% - 6px), var(--mortar) calc(40% - 6px) calc(40% + 6px), transparent calc(40% + 6px)),
-        linear-gradient(90deg, transparent calc(60% - 6px), var(--mortar) calc(60% - 6px) calc(60% + 6px), transparent calc(60% + 6px)),
-        linear-gradient(90deg, transparent calc(80% - 6px), var(--mortar) calc(80% - 6px) calc(80% + 6px), transparent calc(80% + 6px)),
-        linear-gradient(0deg, transparent calc(50% - 6px), var(--mortar) calc(50% - 6px) calc(50% + 6px), transparent calc(50% + 6px)),
-        repeating-linear-gradient(90deg,
-          var(--brick-a) 0 10%,
-          var(--brick-b) 10% 20%,
-          var(--brick-c) 20% 30%,
-          var(--brick-b) 30% 40%,
-          var(--brick-a) 40% 50%,
-          var(--brick-c) 50% 60%,
-          var(--brick-b) 60% 70%,
-          var(--brick-a) 70% 80%,
-          var(--brick-c) 80% 90%,
-          var(--brick-b) 90% 100%);
-      background-size:100% 110px,100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,100% 100%;
-    }
-    .brick-wall::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        radial-gradient(circle at 20% 16%, rgba(255,255,255,.08), transparent 18%),
-        radial-gradient(circle at 78% 78%, rgba(0,0,0,.18), transparent 18%),
-        linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.16));
-      pointer-events:none;
-      mix-blend-mode:screen;
-    }
-
-    .hole-zone{
-      position:absolute;
-      left:50%;
-      top:50%;
-      width:min(74vw,900px);
-      aspect-ratio:1 / 1;
-      transform:translate(-50%,-50%);
-      display:grid;
-      place-items:center;
-    }
-
-    .broken-ring,
-    .broken-ring::before,
-    .broken-ring::after{
-      position:absolute;
-      inset:0;
-      border-radius:50%;
-      content:"";
-      pointer-events:none;
-    }
-    .broken-ring{
-      background:
-        radial-gradient(circle at center, transparent 49%, rgba(0,0,0,.9) 53%, rgba(24,17,15,.98) 61%, transparent 63%),
-        conic-gradient(
-          from 0deg,
-          transparent 0 7%,
-          rgba(47,31,26,.95) 7% 13%,
-          transparent 13% 18%,
-          rgba(70,47,39,.96) 18% 27%,
-          transparent 27% 34%,
-          rgba(53,37,31,.96) 34% 41%,
-          transparent 41% 48%,
-          rgba(82,54,44,.96) 48% 57%,
-          transparent 57% 63%,
-          rgba(49,34,28,.96) 63% 71%,
-          transparent 71% 79%,
-          rgba(77,50,41,.96) 79% 88%,
-          transparent 88% 94%,
-          rgba(48,33,28,.96) 94% 100%
-        );
-      filter:drop-shadow(0 22px 32px rgba(0,0,0,.62));
-    }
-    .broken-ring::before{
-      inset:7%;
-      background:
-        conic-gradient(
-          from 12deg,
-          transparent 0 9%,
-          rgba(122,73,56,.86) 9% 16%,
-          transparent 16% 22%,
-          rgba(102,63,49,.88) 22% 31%,
-          transparent 31% 37%,
-          rgba(118,70,54,.88) 37% 46%,
-          transparent 46% 53%,
-          rgba(94,58,46,.86) 53% 61%,
-          transparent 61% 69%,
-          rgba(117,70,54,.88) 69% 77%,
-          transparent 77% 84%,
-          rgba(101,62,49,.88) 84% 100%
-        );
-      mask:radial-gradient(circle at center, transparent 58%, black 62%, transparent 70%);
-      opacity:.8;
-    }
-    .broken-ring::after{
-      inset:14%;
-      background:radial-gradient(circle at center, rgba(224,124,91,.14), transparent 54%);
-      filter:blur(18px);
-    }
-
-    .fragment-layer{
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-    }
-    .fragment{
-      position:absolute;
-      left:50%;
-      top:50%;
-      width:clamp(18px,2.4vw,34px);
-      aspect-ratio:1 / 1;
-      background:linear-gradient(135deg,var(--brick-b),var(--brick-c));
-      border:1px solid rgba(20,10,10,.25);
-      box-shadow:
-        0 12px 18px rgba(0,0,0,.32),
-        inset 0 1px 0 rgba(255,255,255,.06);
-      clip-path:polygon(15% 0%,100% 18%,83% 100%,0% 76%);
-      transform:
-        translate(-50%,-50%)
-        rotate(calc(var(--angle) * 1deg))
-        translateY(calc(var(--radius) * -1px))
-        rotate(calc(var(--twist) * 1deg));
-      animation:fragmentFloat calc(var(--speed) * 1s) ease-in-out infinite alternate;
-      opacity:.92;
-    }
-    @keyframes fragmentFloat{
-      from{
-        transform:
-          translate(-50%,-50%)
-          rotate(calc(var(--angle) * 1deg))
-          translateY(calc(var(--radius) * -1px))
-          rotate(calc(var(--twist) * 1deg))
-          scale(1);
-      }
-      to{
-        transform:
-          translate(-50%,-50%)
-          rotate(calc(var(--angle) * 1deg))
-          translateY(calc((var(--radius) - 16) * -1px))
-          rotate(calc((var(--twist) + 24) * 1deg))
-          scale(1.08);
-      }
-    }
-
-    .portal-core{
-      position:relative;
-      width:72%;
-      aspect-ratio:1 / 1;
-      border-radius:50%;
-      overflow:hidden;
-      display:grid;
-      place-items:center;
-      background:
-        radial-gradient(circle at center, rgba(0,0,0,.98) 18%, rgba(6,6,6,.94) 34%, rgba(14,10,10,.84) 50%, transparent 70%);
-      box-shadow:
-        inset 0 0 100px rgba(0,0,0,.96),
-        0 0 50px rgba(224,124,91,.18);
-      isolation:isolate;
-    }
-    .portal-core::before{
-      content:"";
-      position:absolute;
-      inset:6%;
-      border-radius:50%;
-      background:radial-gradient(circle at center, rgba(224,124,91,.16), transparent 60%);
-      filter:blur(10px);
-      animation:corePulse 4.8s ease-in-out infinite;
-    }
-    @keyframes corePulse{
-      0%,100%{transform:scale(1);opacity:.72}
-      50%{transform:scale(1.08);opacity:1}
-    }
-
-    .mode-title{
-      position:absolute;
-      left:50%;
-      top:50%;
-      transform:translate(-50%,-50%);
-      width:44%;
-      text-align:center;
-      z-index:8;
-      pointer-events:none;
-    }
-    .mode-title small{
-      display:block;
-      margin-bottom:6px;
-      font-size:.62rem;
-      text-transform:uppercase;
-      letter-spacing:.22em;
-      color:rgba(247,239,228,.58);
-    }
-    .mode-title strong{
-      display:block;
-      font-family:var(--serif);
-      font-size:1.4rem;
-      line-height:.95;
-      color:#fff2e6;
-      text-shadow:0 8px 16px rgba(0,0,0,.45);
-    }
-
-    .wheel{
-      position:absolute;
-      inset:50%;
-      width:88%;
-      height:88%;
-      transform:translate(-50%,-50%);
-      border-radius:50%;
-      animation:spin 20s linear infinite;
-      z-index:5;
-    }
-    .wheel.ring-only{
-      pointer-events:none;
-    }
-    .wheel.ring-only::before,
-    .wheel.ring-only::after{
-      content:"";
-      position:absolute;
-      left:50%;
-      top:50%;
-      border-radius:50%;
-      transform:translate(-50%,-50%);
-      border:1px solid rgba(255,230,205,.08);
-    }
-    .wheel.ring-only::before{width:100%;height:100%}
-    .wheel.ring-only::after{width:64%;height:64%;animation:spin 12s linear infinite reverse}
-
-    .wheel-node{
-      position:absolute;
-      left:50%;
-      top:50%;
-      width:118px;
-      min-height:118px;
-      padding:.72rem;
-      border-radius:26px;
-      border:1px solid rgba(255,230,205,.10);
-      background:linear-gradient(180deg, rgba(24,18,17,.82), rgba(12,10,10,.96));
-      box-shadow:0 18px 24px -20px rgba(0,0,0,.9);
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      text-align:center;
-      cursor:pointer;
-      transition:.22s ease;
-      transform:
-        translate(-50%,-50%)
-        rotate(calc(var(--angle) * 1deg))
-        translateY(-174px)
-        rotate(calc(var(--angle) * -1deg));
-    }
-    .wheel-node i{
-      color:var(--gold);
-      font-size:1rem;
-      margin-bottom:.25rem;
-      transition:.22s ease;
-    }
-    .wheel-node strong{
-      font-size:.68rem;
-      text-transform:uppercase;
-      letter-spacing:.14em;
-      line-height:1.18;
-    }
-    .wheel-node span{
-      display:block;
-      margin-top:.15rem;
-      font-size:.52rem;
-      text-transform:uppercase;
-      letter-spacing:.14em;
-      color:rgba(247,239,228,.52);
-    }
-    .wheel-node:hover,
-    .wheel-node.active{
-      border-color:rgba(224,124,91,.36);
-      background:linear-gradient(180deg, rgba(178,74,59,.18), rgba(12,10,10,.96));
-      transform:
-        translate(-50%,-50%)
-        rotate(calc(var(--angle) * 1deg))
-        translateY(-184px)
-        rotate(calc(var(--angle) * -1deg))
-        scale(1.04);
-    }
-    .wheel-node:hover i,
-    .wheel-node.active i{color:var(--ember-2)}
-
-    .wheel-node.item-node{
-      width:124px;
-      min-height:124px;
-    }
-
-    .portal-card{
-      position:absolute;
-      right:30px;
-      top:50%;
-      transform:translateY(-50%);
-      width:min(360px,28vw);
-      min-width:320px;
-      z-index:20;
-      border-radius:30px;
-      border:1px solid rgba(255,230,205,.10);
-      background:var(--glass);
-      backdrop-filter:blur(18px);
-      box-shadow:0 26px 40px -30px rgba(0,0,0,.92);
-      padding:16px;
-    }
-    .portal-card.hidden{display:none}
     .card-head{
       display:flex;
       justify-content:space-between;
-      align-items:end;
-      gap:12px;
-      margin-bottom:12px;
+      gap:18px;
+      align-items:flex-start;
     }
-    .card-head h3{
-      font-family:var(--serif);
-      font-size:1.85rem;
-      line-height:.9;
-      color:#f4e6d6;
+    .card h3{
+      margin:0;
+      font-size:clamp(1.7rem,3vw,2.2rem);
+      line-height:1.05;
+      letter-spacing:-.03em;
     }
-    .card-head span{
-      font-size:.68rem;
-      text-transform:uppercase;
-      letter-spacing:.16em;
-      color:rgba(247,239,228,.56);
-      white-space:nowrap;
-    }
-    .detail-title{
-      font-family:var(--serif);
-      font-size:2rem;
-      line-height:.9;
-      color:#f4e6d6;
-      margin-bottom:4px;
-    }
-    .detail-price{
-      color:var(--gold);
-      font-weight:800;
-      font-size:1rem;
-      margin-bottom:10px;
-    }
-    .detail-text{
-      color:rgba(247,239,228,.76);
-      font-size:.92rem;
-      line-height:1.55;
-    }
-    .tag-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-      margin-top:12px;
-    }
-    .card-tag{
-      padding:4px 7px;
+    .badge{
+      width:44px;
+      height:44px;
       border-radius:999px;
-      border:1px solid rgba(255,230,205,.08);
-      background:rgba(255,255,255,.03);
-      font-size:.54rem;
-      text-transform:uppercase;
-      letter-spacing:.12em;
-      color:rgba(247,239,228,.66);
-    }
-
-    .bottom-dock{
-      position:absolute;
-      left:16px;
-      right:16px;
-      bottom:16px;
-      z-index:30;
       display:grid;
-      grid-template-columns:auto auto auto auto 1fr;
-      gap:10px;
-      align-items:center;
-      padding:12px;
-      border-radius:24px;
-      border:1px solid rgba(255,230,205,.08);
-      background:rgba(10,8,8,.40);
-      backdrop-filter:blur(16px);
+      place-items:center;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.14);
+      font-size:20px;
+      flex:none;
     }
-    .dock-pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:12px 14px;
-      border-radius:999px;
-      border:1px solid rgba(255,230,205,.08);
-      background:rgba(255,255,255,.03);
-      font-size:.68rem;
-      color:rgba(247,239,228,.80);
-      text-transform:uppercase;
-      letter-spacing:.14em;
-      white-space:nowrap;
-    }
-    .dock-pill i{color:var(--ember-2)}
-    .dock-actions{
-      justify-self:end;
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
+    .card p{
+      margin:20px 0 0;
+      color:rgba(255,255,255,.76);
+      font-size:15px;
+      line-height:1.8;
+      white-space:pre-wrap;
     }
 
-    @keyframes spin{
-      from{transform:translate(-50%,-50%) rotate(0deg)}
-      to{transform:translate(-50%,-50%) rotate(360deg)}
+    .fade{
+      animation:fade .22s ease;
+    }
+    @keyframes fade{
+      from{opacity:0;transform:scale(.96)}
+      to{opacity:1;transform:scale(1)}
     }
 
-    @media (max-width:1180px){
-      body{overflow:auto}
-      .wall-wrap{inset:94px 16px 160px}
-      .brick-wall{
-        width:min(96vw,980px);
-        height:min(70vh,760px);
+    @media (max-width: 900px){
+      .hole{
+        width:min(96vw,1100px);
+        height:min(72vh,680px);
       }
-      .portal-card{
-        position:relative;
-        right:auto;
-        top:auto;
-        transform:none;
-        width:min(96%,760px);
-        min-width:0;
-        margin:18px auto 0;
-      }
-      .bottom-dock{grid-template-columns:1fr 1fr}
-      .dock-actions{
-        justify-self:stretch;
-        grid-column:1 / -1;
-        justify-content:flex-end;
-      }
+      .wheel-shell{width:300px;height:300px}
+      .node{width:82px;height:82px;margin:-41px 0 0 -41px}
+      .hub{width:128px;height:128px}
     }
-
-    @media (max-width:760px){
-      .top-strip{
-        flex-direction:column;
-        align-items:stretch;
-        text-align:center;
-      }
-      .brand,.top-actions{justify-content:center}
-      .phone{width:100%;text-align:center}
-      .brick-wall{
-        height:min(66vh,620px);
-        border-radius:28px;
-      }
-      .hole-zone{width:min(90vw,560px)}
-      .portal-core{width:78%}
-      .wheel-node{
-        width:90px;
-        min-height:90px;
-        transform:
-          translate(-50%,-50%)
-          rotate(calc(var(--angle) * 1deg))
-          translateY(-128px)
-          rotate(calc(var(--angle) * -1deg));
-      }
-      .wheel-node.item-node{
-        width:96px;
-        min-height:96px;
-      }
-      .wheel-node strong{font-size:.56rem}
-      .wheel-node span{display:none}
-      .mode-title{width:54%}
-      .mode-title strong{font-size:1rem}
-      .portal-action{font-size:.58rem}
-      .bottom-dock{grid-template-columns:1fr}
-      .dock-actions{justify-content:stretch}
-      .dock-actions .pill{width:100%}
-      .portal-card .card-head h3{font-size:1.5rem}
+    @media (max-width: 640px){
+      .portal-wrap{padding-top:22px}
+      .headline{margin-bottom:16px}
+      .sub{font-size:14px}
+      .controls{top:18px}
+      .btn{padding:10px 14px;font-size:13px}
+      .wheel-shell{width:270px;height:270px}
+      .node{width:76px;height:76px;margin:-38px 0 0 -38px}
+      .node-label{font-size:11px}
+      .hub{width:116px;height:116px}
+      .card-body{padding:24px}
     }
   </style>
 </head>
 <body>
-  <div class="scene">
-    <div class="smoke"></div>
+  <div id="wall" class="wall" aria-hidden="true"></div>
 
-    <div class="top-strip">
-      <div class="brand">
-        <div class="brand-orb"></div>
-        <div class="brand-copy">
-          <strong>THE FRANCIS</strong>
-          <span>SMOKEHOUSE & MEATS</span>
-        </div>
-      </div>
-      <div class="top-meta">Brick Portal Menu</div>
-      <div class="top-actions">
-        <span class="phone"><i class="fas fa-phone-alt"></i> (225) 245-5046</span>
-        <button class="pill" id="resetPortal"><i class="fas fa-rotate-left"></i> Reset</button>
-      </div>
-    </div>
+  <main class="portal-wrap">
+    <section class="headline">
+      <div class="eyebrow">Interactive Wall Portal</div>
+      <h1>Break Through the Wall</h1>
+      <p class="sub">
+        Choose a category from the wheel, switch to that category’s item wheel, then replace it with an information card when an item is selected.
+      </p>
+    </section>
 
-    <div class="wall-wrap">
-      <div class="brick-wall">
-        <div class="hole-zone">
-          <div class="broken-ring"></div>
-
-          <div class="fragment-layer">
-            <div class="fragment" style="--angle:8;--radius:248;--twist:18;--speed:3.1"></div>
-            <div class="fragment" style="--angle:28;--radius:214;--twist:41;--speed:3.8"></div>
-            <div class="fragment" style="--angle:52;--radius:238;--twist:62;--speed:2.9"></div>
-            <div class="fragment" style="--angle:79;--radius:202;--twist:14;--speed:3.6"></div>
-            <div class="fragment" style="--angle:108;--radius:244;--twist:88;--speed:3.2"></div>
-            <div class="fragment" style="--angle:136;--radius:210;--twist:37;--speed:4.1"></div>
-            <div class="fragment" style="--angle:162;--radius:236;--twist:74;--speed:3.4"></div>
-            <div class="fragment" style="--angle:188;--radius:206;--twist:28;--speed:4.0"></div>
-            <div class="fragment" style="--angle:214;--radius:246;--twist:56;--speed:3.1"></div>
-            <div class="fragment" style="--angle:238;--radius:216;--twist:92;--speed:3.5"></div>
-            <div class="fragment" style="--angle:264;--radius:238;--twist:48;--speed:3.2"></div>
-            <div class="fragment" style="--angle:292;--radius:212;--twist:11;--speed:3.7"></div>
-            <div class="fragment" style="--angle:320;--radius:246;--twist:71;--speed:2.8"></div>
-            <div class="fragment" style="--angle:346;--radius:214;--twist:39;--speed:3.9"></div>
-          </div>
-
-          <div class="portal-core">
-            <div class="wheel ring-only"></div>
-
-            <div class="mode-title" id="modeTitle">
-              <small>Choose A Category</small>
-              <strong>Smoke Wheel</strong>
-            </div>
-
-            <div class="wheel" id="mainWheel"></div>
-
-            <div class="portal-action">
-              <i class="fas fa-arrow-pointer"></i>
-              Tap the wheel
-            </div>
-          </div>
-        </div>
-
-        <div class="portal-card hidden" id="infoCard">
-          <div class="card-head">
-            <h3 id="cardHeading">Item Detail</h3>
-            <span id="cardMeta">Selected</span>
-          </div>
-          <div class="detail-title" id="detailTitle">Brisket Plate</div>
-          <div class="detail-price" id="detailPrice">$10.99</div>
-          <div class="detail-text" id="detailText">Tender. Smoky. Heavy.</div>
-          <div class="tag-row" id="detailTags"></div>
-          <div class="tag-row" style="margin-top:14px">
-            <button class="pill" id="backBtn"><i class="fas fa-arrow-left"></i> Back</button>
-            <button class="pill" id="callBtn"><i class="fas fa-phone"></i> Call</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="bottom-dock">
-      <div class="dock-pill"><i class="fas fa-location-dot"></i> 6779 US Highway 61</div>
-      <div class="dock-pill"><i class="fas fa-clock"></i> Mon–Sat 10–6</div>
-      <div class="dock-pill"><i class="fas fa-sun"></i> Sun 10–3</div>
-      <div class="dock-pill"><i class="fas fa-bag-shopping"></i> Takeout</div>
-      <div class="dock-actions">
-        <button class="pill" id="backStageBtn"><i class="fas fa-arrow-left"></i> Back</button>
-      </div>
-    </div>
-  </div>
+    <section class="hole">
+      <div class="controls" id="controls"></div>
+      <div id="fragments"></div>
+      <div id="stage" class="stage"></div>
+    </section>
+  </main>
 
   <script>
-    (function(){
-      const data = {
-        categories: [
-          {
-            key: 'bbq',
-            label: 'BBQ',
-            sub: 'core',
-            icon: 'fas fa-fire',
-            modeTitle: 'BBQ Core',
-            items: [
-              { title: 'Brisket Plate', price: '$10.99', text: 'Tender. Smoky. Heavy.', detail: 'The heavyweight plate. Smoke, bark, and a clean finish.', tags: ['hero','brisket','two sides'] },
-              { title: 'Full Rack Ribs', price: '$19.99', text: 'Big smoke. Big bark.', detail: 'The showpiece order. Built for sharing or going all in.', tags: ['ribs','signature','shareable'] },
-              { title: 'Half Rack Ribs', price: '$11.99', text: 'Same lane. Lighter.', detail: 'All the rib energy with more room for sides.', tags: ['ribs','balanced'] },
-              { title: 'Pulled Pork Plate', price: '$9.99', text: 'Soft smoke. Comfort.', detail: 'A comfort-first plate with softer texture and broad appeal.', tags: ['pork','classic'] },
-              { title: 'Smoked Wings', price: '$7.99', text: 'Fast impact.', detail: 'Shareable smoke energy in a quicker lane.', tags: ['wings','shareable'] },
-              { title: 'Half Chicken', price: '$9.99', text: 'Clean smoke lane.', detail: 'A lighter smokehouse option without losing the fire.', tags: ['chicken','lighter'] }
-            ]
-          },
-          {
-            key: 'handhelds',
-            label: 'Handhelds',
-            sub: 'orbit',
-            icon: 'fas fa-burger',
-            modeTitle: 'Handheld Orbit',
-            items: [
-              { title: 'Brisket Sandwich', price: '$8.99', text: 'Smoked. Stacked. Loud.', detail: 'The fastest way to get smokehouse energy in one hand.', tags: ['brisket','one side'] },
-              { title: 'Pulled Pork Sandwich', price: '$7.99', text: 'Soft. Smoky. Easy.', detail: 'Comfort handheld with broad appeal.', tags: ['pork','classic'] },
-              { title: 'Cheeseburger', price: '$7.99', text: 'Melty comfort.', detail: 'Straightforward and grounded with good weight.', tags: ['burger','comfort'] },
-              { title: 'Bacon Cheeseburger', price: '$8.99', text: 'Louder. Richer.', detail: 'The indulgent handheld lane.', tags: ['burger','loaded'] },
-              { title: 'Shrimp Po-Boy', price: '$8.99', text: 'Seafood lift.', detail: 'A Louisiana-coded move that widens the mood of the menu.', tags: ['po-boy','seafood'] },
-              { title: 'Ribeye Po-Boy', price: '$10.99', text: 'Premium swagger.', detail: 'The premium handheld turn.', tags: ['po-boy','premium'] }
-            ]
-          },
-          {
-            key: 'boudin',
-            label: 'Boudin',
-            sub: 'signal',
-            icon: 'fas fa-pepper-hot',
-            modeTitle: 'Boudin Signal',
-            items: [
-              { title: 'Boudin Balls', price: 'Market', text: 'Crisp. Rich. Local.', detail: 'One of the strongest identity items on the board.', tags: ['local','crispy'] },
-              { title: 'Pepper Jack Balls', price: 'Market', text: 'More heat. More melt.', detail: 'A hotter, richer version with more drama.', tags: ['spicy','cheese'] },
-              { title: 'Boudin Links', price: 'Market', text: 'Pure Louisiana.', detail: 'A foundational regional item.', tags: ['links','classic'] },
-              { title: 'Boudin Egg Rolls', price: 'Market', text: 'Crunch. Comfort.', detail: 'The novelty lane with stronger texture contrast.', tags: ['crispy','fusion'] },
-              { title: 'Meat Pies', price: 'Market', text: 'Savory comfort.', detail: 'Portable, warm, and easy to add on.', tags: ['portable','savory'] },
-              { title: 'Crawfish Pies', price: 'Market', text: 'Regional pastry.', detail: 'A more Louisiana-coded pie with strong local pull.', tags: ['crawfish','regional'] }
-            ]
-          },
-          {
-            key: 'sides',
-            label: 'Sides',
-            sub: 'system',
-            icon: 'fas fa-bowl-food',
-            modeTitle: 'Side System',
-            items: [
-              { title: 'Corn Pudding', price: '$2.75 / $6.99', text: 'Creamy. Warm. Known.', detail: 'One of the most praised side choices.', tags: ['praised','comfort'] },
-              { title: 'Baked Beans', price: '$2.75 / $6.99', text: 'Sweet-smoky ground.', detail: 'A dependable side with sweetness that rounds out bark and smoke.', tags: ['beans','classic'] },
-              { title: 'Potato Salad', price: '$2.75 / $6.99', text: 'Cool reset.', detail: 'The cooling lane for contrast and comfort.', tags: ['cooling','classic'] },
-              { title: 'Cole Slaw', price: '$2.75 / $6.99', text: 'Fresh crunch.', detail: 'Lightest side profile with good lift.', tags: ['fresh','crisp'] },
-              { title: 'French Fries', price: '$2.75 / $6.99', text: 'Pure comfort.', detail: 'The universal side lane.', tags: ['fries','golden'] },
-              { title: 'Waffle Fries', price: '$2.75 / $6.99', text: 'Visual drama.', detail: 'Sweet edge with stronger personality.', tags: ['sweet','waffle'] }
-            ]
-          },
-          {
-            key: 'sweets',
-            label: 'Sweets',
-            sub: 'exit',
-            icon: 'fas fa-cake-candles',
-            modeTitle: 'Sweet Exit',
-            items: [
-              { title: 'Bread Pudding', price: 'Market', text: 'Warm. Dense. Southern.', detail: 'The strongest ending for guests who want the story to stay warm and heavy.', tags: ['warm','classic'] },
-              { title: 'Creole Cheesecake', price: 'Market', text: 'Silky. Rich. Smooth.', detail: 'A smoother, more elegant dessert profile.', tags: ['smooth','creole'] },
-              { title: 'Chocolate Cake', price: 'Market', text: 'Bakery close.', detail: 'Dense and satisfying finish.', tags: ['cake','bakery'] },
-              { title: 'Carrot Cake', price: 'Market', text: 'Spiced finish.', detail: 'A softer close with a bakery feel.', tags: ['cake','bakery'] },
-              { title: 'Shortcake', price: 'Market', text: 'Brightest exit.', detail: 'The lightest dessert note on the board.', tags: ['fresh','light'] }
-            ]
-          },
-          {
-            key: 'signals',
-            label: 'Signals',
-            sub: 'specials',
-            icon: 'fas fa-star',
-            modeTitle: 'Kitchen Signals',
-            items: [
-              { title: 'Thai Chili Wings', price: '$16', text: 'Glossy heat hit.', detail: 'A quick-hit special with big shine and fast impact.', tags: ['wings','special'] },
-              { title: 'Eggplant Pirogue', price: '$26', text: 'Unexpected plate.', detail: 'A creative kitchen move that changes the tone of the board.', tags: ['creative','plated'] },
-              { title: 'Lemon Fish', price: '$28', text: 'Premium Louisiana.', detail: 'A sharper, more premium seafood signal.', tags: ['fish','premium'] },
-              { title: 'BBQ Shrimp + Chop', price: '$26', text: 'Spectacle plate.', detail: 'One of the biggest contrast plates in the specials lane.', tags: ['special','hero'] },
-              { title: 'Salmon + Crabmeat', price: '$28', text: 'Refined seafood.', detail: 'Softer, more refined seafood energy.', tags: ['salmon','crab'] },
-              { title: 'Miss Mud Pie', price: '$7', text: 'Sweet closer.', detail: 'A dessert signal with easy name recall.', tags: ['dessert','special'] }
-            ]
+    const DATA = {
+      categories: [
+        {
+          id: "services",
+          label: "Services",
+          icon: "🛠️",
+          gradient: "linear-gradient(135deg, rgba(251,146,60,.88), rgba(249,115,22,.76))",
+          items: [
+            {
+              id: "web-design",
+              label: "Web Design",
+              icon: "🎨",
+              title: "Web Design",
+              description: "Custom layouts, visual systems, and responsive user experiences tailored to your brand."
+            },
+            {
+              id: "seo",
+              label: "SEO",
+              icon: "🔎",
+              title: "Search Optimization",
+              description: "On-page strategy, technical improvements, and content structure designed to increase discoverability."
+            },
+            {
+              id: "branding",
+              label: "Branding",
+              icon: "✨",
+              title: "Brand Systems",
+              description: "Identity development, messaging alignment, and brand consistency across digital touchpoints."
+            },
+            {
+              id: "hosting",
+              label: "Hosting",
+              icon: "🌐",
+              title: "Hosting & Support",
+              description: "Reliable infrastructure, maintenance, monitoring, and long-term site support."
+            }
+          ]
+        },
+        {
+          id: "industries",
+          label: "Industries",
+          icon: "🧱",
+          gradient: "linear-gradient(135deg, rgba(56,189,248,.88), rgba(6,182,212,.76))",
+          items: [
+            {
+              id: "construction",
+              label: "Construction",
+              icon: "🏗️",
+              title: "Construction",
+              description: "Portfolio-ready presentation for projects, service lines, and trust-building proof points."
+            },
+            {
+              id: "medical",
+              label: "Medical",
+              icon: "⚕️",
+              title: "Medical",
+              description: "Clear, compliant, patient-friendly information structures with strong calls to action."
+            },
+            {
+              id: "legal",
+              label: "Legal",
+              icon: "⚖️",
+              title: "Legal",
+              description: "Professional layouts for practice areas, attorney bios, and streamlined lead intake."
+            },
+            {
+              id: "retail",
+              label: "Retail",
+              icon: "🛍️",
+              title: "Retail",
+              description: "Visual merchandising online with category-led pathways and persuasive product storytelling."
+            }
+          ]
+        },
+        {
+          id: "materials",
+          label: "Materials",
+          icon: "🔨",
+          gradient: "linear-gradient(135deg, rgba(248,113,113,.88), rgba(244,63,94,.76))",
+          items: [
+            {
+              id: "brick",
+              label: "Brick",
+              icon: "🧱",
+              title: "Brick Texture",
+              description: "Classic, rugged masonry styling with layered shadows and weathered detail."
+            },
+            {
+              id: "stone",
+              label: "Stone",
+              icon: "🪨",
+              title: "Stone Texture",
+              description: "Heavy, carved surfaces with organic edges for a monumental feel."
+            },
+            {
+              id: "metal",
+              label: "Metal",
+              icon: "⚙️",
+              title: "Metal Texture",
+              description: "Industrial finishes with brushed highlights and cool reflective accents."
+            },
+            {
+              id: "glass",
+              label: "Glass",
+              icon: "🔷",
+              title: "Glass Texture",
+              description: "Clean translucent panels with polished light behavior and modern contrast."
+            }
+          ]
+        }
+      ]
+    };
+
+    const state = {
+      selectedCategoryId: null,
+      selectedItemId: null
+    };
+
+    const wall = document.getElementById("wall");
+    const stage = document.getElementById("stage");
+    const controls = document.getElementById("controls");
+    const fragments = document.getElementById("fragments");
+
+    function buildWall() {
+      const total = 168;
+      for (let i = 0; i < total; i++) {
+        const b = document.createElement("div");
+        b.className = "brick";
+        wall.appendChild(b);
+      }
+    }
+
+    function buildFragments() {
+      const defs = [
+        { left: "10%", top: "18%", w: 64, h: 32, r: -16, d: "0s" },
+        { left: "76%", top: "22%", w: 56, h: 28, r: 22, d: ".2s" },
+        { left: "18%", top: "72%", w: 48, h: 24, r: 12, d: ".4s" },
+        { left: "70%", top: "76%", w: 64, h: 32, r: -24, d: ".6s" },
+        { left: "5%", top: "48%", w: 56, h: 28, r: -8, d: ".1s" },
+        { left: "82%", top: "52%", w: 48, h: 24, r: 14, d: ".5s" },
+        { left: "30%", top: "8%", w: 40, h: 20, r: -30, d: ".3s" },
+        { left: "56%", top: "86%", w: 40, h: 20, r: 18, d: ".7s" }
+      ];
+      defs.forEach(def => {
+        const el = document.createElement("div");
+        el.className = "fragment";
+        el.style.left = def.left;
+        el.style.top = def.top;
+        el.style.width = def.w + "px";
+        el.style.height = def.h + "px";
+        el.style.setProperty("--rot", def.r + "deg");
+        el.style.animationDelay = def.d;
+        fragments.appendChild(el);
+      });
+    }
+
+    function getSelectedCategory() {
+      return DATA.categories.find(c => c.id === state.selectedCategoryId) || null;
+    }
+
+    function getSelectedItem() {
+      const category = getSelectedCategory();
+      if (!category) return null;
+      return category.items.find(i => i.id === state.selectedItemId) || null;
+    }
+
+    function createButton(text, variant, onClick) {
+      const btn = document.createElement("button");
+      btn.className = `btn ${variant === "primary" ? "btn-primary" : "btn-secondary"}`;
+      btn.textContent = text;
+      btn.addEventListener("click", onClick);
+      return btn;
+    }
+
+    function polarToCartesian(angle, radius) {
+      const radians = ((angle - 90) * Math.PI) / 180;
+      return {
+        x: Math.cos(radians) * radius,
+        y: Math.sin(radians) * radius
+      };
+    }
+
+    function renderControls() {
+      controls.innerHTML = "";
+      const category = getSelectedCategory();
+      const item = getSelectedItem();
+
+      if (category && !item) {
+        controls.appendChild(createButton("Back to Categories", "primary", () => {
+          state.selectedCategoryId = null;
+          state.selectedItemId = null;
+          render();
+        }));
+      }
+
+      if (category && item) {
+        controls.appendChild(createButton(`Back to ${category.label}`, "primary", () => {
+          state.selectedItemId = null;
+          render();
+        }));
+        controls.appendChild(createButton("All Categories", "secondary", () => {
+          state.selectedCategoryId = null;
+          state.selectedItemId = null;
+          render();
+        }));
+      }
+    }
+
+    function renderWheel(title, centerLabel, entries, onSelect) {
+      const wrap = document.createElement("div");
+      wrap.className = "fade";
+      wrap.style.position = "relative";
+      wrap.style.width = "100%";
+      wrap.style.height = "100%";
+
+      const shell = document.createElement("div");
+      shell.className = "wheel-shell";
+      wrap.appendChild(shell);
+
+      const radius = window.innerWidth < 640 ? 135 : window.innerWidth < 900 ? 150 : 180;
+
+      entries.forEach((entry, index) => {
+        const angle = (360 / entries.length) * index;
+        const pos = polarToCartesian(angle, radius - 28);
+        const btn = document.createElement("button");
+        btn.className = "node";
+        btn.style.left = `calc(50% + ${pos.x}px)`;
+        btn.style.top = `calc(50% + ${pos.y}px)`;
+        btn.style.setProperty("--grad", entry.gradient || "linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.04))");
+        btn.innerHTML = `
+          <div class="node-icon">${entry.icon || "✦"}</div>
+          <div class="node-label">${entry.label}</div>
+        `;
+        btn.addEventListener("click", () => onSelect(entry.id));
+        wrap.appendChild(btn);
+      });
+
+      const hub = document.createElement("div");
+      hub.className = "hub";
+      hub.innerHTML = `
+        <div class="spark">✦</div>
+        <div class="main">${centerLabel}</div>
+        <div class="minor">${title}</div>
+      `;
+      wrap.appendChild(hub);
+
+      return wrap;
+    }
+
+    function renderCard(item) {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="pill">Selected Item</div>
+          <div class="card-head">
+            <div>
+              <h3>${item.title}</h3>
+            </div>
+            <div class="badge">${item.icon || "ℹ️"}</div>
+          </div>
+          <p>${item.description}</p>
+        </div>
+      `;
+      return card;
+    }
+
+    function renderStage() {
+      stage.innerHTML = "";
+      const category = getSelectedCategory();
+      const item = getSelectedItem();
+
+      if (!category) {
+        stage.appendChild(renderWheel(
+          "Choose a Path",
+          "Categories",
+          DATA.categories,
+          (id) => {
+            state.selectedCategoryId = id;
+            state.selectedItemId = null;
+            render();
           }
-        ]
-      };
-
-      const state = {
-        mode: 'categories',
-        selectedCategory: 0,
-        selectedItem: 0
-      };
-
-      const mainWheel = document.getElementById('mainWheel');
-      const modeTitle = document.getElementById('modeTitle');
-      const infoCard = document.getElementById('infoCard');
-      const cardHeading = document.getElementById('cardHeading');
-      const cardMeta = document.getElementById('cardMeta');
-      const detailTitle = document.getElementById('detailTitle');
-      const detailPrice = document.getElementById('detailPrice');
-      const detailText = document.getElementById('detailText');
-      const detailTags = document.getElementById('detailTags');
-      const backBtn = document.getElementById('backBtn');
-      const backStageBtn = document.getElementById('backStageBtn');
-      const callBtn = document.getElementById('callBtn');
-      const resetPortal = document.getElementById('resetPortal');
-
-      function getCategory() {
-        return data.categories[state.selectedCategory];
+        ));
+        return;
       }
 
-      function setMode(mode) {
-        state.mode = mode;
-        render();
+      if (category && !item) {
+        stage.appendChild(renderWheel(
+          "Choose an Item",
+          category.label,
+          category.items.map(item => ({ ...item, gradient: category.gradient })),
+          (id) => {
+            state.selectedItemId = id;
+            render();
+          }
+        ));
+        return;
       }
 
-      function renderCategoriesWheel() {
-        mainWheel.innerHTML = '';
-        data.categories.forEach((cat, index) => {
-          const node = document.createElement('button');
-          node.type = 'button';
-          node.className = 'wheel-node' + (index === state.selectedCategory ? ' active' : '');
-          node.style.setProperty('--angle', String(index * 60));
-          node.innerHTML = `<i class="${cat.icon}"></i><strong>${cat.label}</strong><span>${cat.sub}</span>`;
-          node.addEventListener('click', () => {
-            state.selectedCategory = index;
-            state.selectedItem = 0;
-            setMode('items');
-          });
-          mainWheel.appendChild(node);
-        });
+      stage.appendChild(renderCard(item));
+    }
 
-        modeTitle.innerHTML = `<small>Choose A Category</small><strong>Smoke Wheel</strong>`;
-        infoCard.classList.add('hidden');
-      }
+    function render() {
+      renderControls();
+      renderStage();
+    }
 
-      function renderItemsWheel() {
-        const cat = getCategory();
-        mainWheel.innerHTML = '';
-        cat.items.forEach((item, index) => {
-          const angle = (360 / cat.items.length) * index;
-          const node = document.createElement('button');
-          node.type = 'button';
-          node.className = 'wheel-node item-node';
-          node.style.setProperty('--angle', String(angle));
-          node.innerHTML = `<i class="${cat.icon}"></i><strong>${item.title}</strong><span>${item.price}</span>`;
-          node.addEventListener('click', () => {
-            state.selectedItem = index;
-            setMode('detail');
-          });
-          mainWheel.appendChild(node);
-        });
-
-        modeTitle.innerHTML = `<small>${cat.label}</small><strong>${cat.modeTitle}</strong>`;
-        infoCard.classList.add('hidden');
-      }
-
-      function renderDetailCard() {
-        const cat = getCategory();
-        const item = cat.items[state.selectedItem];
-
-        detailTitle.textContent = item.title;
-        detailPrice.textContent = item.price;
-        detailText.textContent = item.detail;
-        detailTags.innerHTML = '';
-        item.tags.forEach(tag => {
-          const el = document.createElement('span');
-          el.className = 'card-tag';
-          el.textContent = tag;
-          detailTags.appendChild(el);
-        });
-
-        cardHeading.textContent = cat.modeTitle;
-        cardMeta.textContent = 'Selected';
-        infoCard.classList.remove('hidden');
-
-        mainWheel.innerHTML = '';
-        const node = document.createElement('div');
-        node.className = 'wheel-node item-node active';
-        node.style.setProperty('--angle', '0');
-        node.innerHTML = `<i class="${cat.icon}"></i><strong>${item.title}</strong><span>${item.price}</span>`;
-        mainWheel.appendChild(node);
-
-        modeTitle.innerHTML = `<small>Viewing Item</small><strong>${item.title}</strong>`;
-      }
-
-      function render() {
-        if (state.mode === 'categories') renderCategoriesWheel();
-        if (state.mode === 'items') renderItemsWheel();
-        if (state.mode === 'detail') renderDetailCard();
-      }
-
-      backBtn.addEventListener('click', () => setMode('items'));
-      backStageBtn.addEventListener('click', () => {
-        if (state.mode === 'detail') setMode('items');
-        else if (state.mode === 'items') setMode('categories');
-      });
-      resetPortal.addEventListener('click', () => {
-        state.mode = 'categories';
-        state.selectedCategory = 0;
-        state.selectedItem = 0;
-        render();
-      });
-      callBtn.addEventListener('click', () => {
-        window.location.href = 'tel:+12252455046';
-      });
-
-      render();
-    })();
+    buildWall();
+    buildFragments();
+    render();
   </script>
 </body>
 </html>
