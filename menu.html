@@ -2,1601 +2,2359 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Hot Headz Southern Foods – Future Menu</title>
-  <meta name="description" content="Hot Headz Southern Foods interactive future menu" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Francis Smokehouse · Brick Wall Portal Menu</title>
+  <meta name="description" content="Brick wall portal menu concept for The Francis Smokehouse." />
+
+  <link rel="icon" type="image/png" href="Images/Smokehouselogo.png" />
+  <link rel="apple-touch-icon" href="Images/Smokehouselogo.png" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { overflow-x: hidden; }
-    body {
-      font-family: Inter, system-ui, sans-serif;
-      color: rgba(255,255,255,.94);
+    :root{
+      --bg:#090707;
+      --bg-2:#16100f;
+      --brick-a:#5b2f25;
+      --brick-b:#713c2e;
+      --brick-c:#8b4b39;
+      --mortar:#2d211f;
+      --text:#f8f0e6;
+      --muted:#d0b29b;
+      --gold:#d7a56d;
+      --ember:#b44b3c;
+      --ember-2:#e0815d;
+      --line:rgba(255,233,209,.10);
+      --line-strong:rgba(224,129,93,.34);
+      --panel:rgba(23,17,16,.72);
+      --shadow:0 32px 90px rgba(0,0,0,.45);
+      --serif:'Playfair Display', serif;
+      --sans:'Montserrat', sans-serif;
+      --ease:cubic-bezier(.22,1,.36,1);
+    }
+
+    html { scroll-behavior: smooth; }
+    body{
+      background: linear-gradient(180deg, #080606, #130f0e 42%, #0a0808 100%);
+      color: var(--text);
+      font-family: var(--sans);
+      overflow-x: hidden;
+      line-height: 1.55;
+    }
+    body.menu-open { overflow: hidden; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+
+    .container{
+      width: min(calc(100% - 32px), 1380px);
+      margin: 0 auto;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.7rem;
+      padding:1rem 1.5rem;
+      border-radius:999px;
+      border:1px solid var(--line-strong);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      font-size:.73rem;
+      font-weight:800;
+      cursor:pointer;
+      transition:.22s ease;
+      backdrop-filter:blur(10px);
+    }
+    .btn:hover{
+      transform:translateY(-3px);
+      background:rgba(180,75,60,.14);
+      box-shadow:0 16px 26px -20px rgba(180,75,60,.6);
+    }
+    .btn-primary{
+      background:linear-gradient(180deg, rgba(192,88,63,.98), rgba(150,57,44,.98));
+      color:#140f0d;
+    }
+    .btn-primary:hover{
+      color:#fff4ea;
+      background:linear-gradient(180deg, rgba(220,118,86,.98), rgba(180,75,60,.98));
+    }
+
+    .hero{
+      position:relative;
+      min-height:100vh;
+      background:url("https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?q=80&w=2070&auto=format&fit=crop") center/cover fixed;
+      isolation:isolate;
+      overflow:hidden;
+    }
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:0;
       background:
-        radial-gradient(900px 600px at 10% 10%, rgba(255,110,70,.18), transparent 60%),
-        radial-gradient(900px 600px at 90% 0%, rgba(42,127,98,.16), transparent 60%),
-        linear-gradient(180deg, #070604, #0b0806 45%, #050403);
-      min-height: 100vh;
-      padding-bottom: 90px;
+        radial-gradient(circle at 28% 40%, rgba(224,129,93,.25), transparent 24%),
+        radial-gradient(circle at 78% 20%, rgba(215,165,109,.10), transparent 24%),
+        linear-gradient(180deg, rgba(7,5,5,.14), rgba(7,5,5,.92));
+      z-index:1;
     }
-    .app {
-      min-height: 100vh;
-      padding: 18px 14px 80px;
-      position: relative;
-      isolation: isolate;
+    .topbar{
+      position:absolute;
+      top:0; left:0; right:0;
+      z-index:10;
+      padding:1rem 1.2rem;
     }
-    .app::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      opacity: .1;
-      pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");
+    .topbar-inner{
+      width:min(calc(100% - 4px), 1320px);
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      gap:1rem;
+      align-items:center;
+      padding:.95rem 1rem;
+      border-radius:30px;
+      border:1px solid rgba(255,233,209,.08);
+      background:rgba(12,10,10,.34);
+      backdrop-filter:blur(16px);
     }
-    .app > * { position: relative; z-index: 1; }
-
-    .daybar, .glassbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 999px;
-      padding: 10px;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      box-shadow: 0 16px 40px rgba(0,0,0,.28);
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:.9rem;
     }
-    .sticky { position: sticky; top: 10px; z-index: 20; margin-bottom: 14px; }
-
-    .pill, .viewbtn, .actionbtn, .daybtn {
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      color: #fff;
-      border-radius: 999px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: .18s ease;
-      white-space: nowrap;
+    .brand-orb{
+      width:42px; height:42px; border-radius:50%;
+      background:conic-gradient(from 180deg, var(--ember), var(--gold), var(--ember-2), var(--ember));
+      box-shadow:0 0 24px rgba(224,129,93,.24);
+      position:relative;
     }
-    .pill:hover, .viewbtn:hover, .actionbtn:hover, .daybtn:hover { transform: translateY(-1px); }
-    .daybtn, .viewbtn { padding: 10px 16px; }
-    .actionbtn { padding: 12px 18px; }
-    .daybtn.active, .viewbtn.active, .actionbtn.primary {
-      background: linear-gradient(180deg, rgba(192,90,42,.75), rgba(160,65,28,.92));
-      border-color: rgba(255,200,130,.5);
-      box-shadow: 0 10px 28px rgba(192,90,42,.32);
+    .brand-orb::after{
+      content:"";
+      position:absolute;
+      inset:8px;
+      border-radius:50%;
+      background:#140f0d;
     }
-    .actionbtn.secondary {
-      background: linear-gradient(180deg, rgba(42,127,98,.5), rgba(20,70,52,.86));
-      border-color: rgba(146,255,212,.35);
+    .brand-copy{
+      display:flex;
+      flex-direction:column;
+      line-height:1.02;
     }
-
-    .header {
-      text-align: center;
-      padding: 10px 8px 0;
-      margin-bottom: 12px;
-      display: grid;
-      gap: 8px;
-      justify-items: center;
+    .brand-copy strong{
+      font-family:var(--serif);
+      font-size:1.15rem;
+      letter-spacing:.06em;
     }
-    .title {
-      font-size: clamp(24px, 3.2vw, 34px);
-      font-weight: 900;
-      line-height: 1.06;
-      letter-spacing: -.03em;
+    .brand-copy span{
+      font-size:.64rem;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.3em;
+      margin-top:.25rem;
     }
-    .subline {
-      margin-top: 0;
-      color: rgba(255,255,255,.76);
-      font-weight: 700;
-      font-size: 14px;
-      text-align: center;
-      line-height: 1.5;
+    .top-links{
+      display:flex;
+      justify-content:center;
+      gap:.55rem;
+      flex-wrap:wrap;
     }
-    .note {
-      margin-top: 0;
-      color: rgba(255,255,255,.6);
-      font-size: 13px;
-      font-weight: 600;
-      text-align: center;
-      line-height: 1.5;
-      width: min(760px, 100%);
+    .top-link{
+      padding:.75rem .95rem;
+      border-radius:999px;
+      border:1px solid rgba(255,233,209,.07);
+      background:rgba(255,255,255,.03);
+      font-size:.68rem;
+      text-transform:uppercase;
+      letter-spacing:.15em;
+      color:rgba(248,240,230,.82);
+      transition:.22s ease;
+      cursor:pointer;
     }
-
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin: 16px 0 8px;
+    .top-link:hover{
+      background:rgba(180,75,60,.12);
+      border-color:rgba(224,129,93,.28);
+      transform:translateY(-2px);
+    }
+    .top-actions{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:.8rem;
+      flex-wrap:wrap;
+    }
+    .top-phone{
+      font-size:.9rem;
+      color:var(--muted);
+      font-weight:600;
     }
 
-    .wheel-stage {
-      display: grid;
-      gap: 18px;
-      justify-items: center;
-      margin-top: 16px;
+    .hero-content{
+      position:relative;
+      z-index:5;
+      min-height:100vh;
+      display:grid;
+      grid-template-columns: .9fr 1.1fr;
+      align-items:center;
+      gap:2rem;
+      padding:8.2rem 0 4rem;
     }
-    .wheel-wrap {
-      width: 300px;
-      height: 300px;
-      position: relative;
-      touch-action: none;
-      user-select: none;
-      cursor: grab;
+    .hero-copy{
+      padding-left:1.4rem;
     }
-    .wheel-wrap.dragging { cursor: grabbing; }
-    .wheel-arrow {
-      position: absolute;
-      left: 50%;
-      top: -2px;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 16px solid transparent;
-      border-right: 16px solid transparent;
-      border-top: 22px solid #ffb35a;
-      z-index: 5;
-      filter: drop-shadow(0 0 8px rgba(255,179,90,.8));
+    .hero-kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:.6rem;
+      padding:.65rem 1rem;
+      border-radius:999px;
+      border:1px solid rgba(255,233,209,.12);
+      background:rgba(255,255,255,.05);
+      color:var(--muted);
+      font-size:.7rem;
+      text-transform:uppercase;
+      letter-spacing:.22em;
+      margin-bottom:1.2rem;
+      backdrop-filter:blur(10px);
     }
-    .wheel {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      border: 3px solid rgba(255,161,102,.86);
+    .hero-title{
+      font-family:var(--serif);
+      font-size:clamp(4rem,7vw,7rem);
+      line-height:.88;
+      text-transform:uppercase;
+    }
+    .hero-title .a{
+      display:block;
+      background:linear-gradient(135deg, #fff0de, #d2a06e);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+    .hero-title .b{
+      display:block;
+      font-size:.46em;
+      letter-spacing:.25em;
+      font-weight:300;
+      color:#f0d0b0;
+    }
+    .hero-title .c{
+      display:block;
+      margin-top:.6rem;
+      font-size:.28em;
+      letter-spacing:.42em;
+      color:var(--gold);
+    }
+    .hero-sub{
+      max-width:31rem;
+      margin-top:1.2rem;
+      color:rgba(248,240,230,.76);
+      font-size:1rem;
+    }
+    .hero-actions{
+      margin-top:1.6rem;
+      display:flex;
+      gap:.8rem;
+      flex-wrap:wrap;
+    }
+
+    .brick-scene{
+      position:relative;
+      min-height:690px;
+      display:grid;
+      place-items:center;
+      perspective:1400px;
+    }
+    .brick-wall{
+      position:relative;
+      width:min(100%, 820px);
+      aspect-ratio:1.15 / 1;
+      border-radius:44px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      transform:rotateY(-6deg) rotateX(2deg);
+      transition:transform .4s ease;
+      border:1px solid rgba(255,233,209,.08);
       background:
-        radial-gradient(circle at 50% 50%, rgba(255,255,255,.08), transparent 30%),
-        radial-gradient(circle at 50% 50%, rgba(255,128,76,.08), transparent 62%),
-        rgba(13,12,12,.84);
+        linear-gradient(var(--mortar) 12px, transparent 12px),
+        linear-gradient(90deg, var(--mortar) 12px, transparent 12px),
+        linear-gradient(0deg, transparent 0 50%, var(--mortar) 50% 54%, transparent 54% 100%),
+        repeating-linear-gradient(
+          90deg,
+          var(--brick-a) 0 18%,
+          var(--brick-b) 18% 34%,
+          var(--brick-c) 34% 52%,
+          var(--brick-a) 52% 68%,
+          var(--brick-b) 68% 84%,
+          var(--brick-c) 84% 100%
+        );
+      background-size:
+        100% 84px,
+        110px 100%,
+        100% 168px,
+        100% 100%;
+      background-position:
+        0 0,
+        0 0,
+        0 0,
+        0 0;
+    }
+    .brick-wall:hover{
+      transform:rotateY(-3deg) rotateX(1deg) translateY(-4px);
+    }
+    .brick-wall::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 25% 22%, rgba(255,255,255,.08), transparent 18%),
+        radial-gradient(circle at 76% 74%, rgba(0,0,0,.18), transparent 18%);
+      mix-blend-mode:screen;
+      pointer-events:none;
+    }
+    .wall-badge{
+      position:absolute;
+      top:18px;
+      left:18px;
+      z-index:5;
+      padding:.8rem .95rem;
+      border-radius:18px;
+      border:1px solid rgba(255,233,209,.10);
+      background:rgba(8,7,7,.28);
+      backdrop-filter:blur(10px);
+      color:rgba(248,240,230,.76);
+      font-size:.7rem;
+      text-transform:uppercase;
+      letter-spacing:.18em;
+    }
+    .wall-badge strong{
+      display:block;
+      color:#fff5eb;
+      font-size:1rem;
+      text-transform:none;
+      letter-spacing:.02em;
+      margin-bottom:.15rem;
+      font-family:var(--serif);
+    }
+
+    .portal-hole{
+      position:absolute;
+      inset:12% 10%;
+      border-radius:50%;
+      background:
+        radial-gradient(circle at center, rgba(0,0,0,.96) 22%, rgba(9,8,8,.92) 42%, rgba(0,0,0,.14) 65%, transparent 74%);
       box-shadow:
-        0 0 0 8px rgba(255,255,255,.03) inset,
-        0 0 34px rgba(192,90,42,.34),
-        0 18px 40px rgba(0,0,0,.45);
-      will-change: transform;
-      overflow: visible;
+        inset 0 0 70px rgba(0,0,0,.94),
+        0 0 0 18px rgba(34,22,20,.86),
+        0 0 0 28px rgba(15,12,12,.92),
+        inset 0 0 0 2px rgba(255,233,209,.05);
+      display:grid;
+      place-items:center;
+      overflow:hidden;
     }
-    .wheel-item {
-      position: absolute;
-      width: 78px;
-      height: 78px;
-      left: 50%;
-      top: 50%;
-      margin-left: -39px;
-      margin-top: -39px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,161,102,.7);
-      background: linear-gradient(180deg, rgba(48,48,48,.95), rgba(22,22,22,.95));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      font-size: 13px;
-      font-weight: 800;
-      line-height: 1.12;
-      padding: 7px;
-      box-shadow: 0 8px 24px rgba(0,0,0,.5);
-      transform-origin: center center;
-      color: #fff;
-      pointer-events: none;
-      will-change: transform;
-    }
-    .wheel-item.selected {
-      background: linear-gradient(180deg, rgba(220,105,48,.98), rgba(170,70,32,.98));
-      border-color: #ffd4a1;
-      box-shadow: 0 0 26px rgba(255,149,91,.55);
-    }
-    .wheel-center {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      background: #ffb35a;
-      border: 2px solid #fff;
-      z-index: 4;
-      box-shadow: 0 0 18px rgba(255,179,90,.7);
+    .portal-hole::before{
+      content:"";
+      position:absolute;
+      inset:5%;
+      border-radius:50%;
+      border:1px solid rgba(255,233,209,.06);
+      box-shadow:inset 0 0 24px rgba(224,129,93,.14);
     }
 
-    .glasscard {
-      width: min(680px, calc(100vw - 28px));
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: 28px;
-      padding: 20px;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 18px 50px rgba(0,0,0,.35);
-      text-align: center;
-    }
-    .glasscard.pulse {
-      animation: pulseCard .85s ease 1;
-    }
-    #todayDetailCard, #tomorrowDetailCard {
-      max-height: 60vh;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    @keyframes pulseCard {
-      0% { transform: scale(1); box-shadow: 0 18px 50px rgba(0,0,0,.35); }
-      50% { transform: scale(1.015); box-shadow: 0 0 42px rgba(255,149,91,.35), 0 18px 50px rgba(0,0,0,.42); }
-      100% { transform: scale(1); }
-    }
-
-    .cat-title {
-      font-size: clamp(24px, 4vw, 32px);
-      font-weight: 900;
-      color: #ffb35a;
-      margin-bottom: 8px;
-      border-bottom: 2px solid rgba(255,179,90,.24);
-      padding-bottom: 8px;
-    }
-    .section-label {
-      margin: 14px 0 8px;
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,.68);
-    }
-    .list { list-style: none; display: grid; gap: 8px; text-align: left; }
-    .list li {
-      background: rgba(255,255,255,.06);
-      border-left: 4px solid #c05a2a;
-      border-radius: 14px;
-      padding: 11px 12px;
-      color: #f0e6d8;
-      font-size: 15px;
-    }
-    .list details { width: 100%; }
-    .list details summary { cursor: pointer; font-weight: 700; list-style: none; }
-    .list details summary::-webkit-details-marker { display: none; }
-    .desc {
-      margin-top: 7px;
-      color: rgba(255,255,255,.78);
-      font-size: 13px;
-      padding-left: 4px;
-      line-height: 1.5;
-    }
-
-    .swipe-shell {
-      margin-top: 20px;
-      display: grid;
-      gap: 10px;
-      justify-items: center;
-    }
-    .chipnav {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: center;
-      width: min(760px, calc(100vw - 28px));
-      margin-top: 4px;
-    }
-    .chip {
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      color: #fff;
-      border-radius: 999px;
-      padding: 9px 12px;
-      font-size: 12px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: .18s ease;
-    }
-    .chip.active {
-      background: linear-gradient(180deg, rgba(192,90,42,.75), rgba(160,65,28,.92));
-      border-color: rgba(255,200,130,.5);
-      box-shadow: 0 10px 22px rgba(192,90,42,.22);
-    }
-    .modehint {
-      color: rgba(255,255,255,.66);
-      font-size: 12px;
-      font-weight: 700;
-      text-align: center;
-      margin-top: 2px;
-    }
-    .closed-note {
-      margin-top: 12px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.05);
-      color: rgba(255,255,255,.82);
-      font-size: 13px;
-      font-weight: 700;
-      text-align: center;
-      line-height: 1.5;
-    }
-    .pick-card {
-      margin-top: 12px;
-      padding: 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,179,90,.3);
-      background: linear-gradient(180deg, rgba(255,160,90,.12), rgba(255,255,255,.04));
-      box-shadow: 0 10px 26px rgba(0,0,0,.22);
-    }
-    .pick-title {
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,.7);
-      margin-bottom: 8px;
-    }
-    .pick-line {
-      font-size: 15px;
-      color: #fff;
-      margin-top: 6px;
-      font-weight: 700;
-    }
-
-    .flash-overlay {
-      position: fixed;
-      inset: 0;
-      display: none;
-      place-items: center;
-      z-index: 200;
-      background: radial-gradient(circle at center, rgba(255,140,90,.18), rgba(0,0,0,.72));
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      padding: 18px;
-    }
-    .flash-overlay.show { display: grid; }
-    .flash-card {
-      width: min(560px, calc(100vw - 24px));
-      border-radius: 30px;
+    .portal-aura{
+      position:absolute;
+      inset:10%;
+      border-radius:50%;
       background:
-        radial-gradient(500px 200px at 0% 0%, rgba(255,140,90,.24), transparent 60%),
-        radial-gradient(500px 220px at 100% 100%, rgba(60,220,170,.18), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.05));
-      border: 1px solid rgba(255,255,255,.18);
-      box-shadow: 0 0 60px rgba(255,149,91,.22), 0 20px 60px rgba(0,0,0,.45);
-      padding: 24px;
-      text-align: center;
-      animation: flashPop .32s ease;
+        radial-gradient(circle at center, rgba(224,129,93,.13), transparent 56%),
+        radial-gradient(circle at center, rgba(215,165,109,.08), transparent 74%);
+      filter:blur(12px);
+      animation:auraPulse 5s ease-in-out infinite;
     }
-    @keyframes flashPop {
-      0% { transform: scale(.92); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
+    @keyframes auraPulse{
+      0%,100%{ transform:scale(1); opacity:.72; }
+      50%{ transform:scale(1.06); opacity:1; }
     }
-    .flash-title {
-      font-size: 30px;
-      font-weight: 900;
-      color: #ffb35a;
-      margin-bottom: 10px;
-      letter-spacing: -.03em;
-      text-align: center;
-    }
-    .flash-text {
-      color: rgba(255,255,255,.86);
-      font-size: 15px;
-      line-height: 1.6;
-      margin-bottom: 16px;
-      font-weight: 700;
-      text-align: center;
-    }
-    .flash-count {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 66px;
-      height: 66px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, rgba(255,160,90,.9), rgba(200,90,44,.95));
-      color: #fff;
-      font-weight: 900;
-      font-size: 26px;
-      box-shadow: 0 0 30px rgba(255,149,91,.45);
-      margin-bottom: 12px;
-    }
-    .flash-sub {
-      color: rgba(255,255,255,.68);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      text-align: center;
-    }
-    .statusbar {
-      display: inline-flex;
-      gap: 10px;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 10px;
-      color: rgba(255,255,255,.74);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: .04em;
-      text-align: center;
-    }
-    .statusdot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #5effad;
-      box-shadow: 0 0 12px rgba(94,255,173,.7);
-    }
-    .statusdot.closed {
-      background: #ff8a8a;
-      box-shadow: 0 0 12px rgba(255,138,138,.7);
-    }
-    .swipe-head {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .swipe-track {
-      width: min(760px, calc(100vw - 28px));
-      display: flex;
-      gap: 16px;
-      overflow-x: auto;
-      padding: 8px 4px 10px;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-    }
-    .swipe-track::-webkit-scrollbar { display: none; }
 
-    .advanced-tabs {
-      width: min(1100px, calc(100vw - 28px));
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      padding: 8px 4px 6px;
+    .portal-wheel{
+      position:relative;
+      width:78%;
+      aspect-ratio:1 / 1;
+      animation:spin 18s linear infinite;
+      filter:drop-shadow(0 0 22px rgba(224,129,93,.22));
     }
-    .advanced-tab {
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      color: #fff;
-      border-radius: 999px;
-      padding: 10px 14px;
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: .02em;
-      cursor: pointer;
-      transition: .18s ease;
+    .portal-ring{
+      position:absolute;
+      inset:50%;
+      translate:-50% -50%;
+      border-radius:50%;
+      border:1px solid rgba(255,233,209,.08);
+      animation:spin 12s linear infinite reverse;
     }
-    .advanced-tab.active {
-      background: linear-gradient(180deg, rgba(192,90,42,.75), rgba(160,65,28,.92));
-      border-color: rgba(255,200,130,.5);
-      box-shadow: 0 10px 22px rgba(192,90,42,.22);
-    }
-    .advanced-card-wrap {
-      width: min(760px, calc(100vw - 28px));
-      padding: 8px 4px 10px;
-    }
-    .swipe-card {
-      position: relative;
-      flex: 0 0 100%;
-      scroll-snap-align: center;
-      min-height: 420px;
-      border-radius: 30px;
-      padding: 22px;
-      overflow: hidden;
+    .portal-ring.r1{ width:100%; height:100%; }
+    .portal-ring.r2{ width:74%; height:74%; animation-duration:8s; }
+    .portal-ring.r3{ width:44%; height:44%; animation-duration:6s; animation-direction:normal; }
+    .portal-core{
+      position:absolute;
+      left:50%; top:50%;
+      translate:-50% -50%;
+      width:18%;
+      aspect-ratio:1/1;
+      border-radius:50%;
       background:
-        radial-gradient(500px 240px at 10% 0%, rgba(255,148,92,.18), transparent 60%),
-        radial-gradient(500px 240px at 100% 100%, rgba(68,224,170,.14), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-      border: 1px solid rgba(255,255,255,.15);
-      box-shadow: 0 24px 60px rgba(0,0,0,.36);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      transform-style: preserve-3d;
-      will-change: transform;
-    }
-    .swipe-card.active {
-      box-shadow: 0 0 40px rgba(255,149,91,.24), 0 24px 60px rgba(0,0,0,.42);
-    }
-    .swipe-card::before {
-      background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,.15) 45%, transparent 70%);
-      animation: hologram 4s linear infinite;
-
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,.1) 45%, transparent 70%);
-      transform: translateX(-120%);
-      animation: hologram 7s linear infinite;
-      pointer-events: none;
-    }
-    @keyframes hologram { to { transform: translateX(120%); } }
-    .card-meta {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      font-weight: 900;
-      color: rgba(255,255,255,.7);
-      padding: 7px 10px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.1);
-      margin-bottom: 10px;
+        radial-gradient(circle at 35% 35%, rgba(255,248,236,.98), rgba(224,129,93,.72) 42%, rgba(180,75,60,.14) 66%, transparent 72%);
+      box-shadow:0 0 34px rgba(224,129,93,.3);
+      animation:pulse 4.8s ease-in-out infinite;
     }
 
-    .state {
-      width: min(760px, calc(100vw - 28px));
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 28px;
-      padding: 20px;
-      background: rgba(255,255,255,.05);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      box-shadow: 0 16px 44px rgba(0,0,0,.26);
+    .portal-node{
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:108px;
+      min-height:108px;
+      padding:.65rem;
+      border-radius:26px;
+      border:1px solid rgba(255,233,209,.1);
+      background:linear-gradient(180deg, rgba(24,18,17,.78), rgba(12,10,10,.96));
+      transform:
+        translate(-50%, -50%)
+        rotate(calc(var(--angle) * 1deg))
+        translateY(-150px)
+        rotate(calc(var(--angle) * -1deg));
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+      box-shadow:0 18px 24px -20px rgba(0,0,0,.9);
+      transition:.22s ease;
+      cursor:pointer;
+      user-select:none;
+    }
+    .portal-node i{
+      font-size:1rem;
+      color:var(--gold);
+      margin-bottom:.3rem;
+      transition:.2s ease;
+    }
+    .portal-node strong{
+      font-size:.68rem;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      line-height:1.2;
+    }
+    .portal-node span{
+      display:block;
+      margin-top:.18rem;
+      color:rgba(248,240,230,.52);
+      font-size:.54rem;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+    }
+    .portal-node:hover,
+    .portal-node.active{
+      background:linear-gradient(180deg, rgba(180,75,60,.18), rgba(12,10,10,.96));
+      border-color:rgba(224,129,93,.34);
+      transform:
+        translate(-50%, -50%)
+        rotate(calc(var(--angle) * 1deg))
+        translateY(-160px)
+        rotate(calc(var(--angle) * -1deg))
+        scale(1.04);
+    }
+    .portal-node:hover i,
+    .portal-node.active i{ color:var(--ember-2); }
+
+    .portal-instruction{
+      position:absolute;
+      bottom:22px;
+      left:50%;
+      transform:translateX(-50%);
+      padding:.85rem 1rem;
+      border-radius:18px;
+      border:1px solid rgba(255,233,209,.08);
+      background:rgba(0,0,0,.3);
+      backdrop-filter:blur(10px);
+      color:rgba(248,240,230,.7);
+      font-size:.72rem;
+      text-transform:uppercase;
+      letter-spacing:.18em;
+      text-align:center;
+      width:min(calc(100% - 30px), 420px);
     }
 
-    .nav-btn {
-      position: fixed; z-index: 90; bottom: 24px; left: 50%; transform: translateX(-50%);
-      background: rgba(25,25,25,.92); border: 2px solid #c05a2a; border-radius: 999px;
-      display: flex; align-items: center; gap: 12px; cursor: pointer;
-      box-shadow: 0 0 25px rgba(192,90,42,0.32); transition: .2s ease; backdrop-filter: blur(8px);
-      padding: 12px 20px;
+    .hero-stats{
+      position:absolute;
+      left:2rem;
+      bottom:2rem;
+      z-index:6;
+      display:flex;
+      gap:1rem;
+      padding:1rem 1.2rem;
+      border-radius:999px;
+      border:1px solid rgba(255,233,209,.08);
+      background:rgba(8,7,7,.34);
+      backdrop-filter:blur(12px);
     }
-    .nav-btn:hover { transform: translateX(-50%) scale(1.04); }
-    .btn-icon { font-size: 1.5rem; color: #c05a2a; }
-    .btn-text .main { font-weight: 800; letter-spacing: .12em; font-size: .92rem; }
-    .btn-text .sub { font-size: .62rem; opacity: .7; text-transform: uppercase; }
-    .circ-menu-overlay {
-      position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center;
-      pointer-events: none; background: rgba(0,0,0,.7); opacity: 0; transition: opacity .3s ease; backdrop-filter: blur(8px);
+    .hero-stat{
+      min-width:86px;
+      text-align:center;
     }
-    .circ-menu-overlay.open { opacity: 1; pointer-events: all; }
-    .circular-menu {
-      width: 300px; height: 300px; border-radius: 50%; border: 2px solid #c05a2a;
-      box-shadow: 0 0 40px rgba(192,90,42,.4); display: flex; align-items: center; justify-content: center;
-      position: relative; transform: scale(.6); transition: transform .25s ease;
+    .hero-stat strong{
+      display:block;
+      font-size:1.65rem;
+      line-height:1;
+      color:var(--gold);
     }
-    .circ-menu-overlay.open .circular-menu { transform: scale(1); }
-    .center-home {
-      width: 74px; height: 74px; background: #2a7f62; border: 3px solid #c05a2a; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer;
-      box-shadow: 0 0 30px rgba(192,90,42,.4); z-index: 2;
-    }
-    .menu-item {
-      position: absolute;
-      width: 66px; height: 66px;
-      background: #1e1b1b; border: 2px solid #c05a2a; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; text-align: center; padding: 6px;
-      color: #fff; font-size: .72rem; font-weight: 700; text-transform: uppercase;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-110px) rotate(calc(var(--angle) * -1deg));
-      cursor: pointer;
+    .hero-stat span{
+      display:block;
+      margin-top:.25rem;
+      font-size:.63rem;
+      text-transform:uppercase;
+      letter-spacing:.15em;
+      color:var(--muted);
     }
 
-    .hide { display: none !important; }
-  
-.nowbar {
-  white-space: normal;
-  line-height: 1.4;
-  padding: 12px 16px;
+    .section{
+      padding:6rem 0;
+      position:relative;
+    }
+    .section-dark{
+      background:linear-gradient(180deg, #0b0909, #15100f);
+    }
+    .section-title{
+      font-family:var(--serif);
+      font-size:clamp(2.2rem,5vw,3.8rem);
+      line-height:.94;
+      margin-bottom:1rem;
+      color:#f4e6d6;
+    }
+    .section-copy{
+      max-width:42rem;
+      color:rgba(248,240,230,.68);
+      font-size:1rem;
+    }
 
-  margin-top: 8px;
-  padding: 10px 14px;
-  border-radius: 999px;
-  font-weight: 900;
-  font-size: 13px;
-  letter-spacing: .05em;
-  text-align: center;
-  border: 1px solid rgba(255,255,255,.15);
-  background: rgba(255,255,255,.06);
-}
-.nowbar.open { color: #5effad; box-shadow: 0 0 12px rgba(94,255,173,.4); }
-.nowbar.warn { color: #ffd27a; box-shadow: 0 0 12px rgba(255,210,122,.4); }
-.nowbar.closed { color: #ff8a8a; box-shadow: 0 0 12px rgba(255,138,138,.4); }
+    .feature-grid{
+      margin-top:2rem;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:1rem;
+    }
+    .feature-card{
+      padding:1.5rem;
+      border-radius:32px;
+      border:1px solid rgba(255,233,209,.08);
+      background:linear-gradient(180deg, rgba(28,22,21,.62), rgba(14,11,11,.84));
+      backdrop-filter:blur(12px);
+      transition:.24s ease;
+      position:relative;
+      overflow:hidden;
+    }
+    .feature-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:radial-gradient(circle at 50% 0%, rgba(224,129,93,.18), transparent 68%);
+      opacity:0;
+      transition:.22s ease;
+    }
+    .feature-card:hover{
+      transform:translateY(-7px);
+      border-color:rgba(224,129,93,.24);
+      box-shadow:0 18px 26px -20px rgba(180,75,60,.38);
+    }
+    .feature-card:hover::before{ opacity:1; }
+    .feature-card i{
+      position:relative;
+      z-index:1;
+      color:var(--ember-2);
+      font-size:2rem;
+      margin-bottom:.8rem;
+    }
+    .feature-card h3{
+      position:relative;
+      z-index:1;
+      font-family:var(--serif);
+      font-size:1.7rem;
+      margin-bottom:.25rem;
+    }
+    .feature-card p{
+      position:relative;
+      z-index:1;
+      color:rgba(248,240,230,.62);
+      font-size:.92rem;
+    }
+    .feature-card strong{
+      position:relative;
+      z-index:1;
+      display:block;
+      margin-top:.8rem;
+      color:var(--gold);
+      font-size:1.35rem;
+    }
 
-.swipe-card {
-  animation: floatCard 6s ease-in-out infinite;
-}
-@keyframes floatCard {
-  0%,100% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
-}
+    .story{
+      position:relative;
+      min-height:560px;
+      display:flex;
+      align-items:center;
+      background:url("https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1974&auto=format&fit=crop") center/cover fixed;
+      isolation:isolate;
+    }
+    .story::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,.64);
+      z-index:1;
+    }
+    .story-inner{
+      position:relative;
+      z-index:2;
+      max-width:760px;
+      margin:0 auto;
+      text-align:center;
+      padding:4rem 2rem;
+    }
+    .story-quote{
+      font-family:var(--serif);
+      font-size:clamp(2rem,4vw,3.2rem);
+      font-style:italic;
+      line-height:1.06;
+    }
+    .story-author{
+      margin-top:1rem;
+      color:var(--muted);
+      font-size:.9rem;
+      text-transform:uppercase;
+      letter-spacing:.3em;
+    }
 
-</style>
+    .reviews{
+      overflow:hidden;
+      padding-top:2rem;
+    }
+    .review-track{
+      display:flex;
+      gap:1rem;
+      width:max-content;
+      animation:scrollX 24s linear infinite;
+    }
+    @keyframes scrollX{
+      0%{ transform:translateX(0); }
+      100%{ transform:translateX(-50%); }
+    }
+    .review{
+      width:340px;
+      padding:1.4rem;
+      border-radius:28px;
+      border:1px solid rgba(224,129,93,.16);
+      background:rgba(28,22,21,.58);
+      backdrop-filter:blur(10px);
+    }
+    .review .stars{ color:#f5b342; margin-bottom:.7rem; }
+    .review p{ color:rgba(248,240,230,.76); font-style:italic; }
+    .review strong{ display:block; margin-top:.9rem; color:var(--gold); }
+    .review span{ display:block; color:rgba(248,240,230,.54); font-size:.84rem; margin-top:.2rem; }
+
+    .visit-shell{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:1rem;
+      margin-top:2rem;
+      padding:1.5rem;
+      border-radius:36px;
+      border:1px solid rgba(255,233,209,.08);
+      background:linear-gradient(180deg, rgba(28,22,21,.62), rgba(14,11,11,.86));
+      backdrop-filter:blur(14px);
+    }
+    .visit-col h3{
+      font-family:var(--serif);
+      font-size:2rem;
+      margin-bottom:.8rem;
+    }
+    .info{
+      display:flex;
+      gap:.9rem;
+      align-items:center;
+      margin:1rem 0;
+    }
+    .info i{
+      width:28px;
+      color:var(--ember-2);
+      font-size:1.3rem;
+    }
+    .map-box{
+      min-height:260px;
+      border-radius:28px;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      border:1px solid rgba(224,129,93,.18);
+      background:
+        linear-gradient(135deg, rgba(215,165,109,.10), rgba(180,75,60,.10)),
+        radial-gradient(circle at 20% 30%, rgba(224,129,93,.15), transparent 24%),
+        #241f1d;
+      padding:1rem;
+    }
+    .map-box i{
+      font-size:3rem;
+      color:var(--ember-2);
+      margin-bottom:.8rem;
+    }
+
+    .footer{
+      position:relative;
+      overflow:hidden;
+      padding:4rem 0 2rem;
+      background:#0f0d0b;
+      border-top:1px solid rgba(224,129,93,.22);
+    }
+    .footer::before{
+      content:"";
+      position:absolute;
+      left:0; right:0; bottom:0;
+      height:160px;
+      background:radial-gradient(circle at 50% 100%, rgba(180,75,60,.18), transparent 70%);
+      filter:blur(42px);
+    }
+    .footer-grid{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:2fr 1fr 1fr 2fr;
+      gap:2rem;
+    }
+    .footer-logo{
+      font-family:var(--serif);
+      font-size:2rem;
+      line-height:1.05;
+    }
+    .footer-logo span{
+      display:block;
+      margin-top:.25rem;
+      font-size:.68rem;
+      letter-spacing:.34em;
+      text-transform:uppercase;
+      color:var(--ember-2);
+      font-family:var(--sans);
+    }
+    .footer-links a{
+      display:block;
+      margin:.7rem 0;
+      color:rgba(248,240,230,.72);
+      transition:.2s ease;
+    }
+    .footer-links a:hover{
+      color:var(--ember-2);
+      transform:translateX(4px);
+    }
+    .footer-social{
+      display:flex;
+      gap:.9rem;
+      margin-top:.9rem;
+    }
+    .footer-social a{
+      font-size:1.35rem;
+      color:var(--gold);
+      transition:.2s ease;
+    }
+    .footer-social a:hover{
+      color:var(--ember-2);
+      transform:scale(1.14);
+    }
+    .footer-bottom{
+      position:relative;
+      z-index:1;
+      margin-top:2rem;
+      padding-top:1.7rem;
+      border-top:1px solid rgba(255,233,209,.08);
+      text-align:center;
+      color:rgba(248,240,230,.54);
+      font-size:.78rem;
+    }
+
+    /* ORIGINAL CIRCLE NAV */
+    .nav-btn{
+      position:fixed;
+      z-index:1200;
+      display:flex;
+      align-items:center;
+      gap:.7rem;
+      background:rgba(30,27,27,.78);
+      border:1px solid rgba(224,129,93,.46);
+      color:var(--text);
+      box-shadow:0 0 24px rgba(180,75,60,.32);
+      cursor:pointer;
+      transition:.25s ease;
+      backdrop-filter:blur(10px);
+      user-select:none;
+    }
+    .nav-btn:hover{
+      transform:scale(1.04);
+      box-shadow:0 0 38px rgba(180,75,60,.42);
+      border-color:rgba(224,129,93,.7);
+    }
+    .btn-icon{ font-size:1.4rem; color:var(--ember-2); }
+    .btn-text{ display:flex; flex-direction:column; line-height:1.12; }
+    .btn-text .main{
+      font-weight:800;
+      font-size:.9rem;
+      letter-spacing:.18em;
+    }
+    .btn-text .sub{
+      font-size:.58rem;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      color:var(--muted);
+      opacity:.8;
+    }
+    .nav-btn.left-center{
+      left:28px;
+      top:50%;
+      transform:translateY(-50%);
+      flex-direction:column;
+      padding:1rem .55rem;
+      border-radius:999px;
+    }
+    .nav-btn.left-center .btn-text{
+      writing-mode:vertical-rl;
+      text-orientation:upright;
+    }
+    .nav-btn.left-center .main{ letter-spacing:normal; font-size:.8rem; }
+    .nav-btn.left-center .sub{ margin-top:4px; }
+    .nav-btn.bottom-center{
+      left:50%;
+      bottom:28px;
+      transform:translateX(-50%);
+      padding:.9rem 1.5rem;
+      border-radius:999px;
+    }
+
+    .circ-menu-overlay{
+      position:fixed;
+      inset:0;
+      z-index:2000;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(0,0,0,.72);
+      backdrop-filter:blur(10px);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .3s ease;
+    }
+    .circ-menu-overlay.open{
+      opacity:1;
+      pointer-events:auto;
+    }
+    .circular-menu{
+      width:360px;
+      height:360px;
+      border-radius:50%;
+      position:relative;
+      border:1px solid rgba(224,129,93,.55);
+      box-shadow:0 0 60px rgba(180,75,60,.45);
+      background:radial-gradient(circle at center, rgba(180,75,60,.09), rgba(0,0,0,0) 70%);
+      transform:scale(.35);
+      transition:transform .45s var(--ease);
+    }
+    .circ-menu-overlay.open .circular-menu{ transform:scale(1); }
+    .center-home{
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      width:72px;
+      height:72px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:radial-gradient(circle at 30% 30%, #fff1de, var(--gold));
+      color:#160f0d;
+      border:2px solid var(--ember);
+      box-shadow:0 0 28px rgba(224,129,93,.38);
+      cursor:pointer;
+      transition:.22s ease;
+      z-index:2;
+    }
+    .center-home:hover{ transform:translate(-50%,-50%) scale(1.06); }
+    .menu-item{
+      position:absolute;
+      top:50%;
+      left:50%;
+      width:66px;
+      height:66px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:rgba(22,17,16,.9);
+      border:1px solid rgba(224,129,93,.44);
+      color:var(--text);
+      font-size:.72rem;
+      font-weight:700;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      box-shadow:0 0 18px rgba(0,0,0,.65);
+      transform:translate(-50%,-50%) rotate(calc(var(--angle) * 1deg)) translateY(-132px) rotate(calc(var(--angle) * -1deg));
+      transition:.22s ease;
+      cursor:pointer;
+      backdrop-filter:blur(8px);
+    }
+    .menu-item:hover{
+      background:rgba(180,75,60,.94);
+      color:#160f0d;
+      transform:translate(-50%,-50%) rotate(calc(var(--angle) * 1deg)) translateY(-142px) rotate(calc(var(--angle) * -1deg)) scale(1.06);
+    }
+
+    /* PORTAL MENU OVERLAY */
+    .portal-overlay{
+      position:fixed;
+      inset:0;
+      z-index:5000;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .35s ease;
+      background:#050404;
+      overflow:hidden auto;
+    }
+    .portal-overlay.open{
+      opacity:1;
+      pointer-events:auto;
+    }
+    .portal-bg{
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 18% 20%, rgba(224,129,93,.14), transparent 22%),
+        radial-gradient(circle at 80% 18%, rgba(215,165,109,.10), transparent 18%),
+        radial-gradient(circle at 50% 82%, rgba(180,75,60,.08), transparent 24%),
+        linear-gradient(180deg, rgba(9,7,7,.76), rgba(5,4,4,.98));
+      backdrop-filter:blur(18px) saturate(1.05);
+    }
+    .portal-grid{
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size:44px 44px;
+      mask-image:radial-gradient(circle at center, black 24%, rgba(0,0,0,.6) 62%, transparent 90%);
+      opacity:.34;
+    }
+
+    .portal-shell{
+      position:relative;
+      z-index:3;
+      min-height:100vh;
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+      gap:1rem;
+      padding:1rem;
+    }
+    .portal-head{
+      position:sticky;
+      top:1rem;
+      z-index:20;
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      gap:1rem;
+      align-items:center;
+      padding:.95rem 1rem;
+      border-radius:28px;
+      border:1px solid var(--line);
+      background:rgba(14,11,11,.48);
+      backdrop-filter:blur(18px);
+      box-shadow:0 18px 34px -20px rgba(0,0,0,.72);
+    }
+    .portal-badge{
+      display:flex;
+      align-items:center;
+      gap:.85rem;
+      padding:.35rem;
+      border-radius:999px;
+      border:1px solid rgba(255,233,209,.08);
+      background:rgba(255,255,255,.03);
+    }
+    .portal-badge-orb{
+      width:42px; height:42px; border-radius:50%;
+      display:grid; place-items:center;
+      background:radial-gradient(circle at 30% 30%, #fff0de, var(--gold));
+      color:#120d0c;
+    }
+    .portal-badge-copy{
+      display:flex; flex-direction:column; line-height:1.04;
+      padding-right:.35rem;
+    }
+    .portal-badge-copy strong{
+      font-size:.9rem;
+      text-transform:uppercase;
+      letter-spacing:.1em;
+    }
+    .portal-badge-copy span{
+      font-size:.63rem;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.28em;
+      margin-top:.18rem;
+    }
+    .portal-status{
+      display:flex;
+      justify-content:center;
+      gap:.6rem;
+      flex-wrap:wrap;
+      min-width:0;
+    }
+    .status-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:.45rem;
+      padding:.78rem .95rem;
+      border-radius:999px;
+      border:1px solid rgba(255,233,209,.08);
+      background:rgba(255,255,255,.03);
+      color:rgba(248,240,230,.8);
+      font-size:.68rem;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      white-space:nowrap;
+    }
+    .portal-close{
+      padding:.9rem 1rem;
+      border-radius:999px;
+      border:1px solid rgba(224,129,93,.38);
+      background:rgba(180,75,60,.12);
+      color:var(--text);
+      text-transform:uppercase;
+      letter-spacing:.15em;
+      font-size:.74rem;
+      font-weight:800;
+      cursor:pointer;
+      transition:.22s ease;
+    }
+    .portal-close:hover{
+      transform:translateY(-3px);
+      background:rgba(180,75,60,.18);
+    }
+
+    .portal-main{
+      width:min(calc(100% - 4px), 1360px);
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:1.08fr .92fr;
+      gap:1rem;
+      align-items:start;
+    }
+    .portal-viewport{
+      position:relative;
+      min-height:640px;
+      border-radius:42px;
+      overflow:hidden;
+      border:1px solid rgba(255,233,209,.10);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,.7)),
+        var(--menu-image, linear-gradient(135deg,#3f2b25,#151110));
+      background-size:cover;
+      background-position:center;
+      box-shadow:var(--shadow);
+    }
+    .portal-viewport::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 30% 18%, rgba(255,255,255,.16), transparent 28%),
+        linear-gradient(180deg, rgba(0,0,0,.04), rgba(0,0,0,.44));
+    }
+    .portal-viewport-overlay{
+      position:absolute;
+      inset:0;
+      padding:1.3rem;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:1rem;
+      z-index:1;
+    }
+    .viewport-top{
+      display:flex;
+      justify-content:space-between;
+      gap:1rem;
+      align-items:flex-start;
+    }
+    .ghost-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:.5rem;
+      padding:.75rem .95rem;
+      border-radius:999px;
+      border:1px solid rgba(255,233,209,.14);
+      background:rgba(0,0,0,.28);
+      backdrop-filter:blur(10px);
+      font-size:.66rem;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      color:#fff5eb;
+    }
+    .viewport-price{
+      padding:.72rem .92rem;
+      border-radius:999px;
+      border:1px solid rgba(255,233,209,.14);
+      background:rgba(0,0,0,.28);
+      backdrop-filter:blur(10px);
+      color:var(--gold);
+      font-weight:800;
+      font-size:.95rem;
+    }
+    .viewport-copy{
+      max-width:min(78%, 420px);
+      padding:1rem 1rem .95rem;
+      border-radius:28px;
+      border:1px solid rgba(255,233,209,.14);
+      background:rgba(0,0,0,.26);
+      backdrop-filter:blur(10px);
+    }
+    .viewport-copy small{
+      display:block;
+      margin-bottom:.38rem;
+      font-size:.64rem;
+      text-transform:uppercase;
+      letter-spacing:.24em;
+      color:rgba(248,240,230,.72);
+    }
+    .viewport-copy h2{
+      font-family:var(--serif);
+      font-size:clamp(2.4rem,4vw,4.2rem);
+      line-height:.9;
+      margin-bottom:.35rem;
+      color:#fff4e7;
+    }
+    .viewport-copy p{
+      color:rgba(248,240,230,.82);
+      font-size:.94rem;
+      max-width:34ch;
+    }
+    .viewport-bottom{
+      display:flex;
+      justify-content:space-between;
+      gap:.8rem;
+      align-items:flex-end;
+      flex-wrap:wrap;
+    }
+    .signal-row{
+      display:flex;
+      gap:.55rem;
+      flex-wrap:wrap;
+    }
+    .signal-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:.45rem;
+      padding:.76rem .9rem;
+      border-radius:999px;
+      border:1px solid rgba(255,233,209,.12);
+      background:rgba(0,0,0,.24);
+      backdrop-filter:blur(8px);
+      color:rgba(248,240,230,.86);
+      font-size:.64rem;
+      text-transform:uppercase;
+      letter-spacing:.15em;
+    }
+    .signal-chip i{ color:var(--ember-2); }
+    .viewport-actions{
+      display:flex;
+      gap:.7rem;
+      flex-wrap:wrap;
+    }
+
+    .portal-side{
+      display:grid;
+      grid-template-rows:auto auto 1fr;
+      gap:1rem;
+      min-height:640px;
+    }
+    .side-panel{
+      border-radius:30px;
+      border:1px solid rgba(255,233,209,.08);
+      background:linear-gradient(180deg, rgba(24,18,17,.68), rgba(12,10,10,.9));
+      backdrop-filter:blur(14px);
+      padding:1rem;
+      box-shadow:0 20px 30px -24px rgba(0,0,0,.8);
+    }
+    .side-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:end;
+      gap:.8rem;
+      margin-bottom:.8rem;
+    }
+    .side-head h3{
+      font-family:var(--serif);
+      font-size:1.8rem;
+      line-height:.92;
+      color:#f4e5d5;
+    }
+    .side-head span{
+      color:rgba(248,240,230,.56);
+      font-size:.72rem;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      white-space:nowrap;
+    }
+
+    .category-strip{
+      display:flex;
+      gap:.65rem;
+      flex-wrap:wrap;
+    }
+    .category-btn{
+      display:inline-flex;
+      align-items:center;
+      gap:.55rem;
+      padding:.82rem .95rem;
+      border-radius:999px;
+      border:1px solid rgba(255,233,209,.08);
+      background:rgba(255,255,255,.03);
+      color:rgba(248,240,230,.82);
+      font-size:.7rem;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      cursor:pointer;
+      transition:.22s ease;
+      backdrop-filter:blur(10px);
+    }
+    .category-btn i{ color:var(--gold); transition:.22s ease; }
+    .category-btn:hover,
+    .category-btn.active{
+      transform:translateY(-2px);
+      background:rgba(180,75,60,.12);
+      border-color:rgba(224,129,93,.28);
+      color:#fff4ea;
+    }
+    .category-btn:hover i,
+    .category-btn.active i{ color:var(--ember-2); }
+
+    .item-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:.85rem;
+      align-content:start;
+    }
+    .item-card{
+      min-height:160px;
+      padding:1rem;
+      border-radius:28px;
+      border:1px solid rgba(255,233,209,.09);
+      background:linear-gradient(180deg, rgba(24,18,17,.68), rgba(12,10,10,.9));
+      backdrop-filter:blur(12px);
+      overflow:hidden;
+      cursor:pointer;
+      transition:.24s ease;
+      opacity:0;
+      transform:translateY(10px) scale(.96);
+      animation:itemIn .42s var(--ease) forwards;
+    }
+    @keyframes itemIn{
+      to{ opacity:1; transform:translateY(0) scale(1); }
+    }
+    .item-card:hover,
+    .item-card.active{
+      transform:translateY(-5px);
+      border-color:rgba(224,129,93,.28);
+      box-shadow:0 18px 26px -20px rgba(180,75,60,.4);
+      background:linear-gradient(180deg, rgba(180,75,60,.10), rgba(12,10,10,.9));
+    }
+    .item-card-top{
+      display:flex;
+      justify-content:space-between;
+      gap:.6rem;
+      align-items:start;
+    }
+    .item-card h4{
+      font-family:var(--serif);
+      font-size:1.28rem;
+      line-height:.95;
+      color:#fff1e4;
+    }
+    .item-price{
+      color:var(--gold);
+      font-weight:800;
+      font-size:.9rem;
+      white-space:nowrap;
+    }
+    .item-card p{
+      margin-top:.45rem;
+      color:rgba(248,240,230,.62);
+      font-size:.8rem;
+      min-height:2.5em;
+    }
+    .item-tags{
+      display:flex;
+      gap:.35rem;
+      flex-wrap:wrap;
+      margin-top:.7rem;
+    }
+    .item-tag{
+      padding:.3rem .45rem;
+      border-radius:999px;
+      border:1px solid rgba(255,233,209,.08);
+      background:rgba(255,255,255,.03);
+      color:rgba(248,240,230,.68);
+      font-size:.54rem;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+    }
+
+    .detail-panel{
+      display:none;
+    }
+    .detail-panel.open{
+      display:block;
+      animation:detailIn .28s ease;
+    }
+    @keyframes detailIn{
+      from{ opacity:0; transform:translateY(8px); }
+      to{ opacity:1; transform:translateY(0); }
+    }
+    .detail-panel h3{
+      font-family:var(--serif);
+      font-size:2rem;
+      line-height:.92;
+      color:#f4e5d5;
+      margin-bottom:.3rem;
+    }
+    .detail-price{
+      color:var(--gold);
+      font-weight:800;
+      font-size:1rem;
+      margin-bottom:.7rem;
+    }
+    .detail-panel p{
+      color:rgba(248,240,230,.72);
+      font-size:.92rem;
+    }
+    .detail-tags{
+      display:flex;
+      gap:.45rem;
+      flex-wrap:wrap;
+      margin-top:.9rem;
+    }
+    .back-btn{
+      margin-top:1rem;
+      width:100%;
+      justify-content:center;
+    }
+
+    .portal-footer{
+      width:min(calc(100% - 4px), 1360px);
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:1rem;
+      padding-bottom:1rem;
+    }
+    .special-spin{
+      position:relative;
+      min-height:310px;
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+    }
+    .special-wheel{
+      position:relative;
+      width:min(100%, 300px);
+      aspect-ratio:1/1;
+      animation:spin 16s linear infinite;
+      filter:drop-shadow(0 0 24px rgba(224,129,93,.22));
+    }
+    .special-wheel::before{
+      content:"";
+      position:absolute;
+      inset:16%;
+      border-radius:50%;
+      border:1px solid rgba(255,233,209,.08);
+      background:radial-gradient(circle at center, rgba(255,255,255,.03), rgba(0,0,0,0) 68%);
+    }
+    .special-wheel::after{
+      content:"";
+      position:absolute;
+      inset:38%;
+      border-radius:50%;
+      background:radial-gradient(circle at 35% 35%, #fff1de, var(--gold) 45%, var(--ember-2) 72%, transparent 74%);
+      box-shadow:0 0 34px rgba(224,129,93,.34);
+      animation:pulse 4.8s ease-in-out infinite;
+    }
+    .special-wheel-item{
+      position:absolute;
+      left:50%; top:50%;
+      width:112px;
+      min-height:112px;
+      padding:.7rem;
+      border-radius:24px;
+      border:1px solid rgba(255,233,209,.1);
+      background:linear-gradient(180deg, rgba(30,23,22,.78), rgba(14,11,11,.94));
+      transform:
+        translate(-50%, -50%)
+        rotate(calc(var(--angle) * 1deg))
+        translateY(-118px)
+        rotate(calc(var(--angle) * -1deg));
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+    }
+    .special-wheel-item strong{
+      display:block;
+      font-family:var(--serif);
+      font-size:.92rem;
+      line-height:.95;
+      color:#fff1e4;
+      margin-bottom:.2rem;
+    }
+    .special-wheel-item span{
+      display:block;
+      font-size:.58rem;
+      color:rgba(248,240,230,.6);
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      margin-bottom:.2rem;
+    }
+    .special-wheel-item em{
+      font-style:normal;
+      color:var(--gold);
+      font-weight:800;
+      font-size:.74rem;
+    }
+    .special-copy{
+      position:absolute;
+      left:50%;
+      bottom:10px;
+      transform:translateX(-50%);
+      width:min(calc(100% - 22px), 360px);
+      padding:.85rem 1rem;
+      border-radius:18px;
+      border:1px solid rgba(255,233,209,.08);
+      background:rgba(0,0,0,.32);
+      backdrop-filter:blur(10px);
+      text-align:center;
+    }
+    .special-copy strong{
+      display:block;
+      font-size:.72rem;
+      text-transform:uppercase;
+      letter-spacing:.18em;
+      color:rgba(248,240,230,.72);
+      margin-bottom:.15rem;
+    }
+    .special-copy span{
+      display:block;
+      font-size:.76rem;
+      color:rgba(248,240,230,.6);
+    }
+
+    .map-panel{
+      min-height:230px;
+      border-radius:24px;
+      overflow:hidden;
+      border:1px solid rgba(255,233,209,.08);
+      background:
+        linear-gradient(135deg, rgba(215,165,109,.10), rgba(180,75,60,.10)),
+        radial-gradient(circle at 18% 28%, rgba(224,129,93,.16), transparent 24%),
+        radial-gradient(circle at 80% 72%, rgba(215,165,109,.12), transparent 22%),
+        #231e1c;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      position:relative;
+      padding:1rem;
+    }
+    .map-panel::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size:32px 32px;
+      opacity:.34;
+    }
+    .map-content{
+      position:relative;
+      z-index:1;
+      display:grid;
+      gap:.55rem;
+    }
+    .map-pulse{
+      width:18px; height:18px; border-radius:50%;
+      margin:0 auto;
+      background:radial-gradient(circle, #fff1de, var(--ember-2));
+      box-shadow:0 0 0 rgba(224,129,93,.7);
+      animation:mapPulse 2.2s infinite;
+    }
+    @keyframes mapPulse{
+      0%{ box-shadow:0 0 0 0 rgba(224,129,93,.55); }
+      70%{ box-shadow:0 0 0 22px rgba(224,129,93,0); }
+      100%{ box-shadow:0 0 0 0 rgba(224,129,93,0); }
+    }
+    .map-content i{
+      font-size:2.2rem;
+      color:var(--ember-2);
+    }
+    .map-content strong{
+      font-size:.92rem;
+      text-transform:uppercase;
+      letter-spacing:.18em;
+    }
+    .map-content p{
+      font-size:.76rem;
+      color:rgba(248,240,230,.64);
+      max-width:24ch;
+      margin:0 auto;
+    }
+
+    @keyframes spin{ from{ transform:rotate(0); } to{ transform:rotate(360deg); } }
+    @keyframes pulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.08); } }
+
+    @media (max-width: 1180px){
+      .hero-content{ grid-template-columns:1fr; text-align:center; }
+      .hero-copy{ padding-left:0; }
+      .hero-sub{ margin-inline:auto; }
+      .brick-wall{ width:min(92%, 780px); margin:0 auto; }
+      .hero-stats{ left:50%; transform:translateX(-50%); }
+      .feature-grid{ grid-template-columns:1fr 1fr; }
+      .portal-main,
+      .portal-footer,
+      .visit-shell{ grid-template-columns:1fr; }
+      .portal-side{ min-height:auto; }
+      .footer-grid{ grid-template-columns:1fr 1fr; }
+    }
+
+    @media (max-width: 860px){
+      .topbar-inner{
+        grid-template-columns:1fr;
+        text-align:center;
+      }
+      .brand,
+      .top-actions{ justify-content:center; }
+      .top-phone{ width:100%; text-align:center; }
+      .feature-grid{ grid-template-columns:1fr; }
+      .footer-grid{ grid-template-columns:1fr 1fr; }
+      .nav-btn.left-center{ display:none; }
+      .portal-head{
+        grid-template-columns:1fr auto;
+      }
+      .portal-status{
+        grid-column:1 / -1;
+        justify-content:flex-start;
+      }
+      .category-strip{
+        overflow:auto;
+        flex-wrap:nowrap;
+        scrollbar-width:none;
+      }
+      .category-strip::-webkit-scrollbar{ display:none; }
+      .category-btn{ flex:0 0 auto; }
+      .item-grid{ grid-template-columns:1fr; }
+      .portal-viewport{ min-height:520px; }
+      .portal-side{ gap:.8rem; }
+    }
+
+    @media (max-width: 640px){
+      .container{ width:min(calc(100% - 24px), 1380px); }
+      .hero-title{ font-size:3.5rem; }
+      .hero-title .b{ font-size:.5em; letter-spacing:.18em; }
+      .hero-title .c{ font-size:.32em; letter-spacing:.26em; }
+      .hero-actions{ justify-content:center; }
+      .hero-stats{
+        gap:.7rem;
+        padding:.8rem .9rem;
+      }
+      .hero-stat{ min-width:70px; }
+      .brick-wall{
+        aspect-ratio:1 / 1.12;
+      }
+      .portal-hole{ inset:14% 8%; }
+      .portal-node{
+        width:90px;
+        min-height:90px;
+        transform:
+          translate(-50%, -50%)
+          rotate(calc(var(--angle) * 1deg))
+          translateY(-122px)
+          rotate(calc(var(--angle) * -1deg));
+      }
+      .portal-node strong{ font-size:.6rem; }
+      .portal-node span{ display:none; }
+      .footer-grid{ grid-template-columns:1fr; }
+
+      .portal-shell{ padding:.7rem; }
+      .portal-head{ padding:.8rem; border-radius:22px; top:.7rem; }
+      .viewport-copy{ max-width:100%; }
+      .viewport-copy h2{ font-size:2rem; }
+      .viewport-bottom{ flex-direction:column; align-items:stretch; }
+      .viewport-actions .btn{ width:100%; }
+      .special-wheel-item{
+        width:94px;
+        min-height:94px;
+        transform:
+          translate(-50%, -50%)
+          rotate(calc(var(--angle) * 1deg))
+          translateY(-102px)
+          rotate(calc(var(--angle) * -1deg));
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *,
+      *::before,
+      *::after{
+        animation:none !important;
+        transition:none !important;
+        scroll-behavior:auto !important;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="app">
-    <div class="sticky">
-      <div class="daybar" role="tablist" aria-label="Day selector">
-        <button class="daybtn active" type="button" role="tab" aria-controls="panel-today" aria-selected="true" id="dayBtnToday">Today</button>
-        <button class="daybtn" type="button" role="tab" aria-controls="panel-tomorrow" aria-selected="false" id="dayBtnTomorrow">Tomorrow</button>
-        <button class="daybtn" type="button" role="tab" aria-controls="panel-advanced" aria-selected="false" id="dayBtnAdvanced">Advanced Menu</button>
+  <header class="hero">
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="brand-orb"></div>
+          <div class="brand-copy">
+            <strong>THE FRANCIS</strong>
+            <span>SMOKEHOUSE & MEATS</span>
+          </div>
+        </div>
+
+        <div class="top-links">
+          <button class="top-link js-open-menu">Menu</button>
+          <a class="top-link" href="#story">Story</a>
+          <a class="top-link" href="#reviews">Reviews</a>
+          <a class="top-link" href="#contact">Visit</a>
+        </div>
+
+        <div class="top-actions">
+          <span class="top-phone"><i class="fas fa-phone-alt"></i> (225) 245-5046</span>
+          <button class="btn btn-primary js-open-menu">Open Portal Menu</button>
+        </div>
       </div>
     </div>
 
-    <section class="panel" id="panel-today" role="tabpanel" aria-labelledby="dayBtnToday">
-      <div class="header">
-        <div class="title" id="todayTitle">Today’s Menu</div>
-        <div class="subline" id="todayHours">Loading hours…</div>
-        <div class="note" id="todayNote"></div><div class="nowbar" id="todayNow"></div>
-      </div>
-      <div class="toolbar">
-        <button class="viewbtn" id="todayViewWheel">Orbit Navigator</button>
-        <button class="viewbtn active" id="todayViewSwipe">Hologram Cards</button>
-        <button class="actionbtn primary" id="todayAIBtn"><i class="fas fa-sparkles"></i> Choose for Me</button>
-      </div>
-      <div id="todayWheelView">
-        <div class="modehint">Spin the Orbit Navigator to move through the menu.</div>
-        <div class="wheel-stage">
-          <div class="wheel-wrap" id="todayWheelWrap">
-            <div class="wheel-arrow"></div>
-            <div class="wheel" id="todayWheel"></div>
-            <div class="wheel-center"></div>
-          </div>
-          <div class="glasscard" id="todayDetailCard">
-            <div class="cat-title" id="todayDetailTitle"></div>
-            <div id="todayDetailContent"></div><div id="todayPickCard"></div>
-          </div>
+    <div class="hero-content container">
+      <div class="hero-copy">
+        <div class="hero-kicker"><i class="fas fa-fire"></i> St. Francisville · Est. 2015</div>
+        <h1 class="hero-title">
+          <span class="a">Smoke</span>
+          <span class="b">Rubbed & Revered</span>
+          <span class="c">Low & Slow</span>
+        </h1>
+        <p class="hero-sub">A brick wall. A broken portal. A menu spinning behind it like something you were never supposed to find.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary js-open-menu"><i class="fas fa-hole"></i> Enter The Wall</button>
+          <a class="btn" href="#contact"><i class="fas fa-location-dot"></i> Find Us</a>
         </div>
       </div>
-      <div id="todaySwipeView" class="hide">
-        <div class="swipe-shell">
-          <div class="swipe-head">
-            <button class="pill" id="todayPrevCard"><i class="fas fa-chevron-left"></i></button>
-            <div class="subline" id="todayCardStatus">Swipe categories</div>
-            <button class="pill" id="todayNextCard"><i class="fas fa-chevron-right"></i></button>
-          </div>
-          <div class="chipnav" id="todayChipNav"></div>
-          <div class="modehint">Tap a category chip or swipe the hologram cards.</div>
-          <div class="swipe-track" id="todaySwipeTrack"></div>
-        </div>
-      </div>
-      <div class="state hide" id="todayClosed">
-        <div class="title" style="font-size:24px;">Closed</div>
-        <div class="subline" id="todayClosedMsg"></div>
-      </div>
-    </section>
 
-    <section class="panel hide" id="panel-tomorrow" role="tabpanel" aria-labelledby="dayBtnTomorrow">
-      <div class="header">
-        <div class="title" id="tomorrowTitle">Tomorrow’s Menu</div>
-        <div class="subline" id="tomorrowHours">Loading hours…</div>
-        <div class="note" id="tomorrowNote"></div><div class="nowbar" id="tomorrowNow"></div>
-      </div>
-      <div class="toolbar">
-        <button class="viewbtn" id="tomorrowViewWheel">Orbit Navigator</button>
-        <button class="viewbtn active" id="tomorrowViewSwipe">Hologram Cards</button>
-        <button class="actionbtn primary" id="tomorrowAIBtn"><i class="fas fa-sparkles"></i> Choose for Me</button>
-      </div>
-      <div id="tomorrowWheelView">
-        <div class="modehint">Spin the Orbit Navigator to move through the menu.</div>
-        <div class="wheel-stage">
-          <div class="wheel-wrap" id="tomorrowWheelWrap">
-            <div class="wheel-arrow"></div>
-            <div class="wheel" id="tomorrowWheel"></div>
-            <div class="wheel-center"></div>
+      <div class="brick-scene">
+        <div class="brick-wall">
+          <div class="wall-badge">
+            <strong>Smoke Portal</strong>
+            Break through the wall
           </div>
-          <div class="glasscard" id="tomorrowDetailCard">
-            <div class="cat-title" id="tomorrowDetailTitle"></div>
-            <div id="tomorrowDetailContent"></div><div id="tomorrowPickCard"></div>
+
+          <div class="portal-hole">
+            <div class="portal-aura"></div>
+
+            <div class="portal-wheel">
+              <div class="portal-ring r1"></div>
+              <div class="portal-ring r2"></div>
+              <div class="portal-ring r3"></div>
+              <div class="portal-core"></div>
+
+              <div class="portal-node active" style="--angle:0;">
+                <i class="fas fa-fire"></i>
+                <strong>BBQ</strong>
+                <span>core</span>
+              </div>
+              <div class="portal-node" style="--angle:60;">
+                <i class="fas fa-burger"></i>
+                <strong>Handhelds</strong>
+                <span>orbit</span>
+              </div>
+              <div class="portal-node" style="--angle:120;">
+                <i class="fas fa-pepper-hot"></i>
+                <strong>Boudin</strong>
+                <span>signal</span>
+              </div>
+              <div class="portal-node" style="--angle:180;">
+                <i class="fas fa-bowl-food"></i>
+                <strong>Sides</strong>
+                <span>system</span>
+              </div>
+              <div class="portal-node" style="--angle:240;">
+                <i class="fas fa-cake-candles"></i>
+                <strong>Sweets</strong>
+                <span>exit</span>
+              </div>
+              <div class="portal-node" style="--angle:300;">
+                <i class="fas fa-star"></i>
+                <strong>Signals</strong>
+                <span>specials</span>
+              </div>
+            </div>
+
+            <div class="portal-instruction">The real one opens when you click</div>
           </div>
         </div>
       </div>
-      <div id="tomorrowSwipeView" class="hide">
-        <div class="swipe-shell">
-          <div class="swipe-head">
-            <button class="pill" id="tomorrowPrevCard"><i class="fas fa-chevron-left"></i></button>
-            <div class="subline" id="tomorrowCardStatus">Swipe categories</div>
-            <button class="pill" id="tomorrowNextCard"><i class="fas fa-chevron-right"></i></button>
-          </div>
-          <div class="chipnav" id="tomorrowChipNav"></div>
-          <div class="modehint">Tap a category chip or swipe the hologram cards.</div>
-          <div class="swipe-track" id="tomorrowSwipeTrack"></div>
-        </div>
-      </div>
-      <div class="state hide" id="tomorrowClosed">
-        <div class="title" style="font-size:24px;">Closed</div>
-        <div class="subline" id="tomorrowClosedMsg"></div>
-      </div>
-    </section>
-
-    <section class="panel hide" id="panel-advanced" role="tabpanel" aria-labelledby="dayBtnAdvanced">
-      <div class="header">
-        <div class="title">Advanced Menu Forecast</div>
-        <div class="subline" id="advancedDisclaimer"></div>
-      </div>
-      <div class="swipe-shell">
-        <div class="advanced-tabs" id="advancedTabs"></div>
-        <div class="advanced-card-wrap" id="advancedTrack"></div>
-      </div>
-    </section>
-
-    <div class="state hide" id="loadError">
-      <div class="title" style="font-size:24px;">Menu couldn’t load</div>
-      <div class="subline" id="loadErrorMsg">Try again in a moment.</div>
     </div>
-  </div>
 
-  <div class="nav-btn" id="navBtnBottom">
+    <div class="hero-stats">
+      <div class="hero-stat"><strong>4.7</strong><span>Google</span></div>
+      <div class="hero-stat"><strong>4.5</strong><span>Tripadvisor</span></div>
+      <div class="hero-stat"><strong>2015</strong><span>Founded</span></div>
+    </div>
+  </header>
+
+  <div class="nav-btn left-center" id="navBtnLeft">
     <i class="fas fa-compass btn-icon"></i>
-    <div class="btn-text"><div class="main">NAVIGATION</div><div class="sub">explore pages</div></div>
+    <div class="btn-text">
+      <span class="main">NAVIGATION</span>
+      <span class="sub">explore pages</span>
+    </div>
   </div>
+
+  <div class="nav-btn bottom-center" id="navBtnBottom">
+    <i class="fas fa-compass btn-icon"></i>
+    <div class="btn-text">
+      <span class="main">NAVIGATION</span>
+      <span class="sub">explore pages</span>
+    </div>
+  </div>
+
   <div class="circ-menu-overlay" id="circMenuOverlay">
     <div class="circular-menu">
-      <div class="center-home" id="homeCenter" data-link="index.html"><i class="fas fa-home"></i></div>
-      <div class="menu-item" style="--angle:0;" data-link="delivery.html">Delivery</div>
-      <div class="menu-item" style="--angle:72;" data-link="tel:3372211035">Order</div>
-      <div class="menu-item" style="--angle:144;" data-link="about.html">About</div>
-      <div class="menu-item" style="--angle:216;" data-link="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634">Location</div>
-      <div class="menu-item" style="--angle:288;" data-action="share">Share</div>
+      <div class="center-home" id="homeCenter" data-link="#"><i class="fas fa-home"></i></div>
+      <div class="menu-item" style="--angle: 0;" data-action="menu-layer">Menu</div>
+      <div class="menu-item" style="--angle: 60;" data-link="#story">Story</div>
+      <div class="menu-item" style="--angle: 120;" data-link="#reviews">Reviews</div>
+      <div class="menu-item" style="--angle: 180;" data-link="#contact">Visit</div>
+      <div class="menu-item" style="--angle: 240;" data-link="order.html">Order</div>
+      <div class="menu-item" style="--angle: 300;" data-link="#contact">Contact</div>
+    </div>
+  </div>
+
+  <section class="section section-dark">
+    <div class="container">
+      <h2 class="section-title">The Menu Should Feel Hidden</h2>
+      <p class="section-copy">Not like another page. More like discovering a living object inside the building itself.</p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <i class="fas fa-drumstick-bite"></i>
+          <h3>Brisket</h3>
+          <p>Slow-smoked and sliced with real gravity.</p>
+          <strong>$10.99</strong>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-circle-dot"></i>
+          <h3>Boudin Balls</h3>
+          <p>Crisp outside. Rich center. Louisiana signal.</p>
+          <strong>Market</strong>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-utensils"></i>
+          <h3>Full Ribs</h3>
+          <p>Bark, smoke, and a finish that lands hard.</p>
+          <strong>$19.99</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="story" id="story">
+    <div class="story-inner">
+      <div class="story-quote">“We don’t just smoke meat — we carry on a legacy.”</div>
+      <div class="story-author">— The Francis Family</div>
+      <div style="margin-top:1.6rem;">
+        <button class="btn btn-primary js-open-menu">Open The Wall</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="reviews">
+    <div class="container">
+      <h2 class="section-title">What They’re Saying</h2>
+      <div class="reviews">
+        <div class="review-track">
+          <div class="review">
+            <div class="stars">★★★★★</div>
+            <p>“Best brisket I’ve ever had. The corn pudding is to die for.”</p>
+            <strong>Sarah M.</strong>
+            <span>Google</span>
+          </div>
+          <div class="review">
+            <div class="stars">★★★★½</div>
+            <p>“Incredible flavor, friendly staff. A hidden gem.”</p>
+            <strong>John D.</strong>
+            <span>Tripadvisor</span>
+          </div>
+          <div class="review">
+            <div class="stars">★★★★★</div>
+            <p>“Boudin balls are out of this world. Worth the drive.”</p>
+            <strong>Lisa R.</strong>
+            <span>Google</span>
+          </div>
+          <div class="review">
+            <div class="stars">★★★★★</div>
+            <p>“The deck is dog-friendly and the ribs are perfect.”</p>
+            <strong>Mike T.</strong>
+            <span>Tripadvisor</span>
+          </div>
+          <div class="review">
+            <div class="stars">★★★★★</div>
+            <p>“Best brisket I’ve ever had. The corn pudding is to die for.”</p>
+            <strong>Sarah M.</strong>
+            <span>Google</span>
+          </div>
+          <div class="review">
+            <div class="stars">★★★★½</div>
+            <p>“Incredible flavor, friendly staff. A hidden gem.”</p>
+            <strong>John D.</strong>
+            <span>Tripadvisor</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="contact">
+    <div class="container">
+      <h2 class="section-title">Visit Us</h2>
+      <div class="visit-shell">
+        <div class="visit-col">
+          <h3>The Francis Smokehouse</h3>
+          <div class="info"><i class="fas fa-location-dot"></i><span>6779 US Highway 61, St. Francisville, LA 70775</span></div>
+          <div class="info"><i class="fas fa-clock"></i><span>Mon–Sat 10am–6pm · Sun 10am–3pm</span></div>
+          <div class="info"><i class="fas fa-phone"></i><span>(225) 245-5046</span></div>
+          <div class="info"><i class="fas fa-envelope"></i><span>francissmokehouse@att.net</span></div>
+          <div class="info"><i class="fas fa-wheelchair"></i><span>Takeout · Outdoor deck · Wheelchair accessible</span></div>
+        </div>
+        <div class="map-box">
+          <div>
+            <i class="fas fa-map-location-dot"></i>
+            <p>Highway 61 · St. Francisville, LA</p>
+            <div style="margin-top:1rem;">
+              <a class="btn" href="https://www.google.com/maps/search/?api=1&query=6779+US+Highway+61%2C+St.+Francisville%2C+LA+70775">Get Directions</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-logo">THE FRANCIS<span>Smokehouse</span></div>
+          <p style="margin:1rem 0 1.2rem; color:rgba(248,240,230,.64);">Smoked low & slow since 2015.</p>
+          <div class="footer-social">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-tripadvisor"></i></a>
+          </div>
+        </div>
+        <div class="footer-links">
+          <h4>Explore</h4>
+          <a href="#" class="js-open-menu">Menu</a>
+          <a href="#story">Story</a>
+          <a href="#reviews">Reviews</a>
+          <a href="#contact">Visit</a>
+        </div>
+        <div class="footer-links">
+          <h4>Info</h4>
+          <a href="#">Catering</a>
+          <a href="#">Order Online</a>
+          <a href="#">Gift Cards</a>
+          <a href="#">Jobs</a>
+        </div>
+        <div>
+          <h4>Hill Country</h4>
+          <p style="color:rgba(248,240,230,.58);">5716 Commerce St.<br>(225) 635-2880<br>Call ahead – status uncertain</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        © 2025 The Francis Smokehouse & Specialty Meats · Designed with smoke and soul in St. Francisville.
+      </div>
+    </div>
+  </footer>
+
+  <div class="portal-overlay" id="portalOverlay" aria-hidden="true">
+    <div class="portal-bg"></div>
+    <div class="portal-grid"></div>
+
+    <div class="portal-shell">
+      <div class="portal-head">
+        <div class="portal-badge">
+          <div class="portal-badge-orb"><i class="fas fa-fire-flame-curved"></i></div>
+          <div class="portal-badge-copy">
+            <strong>Brick Wall Portal</strong>
+            <span>Interactive Menu</span>
+          </div>
+        </div>
+
+        <div class="portal-status">
+          <div class="status-pill" id="statusTitle"><i class="fas fa-fire"></i> Barbecue Core</div>
+          <div class="status-pill"><i class="fas fa-location-dot"></i> Highway 61 · St. Francisville</div>
+          <div class="status-pill"><i class="fas fa-bag-shopping"></i> Takeout Ready</div>
+        </div>
+
+        <button class="portal-close" id="closePortal" type="button"><i class="fas fa-xmark"></i> Exit</button>
+      </div>
+
+      <div class="portal-main">
+        <div class="portal-viewport" id="portalViewport">
+          <div class="portal-viewport-overlay">
+            <div class="viewport-top">
+              <div class="ghost-pill" id="ghostTag"><i class="fas fa-fire"></i> Signature</div>
+              <div class="viewport-price" id="itemPrice">$10.99</div>
+            </div>
+
+            <div class="viewport-copy">
+              <small id="itemCategory">Barbecue Core</small>
+              <h2 id="itemTitle">Brisket Plate</h2>
+              <p id="itemText">Tender. Smoky. Heavy with presence.</p>
+            </div>
+
+            <div class="viewport-bottom">
+              <div class="signal-row" id="signalRow"></div>
+              <div class="viewport-actions">
+                <button class="btn" id="backToCategory"><i class="fas fa-arrow-left"></i> Back</button>
+                <button class="btn btn-primary" id="callToOrder"><i class="fas fa-phone"></i> Call To Order</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="portal-side">
+          <div class="side-panel">
+            <div class="side-head">
+              <h3>Categories</h3>
+              <span>Tap to change the portal</span>
+            </div>
+            <div class="category-strip" id="categoryStrip"></div>
+          </div>
+
+          <div class="side-panel" id="listPanel">
+            <div class="side-head">
+              <h3 id="listTitle">Items</h3>
+              <span id="listMeta">Choose an item</span>
+            </div>
+            <div class="item-grid" id="itemGrid"></div>
+          </div>
+
+          <div class="side-panel detail-panel" id="detailPanel">
+            <div class="side-head">
+              <h3>More Info</h3>
+              <span>Item detail</span>
+            </div>
+            <h3 id="detailTitle">Brisket Plate</h3>
+            <div class="detail-price" id="detailPrice">$10.99</div>
+            <p id="detailText">Tender. Smoky. Heavy with presence.</p>
+            <div class="detail-tags" id="detailTags"></div>
+            <button class="btn back-btn" id="detailBackBtn"><i class="fas fa-arrow-left"></i> Back To Menu</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="portal-footer">
+        <div class="side-panel">
+          <div class="side-head">
+            <h3>Daily Specials</h3>
+            <span>Rotating spotlight</span>
+          </div>
+          <div class="special-spin">
+            <div class="special-wheel">
+              <div class="special-wheel-item" style="--angle:0;">
+                <span>Mon</span>
+                <strong>Thai Wings</strong>
+                <em>$16</em>
+              </div>
+              <div class="special-wheel-item" style="--angle:72;">
+                <span>Tue</span>
+                <strong>Pirogue</strong>
+                <em>$26</em>
+              </div>
+              <div class="special-wheel-item" style="--angle:144;">
+                <span>Wed</span>
+                <strong>Lemon Fish</strong>
+                <em>$28</em>
+              </div>
+              <div class="special-wheel-item" style="--angle:216;">
+                <span>Thu</span>
+                <strong>BBQ Shrimp</strong>
+                <em>$26</em>
+              </div>
+              <div class="special-wheel-item" style="--angle:288;">
+                <span>Fri</span>
+                <strong>Salmon</strong>
+                <em>$28</em>
+              </div>
+            </div>
+            <div class="special-copy">
+              <strong>Daily Specials</strong>
+              <span>Rotating signal from the kitchen — call ahead for availability.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-panel">
+          <div class="side-head">
+            <h3>Find The Fire</h3>
+            <span>Highway 61</span>
+          </div>
+          <div class="map-panel">
+            <div class="map-content">
+              <div class="map-pulse"></div>
+              <i class="fas fa-location-dot"></i>
+              <strong>6779 US Highway 61</strong>
+              <p>St. Francisville · smokehouse · takeout · deck</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
     (function () {
-      const $ = id => document.getElementById(id);
-
-      function escapeHtml(str) {
-        return String(str ?? "")
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#039;");
-      }
-      function setText(id, text) { const el = $(id); if (el) el.textContent = text || ""; }
-      function normalizeItems(arr) { return Array.isArray(arr) ? arr.map(x => String(x || "").trim()).filter(Boolean) : []; }
-      function normalizeLunchItems(arr) {
-        const items = Array.isArray(arr) ? arr : [];
-        return items.map(raw => {
-          if (raw && typeof raw === "object") return { name: String(raw.name || "").trim(), desc: String(raw.desc || "").trim() };
-          const s = String(raw || "").trim();
-          if (!s) return null;
-          return { name: s, desc: "" };
-        }).filter(Boolean).filter(x => x.name);
-      }
-      function toISODateLocal(d) {
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, "0");
-        const day = String(d.getDate()).padStart(2, "0");
-        return `${y}-${m}-${day}`;
-      }
-      function formatDateNice(d) { return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); }
-      function weekdayName(d) { return d.toLocaleDateString("en-US", { weekday: "long" }); }
-      function parseISODateToLocal(iso) {
-        const [y, m, d] = String(iso).split("-").map(Number);
-        return new Date(y, (m || 1) - 1, d || 1);
-      }
-      function normalizeDateKey(key) {
-        const m = String(key || "").trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-        if (!m) return null;
-        return `${m[1]}-${String(Number(m[2])).padStart(2, "0")}-${String(Number(m[3])).padStart(2, "0")}`;
-      }
-      function parseTimeToMinutes(timeStr) {
-        if (!timeStr) return null;
-        const match = timeStr.match(/(\d+):?(\d*)\s*(AM|PM)/i);
-        if (!match) return null;
-        let hours = parseInt(match[1], 10);
-        const minutes = match[2] ? parseInt(match[2], 10) : 0;
-        const ampm = match[3].toUpperCase();
-        if (ampm === "PM" && hours !== 12) hours += 12;
-        if (ampm === "AM" && hours === 12) hours = 0;
-        return hours * 60 + minutes;
-      }
-      function findHours(weekly, dayName) {
-        return getBusinessHours(dayName);
-      }
-      function getClosure(data, dayName) {
-        const c = data?.closures || {};
-        const key = Object.keys(c).find(k => k.toLowerCase() === String(dayName || "").toLowerCase());
-        return key ? c[key] : null;
-      }
-      function getMenuByDate(data, isoDate) { return (data?.menus || {})[isoDate] || null; }
-      function crawfishFor(data, menu) {
-        const def = data?.defaults?.crawfish || {};
-        const c = menu?.crawfish || {};
-        return {
-          show: c.show === false ? false : true,
-          subtitle: String(c.subtitle ?? def.subtitle ?? "").trim(),
-          items: normalizeItems(c.items ?? def.items ?? [])
-        };
-      }
-      function isPastClosingToday(weekly, todayName) {
-        const hours = findHours(weekly, todayName);
-        const closeMinutes = parseTimeToMinutes(hours.close);
-        if (closeMinutes == null) return false;
-        const now = new Date();
-        return (now.getHours() * 60 + now.getMinutes()) >= closeMinutes;
-      }
-      function showLoadError(msg) {
-        $("loadError").classList.remove("hide");
-        setText("loadErrorMsg", msg || "Try again in a moment.");
-      }
-      function getBusinessHours(dayName) {
-        const lower = String(dayName || "").toLowerCase();
-        const open = lower === "sunday" ? "7:00 AM" : (lower === "saturday" ? "6:00 AM" : "5:30 AM");
-        const close = lower === "sunday" ? "3:00 PM" : "2:00 PM";
-        return {
-          day: dayName,
-          open,
-          close,
-          breakfast: `${open} - 10:30 AM`,
-          lunch: `11:00 AM - ${close}`,
-          crawfish: ["thursday","friday","saturday"].includes(lower) ? "4:00 PM - 8:00 PM" : ""
-        };
-      }
-      function timeToMinutes12h(timeStr) {
-        if (!timeStr) return null;
-        const m = String(timeStr).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-        if (!m) return null;
-        let h = parseInt(m[1], 10);
-        const min = parseInt(m[2], 10);
-        const ap = m[3].toUpperCase();
-        if (ap === "PM" && h !== 12) h += 12;
-        if (ap === "AM" && h === 12) h = 0;
-        return h * 60 + min;
-      }
-      function rangeIncludes(nowMinutes, rangeStr) {
-        if (!rangeStr || !String(rangeStr).includes("-")) return false;
-        const [a, b] = String(rangeStr).split("-").map(s => s.trim());
-        const start = timeToMinutes12h(a);
-        const end = timeToMinutes12h(b);
-        if (start == null || end == null) return false;
-        return nowMinutes >= start && nowMinutes <= end;
-      }
-      function categoryOpenNow(catName, dayName, nowDate) {
-        const hours = getBusinessHours(dayName);
-        const mins = nowDate.getHours() * 60 + nowDate.getMinutes();
-        const lower = String(catName || "").toLowerCase();
-        if (lower === "breakfast") return rangeIncludes(mins, hours.breakfast);
-        if (lower === "lunch" || lower === "salad bar" || lower === "drinks" || lower === "dessert") return rangeIncludes(mins, hours.lunch);
-        if (lower === "crawfish") return !!hours.crawfish && rangeIncludes(mins, hours.crawfish);
-        return rangeIncludes(mins, `${hours.open} - ${hours.close}`);
-      }
-      function openingMessageFor(dayName) {
-        const hours = getBusinessHours(dayName);
-        return `${dayName} opens at ${hours.open}. Breakfast runs until 10:30 AM, lunch starts at 11:00 AM${hours.crawfish ? `, and crawfish runs ${hours.crawfish}` : ""}.`;
-      }
-
-      let luckTimer = null;
-      let luckCountdownTimer = null;
-      function showLuckModal(title, text) {
-        const modal = $("luckModal");
-        const countEl = $("luckCountdown");
-        if (!modal || !countEl) return;
-        setText("luckModalTitle", title);
-        setText("luckModalText", text);
-        if (luckTimer) clearTimeout(luckTimer);
-        if (luckCountdownTimer) clearInterval(luckCountdownTimer);
-        let remaining = 5;
-        countEl.textContent = String(remaining);
-        modal.classList.add("show");
-        luckCountdownTimer = setInterval(() => {
-          remaining -= 1;
-          if (remaining > 0) {
-            countEl.textContent = String(remaining);
-          } else {
-            clearInterval(luckCountdownTimer);
-            luckCountdownTimer = null;
-          }
-        }, 1000);
-        luckTimer = setTimeout(() => {
-          hideLuckModal();
-        }, 5000);
-      }
-      function hideLuckModal() {
-        const modal = $("luckModal");
-        if (luckTimer) {
-          clearTimeout(luckTimer);
-          luckTimer = null;
+      const menuData = {
+        bbq: {
+          icon: 'fas fa-fire',
+          name: 'Barbecue Core',
+          heroTag: 'Signature',
+          image: "url('https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?q=80&w=1600&auto=format&fit=crop')",
+          signals: ['slow smoked', 'two sides', 'fan favorite'],
+          items: [
+            { title: 'Brisket Plate', price: '$10.99', text: 'Tender. Smoky. Heavy with presence.', detail: 'This is the heavyweight plate. Smoke, bark, and a clean finish that keeps it from feeling too dense.', tags: ['hero', 'brisket', 'two sides'] },
+            { title: 'Full Rack of Ribs', price: '$19.99', text: 'Big smoke. Big bark. Big finish.', detail: 'The showpiece order. Built for sharing or for the guest who came here with purpose.', tags: ['ribs', 'signature', 'shareable'] },
+            { title: 'Half Rack of Ribs', price: '$11.99', text: 'Same lane. Lighter gravity.', detail: 'All the rib energy with a little more room for sides or dessert.', tags: ['ribs', 'balanced', 'two sides'] },
+            { title: 'Pulled Pork Plate', price: '$9.99', text: 'Soft smoke and comfort.', detail: 'A reliable comfort order with a softer texture and a broad crowd pull.', tags: ['pork', 'classic', 'comfort'] },
+            { title: 'Half Chicken Plate', price: '$9.99', text: 'Cleaner profile. Still all fire.', detail: 'A lighter smoke lane for guests who want balance without losing the smokehouse identity.', tags: ['chicken', 'lighter', 'two sides'] },
+            { title: 'Smoked Wings', price: '$7.99', text: 'Snack orbit. Fast impact.', detail: 'Quick shareable energy with enough smoke to hold its own against the heavier plates.', tags: ['wings', 'shareable', 'snack'] }
+          ]
+        },
+        handhelds: {
+          icon: 'fas fa-burger',
+          name: 'Handheld Orbit',
+          heroTag: 'Quick Favorite',
+          image: "url('https://images.unsplash.com/photo-1558030006-450675393462?q=80&w=1600&auto=format&fit=crop')",
+          signals: ['one side', 'quick order', 'po-boys'],
+          items: [
+            { title: 'Brisket Sandwich', price: '$8.99', text: 'Smoked, stacked, impossible to ignore.', detail: 'The easiest bridge between speed and smokehouse identity.', tags: ['hero', 'brisket', 'one side'] },
+            { title: 'Pulled Pork Sandwich', price: '$7.99', text: 'Soft. Smoky. Easy favorite.', detail: 'A crowd-pleaser that lands fast and keeps the smoke profile intact.', tags: ['pork', 'classic', 'one side'] },
+            { title: 'Cheeseburger', price: '$7.99', text: 'Melty comfort with weight.', detail: 'Straightforward and grounded with enough richness to feel deliberate.', tags: ['burger', 'comfort', 'one side'] },
+            { title: 'Bacon Cheeseburger', price: '$8.99', text: 'Louder, heavier, richer.', detail: 'The indulgent handheld lane with more swagger and more weight.', tags: ['burger', 'loaded', 'one side'] },
+            { title: 'Shrimp Po-Boy', price: '$8.99', text: 'Seafood lift. Louisiana signal.', detail: 'A local-feeling move that gives the menu more range than a standard smokehouse.', tags: ['seafood', 'po-boy', 'regional'] },
+            { title: 'Ribeye Po-Boy', price: '$10.99', text: 'Premium swing with swagger.', detail: 'The premium handheld turn. Good for guests who want something a little louder.', tags: ['premium', 'po-boy', 'one side'] }
+          ]
+        },
+        boudin: {
+          icon: 'fas fa-pepper-hot',
+          name: 'Boudin Signal',
+          heroTag: 'Local Legend',
+          image: "url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1600&auto=format&fit=crop')",
+          signals: ['local icon', 'counter heat', 'shareable'],
+          items: [
+            { title: 'Boudin Balls', price: 'Market', text: 'Crisp shell. Rich center.', detail: 'One of the strongest identity items on the whole board and an easy signature piece.', tags: ['must try', 'local', 'crispy'] },
+            { title: 'Pepper Jack Boudin Balls', price: 'Market', text: 'More molten. More heat.', detail: 'A hotter, richer version that leans harder into drama and comfort.', tags: ['spicy', 'cheese', 'boudin'] },
+            { title: 'Steamed Boudin Links', price: 'Market', text: 'Pure Louisiana core.', detail: 'A foundational regional item with a cleaner, more direct presentation.', tags: ['links', 'classic', 'regional'] },
+            { title: 'Boudin Egg Rolls', price: 'Market', text: 'Crunch. Comfort. Curiosity.', detail: 'The texture-forward choice with the biggest novelty energy.', tags: ['crispy', 'fusion', 'shareable'] },
+            { title: 'Meat Pies', price: 'Market', text: 'Portable savory comfort.', detail: 'Old-school savory comfort in a portable form.', tags: ['portable', 'savory', 'counter'] },
+            { title: 'Crawfish Pies', price: 'Market', text: 'Regional pastry power.', detail: 'A more Louisiana-coded pie with a stronger local pull.', tags: ['crawfish', 'regional', 'portable'] }
+          ]
+        },
+        sides: {
+          icon: 'fas fa-bowl-food',
+          name: 'Side System',
+          heroTag: 'Most Talked About Side',
+          image: "url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1600&auto=format&fit=crop')",
+          signals: ['small / large', 'comfort', 'balance'],
+          items: [
+            { title: 'Corn Pudding', price: '$2.75 / $6.99', text: 'Creamy. Warm. Remembered.', detail: 'One of the most praised side choices and a strong contrast against the heavier smoke.', tags: ['praised', 'comfort', 'small / large'] },
+            { title: 'Baked Beans', price: '$2.75 / $6.99', text: 'Sweet-smoky grounding.', detail: 'A dependable side with sweetness that rounds out bark and smoke.', tags: ['classic', 'beans', 'pairing'] },
+            { title: 'Potato Salad', price: '$2.75 / $6.99', text: 'Cool reset against smoke.', detail: 'The cooling lane for guests who want contrast and comfort.', tags: ['cooling', 'classic', 'small / large'] },
+            { title: 'Cole Slaw', price: '$2.75 / $6.99', text: 'Fresh crunch and lift.', detail: 'Lightest side profile on the board and a clean palate reset.', tags: ['fresh', 'crisp', 'small / large'] },
+            { title: 'French Fries', price: '$2.75 / $6.99', text: 'Pure comfort. No notes.', detail: 'The universal side lane. Safe, familiar, and always useful.', tags: ['fries', 'golden', 'small / large'] },
+            { title: 'Sweet Potato Waffle Fries', price: '$2.75 / $6.99', text: 'The side with visual drama.', detail: 'Sweet edge and stronger visual personality than the classic fry lane.', tags: ['sweet edge', 'waffle', 'small / large'] }
+          ]
+        },
+        sweets: {
+          icon: 'fas fa-cake-candles',
+          name: 'Sweet Exit',
+          heroTag: 'Southern Finish',
+          image: "url('https://images.unsplash.com/photo-1551024601-bec78aea704b?q=80&w=1600&auto=format&fit=crop')",
+          signals: ['dessert', 'soft landing', 'contrast'],
+          items: [
+            { title: 'Homemade Bread Pudding', price: 'Market', text: 'Warm. Dense. Southern.', detail: 'The strongest ending for guests who want the smokehouse story to stay warm and heavy.', tags: ['warm', 'classic', 'dessert'] },
+            { title: 'Creole Cream Cheesecake', price: 'Market', text: 'Silky and rich.', detail: 'A smoother, more elegant dessert profile with strong finish energy.', tags: ['smooth', 'creole', 'dessert'] },
+            { title: 'Chocolate & Carrot Cake', price: 'Market', text: 'Bakery lane. Double pull.', detail: 'Cake options that broaden the close and make dessert feel more flexible.', tags: ['cake', 'bakery', 'dessert'] },
+            { title: 'Strawberry Shortcake', price: 'Market', text: 'Brightest exit in the room.', detail: 'The lightest dessert note and the cleanest contrast after heavier smoke.', tags: ['fresh', 'light', 'dessert'] }
+          ]
+        },
+        signals: {
+          icon: 'fas fa-star',
+          name: 'Kitchen Signals',
+          heroTag: 'Featured Signal',
+          image: "url('https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1600&auto=format&fit=crop')",
+          signals: ['limited run', 'premium plates', 'live feed'],
+          items: [
+            { title: 'Sweet Thai Chili Wings', price: '$16', text: 'Glossy heat with fast impact.', detail: 'A quick-hit special with big surface shine and immediate visual drama.', tags: ['wings', 'special', 'heat'] },
+            { title: 'Eggplant Pirogue', price: '$26', text: 'Unexpected. Plated. Memorable.', detail: 'A more creative kitchen move that changes the tone of the board.', tags: ['creative', 'plated', 'special'] },
+            { title: 'Blackened Lemon Fish', price: '$28', text: 'Premium Louisiana swing.', detail: 'A sharper, more premium seafood signal with local energy.', tags: ['fish', 'premium', 'special'] },
+            { title: 'BBQ Shrimp + Pork Chop', price: '$26', text: 'Smoke, sweetness, spectacle.', detail: 'One of the biggest contrast plates in the specials lane.', tags: ['special', 'hero', 'contrast'] },
+            { title: 'Grilled Salmon + Crabmeat', price: '$28', text: 'Refined contrast against the smoke.', detail: 'Softer, more refined seafood signal for guests wanting range.', tags: ['salmon', 'crab', 'premium'] },
+            { title: 'Miss Mud Pie', price: '$7', text: 'Sweet closer with name energy.', detail: 'Dessert signal with a memorable name and easy end-cap pull.', tags: ['dessert', 'special', 'sweet'] }
+          ]
         }
-        if (luckCountdownTimer) {
-          clearInterval(luckCountdownTimer);
-          luckCountdownTimer = null;
-        }
-        if (modal) modal.classList.remove("show");
+      };
+
+      const openButtons = document.querySelectorAll('.js-open-menu');
+      const portalOverlay = document.getElementById('portalOverlay');
+      const closePortal = document.getElementById('closePortal');
+      const portalViewport = document.getElementById('portalViewport');
+      const statusTitle = document.getElementById('statusTitle');
+      const ghostTag = document.getElementById('ghostTag');
+      const itemPrice = document.getElementById('itemPrice');
+      const itemCategory = document.getElementById('itemCategory');
+      const itemTitle = document.getElementById('itemTitle');
+      const itemText = document.getElementById('itemText');
+      const signalRow = document.getElementById('signalRow');
+      const categoryStrip = document.getElementById('categoryStrip');
+      const listTitle = document.getElementById('listTitle');
+      const listMeta = document.getElementById('listMeta');
+      const itemGrid = document.getElementById('itemGrid');
+      const detailPanel = document.getElementById('detailPanel');
+      const listPanel = document.getElementById('listPanel');
+      const detailTitle = document.getElementById('detailTitle');
+      const detailPrice = document.getElementById('detailPrice');
+      const detailText = document.getElementById('detailText');
+      const detailTags = document.getElementById('detailTags');
+      const detailBackBtn = document.getElementById('detailBackBtn');
+      const backToCategory = document.getElementById('backToCategory');
+      const callToOrder = document.getElementById('callToOrder');
+
+      const navBtnLeft = document.getElementById('navBtnLeft');
+      const navBtnBottom = document.getElementById('navBtnBottom');
+      const circMenuOverlay = document.getElementById('circMenuOverlay');
+      const homeCenter = document.getElementById('homeCenter');
+      const circleMenuItems = document.querySelectorAll('.menu-item');
+
+      let currentCategory = 'bbq';
+      let currentIndex = 0;
+      let showingDetail = false;
+
+      function toggleCircleNav(){
+        circMenuOverlay.classList.toggle('open');
       }
 
-      function pickLunchCombo(cat) {
-        const entries = Array.isArray(cat?.items) ? cat.items.slice() : [];
-        const labels = entries.map(it => typeof it === "string" ? it : (it?.name || "")).filter(Boolean);
-        if (!labels.length) return null;
-        const meats = labels.filter(x => /chicken|pork|steak|fish|shrimp|hamburger|roast|sausage|turkey|beef|meatloaf|catfish|tenders|boudin/i.test(x));
-        const sides = labels.filter(x => !/chicken|pork|steak|fish|shrimp|hamburger|roast|sausage|turkey|beef|meatloaf|catfish|tenders|boudin/i.test(x));
-        const rand = arr => arr[Math.floor(Math.random() * arr.length)];
-        const meat = meats.length ? rand(meats) : rand(labels);
-        const sidePool = sides.length ? sides.slice() : labels.filter(x => x !== meat);
-        const side1 = sidePool.length ? rand(sidePool) : null;
-        const side2Pool = sidePool.filter(x => x !== side1);
-        const side2 = side2Pool.length ? rand(side2Pool) : (sidePool.length > 1 ? sidePool[0] : null);
-        return { meat, sides: [side1, side2].filter(Boolean) };
+      function closeCircleNav(){
+        circMenuOverlay.classList.remove('open');
       }
-      function renderPickCard(prefix, combo, catName) {
-        const el = $(`${prefix}PickCard`);
-        if (!el) return;
-        if (!combo) {
-          el.innerHTML = "";
+
+      function navigateTo(link){
+        if (!link) return;
+        if (link === '#') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
-        el.innerHTML = `
-          <div class="pick-card">
-            <div class="pick-title">Suggested ${escapeHtml(catName)} Plate</div>
-            <div class="pick-line">Meat: ${escapeHtml(combo.meat || "Chef's choice")}</div>
-            <div class="pick-line">Sides: ${escapeHtml((combo.sides || []).join(" + ") || "Chef's choice")}</div>
-          </div>
-        `;
+        if (link.startsWith('#')) {
+          const target = document.querySelector(link);
+          if (target) target.scrollIntoView({ behavior: 'smooth' });
+          return;
+        }
+        window.location.href = link;
       }
 
-      async function fetchHtml(url) {
-        const res = await fetch(url, { credentials: "same-origin", cache: "no-store" });
-        if (!res.ok) throw new Error(`Fetch failed ${res.status} at ${url}`);
-        return await res.text();
-      }
-      function extractJsonFromHtml(html, label) {
-        const doc = new DOMParser().parseFromString(html, "text/html");
-        const script = doc.querySelector("#hh-menu-data");
-        if (!script) throw new Error(`No #hh-menu-data found on ${label}`);
-        const raw = (script.textContent || "").trim();
-        if (!raw) throw new Error(`#hh-menu-data is empty on ${label}`);
-        return JSON.parse(raw);
-      }
-      async function readData() {
-        const urls = ["menu-data.html", "./menu-data.html", "/menu-data.html"];
-        let lastErr = null;
-        for (const url of urls) {
-          try {
-            const html = await fetchHtml(url);
-            const data = extractJsonFromHtml(html, url);
-            const rawMenus = data?.menus || {};
-            const normalizedMenus = {};
-            Object.keys(rawMenus).forEach(k => {
-              const nk = normalizeDateKey(k);
-              if (nk) normalizedMenus[nk] = rawMenus[k];
-            });
-            data.menus = normalizedMenus;
-            return data;
-          } catch (e) {
-            lastErr = e;
-          }
-        }
-        throw lastErr || new Error("Menu data could not be read from menu-data.html.");
+      function openPortal(category = currentCategory){
+        currentCategory = category;
+        currentIndex = 0;
+        showingDetail = false;
+        renderPortal();
+        closeCircleNav();
+        portalOverlay.classList.add('open');
+        portalOverlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('menu-open');
       }
 
-      function buildCategoryData(data, isoDate) {
-        const menu = getMenuByDate(data, isoDate) || {};
-        const defaults = data?.defaults || {};
-        const lunchItems = normalizeLunchItems(menu.lunch?.items ?? defaults.lunch?.items ?? []);
-        const cats = [
-          {
-            name: "Breakfast",
-            meta: "Morning favorites",
-            plates: normalizeItems(menu.breakfast?.plates ?? defaults.breakfast?.plates ?? []),
-            items: normalizeItems(menu.breakfast?.items ?? defaults.breakfast?.items ?? [])
-          },
-          {
-            name: "Lunch",
-            meta: "Daily plates",
-            plates: normalizeItems(menu.lunch?.plates ?? defaults.lunch?.plates ?? []),
-            items: lunchItems
-          }
-        ];
-        const crawfish = crawfishFor(data, menu);
-        if (crawfish.show) cats.push({ name: "Crawfish", meta: "Seasonal special", items: crawfish.items });
-        cats.push(
-          {
-            name: "Salad Bar",
-            meta: "Build your own",
-            pricing: normalizeItems(menu.salad?.items ?? defaults.salad?.items ?? []),
-            lettuce: normalizeItems(menu.salad?.saladBar?.lettuce ?? defaults.salad?.saladBar?.lettuce ?? []),
-            toppings: normalizeItems(menu.salad?.saladBar?.toppings ?? defaults.salad?.saladBar?.toppings ?? []),
-            dressing: normalizeItems(menu.salad?.saladBar?.dressing ?? defaults.salad?.saladBar?.dressing ?? [])
-          },
-          { name: "Drinks", meta: "Cold & hot", items: normalizeItems(menu.drinks?.items ?? defaults.drinks?.items ?? []) },
-          { name: "Dessert", meta: "Sweet finish", items: normalizeItems(menu.dessert?.items ?? defaults.dessert?.items ?? []) }
-        );
-        return cats.filter(cat => (cat.plates && cat.plates.length) || (cat.items && cat.items.length) || (cat.pricing && cat.pricing.length) || (cat.lettuce && cat.lettuce.length) || (cat.toppings && cat.toppings.length) || (cat.dressing && cat.dressing.length));
+      function closePortalFn(){
+        portalOverlay.classList.remove('open');
+        portalOverlay.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('menu-open');
       }
 
-      function renderCategoryContent(cat, data) {
-        let html = "";
-        if (cat.plates?.length) html += `<div class="section-label">Plates</div><ul class="list">${cat.plates.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
-        if (cat.items?.length) {
-          html += `<div class="section-label">Items</div><ul class="list">` + cat.items.map(it => {
-            if (typeof it === "string") return `<li>${escapeHtml(it)}</li>`;
-            return `<li><details><summary>${escapeHtml(it.name)}</summary><div class="desc">${escapeHtml(it.desc || data?.settings?.noDescriptionText || "No description for this item.")}</div></details></li>`;
-          }).join("") + `</ul>`;
-        }
-        if (cat.pricing?.length) html += `<div class="section-label">Pricing</div><ul class="list">${cat.pricing.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
-        if (cat.lettuce?.length) html += `<div class="section-label">Lettuce</div><ul class="list">${cat.lettuce.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
-        if (cat.toppings?.length) html += `<div class="section-label">Toppings</div><ul class="list">${cat.toppings.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
-        if (cat.dressing?.length) html += `<div class="section-label">Dressing</div><ul class="list">${cat.dressing.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
-        return html || `<div class="subline">No items available.</div>`;
-      }
-
-      function initSwipe(prefix, categories, data) {
-        const track = $(`${prefix}SwipeTrack`);
-        const prev = $(`${prefix}PrevCard`);
-        const next = $(`${prefix}NextCard`);
-        const chipNav = $(`${prefix}ChipNav`);
-        if (!track) return;
-        track.innerHTML = categories.map((cat, i) => `
-          <article class="swipe-card${i === 0 ? " active" : ""}" data-index="${i}">
-            <div class="card-meta">${escapeHtml(cat.meta || "Menu category")}</div>
-            <div class="cat-title">${escapeHtml(cat.name)}</div>
-            ${renderCategoryContent(cat, data)}
-          </article>
-        `).join("");
-        if (chipNav) {
-          chipNav.innerHTML = categories.map((cat, i) => `<button class="chip${i === 0 ? " active" : ""}" data-index="${i}">${escapeHtml(cat.name)}</button>`).join("");
-        }
-        const cards = Array.from(track.querySelectorAll(".swipe-card"));
-        const chips = Array.from((chipNav || document.createElement("div")).querySelectorAll(".chip"));
-
-        function activeIndex() {
-          const left = track.scrollLeft;
-          const width = track.clientWidth || 1;
-          return Math.round(left / width);
-        }
-        function updateStatus() {
-          const idx = Math.max(0, Math.min(categories.length - 1, activeIndex()));
-          setText(`${prefix}CardStatus`, `${categories[idx]?.name || ""} • ${idx + 1} / ${categories.length}`);
-          cards.forEach((card, i) => card.classList.toggle("active", i === idx));
-          chips.forEach((chip, i) => chip.classList.toggle("active", i === idx));
-        }
-        function goTo(idx) {
-          const clamped = Math.max(0, Math.min(categories.length - 1, idx));
-          track.scrollTo({ left: clamped * track.clientWidth, behavior: "smooth" });
-          window.setTimeout(updateStatus, 220);
-        }
-
-        prev?.addEventListener("click", () => goTo(activeIndex() - 1));
-        next?.addEventListener("click", () => goTo(activeIndex() + 1));
-        chips.forEach(chip => chip.addEventListener("click", () => goTo(Number(chip.dataset.index || 0))));
-        track.addEventListener("scroll", () => requestAnimationFrame(updateStatus));
-        window.addEventListener("resize", updateStatus);
-
-        cards.forEach(card => {
-          card.addEventListener("pointermove", e => {
-            const rect = card.getBoundingClientRect();
-            const x = ((e.clientX - rect.left) / rect.width - 0.5) * 10;
-            const y = ((e.clientY - rect.top) / rect.height - 0.5) * -10;
-            card.style.transform = `perspective(1000px) rotateY(${x}deg) rotateX(${y}deg)`;
-          });
-          card.addEventListener("pointerleave", () => {
-            card.style.transform = "perspective(1000px) rotateY(0deg) rotateX(0deg)";
-          });
+      function renderSignals(cat){
+        signalRow.innerHTML = '';
+        cat.signals.forEach(tag => {
+          const chip = document.createElement('div');
+          chip.className = 'signal-chip';
+          chip.innerHTML = `<i class="${cat.icon}"></i><span>${tag}</span>`;
+          signalRow.appendChild(chip);
         });
-        updateStatus();
-        return {
-          selectByName(name) {
-            const idx = categories.findIndex(c => c.name === name);
-            if (idx >= 0) {
-              goTo(idx);
-              const card = cards[idx];
-              if (card) {
-                card.classList.add("pulse");
-                setTimeout(() => card.classList.remove("pulse"), 900);
-              }
-            }
-          }
-        };
       }
 
-      function initWheel(prefix, categories, data, dayName, isTodayPanel) {
-        const wrap = $(`${prefix}WheelWrap`);
-        const wheel = $(`${prefix}Wheel`);
-        const detailTitle = $(`${prefix}DetailTitle`);
-        const detailContent = $(`${prefix}DetailContent`);
-        const detailCard = $(`${prefix}DetailCard`);
-        if (!wrap || !wheel || !detailTitle || !detailContent) return null;
-        const N = categories.length;
-        const step = 360 / N;
-        const radius = 112;
-        const topAngle = -90;
-        wheel.innerHTML = "";
-
-        const items = categories.map((cat, i) => {
-          const el = document.createElement("div");
-          el.className = "wheel-item";
-          el.textContent = cat.name;
-          wheel.appendChild(el);
-          return el;
-        });
-
-        let angle = 0, velocity = 0, dragging = false, lastPointerAngle = 0, selected = 0, raf = 0, lockedByHours = false;
-
-        function shortestDelta(a, b) {
-          let diff = a - b;
-          while (diff > 180) diff -= 360;
-          while (diff < -180) diff += 360;
-          return diff;
-        }
-        function pointerAngle(e) {
-          const rect = wrap.getBoundingClientRect();
-          const cx = rect.left + rect.width / 2;
-          const cy = rect.top + rect.height / 2;
-          return Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
-        }
-        function selectedIndex() {
-          let best = 0, bestDiff = Infinity;
-          for (let i = 0; i < N; i++) {
-            const a = topAngle + i * step + angle;
-            const diff = Math.abs(shortestDelta(a, topAngle));
-            if (diff < bestDiff) { bestDiff = diff; best = i; }
-          }
-          return best;
-        }
-        function canShowCategory(cat) {
-          if (!isTodayPanel) return true;
-          return categoryOpenNow(cat.name, dayName, new Date());
-        }
-        function renderDetailFor(idx, force=false) {
-          const cat = categories[idx];
-          const allowed = canShowCategory(cat);
-          lockedByHours = !allowed;
-          detailTitle.textContent = cat.name;
-          const closedNowNote = isTodayPanel && !allowed
-            ? `<div class="closed-note">This is the ${escapeHtml(dayName)} menu for ${escapeHtml(cat.name)}. They are currently closed for this category. ${escapeHtml(openingMessageFor(dayName))}</div>`
-            : "";
-          detailContent.innerHTML = renderCategoryContent(cat, data) + closedNowNote;
-          renderPickCard(prefix, null, cat.name);
-          if (force) {
-            detailCard.classList.add("pulse");
-            setTimeout(() => detailCard.classList.remove("pulse"), 520);
-          }
-        }
-        function render(force=false) {
-          wheel.style.transform = `rotate(${angle}deg)`;
-          items.forEach((item, i) => {
-            const base = topAngle + i * step;
-            item.style.transform = `rotate(${base}deg) translate(${radius}px) rotate(${-base - angle}deg)`;
+      function renderCategories(){
+        categoryStrip.innerHTML = '';
+        Object.entries(menuData).forEach(([key, cat]) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'category-btn' + (key === currentCategory ? ' active' : '');
+          btn.innerHTML = `<i class="${cat.icon}"></i><span>${cat.name}</span>`;
+          btn.addEventListener('click', () => {
+            currentCategory = key;
+            currentIndex = 0;
+            showingDetail = false;
+            renderPortal();
           });
-          const idx = selectedIndex();
-          if (force || idx !== selected) {
-            selected = idx;
-            items.forEach((item, i) => item.classList.toggle("selected", i === idx));
-            renderDetailFor(idx, true);
-          }
-        }
-        function tick() {
-          raf = 0;
-          if (!dragging) {
-            angle += velocity;
-            velocity *= 0.965;
-            if (Math.abs(velocity) < 0.02) {
-              const target = -(selectedIndex() * step);
-              const delta = shortestDelta(target, angle);
-              angle += delta * 0.16;
-              if (Math.abs(delta) < 0.2) {
-                angle = target;
-                velocity = 0;
-                render(true);
-                return;
-              }
-            }
-          }
-          render();
-          raf = requestAnimationFrame(tick);
-        }
-        function ensureAnim() { if (!raf) raf = requestAnimationFrame(tick); }
-        function onDown(e) {
+          categoryStrip.appendChild(btn);
+        });
+      }
+
+      function renderList(cat){
+        itemGrid.innerHTML = '';
+        cat.items.forEach((item, index) => {
+          const card = document.createElement('article');
+          card.className = 'item-card' + (index === currentIndex && !showingDetail ? ' active' : '');
+          card.style.animationDelay = `${index * 45}ms`;
+          card.innerHTML = `
+            <div class="item-card-top">
+              <h4>${item.title}</h4>
+              <div class="item-price">${item.price}</div>
+            </div>
+            <p>${item.text}</p>
+            <div class="item-tags">
+              ${item.tags.map(tag => `<span class="item-tag">${tag}</span>`).join('')}
+            </div>
+          `;
+          card.addEventListener('click', () => {
+            currentIndex = index;
+            showingDetail = true;
+            renderPortal();
+          });
+          itemGrid.appendChild(card);
+        });
+      }
+
+      function renderDetail(item){
+        detailTitle.textContent = item.title;
+        detailPrice.textContent = item.price;
+        detailText.textContent = item.detail;
+        detailTags.innerHTML = '';
+        item.tags.forEach(tag => {
+          const t = document.createElement('span');
+          t.className = 'item-tag';
+          t.textContent = tag;
+          detailTags.appendChild(t);
+        });
+      }
+
+      function renderPortal(){
+        const cat = menuData[currentCategory];
+        const item = cat.items[currentIndex];
+
+        portalViewport.style.setProperty('--menu-image', cat.image);
+        statusTitle.innerHTML = `<i class="${cat.icon}"></i> ${cat.name}`;
+        ghostTag.innerHTML = `<i class="${cat.icon}"></i> ${cat.heroTag}`;
+        itemPrice.textContent = item.price;
+        itemCategory.textContent = cat.name;
+        itemTitle.textContent = item.title;
+        itemText.textContent = item.text;
+        listTitle.textContent = cat.name;
+        listMeta.textContent = showingDetail ? 'Item detail' : 'Choose an item';
+
+        renderSignals(cat);
+        renderCategories();
+        renderList(cat);
+        renderDetail(item);
+
+        listPanel.style.display = showingDetail ? 'none' : 'block';
+        detailPanel.classList.toggle('open', showingDetail);
+      }
+
+      openButtons.forEach(btn => {
+        btn.addEventListener('click', e => {
           e.preventDefault();
-          dragging = true;
-          wrap.classList.add("dragging");
-          velocity = 0;
-          lastPointerAngle = pointerAngle(e);
-          wrap.setPointerCapture?.(e.pointerId);
-          ensureAnim();
-        }
-        function onMove(e) {
-          if (!dragging) return;
-          e.preventDefault();
-          const a = pointerAngle(e);
-          const delta = shortestDelta(a, lastPointerAngle);
-          lastPointerAngle = a;
-          angle += delta;
-          velocity = delta;
-          render();
-        }
-        function onUp(e) {
-          if (!dragging) return;
-          dragging = false;
-          wrap.classList.remove("dragging");
-          wrap.releasePointerCapture?.(e.pointerId);
-          ensureAnim();
-        }
-        function onClick() {
-          if (lockedByHours && isTodayPanel) {
-            showLuckModal("Currently closed", `${categories[selected].name} is not being served right now. ${openingMessageFor(dayName)}`);
+          openPortal('bbq');
+        });
+      });
+
+      closePortal.addEventListener('click', closePortalFn);
+      detailBackBtn.addEventListener('click', () => {
+        showingDetail = false;
+        renderPortal();
+      });
+      backToCategory.addEventListener('click', () => {
+        showingDetail = false;
+        renderPortal();
+      });
+      callToOrder.addEventListener('click', () => {
+        window.location.href = 'tel:+12252455046';
+      });
+
+      portalOverlay.addEventListener('click', e => {
+        if (e.target === portalOverlay) closePortalFn();
+      });
+
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+          if (portalOverlay.classList.contains('open')) {
+            closePortalFn();
+          } else if (circMenuOverlay.classList.contains('open')) {
+            closeCircleNav();
           }
         }
-        wrap.addEventListener("pointerdown", onDown, { passive: false });
-        wrap.addEventListener("pointermove", onMove, { passive: false });
-        wrap.addEventListener("pointerup", onUp);
-        wrap.addEventListener("pointercancel", onUp);
-        detailCard.addEventListener("click", onClick);
-        render(true);
+      });
 
-        return {
-          aiPick() {
-            const lunchCat = categories.find(c => String(c.name).toLowerCase() === "lunch");
-            const targetCat = lunchCat || categories.find(c => canShowCategory(c)) || categories[0];
-            if (!targetCat) {
-              showLuckModal("Currently closed", openingMessageFor(dayName));
-              return null;
-            }
-            if (isTodayPanel && !canShowCategory(targetCat)) {
-              showLuckModal("Currently closed", `${targetCat.name} is not being served right now. ${openingMessageFor(dayName)}`);
-              return null;
-            }
-            const idx = categories.findIndex(c => c.name === targetCat.name);
-            const combo = pickLunchCombo(targetCat);
-            const target = -(idx * step);
-            const start = performance.now();
-            const startAngle = angle;
-            const extraTurns = 720 + Math.random() * 360;
-            const endAngle = target + extraTurns;
-            function animate(now) {
-              const t = Math.min(1, (now - start) / 2400);
-              const ease = 1 - Math.pow(1 - t, 3);
-              angle = startAngle + (endAngle - startAngle) * ease;
-              velocity = 0;
-              render();
-              if (t < 1) requestAnimationFrame(animate);
-              else {
-                angle = target;
-                render(true);
-                renderPickCard(prefix, combo, targetCat.name);
-                detailCard.classList.add("pulse");
-                setTimeout(() => detailCard.classList.remove("pulse"), 900);
-              }
-            }
-            requestAnimationFrame(animate);
-            return targetCat;
-          },
-          selectByName(name) {
-            const idx = categories.findIndex(c => c.name === name);
-            if (idx >= 0) {
-              angle = -(idx * step);
-              render(true);
-            }
-          }
-        };
-      }
+      navBtnLeft.addEventListener('click', e => {
+        e.stopPropagation();
+        toggleCircleNav();
+      });
 
-      function setupViewToggle(prefix) {
-        const wheelBtn = $(`${prefix}ViewWheel`);
-        const swipeBtn = $(`${prefix}ViewSwipe`);
-        const wheelView = $(`${prefix}WheelView`);
-        const swipeView = $(`${prefix}SwipeView`);
-        swipeBtn?.classList.add("active");
-        wheelBtn?.classList.remove("active");
-        swipeView?.classList.remove("hide");
-        wheelView?.classList.add("hide");
-        wheelBtn?.addEventListener("click", () => {
-          wheelBtn.classList.add("active");
-          swipeBtn?.classList.remove("active");
-          wheelView?.classList.remove("hide");
-          swipeView?.classList.add("hide");
-        });
-        swipeBtn?.addEventListener("click", () => {
-          swipeBtn.classList.add("active");
-          wheelBtn?.classList.remove("active");
-          swipeView?.classList.remove("hide");
-          wheelView?.classList.add("hide");
-        });
-      }
+      navBtnBottom.addEventListener('click', e => {
+        e.stopPropagation();
+        toggleCircleNav();
+      });
 
-      function setupDayTabs() {
-        const buttons = [$("dayBtnToday"), $("dayBtnTomorrow"), $("dayBtnAdvanced")];
-        const panels = [$("panel-today"), $("panel-tomorrow"), $("panel-advanced")];
-        buttons.forEach((btn, i) => {
-          btn?.addEventListener("click", () => {
-            buttons.forEach((b, bi) => {
-              b.classList.toggle("active", bi === i);
-              b.setAttribute("aria-selected", bi === i ? "true" : "false");
-            });
-            panels.forEach((p, pi) => p.classList.toggle("hide", pi !== i));
-          });
-        });
-      }
+      circMenuOverlay.addEventListener('click', e => {
+        if (e.target === circMenuOverlay) closeCircleNav();
+      });
 
-      function buildAdvanced(data, startISO) {
-        const tabs = $("advancedTabs");
-        const track = $("advancedTrack");
-        if (!track || !tabs) return;
-        tabs.innerHTML = "";
-        track.innerHTML = "";
-        setText("advancedDisclaimer", "Showing the next 7 days starting from the next active menu day.");
-        const start = parseISODateToLocal(startISO);
-        const lDef = data?.defaults?.lunch || {};
-        const days = 7;
-        const cards = [];
+      homeCenter.addEventListener('click', () => {
+        closeCircleNav();
+        navigateTo(homeCenter.getAttribute('data-link'));
+      });
 
-        for (let i = 0; i < days; i++) {
-          const d = new Date(start);
-          d.setDate(start.getDate() + i);
+      circleMenuItems.forEach(item => {
+        item.addEventListener('click', () => {
+          const action = item.getAttribute('data-action');
+          const link = item.getAttribute('data-link');
 
-          const iso = toISODateLocal(d);
-          const dayName = weekdayName(d);
-          const hours = getBusinessHours(dayName);
-          const closure = getClosure(data, dayName);
-          const dayMenu = getMenuByDate(data, iso);
-
-          const tab = document.createElement("button");
-          tab.className = "advanced-tab" + (i === 0 ? " active" : "");
-          tab.type = "button";
-          tab.textContent = `${dayName.slice(0,3)} ${d.getMonth()+1}/${d.getDate()}`;
-          tabs.appendChild(tab);
-
-          const card = document.createElement("article");
-          card.className = "swipe-card active" + (i === 0 ? "" : " hide");
-
-          if (!dayMenu) {
-            card.innerHTML = `
-              <div class="card-meta">${escapeHtml(formatDateNice(d))}</div>
-              <div class="cat-title">${escapeHtml(dayName)}</div>
-              <div class="subline">${escapeHtml(iso)}</div>
-              <div class="section-label">Status</div>
-              <ul class="list">
-                <li>Unable to fetch the menu for this day.</li>
-              </ul>
-            `;
-          } else {
-            const lunch = dayMenu?.lunch || {};
-            const plates = normalizeItems(lunch.plates ?? lDef.plates ?? []);
-            const items = normalizeLunchItems(lunch.items ?? []);
-            card.innerHTML = `
-              <div class="card-meta">${escapeHtml(formatDateNice(d))}</div>
-              <div class="cat-title">${escapeHtml(dayName)}</div>
-              <div class="subline">${closure?.closed ? "Closed" : (hours.lunch ? `Lunch ${escapeHtml(hours.lunch)}` : "")}</div>
-              ${
-                closure?.closed
-                  ? `<div class="section-label">Status</div><ul class="list"><li>${escapeHtml(closure.message || "Closed")}</li></ul>`
-                  : `
-                    <div class="section-label">Plates</div>
-                    <ul class="list">${plates.length ? plates.map(x => `<li>${escapeHtml(x)}</li>`).join("") : `<li>Unable to fetch the menu for this day.</li>`}</ul>
-                    <div class="section-label">Lunch Items</div>
-                    <ul class="list">${items.length ? items.map(x => `<li>${escapeHtml(x.name)}</li>`).join("") : `<li>Unable to fetch the menu for this day.</li>`}</ul>
-                  `
-              }
-            `;
+          if (action === 'menu-layer') {
+            openPortal('bbq');
+            return;
           }
 
-          track.appendChild(card);
-          cards.push({tab, card});
-        }
-
-        cards.forEach((entry, idx) => {
-          entry.tab.addEventListener("click", () => {
-            cards.forEach((item, i) => {
-              item.tab.classList.toggle("active", i === idx);
-              item.card.classList.toggle("hide", i !== idx);
-            });
-          });
+          closeCircleNav();
+          navigateTo(link);
         });
-      }
+      });
 
-      
-function updateNowBar(prefix, dayName, isoDate) {
-  const el = document.getElementById(prefix + "Now");
-  if (!el) return;
-
-  const todayISO = toISODateLocal(new Date());
-  const isActualToday = isoDate === todayISO;
-  const h = getBusinessHours(dayName);
-
-  function fmt(totalSeconds) {
-    const safe = Math.max(0, Math.floor(totalSeconds));
-    const hrs = Math.floor(safe / 3600);
-    const mins = Math.floor((safe % 3600) / 60);
-    const secs = safe % 60;
-    return `${String(hrs).padStart(2,"0")}:${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
-  }
-
-  if (!isActualToday) {
-    el.className = "nowbar warn";
-    el.textContent = `${dayName} • Opens at ${h.open}`;
-    return;
-  }
-
-  const now = new Date();
-  const nowSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
-
-  const openSeconds = parseTimeToMinutes(h.open) * 60;
-  const closeSeconds = parseTimeToMinutes(h.close) * 60;
-  const breakfastEndSeconds = 10 * 3600 + 30 * 60;
-  const lunchStartSeconds = 11 * 3600;
-
-  let crawfishStartSeconds = null;
-  let crawfishEndSeconds = null;
-  if (h.crawfish && h.crawfish.includes("-")) {
-    const [startText, endText] = h.crawfish.split("-").map(s => s.trim());
-    crawfishStartSeconds = parseTimeToMinutes(startText) * 60;
-    crawfishEndSeconds = parseTimeToMinutes(endText) * 60;
-  }
-
-  const duringMainHours = nowSeconds >= openSeconds && nowSeconds <= closeSeconds;
-  const duringCrawfish = crawfishStartSeconds !== null && crawfishEndSeconds !== null &&
-    nowSeconds >= crawfishStartSeconds && nowSeconds <= crawfishEndSeconds;
-
-  let text = "";
-  let cls = "";
-
-  if (!duringMainHours && !duringCrawfish) {
-    text = `Closed • Opens ${h.open}`;
-    cls = "closed";
-  } else if (nowSeconds < breakfastEndSeconds) {
-    const remaining = breakfastEndSeconds - nowSeconds;
-    text = `Breakfast • Ends in ${fmt(remaining)}`;
-    cls = remaining < 1800 ? "warn" : "open";
-  } else if (nowSeconds < lunchStartSeconds) {
-    const remaining = lunchStartSeconds - nowSeconds;
-    text = `Transition • Lunch starts in ${fmt(remaining)}`;
-    cls = "warn";
-  } else if (duringMainHours && nowSeconds >= lunchStartSeconds) {
-    const remaining = closeSeconds - nowSeconds;
-    text = `Now Serving Lunch • Ends in ${fmt(remaining)}`;
-    cls = "open";
-  } else if (duringCrawfish) {
-    const remaining = crawfishEndSeconds - nowSeconds;
-    text = `Now Serving Crawfish • Ends in ${fmt(remaining)}`;
-    cls = "open";
-  } else {
-    text = `Closed • Opens ${h.open}`;
-    cls = "closed";
-  }
-
-  el.className = "nowbar " + cls;
-  el.textContent = text;
-}
-
-function initPanel(prefix, data, isoDate, displayName) {
-        const hours = getBusinessHours(displayName);
-        const closure = getClosure(data, displayName);
-        const isTodayPanel = prefix === "today";
-
-        setText(`${prefix}Title`, `${displayName} (${formatDateNice(parseISODateToLocal(isoDate))}) Menu`);
-        setText(`${prefix}Hours`,
-          closure?.closed
-            ? `${displayName} Hours: Closed`
-            : `${displayName} Hours: ${hours.open} – ${hours.close} • Breakfast ${hours.breakfast} • Lunch ${hours.lunch}${hours.crawfish ? ` • Crawfish ${hours.crawfish}` : ""}`
-        );
-
-        const todayISO = toISODateLocal(new Date());
-        const isActualToday = isoDate === todayISO;
-        const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes();
-
-        const noteEl = $(`${prefix}Note`);
-        let nowStatus = "";
-
-        if (closure?.closed) {
-          nowStatus = `<span class="statusdot closed"></span> CLOSED`;
-        } else if (!isActualToday) {
-          nowStatus = `<span class="statusdot closed"></span> SCHEDULED`;
-        } else {
-          const openNow =
-            rangeIncludes(nowMinutes, `${hours.open} - ${hours.close}`) ||
-            (!!hours.crawfish && rangeIncludes(nowMinutes, hours.crawfish));
-
-          nowStatus = `<span class="statusdot ${openNow ? "" : "closed"}"></span>${openNow ? "OPEN NOW" : "CURRENTLY CLOSED"}`;
-        }
-
-        if (noteEl) {
-          noteEl.innerHTML = `${escapeHtml(data?.hours?.note || "")}<div class="statusbar">${nowStatus}</div>`;
-        }
-
-        updateNowBar(prefix, displayName, isoDate);
-
-        if (closure?.closed) {
-          $(`${prefix}Closed`).classList.remove("hide");
-          setText(`${prefix}ClosedMsg`, closure.message || "See you next time!");
-        } else {
-          $(`${prefix}Closed`).classList.add("hide");
-        }
-
-        const cats = buildCategoryData(data, isoDate);
-        const wheelApi = initWheel(prefix, cats, data, displayName, isTodayPanel);
-        const swipeApi = initSwipe(prefix, cats, data);
-        setupViewToggle(prefix);
-
-        $(`${prefix}AIBtn`)?.addEventListener("click", () => {
-          const picked = wheelApi?.aiPick();
-          if (picked) swipeApi?.selectByName(picked.name);
-        });
-      }
-
-      function initNav() {
-        const overlay = $("circMenuOverlay");
-        const navBtn = $("navBtnBottom");
-        const home = $("homeCenter");
-        const items = Array.from(document.querySelectorAll(".menu-item"));
-        if (!overlay || !navBtn || !home) return;
-        navBtn.addEventListener("click", e => { e.stopPropagation(); overlay.classList.toggle("open"); });
-        overlay.addEventListener("click", e => { if (e.target === overlay) overlay.classList.remove("open"); });
-        home.addEventListener("click", () => {
-          overlay.classList.remove("open");
-          const link = home.getAttribute("data-link");
-          if (link) window.location.href = link;
-        });
-        async function sharePage() {
-          const data = { title: document.title, text: "Check out Hot Headz!", url: window.location.href };
-          try {
-            if (navigator.share) await navigator.share(data);
-            else if (navigator.clipboard) { await navigator.clipboard.writeText(window.location.href); alert("Link copied!"); }
-          } catch (_) {}
-        }
-        items.forEach(item => item.addEventListener("click", () => {
-          overlay.classList.remove("open");
-          const action = item.getAttribute("data-action");
-          const link = item.getAttribute("data-link");
-          if (action === "share") sharePage();
-          else if (link) window.location.href = link;
-        }));
-        document.querySelector(".circular-menu")?.addEventListener("click", e => e.stopPropagation());
-        const modalEl = $("luckModal");
-        const flashCard = modalEl?.querySelector(".flash-card");
-        flashCard?.addEventListener("click", e => e.stopPropagation());
-        modalEl?.addEventListener("click", () => hideLuckModal());
-        window.addEventListener("keydown", e => { if (e.key === "Escape") hideLuckModal(); });
-      }
-
-      setupDayTabs();
-      initNav();
-
-      (async function init() {
-        try {
-          const data = await readData();
-          const now = new Date();
-          const todayISO = toISODateLocal(now);
-          const todayName = weekdayName(now);
-          const tomorrow = new Date(now); tomorrow.setDate(now.getDate() + 1);
-          const tomorrowISO = toISODateLocal(tomorrow);
-          const tomorrowName = weekdayName(tomorrow);
-
-          let displayTodayISO = todayISO;
-          let displayTodayName = todayName;
-          let displayTomorrowISO = tomorrowISO;
-          let displayTomorrowName = tomorrowName;
-
-          const closureToday = getClosure(data, todayName);
-          if (isPastClosingToday([], todayName) && !closureToday?.closed) {
-            displayTodayISO = tomorrowISO;
-            displayTodayName = tomorrowName;
-            const dayAfter = new Date(now); dayAfter.setDate(now.getDate() + 2);
-            displayTomorrowISO = toISODateLocal(dayAfter);
-            displayTomorrowName = weekdayName(dayAfter);
-          }
-
-          setText("dayBtnToday", displayTodayName);
-          setText("dayBtnTomorrow", displayTomorrowName);
-
-          initPanel("today", data, displayTodayISO, displayTodayName);
-          initPanel("tomorrow", data, displayTomorrowISO, displayTomorrowName);
-          buildAdvanced(data, displayTodayISO);
-
-          setInterval(() => {
-            updateNowBar("today", displayTodayName, displayTodayISO);
-            updateNowBar("tomorrow", displayTomorrowName, displayTomorrowISO);
-          }, 1000);
-        } catch (e) {
-          console.error(e);
-          showLoadError(String(e?.message || e));
-        }
-      })();
+      renderPortal();
     })();
   </script>
-
-  <div class="flash-overlay" id="luckModal">
-    <div class="flash-card">
-      <div class="flash-count" id="luckCountdown">5</div>
-      <div class="flash-title" id="luckModalTitle">Currently closed</div>
-      <div class="flash-text" id="luckModalText"></div>
-      <div class="flash-sub">Closing automatically</div>
-    </div>
-  </div>
 </body>
 </html>
