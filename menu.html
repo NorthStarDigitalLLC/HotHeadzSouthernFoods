@@ -1420,7 +1420,15 @@ function updateNowBar(prefix, dayName, isoDate) {
     cls = "closed";
   } else if (mins < breakfastEnd) {
     const remaining = breakfastEnd - mins;
-    text = "Breakfast • Ends in " + remaining + " min";
+    {
+    const hrs = Math.floor(remaining/60);
+    const mins = remaining % 60;
+    const secs = 0;
+    text = "Breakfast • Ends in " + 
+      String(hrs).padStart(2,"0")+":"+
+      String(mins).padStart(2,"0")+":"+
+      String(secs).padStart(2,"0");
+}
     cls = remaining < 30 ? "warn" : "open";
   } else if (mins < lunchStart) {
     text = "Transition • Lunch starts at 11:00 AM";
