@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Francis Smokehouse · Brick Portal Menu</title>
+  <title>Francis Smokehouse · Brick Wall Wheel Menu</title>
   <link rel="icon" type="image/png" href="Images/Smokehouselogo.png" />
   <link rel="apple-touch-icon" href="Images/Smokehouselogo.png" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
@@ -11,260 +11,645 @@
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#080606;--bg2:#140f0e;--text:#f8f0e6;--muted:#cdb199;--gold:#d7a56d;--ember:#b44b3c;--ember2:#e0815d;
-      --brick1:#6f3a2f;--brick2:#844535;--brick3:#5b2d24;--mortar:#291d1a;--line:rgba(255,233,209,.1);
-      --serif:'Playfair Display',serif;--sans:'Montserrat',sans-serif;--ease:cubic-bezier(.22,1,.36,1)
+      --bg:#0a0707;
+      --brick-a:#7b4134;
+      --brick-b:#8c4a3a;
+      --brick-c:#64342a;
+      --mortar:#241916;
+      --text:#f7efe4;
+      --muted:#ccb29a;
+      --gold:#d8a56c;
+      --ember:#b24a3b;
+      --ember-2:#e07c5b;
+      --glass:rgba(14,10,10,.52);
+      --line:rgba(255,230,205,.10);
+      --serif:'Playfair Display',serif;
+      --sans:'Montserrat',sans-serif;
+      --ease:cubic-bezier(.22,1,.36,1);
     }
+
     html,body{height:100%}
-    body{background:radial-gradient(circle at 50% 0%, #16100f, #080606 58%);color:var(--text);font-family:var(--sans);overflow:hidden}
-    a{color:inherit;text-decoration:none} button{font:inherit}
-
-    .app{position:relative;min-height:100vh;overflow:hidden;background:
-      radial-gradient(circle at 50% 10%, rgba(224,129,93,.12), transparent 22%),
-      radial-gradient(circle at 80% 20%, rgba(215,165,109,.08), transparent 18%),
-      linear-gradient(180deg, #0a0808, #140f0e 45%, #090707)}
-    .smoke,.smoke:before,.smoke:after{position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none;content:""}
-    .smoke{width:34vw;height:34vw;left:-8vw;top:2vh;background:radial-gradient(circle, rgba(224,129,93,.12), transparent 65%);animation:driftA 18s ease-in-out infinite alternate}
-    .smoke:before{width:30vw;height:30vw;left:68vw;top:10vh;background:radial-gradient(circle, rgba(215,165,109,.08), transparent 65%);animation:driftB 20s ease-in-out infinite alternate}
-    .smoke:after{width:28vw;height:28vw;left:24vw;top:68vh;background:radial-gradient(circle, rgba(180,75,60,.09), transparent 65%);animation:driftC 17s ease-in-out infinite alternate}
-    @keyframes driftA{from{transform:translate(0,0) scale(1)}to{transform:translate(8vw,4vh) scale(1.14)}}
-    @keyframes driftB{from{transform:translate(0,0) scale(1)}to{transform:translate(-7vw,7vh) scale(1.12)}}
-    @keyframes driftC{from{transform:translate(0,0) scale(1)}to{transform:translate(4vw,-6vh) scale(1.1)}}
-
-    .topbar{position:absolute;top:16px;left:16px;right:16px;z-index:50;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 14px;border-radius:28px;border:1px solid var(--line);background:rgba(10,8,8,.4);backdrop-filter:blur(16px)}
-    .brand{display:flex;align-items:center;gap:12px}
-    .brand-orb{width:40px;height:40px;border-radius:50%;background:conic-gradient(from 180deg, var(--ember), var(--gold), var(--ember2), var(--ember));position:relative;box-shadow:0 0 20px rgba(224,129,93,.25)}
-    .brand-orb:after{content:"";position:absolute;inset:8px;border-radius:50%;background:#160f0d}
-    .brand-copy strong{display:block;font-family:var(--serif);font-size:1.15rem;line-height:.95}
-    .brand-copy span{display:block;margin-top:4px;font-size:.6rem;letter-spacing:.32em;text-transform:uppercase;color:var(--muted)}
-    .top-center{text-align:center;font-size:.68rem;text-transform:uppercase;letter-spacing:.2em;color:rgba(248,240,230,.66)}
-    .top-actions{display:flex;align-items:center;gap:10px;justify-content:flex-end}
-    .phone{font-size:.82rem;color:var(--muted);white-space:nowrap}
-    .pill-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border-radius:999px;border:1px solid rgba(224,129,93,.34);background:rgba(180,75,60,.12);color:var(--text);text-transform:uppercase;letter-spacing:.14em;font-size:.7rem;font-weight:800;cursor:pointer;transition:.22s ease}
-    .pill-btn:hover{transform:translateY(-2px);background:rgba(180,75,60,.18)}
-
-    .wall-stage{position:absolute;inset:90px 16px 86px;display:grid;place-items:center}
-    .brick-wall{
-      position:relative;width:min(96vw, 1500px);height:min(78vh, 920px);border-radius:42px;overflow:hidden;border:1px solid rgba(255,233,209,.08);
-      box-shadow:0 30px 90px rgba(0,0,0,.46);background:
-      linear-gradient(var(--mortar) 12px, transparent 12px),
-      linear-gradient(90deg, transparent calc(25% - 6px), var(--mortar) calc(25% - 6px) calc(25% + 6px), transparent calc(25% + 6px)),
-      linear-gradient(90deg, transparent calc(50% - 6px), var(--mortar) calc(50% - 6px) calc(50% + 6px), transparent calc(50% + 6px)),
-      linear-gradient(90deg, transparent calc(75% - 6px), var(--mortar) calc(75% - 6px) calc(75% + 6px), transparent calc(75% + 6px)),
-      linear-gradient(0deg, transparent calc(50% - 6px), var(--mortar) calc(50% - 6px) calc(50% + 6px), transparent calc(50% + 6px)),
-      repeating-linear-gradient(90deg, var(--brick1) 0 13%, var(--brick2) 13% 25%, var(--brick3) 25% 38%, var(--brick2) 38% 50%, var(--brick1) 50% 63%, var(--brick3) 63% 75%, var(--brick2) 75% 88%, var(--brick1) 88% 100%);
-      background-size:100% 108px,100% 100%,100% 100%,100% 100%,100% 100%,100% 100%;transform:perspective(1400px) rotateX(2deg)
-    }
-    .brick-wall:before{content:"";position:absolute;inset:0;background:
-      radial-gradient(circle at 20% 18%, rgba(255,255,255,.08), transparent 18%),
-      radial-gradient(circle at 80% 70%, rgba(0,0,0,.18), transparent 18%),
-      linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.16));mix-blend-mode:screen;pointer-events:none}
-    .wall-badge{position:absolute;top:18px;left:18px;z-index:5;padding:.8rem .95rem;border-radius:18px;border:1px solid rgba(255,233,209,.10);background:rgba(8,7,7,.28);backdrop-filter:blur(10px);color:rgba(248,240,230,.76);font-size:.7rem;text-transform:uppercase;letter-spacing:.18em}
-    .wall-badge strong{display:block;color:#fff5eb;font-size:1rem;text-transform:none;letter-spacing:.02em;margin-bottom:.15rem;font-family:var(--serif)}
-
-    .hole-shell{position:absolute;left:50%;top:50%;width:min(72vw, 860px);aspect-ratio:1/1;transform:translate(-50%,-50%);display:grid;place-items:center}
-    .broken-edge,.broken-edge:before,.broken-edge:after{position:absolute;inset:0;border-radius:50%;pointer-events:none;content:""}
-    .broken-edge{
+    body{
+      overflow:hidden;
+      font-family:var(--sans);
+      color:var(--text);
       background:
-      radial-gradient(circle at center, transparent 50%, rgba(0,0,0,.88) 54%, rgba(20,14,13,.98) 62%, transparent 64%),
-      conic-gradient(from 0deg, transparent 0 8%, rgba(31,22,20,.95) 8% 14%, transparent 14% 18%, rgba(43,29,25,.96) 18% 27%, transparent 27% 32%, rgba(30,22,19,.94) 32% 40%, transparent 40% 47%, rgba(50,34,29,.96) 47% 57%, transparent 57% 64%, rgba(32,24,20,.95) 64% 72%, transparent 72% 78%, rgba(43,30,26,.96) 78% 86%, transparent 86% 92%, rgba(34,24,22,.95) 92% 100%);
-      filter:drop-shadow(0 20px 30px rgba(0,0,0,.6))
+        radial-gradient(circle at 50% 15%, rgba(224,124,91,.14), transparent 25%),
+        radial-gradient(circle at 18% 20%, rgba(216,165,108,.08), transparent 18%),
+        linear-gradient(180deg,#120c0b,#090707 58%,#0c0808);
     }
-    .broken-edge:before{
-      inset:6%;background:conic-gradient(from 12deg, transparent 0 10%, rgba(80,49,38,.85) 10% 16%, transparent 16% 21%, rgba(92,57,44,.88) 21% 30%, transparent 30% 36%, rgba(71,44,35,.85) 36% 45%, transparent 45% 53%, rgba(94,58,44,.9) 53% 62%, transparent 62% 70%, rgba(76,46,37,.86) 70% 78%, transparent 78% 86%, rgba(96,58,46,.88) 86% 100%);
-      mask:radial-gradient(circle at center, transparent 58%, black 62%, transparent 70%);opacity:.75
+
+    .scene{
+      position:relative;
+      min-height:100vh;
+      overflow:hidden;
     }
-    .broken-edge:after{inset:12%;background:radial-gradient(circle at center, rgba(224,129,93,.12), transparent 54%);filter:blur(18px);opacity:.9}
 
-    .portal{position:relative;width:70%;aspect-ratio:1/1;border-radius:50%;overflow:hidden;background:radial-gradient(circle at center, rgba(0,0,0,.96) 18%, rgba(8,7,7,.92) 32%, rgba(13,10,10,.84) 48%, transparent 70%);box-shadow:inset 0 0 90px rgba(0,0,0,.96),0 0 50px rgba(224,129,93,.14);display:grid;place-items:center;isolation:isolate}
-    .portal-fx,.portal-fx:before,.portal-fx:after{position:absolute;border-radius:50%;content:"";pointer-events:none}
-    .portal-fx{inset:6%;background:radial-gradient(circle at center, rgba(224,129,93,.16), transparent 58%);filter:blur(8px);animation:pulsefx 4.8s ease-in-out infinite}
-    .portal-fx:before{inset:9%;border:1px solid rgba(255,233,209,.08);animation:spin 18s linear infinite}
-    .portal-fx:after{inset:23%;border:1px solid rgba(255,233,209,.08);animation:spin 11s linear infinite reverse}
-    @keyframes pulsefx{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+    .smoke,
+    .smoke::before,
+    .smoke::after{
+      position:absolute;
+      border-radius:50%;
+      filter:blur(70px);
+      content:"";
+      pointer-events:none;
+    }
+    .smoke{
+      width:34vw;height:34vw;
+      left:-10vw;top:0;
+      background:radial-gradient(circle, rgba(224,124,91,.12), transparent 65%);
+      animation:driftA 18s ease-in-out infinite alternate;
+    }
+    .smoke::before{
+      width:24vw;height:24vw;
+      left:75vw;top:8vh;
+      background:radial-gradient(circle, rgba(216,165,108,.10), transparent 65%);
+      animation:driftB 20s ease-in-out infinite alternate;
+    }
+    .smoke::after{
+      width:30vw;height:30vw;
+      left:28vw;top:66vh;
+      background:radial-gradient(circle, rgba(178,74,59,.10), transparent 65%);
+      animation:driftC 17s ease-in-out infinite alternate;
+    }
+    @keyframes driftA{from{transform:translate(0,0) scale(1)}to{transform:translate(8vw,4vh) scale(1.15)}}
+    @keyframes driftB{from{transform:translate(0,0) scale(1)}to{transform:translate(-8vw,7vh) scale(1.12)}}
+    @keyframes driftC{from{transform:translate(0,0) scale(1)}to{transform:translate(6vw,-7vh) scale(1.1)}}
 
-    .spin-stage{position:relative;width:86%;aspect-ratio:1/1;display:grid;place-items:center}
-    .spin-wheel{position:absolute;inset:50%;width:100%;height:100%;transform:translate(-50%,-50%);border-radius:50%;animation:spin 18s linear infinite}
-    .spin-node{
-      position:absolute;left:50%;top:50%;width:116px;min-height:116px;padding:.7rem;border-radius:26px;border:1px solid rgba(255,233,209,.1);
+    .top-strip{
+      position:absolute;
+      inset:16px 16px auto 16px;
+      z-index:40;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      padding:12px 14px;
+      border-radius:26px;
+      border:1px solid var(--line);
+      background:rgba(10,8,8,.36);
+      backdrop-filter:blur(16px);
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .brand-orb{
+      width:42px;height:42px;border-radius:50%;
+      background:conic-gradient(from 180deg,var(--ember),var(--gold),var(--ember-2),var(--ember));
+      position:relative;
+      box-shadow:0 0 20px rgba(224,124,91,.3);
+      flex:0 0 auto;
+    }
+    .brand-orb::after{
+      content:"";
+      position:absolute;
+      inset:8px;
+      border-radius:50%;
+      background:#140d0c;
+    }
+    .brand-copy strong{
+      display:block;
+      font-family:var(--serif);
+      font-size:1.12rem;
+      line-height:.95;
+      letter-spacing:.04em;
+    }
+    .brand-copy span{
+      display:block;
+      margin-top:4px;
+      font-size:.6rem;
+      text-transform:uppercase;
+      letter-spacing:.32em;
+      color:var(--muted);
+    }
+    .top-meta{
+      font-size:.68rem;
+      text-transform:uppercase;
+      letter-spacing:.20em;
+      color:rgba(247,239,228,.62);
+    }
+    .top-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .phone{
+      font-size:.82rem;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:12px 14px;
+      border-radius:999px;
+      border:1px solid rgba(224,124,91,.34);
+      background:rgba(178,74,59,.12);
+      color:var(--text);
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      font-size:.68rem;
+      font-weight:800;
+      cursor:pointer;
+      transition:.22s ease;
+    }
+    .pill:hover{
+      transform:translateY(-2px);
+      background:rgba(178,74,59,.18);
+    }
+
+    .wall-wrap{
+      position:absolute;
+      inset:92px 18px 88px;
+      display:grid;
+      place-items:center;
+    }
+
+    .brick-wall{
+      position:relative;
+      width:min(96vw,1520px);
+      height:min(80vh,940px);
+      overflow:hidden;
+      border-radius:44px;
+      border:1px solid rgba(255,230,205,.08);
+      box-shadow:0 36px 100px rgba(0,0,0,.52);
+      background:
+        linear-gradient(var(--mortar) 12px, transparent 12px),
+        linear-gradient(90deg, transparent calc(20% - 6px), var(--mortar) calc(20% - 6px) calc(20% + 6px), transparent calc(20% + 6px)),
+        linear-gradient(90deg, transparent calc(40% - 6px), var(--mortar) calc(40% - 6px) calc(40% + 6px), transparent calc(40% + 6px)),
+        linear-gradient(90deg, transparent calc(60% - 6px), var(--mortar) calc(60% - 6px) calc(60% + 6px), transparent calc(60% + 6px)),
+        linear-gradient(90deg, transparent calc(80% - 6px), var(--mortar) calc(80% - 6px) calc(80% + 6px), transparent calc(80% + 6px)),
+        linear-gradient(0deg, transparent calc(50% - 6px), var(--mortar) calc(50% - 6px) calc(50% + 6px), transparent calc(50% + 6px)),
+        repeating-linear-gradient(90deg,
+          var(--brick-a) 0 10%,
+          var(--brick-b) 10% 20%,
+          var(--brick-c) 20% 30%,
+          var(--brick-b) 30% 40%,
+          var(--brick-a) 40% 50%,
+          var(--brick-c) 50% 60%,
+          var(--brick-b) 60% 70%,
+          var(--brick-a) 70% 80%,
+          var(--brick-c) 80% 90%,
+          var(--brick-b) 90% 100%);
+      background-size:100% 110px,100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,100% 100%;
+    }
+    .brick-wall::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 20% 16%, rgba(255,255,255,.08), transparent 18%),
+        radial-gradient(circle at 78% 78%, rgba(0,0,0,.18), transparent 18%),
+        linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.16));
+      pointer-events:none;
+      mix-blend-mode:screen;
+    }
+
+    .hole-zone{
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:min(74vw,900px);
+      aspect-ratio:1 / 1;
+      transform:translate(-50%,-50%);
+      display:grid;
+      place-items:center;
+    }
+
+    .broken-ring,
+    .broken-ring::before,
+    .broken-ring::after{
+      position:absolute;
+      inset:0;
+      border-radius:50%;
+      content:"";
+      pointer-events:none;
+    }
+    .broken-ring{
+      background:
+        radial-gradient(circle at center, transparent 49%, rgba(0,0,0,.9) 53%, rgba(24,17,15,.98) 61%, transparent 63%),
+        conic-gradient(
+          from 0deg,
+          transparent 0 7%,
+          rgba(47,31,26,.95) 7% 13%,
+          transparent 13% 18%,
+          rgba(70,47,39,.96) 18% 27%,
+          transparent 27% 34%,
+          rgba(53,37,31,.96) 34% 41%,
+          transparent 41% 48%,
+          rgba(82,54,44,.96) 48% 57%,
+          transparent 57% 63%,
+          rgba(49,34,28,.96) 63% 71%,
+          transparent 71% 79%,
+          rgba(77,50,41,.96) 79% 88%,
+          transparent 88% 94%,
+          rgba(48,33,28,.96) 94% 100%
+        );
+      filter:drop-shadow(0 22px 32px rgba(0,0,0,.62));
+    }
+    .broken-ring::before{
+      inset:7%;
+      background:
+        conic-gradient(
+          from 12deg,
+          transparent 0 9%,
+          rgba(122,73,56,.86) 9% 16%,
+          transparent 16% 22%,
+          rgba(102,63,49,.88) 22% 31%,
+          transparent 31% 37%,
+          rgba(118,70,54,.88) 37% 46%,
+          transparent 46% 53%,
+          rgba(94,58,46,.86) 53% 61%,
+          transparent 61% 69%,
+          rgba(117,70,54,.88) 69% 77%,
+          transparent 77% 84%,
+          rgba(101,62,49,.88) 84% 100%
+        );
+      mask:radial-gradient(circle at center, transparent 58%, black 62%, transparent 70%);
+      opacity:.8;
+    }
+    .broken-ring::after{
+      inset:14%;
+      background:radial-gradient(circle at center, rgba(224,124,91,.14), transparent 54%);
+      filter:blur(18px);
+    }
+
+    .fragment-layer{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+    }
+    .fragment{
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:clamp(18px,2.4vw,34px);
+      aspect-ratio:1 / 1;
+      background:linear-gradient(135deg,var(--brick-b),var(--brick-c));
+      border:1px solid rgba(20,10,10,.25);
+      box-shadow:
+        0 12px 18px rgba(0,0,0,.32),
+        inset 0 1px 0 rgba(255,255,255,.06);
+      clip-path:polygon(15% 0%,100% 18%,83% 100%,0% 76%);
+      transform:
+        translate(-50%,-50%)
+        rotate(calc(var(--angle) * 1deg))
+        translateY(calc(var(--radius) * -1px))
+        rotate(calc(var(--twist) * 1deg));
+      animation:fragmentFloat calc(var(--speed) * 1s) ease-in-out infinite alternate;
+      opacity:.92;
+    }
+    @keyframes fragmentFloat{
+      from{
+        transform:
+          translate(-50%,-50%)
+          rotate(calc(var(--angle) * 1deg))
+          translateY(calc(var(--radius) * -1px))
+          rotate(calc(var(--twist) * 1deg))
+          scale(1);
+      }
+      to{
+        transform:
+          translate(-50%,-50%)
+          rotate(calc(var(--angle) * 1deg))
+          translateY(calc((var(--radius) - 16) * -1px))
+          rotate(calc((var(--twist) + 24) * 1deg))
+          scale(1.08);
+      }
+    }
+
+    .portal-core{
+      position:relative;
+      width:72%;
+      aspect-ratio:1 / 1;
+      border-radius:50%;
+      overflow:hidden;
+      display:grid;
+      place-items:center;
+      background:
+        radial-gradient(circle at center, rgba(0,0,0,.98) 18%, rgba(6,6,6,.94) 34%, rgba(14,10,10,.84) 50%, transparent 70%);
+      box-shadow:
+        inset 0 0 100px rgba(0,0,0,.96),
+        0 0 50px rgba(224,124,91,.18);
+      isolation:isolate;
+    }
+    .portal-core::before{
+      content:"";
+      position:absolute;
+      inset:6%;
+      border-radius:50%;
+      background:radial-gradient(circle at center, rgba(224,124,91,.16), transparent 60%);
+      filter:blur(10px);
+      animation:corePulse 4.8s ease-in-out infinite;
+    }
+    @keyframes corePulse{
+      0%,100%{transform:scale(1);opacity:.72}
+      50%{transform:scale(1.08);opacity:1}
+    }
+
+    .mode-title{
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      width:44%;
+      text-align:center;
+      z-index:8;
+      pointer-events:none;
+    }
+    .mode-title small{
+      display:block;
+      margin-bottom:6px;
+      font-size:.62rem;
+      text-transform:uppercase;
+      letter-spacing:.22em;
+      color:rgba(247,239,228,.58);
+    }
+    .mode-title strong{
+      display:block;
+      font-family:var(--serif);
+      font-size:1.4rem;
+      line-height:.95;
+      color:#fff2e6;
+      text-shadow:0 8px 16px rgba(0,0,0,.45);
+    }
+
+    .wheel{
+      position:absolute;
+      inset:50%;
+      width:88%;
+      height:88%;
+      transform:translate(-50%,-50%);
+      border-radius:50%;
+      animation:spin 20s linear infinite;
+      z-index:5;
+    }
+    .wheel.ring-only{
+      pointer-events:none;
+    }
+    .wheel.ring-only::before,
+    .wheel.ring-only::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:50%;
+      border-radius:50%;
+      transform:translate(-50%,-50%);
+      border:1px solid rgba(255,230,205,.08);
+    }
+    .wheel.ring-only::before{width:100%;height:100%}
+    .wheel.ring-only::after{width:64%;height:64%;animation:spin 12s linear infinite reverse}
+
+    .wheel-node{
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:118px;
+      min-height:118px;
+      padding:.72rem;
+      border-radius:26px;
+      border:1px solid rgba(255,230,205,.10);
       background:linear-gradient(180deg, rgba(24,18,17,.82), rgba(12,10,10,.96));
-      transform:translate(-50%,-50%) rotate(calc(var(--angle) * 1deg)) translateY(-168px) rotate(calc(var(--angle) * -1deg));
-      display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-shadow:0 18px 24px -20px rgba(0,0,0,.9);transition:.22s ease;cursor:pointer;z-index:4
+      box-shadow:0 18px 24px -20px rgba(0,0,0,.9);
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+      cursor:pointer;
+      transition:.22s ease;
+      transform:
+        translate(-50%,-50%)
+        rotate(calc(var(--angle) * 1deg))
+        translateY(-174px)
+        rotate(calc(var(--angle) * -1deg));
     }
-    .spin-node i{color:var(--gold);font-size:1rem;margin-bottom:.25rem;transition:.2s ease}
-    .spin-node strong{font-size:.68rem;text-transform:uppercase;letter-spacing:.14em;line-height:1.2;color:var(--text)}
-    .spin-node span{display:block;margin-top:.15rem;font-size:.53rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(248,240,230,.5)}
-    .spin-node:hover,.spin-node.active{border-color:rgba(224,129,93,.36);background:linear-gradient(180deg, rgba(180,75,60,.18), rgba(12,10,10,.96));transform:translate(-50%,-50%) rotate(calc(var(--angle) * 1deg)) translateY(-178px) rotate(calc(var(--angle) * -1deg)) scale(1.04)}
-    .spin-node:hover i,.spin-node.active i{color:var(--ember2)}
-    .inner-core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:38%;aspect-ratio:1/1;border-radius:50%;border:1px solid rgba(255,233,209,.08);background:radial-gradient(circle at 35% 35%, rgba(255,248,236,.98), rgba(224,129,93,.72) 36%, rgba(180,75,60,.12) 58%, transparent 64%);box-shadow:0 0 40px rgba(224,129,93,.25);animation:pulsecore 4.8s ease-in-out infinite;z-index:2}
-    @keyframes pulsecore{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.08)}}
-    .inner-title{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:44%;text-align:center;z-index:5;pointer-events:none}
-    .inner-title small{display:block;font-size:.62rem;text-transform:uppercase;letter-spacing:.22em;color:rgba(248,240,230,.56);margin-bottom:.3rem}
-    .inner-title strong{display:block;font-family:var(--serif);font-size:1.35rem;line-height:.95;color:#fff2e6;text-shadow:0 8px 16px rgba(0,0,0,.45)}
-    .portal-action{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);padding:.9rem 1rem;width:min(calc(100% - 34px), 420px);border-radius:18px;border:1px solid rgba(255,233,209,.08);background:rgba(0,0,0,.32);backdrop-filter:blur(10px);display:flex;justify-content:center;align-items:center;gap:10px;font-size:.72rem;text-transform:uppercase;letter-spacing:.18em;color:rgba(248,240,230,.72);z-index:6}
-    .portal-action i{color:var(--ember2)}
+    .wheel-node i{
+      color:var(--gold);
+      font-size:1rem;
+      margin-bottom:.25rem;
+      transition:.22s ease;
+    }
+    .wheel-node strong{
+      font-size:.68rem;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      line-height:1.18;
+    }
+    .wheel-node span{
+      display:block;
+      margin-top:.15rem;
+      font-size:.52rem;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      color:rgba(247,239,228,.52);
+    }
+    .wheel-node:hover,
+    .wheel-node.active{
+      border-color:rgba(224,124,91,.36);
+      background:linear-gradient(180deg, rgba(178,74,59,.18), rgba(12,10,10,.96));
+      transform:
+        translate(-50%,-50%)
+        rotate(calc(var(--angle) * 1deg))
+        translateY(-184px)
+        rotate(calc(var(--angle) * -1deg))
+        scale(1.04);
+    }
+    .wheel-node:hover i,
+    .wheel-node.active i{color:var(--ember-2)}
 
-    .menu-panel{position:absolute;right:28px;top:50%;transform:translateY(-50%);width:min(360px, 28vw);min-width:320px;z-index:8;border-radius:30px;border:1px solid rgba(255,233,209,.1);background:rgba(10,8,8,.48);backdrop-filter:blur(16px);padding:16px;box-shadow:0 26px 40px -30px rgba(0,0,0,.9)}
-    .menu-panel-top{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:12px}
-    .menu-panel h3{font-family:var(--serif);font-size:1.8rem;line-height:.9;color:#f4e6d6}
-    .menu-panel-top span{font-size:.68rem;text-transform:uppercase;letter-spacing:.16em;color:rgba(248,240,230,.56);white-space:nowrap}
-    .item-list{display:grid;gap:10px}
-    .item-card{padding:12px 12px 11px;border-radius:22px;border:1px solid rgba(255,233,209,.08);background:rgba(255,255,255,.03);cursor:pointer;transition:.22s ease}
-    .item-card:hover{transform:translateY(-3px);border-color:rgba(224,129,93,.26);background:rgba(180,75,60,.08)}
-    .item-row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-    .item-card h4{font-family:var(--serif);font-size:1.2rem;line-height:.95;color:#fff1e4}
-    .item-card .price{font-size:.86rem;font-weight:800;color:var(--gold);white-space:nowrap}
-    .item-card p{margin-top:6px;color:rgba(248,240,230,.62);font-size:.76rem;min-height:2.3em}
-    .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-    .tag{padding:4px 6px;border-radius:999px;border:1px solid rgba(255,233,209,.08);background:rgba(255,255,255,.03);font-size:.52rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(248,240,230,.66)}
-    .detail-view{display:none}
-    .detail-view.open{display:block}
-    .detail-view .big{font-family:var(--serif);font-size:2rem;line-height:.9;color:#f4e6d6;margin-bottom:4px}
-    .detail-view .price{color:var(--gold);font-weight:800;font-size:1rem;margin-bottom:10px}
-    .detail-view p{color:rgba(248,240,230,.74);font-size:.9rem}
-    .detail-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .wheel-node.item-node{
+      width:124px;
+      min-height:124px;
+    }
 
-    .visit-dock{position:absolute;left:16px;right:16px;bottom:16px;z-index:30;display:grid;grid-template-columns:auto auto auto auto 1fr;gap:10px;align-items:center;padding:12px;border-radius:24px;border:1px solid rgba(255,233,209,.08);background:rgba(10,8,8,.4);backdrop-filter:blur(16px)}
-    .dock-pill{display:inline-flex;align-items:center;gap:8px;padding:12px 14px;border-radius:999px;border:1px solid rgba(255,233,209,.08);background:rgba(255,255,255,.03);font-size:.68rem;color:rgba(248,240,230,.8);text-transform:uppercase;letter-spacing:.14em;white-space:nowrap}
-    .dock-pill i{color:var(--ember2)}
-    .dock-fill{justify-self:end;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .portal-card{
+      position:absolute;
+      right:30px;
+      top:50%;
+      transform:translateY(-50%);
+      width:min(360px,28vw);
+      min-width:320px;
+      z-index:20;
+      border-radius:30px;
+      border:1px solid rgba(255,230,205,.10);
+      background:var(--glass);
+      backdrop-filter:blur(18px);
+      box-shadow:0 26px 40px -30px rgba(0,0,0,.92);
+      padding:16px;
+    }
+    .portal-card.hidden{display:none}
+    .card-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:end;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    .card-head h3{
+      font-family:var(--serif);
+      font-size:1.85rem;
+      line-height:.9;
+      color:#f4e6d6;
+    }
+    .card-head span{
+      font-size:.68rem;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      color:rgba(247,239,228,.56);
+      white-space:nowrap;
+    }
+    .detail-title{
+      font-family:var(--serif);
+      font-size:2rem;
+      line-height:.9;
+      color:#f4e6d6;
+      margin-bottom:4px;
+    }
+    .detail-price{
+      color:var(--gold);
+      font-weight:800;
+      font-size:1rem;
+      margin-bottom:10px;
+    }
+    .detail-text{
+      color:rgba(247,239,228,.76);
+      font-size:.92rem;
+      line-height:1.55;
+    }
+    .tag-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-top:12px;
+    }
+    .card-tag{
+      padding:4px 7px;
+      border-radius:999px;
+      border:1px solid rgba(255,230,205,.08);
+      background:rgba(255,255,255,.03);
+      font-size:.54rem;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:rgba(247,239,228,.66);
+    }
 
-    .nav-btn{position:fixed;z-index:1200;display:flex;align-items:center;gap:.7rem;background:rgba(30,27,27,.78);border:1px solid rgba(224,129,93,.46);color:var(--text);box-shadow:0 0 24px rgba(180,75,60,.32);cursor:pointer;transition:.25s ease;backdrop-filter:blur(10px);user-select:none}
-    .nav-btn:hover{transform:scale(1.04);box-shadow:0 0 38px rgba(180,75,60,.42);border-color:rgba(224,129,93,.7)}
-    .btn-icon{font-size:1.4rem;color:var(--ember2)}
-    .btn-text{display:flex;flex-direction:column;line-height:1.12}
-    .btn-text .main{font-weight:800;font-size:.9rem;letter-spacing:.18em}
-    .btn-text .sub{font-size:.58rem;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);opacity:.8}
-    .nav-btn.left-center{left:28px;top:50%;transform:translateY(-50%);flex-direction:column;padding:1rem .55rem;border-radius:999px}
-    .nav-btn.left-center .btn-text{writing-mode:vertical-rl;text-orientation:upright}
-    .nav-btn.left-center .main{letter-spacing:normal;font-size:.8rem}
-    .nav-btn.left-center .sub{margin-top:4px}
-    .nav-btn.bottom-center{left:50%;bottom:28px;transform:translateX(-50%);padding:.9rem 1.5rem;border-radius:999px}
-    .circ-menu-overlay{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);backdrop-filter:blur(10px);opacity:0;pointer-events:none;transition:opacity .3s ease}
-    .circ-menu-overlay.open{opacity:1;pointer-events:auto}
-    .circular-menu{width:360px;height:360px;border-radius:50%;position:relative;border:1px solid rgba(224,129,93,.55);box-shadow:0 0 60px rgba(180,75,60,.45);background:radial-gradient(circle at center, rgba(180,75,60,.09), rgba(0,0,0,0) 70%);transform:scale(.35);transition:transform .45s var(--ease)}
-    .circ-menu-overlay.open .circular-menu{transform:scale(1)}
-    .center-home{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 30% 30%, #fff1de, var(--gold));color:#160f0d;border:2px solid var(--ember);box-shadow:0 0 28px rgba(224,129,93,.38);cursor:pointer;transition:.22s ease;z-index:2}
-    .center-home:hover{transform:translate(-50%,-50%) scale(1.06)}
-    .menu-item{position:absolute;top:50%;left:50%;width:66px;height:66px;border-radius:50%;display:grid;place-items:center;background:rgba(22,17,16,.9);border:1px solid rgba(224,129,93,.44);color:var(--text);font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 0 18px rgba(0,0,0,.65);transform:translate(-50%,-50%) rotate(calc(var(--angle) * 1deg)) translateY(-132px) rotate(calc(var(--angle) * -1deg));transition:.22s ease;cursor:pointer;backdrop-filter:blur(8px)}
-    .menu-item:hover{background:rgba(180,75,60,.94);color:#160f0d;transform:translate(-50%,-50%) rotate(calc(var(--angle) * 1deg)) translateY(-142px) rotate(calc(var(--angle) * -1deg)) scale(1.06)}
+    .bottom-dock{
+      position:absolute;
+      left:16px;
+      right:16px;
+      bottom:16px;
+      z-index:30;
+      display:grid;
+      grid-template-columns:auto auto auto auto 1fr;
+      gap:10px;
+      align-items:center;
+      padding:12px;
+      border-radius:24px;
+      border:1px solid rgba(255,230,205,.08);
+      background:rgba(10,8,8,.40);
+      backdrop-filter:blur(16px);
+    }
+    .dock-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:12px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,230,205,.08);
+      background:rgba(255,255,255,.03);
+      font-size:.68rem;
+      color:rgba(247,239,228,.80);
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      white-space:nowrap;
+    }
+    .dock-pill i{color:var(--ember-2)}
+    .dock-actions{
+      justify-self:end;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
 
-    .portal-overlay{position:fixed;inset:0;z-index:5000;opacity:0;pointer-events:none;transition:opacity .35s ease;background:#050404;overflow:hidden auto}
-    .portal-overlay.open{opacity:1;pointer-events:auto}
-    .portal-bg{position:absolute;inset:0;background:
-      radial-gradient(circle at 18% 20%, rgba(224,129,93,.14), transparent 22%),
-      radial-gradient(circle at 80% 18%, rgba(215,165,109,.10), transparent 18%),
-      radial-gradient(circle at 50% 82%, rgba(180,75,60,.08), transparent 24%),
-      linear-gradient(180deg, rgba(9,7,7,.76), rgba(5,4,4,.98));backdrop-filter:blur(18px) saturate(1.05)}
-    .portal-grid{position:absolute;inset:0;background:
-      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);background-size:44px 44px;mask-image:radial-gradient(circle at center, black 24%, rgba(0,0,0,.6) 62%, transparent 90%);opacity:.34}
-    .portal-shell{position:relative;z-index:3;min-height:100vh;display:grid;grid-template-rows:auto 1fr auto;gap:1rem;padding:1rem}
-    .portal-head{position:sticky;top:1rem;z-index:20;display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;padding:.95rem 1rem;border-radius:28px;border:1px solid var(--line);background:rgba(14,11,11,.48);backdrop-filter:blur(18px);box-shadow:0 18px 34px -20px rgba(0,0,0,.72)}
-    .portal-badge{display:flex;align-items:center;gap:.85rem;padding:.35rem;border-radius:999px;border:1px solid rgba(255,233,209,.08);background:rgba(255,255,255,.03)}
-    .portal-badge-orb{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 30% 30%, #fff0de, var(--gold));color:#120d0c}
-    .portal-badge-copy{display:flex;flex-direction:column;line-height:1.04;padding-right:.35rem}
-    .portal-badge-copy strong{font-size:.9rem;text-transform:uppercase;letter-spacing:.1em}
-    .portal-badge-copy span{font-size:.63rem;color:var(--muted);text-transform:uppercase;letter-spacing:.28em;margin-top:.18rem}
-    .portal-status{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;min-width:0}
-    .status-pill{display:inline-flex;align-items:center;gap:.45rem;padding:.78rem .95rem;border-radius:999px;border:1px solid rgba(255,233,209,.08);background:rgba(255,255,255,.03);color:rgba(248,240,230,.8);font-size:.68rem;text-transform:uppercase;letter-spacing:.16em;white-space:nowrap}
-    .portal-close{padding:.9rem 1rem;border-radius:999px;border:1px solid rgba(224,129,93,.38);background:rgba(180,75,60,.12);color:var(--text);text-transform:uppercase;letter-spacing:.15em;font-size:.74rem;font-weight:800;cursor:pointer;transition:.22s ease}
-    .portal-close:hover{transform:translateY(-3px);background:rgba(180,75,60,.18)}
-    .portal-main{width:min(calc(100% - 4px), 1360px);margin:0 auto;display:grid;grid-template-columns:1.08fr .92fr;gap:1rem;align-items:start}
-    .portal-viewport{position:relative;min-height:640px;border-radius:42px;overflow:hidden;border:1px solid rgba(255,233,209,.10);background:linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,.7)), var(--menu-image, linear-gradient(135deg,#3f2b25,#151110));background-size:cover;background-position:center;box-shadow:0 30px 90px rgba(0,0,0,.45)}
-    .portal-viewport:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 18%, rgba(255,255,255,.16), transparent 28%),linear-gradient(180deg, rgba(0,0,0,.04), rgba(0,0,0,.44))}
-    .portal-viewport-overlay{position:absolute;inset:0;padding:1.3rem;display:flex;flex-direction:column;justify-content:space-between;gap:1rem;z-index:1}
-    .viewport-top{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start}
-    .ghost-pill{display:inline-flex;align-items:center;gap:.5rem;padding:.75rem .95rem;border-radius:999px;border:1px solid rgba(255,233,209,.14);background:rgba(0,0,0,.28);backdrop-filter:blur(10px);font-size:.66rem;text-transform:uppercase;letter-spacing:.16em;color:#fff5eb}
-    .viewport-price{padding:.72rem .92rem;border-radius:999px;border:1px solid rgba(255,233,209,.14);background:rgba(0,0,0,.28);backdrop-filter:blur(10px);color:var(--gold);font-weight:800;font-size:.95rem}
-    .viewport-copy{max-width:min(78%, 420px);padding:1rem 1rem .95rem;border-radius:28px;border:1px solid rgba(255,233,209,.14);background:rgba(0,0,0,.26);backdrop-filter:blur(10px)}
-    .viewport-copy small{display:block;margin-bottom:.38rem;font-size:.64rem;text-transform:uppercase;letter-spacing:.24em;color:rgba(248,240,230,.72)}
-    .viewport-copy h2{font-family:var(--serif);font-size:clamp(2.4rem,4vw,4.2rem);line-height:.9;margin-bottom:.35rem;color:#fff4e7}
-    .viewport-copy p{color:rgba(248,240,230,.82);font-size:.94rem;max-width:34ch}
-    .viewport-bottom{display:flex;justify-content:space-between;gap:.8rem;align-items:flex-end;flex-wrap:wrap}
-    .signal-row{display:flex;gap:.55rem;flex-wrap:wrap}
-    .signal-chip{display:inline-flex;align-items:center;gap:.45rem;padding:.76rem .9rem;border-radius:999px;border:1px solid rgba(255,233,209,.12);background:rgba(0,0,0,.24);backdrop-filter:blur(8px);color:rgba(248,240,230,.86);font-size:.64rem;text-transform:uppercase;letter-spacing:.15em}
-    .signal-chip i{color:var(--ember2)}
-    .viewport-actions{display:flex;gap:.7rem;flex-wrap:wrap}
-    .portal-side{display:grid;grid-template-rows:auto auto 1fr;gap:1rem;min-height:640px}
-    .side-panel{border-radius:30px;border:1px solid rgba(255,233,209,.08);background:linear-gradient(180deg, rgba(24,18,17,.68), rgba(12,10,10,.9));backdrop-filter:blur(14px);padding:1rem;box-shadow:0 20px 30px -24px rgba(0,0,0,.8)}
-    .side-head{display:flex;justify-content:space-between;align-items:end;gap:.8rem;margin-bottom:.8rem}
-    .side-head h3{font-family:var(--serif);font-size:1.8rem;line-height:.92;color:#f4e5d5}
-    .side-head span{color:rgba(248,240,230,.56);font-size:.72rem;text-transform:uppercase;letter-spacing:.16em;white-space:nowrap}
-    .category-strip{display:flex;gap:.65rem;flex-wrap:wrap}
-    .category-btn{display:inline-flex;align-items:center;gap:.55rem;padding:.82rem .95rem;border-radius:999px;border:1px solid rgba(255,233,209,.08);background:rgba(255,255,255,.03);color:rgba(248,240,230,.82);font-size:.7rem;text-transform:uppercase;letter-spacing:.14em;cursor:pointer;transition:.22s ease;backdrop-filter:blur(10px)}
-    .category-btn i{color:var(--gold);transition:.22s ease}
-    .category-btn:hover,.category-btn.active{transform:translateY(-2px);background:rgba(180,75,60,.12);border-color:rgba(224,129,93,.28);color:#fff4ea}
-    .category-btn:hover i,.category-btn.active i{color:var(--ember2)}
-    .item-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.85rem;align-content:start}
-    .detail-panel{display:none}
-    .detail-panel.open{display:block}
-    .portal-footer{width:min(calc(100% - 4px), 1360px);margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:1rem;padding-bottom:1rem}
-    .special-spin{position:relative;min-height:310px;display:grid;place-items:center;overflow:hidden}
-    .special-wheel{position:relative;width:min(100%, 300px);aspect-ratio:1/1;animation:spin 16s linear infinite;filter:drop-shadow(0 0 24px rgba(224,129,93,.22))}
-    .special-wheel:before{content:"";position:absolute;inset:16%;border-radius:50%;border:1px solid rgba(255,233,209,.08);background:radial-gradient(circle at center, rgba(255,255,255,.03), rgba(0,0,0,0) 68%)}
-    .special-wheel:after{content:"";position:absolute;inset:38%;border-radius:50%;background:radial-gradient(circle at 35% 35%, #fff1de, var(--gold) 45%, var(--ember2) 72%, transparent 74%);box-shadow:0 0 34px rgba(224,129,93,.34);animation:pulsefx 4.8s ease-in-out infinite}
-    .special-wheel-item{position:absolute;left:50%;top:50%;width:112px;min-height:112px;padding:.7rem;border-radius:24px;border:1px solid rgba(255,233,209,.1);background:linear-gradient(180deg, rgba(30,23,22,.78), rgba(14,11,11,.94));transform:translate(-50%,-50%) rotate(calc(var(--angle) * 1deg)) translateY(-118px) rotate(calc(var(--angle) * -1deg));display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
-    .special-wheel-item strong{display:block;font-family:var(--serif);font-size:.92rem;line-height:.95;color:#fff1e4;margin-bottom:.2rem}
-    .special-wheel-item span{display:block;font-size:.58rem;color:rgba(248,240,230,.6);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.2rem}
-    .special-wheel-item em{font-style:normal;color:var(--gold);font-weight:800;font-size:.74rem}
-    .special-copy{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:min(calc(100% - 22px), 360px);padding:.85rem 1rem;border-radius:18px;border:1px solid rgba(255,233,209,.08);background:rgba(0,0,0,.32);backdrop-filter:blur(10px);text-align:center}
-    .special-copy strong{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.18em;color:rgba(248,240,230,.72);margin-bottom:.15rem}
-    .special-copy span{display:block;font-size:.76rem;color:rgba(248,240,230,.6)}
-    .map-panel{min-height:230px;border-radius:24px;overflow:hidden;border:1px solid rgba(255,233,209,.08);background:linear-gradient(135deg, rgba(215,165,109,.10), rgba(180,75,60,.10)),radial-gradient(circle at 18% 28%, rgba(224,129,93,.16), transparent 24%),radial-gradient(circle at 80% 72%, rgba(215,165,109,.12), transparent 22%),#231e1c;display:grid;place-items:center;text-align:center;position:relative;padding:1rem}
-    .map-panel:before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);background-size:32px 32px;opacity:.34}
-    .map-content{position:relative;z-index:1;display:grid;gap:.55rem}
-    .map-pulse{width:18px;height:18px;border-radius:50%;margin:0 auto;background:radial-gradient(circle, #fff1de, var(--ember2));box-shadow:0 0 0 rgba(224,129,93,.7);animation:mapPulse 2.2s infinite}
-    @keyframes mapPulse{0%{box-shadow:0 0 0 0 rgba(224,129,93,.55)}70%{box-shadow:0 0 0 22px rgba(224,129,93,0)}100%{box-shadow:0 0 0 0 rgba(224,129,93,0)}}
-    .map-content i{font-size:2.2rem;color:var(--ember2)}
-    .map-content strong{font-size:.92rem;text-transform:uppercase;letter-spacing:.18em}
-    .map-content p{font-size:.76rem;color:rgba(248,240,230,.64);max-width:24ch;margin:0 auto}
-    @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+    @keyframes spin{
+      from{transform:translate(-50%,-50%) rotate(0deg)}
+      to{transform:translate(-50%,-50%) rotate(360deg)}
+    }
 
     @media (max-width:1180px){
       body{overflow:auto}
-      .wall-stage{inset:96px 16px 160px}
-      .brick-wall{width:min(96vw,980px);height:min(70vh,760px)}
-      .menu-panel{position:relative;right:auto;top:auto;transform:none;width:min(96%,760px);min-width:0;margin:18px auto 0}
-      .visit-dock{grid-template-columns:1fr 1fr}
-      .dock-fill{justify-self:stretch;grid-column:1/-1;justify-content:flex-end}
-      .portal-main,.portal-footer{grid-template-columns:1fr}
-      .portal-side{min-height:auto}
-      .hero-stats{left:50%;transform:translateX(-50%)}
+      .wall-wrap{inset:94px 16px 160px}
+      .brick-wall{
+        width:min(96vw,980px);
+        height:min(70vh,760px);
+      }
+      .portal-card{
+        position:relative;
+        right:auto;
+        top:auto;
+        transform:none;
+        width:min(96%,760px);
+        min-width:0;
+        margin:18px auto 0;
+      }
+      .bottom-dock{grid-template-columns:1fr 1fr}
+      .dock-actions{
+        justify-self:stretch;
+        grid-column:1 / -1;
+        justify-content:flex-end;
+      }
     }
+
     @media (max-width:760px){
-      .topbar{grid-template-columns:1fr;text-align:center}
+      .top-strip{
+        flex-direction:column;
+        align-items:stretch;
+        text-align:center;
+      }
       .brand,.top-actions{justify-content:center}
       .phone{width:100%;text-align:center}
-      .nav-btn.left-center{display:none}
-      .brick-wall{height:min(66vh,600px);border-radius:28px}
-      .hole-shell{width:min(88vw,540px)}
-      .portal{width:76%}
-      .spin-node{width:88px;min-height:88px;transform:translate(-50%,-50%) rotate(calc(var(--angle) * 1deg)) translateY(-126px) rotate(calc(var(--angle) * -1deg))}
-      .spin-node strong{font-size:.56rem}
-      .spin-node span{display:none}
-      .inner-title{width:52%}
-      .inner-title strong{font-size:1rem}
+      .brick-wall{
+        height:min(66vh,620px);
+        border-radius:28px;
+      }
+      .hole-zone{width:min(90vw,560px)}
+      .portal-core{width:78%}
+      .wheel-node{
+        width:90px;
+        min-height:90px;
+        transform:
+          translate(-50%,-50%)
+          rotate(calc(var(--angle) * 1deg))
+          translateY(-128px)
+          rotate(calc(var(--angle) * -1deg));
+      }
+      .wheel-node.item-node{
+        width:96px;
+        min-height:96px;
+      }
+      .wheel-node strong{font-size:.56rem}
+      .wheel-node span{display:none}
+      .mode-title{width:54%}
+      .mode-title strong{font-size:1rem}
       .portal-action{font-size:.58rem}
-      .visit-dock{grid-template-columns:1fr}
-      .dock-fill{justify-content:stretch}
-      .dock-fill .pill-btn{width:100%}
-      .portal-head{grid-template-columns:1fr auto}
-      .portal-status{grid-column:1/-1;justify-content:flex-start}
-      .item-grid{grid-template-columns:1fr}
-      .portal-viewport{min-height:520px}
-      .viewport-copy{max-width:100%}
-      .viewport-copy h2{font-size:2rem}
-      .viewport-bottom{flex-direction:column;align-items:stretch}
-      .special-wheel-item{width:94px;min-height:94px;transform:translate(-50%,-50%) rotate(calc(var(--angle) * 1deg)) translateY(-102px) rotate(calc(var(--angle) * -1deg))}
+      .bottom-dock{grid-template-columns:1fr}
+      .dock-actions{justify-content:stretch}
+      .dock-actions .pill{width:100%}
+      .portal-card .card-head h3{font-size:1.5rem}
     }
   </style>
 </head>
 <body>
-  <div class="app">
+  <div class="scene">
     <div class="smoke"></div>
 
-    <div class="topbar">
+    <div class="top-strip">
       <div class="brand">
         <div class="brand-orb"></div>
         <div class="brand-copy">
@@ -272,451 +657,297 @@
           <span>SMOKEHOUSE & MEATS</span>
         </div>
       </div>
-      <div class="top-center">Brick Portal Menu</div>
+      <div class="top-meta">Brick Portal Menu</div>
       <div class="top-actions">
         <span class="phone"><i class="fas fa-phone-alt"></i> (225) 245-5046</span>
-        <button class="pill-btn" id="openPortalTop"><i class="fas fa-fire"></i> Open Menu</button>
+        <button class="pill" id="resetPortal"><i class="fas fa-rotate-left"></i> Reset</button>
       </div>
     </div>
 
-    <div class="wall-stage">
+    <div class="wall-wrap">
       <div class="brick-wall">
-        <div class="wall-badge"><strong>The Wall</strong>Something is behind it</div>
+        <div class="hole-zone">
+          <div class="broken-ring"></div>
 
-        <div class="hole-shell">
-          <div class="broken-edge"></div>
-          <div class="portal">
-            <div class="portal-fx"></div>
-            <div class="spin-stage">
-              <div class="spin-wheel">
-                <button class="spin-node active" style="--angle:0" data-category="bbq"><i class="fas fa-fire"></i><strong>BBQ</strong><span>core</span></button>
-                <button class="spin-node" style="--angle:60" data-category="handhelds"><i class="fas fa-burger"></i><strong>Handhelds</strong><span>orbit</span></button>
-                <button class="spin-node" style="--angle:120" data-category="boudin"><i class="fas fa-pepper-hot"></i><strong>Boudin</strong><span>signal</span></button>
-                <button class="spin-node" style="--angle:180" data-category="sides"><i class="fas fa-bowl-food"></i><strong>Sides</strong><span>system</span></button>
-                <button class="spin-node" style="--angle:240" data-category="sweets"><i class="fas fa-cake-candles"></i><strong>Sweets</strong><span>exit</span></button>
-                <button class="spin-node" style="--angle:300" data-category="signals"><i class="fas fa-star"></i><strong>Signals</strong><span>specials</span></button>
-              </div>
-              <div class="inner-core"></div>
-              <div class="inner-title" id="innerTitle"><small>Portal Active</small><strong>BBQ Core</strong></div>
+          <div class="fragment-layer">
+            <div class="fragment" style="--angle:8;--radius:248;--twist:18;--speed:3.1"></div>
+            <div class="fragment" style="--angle:28;--radius:214;--twist:41;--speed:3.8"></div>
+            <div class="fragment" style="--angle:52;--radius:238;--twist:62;--speed:2.9"></div>
+            <div class="fragment" style="--angle:79;--radius:202;--twist:14;--speed:3.6"></div>
+            <div class="fragment" style="--angle:108;--radius:244;--twist:88;--speed:3.2"></div>
+            <div class="fragment" style="--angle:136;--radius:210;--twist:37;--speed:4.1"></div>
+            <div class="fragment" style="--angle:162;--radius:236;--twist:74;--speed:3.4"></div>
+            <div class="fragment" style="--angle:188;--radius:206;--twist:28;--speed:4.0"></div>
+            <div class="fragment" style="--angle:214;--radius:246;--twist:56;--speed:3.1"></div>
+            <div class="fragment" style="--angle:238;--radius:216;--twist:92;--speed:3.5"></div>
+            <div class="fragment" style="--angle:264;--radius:238;--twist:48;--speed:3.2"></div>
+            <div class="fragment" style="--angle:292;--radius:212;--twist:11;--speed:3.7"></div>
+            <div class="fragment" style="--angle:320;--radius:246;--twist:71;--speed:2.8"></div>
+            <div class="fragment" style="--angle:346;--radius:214;--twist:39;--speed:3.9"></div>
+          </div>
+
+          <div class="portal-core">
+            <div class="wheel ring-only"></div>
+
+            <div class="mode-title" id="modeTitle">
+              <small>Choose A Category</small>
+              <strong>Smoke Wheel</strong>
             </div>
-            <div class="portal-action"><i class="fas fa-arrow-pointer"></i> Tap the wheel or open the full portal</div>
+
+            <div class="wheel" id="mainWheel"></div>
+
+            <div class="portal-action">
+              <i class="fas fa-arrow-pointer"></i>
+              Tap the wheel
+            </div>
           </div>
         </div>
 
-        <div class="menu-panel">
-          <div class="list-view" id="listView">
-            <div class="menu-panel-top">
-              <h3 id="categoryTitle">BBQ Core</h3>
-              <span id="categoryMeta">Choose an item</span>
-            </div>
-            <div class="item-list" id="itemList"></div>
+        <div class="portal-card hidden" id="infoCard">
+          <div class="card-head">
+            <h3 id="cardHeading">Item Detail</h3>
+            <span id="cardMeta">Selected</span>
           </div>
-          <div class="detail-view" id="detailView">
-            <div class="menu-panel-top">
-              <h3>Item Detail</h3>
-              <span>Full view</span>
-            </div>
-            <div class="big" id="detailTitle">Brisket Plate</div>
-            <div class="price" id="detailPrice">$10.99</div>
-            <p id="detailText">Tender. Smoky. Heavy.</p>
-            <div class="tags" id="detailTags"></div>
-            <div class="detail-actions">
-              <button class="pill-btn" id="backBtn"><i class="fas fa-arrow-left"></i> Back</button>
-              <button class="pill-btn" id="callBtn"><i class="fas fa-phone"></i> Call</button>
-            </div>
+          <div class="detail-title" id="detailTitle">Brisket Plate</div>
+          <div class="detail-price" id="detailPrice">$10.99</div>
+          <div class="detail-text" id="detailText">Tender. Smoky. Heavy.</div>
+          <div class="tag-row" id="detailTags"></div>
+          <div class="tag-row" style="margin-top:14px">
+            <button class="pill" id="backBtn"><i class="fas fa-arrow-left"></i> Back</button>
+            <button class="pill" id="callBtn"><i class="fas fa-phone"></i> Call</button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="visit-dock">
+    <div class="bottom-dock">
       <div class="dock-pill"><i class="fas fa-location-dot"></i> 6779 US Highway 61</div>
       <div class="dock-pill"><i class="fas fa-clock"></i> Mon–Sat 10–6</div>
       <div class="dock-pill"><i class="fas fa-sun"></i> Sun 10–3</div>
       <div class="dock-pill"><i class="fas fa-bag-shopping"></i> Takeout</div>
-      <div class="dock-fill"><button class="pill-btn" id="openPortalBottom"><i class="fas fa-sparkles"></i> Enter The Wall</button></div>
-    </div>
-
-    <div class="nav-btn left-center" id="navBtnLeft">
-      <i class="fas fa-compass btn-icon"></i>
-      <div class="btn-text"><span class="main">NAVIGATION</span><span class="sub">explore pages</span></div>
-    </div>
-    <div class="nav-btn bottom-center" id="navBtnBottom">
-      <i class="fas fa-compass btn-icon"></i>
-      <div class="btn-text"><span class="main">NAVIGATION</span><span class="sub">explore pages</span></div>
-    </div>
-
-    <div class="circ-menu-overlay" id="circMenuOverlay">
-      <div class="circular-menu">
-        <div class="center-home" id="homeCenter" data-link="#"><i class="fas fa-home"></i></div>
-        <div class="menu-item" style="--angle:0" data-action="menu-layer">Menu</div>
-        <div class="menu-item" style="--angle:60" data-link="#"></div>
-        <div class="menu-item" style="--angle:120" data-link="#"></div>
-        <div class="menu-item" style="--angle:180" data-link="#"></div>
-        <div class="menu-item" style="--angle:240" data-link="order.html">Order</div>
-        <div class="menu-item" style="--angle:300" data-link="#"></div>
+      <div class="dock-actions">
+        <button class="pill" id="backStageBtn"><i class="fas fa-arrow-left"></i> Back</button>
       </div>
     </div>
-
-    <div class="portal-overlay" id="portalOverlay" aria-hidden="true">
-      <div class="portal-bg"></div><div class="portal-grid"></div>
-      <div class="portal-shell">
-        <div class="portal-head">
-          <div class="portal-badge">
-            <div class="portal-badge-orb"><i class="fas fa-fire-flame-curved"></i></div>
-            <div class="portal-badge-copy"><strong>Brick Wall Portal</strong><span>Interactive Menu</span></div>
-          </div>
-          <div class="portal-status">
-            <div class="status-pill" id="statusTitle"><i class="fas fa-fire"></i> BBQ Core</div>
-            <div class="status-pill"><i class="fas fa-location-dot"></i> Highway 61</div>
-            <div class="status-pill"><i class="fas fa-bag-shopping"></i> Takeout Ready</div>
-          </div>
-          <button class="portal-close" id="closePortal"><i class="fas fa-xmark"></i> Exit</button>
-        </div>
-
-        <div class="portal-main">
-          <div class="portal-viewport" id="portalViewport">
-            <div class="portal-viewport-overlay">
-              <div class="viewport-top">
-                <div class="ghost-pill" id="ghostTag"><i class="fas fa-fire"></i> Signature</div>
-                <div class="viewport-price" id="itemPrice">$10.99</div>
-              </div>
-              <div class="viewport-copy">
-                <small id="itemCategory">BBQ Core</small>
-                <h2 id="itemTitle">Brisket Plate</h2>
-                <p id="itemText">Tender. Smoky. Heavy.</p>
-              </div>
-              <div class="viewport-bottom">
-                <div class="signal-row" id="signalRow"></div>
-                <div class="viewport-actions">
-                  <button class="pill-btn" id="backToList"><i class="fas fa-arrow-left"></i> Back</button>
-                  <button class="pill-btn" id="callToOrder"><i class="fas fa-phone"></i> Call</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="portal-side">
-            <div class="side-panel">
-              <div class="side-head"><h3>Categories</h3><span>Tap the wheel</span></div>
-              <div class="category-strip" id="categoryStrip"></div>
-            </div>
-            <div class="side-panel" id="listPanel">
-              <div class="side-head"><h3 id="listTitle">BBQ Core</h3><span id="listMeta">Choose an item</span></div>
-              <div class="item-grid" id="itemGrid"></div>
-            </div>
-            <div class="side-panel detail-panel" id="detailPanel">
-              <div class="side-head"><h3>More Info</h3><span>Item detail</span></div>
-              <div class="big" id="detailPanelTitle" style="font-family:var(--serif);font-size:2rem;line-height:.9;color:#f4e6d6;margin-bottom:4px;">Brisket Plate</div>
-              <div class="price" id="detailPanelPrice" style="color:var(--gold);font-weight:800;font-size:1rem;margin-bottom:10px;">$10.99</div>
-              <p id="detailPanelText" style="color:rgba(248,240,230,.74);font-size:.92rem;">Tender. Smoky. Heavy.</p>
-              <div class="tags" id="detailPanelTags"></div>
-              <div class="detail-actions"><button class="pill-btn" id="detailBackBtn"><i class="fas fa-arrow-left"></i> Back</button></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="portal-footer">
-          <div class="side-panel">
-            <div class="side-head"><h3>Daily Specials</h3><span>Spinning spotlight</span></div>
-            <div class="special-spin">
-              <div class="special-wheel">
-                <div class="special-wheel-item" style="--angle:0"><span>Mon</span><strong>Thai Wings</strong><em>$16</em></div>
-                <div class="special-wheel-item" style="--angle:72"><span>Tue</span><strong>Pirogue</strong><em>$26</em></div>
-                <div class="special-wheel-item" style="--angle:144"><span>Wed</span><strong>Lemon Fish</strong><em>$28</em></div>
-                <div class="special-wheel-item" style="--angle:216"><span>Thu</span><strong>BBQ Shrimp</strong><em>$26</em></div>
-                <div class="special-wheel-item" style="--angle:288"><span>Fri</span><strong>Salmon</strong><em>$28</em></div>
-              </div>
-              <div class="special-copy"><strong>Daily Specials</strong><span>Rotating signal from the kitchen.</span></div>
-            </div>
-          </div>
-          <div class="side-panel">
-            <div class="side-head"><h3>Find The Fire</h3><span>Highway 61</span></div>
-            <div class="map-panel">
-              <div class="map-content">
-                <div class="map-pulse"></div>
-                <i class="fas fa-location-dot"></i>
-                <strong>6779 US Highway 61</strong>
-                <p>St. Francisville · smokehouse · takeout · deck</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </div>
 
   <script>
     (function(){
-      const menuData = {
-        bbq:{icon:'fas fa-fire',name:'BBQ Core',heroTag:'Signature',image:"url('https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?q=80&w=1600&auto=format&fit=crop')",signals:['slow smoked','two sides','fan favorite'],items:[
-          {title:'Brisket Plate',price:'$10.99',text:'Tender. Smoky. Heavy.',detail:'The heavyweight plate. Smoke, bark, and a clean finish.',tags:['hero','brisket','two sides']},
-          {title:'Full Rack Ribs',price:'$19.99',text:'Big smoke. Big bark.',detail:'The showpiece order. Built for sharing or going all in.',tags:['ribs','signature','shareable']},
-          {title:'Half Rack Ribs',price:'$11.99',text:'Same lane. Lighter.',detail:'All the rib energy with more room for sides.',tags:['ribs','balanced']},
-          {title:'Pulled Pork Plate',price:'$9.99',text:'Soft smoke. Comfort.',detail:'A comfort-first plate with softer texture and broad appeal.',tags:['pork','classic']}
-        ]},
-        handhelds:{icon:'fas fa-burger',name:'Handheld Orbit',heroTag:'Quick Favorite',image:"url('https://images.unsplash.com/photo-1558030006-450675393462?q=80&w=1600&auto=format&fit=crop')",signals:['one side','quick order','po-boys'],items:[
-          {title:'Brisket Sandwich',price:'$8.99',text:'Smoked. Stacked. Loud.',detail:'The fastest way to get smokehouse energy in one hand.',tags:['hero','brisket','one side']},
-          {title:'Pulled Pork Sandwich',price:'$7.99',text:'Soft. Smoky. Easy.',detail:'The comfort handheld. Simple and very repeatable.',tags:['pork','classic']},
-          {title:'Shrimp Po-Boy',price:'$8.99',text:'Seafood lift.',detail:'A Louisiana-coded move that expands the menu mood.',tags:['po-boy','seafood']},
-          {title:'Ribeye Po-Boy',price:'$10.99',text:'Premium swagger.',detail:'The premium handheld turn for bigger appetite energy.',tags:['premium','po-boy']}
-        ]},
-        boudin:{icon:'fas fa-pepper-hot',name:'Boudin Signal',heroTag:'Local Legend',image:"url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1600&auto=format&fit=crop')",signals:['local icon','counter heat','shareable'],items:[
-          {title:'Boudin Balls',price:'Market',text:'Crisp. Rich. Local.',detail:'One of the strongest identity items on the whole board.',tags:['must try','local','crispy']},
-          {title:'Pepper Jack Balls',price:'Market',text:'More heat. More melt.',detail:'A hotter, richer version with more drama.',tags:['spicy','cheese']},
-          {title:'Boudin Links',price:'Market',text:'Pure Louisiana core.',detail:'A foundational regional item with a more direct presentation.',tags:['links','classic']},
-          {title:'Boudin Egg Rolls',price:'Market',text:'Crunch. Comfort.',detail:'The novelty lane with stronger texture contrast.',tags:['crispy','fusion']}
-        ]},
-        sides:{icon:'fas fa-bowl-food',name:'Side System',heroTag:'Most Talked About',image:"url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1600&auto=format&fit=crop')",signals:['small / large','comfort','balance'],items:[
-          {title:'Corn Pudding',price:'$2.75 / $6.99',text:'Creamy. Warm. Known.',detail:'One of the most praised side choices and strong contrast against heavier smoke.',tags:['praised','comfort']},
-          {title:'Baked Beans',price:'$2.75 / $6.99',text:'Sweet-smoky ground.',detail:'A dependable side with sweetness that rounds out bark and smoke.',tags:['beans','classic']},
-          {title:'Potato Salad',price:'$2.75 / $6.99',text:'Cool reset.',detail:'The cooling lane for contrast and comfort.',tags:['cooling','classic']},
-          {title:'Waffle Fries',price:'$2.75 / $6.99',text:'Visual drama.',detail:'Sweet edge and stronger visual personality.',tags:['sweet edge','waffle']}
-        ]},
-        sweets:{icon:'fas fa-cake-candles',name:'Sweet Exit',heroTag:'Southern Finish',image:"url('https://images.unsplash.com/photo-1551024601-bec78aea704b?q=80&w=1600&auto=format&fit=crop')",signals:['dessert','soft landing','contrast'],items:[
-          {title:'Bread Pudding',price:'Market',text:'Warm. Dense. Southern.',detail:'The strongest ending for guests who want the story to stay warm and heavy.',tags:['warm','classic']},
-          {title:'Creole Cheesecake',price:'Market',text:'Silky. Rich. Smooth.',detail:'A smoother, more elegant dessert profile.',tags:['smooth','creole']},
-          {title:'Carrot / Chocolate Cake',price:'Market',text:'Bakery close.',detail:'Cake options that broaden the close.',tags:['cake','bakery']},
-          {title:'Shortcake',price:'Market',text:'Brightest exit.',detail:'The lightest dessert note on the board.',tags:['fresh','light']}
-        ]},
-        signals:{icon:'fas fa-star',name:'Kitchen Signals',heroTag:'Featured Signal',image:"url('https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1600&auto=format&fit=crop')",signals:['limited run','premium plates','live feed'],items:[
-          {title:'Thai Chili Wings',price:'$16',text:'Glossy heat hit.',detail:'A quick-hit special with big shine and fast impact.',tags:['wings','special']},
-          {title:'Eggplant Pirogue',price:'$26',text:'Unexpected plate.',detail:'A more creative kitchen move that changes the tone of the board.',tags:['creative','plated']},
-          {title:'Lemon Fish',price:'$28',text:'Premium Louisiana.',detail:'A sharper, more premium seafood signal.',tags:['fish','premium']},
-          {title:'BBQ Shrimp + Chop',price:'$26',text:'Spectacle plate.',detail:'One of the biggest contrast plates in the specials lane.',tags:['special','hero']}
-        ]}
+      const data = {
+        categories: [
+          {
+            key: 'bbq',
+            label: 'BBQ',
+            sub: 'core',
+            icon: 'fas fa-fire',
+            modeTitle: 'BBQ Core',
+            items: [
+              { title: 'Brisket Plate', price: '$10.99', text: 'Tender. Smoky. Heavy.', detail: 'The heavyweight plate. Smoke, bark, and a clean finish.', tags: ['hero','brisket','two sides'] },
+              { title: 'Full Rack Ribs', price: '$19.99', text: 'Big smoke. Big bark.', detail: 'The showpiece order. Built for sharing or going all in.', tags: ['ribs','signature','shareable'] },
+              { title: 'Half Rack Ribs', price: '$11.99', text: 'Same lane. Lighter.', detail: 'All the rib energy with more room for sides.', tags: ['ribs','balanced'] },
+              { title: 'Pulled Pork Plate', price: '$9.99', text: 'Soft smoke. Comfort.', detail: 'A comfort-first plate with softer texture and broad appeal.', tags: ['pork','classic'] },
+              { title: 'Smoked Wings', price: '$7.99', text: 'Fast impact.', detail: 'Shareable smoke energy in a quicker lane.', tags: ['wings','shareable'] },
+              { title: 'Half Chicken', price: '$9.99', text: 'Clean smoke lane.', detail: 'A lighter smokehouse option without losing the fire.', tags: ['chicken','lighter'] }
+            ]
+          },
+          {
+            key: 'handhelds',
+            label: 'Handhelds',
+            sub: 'orbit',
+            icon: 'fas fa-burger',
+            modeTitle: 'Handheld Orbit',
+            items: [
+              { title: 'Brisket Sandwich', price: '$8.99', text: 'Smoked. Stacked. Loud.', detail: 'The fastest way to get smokehouse energy in one hand.', tags: ['brisket','one side'] },
+              { title: 'Pulled Pork Sandwich', price: '$7.99', text: 'Soft. Smoky. Easy.', detail: 'Comfort handheld with broad appeal.', tags: ['pork','classic'] },
+              { title: 'Cheeseburger', price: '$7.99', text: 'Melty comfort.', detail: 'Straightforward and grounded with good weight.', tags: ['burger','comfort'] },
+              { title: 'Bacon Cheeseburger', price: '$8.99', text: 'Louder. Richer.', detail: 'The indulgent handheld lane.', tags: ['burger','loaded'] },
+              { title: 'Shrimp Po-Boy', price: '$8.99', text: 'Seafood lift.', detail: 'A Louisiana-coded move that widens the mood of the menu.', tags: ['po-boy','seafood'] },
+              { title: 'Ribeye Po-Boy', price: '$10.99', text: 'Premium swagger.', detail: 'The premium handheld turn.', tags: ['po-boy','premium'] }
+            ]
+          },
+          {
+            key: 'boudin',
+            label: 'Boudin',
+            sub: 'signal',
+            icon: 'fas fa-pepper-hot',
+            modeTitle: 'Boudin Signal',
+            items: [
+              { title: 'Boudin Balls', price: 'Market', text: 'Crisp. Rich. Local.', detail: 'One of the strongest identity items on the board.', tags: ['local','crispy'] },
+              { title: 'Pepper Jack Balls', price: 'Market', text: 'More heat. More melt.', detail: 'A hotter, richer version with more drama.', tags: ['spicy','cheese'] },
+              { title: 'Boudin Links', price: 'Market', text: 'Pure Louisiana.', detail: 'A foundational regional item.', tags: ['links','classic'] },
+              { title: 'Boudin Egg Rolls', price: 'Market', text: 'Crunch. Comfort.', detail: 'The novelty lane with stronger texture contrast.', tags: ['crispy','fusion'] },
+              { title: 'Meat Pies', price: 'Market', text: 'Savory comfort.', detail: 'Portable, warm, and easy to add on.', tags: ['portable','savory'] },
+              { title: 'Crawfish Pies', price: 'Market', text: 'Regional pastry.', detail: 'A more Louisiana-coded pie with strong local pull.', tags: ['crawfish','regional'] }
+            ]
+          },
+          {
+            key: 'sides',
+            label: 'Sides',
+            sub: 'system',
+            icon: 'fas fa-bowl-food',
+            modeTitle: 'Side System',
+            items: [
+              { title: 'Corn Pudding', price: '$2.75 / $6.99', text: 'Creamy. Warm. Known.', detail: 'One of the most praised side choices.', tags: ['praised','comfort'] },
+              { title: 'Baked Beans', price: '$2.75 / $6.99', text: 'Sweet-smoky ground.', detail: 'A dependable side with sweetness that rounds out bark and smoke.', tags: ['beans','classic'] },
+              { title: 'Potato Salad', price: '$2.75 / $6.99', text: 'Cool reset.', detail: 'The cooling lane for contrast and comfort.', tags: ['cooling','classic'] },
+              { title: 'Cole Slaw', price: '$2.75 / $6.99', text: 'Fresh crunch.', detail: 'Lightest side profile with good lift.', tags: ['fresh','crisp'] },
+              { title: 'French Fries', price: '$2.75 / $6.99', text: 'Pure comfort.', detail: 'The universal side lane.', tags: ['fries','golden'] },
+              { title: 'Waffle Fries', price: '$2.75 / $6.99', text: 'Visual drama.', detail: 'Sweet edge with stronger personality.', tags: ['sweet','waffle'] }
+            ]
+          },
+          {
+            key: 'sweets',
+            label: 'Sweets',
+            sub: 'exit',
+            icon: 'fas fa-cake-candles',
+            modeTitle: 'Sweet Exit',
+            items: [
+              { title: 'Bread Pudding', price: 'Market', text: 'Warm. Dense. Southern.', detail: 'The strongest ending for guests who want the story to stay warm and heavy.', tags: ['warm','classic'] },
+              { title: 'Creole Cheesecake', price: 'Market', text: 'Silky. Rich. Smooth.', detail: 'A smoother, more elegant dessert profile.', tags: ['smooth','creole'] },
+              { title: 'Chocolate Cake', price: 'Market', text: 'Bakery close.', detail: 'Dense and satisfying finish.', tags: ['cake','bakery'] },
+              { title: 'Carrot Cake', price: 'Market', text: 'Spiced finish.', detail: 'A softer close with a bakery feel.', tags: ['cake','bakery'] },
+              { title: 'Shortcake', price: 'Market', text: 'Brightest exit.', detail: 'The lightest dessert note on the board.', tags: ['fresh','light'] }
+            ]
+          },
+          {
+            key: 'signals',
+            label: 'Signals',
+            sub: 'specials',
+            icon: 'fas fa-star',
+            modeTitle: 'Kitchen Signals',
+            items: [
+              { title: 'Thai Chili Wings', price: '$16', text: 'Glossy heat hit.', detail: 'A quick-hit special with big shine and fast impact.', tags: ['wings','special'] },
+              { title: 'Eggplant Pirogue', price: '$26', text: 'Unexpected plate.', detail: 'A creative kitchen move that changes the tone of the board.', tags: ['creative','plated'] },
+              { title: 'Lemon Fish', price: '$28', text: 'Premium Louisiana.', detail: 'A sharper, more premium seafood signal.', tags: ['fish','premium'] },
+              { title: 'BBQ Shrimp + Chop', price: '$26', text: 'Spectacle plate.', detail: 'One of the biggest contrast plates in the specials lane.', tags: ['special','hero'] },
+              { title: 'Salmon + Crabmeat', price: '$28', text: 'Refined seafood.', detail: 'Softer, more refined seafood energy.', tags: ['salmon','crab'] },
+              { title: 'Miss Mud Pie', price: '$7', text: 'Sweet closer.', detail: 'A dessert signal with easy name recall.', tags: ['dessert','special'] }
+            ]
+          }
+        ]
       };
 
-      const spinNodes = document.querySelectorAll('.spin-node');
-      const innerTitle = document.getElementById('innerTitle');
-      const itemList = document.getElementById('itemList');
-      const categoryTitle = document.getElementById('categoryTitle');
-      const categoryMeta = document.getElementById('categoryMeta');
-      const listView = document.getElementById('listView');
-      const detailView = document.getElementById('detailView');
+      const state = {
+        mode: 'categories',
+        selectedCategory: 0,
+        selectedItem: 0
+      };
+
+      const mainWheel = document.getElementById('mainWheel');
+      const modeTitle = document.getElementById('modeTitle');
+      const infoCard = document.getElementById('infoCard');
+      const cardHeading = document.getElementById('cardHeading');
+      const cardMeta = document.getElementById('cardMeta');
       const detailTitle = document.getElementById('detailTitle');
       const detailPrice = document.getElementById('detailPrice');
       const detailText = document.getElementById('detailText');
       const detailTags = document.getElementById('detailTags');
       const backBtn = document.getElementById('backBtn');
+      const backStageBtn = document.getElementById('backStageBtn');
       const callBtn = document.getElementById('callBtn');
+      const resetPortal = document.getElementById('resetPortal');
 
-      const portalOverlay = document.getElementById('portalOverlay');
-      const closePortal = document.getElementById('closePortal');
-      const openPortalTop = document.getElementById('openPortalTop');
-      const openPortalBottom = document.getElementById('openPortalBottom');
-
-      const statusTitle = document.getElementById('statusTitle');
-      const portalViewport = document.getElementById('portalViewport');
-      const ghostTag = document.getElementById('ghostTag');
-      const itemPrice = document.getElementById('itemPrice');
-      const itemCategory = document.getElementById('itemCategory');
-      const itemTitle = document.getElementById('itemTitle');
-      const itemText = document.getElementById('itemText');
-      const signalRow = document.getElementById('signalRow');
-      const categoryStrip = document.getElementById('categoryStrip');
-      const listTitle = document.getElementById('listTitle');
-      const listMeta = document.getElementById('listMeta');
-      const itemGrid = document.getElementById('itemGrid');
-      const listPanel = document.getElementById('listPanel');
-      const detailPanel = document.getElementById('detailPanel');
-      const detailPanelTitle = document.getElementById('detailPanelTitle');
-      const detailPanelPrice = document.getElementById('detailPanelPrice');
-      const detailPanelText = document.getElementById('detailPanelText');
-      const detailPanelTags = document.getElementById('detailPanelTags');
-      const detailBackBtn = document.getElementById('detailBackBtn');
-      const backToList = document.getElementById('backToList');
-      const callToOrder = document.getElementById('callToOrder');
-
-      const navBtnLeft = document.getElementById('navBtnLeft');
-      const navBtnBottom = document.getElementById('navBtnBottom');
-      const circMenuOverlay = document.getElementById('circMenuOverlay');
-      const homeCenter = document.getElementById('homeCenter');
-      const circleMenuItems = document.querySelectorAll('.menu-item');
-
-      let currentCategory = 'bbq';
-      let currentIndex = 0;
-
-      function renderWallPanel() {
-        const cat = menuData[currentCategory];
-        innerTitle.innerHTML = `<small>Portal Active</small><strong>${cat.name}</strong>`;
-        categoryTitle.textContent = cat.name;
-        categoryMeta.textContent = 'Choose an item';
-        itemList.innerHTML = '';
-        cat.items.forEach((item, index) => {
-          const card = document.createElement('button');
-          card.type = 'button';
-          card.className = 'item-card';
-          card.innerHTML = `<div class="item-row"><h4>${item.title}</h4><div class="price">${item.price}</div></div><p>${item.text}</p><div class="tags">${item.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>`;
-          card.addEventListener('click', () => showWallDetail(index));
-          itemList.appendChild(card);
-        });
-        spinNodes.forEach(node => node.classList.toggle('active', node.dataset.category === currentCategory));
+      function getCategory() {
+        return data.categories[state.selectedCategory];
       }
 
-      function showWallDetail(index) {
-        currentIndex = index;
-        const item = menuData[currentCategory].items[index];
-        listView.style.display = 'none';
-        detailView.classList.add('open');
+      function setMode(mode) {
+        state.mode = mode;
+        render();
+      }
+
+      function renderCategoriesWheel() {
+        mainWheel.innerHTML = '';
+        data.categories.forEach((cat, index) => {
+          const node = document.createElement('button');
+          node.type = 'button';
+          node.className = 'wheel-node' + (index === state.selectedCategory ? ' active' : '');
+          node.style.setProperty('--angle', String(index * 60));
+          node.innerHTML = `<i class="${cat.icon}"></i><strong>${cat.label}</strong><span>${cat.sub}</span>`;
+          node.addEventListener('click', () => {
+            state.selectedCategory = index;
+            state.selectedItem = 0;
+            setMode('items');
+          });
+          mainWheel.appendChild(node);
+        });
+
+        modeTitle.innerHTML = `<small>Choose A Category</small><strong>Smoke Wheel</strong>`;
+        infoCard.classList.add('hidden');
+      }
+
+      function renderItemsWheel() {
+        const cat = getCategory();
+        mainWheel.innerHTML = '';
+        cat.items.forEach((item, index) => {
+          const angle = (360 / cat.items.length) * index;
+          const node = document.createElement('button');
+          node.type = 'button';
+          node.className = 'wheel-node item-node';
+          node.style.setProperty('--angle', String(angle));
+          node.innerHTML = `<i class="${cat.icon}"></i><strong>${item.title}</strong><span>${item.price}</span>`;
+          node.addEventListener('click', () => {
+            state.selectedItem = index;
+            setMode('detail');
+          });
+          mainWheel.appendChild(node);
+        });
+
+        modeTitle.innerHTML = `<small>${cat.label}</small><strong>${cat.modeTitle}</strong>`;
+        infoCard.classList.add('hidden');
+      }
+
+      function renderDetailCard() {
+        const cat = getCategory();
+        const item = cat.items[state.selectedItem];
+
         detailTitle.textContent = item.title;
         detailPrice.textContent = item.price;
         detailText.textContent = item.detail;
-        detailTags.innerHTML = item.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
-      }
-
-      function backWallList() {
-        detailView.classList.remove('open');
-        listView.style.display = 'block';
-      }
-
-      function renderSignals(cat) {
-        signalRow.innerHTML = '';
-        cat.signals.forEach(tag => {
-          const chip = document.createElement('div');
-          chip.className = 'signal-chip';
-          chip.innerHTML = `<i class="${cat.icon}"></i><span>${tag}</span>`;
-          signalRow.appendChild(chip);
+        detailTags.innerHTML = '';
+        item.tags.forEach(tag => {
+          const el = document.createElement('span');
+          el.className = 'card-tag';
+          el.textContent = tag;
+          detailTags.appendChild(el);
         });
+
+        cardHeading.textContent = cat.modeTitle;
+        cardMeta.textContent = 'Selected';
+        infoCard.classList.remove('hidden');
+
+        mainWheel.innerHTML = '';
+        const node = document.createElement('div');
+        node.className = 'wheel-node item-node active';
+        node.style.setProperty('--angle', '0');
+        node.innerHTML = `<i class="${cat.icon}"></i><strong>${item.title}</strong><span>${item.price}</span>`;
+        mainWheel.appendChild(node);
+
+        modeTitle.innerHTML = `<small>Viewing Item</small><strong>${item.title}</strong>`;
       }
 
-      function renderPortalCategories() {
-        categoryStrip.innerHTML = '';
-        Object.entries(menuData).forEach(([key, cat]) => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'category-btn' + (key === currentCategory ? ' active' : '');
-          btn.innerHTML = `<i class="${cat.icon}"></i><span>${cat.name}</span>`;
-          btn.addEventListener('click', () => {
-            currentCategory = key;
-            currentIndex = 0;
-            renderPortal();
-            renderWallPanel();
-          });
-          categoryStrip.appendChild(btn);
-        });
+      function render() {
+        if (state.mode === 'categories') renderCategoriesWheel();
+        if (state.mode === 'items') renderItemsWheel();
+        if (state.mode === 'detail') renderDetailCard();
       }
 
-      function renderPortalList(cat) {
-        itemGrid.innerHTML = '';
-        cat.items.forEach((item, index) => {
-          const card = document.createElement('button');
-          card.type = 'button';
-          card.className = 'item-card';
-          card.innerHTML = `<div class="item-row"><h4>${item.title}</h4><div class="price">${item.price}</div></div><p>${item.text}</p><div class="tags">${item.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>`;
-          card.addEventListener('click', () => {
-            currentIndex = index;
-            openPortalDetail();
-          });
-          itemGrid.appendChild(card);
-        });
-      }
-
-      function openPortalDetail() {
-        const cat = menuData[currentCategory];
-        const item = cat.items[currentIndex];
-        listPanel.style.display = 'none';
-        detailPanel.classList.add('open');
-        detailPanelTitle.textContent = item.title;
-        detailPanelPrice.textContent = item.price;
-        detailPanelText.textContent = item.detail;
-        detailPanelTags.innerHTML = item.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
-        portalViewport.style.setProperty('--menu-image', cat.image);
-        statusTitle.innerHTML = `<i class="${cat.icon}"></i> ${cat.name}`;
-        ghostTag.innerHTML = `<i class="${cat.icon}"></i> ${cat.heroTag}`;
-        itemPrice.textContent = item.price;
-        itemCategory.textContent = cat.name;
-        itemTitle.textContent = item.title;
-        itemText.textContent = item.text;
-        renderSignals(cat);
-      }
-
-      function closePortalDetail() {
-        detailPanel.classList.remove('open');
-        listPanel.style.display = 'block';
-      }
-
-      function renderPortal() {
-        const cat = menuData[currentCategory];
-        const item = cat.items[currentIndex];
-        portalViewport.style.setProperty('--menu-image', cat.image);
-        statusTitle.innerHTML = `<i class="${cat.icon}"></i> ${cat.name}`;
-        ghostTag.innerHTML = `<i class="${cat.icon}"></i> ${cat.heroTag}`;
-        itemPrice.textContent = item.price;
-        itemCategory.textContent = cat.name;
-        itemTitle.textContent = item.title;
-        itemText.textContent = item.text;
-        listTitle.textContent = cat.name;
-        listMeta.textContent = 'Choose an item';
-        renderSignals(cat);
-        renderPortalCategories();
-        renderPortalList(cat);
-        closePortalDetail();
-      }
-
-      function openPortalOverlay() {
-        renderPortal();
-        portalOverlay.classList.add('open');
-        portalOverlay.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('menu-open');
-      }
-
-      function closePortalOverlay() {
-        portalOverlay.classList.remove('open');
-        portalOverlay.setAttribute('aria-hidden', 'true');
-        document.body.classList.remove('menu-open');
-      }
-
-      function toggleCircleNav(){ circMenuOverlay.classList.toggle('open'); }
-      function closeCircleNav(){ circMenuOverlay.classList.remove('open'); }
-      function navigateTo(link){
-        if (!link) return;
-        if (link === '#') { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
-        if (link.startsWith('#')) return;
-        window.location.href = link;
-      }
-
-      spinNodes.forEach(node => {
-        node.addEventListener('click', () => {
-          currentCategory = node.dataset.category;
-          currentIndex = 0;
-          renderWallPanel();
-        });
+      backBtn.addEventListener('click', () => setMode('items'));
+      backStageBtn.addEventListener('click', () => {
+        if (state.mode === 'detail') setMode('items');
+        else if (state.mode === 'items') setMode('categories');
+      });
+      resetPortal.addEventListener('click', () => {
+        state.mode = 'categories';
+        state.selectedCategory = 0;
+        state.selectedItem = 0;
+        render();
+      });
+      callBtn.addEventListener('click', () => {
+        window.location.href = 'tel:+12252455046';
       });
 
-      backBtn.addEventListener('click', backWallList);
-      callBtn.addEventListener('click', () => window.location.href = 'tel:+12252455046');
-      openPortalTop.addEventListener('click', openPortalOverlay);
-      openPortalBottom.addEventListener('click', openPortalOverlay);
-      closePortal.addEventListener('click', closePortalOverlay);
-      detailBackBtn.addEventListener('click', closePortalDetail);
-      backToList.addEventListener('click', closePortalDetail);
-      callToOrder.addEventListener('click', () => window.location.href = 'tel:+12252455046');
-      portalOverlay.addEventListener('click', e => { if (e.target === portalOverlay) closePortalOverlay(); });
-
-      navBtnLeft.addEventListener('click', e => { e.stopPropagation(); toggleCircleNav(); });
-      navBtnBottom.addEventListener('click', e => { e.stopPropagation(); toggleCircleNav(); });
-      circMenuOverlay.addEventListener('click', e => { if (e.target === circMenuOverlay) closeCircleNav(); });
-      homeCenter.addEventListener('click', () => { closeCircleNav(); navigateTo(homeCenter.getAttribute('data-link')); });
-      circleMenuItems.forEach(item => {
-        item.addEventListener('click', () => {
-          const action = item.getAttribute('data-action');
-          const link = item.getAttribute('data-link');
-          if (action === 'menu-layer') { closeCircleNav(); openPortalOverlay(); return; }
-          closeCircleNav(); navigateTo(link);
-        });
-      });
-
-      document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') {
-          if (portalOverlay.classList.contains('open')) closePortalOverlay();
-          else if (circMenuOverlay.classList.contains('open')) closeCircleNav();
-        }
-      });
-
-      renderWallPanel();
-      renderPortal();
+      render();
     })();
   </script>
 </body>
