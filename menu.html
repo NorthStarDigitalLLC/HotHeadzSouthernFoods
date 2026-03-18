@@ -1,1635 +1,881 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Hot Headz Southern Foods – Menu with 3D Cube & Rotate Toggle</title>
-  <meta name="description" content="Daily breakfast, lunch, crawfish, salad bar, drinks and desserts – now in 3D!">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Francis Smokehouse & Specialty Meats — St. Francisville, LA</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,200;0,300;0,400;0,600;1,200;1,300&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ember:    #ff6a1a;
+    --gold:     #e8a835;
+    --smoke:    #b0b8c8;
+    --ash:      #3a3f4a;
+    --coal:     #0e0f12;
+    --deep:     #080a0d;
+    --panel:    rgba(20,16,12,0.72);
+    --border:   rgba(232,168,53,0.2);
+    --glow-e:   rgba(255,106,26,0.35);
+    --glow-g:   rgba(232,168,53,0.25);
+    --text-dim: rgba(176,184,200,0.6);
+  }
 
-  <!-- Google Fonts & Font Awesome -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
 
-  <!-- FAVICON / ICONS -->
-  <link rel="icon" type="image/webp" href="images/HotHeadzLogo.png">
-  <link rel="apple-touch-icon" href="images/HotHeadzLogo.png">
+  body {
+    background: var(--deep);
+    color: #d8dce8;
+    font-family: 'Barlow', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
 
-  <!-- OPEN GRAPH / TWITTER -->
-  <meta property="og:image" content="images/HotHeadzLogo.png">
-  <meta property="og:image:alt" content="Hot Headz Southern Foods logo">
-  <meta name="twitter:image" content="images/HotHeadzLogo.png">
-  <meta name="twitter:image:alt" content="Hot Headz Southern Foods logo">
-  
-  <style>
-    /* ---------- RESET / BASE ---------- */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      max-width: 100%;
-    }
-    html {
-      scroll-behavior: smooth;
-      overflow-x: hidden;
-    }
-    body {
-      background-color: #07060a;
-      color: rgba(255,255,255,0.92);
-      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-      line-height: 1.5;
-      padding-bottom: 90px;
-    }
+  /* ── CURSOR ── */
+  #cur  { position:fixed; width:10px; height:10px; border-radius:50%; background:var(--ember); pointer-events:none; z-index:9999; transform:translate(-50%,-50%); box-shadow:0 0 14px var(--ember),0 0 28px rgba(255,106,26,.4); mix-blend-mode:screen; transition:transform .08s; }
+  #ring { position:fixed; width:34px; height:34px; border-radius:50%; border:1px solid rgba(232,168,53,.55); pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:transform .18s, width .2s, height .2s, border-color .2s; }
 
-    /* ---------- FLOATING DOCK ---------- */
-    :root {
-      --gen-glass: rgba(6,7,10,0.62);
-      --gen-glass-2: rgba(6,7,10,0.78);
-      --gen-border: rgba(255,255,255,0.14);
-      --gen-border-2: rgba(255,255,255,0.22);
-      --gen-text: rgba(255,255,255,0.92);
-      --gen-muted: rgba(255,255,255,0.62);
-      --gen-hotA: rgba(255,120,70,0.82);
-      --gen-hotB: rgba(255,60,140,0.74);
-      --gen-radius-xl: 22px;
-      --gen-radius-lg: 16px;
-      --gen-radius-pill: 999px;
-      --gen-shadow: 0 18px 50px rgba(0,0,0,0.62);
-      --gen-font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-    }
-    .gen-root, .gen-root * { box-sizing: border-box; font-family: var(--gen-font); }
-    .gen-root { position: fixed; inset: 0; z-index: 999999; pointer-events: none; }
-    .gen-pill { display: none !important; }
-    .gen-dock {
-      pointer-events: auto;
-      position: fixed;
-      left: 50%;
-      bottom: 16px;
-      transform: translateX(-50%);
-      width: min(660px, calc(100vw - 26px));
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 10px;
-      border-radius: var(--gen-radius-pill);
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(6,7,10,0.62);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: var(--gen-shadow), inset 0 1px 0 rgba(255,255,255,0.08);
-    }
-    .gen-dock-btn {
-      text-decoration: none;
-      color: rgba(255,255,255,0.92);
-      flex: 1 1 0;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.36);
-      padding: 10px 8px;
-      box-shadow: 0 10px 22px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.08);
-      transition: transform .14s ease, background .14s ease, border-color .14s ease;
-    }
-    .gen-dock-btn:hover { transform: translateY(-1px); background: rgba(0,0,0,0.56); border-color: rgba(255,255,255,0.22); }
-    .gen-dock-ic { font-size: 16px; line-height: 1; }
-    .gen-dock-tx { font-size: 11.5px; font-weight: 900; letter-spacing: -0.1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .gen-dock-cta { background: linear-gradient(90deg, rgba(255,120,70,0.22), rgba(255,60,140,0.16)); border-color: rgba(255,255,255,0.20); }
-    .gen-dock-btn.is-active { background: rgba(42,127,98,0.3); border-color: rgba(255,179,90,0.5); }
-    @media (max-width: 720px) { .gen-dock { gap: 8px; padding: 9px; } .gen-dock-btn { padding: 10px 6px; } .gen-dock-ic { font-size: 15px; } .gen-dock-tx { font-size: 11px; } }
-    @media (max-width: 380px) { .gen-dock { gap: 6px; padding: 8px; } .gen-dock-tx { display: none; } }
+  /* ── BACKGROUND ── */
+  .bg-wrap { position:fixed; inset:0; z-index:0; overflow:hidden; }
+  .bg-grid {
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(232,168,53,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,168,53,.03) 1px, transparent 1px);
+    background-size:70px 70px;
+    animation: gridDrift 25s linear infinite;
+  }
+  @keyframes gridDrift { to { background-position:70px 70px; } }
 
-    /* ===== MENU STYLES (original, with cube additions) ===== */
-    :root{
-      --hh-accent:#c05a2a;
-      --hh-accent-2:#2a7f62;
-      --hh-ink:#14110e;
-      --hh-muted:rgba(20,17,14,.68);
-      --hh-table:#070604;
-      --hh-table2:#0b0806;
-      --hh-paper:#f6f0e6;
-      --hh-paper2:#efe6d9;
-      --hh-radius: 26px;
-      --hh-radius2: 34px;
-      --hh-pill: 999px;
-      --hh-shadow: 0 26px 90px rgba(0,0,0,.48);
-      --hh-shadow2: 0 16px 48px rgba(0,0,0,.22);
-      --hh-shadow3: 0 10px 24px rgba(0,0,0,.14);
-    }
-    .hh-menu {
-      width: 100%; max-width: none; min-height: 100vh; margin: 0; padding: 18px 14px 70px;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color: rgba(245,240,230,.94); position: relative; isolation: isolate;
-      background: radial-gradient(1100px 700px at 16% 14%, rgba(192,90,42,.18), transparent 60%),
-                  radial-gradient(1000px 700px at 86% 20%, rgba(42,127,98,.14), transparent 64%),
-                  linear-gradient(180deg, var(--hh-table), var(--hh-table2) 42%, #050403);
-      box-shadow: var(--hh-shadow); overflow: hidden;
-    }
-    .hh-menu::before { content:""; position:absolute; inset:0; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.20'/%3E%3C/svg%3E"); opacity:.12; mix-blend-mode: overlay; pointer-events:none; z-index:0; }
-    .hh-menu > *{ position:relative; z-index:1; }
+  .bg-orb { position:absolute; border-radius:50%; filter:blur(100px); opacity:.14; }
+  .bg-orb-1 { width:700px; height:700px; background:radial-gradient(var(--ember),transparent); top:-200px; left:-200px; animation:orbf 14s ease-in-out infinite alternate; }
+  .bg-orb-2 { width:500px; height:500px; background:radial-gradient(#8b3a00,transparent); bottom:-100px; right:-100px; animation:orbf 10s ease-in-out infinite alternate-reverse; }
+  .bg-orb-3 { width:350px; height:350px; background:radial-gradient(var(--gold),transparent); top:45%; left:55%; animation:orbf 18s ease-in-out infinite alternate; opacity:.09; }
+  @keyframes orbf { from{transform:translate(0,0) scale(1);} to{transform:translate(25px,-35px) scale(1.06);} }
 
-    .hh-header { margin: 10px 0 14px; padding: 14px 14px 0; text-align: center; }
-    .hh-title { font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; font-size: clamp(20px, 2.2vw, 30px); font-weight: 850; letter-spacing: .2px; line-height: 1.1; }
-    .hh-updated { margin-top: 8px; font-weight: 820; color: rgba(245,240,230,.72); font-size: 13.2px; line-height: 1.35; }
-    .hh-note { margin-top: 8px; font-weight: 780; color: rgba(245,240,230,.62); font-size: 13px; line-height: 1.35; }
-    .hh-stickywrap{ position: sticky; top: 10px; z-index: 90; }
+  /* scanlines */
+  body::after { content:''; position:fixed; inset:0; background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.07) 3px,rgba(0,0,0,.07) 4px); pointer-events:none; z-index:900; }
 
-    .hh-daybar { display:flex; gap:10px; flex-wrap:wrap; justify-content: center; margin: 14px; padding: 10px; border-radius: var(--hh-radius2); background: rgba(0,0,0,.30); border: 1px solid rgba(245,240,230,.14); box-shadow: var(--hh-shadow2); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-    .hh-day, .hh-tab { border: 1px solid rgba(245,240,230,.14); background: rgba(255,255,255,.06); color: rgba(245,240,230,.92); padding: 10px 14px; border-radius: var(--hh-pill); font-weight: 900; cursor: pointer; transition: transform .14s ease, box-shadow .14s ease, background .14s ease, border-color .14s ease; white-space: nowrap; box-shadow: 0 10px 22px rgba(0,0,0,.25); }
-    .hh-day:hover, .hh-tab:hover{ transform: translateY(-1px); border-color: rgba(255,179,90,.28); }
-    .hh-day.is-active{ border-color: rgba(192,90,42,.45); background: linear-gradient(180deg, rgba(192,90,42,.26), rgba(0,0,0,.22)); }
+  /* ── STATUS BAR ── */
+  .status-bar { position:fixed; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--ember),var(--gold),var(--ember)); z-index:800; box-shadow:0 0 12px var(--ember); }
+  .status-label { position:fixed; top:12px; right:80px; font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:3px; color:var(--gold); opacity:.65; z-index:801; }
+  .pulse { display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--ember); margin-right:6px; box-shadow:0 0 6px var(--ember); animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.15} }
 
-    .hh-tablist { display:flex; gap:10px; flex-wrap:wrap; justify-content: center; margin: 0 14px 12px; position: sticky; top: 86px; z-index: 80; padding: 10px; border-radius: var(--hh-radius2); background: rgba(0,0,0,.24); border: 1px solid rgba(245,240,230,.14); box-shadow: var(--hh-shadow2); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-    .hh-tab.is-active{ border-color: rgba(192,90,42,.50); background: linear-gradient(135deg, rgba(192,90,42,.32), rgba(42,127,98,.18)); }
+  /* HUD corners */
+  .hud { position:fixed; width:50px; height:50px; pointer-events:none; z-index:801; opacity:.45; }
+  .hud.tl{top:18px;left:18px;border-top:1px solid var(--gold);border-left:1px solid var(--gold);}
+  .hud.tr{top:18px;right:18px;border-top:1px solid var(--gold);border-right:1px solid var(--gold);}
+  .hud.bl{bottom:18px;left:18px;border-bottom:1px solid var(--gold);border-left:1px solid var(--gold);}
+  .hud.br{bottom:18px;right:18px;border-bottom:1px solid var(--gold);border-right:1px solid var(--gold);}
 
-    .hh-panels{ padding: 0 14px 16px; }
-    .hh-panel{ background: linear-gradient(180deg, var(--hh-paper), var(--hh-paper2)); color: var(--hh-ink); border: 1px solid rgba(20,17,14,.14); border-radius: var(--hh-radius2); padding: 18px; box-shadow: var(--hh-shadow2); position: relative; overflow: hidden; }
-    .hh-panel::before{ content:""; position:absolute; inset:auto -30% -55% -30%; height: 240px; background: radial-gradient(circle at 30% 45%, rgba(192,90,42,.18), transparent 62%), radial-gradient(circle at 70% 55%, rgba(42,127,98,.12), transparent 64%); transform: rotate(-6deg); pointer-events:none; }
-    .hh-panel > *{ position:relative; z-index:1; }
-    .hh-panel h3{ margin: 0 0 8px; font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; font-size: clamp(18px, 2vw, 24px); font-weight: 850; letter-spacing: .2px; }
-    .hh-sub{ margin: 0 0 12px; font-weight: 820; color: rgba(20,17,14,.72); font-size: 13.2px; line-height: 1.38; }
-    .hh-panel h4{ text-transform: uppercase; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; font-size: 10.6px; letter-spacing: .14em; color: rgba(20,17,14,.62); margin: 16px 0 10px; }
+  /* ── NAV ── */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:700;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 40px;
+    background:linear-gradient(to bottom, rgba(8,10,13,.95), transparent);
+    backdrop-filter:blur(4px);
+  }
+  .nav-logo { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:4px; color:var(--gold); text-shadow:0 0 20px var(--glow-g); }
+  .nav-links { display:flex; gap:32px; }
+  .nav-links a { font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:3px; color:var(--text-dim); text-decoration:none; text-transform:uppercase; transition:color .2s; cursor:none; }
+  .nav-links a:hover { color:var(--gold); }
+  .nav-order { font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:3px; padding:8px 18px; border:1px solid var(--ember); color:var(--ember); text-decoration:none; border-radius:2px; cursor:none; transition:all .2s; }
+  .nav-order:hover { background:var(--ember); color:#fff; box-shadow:0 0 20px var(--glow-e); }
 
-    .hh-stack{ list-style:none; padding-left:0; margin:0; display:grid; grid-template-columns:1fr; gap:10px; }
-    @media(min-width:860px){ .hh-stack{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    .hh-stack li{ padding: 11px 12px; background: rgba(255,255,255,.62); border: 1px solid rgba(20,17,14,.12); border-radius: 18px; line-height: 1.25; box-shadow: var(--hh-shadow3); transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease; }
-    .hh-stack li:hover{ transform: translateY(-1px); border-color: rgba(192,90,42,.26); box-shadow: 0 14px 30px rgba(0,0,0,.12); }
+  /* ── PAGE ── */
+  .page { position:relative; z-index:1; max-width:1140px; margin:0 auto; padding:0 36px 80px; }
 
-    .hh-cta{ margin-top: 14px; display:grid; gap:10px; }
-    .hh-btn{ background: linear-gradient(135deg, rgba(20,17,14,.92), rgba(20,17,14,.78)); color: rgba(245,240,230,.96); padding: 12px 14px; border-radius: 20px; text-decoration:none; font-weight: 950; display:inline-flex; align-items:center; justify-content:center; gap:10px; box-shadow: 0 18px 40px rgba(0,0,0,.22); transition: transform .14s ease, box-shadow .14s ease; }
-    .hh-btn:hover{ transform: translateY(-1px); box-shadow: 0 22px 60px rgba(0,0,0,.26); }
-    .hh-small{ color: rgba(20,17,14,.70); font-weight: 780; line-height: 1.35; font-size: 13px; }
+  /* ── HERO ── */
+  .hero {
+    min-height:100vh;
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
+    text-align:center;
+    padding-top:80px;
+  }
 
-    .hh-daypanel[hidden]{ display:none; }
-    .hh-daypanel{ animation: hhFadeUp .22s ease-out; }
-    @keyframes hhFadeUp{ from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  .hero-eyebrow { font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:8px; color:var(--ember); text-transform:uppercase; margin-bottom:20px; animation:fadeD .8s ease both; opacity:.9; }
 
-    .hh-state{ border: 1px solid rgba(245,240,230,.14); border-radius: var(--hh-radius2); padding: 20px; margin: 14px; background: rgba(0,0,0,.22); color: rgba(245,240,230,.92); box-shadow: var(--hh-shadow2); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position:relative; overflow:hidden; }
-    .hh-state::after{ content:""; position:absolute; inset:0; background: radial-gradient(700px 280px at 10% 10%, rgba(192,90,42,.22), transparent 60%), radial-gradient(700px 280px at 90% 0%, rgba(42,127,98,.16), transparent 62%); pointer-events:none; opacity:.9; }
-    .hh-state > *{ position:relative; z-index:1; }
-    .hh-badge{ font-weight: 980; text-transform: uppercase; letter-spacing: .14em; font-size: 11px; padding: 7px 12px; border-radius: 999px; border: 1px solid rgba(245,240,230,.18); background: rgba(255,255,255,.06); display:inline-flex; align-items:center; gap:8px; }
-    .hh-badge::before{ content:""; width:8px;height:8px; border-radius: 99px; background: rgba(255,179,90,.92); display:inline-block; }
-    .hh-badge.is-dark::before{ background: rgba(245,240,230,.92); }
-    .hh-state-title{ font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; font-size: clamp(20px, 2.6vw, 30px); font-weight: 850; letter-spacing: .2px; margin: 10px 0 6px; line-height: 1.08; }
-    .hh-state-msg{ font-weight: 780; color: rgba(245,240,230,.74); margin: 0; line-height: 1.35; font-size: 13.2px; }
+  .hero-title {
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(72px,13vw,160px);
+    line-height:.88;
+    letter-spacing:2px;
+    background:linear-gradient(160deg, #fff 0%, var(--gold) 45%, var(--ember) 80%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    animation:fadeD .8s .1s ease both;
+    position:relative;
+  }
+  .hero-title::after {
+    content:'THE FRANCIS\ASMOKEHOUSE';
+    white-space:pre;
+    position:absolute; inset:0;
+    background:linear-gradient(160deg, #fff 0%, var(--gold) 45%, var(--ember) 80%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    filter:blur(24px); opacity:.3;
+  }
 
-    /* advanced panel top */
-    .hh-advanced-top{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin: 8px 14px 12px; }
-    .hh-advanced-title{ font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; font-size: clamp(18px, 2.2vw, 26px); font-weight: 850; letter-spacing: .2px; color: rgba(245,240,230,.92); }
-    .hh-advanced-disclaimer{ font-weight: 780; color: rgba(245,240,230,.68); text-align:right; max-width: 520px; font-size: 12.8px; line-height: 1.35; }
+  .hero-sub { font-size:13px; letter-spacing:6px; color:var(--text-dim); margin-top:18px; text-transform:uppercase; animation:fadeD .8s .2s ease both; }
 
-    /* ===== CUBE STYLES (compact with rotate toggle) ===== */
-    .hh-cube-controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-      margin: 14px 14px 8px;
-    }
-    .hh-cube-btn {
-      background: rgba(0,0,0,0.4);
-      border: 1px solid rgba(255,179,90,0.4);
-      color: rgba(255,255,255,0.9);
-      padding: 6px 14px;
-      border-radius: 40px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      backdrop-filter: blur(5px);
-      transition: 0.2s;
-    }
-    .hh-cube-btn:hover {
-      background: rgba(192,90,42,0.5);
-      border-color: #c05a2a;
-      transform: scale(1.02);
-    }
-    .hh-cube-btn.rotate-mode {
-      background: rgba(192,90,42,0.7);
-      border-color: #c05a2a;
-    }
-    .hh-cube-wrapper {
-      perspective: 1200px;
-      margin: 10px auto 30px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      touch-action: auto; /* allow scrolling by default */
-      cursor: default;
-      pointer-events: none; /* default: pass through to faces */
-    }
-    .hh-cube-wrapper.rotate-mode {
-      pointer-events: auto; /* capture drags */
-      touch-action: none;   /* prevent scrolling while dragging */
-      cursor: grab;
-    }
-    .hh-cube-wrapper.rotate-mode:active {
-      cursor: grabbing;
-    }
-    .hh-cube-container {
-      width: 240px;
-      height: 240px;
-      position: relative;
-      transform-style: preserve-3d;
-      transform: rotateX(-10deg) rotateY(20deg) scale(1);
-      transition: transform 0.1s ease;
-      will-change: transform;
-    }
-    @media (min-width: 600px) {
-      .hh-cube-container { width: 280px; height: 280px; }
-    }
-    .hh-cube-face {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: rgba(30,25,20,0.95);
-      border: 2px solid #c05a2a;
-      border-radius: 14px;
-      box-shadow: 0 0 20px rgba(192,90,42,0.3);
-      backdrop-filter: blur(4px);
-      display: flex;
-      flex-direction: column;
-      padding: 8px 6px;
-      overflow-y: scroll; /* force scrollbar */
-      -webkit-overflow-scrolling: touch;
-      backface-visibility: visible;
-      color: #efe6d9;
-      font-size: 11px;
-      line-height: 1.2;
-      transform: rotateY(0deg) translateZ(120px);
-    }
-    /* Ensure faces are interactive when wrapper has pointer-events:none */
-    .hh-cube-face {
-      pointer-events: auto;
-    }
-    /* Tiny extra height to ensure scrollability even with little content */
-    .hh-cube-face::after {
-      content: '';
-      display: block;
-      height: 2px;
-    }
-    @media (min-width: 600px) {
-      .hh-cube-face { transform: rotateY(0deg) translateZ(140px); padding: 10px; font-size: 12px; }
-    }
-    .hh-cube-face.front  { transform: rotateY(  0deg) translateZ(120px); }
-    .hh-cube-face.back   { transform: rotateY(180deg) translateZ(120px); }
-    .hh-cube-face.right  { transform: rotateY( 90deg) translateZ(120px); }
-    .hh-cube-face.left   { transform: rotateY(-90deg) translateZ(120px); }
-    .hh-cube-face.top    { transform: rotateX( 90deg) translateZ(120px); }
-    .hh-cube-face.bottom { transform: rotateX(-90deg) translateZ(120px); }
-    @media (min-width: 600px) {
-      .hh-cube-face.front  { transform: rotateY(  0deg) translateZ(140px); }
-      .hh-cube-face.back   { transform: rotateY(180deg) translateZ(140px); }
-      .hh-cube-face.right  { transform: rotateY( 90deg) translateZ(140px); }
-      .hh-cube-face.left   { transform: rotateY(-90deg) translateZ(140px); }
-      .hh-cube-face.top    { transform: rotateX( 90deg) translateZ(140px); }
-      .hh-cube-face.bottom { transform: rotateX(-90deg) translateZ(140px); }
-    }
-    .hh-cube-category {
-      font-weight: 800;
-      font-size: 1.1em;
-      color: #ffb35a;
-      margin-bottom: 4px;
-      border-bottom: 1px solid rgba(255,179,90,0.3);
-      padding-bottom: 2px;
-    }
-    .hh-cube-items {
-      list-style: none;
-      padding-left: 0;
-      margin: 4px 0;
-    }
-    .hh-cube-items li {
-      background: rgba(255,255,240,0.1);
-      border-radius: 10px;
-      padding: 3px 6px;
-      margin-bottom: 3px;
-      border-left: 3px solid #c05a2a;
-      font-size: 0.85em;
-      word-break: break-word;
-    }
-    .hh-cube-unavail {
-      opacity: 0.7;
-      font-style: italic;
-    }
-    .hh-view-toggle {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      margin: 0 14px 8px;
-    }
-    .hh-view-btn {
-      background: rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,179,90,0.3);
-      color: white;
-      padding: 6px 20px;
-      border-radius: 40px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .hh-view-btn.active {
-      background: rgba(192,90,42,0.6);
-      border-color: #c05a2a;
-    }
-    .hh-adv-carousel { display: flex; gap:14px; overflow-x:auto; padding: 2px 14px 14px; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; }
-    .hh-adv-card{ flex: 0 0 92%; max-width: 720px; scroll-snap-align:start; }
-    @media(min-width:860px){ .hh-adv-card{ flex: 0 0 48%; } }
-    .hidden { display: none !important; }
+  .hero-divider { display:flex; align-items:center; gap:16px; margin:32px 0; width:min(500px,90%); animation:fadeD .8s .3s ease both; }
+  .hero-divider::before,.hero-divider::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+  .hero-divider span { font-family:'Share Tech Mono',monospace; font-size:9px; color:var(--gold); letter-spacing:4px; white-space:nowrap; }
 
-    /* circular nav (unchanged) */
-    .nav-btn { position: fixed; z-index: 2000; background: #1e1b1b; border: 2px solid var(--hh-accent, #c05a2a); border-radius: 50px; display: flex; align-items: center; gap: 12px; cursor: pointer; box-shadow: 0 0 25px rgba(192,90,42,0.5); transition: all 0.2s ease; backdrop-filter: blur(8px); }
-    .nav-btn:hover { transform: scale(1.05); border-color: var(--hh-accent-2, #2a7f62); box-shadow: 0 0 35px var(--hh-accent, #c05a2a); }
-    .btn-icon { font-size: 1.8rem; color: var(--hh-accent, #c05a2a); }
-    .btn-text { display: flex; flex-direction: column; line-height: 1.2; }
-    .btn-text .main { font-weight: 700; font-size: 1rem; letter-spacing: 2px; color: rgba(255,255,255,0.92); }
-    .btn-text .sub { font-size: 0.65rem; opacity: 0.7; color: rgba(255,255,255,0.7); text-transform: uppercase; }
-    .nav-btn.left-center { left: 30px; top: 50%; transform: translateY(-50%); flex-direction: column; padding: 1rem 0.5rem; gap: 8px; }
-    .nav-btn.left-center .btn-text { writing-mode: vertical-rl; text-orientation: upright; margin: 0; line-height: 1.2; }
-    .nav-btn.bottom-center { bottom: 30px; left: 50%; transform: translateX(-50%); flex-direction: row; padding: 0.8rem 1.8rem; }
-    .circ-menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2500; display: flex; align-items: center; justify-content: center; pointer-events: none; background: rgba(0,0,0,0.7); opacity: 0; transition: opacity 0.3s ease; backdrop-filter: blur(8px); }
-    .circ-menu-overlay.open { opacity: 1; pointer-events: all; }
-    .circular-menu { width: 360px; height: 360px; border-radius: 50%; background: transparent; border: 2px solid var(--hh-accent, #c05a2a); box-shadow: 0 0 40px rgba(192,90,42,0.5); display: flex; align-items: center; justify-content: center; position: relative; transform: scale(0.3); transition: transform 0.3s ease; }
-    .circ-menu-overlay.open .circular-menu { transform: scale(1); }
-    .center-home { width: 70px; height: 70px; background: var(--hh-accent-2, #2a7f62); border: 3px solid var(--hh-accent, #c05a2a); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.5rem; color: #1a0d0b; box-shadow: 0 0 30px var(--hh-accent, #c05a2a); cursor: pointer; transition: 0.2s; z-index: 1001; }
-    .center-home:hover { background: var(--hh-accent, #c05a2a); color: white; transform: scale(1.05); }
-    .menu-item { position: absolute; width: 60px; height: 60px; background: #1e1b1b; border: 2px solid var(--hh-accent, #c05a2a); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.92); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; transition: all 0.2s; cursor: pointer; box-shadow: 0 0 15px rgba(0,0,0,0.7); top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-130px) rotate(calc(var(--angle) * -1deg)); font-family: 'Inter', sans-serif; letter-spacing: 1px; backdrop-filter: blur(4px); }
-    .menu-item:hover { background: var(--hh-accent, #c05a2a); color: black; border-color: var(--hh-accent-2, #2a7f62); transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-140px) rotate(calc(var(--angle) * -1deg)); width: 65px; height: 65px; }
-    @media (max-width: 600px) {
-      .nav-btn.left-center { left: 10px; padding: 0.8rem 0.3rem; }
-      .nav-btn.bottom-center { bottom: 20px; padding: 0.6rem 1.2rem; }
-      .circular-menu { width: 280px; height: 280px; }
-    }
-  </style>
+  .hero-badges { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-bottom:36px; animation:fadeD .8s .35s ease both; }
+  .badge { font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:3px; padding:6px 14px; border:1px solid var(--border); color:var(--text-dim); border-radius:2px; backdrop-filter:blur(8px); }
+  .badge.hot { border-color:rgba(255,106,26,.4); color:var(--ember); }
+  .badge.award { border-color:rgba(232,168,53,.4); color:var(--gold); }
+
+  .hero-cta { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; animation:fadeD .8s .4s ease both; }
+  .btn-primary { font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:3px; padding:14px 32px; background:linear-gradient(135deg,var(--ember),#c44a00); color:#fff; border:none; border-radius:2px; cursor:none; text-decoration:none; transition:all .25s; box-shadow:0 4px 20px var(--glow-e); }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 30px var(--glow-e); }
+  .btn-ghost { font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:3px; padding:14px 32px; border:1px solid var(--border); color:var(--text-dim); border-radius:2px; cursor:none; text-decoration:none; transition:all .25s; backdrop-filter:blur(8px); }
+  .btn-ghost:hover { border-color:var(--gold); color:var(--gold); }
+
+  .hero-scroll { position:absolute; bottom:40px; left:50%; transform:translateX(-50%); font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:4px; color:var(--text-dim); animation:fadeD 1s .8s ease both, bob 2.5s 1.8s ease-in-out infinite; }
+  @keyframes bob { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(6px)} }
+
+  /* ── SECTION SHARED ── */
+  section { padding:90px 0 30px; }
+  .sec-label { font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:6px; color:var(--ember); text-transform:uppercase; margin-bottom:10px; }
+  .sec-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(36px,5vw,56px); letter-spacing:2px; color:#fff; line-height:1; margin-bottom:8px; }
+  .sec-rule { height:1px; background:linear-gradient(90deg,var(--border),transparent); margin:20px 0 40px; }
+
+  /* ── INFO STRIP ── */
+  .info-strip {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1px;
+    background:var(--border); border:1px solid var(--border);
+    border-radius:4px; overflow:hidden;
+    margin-bottom:80px;
+    animation:fadeU .8s .2s ease both;
+  }
+  .info-cell { background:var(--panel); padding:28px 24px; backdrop-filter:blur(16px); transition:background .25s; }
+  .info-cell:hover { background:rgba(30,22,14,.85); }
+  .info-cell-icon { font-size:22px; margin-bottom:10px; filter:drop-shadow(0 0 6px var(--ember)); }
+  .info-cell-label { font-family:'Share Tech Mono',monospace; font-size:8px; letter-spacing:4px; color:var(--text-dim); text-transform:uppercase; margin-bottom:6px; }
+  .info-cell-val { font-size:14px; font-weight:400; color:#d8dce8; line-height:1.6; }
+  .info-cell-val a { color:var(--gold); text-decoration:none; }
+  .info-cell-val a:hover { text-decoration:underline; }
+
+  /* ── RATINGS ── */
+  .ratings-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin-bottom:60px; }
+  .rating-card { background:var(--panel); border:1px solid var(--border); border-radius:4px; padding:28px; backdrop-filter:blur(16px); position:relative; overflow:hidden; transition:transform .25s,box-shadow .25s; }
+  .rating-card::before { content:''; position:absolute; top:0;left:0;right:0; height:2px; background:linear-gradient(90deg,var(--ember),var(--gold)); opacity:0; transition:opacity .3s; }
+  .rating-card:hover { transform:translateY(-3px); box-shadow:0 12px 40px rgba(0,0,0,.4); }
+  .rating-card:hover::before { opacity:1; }
+  .rating-platform { font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:4px; color:var(--text-dim); margin-bottom:12px; }
+  .rating-score { font-family:'Bebas Neue',sans-serif; font-size:56px; color:var(--gold); line-height:1; text-shadow:0 0 20px var(--glow-g); }
+  .rating-max { font-size:18px; color:var(--text-dim); }
+  .rating-count { font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--text-dim); margin-top:4px; }
+  .rating-stars { font-size:16px; margin-top:8px; letter-spacing:2px; }
+  .rating-badge { display:inline-block; margin-top:12px; font-family:'Share Tech Mono',monospace; font-size:8px; letter-spacing:2px; padding:4px 10px; border:1px solid rgba(232,168,53,.35); color:var(--gold); border-radius:1px; }
+
+  /* REVIEW QUOTES */
+  .quotes-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; margin-top:16px; }
+  .quote-card { background:rgba(14,11,8,.6); border:1px solid var(--border); border-left:2px solid var(--ember); padding:20px 22px; border-radius:2px; backdrop-filter:blur(12px); }
+  .quote-text { font-size:14px; font-style:italic; color:#c0c8d8; line-height:1.65; margin-bottom:12px; }
+  .quote-meta { font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--text-dim); }
+  .quote-stars { color:var(--gold); font-size:11px; margin-bottom:6px; }
+
+  /* ── MENU ── */
+  .menu-nav { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:40px; }
+  .mtab { font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:3px; text-transform:uppercase; padding:10px 20px; border:1px solid var(--border); border-radius:2px; background:var(--panel); color:var(--text-dim); cursor:none; transition:all .2s; backdrop-filter:blur(10px); }
+  .mtab:hover,.mtab.active { color:var(--ember); border-color:var(--ember); box-shadow:0 0 16px var(--glow-e); background:rgba(255,106,26,.06); }
+
+  .menu-section-wrap { margin-bottom:60px; }
+  .msec-head { display:flex; align-items:baseline; gap:16px; margin-bottom:24px; }
+  .msec-name { font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:5px; color:var(--ember); }
+  .msec-rule { flex:1; height:1px; background:linear-gradient(90deg,var(--glow-e),transparent); }
+  .msec-ct { font-family:'Share Tech Mono',monospace; font-size:9px; color:var(--text-dim); letter-spacing:2px; }
+
+  .menu-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; }
+  .mcard {
+    background:var(--panel); border:1px solid var(--border); border-radius:3px;
+    padding:22px; position:relative; overflow:hidden; cursor:none;
+    backdrop-filter:blur(14px);
+    transition:transform .28s,box-shadow .28s,border-color .28s;
+    animation:fadeU .5s ease both;
+  }
+  .mcard::after { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at var(--mx,50%) var(--my,50%),rgba(255,106,26,.07) 0%,transparent 55%); opacity:0; transition:opacity .3s; pointer-events:none; }
+  .mcard::before { content:''; position:absolute; top:0;left:0;right:0; height:1px; background:linear-gradient(90deg,transparent,var(--ember),transparent); opacity:0; transition:opacity .3s; }
+  .mcard:hover { transform:translateY(-3px); border-color:rgba(255,106,26,.45); box-shadow:0 8px 36px rgba(0,0,0,.45); }
+  .mcard:hover::after,.mcard:hover::before { opacity:1; }
+
+  .mcard.featured { grid-column:span 2; background:linear-gradient(135deg,rgba(30,16,8,.75),rgba(15,10,5,.6)); border-color:rgba(255,106,26,.3); }
+  @media(max-width:660px){.mcard.featured{grid-column:span 1;}}
+
+  .mcard-badge { display:inline-block; font-family:'Share Tech Mono',monospace; font-size:8px; letter-spacing:2px; padding:3px 9px; border-radius:1px; margin-bottom:12px; color:var(--coal); background:var(--ember); }
+  .mcard-badge.sig { background:var(--gold); }
+  .mcard-badge.new { background:#a78bfa; }
+
+  .mcard-top { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:8px; }
+  .mcard-name { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:1px; color:#fff; flex:1; line-height:1.1; }
+  .mcard-price { font-family:'Share Tech Mono',monospace; font-size:17px; color:var(--gold); white-space:nowrap; text-shadow:0 0 12px var(--glow-g); }
+  .mcard-price-range { font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--gold); opacity:.75; white-space:nowrap; }
+
+  .mcard-desc { font-size:13px; line-height:1.65; color:var(--text-dim); margin:8px 0 14px; }
+  .mcard-tags { display:flex; flex-wrap:wrap; gap:6px; }
+  .mtag { font-family:'Share Tech Mono',monospace; font-size:8px; letter-spacing:2px; padding:3px 7px; border:1px solid rgba(232,168,53,.25); color:rgba(232,168,53,.75); border-radius:1px; }
+  .mtag.sp { color:#f87171; border-color:rgba(248,113,113,.3); }
+  .mtag.ca { color:#34d399; border-color:rgba(52,211,153,.3); }
+
+  /* Sides price note */
+  .sides-note { font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--text-dim); margin-bottom:16px; padding:10px 14px; border:1px solid var(--border); border-radius:2px; display:inline-block; }
+
+  /* specials */
+  .specials-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
+  .spec-card { background:var(--panel); border:1px solid var(--border); border-top:2px solid var(--gold); border-radius:3px; padding:22px; backdrop-filter:blur(14px); transition:transform .25s; }
+  .spec-card:hover { transform:translateY(-3px); }
+  .spec-name { font-family:'Bebas Neue',sans-serif; font-size:19px; color:#fff; margin-bottom:6px; }
+  .spec-price { font-family:'Share Tech Mono',monospace; font-size:16px; color:var(--gold); margin-bottom:8px; }
+  .spec-desc { font-size:13px; color:var(--text-dim); line-height:1.6; }
+
+  /* ── HOURS SECTION ── */
+  .hours-wrap { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media(max-width:600px){ .hours-wrap{grid-template-columns:1fr;} }
+
+  .hours-card { background:var(--panel); border:1px solid var(--border); border-radius:3px; padding:28px; backdrop-filter:blur(14px); }
+  .hours-card-title { font-family:'Bebas Neue',sans-serif; font-size:14px; letter-spacing:4px; color:var(--ember); margin-bottom:18px; }
+  .hours-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(232,168,53,.08); }
+  .hours-row:last-child { border-bottom:none; }
+  .hours-day { font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--smoke); }
+  .hours-time { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--gold); }
+  .hours-closed { color:#f87171; }
+
+  .access-list { list-style:none; }
+  .access-list li { display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid rgba(232,168,53,.08); font-size:14px; color:var(--smoke); }
+  .access-list li:last-child{border-bottom:none;}
+  .access-list li::before { content:'◈'; color:var(--ember); font-size:10px; flex-shrink:0; }
+
+  /* ── CONTACT / MAP SECTION ── */
+  .contact-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  @media(max-width:700px){ .contact-grid{grid-template-columns:1fr;} }
+
+  .contact-card { background:var(--panel); border:1px solid var(--border); border-radius:3px; padding:32px; backdrop-filter:blur(14px); }
+  .contact-item { display:flex; gap:16px; padding:14px 0; border-bottom:1px solid rgba(232,168,53,.08); align-items:flex-start; }
+  .contact-item:last-child { border-bottom:none; }
+  .contact-icon { font-size:18px; flex-shrink:0; margin-top:2px; filter:drop-shadow(0 0 5px var(--ember)); }
+  .contact-label { font-family:'Share Tech Mono',monospace; font-size:8px; letter-spacing:3px; color:var(--text-dim); text-transform:uppercase; margin-bottom:4px; }
+  .contact-val { font-size:14px; color:#d8dce8; line-height:1.5; }
+  .contact-val a { color:var(--gold); text-decoration:none; }
+  .contact-val a:hover { text-decoration:underline; }
+
+  .map-placeholder {
+    background:linear-gradient(135deg,rgba(20,14,8,.9),rgba(10,8,5,.9));
+    border:1px solid var(--border); border-radius:3px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    min-height:300px; gap:14px; text-align:center; padding:30px;
+  }
+  .map-placeholder-icon { font-size:40px; filter:drop-shadow(0 0 12px var(--ember)); }
+  .map-placeholder-title { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:3px; color:var(--gold); }
+  .map-placeholder-addr { font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--text-dim); line-height:1.7; }
+  .map-link { font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:3px; padding:12px 24px; border:1px solid var(--ember); color:var(--ember); border-radius:2px; text-decoration:none; cursor:none; transition:all .2s; margin-top:8px; display:inline-block; }
+  .map-link:hover { background:var(--ember); color:#fff; box-shadow:0 0 18px var(--glow-e); }
+
+  /* ── FOOTER ── */
+  footer { border-top:1px solid var(--border); padding:50px 0 30px; text-align:center; margin-top:60px; }
+  .footer-logo { font-family:'Bebas Neue',sans-serif; font-size:clamp(28px,5vw,44px); letter-spacing:4px; background:linear-gradient(135deg,var(--gold),var(--ember)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:8px; }
+  .footer-sub { font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:5px; color:var(--text-dim); margin-bottom:28px; }
+  .footer-links { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; margin-bottom:28px; }
+  .footer-links a { font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:3px; color:var(--text-dim); text-decoration:none; text-transform:uppercase; transition:color .2s; cursor:none; }
+  .footer-links a:hover { color:var(--gold); }
+  .footer-copy { font-family:'Share Tech Mono',monospace; font-size:8px; letter-spacing:3px; color:rgba(176,184,200,.3); }
+
+  /* ── DIVIDER ── */
+  .holo-div { height:1px; background:linear-gradient(90deg,transparent,var(--gold),var(--ember),transparent); margin:80px 0; opacity:.25; position:relative; }
+  .holo-div::before { content:'◈'; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:var(--deep); padding:0 12px; color:var(--gold); font-size:11px; opacity:.7; }
+
+  /* ANIMATIONS */
+  @keyframes fadeD { from{opacity:0;transform:translateY(-14px);} to{opacity:1;transform:translateY(0);} }
+  @keyframes fadeU { from{opacity:0;transform:translateY(16px);} to{opacity:1;transform:translateY(0);} }
+  .mcard:nth-child(1){animation-delay:.04s}.mcard:nth-child(2){animation-delay:.08s}.mcard:nth-child(3){animation-delay:.12s}.mcard:nth-child(4){animation-delay:.16s}.mcard:nth-child(5){animation-delay:.2s}.mcard:nth-child(6){animation-delay:.24s}
+
+  /* RESPONSIVE */
+  @media(max-width:768px){
+    nav{padding:14px 20px;}
+    .nav-links{display:none;}
+    .page{padding:0 18px 60px;}
+    .hero{padding-top:70px;}
+  }
+</style>
 </head>
 <body>
-  <!-- invisible anchors -->
-  <div id="gen-home" style="position: absolute; top: 0; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
-  <div id="gen-menu" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
-  <div id="gen-delivery" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
-  <div id="gen-order" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
-  <div id="gen-about" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
-  <div id="gen-location" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;" aria-hidden="true"></div>
 
-  <!-- circular nav -->
-  <div class="nav-btn bottom-center" id="navBtnBottom"><i class="fas fa-compass btn-icon"></i><div class="btn-text"><span class="main">NAVIGATION</span><span class="sub">explore pages</span></div></div>
-  <div class="circ-menu-overlay" id="circMenuOverlay"><div class="circular-menu"><div class="center-home" id="homeCenter" data-link="index.html"><i class="fas fa-home"></i></div><div class="menu-item" style="--angle: 0;" data-link="delivery.html">Delivery</div><div class="menu-item" style="--angle: 72;" data-link="tel:3372211035">Order</div><div class="menu-item" style="--angle: 144;" data-link="about.html">About</div><div class="menu-item" style="--angle: 216;" data-link="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634">Location</div><div class="menu-item" style="--angle: 288;" data-action="share">Share</div></div></div>
+<div class="status-bar"></div>
+<div class="status-label"><span class="pulse"></span>LIVE · ST. FRANCISVILLE, LA</div>
+<div class="hud tl"></div><div class="hud tr"></div><div class="hud bl"></div><div class="hud br"></div>
+<div id="cur"></div><div id="ring"></div>
 
-  <!-- ===== MENU HTML (full, with cubes and rotate button) ===== -->
-  <div class="hh-menu" role="region" aria-label="Menu" id="hh-menu-root">
-    <div class="hh-stickywrap">
-      <div class="hh-daybar" role="tablist" aria-label="Day selector">
-        <button class="hh-day is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-day-today" id="hhDayBtnToday">Today</button>
-        <button class="hh-day" type="button" role="tab" aria-selected="false" aria-controls="hh-day-tomorrow" id="hhDayBtnTomorrow">Tomorrow</button>
-        <button class="hh-day" type="button" role="tab" aria-selected="false" aria-controls="hh-day-advanced" id="hhDayBtnAdvanced">Advanced Menu</button>
-      </div>
+<div class="bg-wrap">
+  <div class="bg-grid"></div>
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Francis</div>
+  <div class="nav-links">
+    <a href="#menu">Menu</a>
+    <a href="#specials">Specials</a>
+    <a href="#reviews">Reviews</a>
+    <a href="#hours">Hours</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <a href="tel:2252455046" class="nav-order">☎ Order Now</a>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero" style="position:relative;">
+    <div class="hero-eyebrow">6779 US Highway 61 · St. Francisville, Louisiana</div>
+    <div class="hero-title">THE FRANCIS<br>SMOKEHOUSE</div>
+    <div class="hero-sub">& Specialty Meats · Established 2015</div>
+    <div class="hero-divider"><span>◈ AWARD-WINNING BBQ ◈</span></div>
+    <div class="hero-badges">
+      <div class="badge award">🏆 Tripadvisor Travellers' Choice</div>
+      <div class="badge hot">4.7 ★ Google · 505 Reviews</div>
+      <div class="badge">4.5 ★ Tripadvisor · 143 Reviews</div>
+      <div class="badge">Takeout Available</div>
+      <div class="badge">Wheelchair Accessible</div>
     </div>
-
-    <!-- TODAY PANEL -->
-    <div class="hh-daypanel is-active" id="hh-day-today" role="tabpanel" aria-labelledby="hhDayBtnToday">
-      <div class="hh-header">
-        <div class="hh-title" id="hh-today-title">Today’s Menu</div>
-        <div class="hh-updated" id="hh-hours-line">Loading hours…</div>
-        <div class="hh-note" id="hh-hours-note"></div>
-      </div>
-
-      <!-- Today's view toggle -->
-      <div class="hh-view-toggle" id="viewToggleToday">
-        <button class="hh-view-btn active" id="viewTodayStandardBtn">Standard</button>
-        <button class="hh-view-btn" id="viewTodayCubeBtn">3D Cube</button>
-      </div>
-
-      <div class="hh-state hh-closed" id="hh-today-closed" hidden>
-        <div class="hh-badge">Closed</div>
-        <div class="hh-state-title" id="hh-today-closed-title"></div>
-        <div class="hh-state-msg" id="hh-today-closed-msg"></div>
-      </div>
-
-      <!-- Standard tabbed view -->
-      <div class="hh-tablist" role="tablist" aria-label="Today categories">
-        <button class="hh-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-today-breakfast" id="hhTabTodayBreakfast">Breakfast</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-lunch" id="hhTabTodayLunch">Lunch</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-crawfish" id="hhTabTodayCrawfish">Crawfish</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-salad" id="hhTabTodaySalad">Salad Bar</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-drinks" id="hhTabTodayDrinks">Drinks</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-today-dessert" id="hhTabTodayDessert">Dessert</button>
-      </div>
-
-      <div class="hh-panels" id="todayStandardPanels">
-        <!-- Breakfast panel -->
-        <section class="hh-panel is-active" id="hh-today-breakfast" role="tabpanel" aria-labelledby="hhTabTodayBreakfast">
-          <h3>Breakfast</h3>
-          <p class="hh-sub" id="hh-today-breakfast-sub"></p>
-          <h4>Plates</h4>
-          <ul class="hh-stack" id="hh-today-breakfast-plates"></ul>
-          <h4>Available Items</h4>
-          <ul class="hh-stack" id="hh-today-breakfast-items"></ul>
-          <div class="hh-cta">
-            <a class="hh-btn" id="hh-call-btn-today-b" href="#">Call to Order</a>
-            <div class="hh-small" id="hh-delivery-note"></div>
-          </div>
-        </section>
-        <!-- Lunch panel -->
-        <section class="hh-panel" id="hh-today-lunch" hidden role="tabpanel" aria-labelledby="hhTabTodayLunch">
-          <h3>Lunch</h3>
-          <p class="hh-sub" id="hh-today-lunch-sub">Loading today’s lunch menu…</p>
-          <div class="hh-lunch-unavail" id="hh-today-lunch-unavail" hidden>
-            <div class="hh-badge is-dark">Unavailable</div>
-            <div class="hh-lunch-unavail-title" id="hh-today-lunch-unavail-title">Lunch menu unavailable.</div>
-          </div>
-          <div id="hh-today-lunch-content" style="display:none">
-            <h4>Plates</h4>
-            <ul class="hh-stack" id="hh-today-lunch-plates"></ul>
-            <h4 id="hh-today-lunch-items-title">Today’s Lunch Items</h4>
-            <div class="hh-hintline" id="hh-today-lunch-hint" hidden></div>
-            <ul class="hh-stack" id="hh-today-lunch-items"></ul>
-          </div>
-          <div class="hh-cta">
-            <a class="hh-btn" id="hh-call-btn-today-l" href="#">Call to Order</a>
-          </div>
-        </section>
-        <!-- Crawfish panel -->
-        <section class="hh-panel" id="hh-today-crawfish" hidden role="tabpanel" aria-labelledby="hhTabTodayCrawfish">
-          <h3>Crawfish</h3>
-          <p class="hh-sub" id="hh-today-crawfish-sub"></p>
-          <ul class="hh-stack" id="hh-today-crawfish-items"></ul>
-          <div class="hh-cta">
-            <a class="hh-btn" id="hh-call-btn-today-c" href="#">Call to Order</a>
-          </div>
-        </section>
-        <!-- Salad panel -->
-        <section class="hh-panel" id="hh-today-salad" hidden role="tabpanel" aria-labelledby="hhTabTodaySalad">
-          <h3>Salad Bar</h3>
-          <p class="hh-sub" id="hh-today-salad-sub"></p>
-          <h4>Pricing</h4>
-          <ul class="hh-stack" id="hh-today-salad-pricing"></ul>
-          <h4>Lettuce</h4>
-          <ul class="hh-stack" id="hh-today-salad-lettuce"></ul>
-          <h4>Toppings</h4>
-          <ul class="hh-stack" id="hh-today-salad-toppings"></ul>
-          <h4>Dressing</h4>
-          <ul class="hh-stack" id="hh-today-salad-dressing"></ul>
-        </section>
-        <!-- Drinks panel -->
-        <section class="hh-panel" id="hh-today-drinks" hidden role="tabpanel" aria-labelledby="hhTabTodayDrinks">
-          <h3>Drinks</h3>
-          <ul class="hh-stack" id="hh-today-drinks-items"></ul>
-        </section>
-        <!-- Dessert panel -->
-        <section class="hh-panel" id="hh-today-dessert" hidden role="tabpanel" aria-labelledby="hhTabTodayDessert">
-          <h3>Dessert</h3>
-          <p class="hh-sub" id="hh-today-dessert-sub"></p>
-          <ul class="hh-stack" id="hh-today-dessert-items"></ul>
-        </section>
-      </div>
-
-      <!-- Today's 3D cube view (hidden by default) -->
-      <div id="todayCubeContainer" class="hidden">
-        <div class="hh-cube-controls">
-          <button class="hh-cube-btn" id="todayCubeZoomOut"><i class="fas fa-search-minus"></i></button>
-          <button class="hh-cube-btn" id="todayCubeReset"><i class="fas fa-undo-alt"></i> Reset</button>
-          <button class="hh-cube-btn" id="todayCubeRotate"><i class="fas fa-rotate-right"></i> Rotate</button>
-          <button class="hh-cube-btn" id="todayCubeZoomIn"><i class="fas fa-search-plus"></i></button>
-        </div>
-        <div class="hh-cube-wrapper" id="todayCubeWrapper">
-          <div class="hh-cube-container" id="todayCube">
-            <div class="hh-cube-face front" id="todayFace0"></div>
-            <div class="hh-cube-face back" id="todayFace1"></div>
-            <div class="hh-cube-face right" id="todayFace2"></div>
-            <div class="hh-cube-face left" id="todayFace3"></div>
-            <div class="hh-cube-face top" id="todayFace4"></div>
-            <div class="hh-cube-face bottom" id="todayFace5"></div>
-          </div>
-        </div>
-        <div class="hh-hint" style="text-align:center; margin:8px;">Scroll normally • Tap Rotate to spin</div>
-      </div>
+    <div class="hero-cta">
+      <a href="#menu" class="btn-primary">VIEW MENU</a>
+      <a href="#contact" class="btn-ghost">GET DIRECTIONS</a>
     </div>
+    <div class="hero-scroll">▾ SCROLL TO EXPLORE</div>
+  </div>
 
-    <!-- TOMORROW PANEL -->
-    <div class="hh-daypanel" id="hh-day-tomorrow" hidden role="tabpanel" aria-labelledby="hhDayBtnTomorrow">
-      <div class="hh-header">
-        <div class="hh-title" id="hh-tomorrow-title">Tomorrow’s Menu</div>
-        <div class="hh-updated" id="hh-hours-line-2">Loading hours…</div>
-        <div class="hh-note" id="hh-hours-note-2"></div>
-      </div>
-
-      <!-- Tomorrow's view toggle -->
-      <div class="hh-view-toggle" id="viewToggleTomorrow">
-        <button class="hh-view-btn active" id="viewTomorrowStandardBtn">Standard</button>
-        <button class="hh-view-btn" id="viewTomorrowCubeBtn">3D Cube</button>
-      </div>
-
-      <div class="hh-state hh-closed" id="hh-tomorrow-closed" hidden>
-        <div class="hh-badge">Closed</div>
-        <div class="hh-state-title" id="hh-tomorrow-closed-title"></div>
-        <div class="hh-state-msg" id="hh-tomorrow-closed-msg"></div>
-      </div>
-
-      <!-- Standard tabbed view -->
-      <div class="hh-tablist" role="tablist" aria-label="Tomorrow categories">
-        <button class="hh-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="hh-tomorrow-breakfast" id="hhTabTomorrowBreakfast">Breakfast</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-lunch" id="hhTabTomorrowLunch">Lunch</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-crawfish" id="hhTabTomorrowCrawfish">Crawfish</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-salad" id="hhTabTomorrowSalad">Salad Bar</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-drinks" id="hhTabTomorrowDrinks">Drinks</button>
-        <button class="hh-tab" type="button" role="tab" aria-selected="false" aria-controls="hh-tomorrow-dessert" id="hhTabTomorrowDessert">Dessert</button>
-      </div>
-
-      <div class="hh-panels" id="tomorrowStandardPanels">
-        <!-- Breakfast panel -->
-        <section class="hh-panel is-active" id="hh-tomorrow-breakfast" role="tabpanel" aria-labelledby="hhTabTomorrowBreakfast">
-          <h3>Breakfast</h3>
-          <p class="hh-sub" id="hh-tomorrow-breakfast-sub"></p>
-          <h4>Plates</h4>
-          <ul class="hh-stack" id="hh-tomorrow-breakfast-plates"></ul>
-          <h4>Available Items</h4>
-          <ul class="hh-stack" id="hh-tomorrow-breakfast-items"></ul>
-          <div class="hh-cta">
-            <a class="hh-btn" id="hh-call-btn-tomorrow-b" href="#">Call to Order</a>
-            <div class="hh-small" id="hh-delivery-note-2"></div>
-          </div>
-        </section>
-        <!-- Lunch panel -->
-        <section class="hh-panel" id="hh-tomorrow-lunch" hidden role="tabpanel" aria-labelledby="hhTabTomorrowLunch">
-          <h3>Lunch</h3>
-          <p class="hh-sub" id="hh-tomorrow-lunch-sub">Loading tomorrow’s lunch menu…</p>
-          <div class="hh-lunch-unavail" id="hh-tomorrow-lunch-unavail" hidden>
-            <div class="hh-badge is-dark">Unavailable</div>
-            <div class="hh-lunch-unavail-title" id="hh-tomorrow-lunch-unavail-title">Lunch menu unavailable.</div>
-          </div>
-          <div id="hh-tomorrow-lunch-content" style="display:none">
-            <h4>Plates</h4>
-            <ul class="hh-stack" id="hh-tomorrow-lunch-plates"></ul>
-            <h4 id="hh-tomorrow-lunch-items-title">Tomorrow’s Lunch Items</h4>
-            <div class="hh-hintline" id="hh-tomorrow-lunch-hint" hidden></div>
-            <ul class="hh-stack" id="hh-tomorrow-lunch-items"></ul>
-          </div>
-          <div class="hh-cta">
-            <a class="hh-btn" id="hh-call-btn-tomorrow-l" href="#">Call to Order</a>
-          </div>
-        </section>
-        <!-- Crawfish panel -->
-        <section class="hh-panel" id="hh-tomorrow-crawfish" hidden role="tabpanel" aria-labelledby="hhTabTomorrowCrawfish">
-          <h3>Crawfish</h3>
-          <p class="hh-sub" id="hh-tomorrow-crawfish-sub"></p>
-          <ul class="hh-stack" id="hh-tomorrow-crawfish-items"></ul>
-          <div class="hh-cta">
-            <a class="hh-btn" id="hh-call-btn-tomorrow-c" href="#">Call to Order</a>
-          </div>
-        </section>
-        <!-- Salad panel -->
-        <section class="hh-panel" id="hh-tomorrow-salad" hidden role="tabpanel" aria-labelledby="hhTabTomorrowSalad">
-          <h3>Salad Bar</h3>
-          <p class="hh-sub" id="hh-tomorrow-salad-sub"></p>
-          <h4>Pricing</h4>
-          <ul class="hh-stack" id="hh-tomorrow-salad-pricing"></ul>
-          <h4>Lettuce</h4>
-          <ul class="hh-stack" id="hh-tomorrow-salad-lettuce"></ul>
-          <h4>Toppings</h4>
-          <ul class="hh-stack" id="hh-tomorrow-salad-toppings"></ul>
-          <h4>Dressing</h4>
-          <ul class="hh-stack" id="hh-tomorrow-salad-dressing"></ul>
-        </section>
-        <!-- Drinks panel -->
-        <section class="hh-panel" id="hh-tomorrow-drinks" hidden role="tabpanel" aria-labelledby="hhTabTomorrowDrinks">
-          <h3>Drinks</h3>
-          <ul class="hh-stack" id="hh-tomorrow-drinks-items"></ul>
-        </section>
-        <!-- Dessert panel -->
-        <section class="hh-panel" id="hh-tomorrow-dessert" hidden role="tabpanel" aria-labelledby="hhTabTomorrowDessert">
-          <h3>Dessert</h3>
-          <p class="hh-sub" id="hh-tomorrow-dessert-sub"></p>
-          <ul class="hh-stack" id="hh-tomorrow-dessert-items"></ul>
-        </section>
-      </div>
-
-      <!-- Tomorrow's 3D cube view -->
-      <div id="tomorrowCubeContainer" class="hidden">
-        <div class="hh-cube-controls">
-          <button class="hh-cube-btn" id="tomorrowCubeZoomOut"><i class="fas fa-search-minus"></i></button>
-          <button class="hh-cube-btn" id="tomorrowCubeReset"><i class="fas fa-undo-alt"></i> Reset</button>
-          <button class="hh-cube-btn" id="tomorrowCubeRotate"><i class="fas fa-rotate-right"></i> Rotate</button>
-          <button class="hh-cube-btn" id="tomorrowCubeZoomIn"><i class="fas fa-search-plus"></i></button>
-        </div>
-        <div class="hh-cube-wrapper" id="tomorrowCubeWrapper">
-          <div class="hh-cube-container" id="tomorrowCube">
-            <div class="hh-cube-face front" id="tomorrowFace0"></div>
-            <div class="hh-cube-face back" id="tomorrowFace1"></div>
-            <div class="hh-cube-face right" id="tomorrowFace2"></div>
-            <div class="hh-cube-face left" id="tomorrowFace3"></div>
-            <div class="hh-cube-face top" id="tomorrowFace4"></div>
-            <div class="hh-cube-face bottom" id="tomorrowFace5"></div>
-          </div>
-        </div>
-        <div class="hh-hint" style="text-align:center; margin:8px;">Scroll normally • Tap Rotate to spin</div>
-      </div>
+  <!-- INFO STRIP -->
+  <div class="info-strip">
+    <div class="info-cell">
+      <div class="info-cell-icon">📍</div>
+      <div class="info-cell-label">Location</div>
+      <div class="info-cell-val">6779 US Highway 61<br>St. Francisville, LA 70775</div>
     </div>
-
-    <!-- ADVANCED PANEL -->
-    <div class="hh-daypanel" id="hh-day-advanced" hidden role="tabpanel" aria-labelledby="hhDayBtnAdvanced">
-      <div class="hh-advanced-top">
-        <div class="hh-advanced-title">Advanced Menu</div>
-        <div class="hh-advanced-disclaimer" id="hh-advanced-disclaimer"></div>
-      </div>
-
-      <div class="hh-view-toggle">
-        <button class="hh-view-btn active" id="viewCarouselBtn">Carousel</button>
-        <button class="hh-view-btn" id="viewCubeBtn">3D Cube</button>
-      </div>
-
-      <div class="hh-adv-carousel" id="hh-adv-carousel" aria-label="Advanced menu day cards"></div>
-
-      <div id="cubeViewContainer" class="hidden">
-        <div class="hh-cube-controls">
-          <button class="hh-cube-btn" id="cubePrevGroup"><i class="fas fa-chevron-left"></i> Prev 6</button>
-          <button class="hh-cube-btn" id="cubeZoomOut"><i class="fas fa-search-minus"></i></button>
-          <button class="hh-cube-btn" id="cubeReset"><i class="fas fa-undo-alt"></i> Reset</button>
-          <button class="hh-cube-btn" id="cubeRotate"><i class="fas fa-rotate-right"></i> Rotate</button>
-          <button class="hh-cube-btn" id="cubeZoomIn"><i class="fas fa-search-plus"></i></button>
-          <button class="hh-cube-btn" id="cubeNextGroup">Next 6 <i class="fas fa-chevron-right"></i></button>
-        </div>
-        <div class="hh-cube-wrapper" id="cubeWrapper">
-          <div class="hh-cube-container" id="cubeContainer">
-            <div class="hh-cube-face front" id="face0"></div>
-            <div class="hh-cube-face back" id="face1"></div>
-            <div class="hh-cube-face right" id="face2"></div>
-            <div class="hh-cube-face left" id="face3"></div>
-            <div class="hh-cube-face top" id="face4"></div>
-            <div class="hh-cube-face bottom" id="face5"></div>
-          </div>
-        </div>
-        <div class="hh-hint" style="text-align:center; margin:8px;">Scroll normally • Tap Rotate to spin</div>
-      </div>
-
-      <div class="hh-hint">Tip: switch to 3D cube for a spinning experience!</div>
+    <div class="info-cell">
+      <div class="info-cell-icon">📞</div>
+      <div class="info-cell-label">Phone</div>
+      <div class="info-cell-val"><a href="tel:2252455046">(225) 245-5046</a></div>
     </div>
-
-    <!-- error state -->
-    <div class="hh-state" id="hh-load-error" hidden>
-      <div class="hh-badge is-dark">Error</div>
-      <div class="hh-state-title">Menu couldn’t load</div>
-      <p class="hh-state-msg" id="hh-load-error-msg">Please try again in a moment.</p>
+    <div class="info-cell">
+      <div class="info-cell-icon">🕙</div>
+      <div class="info-cell-label">Hours</div>
+      <div class="info-cell-val">Mon–Sat: 10am – 6pm<br>Sun: 10am – 3pm</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-cell-icon">✉</div>
+      <div class="info-cell-label">Email</div>
+      <div class="info-cell-val"><a href="mailto:francissmokehouse@att.net">francissmokehouse@att.net</a></div>
     </div>
   </div>
 
-  <!-- ===== SCRIPTS ===== -->
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>
-    // ----- ORIGINAL MENU SCRIPT (full, with cube integration) -----
-    (function(){
-      const DATA_URLS = ["/menu-data.html", "/menu-data/"]; // tries both
-      const $ = (id)=>document.getElementById(id);
-
-      function setText(id, text){ const el=$(id); if(el) el.textContent = text || ""; }
-      function setList(id, items){
-        const ul=$(id); if(!ul) return;
-        ul.innerHTML="";
-        (items||[]).forEach(t=>{
-          const li=document.createElement("li");
-          li.textContent=String(t ?? "");
-          ul.appendChild(li);
-        });
-      }
-
-      function escapeHtml(str){
-        return String(str ?? "")
-          .replace(/&/g,"&amp;")
-          .replace(/</g,"&lt;")
-          .replace(/>/g,"&gt;")
-          .replace(/"/g,"&quot;")
-          .replace(/'/g,"&#039;");
-      }
-
-      function normalizeItems(arr){
-        return Array.isArray(arr) ? arr.map(x=>String(x||"").trim()).filter(Boolean) : [];
-      }
-
-      function toISODateLocal(d){
-        const y=d.getFullYear();
-        const m=String(d.getMonth()+1).padStart(2,"0");
-        const day=String(d.getDate()).padStart(2,"0");
-        return `${y}-${m}-${day}`;
-      }
-
-      function formatDateNice(d){
-        return d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
-      }
-
-      function weekdayName(d){
-        return d.toLocaleDateString("en-US",{weekday:"long"});
-      }
-
-      function parseISODateToLocal(iso){
-        const [y,m,d]=String(iso).split("-").map(Number);
-        return new Date(y,(m||1)-1,d||1);
-      }
-
-      function normalizeDateKey(key){
-        const s=String(key||"").trim();
-        const m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-        if(!m) return null;
-        const y=m[1];
-        const mo=String(Number(m[2])).padStart(2,"0");
-        const da=String(Number(m[3])).padStart(2,"0");
-        return `${y}-${mo}-${da}`;
-      }
-
-      function showLoadError(msg){
-        const err = $("hh-load-error");
-        const msgEl = $("hh-load-error-msg");
-        if(msgEl) msgEl.textContent = msg || "Please try again.";
-        if(err) err.hidden = false;
-      }
-
-      async function fetchHtml(url){
-        const res = await fetch(url, { credentials:"same-origin", cache:"no-store" });
-        if(!res.ok) throw new Error(`Fetch failed ${res.status} at ${url}`);
-        return await res.text();
-      }
-
-      function extractJsonFromHtml(html, urlLabel){
-        const doc = new DOMParser().parseFromString(html, "text/html");
-        const script = doc.querySelector("#hh-menu-data");
-        if(!script) throw new Error(`No #hh-menu-data found on ${urlLabel}`);
-        const raw = (script.textContent || "").trim();
-        if(!raw) throw new Error(`#hh-menu-data is empty on ${urlLabel}`);
-        return JSON.parse(raw);
-      }
-
-      async function readData(){
-        const local = document.querySelector("#hh-menu-data");
-        if(local && local.textContent.trim()){
-          const data = JSON.parse(local.textContent.trim());
-          return normalizeMenus(data);
-        }
-        let lastErr = null;
-        for(const url of DATA_URLS){
-          try{
-            const html = await fetchHtml(url);
-            const data = extractJsonFromHtml(html, url);
-            return normalizeMenus(data);
-          }catch(e){
-            lastErr = e;
-          }
-        }
-        throw lastErr || new Error("Menu data could not be read.");
-      }
-
-      function normalizeMenus(data){
-        const rawMenus=data?.menus||{};
-        const normalizedMenus={};
-        Object.keys(rawMenus).forEach(k=>{
-          const nk=normalizeDateKey(k);
-          if(!nk) return;
-          normalizedMenus[nk]=rawMenus[k];
-        });
-        data.menus=normalizedMenus;
-        return data;
-      }
-
-      function findHours(weekly, dayName){
-        return (weekly||[]).find(d => (d.day||"").toLowerCase()===(dayName||"").toLowerCase())
-          || {day:dayName, open:"", close:"", breakfast:"", lunch:""};
-      }
-
-      function getClosure(data, dayName){
-        const c=data?.closures||{};
-        const key=Object.keys(c).find(k => (k||"").toLowerCase()===(dayName||"").toLowerCase());
-        return key ? c[key] : null;
-      }
-
-      function getMenuByDate(data, isoDate){
-        return (data?.menus||{})[isoDate] || null;
-      }
-
-      function normalizeLunchItems(rawItems){
-        const items = Array.isArray(rawItems) ? rawItems : [];
-        return items.map(raw=>{
-          if(raw && typeof raw === "object"){
-            const name = String(raw.name ?? "").trim();
-            const desc = String(raw.desc ?? "").trim();
-            return { name, desc };
-          }
-          const s = String(raw ?? "").trim();
-          if(!s) return null;
-          return { name: s, desc: "" };
-        }).filter(Boolean).filter(x=>x.name);
-      }
-
-      function setDropdownList(listId, items, noDescText){
-        const ul = $(listId); if(!ul) return;
-        ul.innerHTML = "";
-        items.forEach(it=>{
-          const li = document.createElement("li");
-          const details = document.createElement("details");
-          const summary = document.createElement("summary");
-          summary.textContent = it.name;
-          const d = document.createElement("div");
-          d.className = "hh-desc";
-          d.textContent = it.desc ? it.desc : (noDescText || "No description for this item.");
-          details.appendChild(summary);
-          details.appendChild(d);
-          li.appendChild(details);
-          ul.appendChild(li);
-        });
-      }
-
-      function setCrawfishVisibility(prefix, show){
-        const tab = $(`hhTab${prefix}Crawfish`);
-        const panel = $(`hh-${prefix.toLowerCase()}-crawfish`);
-        if(tab) tab.style.display = show ? "" : "none";
-        if(!show){
-          if(panel) panel.hidden = true;
-          if(tab && tab.classList.contains("is-active")){
-            const breakfastTab = $(`hhTab${prefix}Breakfast`);
-            if(breakfastTab) breakfastTab.click();
-          }
-          return;
-        }
-        if(tab && tab.classList.contains("is-active")){
-          if(panel) panel.hidden = false;
-        }
-      }
-
-      function crawfishFor(data, menu){
-        const def=data?.defaults?.crawfish||{};
-        const c=menu?.crawfish||{};
-        const show=(c.show===false) ? false : true;
-        const subtitle=(c.subtitle ?? def.subtitle ?? "").trim();
-        const items=normalizeItems(c.items ?? def.items ?? []);
-        return {show, subtitle, items};
-      }
-
-      function getLunchAvailability(data, isoDate, todayISO){
-        const msg = data?.settings?.autoClearMessage || "Lunch menu unavailable.";
-        const today=parseISODateToLocal(todayISO);
-        const cur=parseISODateToLocal(isoDate);
-        today.setHours(12,0,0,0);
-        cur.setHours(12,0,0,0);
-
-        if(data?.settings?.autoClearPastDays && cur < today) return { ok:false, msg };
-
-        const menu=getMenuByDate(data, isoDate);
-        if(!menu) return { ok:false, msg };
-
-        const lunch=menu?.lunch || {};
-        if(lunch.show === false) return { ok:false, msg };
-
-        const items = normalizeLunchItems(lunch.items);
-        if(items.length === 0) return { ok:false, msg };
-
-        return { ok:true, msg:"" };
-      }
-
-      function showLunchUnavailable(prefixIdBase, msg){
-        const un = $(`${prefixIdBase}-lunch-unavail`);
-        const unTitle = $(`${prefixIdBase}-lunch-unavail-title`);
-        const content = $(`${prefixIdBase}-lunch-content`);
-        const hint = $(`${prefixIdBase}-lunch-hint`);
-        if(un) un.hidden = false;
-        if(unTitle) unTitle.textContent = msg || "Lunch menu unavailable.";
-        if(content) content.style.display = "none";
-        if(hint) hint.hidden = true;
-      }
-
-      function showLunchAvailable(prefixIdBase){
-        const un = $(`${prefixIdBase}-lunch-unavail`);
-        const content = $(`${prefixIdBase}-lunch-content`);
-        if(un) un.hidden = true;
-        if(content) content.style.display = "";
-      }
-
-      function parseTimeToMinutes(timeStr) {
-        if (!timeStr) return null;
-        const match = timeStr.match(/(\d+):?(\d*)\s*(AM|PM)/i);
-        if (!match) return null;
-        let hours = parseInt(match[1], 10);
-        const minutes = match[2] ? parseInt(match[2], 10) : 0;
-        const ampm = match[3].toUpperCase();
-        if (ampm === 'PM' && hours !== 12) hours += 12;
-        if (ampm === 'AM' && hours === 12) hours = 0;
-        return hours * 60 + minutes;
-      }
-
-      function isPastClosingToday(weekly, todayName) {
-        const hours = findHours(weekly, todayName);
-        if (!hours.close) return false;
-        const closeMinutes = parseTimeToMinutes(hours.close);
-        if (closeMinutes === null) return false;
-        const now = new Date();
-        const currentMinutes = now.getHours() * 60 + now.getMinutes();
-        return currentMinutes >= closeMinutes;
-      }
-
-      function fillTwoDay(prefixIdBase, labelPrefix, isoDate, data, hours, todayISO){
-        const defaults=data?.defaults||{};
-        const menu=getMenuByDate(data, isoDate) || {};
-
-        const b=menu?.breakfast||{};
-        const bDef=defaults?.breakfast||{};
-        const bHours = hours?.breakfast ? `Breakfast ${hours.breakfast}. ` : "";
-        setText(`${prefixIdBase}-breakfast-sub`, (bHours + ((b.subtitle ?? bDef.subtitle ?? "").trim())).trim());
-        setList(`${prefixIdBase}-breakfast-plates`, normalizeItems(b.plates ?? bDef.plates ?? []));
-        setList(`${prefixIdBase}-breakfast-items`,  normalizeItems(b.items  ?? bDef.items  ?? []));
-
-        const l=menu?.lunch||{};
-        const lDef=defaults?.lunch||{};
-        const lHours = hours?.lunch ? `Lunch ${hours.lunch}. ` : "";
-        setText(`${prefixIdBase}-lunch-sub`, (lHours + ((l.subtitle ?? lDef.subtitle ?? "").trim())).trim());
-
-        const lunchAvail = getLunchAvailability(data, isoDate, todayISO);
-        if(!lunchAvail.ok){
-          showLunchUnavailable(prefixIdBase, lunchAvail.msg);
-          setList(`${prefixIdBase}-lunch-plates`, []);
-          const ul = $(`${prefixIdBase}-lunch-items`);
-          if(ul) ul.innerHTML = "";
-        } else {
-          showLunchAvailable(prefixIdBase);
-          setList(`${prefixIdBase}-lunch-plates`, normalizeItems(l.plates ?? lDef.plates ?? []));
-          const items = normalizeLunchItems(l.items);
-          const hint = $(`${prefixIdBase}-lunch-hint`);
-          if(hint){
-            hint.textContent = data?.settings?.clickForDescriptionHint || "Tip: click an item for description.";
-            hint.hidden = (items.length === 0);
-          }
-          setDropdownList(`${prefixIdBase}-lunch-items`, items, data?.settings?.noDescriptionText);
-        }
-
-        const c=crawfishFor(data, menu);
-        setText(`${prefixIdBase}-crawfish-sub`, c.subtitle);
-        setList(`${prefixIdBase}-crawfish-items`, c.items.length ? c.items : ["Call to ask about crawfish availability."]);
-        setCrawfishVisibility(labelPrefix, c.show);
-
-        const s=menu?.salad||{};
-        const sDef=defaults?.salad||{};
-        setText(`${prefixIdBase}-salad-sub`, (s.subtitle ?? sDef.subtitle ?? "").trim());
-        setList(`${prefixIdBase}-salad-pricing`, normalizeItems(s.items ?? sDef.items ?? []));
-        setList(`${prefixIdBase}-salad-lettuce`,  normalizeItems(s.saladBar?.lettuce  ?? sDef.saladBar?.lettuce  ?? []));
-        setList(`${prefixIdBase}-salad-toppings`, normalizeItems(s.saladBar?.toppings ?? sDef.saladBar?.toppings ?? []));
-        setList(`${prefixIdBase}-salad-dressing`, normalizeItems(s.saladBar?.dressing ?? sDef.saladBar?.dressing ?? []));
-
-        const d=menu?.drinks||{};
-        const dDef=defaults?.drinks||{};
-        setList(`${prefixIdBase}-drinks-items`, normalizeItems(d.items ?? dDef.items ?? []));
-
-        const ds=menu?.dessert||{};
-        const dsDef=defaults?.dessert||{};
-        setText(`${prefixIdBase}-dessert-sub`, (ds.subtitle ?? dsDef.subtitle ?? "").trim());
-        const desserts=normalizeItems(ds.items ?? []);
-        setList(`${prefixIdBase}-dessert-items`, desserts.length ? desserts : ["(Dessert not posted yet.)"]);
-      }
-
-      function buildAdvancedCarousel(data, todayISO){
-        const wrap=$("hh-adv-carousel");
-        if(!wrap) return;
-        wrap.innerHTML="";
-
-        const weekly=data?.hours?.weekly||[];
-        const lDef=data?.defaults?.lunch||{};
-        const windowDays=Math.max(1, Math.min(31, Number(data?.settings?.advancedWindowDays ?? 7)));
-        const start=parseISODateToLocal(todayISO);
-
-        for(let i=0;i<windowDays;i++){
-          const d=new Date(start);
-          d.setDate(start.getDate()+i);
-          const iso=toISODateLocal(d);
-          const dayName=weekdayName(d);
-          const hours=findHours(weekly, dayName);
-
-          const closure=getClosure(data, dayName);
-          const isClosed=!!closure?.closed;
-          const menu=getMenuByDate(data, iso) || {};
-          const lunch=menu?.lunch||{};
-          const items=normalizeLunchItems(lunch.items);
-
-          let state = { kind:"open", msg:"" };
-          if(isClosed){
-            state = { kind:"closed", msg: closure.message || "See you tomorrow!" };
-          } else {
-            const avail=getLunchAvailability(data, iso, todayISO);
-            if(!avail.ok) state = { kind:"unavailable", msg: avail.msg };
-          }
-
-          const card=document.createElement("article");
-          card.className="hh-adv-card";
-
-          const head=document.createElement("div");
-          head.className="hh-adv-head";
-          head.innerHTML=`
-            <div>
-              <div class="hh-adv-dayname">${escapeHtml(dayName)}</div>
-              <div class="hh-adv-date">${escapeHtml(formatDateNice(d))}</div>
-            </div>
-            <div class="hh-adv-hours">${state.kind==="closed" ? "Closed" : (hours.lunch ? `Lunch ${escapeHtml(hours.lunch)}` : "")}</div>
-          `;
-          card.appendChild(head);
-
-          if(state.kind!=="open"){
-            const st=document.createElement("div");
-            st.className="hh-state";
-            st.innerHTML=`
-              <div class="hh-badge ${state.kind==="unavailable" ? "is-dark" : ""}">${state.kind==="closed" ? "Closed" : "Unavailable"}</div>
-              <div class="hh-state-title">${escapeHtml(dayName)}</div>
-              <p class="hh-state-msg">${escapeHtml(state.msg)}</p>
-            `;
-            card.appendChild(st);
-          } else {
-            const panel=document.createElement("section");
-            panel.className="hh-panel";
-
-            const subtitle=((hours.lunch ? `Lunch ${hours.lunch}. ` : "") + ((lunch.subtitle ?? lDef.subtitle ?? "").trim())).trim();
-            const plates=normalizeItems(lunch.plates ?? lDef.plates ?? []);
-            const hintText=data?.settings?.clickForDescriptionHint || "Tip: click an item for description.";
-            const noDesc=data?.settings?.noDescriptionText || "No description for this item.";
-
-            panel.innerHTML=`
-              <h3>Lunch</h3>
-              <p class="hh-sub">${escapeHtml(subtitle)}</p>
-              <h4>Plates</h4>
-              <ul class="hh-stack">${plates.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>
-              <h4>${escapeHtml(dayName)} Lunch Items</h4>
-              <div class="hh-hintline">${escapeHtml(hintText)}</div>
-              <ul class="hh-stack">
-                ${items.map(it=>{
-                  const d = it.desc ? it.desc : noDesc;
-                  return `<li><details><summary>${escapeHtml(it.name)}</summary><div class="hh-desc">${escapeHtml(d)}</div></details></li>`;
-                }).join("")}
-              </ul>
-            `;
-            card.appendChild(panel);
-          }
-
-          wrap.appendChild(card);
-        }
-      }
-
-      function wireTabs(dayPanelEl){
-        if(!dayPanelEl) return;
-        const tabs=Array.from(dayPanelEl.querySelectorAll(".hh-tab[role='tab']"));
-        const panels=Array.from(dayPanelEl.querySelectorAll(".hh-panel[role='tabpanel']"));
-        if(!tabs.length || !panels.length) return;
-
-        function activateTab(tab){
-          const targetId=tab.getAttribute("aria-controls");
-          tabs.forEach(t=>{
-            const active=(t===tab);
-            t.classList.toggle("is-active", active);
-            t.setAttribute("aria-selected", active ? "true" : "false");
-          });
-          panels.forEach(p=> p.hidden = (p.id !== targetId));
-        }
-        tabs.forEach(tab=> tab.addEventListener("click", ()=> activateTab(tab)));
-      }
-
-      function wireDayTabs(){
-        const dayButtons=Array.from(document.querySelectorAll(".hh-day[role='tab']"));
-        const dayPanels=Array.from(document.querySelectorAll(".hh-daypanel[role='tabpanel']"));
-
-        function activate(btn){
-          const targetId=btn.getAttribute("aria-controls");
-          dayButtons.forEach(b=>{
-            const active=(b===btn);
-            b.classList.toggle("is-active", active);
-            b.setAttribute("aria-selected", active ? "true" : "false");
-          });
-          dayPanels.forEach(p=> p.hidden = (p.id !== targetId));
-        }
-        dayButtons.forEach(btn=> btn.addEventListener("click", ()=> activate(btn)));
-
-        return activate;
-      }
-
-      // ---- INIT ----
-      const activateDay = wireDayTabs();
-      wireTabs($("hh-day-today"));
-      wireTabs($("hh-day-tomorrow"));
-
-      (async function init(){
-        try{
-          const data = await readData();
-
-          setText("hh-advanced-disclaimer", data?.settings?.advancedDisclaimer || "");
-          if(!data?.settings?.showAdvancedTab){
-            const advBtn=$("hhDayBtnAdvanced");
-            if(advBtn) advBtn.style.display="none";
-          }
-
-          const now = new Date();
-          const calendarTodayISO = toISODateLocal(now);
-          const calendarTodayName = weekdayName(now);
-
-          const calendarTomorrow = new Date(now); 
-          calendarTomorrow.setDate(now.getDate() + 1);
-          const calendarTomorrowISO = toISODateLocal(calendarTomorrow);
-          const calendarTomorrowName = weekdayName(calendarTomorrow);
-
-          let displayTodayISO = calendarTodayISO;
-          let displayTodayName = calendarTodayName;
-          let displayTomorrowISO = calendarTomorrowISO;
-          let displayTomorrowName = calendarTomorrowName;
-
-          const weekly = data?.hours?.weekly || [];
-          const closureToday = getClosure(data, calendarTodayName);
-
-          const pastClosing = isPastClosingToday(weekly, calendarTodayName);
-          if (pastClosing && !closureToday?.closed) {
-            displayTodayISO = calendarTomorrowISO;
-            displayTodayName = calendarTomorrowName;
-            const dayAfterTomorrow = new Date(now);
-            dayAfterTomorrow.setDate(now.getDate() + 2);
-            displayTomorrowISO = toISODateLocal(dayAfterTomorrow);
-            displayTomorrowName = weekdayName(dayAfterTomorrow);
-          }
-
-          setText("hhDayBtnToday", displayTodayName);
-          setText("hhDayBtnTomorrow", displayTomorrowName);
-
-          setText("hh-today-title", `${displayTodayName} (${formatDateNice(parseISODateToLocal(displayTodayISO))}) Menu`);
-          setText("hh-tomorrow-title", `${displayTomorrowName} (${formatDateNice(parseISODateToLocal(displayTomorrowISO))}) Menu`);
-
-          setText("hh-hours-note", data?.hours?.note || "");
-          setText("hh-hours-note-2", data?.hours?.note || "");
-
-          const hoursToday = findHours(weekly, displayTodayName);
-          const hoursTomorrow = findHours(weekly, displayTomorrowName);
-
-          const closureDisplayToday = getClosure(data, displayTodayName);
-          const closureDisplayTomorrow = getClosure(data, displayTomorrowName);
-
-          const lineToday = closureDisplayToday?.closed ? `${displayTodayName} Hours: Closed`
-            : `${displayTodayName} Hours: ${hoursToday.open} – ${hoursToday.close}` +
-              (hoursToday.breakfast ? ` • Breakfast ${hoursToday.breakfast}` : "") +
-              (hoursToday.lunch ? ` • Lunch ${hoursToday.lunch}` : "");
-
-          const lineTomorrow = closureDisplayTomorrow?.closed ? `${displayTomorrowName} Hours: Closed`
-            : `${displayTomorrowName} Hours: ${hoursTomorrow.open} – ${hoursTomorrow.close}` +
-              (hoursTomorrow.breakfast ? ` • Breakfast ${hoursTomorrow.breakfast}` : "") +
-              (hoursTomorrow.lunch ? ` • Lunch ${hoursTomorrow.lunch}` : "");
-
-          setText("hh-hours-line", lineToday);
-          setText("hh-hours-line-2", lineTomorrow);
-
-          const phone = data?.phoneTel || "#";
-          ["hh-call-btn-today-b","hh-call-btn-today-l","hh-call-btn-today-c",
-           "hh-call-btn-tomorrow-b","hh-call-btn-tomorrow-l","hh-call-btn-tomorrow-c"
-          ].forEach(id=>{ const a=$(id); if(a) a.href=phone; });
-
-          setText("hh-delivery-note", data?.deliveryNote || "");
-          setText("hh-delivery-note-2", data?.deliveryNote || "");
-
-          if(closureDisplayToday?.closed){
-            $("hh-today-closed").hidden=false;
-            setText("hh-today-closed-title", `${displayTodayName} (${displayTodayISO})`);
-            setText("hh-today-closed-msg", closureDisplayToday.message || "See you tomorrow!");
-          } else {
-            $("hh-today-closed").hidden=true;
-          }
-          if(closureDisplayTomorrow?.closed){
-            $("hh-tomorrow-closed").hidden=false;
-            setText("hh-tomorrow-closed-title", `${displayTomorrowName} (${displayTomorrowISO})`);
-            setText("hh-tomorrow-closed-msg", closureDisplayTomorrow.message || "See you tomorrow!");
-          } else {
-            $("hh-tomorrow-closed").hidden=true;
-          }
-
-          fillTwoDay("hh-today", "Today", displayTodayISO, data, hoursToday, calendarTodayISO);
-          fillTwoDay("hh-tomorrow", "Tomorrow", displayTomorrowISO, data, hoursTomorrow, calendarTodayISO);
-
-          setText("hh-today-lunch-items-title", `${displayTodayName} Lunch Items`);
-          setText("hh-tomorrow-lunch-items-title", `${displayTomorrowName} Lunch Items`);
-
-          buildAdvancedCarousel(data, calendarTodayISO);
-
-          // ========== CUBE INTEGRATION WITH ROTATE TOGGLE (POINTER-EVENTS) ==========
-          initDayCube('today', displayTodayISO, data, hoursToday, calendarTodayISO);
-          initDayCube('tomorrow', displayTomorrowISO, data, hoursTomorrow, calendarTodayISO);
-          initAdvancedCube(data, calendarTodayISO);
-
-        }catch(e){
-          console.error("HOT HEADZ MENU ERROR:", e);
-          setText("hh-hours-line", "Menu unavailable right now.");
-          setText("hh-hours-line-2", "Menu unavailable right now.");
-          showLoadError(String(e && e.message ? e.message : e));
-        }
-      })();
-
-      // ----- CUBE FUNCTIONS WITH ROTATE TOGGLE (POINTER-EVENTS) -----
-      function initDayCube(dayId, isoDate, data, hours, todayISO) {
-        const cube = document.getElementById(`${dayId}Cube`);
-        if (!cube) return;
-        const faces = [0,1,2,3,4,5].map(i => document.getElementById(`${dayId}Face${i}`));
-        const menu = getMenuByDate(data, isoDate) || {};
-        const defaults = data?.defaults || {};
-
-        const categories = [
-          { name: 'Breakfast', items: normalizeItems(menu.breakfast?.items ?? defaults.breakfast?.items ?? []),
-            plates: normalizeItems(menu.breakfast?.plates ?? defaults.breakfast?.plates ?? []) },
-          { name: 'Lunch', items: normalizeLunchItems(menu.lunch?.items),
-            plates: normalizeItems(menu.lunch?.plates ?? defaults.lunch?.plates ?? []) },
-          { name: 'Crawfish', items: crawfishFor(data, menu).items },
-          { name: 'Salad Bar', items: normalizeItems(menu.salad?.items ?? defaults.salad?.items ?? []),
-            lettuce: normalizeItems(menu.salad?.saladBar?.lettuce ?? defaults.salad?.saladBar?.lettuce ?? []),
-            toppings: normalizeItems(menu.salad?.saladBar?.toppings ?? defaults.salad?.saladBar?.toppings ?? []),
-            dressing: normalizeItems(menu.salad?.saladBar?.dressing ?? defaults.salad?.saladBar?.dressing ?? []) },
-          { name: 'Drinks', items: normalizeItems(menu.drinks?.items ?? defaults.drinks?.items ?? []) },
-          { name: 'Dessert', items: normalizeItems(menu.dessert?.items ?? []) }
-        ];
-
-        faces.forEach((face, idx) => {
-          const cat = categories[idx];
-          if (!cat) return;
-          let content = `<div class="hh-cube-category">${cat.name}</div>`;
-          if (cat.name === 'Breakfast' || cat.name === 'Lunch') {
-            if (cat.plates && cat.plates.length) {
-              content += `<div style="font-weight:600; margin:4px 0;">Plates:</div><ul class="hh-cube-items">`;
-              cat.plates.forEach(p => content += `<li>${escapeHtml(p)}</li>`);
-              content += `</ul>`;
-            }
-          }
-          if (cat.name === 'Salad Bar') {
-            if (cat.lettuce.length) content += `<div style="font-weight:600;">Lettuce:</div><ul class="hh-cube-items">` + cat.lettuce.map(l => `<li>${escapeHtml(l)}</li>`).join('') + `</ul>`;
-            if (cat.toppings.length) content += `<div style="font-weight:600;">Toppings:</div><ul class="hh-cube-items">` + cat.toppings.map(t => `<li>${escapeHtml(t)}</li>`).join('') + `</ul>`;
-            if (cat.dressing.length) content += `<div style="font-weight:600;">Dressing:</div><ul class="hh-cube-items">` + cat.dressing.map(d => `<li>${escapeHtml(d)}</li>`).join('') + `</ul>`;
-          }
-          if (cat.items && cat.items.length) {
-            content += `<ul class="hh-cube-items">`;
-            cat.items.forEach(it => {
-              if (typeof it === 'string') content += `<li>${escapeHtml(it)}</li>`;
-              else if (it.name) content += `<li title="${escapeHtml(it.desc)}">${escapeHtml(it.name)}</li>`;
-            });
-            content += `</ul>`;
-          }
-          if (!cat.items?.length && !cat.plates?.length && !cat.lettuce?.length) {
-            content += `<div class="hh-cube-unavail">(no items)</div>`;
-          }
-          face.innerHTML = content;
-        });
-
-        const wrapper = document.getElementById(`${dayId}CubeWrapper`);
-        let rotateX = -10, rotateY = 20, zoom = 1;
-        let isDragging = false, lastX, lastY;
-        let rotateMode = false; // default: scroll mode
-
-        function setTransform() {
-          cube.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${zoom})`;
-        }
-
-        // Drag handlers (only active if rotateMode is true)
-        function handleMouseDown(e) {
-          if (!rotateMode) return;
-          isDragging = true;
-          lastX = e.clientX; lastY = e.clientY;
-          wrapper.style.cursor = 'grabbing';
-        }
-        function handleMouseMove(e) {
-          if (!isDragging || !rotateMode) return;
-          const dx = e.clientX - lastX;
-          const dy = e.clientY - lastY;
-          rotateY += dx * 0.5;
-          rotateX -= dy * 0.3;
-          setTransform();
-          lastX = e.clientX; lastY = e.clientY;
-        }
-        function handleMouseUp() {
-          isDragging = false;
-          wrapper.style.cursor = rotateMode ? 'grab' : 'default';
-        }
-        function handleTouchStart(e) {
-          if (!rotateMode) return;
-          isDragging = true;
-          lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
-        }
-        function handleTouchMove(e) {
-          if (!isDragging || !rotateMode) return;
-          e.preventDefault();
-          const dx = e.touches[0].clientX - lastX;
-          const dy = e.touches[0].clientY - lastY;
-          rotateY += dx * 0.5;
-          rotateX -= dy * 0.3;
-          setTransform();
-          lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
-        }
-        function handleTouchEnd() {
-          isDragging = false;
-        }
-
-        wrapper.addEventListener('mousedown', handleMouseDown);
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
-        wrapper.addEventListener('touchstart', handleTouchStart);
-        window.addEventListener('touchmove', handleTouchMove, { passive: false });
-        window.addEventListener('touchend', handleTouchEnd);
-
-        // Rotate button toggles mode
-        const rotateBtn = document.getElementById(`${dayId}CubeRotate`);
-        if (rotateBtn) {
-          rotateBtn.addEventListener('click', () => {
-            rotateMode = !rotateMode;
-            if (rotateMode) {
-              rotateBtn.innerHTML = '<i class="fas fa-hand-pointer"></i> Scroll';
-              rotateBtn.classList.add('rotate-mode');
-              wrapper.classList.add('rotate-mode');
-            } else {
-              rotateBtn.innerHTML = '<i class="fas fa-rotate-right"></i> Rotate';
-              rotateBtn.classList.remove('rotate-mode');
-              wrapper.classList.remove('rotate-mode');
-              wrapper.style.cursor = 'default';
-            }
-          });
-        }
-
-        // Zoom and reset
-        document.getElementById(`${dayId}CubeZoomIn`).addEventListener('click', () => {
-          zoom = Math.min(2, zoom + 0.1);
-          setTransform();
-        });
-        document.getElementById(`${dayId}CubeZoomOut`).addEventListener('click', () => {
-          zoom = Math.max(0.5, zoom - 0.1);
-          setTransform();
-        });
-        document.getElementById(`${dayId}CubeReset`).addEventListener('click', () => {
-          rotateX = -10; rotateY = 20; zoom = 1;
-          setTransform();
-        });
-      }
-
-      function initAdvancedCube(data, todayISO) {
-        const cubeContainer = document.getElementById('cubeContainer');
-        if (!cubeContainer) return;
-        const faces = [0,1,2,3,4,5].map(i => document.getElementById(`face${i}`));
-        let currentStartIndex = 0;
-        let zoomLevel = 1;
-        let daysArray = [];
-        let rotateX = -10, rotateY = 20;
-        let isDragging = false, lastX, lastY;
-        let rotateMode = false;
-
-        function buildDaysArrayFromData(data, todayISO) {
-          const windowDays = Math.max(1, Math.min(31, Number(data?.settings?.advancedWindowDays ?? 7)));
-          const start = parseISODateToLocal(todayISO);
-          const weekly = data?.hours?.weekly || [];
-          const arr = [];
-          for (let i = 0; i < windowDays; i++) {
-            const d = new Date(start);
-            d.setDate(start.getDate() + i);
-            const iso = toISODateLocal(d);
-            const dayName = weekdayName(d);
-            const hours = findHours(weekly, dayName);
-            const closure = getClosure(data, dayName);
-            const menu = getMenuByDate(data, iso) || {};
-            const lunch = menu?.lunch || {};
-            const lDef = data?.defaults?.lunch || {};
-            const items = normalizeLunchItems(lunch.items);
-            const plates = normalizeItems(lunch.plates ?? lDef.plates ?? []);
-            let state = 'open';
-            let msg = '';
-            if (closure?.closed) { state='closed'; msg=closure.message||'Closed'; }
-            else {
-              const avail = getLunchAvailability(data, iso, todayISO);
-              if (!avail.ok) { state='unavailable'; msg=avail.msg; }
-            }
-            arr.push({ iso, dayName, date: d, hours, state, msg, items, plates, subtitle: lunch.subtitle ?? lDef.subtitle ?? '' });
-          }
-          return arr;
-        }
-
-        function populateCubeFaces(startIdx) {
-          if (!daysArray.length) daysArray = buildDaysArrayFromData(data, todayISO);
-          for (let i = 0; i < 6; i++) {
-            const face = faces[i];
-            if (!face) continue;
-            const day = daysArray[startIdx + i];
-            if (!day) {
-              face.innerHTML = `<div style="opacity:0.5; text-align:center; margin-top:40px;">— no menu —</div>`;
-              continue;
-            }
-            let content = `<div class="hh-cube-category">${escapeHtml(day.dayName)}</div>
-                           <div class="hh-cube-date">${escapeHtml(formatDateNice(day.date))}</div>`;
-            if (day.state !== 'open') {
-              content += `<div class="hh-cube-unavail">${day.state==='closed'?'🔴 Closed':'⚠️ Unavailable'}<br>${escapeHtml(day.msg)}</div>`;
-            } else {
-              content += `<div style="font-weight:600;margin:4px 0;color:#ffb35a;">Lunch</div>`;
-              if (day.plates.length) {
-                content += `<div style="font-weight:600;">Plates:</div><ul class="hh-cube-items">`;
-                day.plates.forEach(p => content += `<li>${escapeHtml(p)}</li>`);
-                content += `</ul>`;
-              }
-              if (day.items.length) {
-                content += `<ul class="hh-cube-items">`;
-                day.items.forEach(it => content += `<li title="${escapeHtml(it.desc)}">${escapeHtml(it.name)}</li>`);
-                content += `</ul>`;
-              } else {
-                content += `<div class="hh-cube-unavail">(no items)</div>`;
-              }
-            }
-            face.innerHTML = content;
-          }
-        }
-
-        const wrapper = document.getElementById('cubeWrapper');
-
-        function handleMouseDown(e) {
-          if (!rotateMode) return;
-          isDragging = true;
-          lastX = e.clientX; lastY = e.clientY;
-          wrapper.style.cursor = 'grabbing';
-        }
-        function handleMouseMove(e) {
-          if (!isDragging || !rotateMode) return;
-          const dx = e.clientX - lastX;
-          const dy = e.clientY - lastY;
-          rotateY += dx * 0.5;
-          rotateX -= dy * 0.3;
-          cubeContainer.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${zoomLevel})`;
-          lastX = e.clientX; lastY = e.clientY;
-        }
-        function handleMouseUp() {
-          isDragging = false;
-          wrapper.style.cursor = rotateMode ? 'grab' : 'default';
-        }
-        function handleTouchStart(e) {
-          if (!rotateMode) return;
-          isDragging = true;
-          lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
-        }
-        function handleTouchMove(e) {
-          if (!isDragging || !rotateMode) return;
-          e.preventDefault();
-          const dx = e.touches[0].clientX - lastX;
-          const dy = e.touches[0].clientY - lastY;
-          rotateY += dx * 0.5;
-          rotateX -= dy * 0.3;
-          cubeContainer.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${zoomLevel})`;
-          lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
-        }
-        function handleTouchEnd() {
-          isDragging = false;
-        }
-
-        wrapper.addEventListener('mousedown', handleMouseDown);
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
-        wrapper.addEventListener('touchstart', handleTouchStart);
-        window.addEventListener('touchmove', handleTouchMove, { passive: false });
-        window.addEventListener('touchend', handleTouchEnd);
-
-        const rotateBtn = document.getElementById('cubeRotate');
-        if (rotateBtn) {
-          rotateBtn.addEventListener('click', () => {
-            rotateMode = !rotateMode;
-            if (rotateMode) {
-              rotateBtn.innerHTML = '<i class="fas fa-hand-pointer"></i> Scroll';
-              rotateBtn.classList.add('rotate-mode');
-              wrapper.classList.add('rotate-mode');
-            } else {
-              rotateBtn.innerHTML = '<i class="fas fa-rotate-right"></i> Rotate';
-              rotateBtn.classList.remove('rotate-mode');
-              wrapper.classList.remove('rotate-mode');
-              wrapper.style.cursor = 'default';
-            }
-          });
-        }
-
-        document.getElementById('cubeZoomIn').addEventListener('click', () => {
-          zoomLevel = Math.min(2, zoomLevel + 0.1);
-          cubeContainer.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${zoomLevel})`;
-        });
-        document.getElementById('cubeZoomOut').addEventListener('click', () => {
-          zoomLevel = Math.max(0.5, zoomLevel - 0.1);
-          cubeContainer.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${zoomLevel})`;
-        });
-        document.getElementById('cubeReset').addEventListener('click', () => {
-          rotateX = -10; rotateY = 20; zoomLevel = 1;
-          cubeContainer.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${zoomLevel})`;
-        });
-
-        document.getElementById('cubePrevGroup').addEventListener('click', () => {
-          if (currentStartIndex - 6 >= 0) currentStartIndex -= 6;
-          else currentStartIndex = 0;
-          populateCubeFaces(currentStartIndex);
-        });
-        document.getElementById('cubeNextGroup').addEventListener('click', () => {
-          if (daysArray.length && currentStartIndex + 6 < daysArray.length) currentStartIndex += 6;
-          populateCubeFaces(currentStartIndex);
-        });
-
-        const carouselDiv = document.getElementById('hh-adv-carousel');
-        const cubeViewDiv = document.getElementById('cubeViewContainer');
-        document.getElementById('viewCarouselBtn').addEventListener('click', function() {
-          this.classList.add('active');
-          document.getElementById('viewCubeBtn').classList.remove('active');
-          carouselDiv.classList.remove('hidden');
-          cubeViewDiv.classList.add('hidden');
-        });
-        document.getElementById('viewCubeBtn').addEventListener('click', function() {
-          this.classList.add('active');
-          document.getElementById('viewCarouselBtn').classList.remove('active');
-          carouselDiv.classList.add('hidden');
-          cubeViewDiv.classList.remove('hidden');
-          daysArray = buildDaysArrayFromData(data, todayISO);
-          populateCubeFaces(currentStartIndex);
-        });
-
-        daysArray = buildDaysArrayFromData(data, todayISO);
-        populateCubeFaces(0);
-      }
-
-      // Toggle views for Today and Tomorrow
-      function setupViewToggles() {
-        const todayStandardBtn = document.getElementById('viewTodayStandardBtn');
-        const todayCubeBtn = document.getElementById('viewTodayCubeBtn');
-        const todayTablist = document.querySelector('#hh-day-today .hh-tablist');
-        const todayPanels = document.getElementById('todayStandardPanels');
-        const todayCube = document.getElementById('todayCubeContainer');
-        if (todayStandardBtn && todayCubeBtn) {
-          todayStandardBtn.addEventListener('click', () => {
-            todayStandardBtn.classList.add('active');
-            todayCubeBtn.classList.remove('active');
-            if (todayTablist) todayTablist.classList.remove('hidden');
-            if (todayPanels) todayPanels.classList.remove('hidden');
-            if (todayCube) todayCube.classList.add('hidden');
-          });
-          todayCubeBtn.addEventListener('click', () => {
-            todayCubeBtn.classList.add('active');
-            todayStandardBtn.classList.remove('active');
-            if (todayTablist) todayTablist.classList.add('hidden');
-            if (todayPanels) todayPanels.classList.add('hidden');
-            if (todayCube) todayCube.classList.remove('hidden');
-          });
-        }
-
-        const tomorrowStandardBtn = document.getElementById('viewTomorrowStandardBtn');
-        const tomorrowCubeBtn = document.getElementById('viewTomorrowCubeBtn');
-        const tomorrowTablist = document.querySelector('#hh-day-tomorrow .hh-tablist');
-        const tomorrowPanels = document.getElementById('tomorrowStandardPanels');
-        const tomorrowCube = document.getElementById('tomorrowCubeContainer');
-        if (tomorrowStandardBtn && tomorrowCubeBtn) {
-          tomorrowStandardBtn.addEventListener('click', () => {
-            tomorrowStandardBtn.classList.add('active');
-            tomorrowCubeBtn.classList.remove('active');
-            if (tomorrowTablist) tomorrowTablist.classList.remove('hidden');
-            if (tomorrowPanels) tomorrowPanels.classList.remove('hidden');
-            if (tomorrowCube) tomorrowCube.classList.add('hidden');
-          });
-          tomorrowCubeBtn.addEventListener('click', () => {
-            tomorrowCubeBtn.classList.add('active');
-            tomorrowStandardBtn.classList.remove('active');
-            if (tomorrowTablist) tomorrowTablist.classList.add('hidden');
-            if (tomorrowPanels) tomorrowPanels.classList.add('hidden');
-            if (tomorrowCube) tomorrowCube.classList.remove('hidden');
-          });
-        }
-      }
-      setTimeout(setupViewToggles, 500);
-    })();
-
-    // ----- DOCK SCRIPT (unchanged) -----
-    (function() {
-      const root = document.getElementById('genRoot');
-      const dock = document.getElementById('genDock');
-      if (root && dock) {
-        root.hidden = false;
-        dock.hidden = false;
-      }
-    })();
-
-    // circular menu toggle (unchanged)
-    (function() {
-      const overlay = document.getElementById('circMenuOverlay');
-      const bottomBtn = document.getElementById('navBtnBottom');
-      const homeCenter = document.getElementById('homeCenter');
-      const menuItems = document.querySelectorAll('.menu-item');
-
-      function toggleMenu() { overlay.classList.toggle('open'); }
-      bottomBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
-
-      async function sharePage() {
-        const shareData = { title: document.title, text: 'Check out Hot Headz!', url: window.location.href };
-        try {
-          if (navigator.share) await navigator.share(shareData);
-          else if (navigator.clipboard) {
-            await navigator.clipboard.writeText(window.location.href);
-            alert('Link copied!');
-          } else alert('Copy manually: '+window.location.href);
-        } catch (e) {}
-      }
-
-      homeCenter.addEventListener('click', () => { overlay.classList.remove('open'); const link = homeCenter.getAttribute('data-link'); if(link) window.location.href = link; });
-      menuItems.forEach(item => {
-        item.addEventListener('click', () => {
-          overlay.classList.remove('open');
-          const link = item.getAttribute('data-link');
-          const action = item.getAttribute('data-action');
-          if (action === 'share') sharePage();
-          else if (link) window.location.href = link;
-        });
-      });
-      document.querySelector('.circular-menu').addEventListener('click', e => e.stopPropagation());
-    })();
-  </script>
+  <!-- REVIEWS SECTION -->
+  <section id="reviews">
+    <div class="sec-label">What People Are Saying</div>
+    <div class="sec-title">Reviews & Reputation</div>
+    <div class="sec-rule"></div>
+
+    <div class="ratings-row">
+      <div class="rating-card">
+        <div class="rating-platform">TRIPADVISOR</div>
+        <div><span class="rating-score">4.5</span><span class="rating-max"> /5</span></div>
+        <div class="rating-stars">🔥🔥🔥🔥🔥</div>
+        <div class="rating-count">Based on 143 reviews</div>
+        <div class="rating-badge">🏆 TRAVELLERS' CHOICE</div>
+      </div>
+      <div class="rating-card">
+        <div class="rating-platform">GOOGLE REVIEWS</div>
+        <div><span class="rating-score">4.7</span><span class="rating-max"> /5</span></div>
+        <div class="rating-stars">🔥🔥🔥🔥🔥</div>
+        <div class="rating-count">Based on 505 reviews</div>
+        <div class="rating-badge">TOP-RATED LOCAL</div>
+      </div>
+      <div class="rating-card">
+        <div class="rating-platform">PRICE RANGE</div>
+        <div><span class="rating-score">$$</span><span class="rating-max">–$$$</span></div>
+        <div style="margin-top:16px;font-size:13px;color:var(--text-dim);line-height:1.7;">Sandwiches from $6.99<br>Plates up to $19.99<br>Specials in the $20s</div>
+      </div>
+    </div>
+
+    <div class="quotes-grid">
+      <div class="quote-card">
+        <div class="quote-stars">★★★★★</div>
+        <div class="quote-text">"Brisket practically melted in my mouth alongside ribs described as tender and smokey."</div>
+        <div class="quote-meta">TRIPADVISOR REVIEWER</div>
+      </div>
+      <div class="quote-card">
+        <div class="quote-stars">★★★★★</div>
+        <div class="quote-text">"Boudin balls were AMAZING! Service was fantastic and everyone was incredibly friendly."</div>
+        <div class="quote-meta">GOOGLE REVIEWER</div>
+      </div>
+      <div class="quote-card">
+        <div class="quote-stars">★★★★★</div>
+        <div class="quote-text">"Good food, friendly staff, and a cozy outdoor deck built around a tree — truly one of a kind."</div>
+        <div class="quote-meta">TRIPADVISOR REVIEWER</div>
+      </div>
+      <div class="quote-card">
+        <div class="quote-stars">★★★★☆</div>
+        <div class="quote-text">"Corn pudding and the pulled pork are must-tries. Lots of locals mixed with travelers — great vibe."</div>
+        <div class="quote-meta">GOOGLE REVIEWER</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="holo-div"></div>
+
+  <!-- MENU SECTION -->
+  <section id="menu">
+    <div class="sec-label">Full Menu</div>
+    <div class="sec-title">What We Smoke</div>
+    <div class="sec-rule"></div>
+
+    <div class="menu-nav">
+      <div class="mtab active" onclick="filterMenu('all',this)">All Items</div>
+      <div class="mtab" onclick="filterMenu('bbq',this)">BBQ Plates</div>
+      <div class="mtab" onclick="filterMenu('burgers',this)">Burgers & Sandwiches</div>
+      <div class="mtab" onclick="filterMenu('boudin',this)">Boudin & Deli</div>
+      <div class="mtab" onclick="filterMenu('sides',this)">Sides</div>
+      <div class="mtab" onclick="filterMenu('desserts',this)">Desserts</div>
+    </div>
+
+    <!-- BBQ PLATES -->
+    <div class="menu-section-wrap" data-cat="bbq">
+      <div class="msec-head">
+        <div class="msec-name">BBQ Plates</div>
+        <div class="msec-rule"></div>
+        <div class="msec-ct">ALL WITH TWO SIDES</div>
+      </div>
+      <div class="menu-grid">
+        <div class="mcard featured">
+          <div class="mcard-badge sig">Signature</div>
+          <div class="mcard-top">
+            <div class="mcard-name">Full Rack of Ribs</div>
+            <div class="mcard-price">$19.99</div>
+          </div>
+          <div class="mcard-desc">Our crown jewel — a full rack of slow-smoked ribs, fall-off-the-bone tender with our house BBQ glaze. Served with your choice of two sides. This is what St. Francisville comes back for.</div>
+          <div class="mcard-tags"><span class="mtag">SLOW SMOKED</span><span class="mtag sp">🌶 SMOKY HEAT</span><span class="mtag">BEST SELLER</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top">
+            <div class="mcard-name">Half Rack of Ribs</div>
+            <div class="mcard-price">$11.99</div>
+          </div>
+          <div class="mcard-desc">Half rack of our signature smoked ribs with two sides. A lighter take on the full experience.</div>
+          <div class="mcard-tags"><span class="mtag">SLOW SMOKED</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top">
+            <div class="mcard-name">Brisket Plate</div>
+            <div class="mcard-price">$10.99</div>
+          </div>
+          <div class="mcard-desc">Hand-sliced smoked brisket — reviewers say it "practically melts in your mouth." Served with two sides.</div>
+          <div class="mcard-tags"><span class="mtag">CROWD FAVORITE</span><span class="mtag">SMOKY</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top">
+            <div class="mcard-name">Pulled Pork Plate</div>
+            <div class="mcard-price">$9.99</div>
+          </div>
+          <div class="mcard-desc">Slow-pulled smoked pork, tender and smoky, served with two sides of your choice.</div>
+          <div class="mcard-tags"><span class="mtag">PULLED</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top">
+            <div class="mcard-name">Half Chicken Plate</div>
+            <div class="mcard-price">$9.99</div>
+          </div>
+          <div class="mcard-desc">Juicy smoked half chicken with crispy skin, served with two sides.</div>
+          <div class="mcard-tags"><span class="mtag">SMOKED</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top">
+            <div class="mcard-name">Smoked Wings</div>
+            <div class="mcard-price">$7.99</div>
+          </div>
+          <div class="mcard-desc">Smoky, catered wings with a perfectly seasoned crust — a crowd pleaser.</div>
+          <div class="mcard-tags"><span class="mtag sp">🌶 SEASONED</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BURGERS & SANDWICHES -->
+    <div class="menu-section-wrap" data-cat="burgers">
+      <div class="msec-head">
+        <div class="msec-name">Burgers & Sandwiches</div>
+        <div class="msec-rule"></div>
+        <div class="msec-ct">SERVED DRESSED · WITH ONE SIDE</div>
+      </div>
+      <div class="menu-grid">
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Hamburger</div><div class="mcard-price">$6.99</div></div>
+          <div class="mcard-desc">Classic house burger, dressed with lettuce and tomato, served with one side.</div>
+          <div class="mcard-tags"><span class="mtag">DRESSED</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Cheeseburger</div><div class="mcard-price">$7.99</div></div>
+          <div class="mcard-desc">House burger with melted cheese, dressed with lettuce and tomato, with one side.</div>
+          <div class="mcard-tags"><span class="mtag">CHEESE</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Bacon Cheeseburger</div><div class="mcard-price">$8.99</div></div>
+          <div class="mcard-desc">Loaded with crispy bacon and melted cheese. Dressed, with one side.</div>
+          <div class="mcard-tags"><span class="mtag">BACON</span><span class="mtag">CHEESE</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Pulled Pork Sandwich</div><div class="mcard-price">$7.99</div></div>
+          <div class="mcard-desc">Slow-smoked pulled pork piled high, dressed with lettuce and tomato, with one side.</div>
+          <div class="mcard-tags"><span class="mtag">SMOKED</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Brisket Sandwich</div><div class="mcard-price">$8.99</div></div>
+          <div class="mcard-desc">Sliced smoked brisket sandwich, dressed with lettuce and tomato, with one side.</div>
+          <div class="mcard-tags"><span class="mtag">SMOKED</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-badge">Po-Boy</div>
+          <div class="mcard-top"><div class="mcard-name">Ribeye Po-Boy</div><div class="mcard-price">$10.99</div></div>
+          <div class="mcard-desc">Hearty ribeye po-boy dressed Louisiana-style, with one side.</div>
+          <div class="mcard-tags"><span class="mtag">LOUISIANA</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Shrimp Po-Boy</div><div class="mcard-price">$8.99</div></div>
+          <div class="mcard-desc">Gulf shrimp po-boy, dressed and served with one side.</div>
+          <div class="mcard-tags"><span class="mtag">SEAFOOD</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Crawfish Po-Boy</div><div class="mcard-price">$10.99</div></div>
+          <div class="mcard-desc">Louisiana crawfish po-boy, dressed, with one side. A true local classic.</div>
+          <div class="mcard-tags"><span class="mtag">LOUISIANA</span><span class="mtag">CRAWFISH</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Catfish Po-Boy</div><div class="mcard-price">$8.99</div></div>
+          <div class="mcard-desc">Southern-style catfish po-boy, dressed and served with one side.</div>
+          <div class="mcard-tags"><span class="mtag">SEAFOOD</span><span class="mtag">SOUTHERN</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Chicken Sandwich</div><div class="mcard-price">$7.99</div></div>
+          <div class="mcard-desc">Juicy chicken sandwich dressed with lettuce and tomato, with one side.</div>
+          <div class="mcard-tags"><span class="mtag">CHICKEN</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOUDIN & DELI -->
+    <div class="menu-section-wrap" data-cat="boudin">
+      <div class="msec-head">
+        <div class="msec-name">Boudin & Deli Favorites</div>
+        <div class="msec-rule"></div>
+        <div class="msec-ct">SPECIALTY ITEMS</div>
+      </div>
+      <div class="menu-grid">
+        <div class="mcard featured">
+          <div class="mcard-badge sig">Fan Favorite</div>
+          <div class="mcard-top"><div class="mcard-name">Boudin Balls</div><div class="mcard-price-range">MARKET PRICE</div></div>
+          <div class="mcard-desc">Our legendary boudin balls — reviewers consistently call them "AMAZING." Crispy golden exterior, perfectly seasoned Cajun rice and pork filling. A St. Francisville staple.</div>
+          <div class="mcard-tags"><span class="mtag">CAJUN</span><span class="mtag">#1 REVIEWED ITEM</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Steamed Boudin Links</div><div class="mcard-price-range">MARKET PRICE</div></div>
+          <div class="mcard-desc">Classic Louisiana steamed boudin links, packed with seasoned rice and pork.</div>
+          <div class="mcard-tags"><span class="mtag">CAJUN</span><span class="mtag">TRADITIONAL</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Pepper Jack Boudin Balls</div><div class="mcard-price-range">MARKET PRICE</div></div>
+          <div class="mcard-desc">Boudin balls loaded with melted pepper jack cheese for an extra kick.</div>
+          <div class="mcard-tags"><span class="mtag sp">🌶 SPICY</span><span class="mtag">CHEESE</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Boudin Egg Rolls</div><div class="mcard-price-range">MARKET PRICE</div></div>
+          <div class="mcard-desc">Cajun boudin wrapped in crispy egg roll wrappers and fried golden. A fusion classic.</div>
+          <div class="mcard-tags"><span class="mtag">FUSION</span><span class="mtag">CAJUN</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Meat Pies</div><div class="mcard-price-range">MARKET PRICE</div></div>
+          <div class="mcard-desc">Traditional Louisiana meat pies with seasoned ground meat in a flaky pastry crust.</div>
+          <div class="mcard-tags"><span class="mtag">LOUISIANA</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Crawfish Pies</div><div class="mcard-price-range">MARKET PRICE</div></div>
+          <div class="mcard-desc">Flaky pies stuffed with seasoned Louisiana crawfish filling. A regional delicacy.</div>
+          <div class="mcard-tags"><span class="mtag">CRAWFISH</span><span class="mtag">CAJUN</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDES -->
+    <div class="menu-section-wrap" data-cat="sides">
+      <div class="msec-head">
+        <div class="msec-name">Sides</div>
+        <div class="msec-rule"></div>
+        <div class="msec-ct">6 ITEMS</div>
+      </div>
+      <div class="sides-note">SMALL: $2.75 &nbsp;·&nbsp; LARGE: $6.99</div>
+      <div class="menu-grid">
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Corn Pudding</div><div class="mcard-price-range">$2.75 / $6.99</div></div>
+          <div class="mcard-desc">A customer favorite — rich, creamy corn pudding that reviewers rave about.</div>
+          <div class="mcard-tags"><span class="mtag">REVIEWER FAV</span><span class="mtag ca">VEGETARIAN</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Baked Beans</div><div class="mcard-price-range">$2.75 / $6.99</div></div>
+          <div class="mcard-desc">Slow-cooked smoky baked beans, the perfect companion to any BBQ plate.</div>
+          <div class="mcard-tags"><span class="mtag">SMOKY</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Potato Salad</div><div class="mcard-price-range">$2.75 / $6.99</div></div>
+          <div class="mcard-desc">Southern-style house potato salad, classic comfort at its finest.</div>
+          <div class="mcard-tags"><span class="mtag ca">VEGETARIAN</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Cole Slaw</div><div class="mcard-price-range">$2.75 / $6.99</div></div>
+          <div class="mcard-desc">Crisp and creamy house-made coleslaw — a classic BBQ pairing.</div>
+          <div class="mcard-tags"><span class="mtag ca">VEGETARIAN</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">French Fries</div><div class="mcard-price-range">$2.75 / $6.99</div></div>
+          <div class="mcard-desc">Golden, crispy fries — a reliable crowd-pleaser on any menu.</div>
+          <div class="mcard-tags"><span class="mtag ca">VEGAN</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-badge new">Popular</div>
+          <div class="mcard-top"><div class="mcard-name">Sweet Potato Waffle Fries</div><div class="mcard-price-range">$2.75 / $6.99</div></div>
+          <div class="mcard-desc">Crispy waffle-cut sweet potato fries — the unexpected upgrade your plate deserves.</div>
+          <div class="mcard-tags"><span class="mtag ca">VEGAN</span><span class="mtag">SWEET POTATO</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESSERTS -->
+    <div class="menu-section-wrap" data-cat="desserts">
+      <div class="msec-head">
+        <div class="msec-name">The Sweet</div>
+        <div class="msec-rule"></div>
+        <div class="msec-ct">HOMEMADE DESSERTS</div>
+      </div>
+      <div class="menu-grid">
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Homemade Bread Pudding</div><div class="mcard-price-range">DAILY SPECIAL</div></div>
+          <div class="mcard-desc">Classic Southern bread pudding made in-house — reviewers have taken whole trays home.</div>
+          <div class="mcard-tags"><span class="mtag">HOMEMADE</span><span class="mtag">SOUTHERN</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Creole Cream Cheesecake</div><div class="mcard-price-range">DAILY SPECIAL</div></div>
+          <div class="mcard-desc">A Louisiana-inspired cheesecake made with rich Creole cream cheese. Uniquely local.</div>
+          <div class="mcard-tags"><span class="mtag">CREOLE</span><span class="mtag">LOUISIANA</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Chocolate & Carrot Cake</div><div class="mcard-price-range">DAILY SPECIAL</div></div>
+          <div class="mcard-desc">Two beloved classics — decadent chocolate cake or moist homemade carrot cake, ask what's available today.</div>
+          <div class="mcard-tags"><span class="mtag">HOMEMADE</span></div>
+        </div>
+        <div class="mcard">
+          <div class="mcard-top"><div class="mcard-name">Strawberry Shortcake</div><div class="mcard-price-range">DAILY SPECIAL</div></div>
+          <div class="mcard-desc">Fresh strawberry shortcake — light, sweet, and the perfect ending to a smoke-filled meal.</div>
+          <div class="mcard-tags"><span class="mtag">SEASONAL</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="holo-div"></div>
+
+  <!-- SPECIALS -->
+  <section id="specials">
+    <div class="sec-label">Chef's Board</div>
+    <div class="sec-title">Daily Specials</div>
+    <div class="sec-rule"></div>
+    <p style="font-size:14px;color:var(--text-dim);margin-bottom:28px;line-height:1.7;">Our specials board changes regularly. Below are featured items spotted on recent boards — call ahead at <a href="tel:2252455046" style="color:var(--gold);">(225) 245-5046</a> to check what's on today.</p>
+    <div class="specials-grid">
+      <div class="spec-card">
+        <div class="spec-name">Sweet Thai Chili Wings</div>
+        <div class="spec-price">$16</div>
+        <div class="spec-desc">Appetizer portion of wings tossed in sweet Thai chili glaze — sticky, bright, and addictive.</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-name">Eggplant Pirogue</div>
+        <div class="spec-price">$26</div>
+        <div class="spec-desc">Louisiana-style eggplant boat with a rich seafood-style stuffing. A showstopper entrée.</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-name">Blackened Lemon Fish</div>
+        <div class="spec-price">$28</div>
+        <div class="spec-desc">Blackened fish with cream spinach and grilled crawfish tails. Bold Southern flavors.</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-name">Jack Daniel's BBQ Shrimp & Pork Chop</div>
+        <div class="spec-price">$26</div>
+        <div class="spec-desc">14oz bone-in pork chop with JD BBQ shrimp, mac & cheese, and green beans.</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-name">Grilled Salmon</div>
+        <div class="spec-price">$28</div>
+        <div class="spec-desc">Grilled salmon topped with crabmeat and avocado cream sauce with sides.</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-name">Miss Mud Pie</div>
+        <div class="spec-price">$7</div>
+        <div class="spec-desc">Beloved house dessert — the famous "Miss Mud Pie" that keeps people coming back.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="holo-div"></div>
+
+  <!-- HOURS & ACCESS -->
+  <section id="hours">
+    <div class="sec-label">Plan Your Visit</div>
+    <div class="sec-title">Hours & Access</div>
+    <div class="sec-rule"></div>
+    <div class="hours-wrap">
+      <div class="hours-card">
+        <div class="hours-card-title">Operating Hours</div>
+        <div class="hours-row"><span class="hours-day">Monday</span><span class="hours-time">10:00 AM – 6:00 PM</span></div>
+        <div class="hours-row"><span class="hours-day">Tuesday</span><span class="hours-time">10:00 AM – 6:00 PM</span></div>
+        <div class="hours-row"><span class="hours-day">Wednesday</span><span class="hours-time">10:00 AM – 6:00 PM</span></div>
+        <div class="hours-row"><span class="hours-day">Thursday</span><span class="hours-time">10:00 AM – 6:00 PM</span></div>
+        <div class="hours-row"><span class="hours-day">Friday</span><span class="hours-time">10:00 AM – 6:00 PM</span></div>
+        <div class="hours-row"><span class="hours-day">Saturday</span><span class="hours-time">10:00 AM – 6:00 PM</span></div>
+        <div class="hours-row"><span class="hours-day">Sunday</span><span class="hours-time" style="color:var(--ember);">10:00 AM – 3:00 PM</span></div>
+        <p style="margin-top:16px;font-size:12px;color:var(--text-dim);line-height:1.6;">⚠ Popular items may sell out near closing. Arrive early for best selection.</p>
+      </div>
+      <div class="hours-card">
+        <div class="hours-card-title">Accessibility & Services</div>
+        <ul class="access-list">
+          <li>Takeout Available</li>
+          <li>Wheelchair Accessible Entrance</li>
+          <li>Accessible Parking Lot</li>
+          <li>Accessible Restrooms</li>
+          <li>Accessible Seating</li>
+          <li>Parking Available On-Site</li>
+          <li>Outdoor Deck Seating (dog-friendly area)</li>
+          <li>Large Orders & Catering Supported</li>
+          <li>No Reservations Required (walk-in)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="holo-div"></div>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="sec-label">Find Us</div>
+    <div class="sec-title">Contact & Location</div>
+    <div class="sec-rule"></div>
+    <div class="contact-grid">
+      <div class="contact-card">
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div>
+            <div class="contact-label">Address</div>
+            <div class="contact-val">6779 US Highway 61<br>St. Francisville, LA 70775</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div>
+            <div class="contact-label">Phone</div>
+            <div class="contact-val"><a href="tel:2252455046">(225) 245-5046</a></div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">✉</div>
+          <div>
+            <div class="contact-label">Email</div>
+            <div class="contact-val"><a href="mailto:francissmokehouse@att.net">francissmokehouse@att.net</a></div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">🌐</div>
+          <div>
+            <div class="contact-label">Website</div>
+            <div class="contact-val"><a href="http://thefrancissmokehouse.com" target="_blank">thefrancissmokehouse.com</a></div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📘</div>
+          <div>
+            <div class="contact-label">Facebook</div>
+            <div class="contact-val"><a href="https://www.facebook.com/1547733028788117/" target="_blank">The Francis Smokehouse & Specialty Meats</a></div>
+          </div>
+        </div>
+      </div>
+      <div class="map-placeholder">
+        <div class="map-placeholder-icon">🗺</div>
+        <div class="map-placeholder-title">Get Directions</div>
+        <div class="map-placeholder-addr">6779 US Highway 61<br>St. Francisville, LA 70775<br><br>Located on US-61 — easily accessible<br>with on-site parking available.</div>
+        <a href="https://www.google.com/maps/search/?api=1&query=The+Francis+Smokehouse%2C+St+Francisville%2C+LA" target="_blank" class="map-link">OPEN IN GOOGLE MAPS ↗</a>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /page -->
+
+<!-- FOOTER -->
+<footer>
+  <div class="page" style="padding-bottom:0;">
+    <div class="footer-logo">THE FRANCIS SMOKEHOUSE</div>
+    <div class="footer-sub">& Specialty Meats · St. Francisville, Louisiana · Est. 2015</div>
+    <div class="footer-links">
+      <a href="#menu">Menu</a>
+      <a href="#specials">Specials</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#hours">Hours</a>
+      <a href="#contact">Contact</a>
+      <a href="https://www.tripadvisor.com/Restaurant_Review-g40411-d7851018-Reviews-The_Francis_Smokehouse-Saint_Francisville_Louisiana.html" target="_blank">Tripadvisor</a>
+    </div>
+    <div class="footer-copy">© THE FRANCIS SMOKEHOUSE · (225) 245-5046 · ALL ITEMS SUBJECT TO AVAILABILITY · PRICES MAY CHANGE</div>
+  </div>
+</footer>
+
+<script>
+  // CURSOR
+  const cur = document.getElementById('cur');
+  const ring = document.getElementById('ring');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove', e => {
+    mx=e.clientX; my=e.clientY;
+    cur.style.left=mx+'px'; cur.style.top=my+'px';
+  });
+  (function animRing(){
+    rx+=(mx-rx)*.12; ry+=(my-ry)*.12;
+    ring.style.left=rx+'px'; ring.style.top=ry+'px';
+    requestAnimationFrame(animRing);
+  })();
+
+  document.querySelectorAll('a,button,.mtab,.mcard,.btn-primary,.btn-ghost,.nav-order,.map-link').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{ ring.style.width='48px';ring.style.height='48px';ring.style.borderColor='rgba(255,106,26,.9)'; });
+    el.addEventListener('mouseleave',()=>{ ring.style.width='34px';ring.style.height='34px';ring.style.borderColor='rgba(232,168,53,.55)'; });
+  });
+
+  // CARD GLOW TRACKING
+  document.querySelectorAll('.mcard,.rating-card,.spec-card').forEach(card=>{
+    card.addEventListener('mousemove',e=>{
+      const r=card.getBoundingClientRect();
+      card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');
+      card.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');
+    });
+  });
+
+  // MENU FILTER
+  function filterMenu(cat, el) {
+    document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.menu-section-wrap').forEach(s=>{
+      s.style.display = (cat==='all'||s.dataset.cat===cat)?'':'none';
+    });
+  }
+
+  // SCROLL REVEAL
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.style.opacity='1'; });
+  },{threshold:0.1});
+  document.querySelectorAll('section').forEach(s=>{ s.style.opacity='0'; s.style.transition='opacity .7s ease'; obs.observe(s); });
+</script>
 </body>
 </html>
