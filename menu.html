@@ -499,6 +499,9 @@
       box-shadow: 0 0 40px rgba(255,149,91,.24), 0 24px 60px rgba(0,0,0,.42);
     }
     .swipe-card::before {
+      background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,.15) 45%, transparent 70%);
+      animation: hologram 4s linear infinite;
+
       content: "";
       position: absolute;
       inset: 0;
@@ -574,7 +577,31 @@
     }
 
     .hide { display: none !important; }
-  </style>
+  
+.nowbar {
+  margin-top: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: .05em;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.06);
+}
+.nowbar.open { color: #5effad; box-shadow: 0 0 12px rgba(94,255,173,.4); }
+.nowbar.warn { color: #ffd27a; box-shadow: 0 0 12px rgba(255,210,122,.4); }
+.nowbar.closed { color: #ff8a8a; box-shadow: 0 0 12px rgba(255,138,138,.4); }
+
+.swipe-card {
+  animation: floatCard 6s ease-in-out infinite;
+}
+@keyframes floatCard {
+  0%,100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+</style>
 </head>
 <body>
   <div class="app">
@@ -590,7 +617,7 @@
       <div class="header">
         <div class="title" id="todayTitle">Today’s Menu</div>
         <div class="subline" id="todayHours">Loading hours…</div>
-        <div class="note" id="todayNote"></div>
+        <div class="note" id="todayNote"></div><div class="nowbar" id="todayNow"></div>
       </div>
       <div class="toolbar">
         <button class="viewbtn" id="todayViewWheel">Orbit Navigator</button>
@@ -633,7 +660,7 @@
       <div class="header">
         <div class="title" id="tomorrowTitle">Tomorrow’s Menu</div>
         <div class="subline" id="tomorrowHours">Loading hours…</div>
-        <div class="note" id="tomorrowNote"></div>
+        <div class="note" id="tomorrowNote"></div><div class="nowbar" id="tomorrowNow"></div>
       </div>
       <div class="toolbar">
         <button class="viewbtn" id="tomorrowViewWheel">Orbit Navigator</button>
@@ -1349,7 +1376,47 @@
         });
       }
 
-      function initPanel(prefix, data, isoDate, displayName) {
+      
+function updateNowBar(prefix, dayName) {
+  const el = document.getElementById(prefix + "Now");
+  if (!el) return;
+
+  const now = new Date();
+  const mins = now.getHours()*60 + now.getMinutes();
+  const h = getBusinessHours(dayName);
+
+  const breakfastEnd = 10*60+30;
+  const lunchStart = 11*60;
+
+  let text = "";
+  let cls = "";
+
+  if (!rangeIncludes(mins, h.open + " - " + h.close) && !(h.crawfish && rangeIncludes(mins, h.crawfish))) {
+    text = "Closed • Opens " + h.open;
+    cls = "closed";
+  } else if (mins < breakfastEnd) {
+    const remaining = breakfastEnd - mins;
+    text = "Breakfast • Ends in " + remaining + " min";
+    cls = remaining < 30 ? "warn" : "open";
+  } else if (mins < lunchStart) {
+    text = "Transition • Lunch starts at 11:00 AM";
+    cls = "warn";
+  } else if (rangeIncludes(mins, h.lunch)) {
+    text = "Now Serving Lunch";
+    cls = "open";
+  } else if (h.crawfish && rangeIncludes(mins, h.crawfish)) {
+    text = "Now Serving Crawfish";
+    cls = "open";
+  } else {
+    text = "Closed • Opens " + h.open;
+    cls = "closed";
+  }
+
+  el.className = "nowbar " + cls;
+  el.textContent = text;
+}
+
+function initPanel(prefix, data, isoDate, displayName) {
         const hours = getBusinessHours(displayName);
         const closure = getClosure(data, displayName);
         const isTodayPanel = prefix === "today";
@@ -1377,6 +1444,7 @@
           $(`${prefix}Closed`).classList.add("hide");
         }
 
+        updateNowBar(prefix, displayName);
         const cats = buildCategoryData(data, isoDate);
         const wheelApi = initWheel(prefix, cats, data, displayName, isTodayPanel);
         const swipeApi = initSwipe(prefix, cats, data);
