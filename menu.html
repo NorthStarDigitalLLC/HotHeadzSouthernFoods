@@ -2,732 +2,1601 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Brick Wall Category Wheel</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Hot Headz Southern Foods – Future Menu</title>
+  <meta name="description" content="Hot Headz Southern Foods interactive future menu" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <style>
-    :root{
-      --brick1:#b96d43;
-      --brick2:#9f5733;
-      --brick3:#7e3f24;
-      --mortar:#d2b7a3;
-      --bg:#24140e;
-      --hole:#05080c;
-      --ring:rgba(255,255,255,.14);
-      --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.68);
-      --accent:#ffb95e;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      min-height:100vh;
-      color:var(--text);
-      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { overflow-x: hidden; }
+    body {
+      font-family: Inter, system-ui, sans-serif;
+      color: rgba(255,255,255,.94);
       background:
-        radial-gradient(circle at center, rgba(255,190,120,0.08), transparent 28%),
-        linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.45)),
-        var(--bg);
-      overflow:hidden;
+        radial-gradient(900px 600px at 10% 10%, rgba(255,110,70,.18), transparent 60%),
+        radial-gradient(900px 600px at 90% 0%, rgba(42,127,98,.16), transparent 60%),
+        linear-gradient(180deg, #070604, #0b0806 45%, #050403);
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
+    .app {
+      min-height: 100vh;
+      padding: 18px 14px 80px;
+      position: relative;
+      isolation: isolate;
+    }
+    .app::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .1;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");
+    }
+    .app > * { position: relative; z-index: 1; }
+
+    .daybar, .glassbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      padding: 10px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 16px 40px rgba(0,0,0,.28);
+    }
+    .sticky { position: sticky; top: 10px; z-index: 20; margin-bottom: 14px; }
+
+    .pill, .viewbtn, .actionbtn, .daybtn {
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      border-radius: 999px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: .18s ease;
+      white-space: nowrap;
+    }
+    .pill:hover, .viewbtn:hover, .actionbtn:hover, .daybtn:hover { transform: translateY(-1px); }
+    .daybtn, .viewbtn { padding: 10px 16px; }
+    .actionbtn { padding: 12px 18px; }
+    .daybtn.active, .viewbtn.active, .actionbtn.primary {
+      background: linear-gradient(180deg, rgba(192,90,42,.75), rgba(160,65,28,.92));
+      border-color: rgba(255,200,130,.5);
+      box-shadow: 0 10px 28px rgba(192,90,42,.32);
+    }
+    .actionbtn.secondary {
+      background: linear-gradient(180deg, rgba(42,127,98,.5), rgba(20,70,52,.86));
+      border-color: rgba(146,255,212,.35);
     }
 
-    .wall{
-      position:fixed;
-      inset:0;
-      display:grid;
-      grid-template-columns:repeat(12,1fr);
-      gap:6px;
-      padding:10px;
-      z-index:0;
+    .header {
+      text-align: center;
+      padding: 10px 8px 0;
+      margin-bottom: 12px;
+      display: grid;
+      gap: 8px;
+      justify-items: center;
     }
-    .brick{
-      position:relative;
-      border-radius:4px;
-      border:1px solid rgba(0,0,0,.18);
-      background:linear-gradient(135deg,var(--brick1),var(--brick2),var(--brick3));
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
-      min-height:48px;
-      overflow:hidden;
+    .title {
+      font-size: clamp(24px, 3.2vw, 34px);
+      font-weight: 900;
+      line-height: 1.06;
+      letter-spacing: -.03em;
     }
-    .brick::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:linear-gradient(135deg,rgba(255,255,255,.08),transparent 50%,rgba(0,0,0,.10));
-      border-radius:3px;
+    .subline {
+      margin-top: 0;
+      color: rgba(255,255,255,.76);
+      font-weight: 700;
+      font-size: 14px;
+      text-align: center;
+      line-height: 1.5;
     }
-
-    .portal-wrap{
-      position:relative;
-      z-index:2;
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      padding:32px 20px 44px;
+    .note {
+      margin-top: 0;
+      color: rgba(255,255,255,.6);
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      line-height: 1.5;
+      width: min(760px, 100%);
     }
 
-    .headline{
-      text-align:center;
-      margin-bottom:24px;
-      max-width:900px;
-    }
-    .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 14px;
-      border-radius:999px;
-      background:rgba(0,0,0,.24);
-      border:1px solid rgba(255,255,255,.14);
-      font-size:11px;
-      letter-spacing:.28em;
-      text-transform:uppercase;
-      color:rgba(255,255,255,.68);
-      backdrop-filter:blur(8px);
-    }
-    h1{
-      margin:14px 0 10px;
-      font-size:clamp(2rem,4vw,3.5rem);
-      line-height:1;
-      font-weight:700;
-      letter-spacing:-.03em;
-    }
-    .sub{
-      margin:0 auto;
-      max-width:760px;
-      color:var(--muted);
-      line-height:1.7;
-      font-size:15px;
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin: 16px 0 8px;
     }
 
-    .hole{
-      position:relative;
-      width:min(1100px,82vw);
-      height:min(760px,74vh);
-      max-height:760px;
-      border-radius:42px;
+    .wheel-stage {
+      display: grid;
+      gap: 18px;
+      justify-items: center;
+      margin-top: 16px;
+    }
+    .wheel-wrap {
+      width: 300px;
+      height: 300px;
+      position: relative;
+      touch-action: none;
+      user-select: none;
+      cursor: grab;
+    }
+    .wheel-wrap.dragging { cursor: grabbing; }
+    .wheel-arrow {
+      position: absolute;
+      left: 50%;
+      top: -2px;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 16px solid transparent;
+      border-right: 16px solid transparent;
+      border-top: 22px solid #ffb35a;
+      z-index: 5;
+      filter: drop-shadow(0 0 8px rgba(255,179,90,.8));
+    }
+    .wheel {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 3px solid rgba(255,161,102,.86);
       background:
-        radial-gradient(circle at center, rgba(255,180,110,.05), transparent 45%),
-        radial-gradient(circle at center, rgba(8,12,18,.96), rgba(3,5,8,.99));
-      border:1px solid rgba(79,39,22,.72);
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,.08), transparent 30%),
+        radial-gradient(circle at 50% 50%, rgba(255,128,76,.08), transparent 62%),
+        rgba(13,12,12,.84);
       box-shadow:
-        0 50px 120px rgba(0,0,0,.65),
-        inset 0 0 70px rgba(255,160,90,.05),
-        inset 0 0 0 16px rgba(86,45,26,.35),
-        inset 0 0 0 36px rgba(44,21,12,.55);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
+        0 0 0 8px rgba(255,255,255,.03) inset,
+        0 0 34px rgba(192,90,42,.34),
+        0 18px 40px rgba(0,0,0,.45);
+      will-change: transform;
+      overflow: visible;
+    }
+    .wheel-item {
+      position: absolute;
+      width: 78px;
+      height: 78px;
+      left: 50%;
+      top: 50%;
+      margin-left: -39px;
+      margin-top: -39px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,161,102,.7);
+      background: linear-gradient(180deg, rgba(48,48,48,.95), rgba(22,22,22,.95));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.12;
+      padding: 7px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.5);
+      transform-origin: center center;
+      color: #fff;
+      pointer-events: none;
+      will-change: transform;
+    }
+    .wheel-item.selected {
+      background: linear-gradient(180deg, rgba(220,105,48,.98), rgba(170,70,32,.98));
+      border-color: #ffd4a1;
+      box-shadow: 0 0 26px rgba(255,149,91,.55);
+    }
+    .wheel-center {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      background: #ffb35a;
+      border: 2px solid #fff;
+      z-index: 4;
+      box-shadow: 0 0 18px rgba(255,179,90,.7);
     }
 
-    .fragment{
-      position:absolute;
-      border-radius:4px;
-      border:1px solid rgba(0,0,0,.22);
-      background:linear-gradient(135deg,var(--brick1),var(--brick2),var(--brick3));
-      box-shadow:0 12px 30px rgba(0,0,0,.28);
-      animation:float 7s ease-in-out infinite;
+    .glasscard {
+      width: min(680px, calc(100vw - 28px));
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 28px;
+      padding: 20px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 18px 50px rgba(0,0,0,.35);
+      text-align: center;
     }
-    .fragment::after{
-      content:"";
-      position:absolute;
-      inset:2px;
-      border-radius:2px;
+    .glasscard.pulse {
+      animation: pulseCard .85s ease 1;
+    }
+    #todayDetailCard, #tomorrowDetailCard {
+      max-height: 60vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    @keyframes pulseCard {
+      0% { transform: scale(1); box-shadow: 0 18px 50px rgba(0,0,0,.35); }
+      50% { transform: scale(1.015); box-shadow: 0 0 42px rgba(255,149,91,.35), 0 18px 50px rgba(0,0,0,.42); }
+      100% { transform: scale(1); }
+    }
+
+    .cat-title {
+      font-size: clamp(24px, 4vw, 32px);
+      font-weight: 900;
+      color: #ffb35a;
+      margin-bottom: 8px;
+      border-bottom: 2px solid rgba(255,179,90,.24);
+      padding-bottom: 8px;
+    }
+    .section-label {
+      margin: 14px 0 8px;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.68);
+    }
+    .list { list-style: none; display: grid; gap: 8px; text-align: left; }
+    .list li {
+      background: rgba(255,255,255,.06);
+      border-left: 4px solid #c05a2a;
+      border-radius: 14px;
+      padding: 11px 12px;
+      color: #f0e6d8;
+      font-size: 15px;
+    }
+    .list details { width: 100%; }
+    .list details summary { cursor: pointer; font-weight: 700; list-style: none; }
+    .list details summary::-webkit-details-marker { display: none; }
+    .desc {
+      margin-top: 7px;
+      color: rgba(255,255,255,.78);
+      font-size: 13px;
+      padding-left: 4px;
+      line-height: 1.5;
+    }
+
+    .swipe-shell {
+      margin-top: 20px;
+      display: grid;
+      gap: 10px;
+      justify-items: center;
+    }
+    .chipnav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: min(760px, calc(100vw - 28px));
+      margin-top: 4px;
+    }
+    .chip {
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+    .chip.active {
+      background: linear-gradient(180deg, rgba(192,90,42,.75), rgba(160,65,28,.92));
+      border-color: rgba(255,200,130,.5);
+      box-shadow: 0 10px 22px rgba(192,90,42,.22);
+    }
+    .modehint {
+      color: rgba(255,255,255,.66);
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+      margin-top: 2px;
+    }
+    .closed-note {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: rgba(255,255,255,.82);
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.5;
+    }
+    .pick-card {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,179,90,.3);
+      background: linear-gradient(180deg, rgba(255,160,90,.12), rgba(255,255,255,.04));
+      box-shadow: 0 10px 26px rgba(0,0,0,.22);
+    }
+    .pick-title {
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.7);
+      margin-bottom: 8px;
+    }
+    .pick-line {
+      font-size: 15px;
+      color: #fff;
+      margin-top: 6px;
+      font-weight: 700;
+    }
+
+    .flash-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      z-index: 200;
+      background: radial-gradient(circle at center, rgba(255,140,90,.18), rgba(0,0,0,.72));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 18px;
+    }
+    .flash-overlay.show { display: grid; }
+    .flash-card {
+      width: min(560px, calc(100vw - 24px));
+      border-radius: 30px;
       background:
-        linear-gradient(90deg, rgba(0,0,0,.18) 0 48%, transparent 48% 52%, rgba(255,255,255,.08) 52% 100%);
-      opacity:.4;
+        radial-gradient(500px 200px at 0% 0%, rgba(255,140,90,.24), transparent 60%),
+        radial-gradient(500px 220px at 100% 100%, rgba(60,220,170,.18), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 0 60px rgba(255,149,91,.22), 0 20px 60px rgba(0,0,0,.45);
+      padding: 24px;
+      text-align: center;
+      animation: flashPop .32s ease;
     }
-    @keyframes float{
-      0%,100%{transform:translate(0,0) rotate(var(--rot))}
-      25%{transform:translate(8px,-10px) rotate(calc(var(--rot) + 4deg))}
-      50%{transform:translate(-8px,8px) rotate(calc(var(--rot) - 5deg))}
-      75%{transform:translate(10px,4px) rotate(calc(var(--rot) + 2deg))}
+    @keyframes flashPop {
+      0% { transform: scale(.92); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .flash-title {
+      font-size: 30px;
+      font-weight: 900;
+      color: #ffb35a;
+      margin-bottom: 10px;
+      letter-spacing: -.03em;
+      text-align: center;
+    }
+    .flash-text {
+      color: rgba(255,255,255,.86);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 16px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .flash-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 66px;
+      height: 66px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255,160,90,.9), rgba(200,90,44,.95));
+      color: #fff;
+      font-weight: 900;
+      font-size: 26px;
+      box-shadow: 0 0 30px rgba(255,149,91,.45);
+      margin-bottom: 12px;
+    }
+    .flash-sub {
+      color: rgba(255,255,255,.68);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    .statusbar {
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      color: rgba(255,255,255,.74);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-align: center;
+    }
+    .statusdot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #5effad;
+      box-shadow: 0 0 12px rgba(94,255,173,.7);
+    }
+    .statusdot.closed {
+      background: #ff8a8a;
+      box-shadow: 0 0 12px rgba(255,138,138,.7);
+    }
+    .swipe-head {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .swipe-track {
+      width: min(760px, calc(100vw - 28px));
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      padding: 8px 4px 10px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .swipe-track::-webkit-scrollbar { display: none; }
+
+    .advanced-tabs {
+      width: min(1100px, calc(100vw - 28px));
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      padding: 8px 4px 6px;
+    }
+    .advanced-tab {
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .02em;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+    .advanced-tab.active {
+      background: linear-gradient(180deg, rgba(192,90,42,.75), rgba(160,65,28,.92));
+      border-color: rgba(255,200,130,.5);
+      box-shadow: 0 10px 22px rgba(192,90,42,.22);
+    }
+    .advanced-card-wrap {
+      width: min(760px, calc(100vw - 28px));
+      padding: 8px 4px 10px;
+    }
+    .swipe-card {
+      position: relative;
+      flex: 0 0 100%;
+      scroll-snap-align: center;
+      min-height: 420px;
+      border-radius: 30px;
+      padding: 22px;
+      overflow: hidden;
+      background:
+        radial-gradient(500px 240px at 10% 0%, rgba(255,148,92,.18), transparent 60%),
+        radial-gradient(500px 240px at 100% 100%, rgba(68,224,170,.14), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border: 1px solid rgba(255,255,255,.15);
+      box-shadow: 0 24px 60px rgba(0,0,0,.36);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+    .swipe-card.active {
+      box-shadow: 0 0 40px rgba(255,149,91,.24), 0 24px 60px rgba(0,0,0,.42);
+    }
+    .swipe-card::before {
+      background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,.15) 45%, transparent 70%);
+      animation: hologram 4s linear infinite;
+
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,.1) 45%, transparent 70%);
+      transform: translateX(-120%);
+      animation: hologram 7s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes hologram { to { transform: translateX(120%); } }
+    .card-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      font-weight: 900;
+      color: rgba(255,255,255,.7);
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      margin-bottom: 10px;
     }
 
-    .controls{
-      position:absolute;
-      top:24px;
-      left:50%;
-      transform:translateX(-50%);
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      justify-content:center;
-      z-index:5;
-    }
-    .btn{
-      border:none;
-      border-radius:999px;
-      padding:12px 18px;
-      font-size:14px;
-      font-weight:600;
-      cursor:pointer;
-      transition:.2s ease;
-    }
-    .btn:hover{transform:translateY(-1px)}
-    .btn-primary{
-      background:#fff;
-      color:#111827;
-    }
-    .btn-secondary{
-      background:rgba(255,255,255,.06);
-      color:#fff;
-      border:1px solid rgba(255,255,255,.16);
-      backdrop-filter:blur(8px);
+    .state {
+      width: min(760px, calc(100vw - 28px));
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 28px;
+      padding: 20px;
+      background: rgba(255,255,255,.05);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 16px 44px rgba(0,0,0,.26);
     }
 
-    .stage{
-      position:relative;
-      width:min(520px,88vw);
-      height:min(520px,88vw);
-      display:flex;
-      align-items:center;
-      justify-content:center;
+    .nav-btn {
+      position: fixed; z-index: 90; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: rgba(25,25,25,.92); border: 2px solid #c05a2a; border-radius: 999px;
+      display: flex; align-items: center; gap: 12px; cursor: pointer;
+      box-shadow: 0 0 25px rgba(192,90,42,0.32); transition: .2s ease; backdrop-filter: blur(8px);
+      padding: 12px 20px;
+    }
+    .nav-btn:hover { transform: translateX(-50%) scale(1.04); }
+    .btn-icon { font-size: 1.5rem; color: #c05a2a; }
+    .btn-text .main { font-weight: 800; letter-spacing: .12em; font-size: .92rem; }
+    .btn-text .sub { font-size: .62rem; opacity: .7; text-transform: uppercase; }
+    .circ-menu-overlay {
+      position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center;
+      pointer-events: none; background: rgba(0,0,0,.7); opacity: 0; transition: opacity .3s ease; backdrop-filter: blur(8px);
+    }
+    .circ-menu-overlay.open { opacity: 1; pointer-events: all; }
+    .circular-menu {
+      width: 300px; height: 300px; border-radius: 50%; border: 2px solid #c05a2a;
+      box-shadow: 0 0 40px rgba(192,90,42,.4); display: flex; align-items: center; justify-content: center;
+      position: relative; transform: scale(.6); transition: transform .25s ease;
+    }
+    .circ-menu-overlay.open .circular-menu { transform: scale(1); }
+    .center-home {
+      width: 74px; height: 74px; background: #2a7f62; border: 3px solid #c05a2a; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer;
+      box-shadow: 0 0 30px rgba(192,90,42,.4); z-index: 2;
+    }
+    .menu-item {
+      position: absolute;
+      width: 66px; height: 66px;
+      background: #1e1b1b; border: 2px solid #c05a2a; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; text-align: center; padding: 6px;
+      color: #fff; font-size: .72rem; font-weight: 700; text-transform: uppercase;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-110px) rotate(calc(var(--angle) * -1deg));
+      cursor: pointer;
     }
 
-    .wheel-shell{
-      position:absolute;
-      inset:50%;
-      width:360px;
-      height:360px;
-      transform:translate(-50%,-50%);
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.18);
-      background:rgba(255,255,255,.04);
-      box-shadow:0 0 80px rgba(255,255,255,.08);
-      backdrop-filter:blur(8px);
-      animation:spin 40s linear infinite;
-    }
-    .wheel-shell::before,
-    .wheel-shell::after{
-      content:"";
-      position:absolute;
-      border-radius:999px;
-      inset:22px;
-      border:1px dashed rgba(255,255,255,.10);
-    }
-    .wheel-shell::after{
-      inset:46px;
-      border-style:solid;
-    }
-    @keyframes spin{
-      from{transform:translate(-50%,-50%) rotate(0)}
-      to{transform:translate(-50%,-50%) rotate(360deg)}
-    }
+    .hide { display: none !important; }
+  
+.nowbar {
+  white-space: normal;
+  line-height: 1.4;
+  padding: 12px 16px;
 
-    .node{
-      position:absolute;
-      width:96px;
-      height:96px;
-      margin:-48px 0 0 -48px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.18);
-      background:rgba(15,23,42,.85);
-      color:#fff;
-      box-shadow:0 18px 40px rgba(0,0,0,.35);
-      backdrop-filter:blur(10px);
-      cursor:pointer;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      gap:6px;
-      text-align:center;
-      padding:10px;
-      transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
-      overflow:hidden;
-    }
-    .node:hover{
-      transform:scale(1.08) translateY(-2px);
-      box-shadow:0 22px 50px rgba(0,0,0,.42);
-      border-color:rgba(255,255,255,.26);
-    }
-    .node::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      border-radius:inherit;
-      background:var(--grad, linear-gradient(135deg, rgba(255,255,255,.1), rgba(255,255,255,.04)));
-      opacity:0;
-      transition:opacity .2s ease;
-    }
-    .node:hover::before{opacity:1}
-    .node > *{position:relative;z-index:1}
-    .node-icon{
-      font-size:20px;
-      line-height:1;
-    }
-    .node-label{
-      font-size:12px;
-      line-height:1.15;
-      font-weight:600;
-    }
+  margin-top: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: .05em;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.06);
+}
+.nowbar.open { color: #5effad; box-shadow: 0 0 12px rgba(94,255,173,.4); }
+.nowbar.warn { color: #ffd27a; box-shadow: 0 0 12px rgba(255,210,122,.4); }
+.nowbar.closed { color: #ff8a8a; box-shadow: 0 0 12px rgba(255,138,138,.4); }
 
-    .hub{
-      position:relative;
-      z-index:3;
-      width:144px;
-      height:144px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.18);
-      background:rgba(2,6,23,.92);
-      box-shadow:0 0 50px rgba(0,0,0,.45);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      padding:20px;
-    }
-    .hub .spark{
-      font-size:18px;
-      margin-bottom:8px;
-      color:#ffd79e;
-    }
-    .hub .main{
-      font-size:14px;
-      font-weight:700;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-    }
-    .hub .minor{
-      margin-top:6px;
-      font-size:10px;
-      letter-spacing:.28em;
-      text-transform:uppercase;
-      color:rgba(255,255,255,.45);
-    }
+.swipe-card {
+  animation: floatCard 6s ease-in-out infinite;
+}
+@keyframes floatCard {
+  0%,100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
 
-    .card{
-      width:min(460px,88vw);
-      border-radius:28px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.16);
-      background:rgba(2,6,23,.82);
-      box-shadow:0 30px 80px rgba(0,0,0,.45);
-      backdrop-filter:blur(10px);
-      animation:cardIn .28s ease;
-    }
-    @keyframes cardIn{
-      from{opacity:0;transform:scale(.9) translateY(8px)}
-      to{opacity:1;transform:scale(1) translateY(0)}
-    }
-    .card-top{
-      height:8px;
-      background:linear-gradient(90deg,#fb923c,#fde68a,#f97316);
-    }
-    .card-body{
-      padding:32px;
-    }
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      padding:6px 10px;
-      border-radius:999px;
-      background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.14);
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.24em;
-      color:rgba(255,255,255,.6);
-      margin-bottom:16px;
-    }
-    .card-head{
-      display:flex;
-      justify-content:space-between;
-      gap:18px;
-      align-items:flex-start;
-    }
-    .card h3{
-      margin:0;
-      font-size:clamp(1.7rem,3vw,2.2rem);
-      line-height:1.05;
-      letter-spacing:-.03em;
-    }
-    .badge{
-      width:44px;
-      height:44px;
-      border-radius:999px;
-      display:grid;
-      place-items:center;
-      background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.14);
-      font-size:20px;
-      flex:none;
-    }
-    .card p{
-      margin:20px 0 0;
-      color:rgba(255,255,255,.76);
-      font-size:15px;
-      line-height:1.8;
-      white-space:pre-wrap;
-    }
-
-    .fade{
-      animation:fade .22s ease;
-    }
-    @keyframes fade{
-      from{opacity:0;transform:scale(.96)}
-      to{opacity:1;transform:scale(1)}
-    }
-
-    @media (max-width: 900px){
-      .hole{
-        width:min(96vw,1100px);
-        height:min(72vh,680px);
-      }
-      .wheel-shell{width:300px;height:300px}
-      .node{width:82px;height:82px;margin:-41px 0 0 -41px}
-      .hub{width:128px;height:128px}
-    }
-    @media (max-width: 640px){
-      .portal-wrap{padding-top:22px}
-      .headline{margin-bottom:16px}
-      .sub{font-size:14px}
-      .controls{top:18px}
-      .btn{padding:10px 14px;font-size:13px}
-      .wheel-shell{width:270px;height:270px}
-      .node{width:76px;height:76px;margin:-38px 0 0 -38px}
-      .node-label{font-size:11px}
-      .hub{width:116px;height:116px}
-      .card-body{padding:24px}
-    }
-  </style>
+</style>
 </head>
 <body>
-  <div id="wall" class="wall" aria-hidden="true"></div>
+  <div class="app">
+    <div class="sticky">
+      <div class="daybar" role="tablist" aria-label="Day selector">
+        <button class="daybtn active" type="button" role="tab" aria-controls="panel-today" aria-selected="true" id="dayBtnToday">Today</button>
+        <button class="daybtn" type="button" role="tab" aria-controls="panel-tomorrow" aria-selected="false" id="dayBtnTomorrow">Tomorrow</button>
+        <button class="daybtn" type="button" role="tab" aria-controls="panel-advanced" aria-selected="false" id="dayBtnAdvanced">Advanced Menu</button>
+      </div>
+    </div>
 
-  <main class="portal-wrap">
-    <section class="headline">
-      <div class="eyebrow">Interactive Wall Portal</div>
-      <h1>Break Through the Wall</h1>
-      <p class="sub">
-        Choose a category from the wheel, switch to that category’s item wheel, then replace it with an information card when an item is selected.
-      </p>
+    <section class="panel" id="panel-today" role="tabpanel" aria-labelledby="dayBtnToday">
+      <div class="header">
+        <div class="title" id="todayTitle">Today’s Menu</div>
+        <div class="subline" id="todayHours">Loading hours…</div>
+        <div class="note" id="todayNote"></div><div class="nowbar" id="todayNow"></div>
+      </div>
+      <div class="toolbar">
+        <button class="viewbtn" id="todayViewWheel">Orbit Navigator</button>
+        <button class="viewbtn active" id="todayViewSwipe">Hologram Cards</button>
+        <button class="actionbtn primary" id="todayAIBtn"><i class="fas fa-sparkles"></i> Choose for Me</button>
+      </div>
+      <div id="todayWheelView">
+        <div class="modehint">Spin the Orbit Navigator to move through the menu.</div>
+        <div class="wheel-stage">
+          <div class="wheel-wrap" id="todayWheelWrap">
+            <div class="wheel-arrow"></div>
+            <div class="wheel" id="todayWheel"></div>
+            <div class="wheel-center"></div>
+          </div>
+          <div class="glasscard" id="todayDetailCard">
+            <div class="cat-title" id="todayDetailTitle"></div>
+            <div id="todayDetailContent"></div><div id="todayPickCard"></div>
+          </div>
+        </div>
+      </div>
+      <div id="todaySwipeView" class="hide">
+        <div class="swipe-shell">
+          <div class="swipe-head">
+            <button class="pill" id="todayPrevCard"><i class="fas fa-chevron-left"></i></button>
+            <div class="subline" id="todayCardStatus">Swipe categories</div>
+            <button class="pill" id="todayNextCard"><i class="fas fa-chevron-right"></i></button>
+          </div>
+          <div class="chipnav" id="todayChipNav"></div>
+          <div class="modehint">Tap a category chip or swipe the hologram cards.</div>
+          <div class="swipe-track" id="todaySwipeTrack"></div>
+        </div>
+      </div>
+      <div class="state hide" id="todayClosed">
+        <div class="title" style="font-size:24px;">Closed</div>
+        <div class="subline" id="todayClosedMsg"></div>
+      </div>
     </section>
 
-    <section class="hole">
-      <div class="controls" id="controls"></div>
-      <div id="fragments"></div>
-      <div id="stage" class="stage"></div>
+    <section class="panel hide" id="panel-tomorrow" role="tabpanel" aria-labelledby="dayBtnTomorrow">
+      <div class="header">
+        <div class="title" id="tomorrowTitle">Tomorrow’s Menu</div>
+        <div class="subline" id="tomorrowHours">Loading hours…</div>
+        <div class="note" id="tomorrowNote"></div><div class="nowbar" id="tomorrowNow"></div>
+      </div>
+      <div class="toolbar">
+        <button class="viewbtn" id="tomorrowViewWheel">Orbit Navigator</button>
+        <button class="viewbtn active" id="tomorrowViewSwipe">Hologram Cards</button>
+        <button class="actionbtn primary" id="tomorrowAIBtn"><i class="fas fa-sparkles"></i> Choose for Me</button>
+      </div>
+      <div id="tomorrowWheelView">
+        <div class="modehint">Spin the Orbit Navigator to move through the menu.</div>
+        <div class="wheel-stage">
+          <div class="wheel-wrap" id="tomorrowWheelWrap">
+            <div class="wheel-arrow"></div>
+            <div class="wheel" id="tomorrowWheel"></div>
+            <div class="wheel-center"></div>
+          </div>
+          <div class="glasscard" id="tomorrowDetailCard">
+            <div class="cat-title" id="tomorrowDetailTitle"></div>
+            <div id="tomorrowDetailContent"></div><div id="tomorrowPickCard"></div>
+          </div>
+        </div>
+      </div>
+      <div id="tomorrowSwipeView" class="hide">
+        <div class="swipe-shell">
+          <div class="swipe-head">
+            <button class="pill" id="tomorrowPrevCard"><i class="fas fa-chevron-left"></i></button>
+            <div class="subline" id="tomorrowCardStatus">Swipe categories</div>
+            <button class="pill" id="tomorrowNextCard"><i class="fas fa-chevron-right"></i></button>
+          </div>
+          <div class="chipnav" id="tomorrowChipNav"></div>
+          <div class="modehint">Tap a category chip or swipe the hologram cards.</div>
+          <div class="swipe-track" id="tomorrowSwipeTrack"></div>
+        </div>
+      </div>
+      <div class="state hide" id="tomorrowClosed">
+        <div class="title" style="font-size:24px;">Closed</div>
+        <div class="subline" id="tomorrowClosedMsg"></div>
+      </div>
     </section>
-  </main>
+
+    <section class="panel hide" id="panel-advanced" role="tabpanel" aria-labelledby="dayBtnAdvanced">
+      <div class="header">
+        <div class="title">Advanced Menu Forecast</div>
+        <div class="subline" id="advancedDisclaimer"></div>
+      </div>
+      <div class="swipe-shell">
+        <div class="advanced-tabs" id="advancedTabs"></div>
+        <div class="advanced-card-wrap" id="advancedTrack"></div>
+      </div>
+    </section>
+
+    <div class="state hide" id="loadError">
+      <div class="title" style="font-size:24px;">Menu couldn’t load</div>
+      <div class="subline" id="loadErrorMsg">Try again in a moment.</div>
+    </div>
+  </div>
+
+  <div class="nav-btn" id="navBtnBottom">
+    <i class="fas fa-compass btn-icon"></i>
+    <div class="btn-text"><div class="main">NAVIGATION</div><div class="sub">explore pages</div></div>
+  </div>
+  <div class="circ-menu-overlay" id="circMenuOverlay">
+    <div class="circular-menu">
+      <div class="center-home" id="homeCenter" data-link="index.html"><i class="fas fa-home"></i></div>
+      <div class="menu-item" style="--angle:0;" data-link="delivery.html">Delivery</div>
+      <div class="menu-item" style="--angle:72;" data-link="tel:3372211035">Order</div>
+      <div class="menu-item" style="--angle:144;" data-link="about.html">About</div>
+      <div class="menu-item" style="--angle:216;" data-link="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634">Location</div>
+      <div class="menu-item" style="--angle:288;" data-action="share">Share</div>
+    </div>
+  </div>
 
   <script>
-    const DATA = {
-      categories: [
-        {
-          id: "services",
-          label: "Services",
-          icon: "🛠️",
-          gradient: "linear-gradient(135deg, rgba(251,146,60,.88), rgba(249,115,22,.76))",
-          items: [
-            {
-              id: "web-design",
-              label: "Web Design",
-              icon: "🎨",
-              title: "Web Design",
-              description: "Custom layouts, visual systems, and responsive user experiences tailored to your brand."
-            },
-            {
-              id: "seo",
-              label: "SEO",
-              icon: "🔎",
-              title: "Search Optimization",
-              description: "On-page strategy, technical improvements, and content structure designed to increase discoverability."
-            },
-            {
-              id: "branding",
-              label: "Branding",
-              icon: "✨",
-              title: "Brand Systems",
-              description: "Identity development, messaging alignment, and brand consistency across digital touchpoints."
-            },
-            {
-              id: "hosting",
-              label: "Hosting",
-              icon: "🌐",
-              title: "Hosting & Support",
-              description: "Reliable infrastructure, maintenance, monitoring, and long-term site support."
-            }
-          ]
-        },
-        {
-          id: "industries",
-          label: "Industries",
-          icon: "🧱",
-          gradient: "linear-gradient(135deg, rgba(56,189,248,.88), rgba(6,182,212,.76))",
-          items: [
-            {
-              id: "construction",
-              label: "Construction",
-              icon: "🏗️",
-              title: "Construction",
-              description: "Portfolio-ready presentation for projects, service lines, and trust-building proof points."
-            },
-            {
-              id: "medical",
-              label: "Medical",
-              icon: "⚕️",
-              title: "Medical",
-              description: "Clear, compliant, patient-friendly information structures with strong calls to action."
-            },
-            {
-              id: "legal",
-              label: "Legal",
-              icon: "⚖️",
-              title: "Legal",
-              description: "Professional layouts for practice areas, attorney bios, and streamlined lead intake."
-            },
-            {
-              id: "retail",
-              label: "Retail",
-              icon: "🛍️",
-              title: "Retail",
-              description: "Visual merchandising online with category-led pathways and persuasive product storytelling."
-            }
-          ]
-        },
-        {
-          id: "materials",
-          label: "Materials",
-          icon: "🔨",
-          gradient: "linear-gradient(135deg, rgba(248,113,113,.88), rgba(244,63,94,.76))",
-          items: [
-            {
-              id: "brick",
-              label: "Brick",
-              icon: "🧱",
-              title: "Brick Texture",
-              description: "Classic, rugged masonry styling with layered shadows and weathered detail."
-            },
-            {
-              id: "stone",
-              label: "Stone",
-              icon: "🪨",
-              title: "Stone Texture",
-              description: "Heavy, carved surfaces with organic edges for a monumental feel."
-            },
-            {
-              id: "metal",
-              label: "Metal",
-              icon: "⚙️",
-              title: "Metal Texture",
-              description: "Industrial finishes with brushed highlights and cool reflective accents."
-            },
-            {
-              id: "glass",
-              label: "Glass",
-              icon: "🔷",
-              title: "Glass Texture",
-              description: "Clean translucent panels with polished light behavior and modern contrast."
-            }
-          ]
+    (function () {
+      const $ = id => document.getElementById(id);
+
+      function escapeHtml(str) {
+        return String(str ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+      function setText(id, text) { const el = $(id); if (el) el.textContent = text || ""; }
+      function normalizeItems(arr) { return Array.isArray(arr) ? arr.map(x => String(x || "").trim()).filter(Boolean) : []; }
+      function normalizeLunchItems(arr) {
+        const items = Array.isArray(arr) ? arr : [];
+        return items.map(raw => {
+          if (raw && typeof raw === "object") return { name: String(raw.name || "").trim(), desc: String(raw.desc || "").trim() };
+          const s = String(raw || "").trim();
+          if (!s) return null;
+          return { name: s, desc: "" };
+        }).filter(Boolean).filter(x => x.name);
+      }
+      function toISODateLocal(d) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        return `${y}-${m}-${day}`;
+      }
+      function formatDateNice(d) { return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); }
+      function weekdayName(d) { return d.toLocaleDateString("en-US", { weekday: "long" }); }
+      function parseISODateToLocal(iso) {
+        const [y, m, d] = String(iso).split("-").map(Number);
+        return new Date(y, (m || 1) - 1, d || 1);
+      }
+      function normalizeDateKey(key) {
+        const m = String(key || "").trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+        if (!m) return null;
+        return `${m[1]}-${String(Number(m[2])).padStart(2, "0")}-${String(Number(m[3])).padStart(2, "0")}`;
+      }
+      function parseTimeToMinutes(timeStr) {
+        if (!timeStr) return null;
+        const match = timeStr.match(/(\d+):?(\d*)\s*(AM|PM)/i);
+        if (!match) return null;
+        let hours = parseInt(match[1], 10);
+        const minutes = match[2] ? parseInt(match[2], 10) : 0;
+        const ampm = match[3].toUpperCase();
+        if (ampm === "PM" && hours !== 12) hours += 12;
+        if (ampm === "AM" && hours === 12) hours = 0;
+        return hours * 60 + minutes;
+      }
+      function findHours(weekly, dayName) {
+        return getBusinessHours(dayName);
+      }
+      function getClosure(data, dayName) {
+        const c = data?.closures || {};
+        const key = Object.keys(c).find(k => k.toLowerCase() === String(dayName || "").toLowerCase());
+        return key ? c[key] : null;
+      }
+      function getMenuByDate(data, isoDate) { return (data?.menus || {})[isoDate] || null; }
+      function crawfishFor(data, menu) {
+        const def = data?.defaults?.crawfish || {};
+        const c = menu?.crawfish || {};
+        return {
+          show: c.show === false ? false : true,
+          subtitle: String(c.subtitle ?? def.subtitle ?? "").trim(),
+          items: normalizeItems(c.items ?? def.items ?? [])
+        };
+      }
+      function isPastClosingToday(weekly, todayName) {
+        const hours = findHours(weekly, todayName);
+        const closeMinutes = parseTimeToMinutes(hours.close);
+        if (closeMinutes == null) return false;
+        const now = new Date();
+        return (now.getHours() * 60 + now.getMinutes()) >= closeMinutes;
+      }
+      function showLoadError(msg) {
+        $("loadError").classList.remove("hide");
+        setText("loadErrorMsg", msg || "Try again in a moment.");
+      }
+      function getBusinessHours(dayName) {
+        const lower = String(dayName || "").toLowerCase();
+        const open = lower === "sunday" ? "7:00 AM" : (lower === "saturday" ? "6:00 AM" : "5:30 AM");
+        const close = lower === "sunday" ? "3:00 PM" : "2:00 PM";
+        return {
+          day: dayName,
+          open,
+          close,
+          breakfast: `${open} - 10:30 AM`,
+          lunch: `11:00 AM - ${close}`,
+          crawfish: ["thursday","friday","saturday"].includes(lower) ? "4:00 PM - 8:00 PM" : ""
+        };
+      }
+      function timeToMinutes12h(timeStr) {
+        if (!timeStr) return null;
+        const m = String(timeStr).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+        if (!m) return null;
+        let h = parseInt(m[1], 10);
+        const min = parseInt(m[2], 10);
+        const ap = m[3].toUpperCase();
+        if (ap === "PM" && h !== 12) h += 12;
+        if (ap === "AM" && h === 12) h = 0;
+        return h * 60 + min;
+      }
+      function rangeIncludes(nowMinutes, rangeStr) {
+        if (!rangeStr || !String(rangeStr).includes("-")) return false;
+        const [a, b] = String(rangeStr).split("-").map(s => s.trim());
+        const start = timeToMinutes12h(a);
+        const end = timeToMinutes12h(b);
+        if (start == null || end == null) return false;
+        return nowMinutes >= start && nowMinutes <= end;
+      }
+      function categoryOpenNow(catName, dayName, nowDate) {
+        const hours = getBusinessHours(dayName);
+        const mins = nowDate.getHours() * 60 + nowDate.getMinutes();
+        const lower = String(catName || "").toLowerCase();
+        if (lower === "breakfast") return rangeIncludes(mins, hours.breakfast);
+        if (lower === "lunch" || lower === "salad bar" || lower === "drinks" || lower === "dessert") return rangeIncludes(mins, hours.lunch);
+        if (lower === "crawfish") return !!hours.crawfish && rangeIncludes(mins, hours.crawfish);
+        return rangeIncludes(mins, `${hours.open} - ${hours.close}`);
+      }
+      function openingMessageFor(dayName) {
+        const hours = getBusinessHours(dayName);
+        return `${dayName} opens at ${hours.open}. Breakfast runs until 10:30 AM, lunch starts at 11:00 AM${hours.crawfish ? `, and crawfish runs ${hours.crawfish}` : ""}.`;
+      }
+
+      let luckTimer = null;
+      let luckCountdownTimer = null;
+      function showLuckModal(title, text) {
+        const modal = $("luckModal");
+        const countEl = $("luckCountdown");
+        if (!modal || !countEl) return;
+        setText("luckModalTitle", title);
+        setText("luckModalText", text);
+        if (luckTimer) clearTimeout(luckTimer);
+        if (luckCountdownTimer) clearInterval(luckCountdownTimer);
+        let remaining = 5;
+        countEl.textContent = String(remaining);
+        modal.classList.add("show");
+        luckCountdownTimer = setInterval(() => {
+          remaining -= 1;
+          if (remaining > 0) {
+            countEl.textContent = String(remaining);
+          } else {
+            clearInterval(luckCountdownTimer);
+            luckCountdownTimer = null;
+          }
+        }, 1000);
+        luckTimer = setTimeout(() => {
+          hideLuckModal();
+        }, 5000);
+      }
+      function hideLuckModal() {
+        const modal = $("luckModal");
+        if (luckTimer) {
+          clearTimeout(luckTimer);
+          luckTimer = null;
         }
-      ]
-    };
-
-    const state = {
-      selectedCategoryId: null,
-      selectedItemId: null
-    };
-
-    const wall = document.getElementById("wall");
-    const stage = document.getElementById("stage");
-    const controls = document.getElementById("controls");
-    const fragments = document.getElementById("fragments");
-
-    function buildWall() {
-      const total = 168;
-      for (let i = 0; i < total; i++) {
-        const b = document.createElement("div");
-        b.className = "brick";
-        wall.appendChild(b);
-      }
-    }
-
-    function buildFragments() {
-      const defs = [
-        { left: "10%", top: "18%", w: 64, h: 32, r: -16, d: "0s" },
-        { left: "76%", top: "22%", w: 56, h: 28, r: 22, d: ".2s" },
-        { left: "18%", top: "72%", w: 48, h: 24, r: 12, d: ".4s" },
-        { left: "70%", top: "76%", w: 64, h: 32, r: -24, d: ".6s" },
-        { left: "5%", top: "48%", w: 56, h: 28, r: -8, d: ".1s" },
-        { left: "82%", top: "52%", w: 48, h: 24, r: 14, d: ".5s" },
-        { left: "30%", top: "8%", w: 40, h: 20, r: -30, d: ".3s" },
-        { left: "56%", top: "86%", w: 40, h: 20, r: 18, d: ".7s" }
-      ];
-      defs.forEach(def => {
-        const el = document.createElement("div");
-        el.className = "fragment";
-        el.style.left = def.left;
-        el.style.top = def.top;
-        el.style.width = def.w + "px";
-        el.style.height = def.h + "px";
-        el.style.setProperty("--rot", def.r + "deg");
-        el.style.animationDelay = def.d;
-        fragments.appendChild(el);
-      });
-    }
-
-    function getSelectedCategory() {
-      return DATA.categories.find(c => c.id === state.selectedCategoryId) || null;
-    }
-
-    function getSelectedItem() {
-      const category = getSelectedCategory();
-      if (!category) return null;
-      return category.items.find(i => i.id === state.selectedItemId) || null;
-    }
-
-    function createButton(text, variant, onClick) {
-      const btn = document.createElement("button");
-      btn.className = `btn ${variant === "primary" ? "btn-primary" : "btn-secondary"}`;
-      btn.textContent = text;
-      btn.addEventListener("click", onClick);
-      return btn;
-    }
-
-    function polarToCartesian(angle, radius) {
-      const radians = ((angle - 90) * Math.PI) / 180;
-      return {
-        x: Math.cos(radians) * radius,
-        y: Math.sin(radians) * radius
-      };
-    }
-
-    function renderControls() {
-      controls.innerHTML = "";
-      const category = getSelectedCategory();
-      const item = getSelectedItem();
-
-      if (category && !item) {
-        controls.appendChild(createButton("Back to Categories", "primary", () => {
-          state.selectedCategoryId = null;
-          state.selectedItemId = null;
-          render();
-        }));
+        if (luckCountdownTimer) {
+          clearInterval(luckCountdownTimer);
+          luckCountdownTimer = null;
+        }
+        if (modal) modal.classList.remove("show");
       }
 
-      if (category && item) {
-        controls.appendChild(createButton(`Back to ${category.label}`, "primary", () => {
-          state.selectedItemId = null;
-          render();
-        }));
-        controls.appendChild(createButton("All Categories", "secondary", () => {
-          state.selectedCategoryId = null;
-          state.selectedItemId = null;
-          render();
-        }));
+      function pickLunchCombo(cat) {
+        const entries = Array.isArray(cat?.items) ? cat.items.slice() : [];
+        const labels = entries.map(it => typeof it === "string" ? it : (it?.name || "")).filter(Boolean);
+        if (!labels.length) return null;
+        const meats = labels.filter(x => /chicken|pork|steak|fish|shrimp|hamburger|roast|sausage|turkey|beef|meatloaf|catfish|tenders|boudin/i.test(x));
+        const sides = labels.filter(x => !/chicken|pork|steak|fish|shrimp|hamburger|roast|sausage|turkey|beef|meatloaf|catfish|tenders|boudin/i.test(x));
+        const rand = arr => arr[Math.floor(Math.random() * arr.length)];
+        const meat = meats.length ? rand(meats) : rand(labels);
+        const sidePool = sides.length ? sides.slice() : labels.filter(x => x !== meat);
+        const side1 = sidePool.length ? rand(sidePool) : null;
+        const side2Pool = sidePool.filter(x => x !== side1);
+        const side2 = side2Pool.length ? rand(side2Pool) : (sidePool.length > 1 ? sidePool[0] : null);
+        return { meat, sides: [side1, side2].filter(Boolean) };
       }
-    }
-
-    function renderWheel(title, centerLabel, entries, onSelect) {
-      const wrap = document.createElement("div");
-      wrap.className = "fade";
-      wrap.style.position = "relative";
-      wrap.style.width = "100%";
-      wrap.style.height = "100%";
-
-      const shell = document.createElement("div");
-      shell.className = "wheel-shell";
-      wrap.appendChild(shell);
-
-      const radius = window.innerWidth < 640 ? 135 : window.innerWidth < 900 ? 150 : 180;
-
-      entries.forEach((entry, index) => {
-        const angle = (360 / entries.length) * index;
-        const pos = polarToCartesian(angle, radius - 28);
-        const btn = document.createElement("button");
-        btn.className = "node";
-        btn.style.left = `calc(50% + ${pos.x}px)`;
-        btn.style.top = `calc(50% + ${pos.y}px)`;
-        btn.style.setProperty("--grad", entry.gradient || "linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.04))");
-        btn.innerHTML = `
-          <div class="node-icon">${entry.icon || "✦"}</div>
-          <div class="node-label">${entry.label}</div>
-        `;
-        btn.addEventListener("click", () => onSelect(entry.id));
-        wrap.appendChild(btn);
-      });
-
-      const hub = document.createElement("div");
-      hub.className = "hub";
-      hub.innerHTML = `
-        <div class="spark">✦</div>
-        <div class="main">${centerLabel}</div>
-        <div class="minor">${title}</div>
-      `;
-      wrap.appendChild(hub);
-
-      return wrap;
-    }
-
-    function renderCard(item) {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <div class="card-top"></div>
-        <div class="card-body">
-          <div class="pill">Selected Item</div>
-          <div class="card-head">
-            <div>
-              <h3>${item.title}</h3>
-            </div>
-            <div class="badge">${item.icon || "ℹ️"}</div>
+      function renderPickCard(prefix, combo, catName) {
+        const el = $(`${prefix}PickCard`);
+        if (!el) return;
+        if (!combo) {
+          el.innerHTML = "";
+          return;
+        }
+        el.innerHTML = `
+          <div class="pick-card">
+            <div class="pick-title">Suggested ${escapeHtml(catName)} Plate</div>
+            <div class="pick-line">Meat: ${escapeHtml(combo.meat || "Chef's choice")}</div>
+            <div class="pick-line">Sides: ${escapeHtml((combo.sides || []).join(" + ") || "Chef's choice")}</div>
           </div>
-          <p>${item.description}</p>
-        </div>
-      `;
-      return card;
-    }
-
-    function renderStage() {
-      stage.innerHTML = "";
-      const category = getSelectedCategory();
-      const item = getSelectedItem();
-
-      if (!category) {
-        stage.appendChild(renderWheel(
-          "Choose a Path",
-          "Categories",
-          DATA.categories,
-          (id) => {
-            state.selectedCategoryId = id;
-            state.selectedItemId = null;
-            render();
-          }
-        ));
-        return;
+        `;
       }
 
-      if (category && !item) {
-        stage.appendChild(renderWheel(
-          "Choose an Item",
-          category.label,
-          category.items.map(item => ({ ...item, gradient: category.gradient })),
-          (id) => {
-            state.selectedItemId = id;
-            render();
+      async function fetchHtml(url) {
+        const res = await fetch(url, { credentials: "same-origin", cache: "no-store" });
+        if (!res.ok) throw new Error(`Fetch failed ${res.status} at ${url}`);
+        return await res.text();
+      }
+      function extractJsonFromHtml(html, label) {
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const script = doc.querySelector("#hh-menu-data");
+        if (!script) throw new Error(`No #hh-menu-data found on ${label}`);
+        const raw = (script.textContent || "").trim();
+        if (!raw) throw new Error(`#hh-menu-data is empty on ${label}`);
+        return JSON.parse(raw);
+      }
+      async function readData() {
+        const urls = ["menu-data.html", "./menu-data.html", "/menu-data.html"];
+        let lastErr = null;
+        for (const url of urls) {
+          try {
+            const html = await fetchHtml(url);
+            const data = extractJsonFromHtml(html, url);
+            const rawMenus = data?.menus || {};
+            const normalizedMenus = {};
+            Object.keys(rawMenus).forEach(k => {
+              const nk = normalizeDateKey(k);
+              if (nk) normalizedMenus[nk] = rawMenus[k];
+            });
+            data.menus = normalizedMenus;
+            return data;
+          } catch (e) {
+            lastErr = e;
           }
-        ));
-        return;
+        }
+        throw lastErr || new Error("Menu data could not be read from menu-data.html.");
       }
 
-      stage.appendChild(renderCard(item));
-    }
+      function buildCategoryData(data, isoDate) {
+        const menu = getMenuByDate(data, isoDate) || {};
+        const defaults = data?.defaults || {};
+        const lunchItems = normalizeLunchItems(menu.lunch?.items ?? defaults.lunch?.items ?? []);
+        const cats = [
+          {
+            name: "Breakfast",
+            meta: "Morning favorites",
+            plates: normalizeItems(menu.breakfast?.plates ?? defaults.breakfast?.plates ?? []),
+            items: normalizeItems(menu.breakfast?.items ?? defaults.breakfast?.items ?? [])
+          },
+          {
+            name: "Lunch",
+            meta: "Daily plates",
+            plates: normalizeItems(menu.lunch?.plates ?? defaults.lunch?.plates ?? []),
+            items: lunchItems
+          }
+        ];
+        const crawfish = crawfishFor(data, menu);
+        if (crawfish.show) cats.push({ name: "Crawfish", meta: "Seasonal special", items: crawfish.items });
+        cats.push(
+          {
+            name: "Salad Bar",
+            meta: "Build your own",
+            pricing: normalizeItems(menu.salad?.items ?? defaults.salad?.items ?? []),
+            lettuce: normalizeItems(menu.salad?.saladBar?.lettuce ?? defaults.salad?.saladBar?.lettuce ?? []),
+            toppings: normalizeItems(menu.salad?.saladBar?.toppings ?? defaults.salad?.saladBar?.toppings ?? []),
+            dressing: normalizeItems(menu.salad?.saladBar?.dressing ?? defaults.salad?.saladBar?.dressing ?? [])
+          },
+          { name: "Drinks", meta: "Cold & hot", items: normalizeItems(menu.drinks?.items ?? defaults.drinks?.items ?? []) },
+          { name: "Dessert", meta: "Sweet finish", items: normalizeItems(menu.dessert?.items ?? defaults.dessert?.items ?? []) }
+        );
+        return cats.filter(cat => (cat.plates && cat.plates.length) || (cat.items && cat.items.length) || (cat.pricing && cat.pricing.length) || (cat.lettuce && cat.lettuce.length) || (cat.toppings && cat.toppings.length) || (cat.dressing && cat.dressing.length));
+      }
 
-    function render() {
-      renderControls();
-      renderStage();
-    }
+      function renderCategoryContent(cat, data) {
+        let html = "";
+        if (cat.plates?.length) html += `<div class="section-label">Plates</div><ul class="list">${cat.plates.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
+        if (cat.items?.length) {
+          html += `<div class="section-label">Items</div><ul class="list">` + cat.items.map(it => {
+            if (typeof it === "string") return `<li>${escapeHtml(it)}</li>`;
+            return `<li><details><summary>${escapeHtml(it.name)}</summary><div class="desc">${escapeHtml(it.desc || data?.settings?.noDescriptionText || "No description for this item.")}</div></details></li>`;
+          }).join("") + `</ul>`;
+        }
+        if (cat.pricing?.length) html += `<div class="section-label">Pricing</div><ul class="list">${cat.pricing.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
+        if (cat.lettuce?.length) html += `<div class="section-label">Lettuce</div><ul class="list">${cat.lettuce.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
+        if (cat.toppings?.length) html += `<div class="section-label">Toppings</div><ul class="list">${cat.toppings.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
+        if (cat.dressing?.length) html += `<div class="section-label">Dressing</div><ul class="list">${cat.dressing.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
+        return html || `<div class="subline">No items available.</div>`;
+      }
 
-    buildWall();
-    buildFragments();
-    render();
+      function initSwipe(prefix, categories, data) {
+        const track = $(`${prefix}SwipeTrack`);
+        const prev = $(`${prefix}PrevCard`);
+        const next = $(`${prefix}NextCard`);
+        const chipNav = $(`${prefix}ChipNav`);
+        if (!track) return;
+        track.innerHTML = categories.map((cat, i) => `
+          <article class="swipe-card${i === 0 ? " active" : ""}" data-index="${i}">
+            <div class="card-meta">${escapeHtml(cat.meta || "Menu category")}</div>
+            <div class="cat-title">${escapeHtml(cat.name)}</div>
+            ${renderCategoryContent(cat, data)}
+          </article>
+        `).join("");
+        if (chipNav) {
+          chipNav.innerHTML = categories.map((cat, i) => `<button class="chip${i === 0 ? " active" : ""}" data-index="${i}">${escapeHtml(cat.name)}</button>`).join("");
+        }
+        const cards = Array.from(track.querySelectorAll(".swipe-card"));
+        const chips = Array.from((chipNav || document.createElement("div")).querySelectorAll(".chip"));
+
+        function activeIndex() {
+          const left = track.scrollLeft;
+          const width = track.clientWidth || 1;
+          return Math.round(left / width);
+        }
+        function updateStatus() {
+          const idx = Math.max(0, Math.min(categories.length - 1, activeIndex()));
+          setText(`${prefix}CardStatus`, `${categories[idx]?.name || ""} • ${idx + 1} / ${categories.length}`);
+          cards.forEach((card, i) => card.classList.toggle("active", i === idx));
+          chips.forEach((chip, i) => chip.classList.toggle("active", i === idx));
+        }
+        function goTo(idx) {
+          const clamped = Math.max(0, Math.min(categories.length - 1, idx));
+          track.scrollTo({ left: clamped * track.clientWidth, behavior: "smooth" });
+          window.setTimeout(updateStatus, 220);
+        }
+
+        prev?.addEventListener("click", () => goTo(activeIndex() - 1));
+        next?.addEventListener("click", () => goTo(activeIndex() + 1));
+        chips.forEach(chip => chip.addEventListener("click", () => goTo(Number(chip.dataset.index || 0))));
+        track.addEventListener("scroll", () => requestAnimationFrame(updateStatus));
+        window.addEventListener("resize", updateStatus);
+
+        cards.forEach(card => {
+          card.addEventListener("pointermove", e => {
+            const rect = card.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width - 0.5) * 10;
+            const y = ((e.clientY - rect.top) / rect.height - 0.5) * -10;
+            card.style.transform = `perspective(1000px) rotateY(${x}deg) rotateX(${y}deg)`;
+          });
+          card.addEventListener("pointerleave", () => {
+            card.style.transform = "perspective(1000px) rotateY(0deg) rotateX(0deg)";
+          });
+        });
+        updateStatus();
+        return {
+          selectByName(name) {
+            const idx = categories.findIndex(c => c.name === name);
+            if (idx >= 0) {
+              goTo(idx);
+              const card = cards[idx];
+              if (card) {
+                card.classList.add("pulse");
+                setTimeout(() => card.classList.remove("pulse"), 900);
+              }
+            }
+          }
+        };
+      }
+
+      function initWheel(prefix, categories, data, dayName, isTodayPanel) {
+        const wrap = $(`${prefix}WheelWrap`);
+        const wheel = $(`${prefix}Wheel`);
+        const detailTitle = $(`${prefix}DetailTitle`);
+        const detailContent = $(`${prefix}DetailContent`);
+        const detailCard = $(`${prefix}DetailCard`);
+        if (!wrap || !wheel || !detailTitle || !detailContent) return null;
+        const N = categories.length;
+        const step = 360 / N;
+        const radius = 112;
+        const topAngle = -90;
+        wheel.innerHTML = "";
+
+        const items = categories.map((cat, i) => {
+          const el = document.createElement("div");
+          el.className = "wheel-item";
+          el.textContent = cat.name;
+          wheel.appendChild(el);
+          return el;
+        });
+
+        let angle = 0, velocity = 0, dragging = false, lastPointerAngle = 0, selected = 0, raf = 0, lockedByHours = false;
+
+        function shortestDelta(a, b) {
+          let diff = a - b;
+          while (diff > 180) diff -= 360;
+          while (diff < -180) diff += 360;
+          return diff;
+        }
+        function pointerAngle(e) {
+          const rect = wrap.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+          return Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
+        }
+        function selectedIndex() {
+          let best = 0, bestDiff = Infinity;
+          for (let i = 0; i < N; i++) {
+            const a = topAngle + i * step + angle;
+            const diff = Math.abs(shortestDelta(a, topAngle));
+            if (diff < bestDiff) { bestDiff = diff; best = i; }
+          }
+          return best;
+        }
+        function canShowCategory(cat) {
+          if (!isTodayPanel) return true;
+          return categoryOpenNow(cat.name, dayName, new Date());
+        }
+        function renderDetailFor(idx, force=false) {
+          const cat = categories[idx];
+          const allowed = canShowCategory(cat);
+          lockedByHours = !allowed;
+          detailTitle.textContent = cat.name;
+          const closedNowNote = isTodayPanel && !allowed
+            ? `<div class="closed-note">This is the ${escapeHtml(dayName)} menu for ${escapeHtml(cat.name)}. They are currently closed for this category. ${escapeHtml(openingMessageFor(dayName))}</div>`
+            : "";
+          detailContent.innerHTML = renderCategoryContent(cat, data) + closedNowNote;
+          renderPickCard(prefix, null, cat.name);
+          if (force) {
+            detailCard.classList.add("pulse");
+            setTimeout(() => detailCard.classList.remove("pulse"), 520);
+          }
+        }
+        function render(force=false) {
+          wheel.style.transform = `rotate(${angle}deg)`;
+          items.forEach((item, i) => {
+            const base = topAngle + i * step;
+            item.style.transform = `rotate(${base}deg) translate(${radius}px) rotate(${-base - angle}deg)`;
+          });
+          const idx = selectedIndex();
+          if (force || idx !== selected) {
+            selected = idx;
+            items.forEach((item, i) => item.classList.toggle("selected", i === idx));
+            renderDetailFor(idx, true);
+          }
+        }
+        function tick() {
+          raf = 0;
+          if (!dragging) {
+            angle += velocity;
+            velocity *= 0.965;
+            if (Math.abs(velocity) < 0.02) {
+              const target = -(selectedIndex() * step);
+              const delta = shortestDelta(target, angle);
+              angle += delta * 0.16;
+              if (Math.abs(delta) < 0.2) {
+                angle = target;
+                velocity = 0;
+                render(true);
+                return;
+              }
+            }
+          }
+          render();
+          raf = requestAnimationFrame(tick);
+        }
+        function ensureAnim() { if (!raf) raf = requestAnimationFrame(tick); }
+        function onDown(e) {
+          e.preventDefault();
+          dragging = true;
+          wrap.classList.add("dragging");
+          velocity = 0;
+          lastPointerAngle = pointerAngle(e);
+          wrap.setPointerCapture?.(e.pointerId);
+          ensureAnim();
+        }
+        function onMove(e) {
+          if (!dragging) return;
+          e.preventDefault();
+          const a = pointerAngle(e);
+          const delta = shortestDelta(a, lastPointerAngle);
+          lastPointerAngle = a;
+          angle += delta;
+          velocity = delta;
+          render();
+        }
+        function onUp(e) {
+          if (!dragging) return;
+          dragging = false;
+          wrap.classList.remove("dragging");
+          wrap.releasePointerCapture?.(e.pointerId);
+          ensureAnim();
+        }
+        function onClick() {
+          if (lockedByHours && isTodayPanel) {
+            showLuckModal("Currently closed", `${categories[selected].name} is not being served right now. ${openingMessageFor(dayName)}`);
+          }
+        }
+        wrap.addEventListener("pointerdown", onDown, { passive: false });
+        wrap.addEventListener("pointermove", onMove, { passive: false });
+        wrap.addEventListener("pointerup", onUp);
+        wrap.addEventListener("pointercancel", onUp);
+        detailCard.addEventListener("click", onClick);
+        render(true);
+
+        return {
+          aiPick() {
+            const lunchCat = categories.find(c => String(c.name).toLowerCase() === "lunch");
+            const targetCat = lunchCat || categories.find(c => canShowCategory(c)) || categories[0];
+            if (!targetCat) {
+              showLuckModal("Currently closed", openingMessageFor(dayName));
+              return null;
+            }
+            if (isTodayPanel && !canShowCategory(targetCat)) {
+              showLuckModal("Currently closed", `${targetCat.name} is not being served right now. ${openingMessageFor(dayName)}`);
+              return null;
+            }
+            const idx = categories.findIndex(c => c.name === targetCat.name);
+            const combo = pickLunchCombo(targetCat);
+            const target = -(idx * step);
+            const start = performance.now();
+            const startAngle = angle;
+            const extraTurns = 720 + Math.random() * 360;
+            const endAngle = target + extraTurns;
+            function animate(now) {
+              const t = Math.min(1, (now - start) / 2400);
+              const ease = 1 - Math.pow(1 - t, 3);
+              angle = startAngle + (endAngle - startAngle) * ease;
+              velocity = 0;
+              render();
+              if (t < 1) requestAnimationFrame(animate);
+              else {
+                angle = target;
+                render(true);
+                renderPickCard(prefix, combo, targetCat.name);
+                detailCard.classList.add("pulse");
+                setTimeout(() => detailCard.classList.remove("pulse"), 900);
+              }
+            }
+            requestAnimationFrame(animate);
+            return targetCat;
+          },
+          selectByName(name) {
+            const idx = categories.findIndex(c => c.name === name);
+            if (idx >= 0) {
+              angle = -(idx * step);
+              render(true);
+            }
+          }
+        };
+      }
+
+      function setupViewToggle(prefix) {
+        const wheelBtn = $(`${prefix}ViewWheel`);
+        const swipeBtn = $(`${prefix}ViewSwipe`);
+        const wheelView = $(`${prefix}WheelView`);
+        const swipeView = $(`${prefix}SwipeView`);
+        swipeBtn?.classList.add("active");
+        wheelBtn?.classList.remove("active");
+        swipeView?.classList.remove("hide");
+        wheelView?.classList.add("hide");
+        wheelBtn?.addEventListener("click", () => {
+          wheelBtn.classList.add("active");
+          swipeBtn?.classList.remove("active");
+          wheelView?.classList.remove("hide");
+          swipeView?.classList.add("hide");
+        });
+        swipeBtn?.addEventListener("click", () => {
+          swipeBtn.classList.add("active");
+          wheelBtn?.classList.remove("active");
+          swipeView?.classList.remove("hide");
+          wheelView?.classList.add("hide");
+        });
+      }
+
+      function setupDayTabs() {
+        const buttons = [$("dayBtnToday"), $("dayBtnTomorrow"), $("dayBtnAdvanced")];
+        const panels = [$("panel-today"), $("panel-tomorrow"), $("panel-advanced")];
+        buttons.forEach((btn, i) => {
+          btn?.addEventListener("click", () => {
+            buttons.forEach((b, bi) => {
+              b.classList.toggle("active", bi === i);
+              b.setAttribute("aria-selected", bi === i ? "true" : "false");
+            });
+            panels.forEach((p, pi) => p.classList.toggle("hide", pi !== i));
+          });
+        });
+      }
+
+      function buildAdvanced(data, startISO) {
+        const tabs = $("advancedTabs");
+        const track = $("advancedTrack");
+        if (!track || !tabs) return;
+        tabs.innerHTML = "";
+        track.innerHTML = "";
+        setText("advancedDisclaimer", "Showing the next 7 days starting from the next active menu day.");
+        const start = parseISODateToLocal(startISO);
+        const lDef = data?.defaults?.lunch || {};
+        const days = 7;
+        const cards = [];
+
+        for (let i = 0; i < days; i++) {
+          const d = new Date(start);
+          d.setDate(start.getDate() + i);
+
+          const iso = toISODateLocal(d);
+          const dayName = weekdayName(d);
+          const hours = getBusinessHours(dayName);
+          const closure = getClosure(data, dayName);
+          const dayMenu = getMenuByDate(data, iso);
+
+          const tab = document.createElement("button");
+          tab.className = "advanced-tab" + (i === 0 ? " active" : "");
+          tab.type = "button";
+          tab.textContent = `${dayName.slice(0,3)} ${d.getMonth()+1}/${d.getDate()}`;
+          tabs.appendChild(tab);
+
+          const card = document.createElement("article");
+          card.className = "swipe-card active" + (i === 0 ? "" : " hide");
+
+          if (!dayMenu) {
+            card.innerHTML = `
+              <div class="card-meta">${escapeHtml(formatDateNice(d))}</div>
+              <div class="cat-title">${escapeHtml(dayName)}</div>
+              <div class="subline">${escapeHtml(iso)}</div>
+              <div class="section-label">Status</div>
+              <ul class="list">
+                <li>Unable to fetch the menu for this day.</li>
+              </ul>
+            `;
+          } else {
+            const lunch = dayMenu?.lunch || {};
+            const plates = normalizeItems(lunch.plates ?? lDef.plates ?? []);
+            const items = normalizeLunchItems(lunch.items ?? []);
+            card.innerHTML = `
+              <div class="card-meta">${escapeHtml(formatDateNice(d))}</div>
+              <div class="cat-title">${escapeHtml(dayName)}</div>
+              <div class="subline">${closure?.closed ? "Closed" : (hours.lunch ? `Lunch ${escapeHtml(hours.lunch)}` : "")}</div>
+              ${
+                closure?.closed
+                  ? `<div class="section-label">Status</div><ul class="list"><li>${escapeHtml(closure.message || "Closed")}</li></ul>`
+                  : `
+                    <div class="section-label">Plates</div>
+                    <ul class="list">${plates.length ? plates.map(x => `<li>${escapeHtml(x)}</li>`).join("") : `<li>Unable to fetch the menu for this day.</li>`}</ul>
+                    <div class="section-label">Lunch Items</div>
+                    <ul class="list">${items.length ? items.map(x => `<li>${escapeHtml(x.name)}</li>`).join("") : `<li>Unable to fetch the menu for this day.</li>`}</ul>
+                  `
+              }
+            `;
+          }
+
+          track.appendChild(card);
+          cards.push({tab, card});
+        }
+
+        cards.forEach((entry, idx) => {
+          entry.tab.addEventListener("click", () => {
+            cards.forEach((item, i) => {
+              item.tab.classList.toggle("active", i === idx);
+              item.card.classList.toggle("hide", i !== idx);
+            });
+          });
+        });
+      }
+
+      
+function updateNowBar(prefix, dayName, isoDate) {
+  const el = document.getElementById(prefix + "Now");
+  if (!el) return;
+
+  const todayISO = toISODateLocal(new Date());
+  const isActualToday = isoDate === todayISO;
+  const h = getBusinessHours(dayName);
+
+  function fmt(totalSeconds) {
+    const safe = Math.max(0, Math.floor(totalSeconds));
+    const hrs = Math.floor(safe / 3600);
+    const mins = Math.floor((safe % 3600) / 60);
+    const secs = safe % 60;
+    return `${String(hrs).padStart(2,"0")}:${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
+  }
+
+  if (!isActualToday) {
+    el.className = "nowbar warn";
+    el.textContent = `${dayName} • Opens at ${h.open}`;
+    return;
+  }
+
+  const now = new Date();
+  const nowSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+
+  const openSeconds = parseTimeToMinutes(h.open) * 60;
+  const closeSeconds = parseTimeToMinutes(h.close) * 60;
+  const breakfastEndSeconds = 10 * 3600 + 30 * 60;
+  const lunchStartSeconds = 11 * 3600;
+
+  let crawfishStartSeconds = null;
+  let crawfishEndSeconds = null;
+  if (h.crawfish && h.crawfish.includes("-")) {
+    const [startText, endText] = h.crawfish.split("-").map(s => s.trim());
+    crawfishStartSeconds = parseTimeToMinutes(startText) * 60;
+    crawfishEndSeconds = parseTimeToMinutes(endText) * 60;
+  }
+
+  const duringMainHours = nowSeconds >= openSeconds && nowSeconds <= closeSeconds;
+  const duringCrawfish = crawfishStartSeconds !== null && crawfishEndSeconds !== null &&
+    nowSeconds >= crawfishStartSeconds && nowSeconds <= crawfishEndSeconds;
+
+  let text = "";
+  let cls = "";
+
+  if (!duringMainHours && !duringCrawfish) {
+    text = `Closed • Opens ${h.open}`;
+    cls = "closed";
+  } else if (nowSeconds < breakfastEndSeconds) {
+    const remaining = breakfastEndSeconds - nowSeconds;
+    text = `Breakfast • Ends in ${fmt(remaining)}`;
+    cls = remaining < 1800 ? "warn" : "open";
+  } else if (nowSeconds < lunchStartSeconds) {
+    const remaining = lunchStartSeconds - nowSeconds;
+    text = `Transition • Lunch starts in ${fmt(remaining)}`;
+    cls = "warn";
+  } else if (duringMainHours && nowSeconds >= lunchStartSeconds) {
+    const remaining = closeSeconds - nowSeconds;
+    text = `Now Serving Lunch • Ends in ${fmt(remaining)}`;
+    cls = "open";
+  } else if (duringCrawfish) {
+    const remaining = crawfishEndSeconds - nowSeconds;
+    text = `Now Serving Crawfish • Ends in ${fmt(remaining)}`;
+    cls = "open";
+  } else {
+    text = `Closed • Opens ${h.open}`;
+    cls = "closed";
+  }
+
+  el.className = "nowbar " + cls;
+  el.textContent = text;
+}
+
+function initPanel(prefix, data, isoDate, displayName) {
+        const hours = getBusinessHours(displayName);
+        const closure = getClosure(data, displayName);
+        const isTodayPanel = prefix === "today";
+
+        setText(`${prefix}Title`, `${displayName} (${formatDateNice(parseISODateToLocal(isoDate))}) Menu`);
+        setText(`${prefix}Hours`,
+          closure?.closed
+            ? `${displayName} Hours: Closed`
+            : `${displayName} Hours: ${hours.open} – ${hours.close} • Breakfast ${hours.breakfast} • Lunch ${hours.lunch}${hours.crawfish ? ` • Crawfish ${hours.crawfish}` : ""}`
+        );
+
+        const todayISO = toISODateLocal(new Date());
+        const isActualToday = isoDate === todayISO;
+        const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes();
+
+        const noteEl = $(`${prefix}Note`);
+        let nowStatus = "";
+
+        if (closure?.closed) {
+          nowStatus = `<span class="statusdot closed"></span> CLOSED`;
+        } else if (!isActualToday) {
+          nowStatus = `<span class="statusdot closed"></span> SCHEDULED`;
+        } else {
+          const openNow =
+            rangeIncludes(nowMinutes, `${hours.open} - ${hours.close}`) ||
+            (!!hours.crawfish && rangeIncludes(nowMinutes, hours.crawfish));
+
+          nowStatus = `<span class="statusdot ${openNow ? "" : "closed"}"></span>${openNow ? "OPEN NOW" : "CURRENTLY CLOSED"}`;
+        }
+
+        if (noteEl) {
+          noteEl.innerHTML = `${escapeHtml(data?.hours?.note || "")}<div class="statusbar">${nowStatus}</div>`;
+        }
+
+        updateNowBar(prefix, displayName, isoDate);
+
+        if (closure?.closed) {
+          $(`${prefix}Closed`).classList.remove("hide");
+          setText(`${prefix}ClosedMsg`, closure.message || "See you next time!");
+        } else {
+          $(`${prefix}Closed`).classList.add("hide");
+        }
+
+        const cats = buildCategoryData(data, isoDate);
+        const wheelApi = initWheel(prefix, cats, data, displayName, isTodayPanel);
+        const swipeApi = initSwipe(prefix, cats, data);
+        setupViewToggle(prefix);
+
+        $(`${prefix}AIBtn`)?.addEventListener("click", () => {
+          const picked = wheelApi?.aiPick();
+          if (picked) swipeApi?.selectByName(picked.name);
+        });
+      }
+
+      function initNav() {
+        const overlay = $("circMenuOverlay");
+        const navBtn = $("navBtnBottom");
+        const home = $("homeCenter");
+        const items = Array.from(document.querySelectorAll(".menu-item"));
+        if (!overlay || !navBtn || !home) return;
+        navBtn.addEventListener("click", e => { e.stopPropagation(); overlay.classList.toggle("open"); });
+        overlay.addEventListener("click", e => { if (e.target === overlay) overlay.classList.remove("open"); });
+        home.addEventListener("click", () => {
+          overlay.classList.remove("open");
+          const link = home.getAttribute("data-link");
+          if (link) window.location.href = link;
+        });
+        async function sharePage() {
+          const data = { title: document.title, text: "Check out Hot Headz!", url: window.location.href };
+          try {
+            if (navigator.share) await navigator.share(data);
+            else if (navigator.clipboard) { await navigator.clipboard.writeText(window.location.href); alert("Link copied!"); }
+          } catch (_) {}
+        }
+        items.forEach(item => item.addEventListener("click", () => {
+          overlay.classList.remove("open");
+          const action = item.getAttribute("data-action");
+          const link = item.getAttribute("data-link");
+          if (action === "share") sharePage();
+          else if (link) window.location.href = link;
+        }));
+        document.querySelector(".circular-menu")?.addEventListener("click", e => e.stopPropagation());
+        const modalEl = $("luckModal");
+        const flashCard = modalEl?.querySelector(".flash-card");
+        flashCard?.addEventListener("click", e => e.stopPropagation());
+        modalEl?.addEventListener("click", () => hideLuckModal());
+        window.addEventListener("keydown", e => { if (e.key === "Escape") hideLuckModal(); });
+      }
+
+      setupDayTabs();
+      initNav();
+
+      (async function init() {
+        try {
+          const data = await readData();
+          const now = new Date();
+          const todayISO = toISODateLocal(now);
+          const todayName = weekdayName(now);
+          const tomorrow = new Date(now); tomorrow.setDate(now.getDate() + 1);
+          const tomorrowISO = toISODateLocal(tomorrow);
+          const tomorrowName = weekdayName(tomorrow);
+
+          let displayTodayISO = todayISO;
+          let displayTodayName = todayName;
+          let displayTomorrowISO = tomorrowISO;
+          let displayTomorrowName = tomorrowName;
+
+          const closureToday = getClosure(data, todayName);
+          if (isPastClosingToday([], todayName) && !closureToday?.closed) {
+            displayTodayISO = tomorrowISO;
+            displayTodayName = tomorrowName;
+            const dayAfter = new Date(now); dayAfter.setDate(now.getDate() + 2);
+            displayTomorrowISO = toISODateLocal(dayAfter);
+            displayTomorrowName = weekdayName(dayAfter);
+          }
+
+          setText("dayBtnToday", displayTodayName);
+          setText("dayBtnTomorrow", displayTomorrowName);
+
+          initPanel("today", data, displayTodayISO, displayTodayName);
+          initPanel("tomorrow", data, displayTomorrowISO, displayTomorrowName);
+          buildAdvanced(data, displayTodayISO);
+
+          setInterval(() => {
+            updateNowBar("today", displayTodayName, displayTodayISO);
+            updateNowBar("tomorrow", displayTomorrowName, displayTomorrowISO);
+          }, 1000);
+        } catch (e) {
+          console.error(e);
+          showLoadError(String(e?.message || e));
+        }
+      })();
+    })();
   </script>
+
+  <div class="flash-overlay" id="luckModal">
+    <div class="flash-card">
+      <div class="flash-count" id="luckCountdown">5</div>
+      <div class="flash-title" id="luckModalTitle">Currently closed</div>
+      <div class="flash-text" id="luckModalText"></div>
+      <div class="flash-sub">Closing automatically</div>
+    </div>
+  </div>
 </body>
 </html>
