@@ -872,12 +872,18 @@
         if (luckTimer) clearTimeout(luckTimer);
         if (luckCountdownTimer) clearInterval(luckCountdownTimer);
         let remaining = 5;
-        countEl.textContent = String(remaining);
+        function formatTime(s){
+          const hrs = Math.floor(s/3600);
+          const mins = Math.floor((s%3600)/60);
+          const secs = s%60;
+          return `${String(hrs).padStart(2,"0")}:${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
+        }
+        countEl.textContent = formatTime(remaining);
         modal.classList.add("show");
         luckCountdownTimer = setInterval(() => {
           remaining -= 1;
           if (remaining > 0) {
-            countEl.textContent = String(remaining);
+            countEl.textContent = formatTime(remaining);
           } else {
             clearInterval(luckCountdownTimer);
             luckCountdownTimer = null;
