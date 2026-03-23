@@ -758,7 +758,7 @@ document.getElementById('mob-hours').textContent=mobHoursStr;
 
 /* PAGE DATA */
 const PAGES={
-  home:{num:'01',eyebrow:'Home',cta:'Go to Home Page',title:'Hot Headz\nSouthern Foods.',italic:'Fresh · From Scratch · Est. 2020',meta:'2741 US-190 · DeRidder, LA · (337) 221-1035',mood:'radial-gradient(ellipse at 30% 80%,#3a0800 0%,#1c0404 50%,#08040a 100%)',desc:`<strong>Hot Headz Southern Foods</strong> — fresh, made-from-scratch breakfast and lunch in DeRidder, Louisiana. Open Mon–Fri 5:30am, Saturday 6am, Sunday 7am. Cafeteria-style comfort food done right since 2020.`,chips:['Est. 2020','DeRidder, LA','Made From Scratch','(337) 221-1035','Mon–Fri 5:30am','Sun 7am–3pm'],rule:'Home is where the food is.',dest:'home.html'},
+  home:{num:'01',eyebrow:'Home',cta:'Go to Home Page',title:'Hot Headz\nSouthern Foods.',italic:'Fresh · From Scratch · Est. 2020',meta:'2741 US-190 · DeRidder, LA · (337) 221-1035',mood:'radial-gradient(ellipse at 30% 80%,#3a0800 0%,#1c0404 50%,#08040a 100%)',desc:`<strong>Hot Headz Southern Foods</strong> — fresh, made-from-scratch breakfast and lunch in DeRidder, Louisiana. Open Mon–Fri 5:30am, Saturday 6am, Sunday 7am. Cafeteria-style comfort food done right since 2020.`,chips:['Est. 2020','DeRidder, LA','Made From Scratch','(337) 221-1035','Mon–Fri 5:30am','Sun 7am–3pm'],rule:'Home is where the food is.',dest:'index.html'},
   menu:{num:'02',eyebrow:'The Menu',cta:'See Full Menu',title:'Fresh.\nFrom Scratch.',italic:'Breakfast · Lunch · Daily specials · Desserts',meta:'Made fresh every morning — no shortcuts',mood:'radial-gradient(ellipse at 30% 80%,#3a0800 0%,#1c0404 50%,#08040a 100%)',desc:`Everything at Hot Headz is <strong>made from scratch every morning.</strong> Breakfast plates, lunch specials, Southern sides, Cajun classics and homemade desserts. Red beans & rice, fried chicken, catfish, smothered pork chops, crawfish étouffée and more. Cafeteria-style comfort food done right.`,chips:['Breakfast Plates','Red Beans & Rice','Fried Chicken','Catfish','Crawfish Étouffée','Daily Specials'],rule:'From scratch, every time.',dest:'menu.html'},
   lunch:{num:'✦',eyebrow:'Lunch',cta:'See Lunch Menu',title:'Lunch.\nDone Right.',italic:'Daily Southern plates · Changes every day',meta:'Served Mon–Fri until 2pm · Sat until 2pm · Sun until 3pm',mood:'radial-gradient(ellipse at 30% 80%,#3a0800 0%,#1c0404 50%,#08040a 100%)',desc:`Hot Headz lunch is <strong>made fresh every morning</strong> and changes daily. Expect classics like red beans & rice, fried chicken, smothered pork chops, catfish plates, jambalaya, meatloaf and crawfish étouffée. Southern sides included. <strong>Check Facebook every morning</strong> to see what's on the board before you drive out.`,chips:['Changes Daily','Southern Plates','Includes Sides','Check Facebook','Mon–Fri to 2pm','Sun to 3pm'],rule:'Check Facebook for today\'s plate.',dest:'menu.html#lunch'},
   beer:{num:'✦',eyebrow:'Beer',cta:'See Beer Menu',title:'Cold.\nCold Beer.',italic:'Ice cold · Natural Light · Modelo · Budweiser',meta:'Ask staff for what\'s available today',mood:'radial-gradient(ellipse at 30% 80%,#1a0400 0%,#100200 50%,#08040a 100%)',desc:`Hot Headz keeps it cold. <strong>Natural Light, Miller Lite, Coors Light, Bud Light, Budweiser, Michelob Ultra, Corona and Modelo</strong> — all ice cold. The perfect end to a Southern lunch.`,chips:['Natural Light','Miller Lite','Coors Light','Bud Light','Budweiser','Modelo'],rule:'Best with a plate of fried chicken.',dest:'menu.html#beer'},
@@ -881,9 +881,19 @@ function goTo(){
   const fill=document.getElementById('ld-fill');
   fill.style.animation='none';void fill.offsetHeight;
   ld.classList.add('show');
+  const dest=currentPage.dest;
+  const isExternal=dest.startsWith('http')||dest.startsWith('tel');
+  // Open external links immediately (before setTimeout) to avoid popup blockers
+  let extWin=null;
+  if(isExternal) extWin=window.open(dest,'_blank');
   setTimeout(()=>{
-    if(currentPage.dest.startsWith('http')||currentPage.dest.startsWith('tel')){window.open(currentPage.dest,'_blank');ld.classList.remove('show');navigating=false;}
-    else{window.location.href=currentPage.dest;}
+    if(isExternal){
+      // If popup was blocked, fall back to same-tab
+      if(!extWin||extWin.closed) window.location.href=dest;
+      ld.classList.remove('show');navigating=false;
+    } else {
+      window.location.href=dest;
+    }
   },1900);
 }
 
