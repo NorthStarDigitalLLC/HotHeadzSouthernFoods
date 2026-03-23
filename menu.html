@@ -123,8 +123,6 @@
           <div class="subline" id="todayCardStatus">Swipe categories</div>
           <button class="pill" id="todayNextCard"><i class="fas fa-chevron-right"></i></button>
         </div>
-        <div class="chipnav" id="todayChipNav"></div>
-        <div class="modehint">Tap a category chip or swipe the hologram cards.</div>
         <div class="swipe-track" id="todaySwipeTrack"></div>
       </div>
     </div>
@@ -157,8 +155,6 @@
           <div class="subline" id="tomorrowCardStatus">Swipe categories</div>
           <button class="pill" id="tomorrowNextCard"><i class="fas fa-chevron-right"></i></button>
         </div>
-        <div class="chipnav" id="tomorrowChipNav"></div>
-        <div class="modehint">Tap a category chip or swipe the hologram cards.</div>
         <div class="swipe-track" id="tomorrowSwipeTrack"></div>
       </div>
     </div>
@@ -248,7 +244,7 @@ function buildCats(data,isoDate){
 }
 
 function renderCat(cat,data){
-  if(cat.isBeer)return`<div class="section-label">Available Beers</div><ul class="list">${BEER_ITEMS.map(b=>`<li class="beer-item">🍺 ${esc(b)}</li>`).join("")}</ul><div class="beer-sign-wrap"><img src="images/BeerMenu.jpeg" alt="Hot Headz beer chalkboard" loading="lazy"/></div><div class="beer-sign-caption">The board at the restaurant</div>`;
+  if(cat.isBeer)return`<div class="section-label">Available Beers</div><ul class="list">${BEER_ITEMS.map(b=>`<li class="beer-item">🍺 ${esc(b)}</li>`).join("")}</ul>`;
   let html="";
   if(cat.plates?.length)html+=`<div class="section-label">Plates</div><ul class="list">${cat.plates.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
   if(cat.items?.length)html+=`<div class="section-label">Items</div><ul class="list">`+cat.items.map(it=>{if(typeof it==="string")return`<li>${esc(it)}</li>`;return`<li><details><summary>${esc(it.name)}</summary><div class="desc">${esc(it.desc||"No description.")}</div></details></li>`;}).join("")+`</ul>`;
