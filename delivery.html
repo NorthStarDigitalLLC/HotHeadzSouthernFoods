@@ -3,654 +3,165 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hot Headz – Delivery Checker</title>
+  <title>Hot Headz &ndash; Delivery Checker</title>
   <meta name="description" content="Check if we deliver to your address. 10+ plates required within 10 miles of DeRidder, LA.">
-
-  <!-- Google Fonts & Font Awesome (same as homepage) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-  <!-- Leaflet CSS (map) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
-   <!-- ===== FAVICON / ICONS ===== -->
-<link rel="icon" type="image/webp" href="images/HotHeadzLogo.png">
-<link rel="apple-touch-icon" href="images/HotHeadzLogo.png">
-
-  <!-- ===== OPEN GRAPH ===== -->
-<meta property="og:image" content="images/HotHeadzLogo.png">
-<meta property="og:image:alt" content="Hot Headz Southern Foods logo">
-
-  <!-- ===== TWITTER CARD ===== -->
-<meta name="twitter:image" content="images/HotHeadzLogo.png">
-<meta name="twitter:image:alt" content="Hot Headz Southern Foods logo">
+  <link rel="icon" type="image/png" href="images/HotHeadzLogo.png">
+  <link rel="apple-touch-icon" href="images/HotHeadzLogo.png">
+  <meta property="og:image" content="images/HotHeadzLogo.png">
+  <meta property="og:image:alt" content="Hot Headz Southern Foods logo">
+  <meta name="twitter:image" content="images/HotHeadzLogo.png">
+  <meta name="twitter:image:alt" content="Hot Headz Southern Foods logo">
   <style>
-
-  <style>
-    /* ---------- RESET / BASE ---------- */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      max-width: 100%;
-    }
-    html {
-      scroll-behavior: smooth;
-      overflow-x: hidden;
-    }
-    body {
-      background-color: #07060a;
-      color: rgba(255,255,255,0.92);
-      font-family: 'Inter', sans-serif;
-      line-height: 1.5;
-      padding-bottom: 90px; /* space for bottom navigation button */
-    }
-
-    /* ===== DELIVERY PAGE STYLES (unchanged) ===== */
+    *{margin:0;padding:0;box-sizing:border-box;max-width:100%;}
+    html{scroll-behavior:smooth;overflow-x:hidden;}
+    body{background-color:#07060a;color:rgba(255,255,255,0.92);font-family:'Inter',sans-serif;line-height:1.5;padding-bottom:90px;}
     .hh-delivery{
-      --bg: #07060a;
-      --glass: rgba(10,12,18,.62);
-      --glass2: rgba(10,12,18,.48);
-      --stroke: rgba(255,255,255,.14);
-      --stroke2: rgba(255,255,255,.10);
-      --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.70);
-      --soft: rgba(255,255,255,.58);
-      --ember: #ff5b3d;
-      --ember2: #ffb04b;
-      --shadow: 0 22px 70px rgba(0,0,0,.55);
-      --shadow2: 0 14px 40px rgba(0,0,0,.42);
-      --r1: 24px;
-      --r2: 18px;
-
-      max-width: 980px;
-      margin: 2rem auto;
-      font-family: 'Inter', sans-serif;
-      color: var(--text);
-      padding: 0 1rem;
+      --bg:#07060a;--glass:rgba(10,12,18,.62);--glass2:rgba(10,12,18,.48);
+      --stroke:rgba(255,255,255,.14);--stroke2:rgba(255,255,255,.10);
+      --text:rgba(255,255,255,.92);--muted:rgba(255,255,255,.70);--soft:rgba(255,255,255,.58);
+      --ember:#ff5b3d;--ember2:#ffb04b;
+      --shadow:0 22px 70px rgba(0,0,0,.55);--shadow2:0 14px 40px rgba(0,0,0,.42);
+      --r1:24px;--r2:18px;
+      max-width:980px;margin:2rem auto;font-family:'Inter',sans-serif;color:var(--text);padding:0 1rem;
     }
-
-    .hh-glass{
-      background: linear-gradient(to bottom, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      background-color: var(--glass);
-      border: 1px solid var(--stroke);
-      box-shadow: var(--shadow2);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-    }
-
-    .hh-headerbox{
-      border-radius: var(--r1);
-      padding: 18px 20px;
-      margin-bottom: 14px;
-      position: relative;
-      overflow: hidden;
-    }
-    .hh-headerbox::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        radial-gradient(900px 260px at 10% 0%, rgba(255,91,61,.14), transparent 62%),
-        radial-gradient(900px 260px at 90% 10%, rgba(255,176,75,.10), transparent 62%);
-      pointer-events:none;
-    }
-    .hh-headerbox > *{ position: relative; z-index: 1; }
-
-    .hh-headTop{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .hh-title{
-      margin: 0;
-      font-size: clamp(22px, 3.2vw, 34px);
-      letter-spacing: -0.03em;
-      line-height: 1.1;
-      font-weight: 950;
-    }
-
-    .hh-badge{
-      padding: 8px 10px;
-      border-radius: 999px;
-      font-weight: 900;
-      font-size: 12px;
-      letter-spacing: .16em;
-      text-transform: uppercase;
-      background: linear-gradient(135deg, rgba(255,91,61,.22), rgba(255,176,75,.18));
-      border: 1px solid rgba(255,255,255,.16);
-      color: rgba(255,255,255,.90);
-      white-space: nowrap;
-    }
-
-    .hh-sub{
-      margin: 8px 0 0;
-      font-weight: 700;
-      color: var(--muted);
-      line-height: 1.45;
-    }
-
-    .hh-card{
-      border-radius: var(--r1);
-      padding: 18px;
-      margin-bottom: 14px;
-    }
-
-    .hh-grid{
-      display:grid;
-      grid-template-columns: 1.4fr .6fr;
-      gap: 12px;
-    }
-    @media (max-width: 720px){
-      .hh-grid{ grid-template-columns: 1fr; }
-    }
-
-    .hh-label{
-      display:flex;
-      flex-direction: column;
-      gap: 8px;
-      font-weight: 850;
-    }
-
-    .hh-labelText{
-      color: rgba(255,255,255,.82);
-      font-size: 13px;
-      letter-spacing: .10em;
-      text-transform: uppercase;
-    }
-
-    .hh-input{
-      padding: 14px 14px;
-      border-radius: 16px;
-      border: 1px solid var(--stroke2);
-      font-size: 16px;
-      background: rgba(0,0,0,.22);
-      color: var(--text);
-      outline: none;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-    }
-    .hh-input::placeholder{ color: rgba(255,255,255,.45); }
-    .hh-input:focus{
-      border-color: rgba(255,176,75,.38);
-      box-shadow:
-        0 0 0 4px rgba(255,176,75,.12),
-        inset 0 1px 0 rgba(255,255,255,.06);
-    }
-
-    .hh-actions{
-      display:flex;
-      gap: 10px;
-      margin: 12px 0 10px;
-      flex-wrap: wrap;
-    }
-    @media (max-width: 720px){
-      .hh-actions{ flex-direction: column; }
-    }
-
-    .hh-btn{
-      padding: 13px 14px;
-      border-radius: 16px;
-      font-weight: 950;
-      font-size: 15px;
-      cursor: pointer;
-      border: 1px solid rgba(255,255,255,.12);
-      text-decoration:none;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap: 10px;
-      user-select:none;
-      transition: transform .14s ease, box-shadow .14s ease, opacity .14s ease, background .14s ease;
-    }
-    .hh-btn:active{ transform: translateY(1px); }
-
-    .hh-btn--primary{
-      border-color: transparent;
-      background: linear-gradient(135deg, var(--ember), var(--ember2));
-      color: rgba(12,12,12,.94);
-      box-shadow: 0 18px 52px rgba(255,91,61,.18);
-    }
-    .hh-btn--primary:hover{ opacity: .95; }
-
-    .hh-btn--ghost{
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-    }
-    .hh-btn--ghost:hover{ background: rgba(255,255,255,.09); }
-
-    .hh-call{
-      margin-top: 12px;
-      width: 100%;
-    }
-
-    .hh-status{
-      padding: 14px 14px;
-      border-radius: 16px;
-      background: rgba(0,0,0,.20);
-      border: 1px solid var(--stroke2);
-      font-weight: 850;
-      color: rgba(255,255,255,.86);
-      line-height: 1.35;
-    }
-
-    .hh-status.is-good{
-      border-color: rgba(255,176,75,.35);
-      box-shadow: 0 0 0 4px rgba(255,176,75,.10);
-    }
-    .hh-status.is-bad{
-      border-color: rgba(255,91,61,.35);
-      box-shadow: 0 0 0 4px rgba(255,91,61,.10);
-    }
-
-    .hh-hint{
-      margin: 10px 0 0;
-      color: rgba(255,255,255,.58);
-      font-weight: 700;
-      font-size: 13px;
-    }
-
-    .hh-mapWrap{
-      border-radius: var(--r1);
-      overflow: hidden;
-      padding: 10px;
-    }
-
-    .hh-map{
-      height: 420px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.10);
-      overflow: hidden;
-    }
-
-    .hh-note{
-      margin: 10px 0 0;
-      font-size: 12px;
-      color: rgba(255,255,255,.62);
-      font-weight: 700;
-    }
-
-    /* Leaflet tweaks */
-    .leaflet-control-zoom a{
-      background: rgba(0,0,0,.55) !important;
-      color: rgba(255,255,255,.90) !important;
-      border: 1px solid rgba(255,255,255,.14) !important;
-    }
-    .leaflet-control-attribution{
-      background: rgba(0,0,0,.55) !important;
-      color: rgba(255,255,255,.75) !important;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,.10);
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      .hh-btn{ transition: none; }
-    }
-
-    /* ==================== CIRCULAR NAVIGATION (adapted for Hot Headz) ==================== */
-    .nav-btn {
-      position: fixed;
-      z-index: 2000;
-      background: #1e1b1b;
-      border: 2px solid var(--ember, #ff5b3d);
-      border-radius: 50px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      box-shadow: 0 0 25px rgba(255,91,61,0.5);
-      transition: all 0.2s ease;
-      backdrop-filter: blur(8px);
-    }
-
-    .nav-btn:hover {
-      transform: scale(1.05);
-      border-color: var(--ember2, #ffb04b);
-      box-shadow: 0 0 35px var(--ember, #ff5b3d);
-    }
-
-    .btn-icon {
-      font-size: 1.8rem;
-      color: var(--ember, #ff5b3d);
-    }
-
-    .btn-text {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.2;
-    }
-
-    .btn-text .main {
-      font-weight: 700;
-      font-size: 1rem;
-      letter-spacing: 2px;
-      color: rgba(255,255,255,0.92);
-    }
-
-    .btn-text .sub {
-      font-size: 0.65rem;
-      opacity: 0.7;
-      color: rgba(255,255,255,0.7);
-      text-transform: uppercase;
-    }
-
-    /* left-center button - VERTICAL */
-    .nav-btn.left-center {
-      left: 30px;
-      top: 50%;
-      transform: translateY(-50%);
-      flex-direction: column;
-      padding: 1rem 0.5rem;
-      gap: 8px;
-    }
-
-    .nav-btn.left-center .btn-text {
-      writing-mode: vertical-rl;
-      text-orientation: upright;
-      margin: 0;
-      line-height: 1.2;
-    }
-
-    .nav-btn.left-center .btn-text .main {
-      font-size: 0.9rem;
-      letter-spacing: normal;
-    }
-
-    .nav-btn.left-center .btn-text .sub {
-      font-size: 0.6rem;
-      margin-top: 4px;
-    }
-
-    /* bottom-center button - HORIZONTAL */
-    .nav-btn.bottom-center {
-      bottom: 30px;
-      left: 50%;
+    .hh-glass{background:linear-gradient(to bottom,rgba(255,255,255,.06),rgba(255,255,255,.03));background-color:var(--glass);border:1px solid var(--stroke);box-shadow:var(--shadow2);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
+    .hh-headerbox{border-radius:var(--r1);padding:18px 20px;margin-bottom:14px;position:relative;overflow:hidden;}
+    .hh-headerbox::before{content:"";position:absolute;inset:0;background:radial-gradient(900px 260px at 10% 0%,rgba(255,91,61,.14),transparent 62%),radial-gradient(900px 260px at 90% 10%,rgba(255,176,75,.10),transparent 62%);pointer-events:none;}
+    .hh-headerbox>*{position:relative;z-index:1;}
+    .hh-headTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .hh-title{margin:0;font-size:clamp(22px,3.2vw,34px);letter-spacing:-0.03em;line-height:1.1;font-weight:950;}
+    .hh-badge{padding:8px 10px;border-radius:999px;font-weight:900;font-size:12px;letter-spacing:.16em;text-transform:uppercase;background:linear-gradient(135deg,rgba(255,91,61,.22),rgba(255,176,75,.18));border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.90);white-space:nowrap;}
+    .hh-sub{margin:8px 0 0;font-weight:700;color:var(--muted);line-height:1.45;}
+    .hh-card{border-radius:var(--r1);padding:18px;margin-bottom:14px;}
+    .hh-grid{display:grid;grid-template-columns:1.4fr .6fr;gap:12px;}
+    @media(max-width:720px){.hh-grid{grid-template-columns:1fr;}}
+    .hh-label{display:flex;flex-direction:column;gap:8px;font-weight:850;}
+    .hh-labelText{color:rgba(255,255,255,.82);font-size:13px;letter-spacing:.10em;text-transform:uppercase;}
+    .hh-input{padding:14px;border-radius:16px;border:1px solid var(--stroke2);font-size:16px;background:rgba(0,0,0,.22);color:var(--text);outline:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
+    .hh-input::placeholder{color:rgba(255,255,255,.45);}
+    .hh-input:focus{border-color:rgba(255,176,75,.38);box-shadow:0 0 0 4px rgba(255,176,75,.12),inset 0 1px 0 rgba(255,255,255,.06);}
+    .hh-actions{display:flex;gap:10px;margin:12px 0 10px;flex-wrap:wrap;}
+    @media(max-width:720px){.hh-actions{flex-direction:column;}}
+    .hh-btn{padding:13px 14px;border-radius:16px;font-weight:950;font-size:15px;cursor:pointer;border:1px solid rgba(255,255,255,.12);text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:10px;user-select:none;transition:transform .14s ease,box-shadow .14s ease,opacity .14s ease,background .14s ease;}
+    .hh-btn:active{transform:translateY(1px);}
+    .hh-btn--primary{border-color:transparent;background:linear-gradient(135deg,var(--ember),var(--ember2));color:rgba(12,12,12,.94);box-shadow:0 18px 52px rgba(255,91,61,.18);}
+    .hh-btn--primary:hover{opacity:.95;}
+    .hh-btn--ghost{background:rgba(255,255,255,.06);color:var(--text);}
+    .hh-btn--ghost:hover{background:rgba(255,255,255,.09);}
+    .hh-call{margin-top:12px;width:100%;}
+    .hh-status{padding:14px;border-radius:16px;background:rgba(0,0,0,.20);border:1px solid var(--stroke2);font-weight:850;color:rgba(255,255,255,.86);line-height:1.35;}
+    .hh-status.is-good{border-color:rgba(255,176,75,.35);box-shadow:0 0 0 4px rgba(255,176,75,.10);}
+    .hh-status.is-bad{border-color:rgba(255,91,61,.35);box-shadow:0 0 0 4px rgba(255,91,61,.10);}
+    .hh-hint{margin:10px 0 0;color:rgba(255,255,255,.58);font-weight:700;font-size:13px;}
+    .hh-mapWrap{border-radius:var(--r1);overflow:hidden;padding:10px;}
+    .hh-map{height:420px;border-radius:18px;border:1px solid rgba(255,255,255,.10);overflow:hidden;}
+    .hh-note{margin:10px 0 0;font-size:12px;color:rgba(255,255,255,.62);font-weight:700;}
+    .leaflet-control-zoom a{background:rgba(0,0,0,.55)!important;color:rgba(255,255,255,.90)!important;border:1px solid rgba(255,255,255,.14)!important;}
+    .leaflet-control-attribution{background:rgba(0,0,0,.55)!important;color:rgba(255,255,255,.75)!important;border-radius:10px;border:1px solid rgba(255,255,255,.10);}
+    @media(prefers-reduced-motion:reduce){.hh-btn{transition:none;}}
+    /* ===== BACK BUTTON ===== */
+    .back-btn {
+      position: fixed; z-index: 1000; bottom: 24px; left: 50%;
       transform: translateX(-50%);
-      flex-direction: row;
-      padding: 0.8rem 1.8rem;
+      background: rgba(25,20,15,.92);
+      border: 1px solid rgba(255,91,61,.45);
+      border-radius: 999px;
+      display: inline-flex; align-items: center; gap: 10px;
+      cursor: pointer; box-shadow: 0 4px 24px rgba(0,0,0,.4);
+      transition: all .2s ease; backdrop-filter: blur(8px);
+      padding: 12px 24px; text-decoration: none;
+      color: rgba(255,255,255,.9);
+      font-family: 'Inter', sans-serif; font-weight: 800;
+      font-size: .9rem; letter-spacing: .08em; white-space: nowrap;
     }
-
-    /* circular menu overlay */
-    .circ-menu-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 2500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-      background: rgba(0,0,0,0.7);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      backdrop-filter: blur(8px);
+    .back-btn:hover {
+      transform: translateX(-50%) translateY(-2px);
+      border-color: rgba(255,91,61,.85);
+      box-shadow: 0 8px 32px rgba(255,91,61,.22);
     }
-
-    .circ-menu-overlay.open {
-      opacity: 1;
-      pointer-events: all;
+    .back-btn .back-arrow {
+      font-size: 1.1rem; color: #ff5b3d;
+      transition: transform .2s; display: inline-block;
     }
-
-    .circular-menu {
-      width: 360px;
-      height: 360px;
-      border-radius: 50%;
-      background: transparent;
-      border: 2px solid var(--ember, #ff5b3d);
-      box-shadow: 0 0 40px rgba(255,91,61,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      transform: scale(0.3);
-      transition: transform 0.3s ease;
-    }
-
-    .circ-menu-overlay.open .circular-menu {
-      transform: scale(1);
-    }
-
-    .center-home {
-      width: 70px;
-      height: 70px;
-      background: var(--ember2, #ffb04b);
-      border: 3px solid var(--ember, #ff5b3d);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      font-size: 1.5rem;
-      color: #1a0d0b;
-      box-shadow: 0 0 30px var(--ember, #ff5b3d);
-      cursor: pointer;
-      transition: 0.2s;
-      z-index: 1001;
-    }
-    .center-home:hover {
-      background: var(--ember, #ff5b3d);
-      color: white;
-      transform: scale(1.05);
-    }
-
-    .menu-item {
-      position: absolute;
-      width: 60px;
-      height: 60px;
-      background: #1e1b1b;
-      border: 2px solid var(--ember, #ff5b3d);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: rgba(255,255,255,0.92);
-      font-size: 0.8rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      transition: all 0.2s;
-      cursor: pointer;
-      box-shadow: 0 0 15px rgba(0,0,0,0.7);
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-130px) rotate(calc(var(--angle) * -1deg));
-      font-family: 'Inter', sans-serif;
-      letter-spacing: 1px;
-      backdrop-filter: blur(4px);
-    }
-
-    .menu-item:hover {
-      background: var(--ember, #ff5b3d);
-      color: black;
-      border-color: var(--ember2, #ffb04b);
-      transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-140px) rotate(calc(var(--angle) * -1deg));
-      width: 65px;
-      height: 65px;
-    }
-
-    /* mobile adjustments */
-    @media (max-width: 600px) {
-      .nav-btn.left-center {
-        left: 10px;
-        padding: 0.8rem 0.3rem;
-      }
-      .nav-btn.left-center .btn-icon {
-        font-size: 1.5rem;
-      }
-      .nav-btn.left-center .btn-text .main {
-        font-size: 0.8rem;
-      }
-      .nav-btn.left-center .btn-text .sub {
-        font-size: 0.5rem;
-      }
-      .nav-btn.bottom-center {
-        bottom: 20px;
-        padding: 0.6rem 1.2rem;
-      }
-      .circular-menu {
-        width: 280px;
-        height: 280px;
-      }
-      .menu-item {
-        width: 50px;
-        height: 50px;
-        font-size: 0.7rem;
-        transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-100px) rotate(calc(var(--angle) * -1deg));
-      }
-      .menu-item:hover {
-        transform: translate(-50%, -50%) rotate(calc(var(--angle) * 1deg)) translateY(-110px) rotate(calc(var(--angle) * -1deg));
-        width: 55px;
-        height: 55px;
-      }
-      .center-home {
-        width: 60px;
-        height: 60px;
-        font-size: 1.2rem;
-      }
+    .back-btn:hover .back-arrow { transform: translateX(-3px); }
+    .back-btn .back-sub {
+      font-size: .65rem; font-weight: 600; opacity: .5;
+      text-transform: uppercase; letter-spacing: .1em; margin-left: 2px;
     }
   </style>
 </head>
 <body>
-  <!-- invisible anchors (kept for compatibility) -->
-  <div id="gen-home" style="position: absolute; top:0; height:1px; width:1px; opacity:0;"></div>
-  <div id="gen-menu" style="position: absolute; height:1px; width:1px; opacity:0;"></div>
-  <div id="gen-delivery" style="position: absolute; height:1px; width:1px; opacity:0;"></div>
-  <div id="gen-order" style="position: absolute; height:1px; width:1px; opacity:0;"></div>
-  <div id="gen-about" style="position: absolute; height:1px; width:1px; opacity:0;"></div>
-  <div id="gen-location" style="position: absolute; height:1px; width:1px; opacity:0;"></div>
 
-  <!-- ===== CIRCULAR NAVIGATION BUTTONS ===== -->
-  <div class="nav-btn left-center" id="navBtnLeft">
-    <i class="fas fa-compass btn-icon"></i>
-    <div class="btn-text">
-      <span class="main">NAVIGATION</span>
-      <span class="sub">explore pages</span>
-    </div>
-  </div>
+  <!-- ===== BACK BUTTON ===== -->
+  <a class="back-btn" href="index.html">
+    <span class="back-arrow">&#8592;</span>
+    <span>Back</span>
+    <span class="back-sub">Home</span>
+  </a>
 
-  <div class="nav-btn bottom-center" id="navBtnBottom">
-    <i class="fas fa-compass btn-icon"></i>
-    <div class="btn-text">
-      <span class="main">NAVIGATION</span>
-      <span class="sub">explore pages</span>
-    </div>
-  </div>
-
-  <!-- CIRCULAR MENU OVERLAY with page links (5 items evenly spaced at 72° increments) -->
-  <div class="circ-menu-overlay" id="circMenuOverlay">
-    <div class="circular-menu">
-      <div class="center-home" id="homeCenter" data-link="index.html"><i class="fas fa-home"></i></div>
-      <div class="menu-item" style="--angle: 0;" data-link="menu.html">Menu</div>
-      <div class="menu-item" style="--angle: 72;" data-link="tel:3372211035">Order</div>
-      <div class="menu-item" style="--angle: 144;" data-link="about.html">About</div>
-      <div class="menu-item" style="--angle: 216;" data-link="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634">Location</div>
-      <div class="menu-item" style="--angle: 288;" data-action="share">Share</div>
-    </div>
-  </div>
-
-  <!-- DELIVERY CONTENT -->
   <section class="hh-delivery" aria-label="Delivery availability checker">
 
-    <!-- HEADER -->
     <header class="hh-headerbox hh-glass">
       <div class="hh-headTop">
         <h2 class="hh-title">Check Delivery Availability</h2>
-        <span class="hh-badge" aria-hidden="true">10+ plates • 10 miles</span>
+        <span class="hh-badge" aria-hidden="true">10+ plates &bull; 10 miles</span>
       </div>
-
       <p class="hh-sub">
         Delivery is available for <strong>10 plates or more</strong> within a
         <strong>10-mile radius</strong> of our location in DeRidder.
       </p>
     </header>
 
-    <!-- CARD -->
     <div class="hh-card hh-glass">
-
       <div class="hh-grid">
         <label class="hh-label">
           <span class="hh-labelText">Your address</span>
-          <input
-            id="addr"
-            class="hh-input"
-            inputmode="text"
-            autocomplete="street-address"
-            placeholder="123 Main St, DeRidder, LA"
-            aria-describedby="status"
-          />
+          <input id="addr" class="hh-input" inputmode="text" autocomplete="street-address"
+            placeholder="123 Main St, DeRidder, LA" aria-describedby="status" />
         </label>
-
         <label class="hh-label">
           <span class="hh-labelText">Number of plates</span>
-          <input
-            id="plates"
-            class="hh-input"
-            type="number"
-            min="1"
-            value="10"
-            inputmode="numeric"
-          />
+          <input id="plates" class="hh-input" type="number" min="1" value="10" inputmode="numeric" />
         </label>
       </div>
-
       <div class="hh-actions">
-        <button id="check" class="hh-btn hh-btn--primary" type="button">
-          Check Address
-        </button>
-        <button id="reset" class="hh-btn hh-btn--ghost" type="button">
-          Clear
-        </button>
+        <button id="check" class="hh-btn hh-btn--primary" type="button">Check Address</button>
+        <button id="reset" class="hh-btn hh-btn--ghost" type="button">Clear</button>
       </div>
-
       <div id="status" class="hh-status" role="status" aria-live="polite">
         Enter an address (or tap the map) to check delivery availability.
       </div>
-
-      <a
-        id="callBtn"
-        href="tel:3372211035"
-        class="hh-btn hh-btn--primary hh-call"
-        style="display:none"
-      >
-        📞 Call to Place Order
+      <a id="callBtn" href="tel:3372211035" class="hh-btn hh-btn--primary hh-call" style="display:none">
+        &#128222; Call to Place Order
       </a>
-
-      <p class="hh-hint">
-        Tip: You can also tap the map to drop a pin.
-      </p>
+      <p class="hh-hint">Tip: You can also tap the map to drop a pin.</p>
     </div>
 
-    <!-- MAP -->
     <div class="hh-mapWrap hh-glass">
       <div id="map" class="hh-map" aria-label="Map"></div>
     </div>
 
-    <p class="hh-note">
-      Distance is estimated straight-line. Actual driving routes may vary.
-    </p>
+    <p class="hh-note">Distance is estimated straight-line. Actual driving routes may vary.</p>
 
   </section>
 
-  <!-- SCRIPTS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function(){
-
-      /* =========================
-         SETTINGS (EDIT THESE)
-      ========================= */
-      const REST = { lat: 30.8466, lng: -93.2893 }; // Hot Headz
+    // Wait for Leaflet to be available before initializing the map
+    function initMap() {
+      if (typeof L === 'undefined') {
+        document.getElementById('map').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,.5);font-family:Inter,sans-serif;font-size:14px;text-align:center;padding:20px;">Map unavailable — check your connection.<br><br><a href="https://maps.google.com/?q=2741+US-190+DeRidder+LA+70634" target="_blank" style="color:#ff5b3d;">Open in Google Maps →</a></div>';
+        return;
+      }
+      const REST = { lat: 30.8466, lng: -93.2893 };
       const RADIUS_MILES = 10;
       const MIN_PLATES = 10;
 
-      /* =========================
-         DOM
-      ========================= */
       const statusEl = document.getElementById("status");
       const addrEl   = document.getElementById("addr");
       const platesEl = document.getElementById("plates");
@@ -658,303 +169,94 @@
       const checkBtn = document.getElementById("check");
       const resetBtn = document.getElementById("reset");
 
-      /* =========================
-         MAP
-      ========================= */
       const map = L.map("map", { zoomControl: true }).setView([REST.lat, REST.lng], 12);
 
-      // Imagery base
-      L.tileLayer(
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        { maxZoom: 19 }
-      ).addTo(map);
+      L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19 }).addTo(map);
+      L.tileLayer("https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19 }).addTo(map);
 
-      // Labels overlay
-      L.tileLayer(
-        "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
-        { maxZoom: 19 }
-      ).addTo(map);
-
-      const restMarker = L.marker([REST.lat, REST.lng]).addTo(map)
+      L.marker([REST.lat, REST.lng]).addTo(map)
         .bindPopup("<b>Hot Headz Southern Foods</b><br>Delivery starts at 10+ plates.");
 
       const radiusCircle = L.circle([REST.lat, REST.lng], {
         radius: RADIUS_MILES * 1609.344,
-        color: "#ffb04b",
-        weight: 2,
-        fillColor: "#ff5b3d",
-        fillOpacity: 0.12
+        color: "#ffb04b", weight: 2, fillColor: "#ff5b3d", fillOpacity: 0.12
       }).addTo(map);
 
       map.fitBounds(radiusCircle.getBounds());
 
-      let userMarker = null;
-      let line = null;
+      let userMarker = null, line = null;
 
-      /* =========================
-         HELPERS
-      ========================= */
       function setStatus(text, kind){
-        statusEl.classList.remove("is-good", "is-bad");
-        if(kind === "good") statusEl.classList.add("is-good");
-        if(kind === "bad")  statusEl.classList.add("is-bad");
+        statusEl.classList.remove("is-good","is-bad");
+        if(kind==="good") statusEl.classList.add("is-good");
+        if(kind==="bad")  statusEl.classList.add("is-bad");
         statusEl.textContent = text;
       }
-
-      function setLoading(isLoading){
-        checkBtn.disabled = !!isLoading;
-        resetBtn.disabled = !!isLoading;
-        checkBtn.style.opacity = isLoading ? "0.75" : "1";
-        checkBtn.textContent = isLoading ? "Checking..." : "Check Address";
+      function setLoading(v){
+        checkBtn.disabled = !!v; resetBtn.disabled = !!v;
+        checkBtn.style.opacity = v ? "0.75" : "1";
+        checkBtn.textContent = v ? "Checking..." : "Check Address";
       }
-
-      function clearCall(){
-        callBtn.style.display = "none";
-      }
-
-      function showCall(){
-        callBtn.style.display = "inline-flex";
-      }
-
+      function clearCall(){ callBtn.style.display = "none"; }
+      function showCall(){ callBtn.style.display = "inline-flex"; }
       function toMiles(a, b){
-        // Haversine
-        const R = 3958.7613;
-        const dLat = (b.lat - a.lat) * Math.PI/180;
-        const dLng = (b.lng - a.lng) * Math.PI/180;
-
-        const s1 = Math.sin(dLat/2);
-        const s2 = Math.sin(dLng/2);
-
-        const h = s1*s1 + Math.cos(a.lat*Math.PI/180) * Math.cos(b.lat*Math.PI/180) * s2*s2;
-        return 2 * R * Math.asin(Math.sqrt(h));
+        const R=3958.7613, dLat=(b.lat-a.lat)*Math.PI/180, dLng=(b.lng-a.lng)*Math.PI/180;
+        const s1=Math.sin(dLat/2), s2=Math.sin(dLng/2);
+        const h=s1*s1+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*s2*s2;
+        return 2*R*Math.asin(Math.sqrt(h));
       }
-
       function drawTo(loc){
         if(userMarker) userMarker.remove();
         if(line) line.remove();
-
-        userMarker = L.marker([loc.lat, loc.lng]).addTo(map);
-
-        line = L.polyline(
-          [[REST.lat, REST.lng], [loc.lat, loc.lng]],
-          { color: "#ffffff", weight: 2, opacity: 0.75, dashArray: "6 8" }
-        ).addTo(map);
-
-        const bounds = L.latLngBounds([[REST.lat, REST.lng], [loc.lat, loc.lng]]);
-        map.fitBounds(bounds, { padding: [40, 40] });
+        userMarker = L.marker([loc.lat,loc.lng]).addTo(map);
+        line = L.polyline([[REST.lat,REST.lng],[loc.lat,loc.lng]],{color:"#ffffff",weight:2,opacity:0.75,dashArray:"6 8"}).addTo(map);
+        map.fitBounds(L.latLngBounds([[REST.lat,REST.lng],[loc.lat,loc.lng]]),{padding:[40,40]});
       }
-
       function evaluate(dist, plates){
         clearCall();
-
-        const d = dist.toFixed(2);
-        const p = Number(plates) || 0;
-
-        if(dist <= RADIUS_MILES && p >= MIN_PLATES){
-          setStatus(`✅ You’re within ${d} miles and have ${p} plates. Delivery is available.`, "good");
-          showCall();
-          return;
-        }
-
-        if(dist <= RADIUS_MILES && p < MIN_PLATES){
-          setStatus(`⚠️ You’re within ${d} miles, but need ${MIN_PLATES}+ plates (you entered ${p}).`, "bad");
-          return;
-        }
-
-        setStatus(`❌ You’re ${d} miles away — outside the ${RADIUS_MILES}-mile delivery area.`, "bad");
+        const d=dist.toFixed(2), p=Number(plates)||0;
+        if(dist<=RADIUS_MILES && p>=MIN_PLATES){ setStatus("✅ You're within "+d+" miles and have "+p+" plates. Delivery is available.","good"); showCall(); return; }
+        if(dist<=RADIUS_MILES && p<MIN_PLATES){ setStatus("⚠️ You're within "+d+" miles, but need "+MIN_PLATES+"+ plates (you entered "+p+").","bad"); return; }
+        setStatus("❌ You're "+d+" miles away — outside the "+RADIUS_MILES+"-mile delivery area.","bad");
       }
-
       async function geocode(q){
-        // Nominatim is rate-limited; keep requests reasonable.
-        const url =
-          "https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=us&q=" +
-          encodeURIComponent(q);
-
-        const res = await fetch(url, {
-          method: "GET",
-          headers: {
-            "Accept": "application/json"
-          }
-        });
-
+        const url="https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=us&q="+encodeURIComponent(q);
+        const res=await fetch(url,{method:"GET",headers:{"Accept":"application/json"}});
         if(!res.ok) throw new Error("Geocode failed");
-        const data = await res.json();
-
-        if(!data || !data[0]) return null;
-
-        return { lat: Number(data[0].lat), lng: Number(data[0].lon) };
+        const data=await res.json();
+        if(!data||!data[0]) return null;
+        return{lat:Number(data[0].lat),lng:Number(data[0].lon)};
       }
-
-      /* =========================
-         EVENTS
-      ========================= */
       async function runCheck(){
-        const addr = addrEl.value.trim();
-        if(!addr){
-          setStatus("Please enter your address (include city & state if possible).", "bad");
-          return;
-        }
-
-        setLoading(true);
-        setStatus("Looking up that address…", null);
-        clearCall();
-
+        const addr=addrEl.value.trim();
+        if(!addr){ setStatus("Please enter your address (include city & state if possible).","bad"); return; }
+        setLoading(true); setStatus("Looking up that address…",null); clearCall();
         try{
-          const loc = await geocode(addr + ", USA");
-          if(!loc){
-            setStatus("Address not found. Try adding: DeRidder, LA.", "bad");
-            return;
-          }
-
-          drawTo(loc);
-          const dist = toMiles(REST, loc);
-          evaluate(dist, platesEl.value);
-
-        }catch(e){
-          setStatus("Couldn’t check that address right now. Please try again in a moment.", "bad");
-        }finally{
-          setLoading(false);
-        }
+          const loc=await geocode(addr+", USA");
+          if(!loc){ setStatus("Address not found. Try adding: DeRidder, LA.","bad"); return; }
+          drawTo(loc); evaluate(toMiles(REST,loc),platesEl.value);
+        }catch(e){ setStatus("Couldn't check that address right now. Please try again in a moment.","bad");
+        }finally{ setLoading(false); }
       }
-
-      checkBtn.addEventListener("click", runCheck);
-
-      addrEl.addEventListener("keydown", (e) => {
-        if(e.key === "Enter"){
-          e.preventDefault();
-          runCheck();
-        }
-      });
-
-      platesEl.addEventListener("change", () => {
-        // If user already has a line drawn, re-evaluate on plate change
-        if(userMarker){
-          const loc = { lat: userMarker.getLatLng().lat, lng: userMarker.getLatLng().lng };
-          const dist = toMiles(REST, loc);
-          evaluate(dist, platesEl.value);
-        }
-      });
-
-      resetBtn.addEventListener("click", () => {
+      checkBtn.addEventListener("click",runCheck);
+      addrEl.addEventListener("keydown",(e)=>{ if(e.key==="Enter"){ e.preventDefault(); runCheck(); }});
+      platesEl.addEventListener("change",()=>{ if(userMarker){ const loc={lat:userMarker.getLatLng().lat,lng:userMarker.getLatLng().lng}; evaluate(toMiles(REST,loc),platesEl.value); }});
+      resetBtn.addEventListener("click",()=>{
         if(userMarker) userMarker.remove();
         if(line) line.remove();
-
-        userMarker = null;
-        line = null;
-
-        addrEl.value = "";
-        platesEl.value = MIN_PLATES;
-
-        clearCall();
-        map.fitBounds(radiusCircle.getBounds());
-        setStatus("Enter an address (or tap the map) to check delivery availability.", null);
+        userMarker=null; line=null;
+        addrEl.value=""; platesEl.value=MIN_PLATES;
+        clearCall(); map.fitBounds(radiusCircle.getBounds());
+        setStatus("Enter an address (or tap the map) to check delivery availability.",null);
       });
+      map.on("click",(e)=>{ const loc={lat:e.latlng.lat,lng:e.latlng.lng}; drawTo(loc); evaluate(toMiles(REST,loc),platesEl.value); });
+    } // end initMap
 
-      map.on("click", (e) => {
-        const loc = { lat: e.latlng.lat, lng: e.latlng.lng };
-        drawTo(loc);
-        const dist = toMiles(REST, loc);
-        evaluate(dist, platesEl.value);
-      });
-
-    });
-
-    // Circular menu toggle script with page navigation and share
-    (function() {
-      const overlay = document.getElementById('circMenuOverlay');
-      const leftBtn = document.getElementById('navBtnLeft');
-      const bottomBtn = document.getElementById('navBtnBottom');
-      const homeCenter = document.getElementById('homeCenter');
-      const menuItems = document.querySelectorAll('.menu-item');
-
-      function toggleMenu() {
-        overlay.classList.toggle('open');
-      }
-
-      leftBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleMenu();
-      });
-
-      bottomBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleMenu();
-      });
-
-      overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) {
-          overlay.classList.remove('open');
-        }
-      });
-
-      // Share function
-      async function sharePage() {
-        const shareData = {
-          title: document.title || 'Hot Headz Southern Foods',
-          text: 'Check out Hot Headz Southern Foods in DeRidder, LA!',
-          url: window.location.href
-        };
-        try {
-          if (navigator.share) {
-            await navigator.share(shareData);
-          } else if (navigator.clipboard && navigator.clipboard.writeText) {
-            await navigator.clipboard.writeText(window.location.href);
-            // Provide visual feedback
-            const shareItem = document.querySelector('.menu-item[data-action="share"]');
-            if (shareItem) {
-              const originalText = shareItem.textContent;
-              shareItem.textContent = 'Copied';
-              setTimeout(() => {
-                shareItem.textContent = originalText;
-              }, 1500);
-            } else {
-              alert('Link copied to clipboard!');
-            }
-          } else {
-            // Fallback
-            const temp = document.createElement('input');
-            temp.value = window.location.href;
-            document.body.appendChild(temp);
-            temp.select();
-            temp.setSelectionRange(0, 99999);
-            document.execCommand('copy');
-            document.body.removeChild(temp);
-            alert('Link copied to clipboard!');
-          }
-        } catch (e) {
-          console.log('Share/copy failed', e);
-        }
-      }
-
-      // Navigate to link (page or anchor)
-      function navigate(link) {
-        if (!link) return;
-        window.location.href = link; // external or relative works
-      }
-
-      homeCenter.addEventListener('click', () => {
-        overlay.classList.remove('open');
-        const link = homeCenter.getAttribute('data-link');
-        if (link) navigate(link);
-      });
-
-      menuItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-          overlay.classList.remove('open');
-          const link = item.getAttribute('data-link');
-          const action = item.getAttribute('data-action');
-          if (action === 'share') {
-            sharePage();
-          } else if (link) {
-            navigate(link);
-          }
-        });
-      });
-
-      document.querySelector('.circular-menu').addEventListener('click', (e) => {
-        e.stopPropagation();
-      });
-    })();
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initMap);
+    } else {
+      initMap();
+    }
   </script>
 </body>
 </html>
