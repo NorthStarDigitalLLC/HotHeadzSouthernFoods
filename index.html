@@ -352,22 +352,55 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
   text-transform:uppercase;padding:4px 11px;border-radius:2px;
   border:1px solid rgba(232,180,160,.1);color:rgba(232,180,160,.28);transition:all .3s;}
 .panel-chip.lit{border-color:rgba(240,80,32,.35);color:var(--chili);background:rgba(240,80,32,.07);}
-.pi-cta-wrap{display:flex;flex-direction:column;gap:8px;}
-.pi-dbl-note{font-family:var(--serif);font-style:italic;font-size:11px;color:rgba(232,180,160,.28);}
-#panel-cta{align-self:flex-start;position:relative;overflow:hidden;font-family:var(--body);
+.pi-cta-wrap{display:flex;flex-direction:column;gap:12px;}
+.pi-dbl-note{display:none;}
+
+/* ── AUTO-REDIRECT COUNTDOWN ── */
+.pi-countdown-row{display:flex;align-items:center;gap:12px;margin-bottom:4px;}
+.pi-countdown-ring{position:relative;width:38px;height:38px;flex-shrink:0;}
+.pi-countdown-ring svg{position:absolute;inset:0;transform:rotate(-90deg);}
+.pi-countdown-ring .ring-bg{fill:none;stroke:rgba(240,80,32,.12);stroke-width:3;}
+.pi-countdown-ring .ring-fill{fill:none;stroke:var(--chili);stroke-width:3;stroke-linecap:round;
+  stroke-dasharray:100;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear;}
+.pi-countdown-ring .ring-num{position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;font-family:var(--body);font-weight:800;font-size:13px;color:var(--chili);}
+.pi-countdown-text{font-family:var(--body);font-size:11px;letter-spacing:.08em;
+  text-transform:uppercase;color:rgba(232,180,160,.4);line-height:1.4;}
+
+/* ── CTA BUTTON with light chaser ── */
+.cta-wrap{position:relative;align-self:flex-start;display:inline-block;}
+.cta-border-svg{position:absolute;top:-1px;left:-1px;width:calc(100% + 2px);height:calc(100% + 2px);
+  pointer-events:none;overflow:visible;z-index:5;}
+.cta-border-track{fill:none;stroke:rgba(240,80,32,.18);stroke-width:1.5;}
+.cta-border-chaser{fill:none;stroke:var(--chili);stroke-width:2;stroke-linecap:round;
+  filter:drop-shadow(0 0 5px var(--chili)) drop-shadow(0 0 10px rgba(240,80,32,.7));
+  stroke-dasharray:50 9999;stroke-dashoffset:0;animation:chaserMove 1.8s linear infinite;}
+@keyframes chaserMove{from{stroke-dashoffset:0}to{stroke-dashoffset:-9999}}
+#panel-cta{position:relative;overflow:hidden;font-family:var(--body);
   font-weight:700;font-size:clamp(11px,1.2vw,13px);letter-spacing:.18em;text-transform:uppercase;
-  color:var(--cream);border:none;cursor:none;
-  padding:clamp(12px,1.7vh,16px) clamp(22px,2.8vw,34px);background:transparent;
-  border:1px solid rgba(240,80,32,.28);transition:border-color .3s,letter-spacing .35s;
-  display:flex;align-items:center;gap:10px;}
+  color:var(--cream);border:1px solid rgba(240,80,32,.28);cursor:none;
+  padding:clamp(12px,1.7vh,16px) clamp(22px,2.8vw,34px);background:rgba(240,80,32,.07);
+  transition:letter-spacing .35s;display:flex;align-items:center;gap:10px;}
 #panel-cta::before{content:'';position:absolute;inset:0;
   background:linear-gradient(90deg,var(--pepper) 0%,var(--fire) 50%,var(--chili) 100%);
   transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.77,0,.18,1);z-index:0;}
 #panel-cta:hover::before{transform:scaleX(1);}
-#panel-cta:hover{border-color:var(--fire);letter-spacing:.26em;}
+#panel-cta:hover{letter-spacing:.26em;}
 #panel-cta span{position:relative;z-index:1;}
 #panel-cta .cta-arrow{position:relative;z-index:1;transition:transform .4s cubic-bezier(.34,1.56,.64,1);}
 #panel-cta:hover .cta-arrow{transform:translateX(5px);}
+
+/* Mobile countdown */
+.mob-countdown-row{display:flex;align-items:center;gap:10px;justify-content:center;}
+.mob-countdown-ring{position:relative;width:34px;height:34px;flex-shrink:0;}
+.mob-countdown-ring svg{position:absolute;inset:0;transform:rotate(-90deg);}
+.mob-countdown-ring .ring-bg{fill:none;stroke:rgba(240,80,32,.12);stroke-width:3;}
+.mob-countdown-ring .ring-fill{fill:none;stroke:var(--chili);stroke-width:3;stroke-linecap:round;
+  stroke-dasharray:88;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear;}
+.mob-countdown-ring .ring-num{position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;font-family:var(--body);font-weight:800;font-size:12px;color:var(--chili);}
+.mob-countdown-text{font-family:var(--body);font-size:11px;letter-spacing:.06em;
+  text-transform:uppercase;color:rgba(232,180,160,.4);}
 .pi-bottom{display:flex;justify-content:space-between;align-items:flex-end;
   margin-top:8px;padding-top:14px;border-top:1px solid rgba(232,180,160,.07);}
 .pi-foot-rule{font-family:var(--serif);font-style:italic;font-size:11px;color:rgba(232,180,160,.22);}
@@ -420,7 +453,11 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
   background:linear-gradient(90deg,var(--pepper),var(--fire),var(--chili));
   border-radius:4px;display:flex;align-items:center;justify-content:center;gap:10px;
   -webkit-tap-highlight-color:transparent;box-shadow:0 8px 30px rgba(196,24,0,.35);
-  transition:transform .2s,box-shadow .2s;}
+  transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;}
+#mob-sheet-cta::after{content:'';position:absolute;top:0;left:-100%;width:55%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
+  animation:mobShine 2s ease-in-out infinite;}
+@keyframes mobShine{0%{left:-100%}60%,100%{left:140%}}
 #mob-sheet-cta:active{transform:scale(.98);box-shadow:0 4px 15px rgba(196,24,0,.25);}
 .msc-arrow{transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
 #mob-sheet-cta:active .msc-arrow{transform:translateX(4px);}
@@ -583,8 +620,17 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
       <p id="panel-desc"></p>
       <div id="panel-chips"></div>
       <div class="pi-cta-wrap">
-        <div class="pi-dbl-note">Double-click anywhere to enter, or use the button</div>
-        <button id="panel-cta" onclick="goTo()"><span id="cta-label">Enter</span><span class="cta-arrow">→</span></button>
+        <div class="pi-countdown-row" id="panel-countdown-row" style="display:none;">
+          <div class="pi-countdown-ring" id="panel-countdown-ring">
+            <svg viewBox="0 0 38 38"><circle class="ring-bg" cx="19" cy="19" r="16"/><circle class="ring-fill" id="panel-ring-fill" cx="19" cy="19" r="16"/></svg>
+            <div class="ring-num" id="panel-ring-num">5</div>
+          </div>
+          <div class="pi-countdown-text">Redirecting in <strong id="panel-countdown-sec" style="color:var(--chili);">5</strong> seconds</div>
+        </div>
+        <div class="cta-wrap">
+          <button id="panel-cta" onclick="goTo()"><span id="cta-label">Enter</span><span class="cta-arrow">→</span></button>
+          <svg class="cta-border-svg" id="cta-border-svg"><rect class="cta-border-track" id="cta-track" rx="0"/><rect class="cta-border-chaser" id="cta-chaser" rx="0"/></svg>
+        </div>
       </div>
     </div>
     <div class="pi-bottom"><span class="pi-foot-rule" id="panel-rule"></span><span class="pi-foot-idx" id="panel-idx"></span></div>
@@ -605,6 +651,13 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
       <div class="msh-meta" id="mob-sheet-meta"></div>
       <p id="mob-sheet-desc"></p>
       <div id="mob-sheet-chips"></div>
+      <div class="mob-countdown-row" id="mob-countdown-row" style="display:none;">
+        <div class="mob-countdown-ring" id="mob-countdown-ring">
+          <svg viewBox="0 0 34 34"><circle class="ring-bg" cx="17" cy="17" r="14"/><circle class="ring-fill" id="mob-ring-fill" cx="17" cy="17" r="14"/></svg>
+          <div class="ring-num" id="mob-ring-num">5</div>
+        </div>
+        <div class="mob-countdown-text">Redirecting in <strong id="mob-countdown-sec" style="color:var(--chili);">5</strong>s</div>
+      </div>
       <button id="mob-sheet-cta" onclick="goTo()"><span id="mob-cta-label">Enter</span><span class="msc-arrow">→</span></button>
       <div class="msh-foot-rule" id="mob-sheet-rule"></div>
     </div>
@@ -705,7 +758,7 @@ document.getElementById('mob-hours').textContent=mobHoursStr;
 
 /* PAGE DATA */
 const PAGES={
-  home:{num:'01',eyebrow:'Home',cta:'Go to Home Page',title:'Hot Headz\nSouthern Foods.',italic:'Fresh · From Scratch · Est. 2020',meta:'2741 US-190 · DeRidder, LA · (337) 221-1035',mood:'radial-gradient(ellipse at 30% 80%,#3a0800 0%,#1c0404 50%,#08040a 100%)',desc:`<strong>Hot Headz Southern Foods</strong> — fresh, made-from-scratch breakfast and lunch in DeRidder, Louisiana. Open Mon–Fri 5:30am, Saturday 6am, Sunday 7am. Cafeteria-style comfort food done right since 2020.`,chips:['Est. 2020','DeRidder, LA','Made From Scratch','(337) 221-1035','Mon–Fri 5:30am','Sun 7am–3pm'],rule:'Home is where the food is.',dest:'home.html'},
+  home:{num:'01',eyebrow:'Home',cta:'Go to Home Page',title:'Hot Headz\nSouthern Foods.',italic:'Fresh · From Scratch · Est. 2020',meta:'2741 US-190 · DeRidder, LA · (337) 221-1035',mood:'radial-gradient(ellipse at 30% 80%,#3a0800 0%,#1c0404 50%,#08040a 100%)',desc:`<strong>Hot Headz Southern Foods</strong> — fresh, made-from-scratch breakfast and lunch in DeRidder, Louisiana. Open Mon–Fri 5:30am, Saturday 6am, Sunday 7am. Cafeteria-style comfort food done right since 2020.`,chips:['Est. 2020','DeRidder, LA','Made From Scratch','(337) 221-1035','Mon–Fri 5:30am','Sun 7am–3pm'],rule:'Home is where the food is.',dest:'index.html'},
   menu:{num:'02',eyebrow:'The Menu',cta:'See Full Menu',title:'Fresh.\nFrom Scratch.',italic:'Breakfast · Lunch · Daily specials · Desserts',meta:'Made fresh every morning — no shortcuts',mood:'radial-gradient(ellipse at 30% 80%,#3a0800 0%,#1c0404 50%,#08040a 100%)',desc:`Everything at Hot Headz is <strong>made from scratch every morning.</strong> Breakfast plates, lunch specials, Southern sides, Cajun classics and homemade desserts. Red beans & rice, fried chicken, catfish, smothered pork chops, crawfish étouffée and more. Cafeteria-style comfort food done right.`,chips:['Breakfast Plates','Red Beans & Rice','Fried Chicken','Catfish','Crawfish Étouffée','Daily Specials'],rule:'From scratch, every time.',dest:'menu.html'},
   lunch:{num:'✦',eyebrow:'Lunch',cta:'See Lunch Menu',title:'Lunch.\nDone Right.',italic:'Daily Southern plates · Changes every day',meta:'Served Mon–Fri until 2pm · Sat until 2pm · Sun until 3pm',mood:'radial-gradient(ellipse at 30% 80%,#3a0800 0%,#1c0404 50%,#08040a 100%)',desc:`Hot Headz lunch is <strong>made fresh every morning</strong> and changes daily. Expect classics like red beans & rice, fried chicken, smothered pork chops, catfish plates, jambalaya, meatloaf and crawfish étouffée. Southern sides included. <strong>Check Facebook every morning</strong> to see what's on the board before you drive out.`,chips:['Changes Daily','Southern Plates','Includes Sides','Check Facebook','Mon–Fri to 2pm','Sun to 3pm'],rule:'Check Facebook for today\'s plate.',dest:'menu.html#lunch'},
   beer:{num:'✦',eyebrow:'Beer',cta:'See Beer Menu',title:'Cold.\nCold Beer.',italic:'Ice cold · Natural Light · Modelo · Budweiser',meta:'Ask staff for what\'s available today',mood:'radial-gradient(ellipse at 30% 80%,#1a0400 0%,#100200 50%,#08040a 100%)',desc:`Hot Headz keeps it cold. <strong>Natural Light, Miller Lite, Coors Light, Bud Light, Budweiser, Michelob Ultra, Corona and Modelo</strong> — all ice cold. The perfect end to a Southern lunch.`,chips:['Natural Light','Miller Lite','Coors Light','Bud Light','Budweiser','Modelo'],rule:'Best with a plate of fried chicken.',dest:'menu.html#beer'},
@@ -734,6 +787,49 @@ function clearPreview(){
 }
 
 let currentPage=null,navigating=false;
+
+/* AUTO-REDIRECT COUNTDOWN */
+let _cdTimer=null,_cdInterval=null;
+const CD_SECS=5,RING_D=100,RING_M=88;
+function stopCountdown(){
+  if(_cdTimer){clearTimeout(_cdTimer);_cdTimer=null;}
+  if(_cdInterval){clearInterval(_cdInterval);_cdInterval=null;}
+  const dr=document.getElementById('panel-countdown-row');
+  const mr=document.getElementById('mob-countdown-row');
+  if(dr)dr.style.display='none';
+  if(mr)mr.style.display='none';
+}
+function startCountdown(){
+  stopCountdown();
+  let secs=CD_SECS;
+  const dr=document.getElementById('panel-countdown-row');
+  const mr=document.getElementById('mob-countdown-row');
+  if(dr)dr.style.display='flex';
+  if(mr)mr.style.display='flex';
+  function tick(){
+    const ds=document.getElementById('panel-countdown-sec'),dn=document.getElementById('panel-ring-num'),df=document.getElementById('panel-ring-fill');
+    if(ds)ds.textContent=secs;if(dn)dn.textContent=secs;
+    if(df)df.style.strokeDashoffset=String(RING_D*(1-secs/CD_SECS));
+    const ms=document.getElementById('mob-countdown-sec'),mn=document.getElementById('mob-ring-num'),mf=document.getElementById('mob-ring-fill');
+    if(ms)ms.textContent=secs;if(mn)mn.textContent=secs;
+    if(mf)mf.style.strokeDashoffset=String(RING_M*(1-secs/CD_SECS));
+  }
+  tick();
+  _cdInterval=setInterval(()=>{secs--;if(secs>=0)tick();},1000);
+  _cdTimer=setTimeout(()=>{stopCountdown();goTo();},CD_SECS*1000);
+}
+function sizeChaserBorder(){
+  const btn=document.getElementById('panel-cta');
+  const track=document.getElementById('cta-track');
+  const chaser=document.getElementById('cta-chaser');
+  if(!btn||!track||!chaser)return;
+  const w=btn.offsetWidth,h=btn.offsetHeight;
+  const perimeter=2*(w+h);
+  [track,chaser].forEach(el=>{el.setAttribute('x','0');el.setAttribute('y','0');el.setAttribute('width',w);el.setAttribute('height',h);});
+  chaser.style.strokeDasharray='50 '+perimeter;
+  chaser.style.animationDuration=(perimeter/150)+'s';
+}
+
 function openPanel(id){
   const p=PAGES[id];currentPage=p;
   document.getElementById('panel-mood-bg').style.background=p.mood;
@@ -750,8 +846,14 @@ function openPanel(id){
   document.getElementById('panel').classList.add('open');
   document.getElementById('shell').style.pointerEvents='none';
   navigating=false;
+  requestAnimationFrame(()=>{sizeChaserBorder();startCountdown();});
 }
-function closePanel(){document.getElementById('panel').classList.remove('open');document.getElementById('shell').style.pointerEvents='';currentPage=null;}
+function closePanel(){
+  stopCountdown();
+  document.getElementById('panel').classList.remove('open');
+  document.getElementById('shell').style.pointerEvents='';
+  currentPage=null;
+}
 document.getElementById('panel-info').addEventListener('dblclick',goTo);
 
 function openMobPanel(id){
@@ -767,8 +869,9 @@ function openMobPanel(id){
   document.getElementById('mob-panel').classList.add('open');
   navigating=false;
   document.getElementById('mob-sheet-body').scrollTop=0;
+  startCountdown();
 }
-function closeMobPanel(){document.getElementById('mob-panel').classList.remove('open');currentPage=null;}
+function closeMobPanel(){stopCountdown();document.getElementById('mob-panel').classList.remove('open');currentPage=null;}
 
 function goTo(){
   if(!currentPage||navigating)return;
