@@ -883,13 +883,12 @@ function goTo(){
   ld.classList.add('show');
   const dest=currentPage.dest;
   const isExternal=dest.startsWith('http')||dest.startsWith('tel');
-  // Open external links immediately (before setTimeout) to avoid popup blockers
-  let extWin=null;
-  if(isExternal) extWin=window.open(dest,'_blank');
+  // Open blank window NOW (within the user gesture) so browser doesn't block it
+  const extWin=isExternal?window.open('','_blank'):null;
   setTimeout(()=>{
     if(isExternal){
-      // If popup was blocked, fall back to same-tab
-      if(!extWin||extWin.closed) window.location.href=dest;
+      if(extWin&&!extWin.closed){extWin.location.href=dest;}
+      else{window.location.href=dest;} // popup blocked fallback
       ld.classList.remove('show');navigating=false;
     } else {
       window.location.href=dest;
