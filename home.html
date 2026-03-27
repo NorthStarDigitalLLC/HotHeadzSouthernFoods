@@ -31,6 +31,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <style>
     :root {
@@ -71,6 +72,62 @@
     .hhx-dot{width:9px;height:9px;border-radius:99px;background:var(--hhx-ember);box-shadow:0 0 0 4px rgba(255,91,61,.18);}
     .hhx-dot2{background:var(--hhx-ember2);box-shadow:0 0 0 4px rgba(255,176,75,.16);}
     .hhx-dot3{background:rgba(255,255,255,.72);box-shadow:0 0 0 4px rgba(255,255,255,.10);}
+
+    /* ═══ CRAWFISH 3D PANEL ═══ */
+    .hhx-crawfish-wrap{
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:0;border-radius:var(--hhx-radius);
+      border:1px solid rgba(255,91,61,.22);
+      background:radial-gradient(circle at 50% 30%,rgba(255,91,61,.12),transparent 65%),rgba(0,0,0,.34);
+      box-shadow:0 0 60px rgba(255,91,61,.08),var(--hhx-shadow);
+      position:relative;overflow:hidden;
+      cursor:pointer;min-height:300px;
+      transition:border-color .2s,box-shadow .2s;
+    }
+    .hhx-crawfish-wrap:hover{
+      border-color:rgba(255,91,61,.45);
+      box-shadow:0 0 80px rgba(255,91,61,.18),var(--hhx-shadow);
+    }
+    .hhx-crawfish-wrap::before{
+      content:'';position:absolute;inset:-40%;
+      background:conic-gradient(from 0deg,rgba(255,91,61,.10),rgba(255,176,75,.08),rgba(255,255,255,.04),rgba(255,91,61,.10));
+      filter:blur(40px);opacity:.5;
+      animation:crawfishGlow 14s linear infinite;
+    }
+    @keyframes crawfishGlow{to{transform:rotate(360deg);}}
+    #crawfishCanvas{
+      width:100%!important;height:100%!important;
+      position:absolute;inset:0;display:block;
+      cursor:grab;z-index:2;
+    }
+    #crawfishCanvas:active{cursor:grabbing;}
+    .hhx-crawfish-label{
+      position:absolute;bottom:16px;left:50%;transform:translateX(-50%);
+      z-index:3;pointer-events:none;
+      display:flex;flex-direction:column;align-items:center;gap:4px;
+    }
+    .hhx-crawfish-cta{
+      padding:7px 18px;border-radius:999px;
+      background:linear-gradient(135deg,rgba(255,91,61,.85),rgba(255,176,75,.75));
+      border:1px solid rgba(255,255,255,.22);
+      font-weight:900;font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+      color:#1a0d0b;box-shadow:0 4px 18px rgba(255,91,61,.3);
+      white-space:nowrap;
+    }
+    .hhx-crawfish-hint{
+      font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+      color:rgba(255,255,255,.45);
+    }
+    /* ground ring */
+    .hhx-crawfish-ring{
+      position:absolute;bottom:14%;left:50%;transform:translateX(-50%);
+      width:55%;height:14px;border-radius:50%;
+      background:radial-gradient(ellipse,rgba(255,91,61,.18) 0%,transparent 70%);
+      z-index:1;pointer-events:none;
+      animation:ringPulse 2s ease-in-out infinite;
+    }
+    @keyframes ringPulse{0%,100%{opacity:.6;transform:translateX(-50%) scaleX(1);}50%{opacity:1;transform:translateX(-50%) scaleX(1.08);}}
+
     .hhx-sigil{position:relative;width:240px;height:240px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(255,255,255,.18);background:radial-gradient(circle at 30% 20%,rgba(255,176,75,.12),transparent 55%),radial-gradient(circle at 70% 80%,rgba(255,91,61,.14),transparent 55%),rgba(0,0,0,.34);box-shadow:0 30px 80px rgba(0,0,0,.62),inset 0 0 0 1px rgba(255,255,255,.08);overflow:hidden;}
     .hhx-sigil::before{content:"";position:absolute;inset:-40%;background:conic-gradient(from 0deg,rgba(255,91,61,.16),rgba(255,176,75,.14),rgba(255,255,255,.06),rgba(255,91,61,.16));filter:blur(42px);opacity:.6;animation:hhxSealSpin 18s linear infinite;}
     @keyframes hhxSealSpin{to{transform:rotate(360deg);}}
@@ -137,7 +194,7 @@
     @media(max-width:560px){.hhx-photo{width:200px;}}
     .hhx-photo img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.02);filter:contrast(1.02) saturate(1.02);}
 
-    /* ===== BACK BUTTON (replaces circular nav) ===== */
+    /* ===== BACK BUTTON ===== */
     .back-btn {
       position: fixed; z-index: 1000; bottom: 24px; left: 50%;
       transform: translateX(-50%);
@@ -220,7 +277,7 @@
     .footer-credit strong{font-weight:600;color:rgba(255,255,255,.75);}
     .footer-credit .credit-name{color:rgba(255,255,255,.65);}
     @media(max-width:900px){.footer-inner{grid-template-columns:1fr;}}
-    @media(prefers-reduced-motion:reduce){.hhx-marqueeTrack{animation:none;}.hhx-sigil::before{animation:none;}}
+    @media(prefers-reduced-motion:reduce){.hhx-marqueeTrack{animation:none;}.hhx-sigil::before{animation:none;}.hhx-crawfish-wrap::before{animation:none;}}
   </style>
 </head>
 <body>
@@ -278,11 +335,18 @@
             <div class="hhx-pill" role="listitem"><span class="hhx-dot hhx-dot3" aria-hidden="true"></span>(10 plates+ • within 10 miles)</div>
           </div>
         </div>
-        <div class="hhx-sigil" aria-hidden="true">
-          <div class="hhx-sigilRing"></div>
-          <div class="hhx-sigilCore"></div>
-          <img class="hhx-sigilLogo" src="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/56a6bcf8-18fc-4dcc-9f69-fd6f3774fac2/IMG_4798.png?format=750w" alt="Hot Headz Southern Foods logo">
-          <div class="hhx-sigilText">EST. 2020</div>
+
+        <!-- ═══ 3D CRAWFISH — clicks to menu.html ═══ -->
+        <div class="hhx-crawfish-wrap" id="crawfishWrap" role="button" tabindex="0"
+             aria-label="Interactive 3D crawfish — click to view our menu"
+             onclick="window.location.href='menu.html'"
+             onkeydown="if(event.key==='Enter'||event.key===' '){window.location.href='menu.html';}">
+          <canvas id="crawfishCanvas"></canvas>
+          <div class="hhx-crawfish-ring" aria-hidden="true"></div>
+          <div class="hhx-crawfish-label" aria-hidden="true">
+            <div class="hhx-crawfish-cta">🦞 View Our Menu</div>
+            <div class="hhx-crawfish-hint">Drag to rotate</div>
+          </div>
         </div>
       </header>
 
@@ -409,7 +473,403 @@
     </div>
   </footer>
 
+  <!-- ═══════════════════════════════════════
+       3D CRAWFISH MODEL — Three.js
+       Fully procedural crawfish shape.
+       Click anywhere on the panel → menu.html
+       Drag to rotate. Auto-spins when idle.
+  ═══════════════════════════════════════ -->
+  <script>
+  (function() {
+    const wrap = document.getElementById('crawfishWrap');
+    const canvas = document.getElementById('crawfishCanvas');
+    if (!wrap || !canvas || typeof THREE === 'undefined') return;
 
+    // Size renderer to panel
+    const scene = new THREE.Scene();
+    const cam = new THREE.PerspectiveCamera(42, 1, 0.01, 100);
+    cam.position.set(0, 0.5, 5.5);
+    cam.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setClearColor(0x000000, 0);
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    function resize() {
+      const W = wrap.clientWidth;
+      const H = wrap.clientHeight;
+      if (!W || !H) return;
+      renderer.setSize(W, H);
+      cam.aspect = W / H;
+      cam.updateProjectionMatrix();
+    }
+    resize();
+    if (window.ResizeObserver) new ResizeObserver(resize).observe(wrap);
+
+    // ── Lighting ─────────────────────────────
+    scene.add(new THREE.AmbientLight(0xffe8d0, 0.6));
+
+    const sun = new THREE.DirectionalLight(0xffffff, 1.8);
+    sun.position.set(4, 8, 5);
+    sun.castShadow = true;
+    scene.add(sun);
+
+    const fill = new THREE.PointLight(0xff5b3d, 2.0, 18);
+    fill.position.set(-4, 2, 3);
+    scene.add(fill);
+
+    const rim = new THREE.PointLight(0xffb04b, 1.2, 14);
+    rim.position.set(3, -2, -3);
+    scene.add(rim);
+
+    const top = new THREE.PointLight(0xffffff, 0.5, 10);
+    top.position.set(0, 7, 1);
+    scene.add(top);
+
+    // ── Materials ─────────────────────────────
+    const shellMat = new THREE.MeshStandardMaterial({
+      color: 0xd94a1e,      // classic boiled crawfish red-orange
+      roughness: 0.35,
+      metalness: 0.18,
+      emissive: 0x6a1800,
+      emissiveIntensity: 0.15,
+    });
+    const darkMat = new THREE.MeshStandardMaterial({
+      color: 0x8b2a0a,
+      roughness: 0.5,
+      metalness: 0.1,
+    });
+    const eyeMat = new THREE.MeshStandardMaterial({
+      color: 0x111111,
+      roughness: 0.2,
+      metalness: 0.5,
+    });
+    const eyeWhiteMat = new THREE.MeshStandardMaterial({
+      color: 0xfff0e0,
+      roughness: 0.3,
+      metalness: 0.1,
+    });
+    const clawMat = new THREE.MeshStandardMaterial({
+      color: 0xc03010,
+      roughness: 0.4,
+      metalness: 0.2,
+      emissive: 0x4a0d00,
+      emissiveIntensity: 0.1,
+    });
+
+    // ── Helper: segmented body (stacked flattened spheres) ─
+    function addBodySegment(group, x, y, z, rx, ry, rz, mat) {
+      const geo = new THREE.SphereGeometry(1, 14, 10);
+      const m = new THREE.Mesh(geo, mat);
+      m.scale.set(rx, ry, rz);
+      m.position.set(x, y, z);
+      m.castShadow = true;
+      group.add(m);
+      return m;
+    }
+
+    const crawfish = new THREE.Group();
+
+    // ── Tail / abdomen (5 curved segments, curling up) ──────
+    const tailSegs = [
+      { x:  1.9, y: -0.18, rx: 0.52, ry: 0.36, rz: 0.42 },
+      { x:  1.32, y:  0.05, rx: 0.50, ry: 0.34, rz: 0.41 },
+      { x:  0.72, y:  0.22, rx: 0.48, ry: 0.32, rz: 0.40 },
+      { x:  0.14, y:  0.30, rx: 0.44, ry: 0.30, rz: 0.38 },
+      { x: -0.42, y:  0.26, rx: 0.38, ry: 0.27, rz: 0.35 },
+    ];
+    tailSegs.forEach(s => addBodySegment(crawfish, s.x, s.y, 0, s.rx, s.ry, s.rz, shellMat));
+
+    // Tail fan — 5 flat rounded paddles
+    const fanAngles = [-0.5, -0.25, 0, 0.25, 0.5];
+    fanAngles.forEach((a, i) => {
+      const fan = new THREE.Mesh(
+        new THREE.SphereGeometry(1, 10, 6),
+        i === 2 ? shellMat : darkMat
+      );
+      fan.scale.set(0.36, 0.14, 0.26);
+      fan.position.set(2.62 + Math.cos(a) * 0.12, -0.32 + Math.sin(a) * 0.15, a * 0.5);
+      fan.rotation.z = a * 0.4;
+      fan.castShadow = true;
+      crawfish.add(fan);
+    });
+
+    // ── Cephalothorax (main body / carapace) ──────────────
+    const bodyMain = new THREE.Mesh(
+      new THREE.SphereGeometry(1, 16, 12),
+      shellMat
+    );
+    bodyMain.scale.set(1.05, 0.62, 0.72);
+    bodyMain.position.set(-0.6, 0.1, 0);
+    bodyMain.castShadow = true;
+    crawfish.add(bodyMain);
+
+    // Rostrum (pointy head spike)
+    const rostrum = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.04, 0.11, 0.9, 10),
+      shellMat
+    );
+    rostrum.rotation.z = -Math.PI / 2 + 0.18;
+    rostrum.position.set(-1.55, 0.42, 0);
+    rostrum.castShadow = true;
+    crawfish.add(rostrum);
+
+    // ── Eyes ─────────────────────────────────────────────
+    [-0.22, 0.22].forEach(z => {
+      const eyeStalk = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.05, 0.05, 0.28, 8),
+        darkMat
+      );
+      eyeStalk.rotation.z = Math.PI / 4;
+      eyeStalk.position.set(-1.42, 0.52, z);
+      crawfish.add(eyeStalk);
+
+      const eyeWhite = new THREE.Mesh(new THREE.SphereGeometry(0.13, 10, 8), eyeWhiteMat);
+      eyeWhite.position.set(-1.55, 0.64, z);
+      crawfish.add(eyeWhite);
+
+      const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.075, 8, 6), eyeMat);
+      pupil.position.set(-1.61, 0.64, z);
+      crawfish.add(pupil);
+    });
+
+    // ── Antennae (long, sweeping) ─────────────────────────
+    function makeAntenna(sign) {
+      const pts = [];
+      const steps = 18;
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        pts.push(new THREE.Vector3(
+          -1.6 - t * 2.8,
+          0.55 + t * 0.6 - t * t * 0.9,
+          sign * (t * 0.9 + 0.18)
+        ));
+      }
+      const curve = new THREE.CatmullRomCurve3(pts);
+      const tubeGeo = new THREE.TubeGeometry(curve, 20, 0.028, 6, false);
+      const ant = new THREE.Mesh(tubeGeo, darkMat);
+      crawfish.add(ant);
+
+      // Short antennules
+      const pts2 = [];
+      for (let i = 0; i <= 8; i++) {
+        const t = i / 8;
+        pts2.push(new THREE.Vector3(-1.52 - t * 0.9, 0.48 + t * 0.22, sign * (0.12 + t * 0.3)));
+      }
+      const curve2 = new THREE.CatmullRomCurve3(pts2);
+      const tube2 = new THREE.TubeGeometry(curve2, 10, 0.018, 5, false);
+      crawfish.add(new THREE.Mesh(tube2, darkMat));
+    }
+    makeAntenna(-1);
+    makeAntenna(1);
+
+    // ── Big claws (chelipeds) ─────────────────────────────
+    function makeClaw(sign) {
+      const g = new THREE.Group();
+
+      // Upper arm
+      const arm1 = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.1, 0.13, 0.85, 10),
+        clawMat
+      );
+      arm1.rotation.z = sign > 0 ? -0.6 : -0.6;
+      arm1.rotation.x = sign * 0.3;
+      arm1.position.set(-1.05, -0.08, sign * 0.5);
+      arm1.castShadow = true;
+      g.add(arm1);
+
+      // Lower arm
+      const arm2 = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.09, 0.11, 0.8, 10),
+        clawMat
+      );
+      arm2.rotation.z = sign > 0 ? 0.1 : 0.1;
+      arm2.rotation.x = sign * 0.5;
+      arm2.position.set(-1.58, -0.35, sign * 0.7);
+      arm2.castShadow = true;
+      g.add(arm2);
+
+      // Claw body (fat oval)
+      const clawBody = new THREE.Mesh(
+        new THREE.SphereGeometry(1, 12, 8),
+        clawMat
+      );
+      clawBody.scale.set(0.42, 0.28, 0.28);
+      clawBody.position.set(-2.06, -0.52, sign * 0.88);
+      clawBody.castShadow = true;
+      g.add(clawBody);
+
+      // Fixed finger
+      const finger1 = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.07, 0.03, 0.52, 8),
+        clawMat
+      );
+      finger1.rotation.z = -1.1;
+      finger1.rotation.x = sign * 0.15;
+      finger1.position.set(-2.42, -0.38, sign * 0.9);
+      g.add(finger1);
+
+      // Movable finger (slightly open)
+      const finger2 = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.06, 0.025, 0.48, 8),
+        darkMat
+      );
+      finger2.rotation.z = -0.85;
+      finger2.rotation.x = sign * 0.05;
+      finger2.position.set(-2.38, -0.65, sign * 0.85);
+      g.add(finger2);
+
+      crawfish.add(g);
+    }
+    makeClaw(-1);
+    makeClaw(1);
+
+    // ── Walking legs (3 pairs each side, small) ──────────
+    const legPositions = [
+      { x: -0.3,  z: 0.72, len: 0.7 },
+      { x:  0.1,  z: 0.70, len: 0.65 },
+      { x:  0.5,  z: 0.66, len: 0.6 },
+      { x:  0.85, z: 0.60, len: 0.55 },
+      { x:  1.15, z: 0.54, len: 0.50 },
+    ];
+
+    legPositions.forEach((lp) => {
+      [-1, 1].forEach(sign => {
+        // Upper leg
+        const upper = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.04, 0.035, lp.len * 0.55, 6),
+          darkMat
+        );
+        upper.rotation.z = sign > 0 ? 0.55 : -0.55;
+        upper.rotation.x = sign * 0.1;
+        upper.position.set(lp.x, -0.42, sign * lp.z);
+        crawfish.add(upper);
+
+        // Lower leg
+        const lower = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.03, 0.015, lp.len * 0.5, 6),
+          darkMat
+        );
+        lower.rotation.z = sign > 0 ? 0.9 : -0.9;
+        lower.rotation.x = sign * 0.15;
+        lower.position.set(lp.x + sign * -0.02, -0.78, sign * (lp.z + 0.2));
+        crawfish.add(lower);
+      });
+    });
+
+    // ── Swimmerets (pleopods — tiny under-tail) ───────────
+    for (let i = 0; i < 4; i++) {
+      [-1, 1].forEach(sign => {
+        const pleopod = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.025, 0.01, 0.32, 5),
+          darkMat
+        );
+        pleopod.rotation.z = sign > 0 ? 0.7 : -0.7;
+        pleopod.position.set(0.55 + i * 0.38, -0.38, sign * 0.22);
+        crawfish.add(pleopod);
+      });
+    }
+
+    // ── Ground shadow ring ────────────────────────────────
+    const shadowRing = new THREE.Mesh(
+      new THREE.CircleGeometry(2.2, 40),
+      new THREE.MeshStandardMaterial({
+        color: 0x000000,
+        transparent: true,
+        opacity: 0.35,
+        roughness: 1,
+        metalness: 0,
+      })
+    );
+    shadowRing.rotation.x = -Math.PI / 2;
+    shadowRing.position.y = -1.12;
+    scene.add(shadowRing);
+
+    // Initial pose — slightly tilted for dramatic look
+    crawfish.rotation.y = 0.4;
+    crawfish.rotation.x = 0.15;
+    crawfish.position.y = 0.1;
+    scene.add(crawfish);
+
+    // ── Drag to rotate ────────────────────────────────────
+    let isDragging = false, prevX = 0, prevY = 0;
+    let targetRotY = crawfish.rotation.y;
+    let targetRotX = crawfish.rotation.x;
+    let rotY = targetRotY, rotX = targetRotX;
+    let hasDragged = false;
+
+    canvas.addEventListener('mousedown', e => {
+      isDragging = true; prevX = e.clientX; prevY = e.clientY;
+      e.stopPropagation(); // don't fire the wrap's click yet
+    });
+    window.addEventListener('mouseup', e => { isDragging = false; });
+
+    canvas.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      const dx = e.clientX - prevX;
+      const dy = e.clientY - prevY;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) hasDragged = true;
+      targetRotY += dx * 0.01;
+      targetRotX += dy * 0.007;
+      targetRotX = Math.max(-0.6, Math.min(0.6, targetRotX));
+      prevX = e.clientX; prevY = e.clientY;
+      e.stopPropagation();
+    });
+
+    canvas.addEventListener('click', e => {
+      if (hasDragged) { hasDragged = false; e.stopPropagation(); return; }
+      window.location.href = 'menu.html';
+    });
+
+    canvas.addEventListener('touchstart', e => {
+      isDragging = true; hasDragged = false;
+      prevX = e.touches[0].clientX; prevY = e.touches[0].clientY;
+    }, { passive: true });
+    canvas.addEventListener('touchend', () => { isDragging = false; });
+    canvas.addEventListener('touchmove', e => {
+      if (!isDragging) return;
+      const dx = e.touches[0].clientX - prevX;
+      const dy = e.touches[0].clientY - prevY;
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) hasDragged = true;
+      targetRotY += dx * 0.01;
+      targetRotX += dy * 0.007;
+      targetRotX = Math.max(-0.6, Math.min(0.6, targetRotX));
+      prevX = e.touches[0].clientX; prevY = e.touches[0].clientY;
+      e.preventDefault();
+    }, { passive: false });
+
+    // ── Animate ───────────────────────────────────────────
+    (function loop() {
+      requestAnimationFrame(loop);
+      const t = Date.now() * 0.001;
+
+      // Auto-rotate when idle
+      if (!isDragging) targetRotY += 0.004;
+
+      // Smooth lerp
+      rotY += (targetRotY - rotY) * 0.08;
+      rotX += (targetRotX - rotX) * 0.08;
+      crawfish.rotation.y = rotY;
+      crawfish.rotation.x = rotX;
+
+      // Gentle bob
+      crawfish.position.y = 0.1 + Math.sin(t * 0.9) * 0.06;
+
+      // Antennae quiver — subtle z-rotation on the whole model
+      crawfish.rotation.z = Math.sin(t * 1.4) * 0.018;
+
+      // Pulse the fill light
+      fill.intensity = 2.0 + Math.sin(t * 1.3) * 0.4;
+
+      renderer.render(scene, cam);
+    })();
+  })();
+  </script>
 
   <script>
     (() => {
