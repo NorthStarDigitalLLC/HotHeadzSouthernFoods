@@ -479,8 +479,9 @@
        Click anywhere on the panel → menu.html
        Drag to rotate. Auto-spins when idle.
   ═══════════════════════════════════════ -->
-  <!-- GLTFLoader for crawfish.glb -->
+  <!-- GLTFLoader + DRACOLoader for crawfish.glb -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
   <script>
   (function() {
     const wrap = document.getElementById('crawfishWrap');
@@ -575,12 +576,30 @@
     }
 
     // Try to load the GLB
+    const dracoLoader = new THREE.DRACOLoader();
+    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
     const loader = new THREE.GLTFLoader();
+    loader.setDRACOLoader(dracoLoader);
     loader.load(
       'models/crawfish.glb',
       function(gltf) {
         loadingEl.remove();
         const model = gltf.scene;
+        // Fix texture encoding for proper color rendering
+        model.traverse(child => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+            if (child.material) {
+              const mats = Array.isArray(child.material) ? child.material : [child.material];
+              mats.forEach(mat => {
+                if (mat.map) mat.map.encoding = THREE.sRGBEncoding;
+                if (mat.emissiveMap) mat.emissiveMap.encoding = THREE.sRGBEncoding;
+                mat.needsUpdate = true;
+              });
+            }
+          }
+        });
         // Auto-scale to fit the viewer
         const box = new THREE.Box3().setFromObject(model);
         const size = box.getSize(new THREE.Vector3());
@@ -591,14 +610,17 @@
         const centre = box.getCenter(new THREE.Vector3());
         model.position.sub(centre);
         model.position.y -= 0.2;
-        model.traverse(child => {
-          if (child.isMesh) { child.castShadow = true; child.receiveShadow = true; }
-        });
         crawfish.add(model);
       },
-      undefined,
-      function() {
+      function(xhr) {
+        if (xhr.lengthComputable) {
+          const pct = Math.round(xhr.loaded / xhr.total * 100);
+          loadingEl.innerHTML = '<div style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.45);">Loading ' + pct + '%</div>';
+        }
+      },
+      function(err) {
         // GLB not found — show procedural fallback
+        console.error('crawfish.glb load error:', err);
         loadingEl.remove();
         buildFallback();
       }
