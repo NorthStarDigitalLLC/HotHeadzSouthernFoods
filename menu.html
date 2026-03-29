@@ -3,15 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hot Headz Southern Foods – Menu (Test)</title>
+  <title>Hot Headz Southern Foods – Menu (3D)</title>
   <meta name="description" content="Hot Headz Southern Foods full menu — breakfast, lunch, beer, salad bar, drinks and dessert. DeRidder, LA." />
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- model-viewer for 3D (only loaded when toggled on) -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 
   <style>
@@ -19,7 +17,6 @@
       --bg: #0c0a08;
       --surface: #161210;
       --surface-raised: #1e1a16;
-      --surface-glass: rgba(22, 18, 14, 0.75);
       --border: rgba(255,255,255,0.08);
       --border-warm: rgba(210,120,60,0.2);
       --text: #f5f0ea;
@@ -30,9 +27,7 @@
       --accent-glow: rgba(232,121,43,0.35);
       --ember: #c0421a;
       --sage: #5a8a6a;
-      --sage-glow: rgba(90,138,106,0.3);
       --beer-accent: #d4a843;
-      --beer-glow: rgba(212,168,67,0.25);
       --radius-sm: 12px;
       --radius-md: 20px;
       --radius-lg: 28px;
@@ -54,235 +49,77 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── GRAIN OVERLAY ─────────────────── */
     body::after {
       content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.03;
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 9999; opacity: 0.03;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
-    /* ── AMBIENT BACKGROUND ────────────── */
     .bg-glow {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
       background:
         radial-gradient(ellipse 800px 500px at 15% 10%, rgba(232,121,43,0.08), transparent),
         radial-gradient(ellipse 600px 600px at 85% 80%, rgba(90,138,106,0.06), transparent),
         radial-gradient(ellipse 400px 400px at 50% 50%, rgba(192,66,26,0.04), transparent);
     }
 
-    /* ── LAYOUT ─────────────────────────── */
     .app {
-      position: relative;
-      z-index: 1;
-      max-width: 900px;
-      margin: 0 auto;
+      position: relative; z-index: 1;
+      max-width: 900px; margin: 0 auto;
       padding: 0 16px 120px;
     }
 
-    /* ── HEADER ─────────────────────────── */
-    .hero {
-      text-align: center;
-      padding: 40px 0 20px;
-    }
+    /* ── HEADER ──────────────── */
+    .hero { text-align: center; padding: 40px 0 20px; }
     .hero-eyebrow {
-      font-family: var(--font-body);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 12px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
     }
     .hero-title {
       font-family: var(--font-display);
-      font-size: clamp(32px, 6vw, 52px);
-      font-weight: 900;
-      line-height: 1.05;
-      letter-spacing: -0.03em;
-      color: var(--text);
-      margin-bottom: 8px;
+      font-size: clamp(32px, 6vw, 52px); font-weight: 900;
+      line-height: 1.05; letter-spacing: -0.03em;
     }
-    .hero-title em {
-      font-style: italic;
-      color: var(--accent);
-    }
-    .hero-sub {
-      font-size: 15px;
-      color: var(--text-mid);
-      font-weight: 500;
-      line-height: 1.5;
-    }
+    .hero-title em { font-style: italic; color: var(--accent); }
+    .hero-sub { font-size: 15px; color: var(--text-mid); font-weight: 500; line-height: 1.5; }
 
-    /* ── STATUS BADGE ──────────────────── */
     .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 16px;
-      padding: 10px 20px;
-      border-radius: var(--radius-pill);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      backdrop-filter: blur(12px);
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 16px; padding: 10px 20px; border-radius: var(--radius-pill);
+      font-size: 13px; font-weight: 700; letter-spacing: 0.06em;
+      border: 1px solid var(--border); background: var(--surface);
     }
-    .status-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
     .status-dot.open { background: #4ade80; box-shadow: 0 0 12px rgba(74,222,128,0.6); }
     .status-dot.closed { background: #f87171; box-shadow: 0 0 12px rgba(248,113,113,0.6); }
     .status-dot.warn { background: #fbbf24; box-shadow: 0 0 12px rgba(251,191,36,0.6); }
 
-    /* ── DAY TABS (sticky) ─────────────── */
+    /* ── DAY TABS ─────────────── */
     .day-tabs-wrap {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      padding: 12px 0;
+      position: sticky; top: 0; z-index: 50; padding: 12px 0;
       background: linear-gradient(180deg, var(--bg) 60%, transparent);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     }
-    .day-tabs {
-      display: flex;
-      gap: 6px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
+    .day-tabs { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
     .day-tab {
-      font-family: var(--font-body);
-      font-size: 13px;
-      font-weight: 700;
-      padding: 10px 22px;
-      border-radius: var(--radius-pill);
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text-mid);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      white-space: nowrap;
+      font-family: var(--font-body); font-size: 13px; font-weight: 700;
+      padding: 10px 22px; border-radius: var(--radius-pill);
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text-mid); cursor: pointer; transition: all 0.2s;
     }
     .day-tab:hover { border-color: rgba(255,255,255,0.15); color: var(--text); }
     .day-tab.active {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
-      box-shadow: 0 4px 20px var(--accent-glow);
+      background: var(--accent); border-color: var(--accent);
+      color: #fff; box-shadow: 0 4px 20px var(--accent-glow);
     }
 
-    /* ── CATEGORY NAV ──────────────────── */
-    .cat-nav {
-      display: flex;
-      gap: 6px;
-      overflow-x: auto;
-      padding: 8px 0 12px;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .cat-nav::-webkit-scrollbar { display: none; }
-    .cat-btn {
-      font-family: var(--font-body);
-      font-size: 12px;
-      font-weight: 700;
-      padding: 8px 16px;
-      border-radius: var(--radius-pill);
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-dim);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-    }
-    .cat-btn:hover { color: var(--text-mid); border-color: rgba(255,255,255,0.12); }
-    .cat-btn.active {
-      background: var(--surface-raised);
-      border-color: var(--border-warm);
-      color: var(--accent-light);
-    }
-    .cat-btn.beer-btn.active {
-      border-color: rgba(212,168,67,0.3);
-      color: var(--beer-accent);
-    }
-
-    /* ── PANEL ──────────────────────────── */
-    .panel { display: none; }
-    .panel.visible { display: block; }
-
-    /* ── HOURS LINE ─────────────────────── */
-    .hours-line {
-      text-align: center;
-      font-size: 13px;
-      color: var(--text-dim);
-      font-weight: 500;
-      padding: 4px 0 16px;
-      line-height: 1.6;
-    }
-    .hours-line strong { color: var(--text-mid); font-weight: 700; }
-
-    /* ── CATEGORY SECTION ──────────────── */
-    .cat-section { display: none; }
-    .cat-section.visible { display: block; }
-
-    .cat-header {
-      display: flex;
-      align-items: baseline;
-      gap: 12px;
-      margin-bottom: 20px;
-      padding-bottom: 14px;
-      border-bottom: 1px solid var(--border);
-    }
-    .cat-name {
-      font-family: var(--font-display);
-      font-size: clamp(26px, 4vw, 36px);
-      font-weight: 900;
-      letter-spacing: -0.02em;
-    }
-    .cat-tag {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-    }
-
-    .section-label {
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin: 24px 0 12px;
-      padding-left: 2px;
-    }
-    .section-label:first-child { margin-top: 0; }
-
-    /* ══════════════════════════════════════
-       3D TOGGLE SWITCH
-       ══════════════════════════════════════ */
+    /* ── 3D TOGGLE ────────────── */
     .toggle-3d-bar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      margin: 6px 0 18px;
-      padding: 14px 20px;
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      background: var(--surface);
-      transition: all 0.3s ease;
+      display: flex; align-items: center; justify-content: center;
+      gap: 14px; margin: 6px 0 18px; padding: 14px 20px;
+      border-radius: var(--radius-lg); border: 1px solid var(--border);
+      background: var(--surface); transition: all 0.3s ease;
     }
     .toggle-3d-bar.glow-on {
       border-color: var(--accent);
@@ -290,233 +127,126 @@
       background: linear-gradient(135deg, var(--surface) 0%, rgba(232,121,43,0.06) 100%);
     }
     .toggle-3d-label {
-      font-family: var(--font-body);
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text-mid);
-      user-select: none;
-      transition: color 0.2s;
+      font-size: 14px; font-weight: 700; color: var(--text-mid); user-select: none; transition: color 0.2s;
     }
-    .toggle-3d-bar.glow-on .toggle-3d-label {
-      color: var(--accent-light);
-    }
-    .toggle-3d-icon {
-      font-size: 20px;
-      line-height: 1;
-    }
-
-    /* The actual toggle switch */
-    .toggle-switch {
-      position: relative;
-      width: 56px;
-      height: 30px;
-      flex-shrink: 0;
-      cursor: pointer;
-    }
-    .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-      position: absolute;
-    }
+    .toggle-3d-bar.glow-on .toggle-3d-label { color: var(--accent-light); }
+    .toggle-3d-icon { font-size: 20px; line-height: 1; }
+    .toggle-switch { position: relative; width: 56px; height: 30px; flex-shrink: 0; cursor: pointer; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
     .toggle-track {
-      position: absolute;
-      inset: 0;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.15);
+      position: absolute; inset: 0; border-radius: 999px;
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
       transition: all 0.3s ease;
     }
     .toggle-switch input:checked + .toggle-track {
-      background: var(--accent);
-      border-color: var(--accent-light);
+      background: var(--accent); border-color: var(--accent-light);
       box-shadow: 0 0 16px var(--accent-glow);
     }
     .toggle-knob {
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: #fff;
+      position: absolute; top: 3px; left: 3px; width: 24px; height: 24px;
+      border-radius: 50%; background: #fff;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
       transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       pointer-events: none;
     }
     .toggle-switch input:checked ~ .toggle-knob {
       left: 29px;
-      background: #fff;
       box-shadow: 0 2px 10px rgba(0,0,0,0.3), 0 0 8px var(--accent-glow);
     }
 
-    /* ── 3D MODEL GRID ─────────────────── */
-    .model-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 16px;
+    /* ── CATEGORY NAV ─────────── */
+    .cat-nav {
+      display: flex; gap: 6px; overflow-x: auto; padding: 8px 0 12px;
+      scrollbar-width: none; justify-content: center; flex-wrap: wrap;
     }
+    .cat-nav::-webkit-scrollbar { display: none; }
+    .cat-btn {
+      font-size: 12px; font-weight: 700; padding: 8px 16px;
+      border-radius: var(--radius-pill); border: 1px solid var(--border);
+      background: transparent; color: var(--text-dim); cursor: pointer;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .cat-btn:hover { color: var(--text-mid); border-color: rgba(255,255,255,0.12); }
+    .cat-btn.active {
+      background: var(--surface-raised); border-color: var(--border-warm);
+      color: var(--accent-light);
+    }
+    .cat-btn.beer-btn.active { border-color: rgba(212,168,67,0.3); color: var(--beer-accent); }
 
-    .model-card {
-      position: relative;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
-      background: var(--surface);
-      overflow: hidden;
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-    .model-card:hover {
-      border-color: var(--border-warm);
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-lg);
-    }
-    .model-card.expanded .model-desc {
-      max-height: 120px;
-      opacity: 1;
-      padding: 0 16px 16px;
-    }
+    /* ── PANEL / SECTION ──────── */
+    .panel { display: none; }
+    .panel.visible { display: block; }
+    .cat-section { display: none; }
+    .cat-section.visible { display: block; }
 
-    .model-stage {
-      position: relative;
-      width: 100%;
-      height: 200px;
-      background: radial-gradient(ellipse at center bottom, rgba(232,121,43,0.06), transparent 70%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .hours-line {
+      text-align: center; font-size: 13px; color: var(--text-dim);
+      font-weight: 500; padding: 4px 0 16px; line-height: 1.6;
     }
-    .model-stage model-viewer {
-      width: 100%;
-      height: 100%;
-      --poster-color: transparent;
-    }
-    .model-placeholder {
-      font-size: 56px;
-      opacity: 0.15;
-      user-select: none;
-    }
+    .hours-line strong { color: var(--text-mid); font-weight: 700; }
 
-    .model-info {
-      padding: 14px 16px 6px;
+    .cat-header {
+      display: flex; align-items: baseline; gap: 12px;
+      margin-bottom: 20px; padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
     }
-    .model-item-name {
+    .cat-name {
       font-family: var(--font-display);
-      font-size: 18px;
-      font-weight: 700;
-      line-height: 1.3;
+      font-size: clamp(26px, 4vw, 36px); font-weight: 900;
+      letter-spacing: -0.02em;
     }
-    .model-desc {
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      transition: all 0.35s ease;
-      font-size: 13px;
-      color: var(--text-mid);
-      line-height: 1.6;
+    .cat-tag {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--text-dim);
     }
-    .model-card-hint {
-      padding: 0 16px 12px;
-      font-size: 11px;
-      color: var(--text-dim);
-      font-weight: 600;
+    .section-label {
+      font-size: 11px; font-weight: 800; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--accent);
+      margin: 24px 0 12px; padding-left: 2px;
     }
+    .section-label:first-child { margin-top: 0; }
 
-    /* ── SIMPLE LIST (breakfast, drinks, etc.) ── */
-    .item-list {
-      list-style: none;
-      display: grid;
-      gap: 6px;
-    }
+    /* ── ITEM LIST ────────────── */
+    .item-list { list-style: none; display: grid; gap: 6px; }
     .item-list li {
-      padding: 12px 16px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-      background: var(--surface);
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text);
-      transition: all 0.2s ease;
+      padding: 12px 16px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--surface);
+      font-size: 14px; font-weight: 500; transition: all 0.2s;
     }
-    .item-list li:hover {
-      border-color: var(--border-warm);
-      background: var(--surface-raised);
-    }
+    .item-list li:hover { border-color: var(--border-warm); background: var(--surface-raised); }
+    .item-list li.beer-item { border-color: rgba(212,168,67,0.12); }
+    .item-list li.beer-item:hover { border-color: rgba(212,168,67,0.25); background: rgba(212,168,67,0.06); }
 
-    /* ── LUNCH LIST ITEM (with tap-to-expand desc) ── */
-    .lunch-list-item {
-      cursor: pointer;
-    }
-    .lunch-list-item .lunch-item-name {
-      font-weight: 600;
-    }
+    .lunch-list-item { cursor: pointer; }
+    .lunch-list-item .lunch-item-name { font-weight: 600; }
     .lunch-list-item .lunch-item-desc {
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      transition: all 0.3s ease;
-      font-size: 13px;
-      color: var(--text-mid);
-      line-height: 1.5;
-      margin-top: 0;
+      max-height: 0; opacity: 0; overflow: hidden;
+      transition: all 0.3s; font-size: 13px; color: var(--text-mid); line-height: 1.5;
     }
-    .lunch-list-item.expanded .lunch-item-desc {
-      max-height: 80px;
-      opacity: 1;
-      margin-top: 6px;
-    }
-    .lunch-list-item .lunch-hint {
-      font-size: 11px;
-      color: var(--text-dim);
-      margin-top: 2px;
-      font-weight: 600;
-    }
-    .lunch-list-item.expanded .lunch-hint {
-      display: none;
-    }
+    .lunch-list-item.expanded .lunch-item-desc { max-height: 80px; opacity: 1; margin-top: 6px; }
+    .lunch-list-item .lunch-hint { font-size: 11px; color: var(--text-dim); margin-top: 2px; font-weight: 600; }
+    .lunch-list-item.expanded .lunch-hint { display: none; }
 
-    /* Beer items */
-    .item-list li.beer-item {
-      border-color: rgba(212,168,67,0.12);
-    }
-    .item-list li.beer-item:hover {
-      border-color: rgba(212,168,67,0.25);
-      background: rgba(212,168,67,0.06);
-    }
-
-    /* ── PLATES (pricing cards) ─────────── */
     .plates-row {
-      display: grid;
-      gap: 8px;
+      display: grid; gap: 8px;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     }
     .plate-card {
-      padding: 16px;
-      border-radius: var(--radius-md);
+      padding: 16px; border-radius: var(--radius-md);
       border: 1px solid var(--border-warm);
       background: linear-gradient(135deg, var(--surface) 0%, rgba(232,121,43,0.04) 100%);
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
-      line-height: 1.5;
+      font-size: 14px; font-weight: 600; line-height: 1.5;
     }
 
-    /* ── SALAD BAR COLUMNS ─────────────── */
     .salad-grid {
-      display: grid;
+      display: grid; gap: 16px;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 16px;
     }
     .salad-col-title {
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--sage);
-      margin-bottom: 8px;
+      font-size: 12px; font-weight: 800; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--sage); margin-bottom: 8px;
     }
 
-    /* ── CRAWFISH SECTION ──────────────── */
     .crawfish-banner {
       border-radius: var(--radius-md);
       border: 1px solid rgba(192,66,26,0.2);
@@ -525,150 +255,189 @@
     }
     .crawfish-banner .cat-name { color: var(--ember); }
 
-    /* ── ADVANCED TAB ──────────────────── */
-    .adv-day-tabs {
+    /* ═══════════════════════════════════════
+       3D WRAP LAYOUT — Text flows around model
+       ═══════════════════════════════════════ */
+    .lunch-3d-wrap {
+      position: relative;
+      min-height: 400px;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    /* The 3D model container — floated to center using the two-float trick */
+    .lunch-3d-model-anchor {
+      position: relative;
+      width: 100%;
       display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
       justify-content: center;
-      margin-bottom: 16px;
+      pointer-events: none;
     }
-    .adv-day-tab {
-      font-family: var(--font-body);
-      font-size: 12px;
-      font-weight: 700;
-      padding: 9px 16px;
-      border-radius: var(--radius-pill);
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text-dim);
-      cursor: pointer;
-      transition: all 0.2s ease;
+
+    .lunch-3d-model-container {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      margin: 20px auto;
+      z-index: 1;
+      pointer-events: auto;
     }
-    .adv-day-tab.active {
-      background: var(--surface-raised);
-      border-color: var(--border-warm);
-      color: var(--accent-light);
+
+    .lunch-3d-model-container model-viewer {
+      width: 100%;
+      height: 100%;
+      --poster-color: transparent;
     }
-    .adv-card {
+
+    /* Glow under model */
+    .lunch-3d-model-container::after {
+      content: "";
+      position: absolute;
+      bottom: -10px; left: 10%; right: 10%;
+      height: 40px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
+      filter: blur(12px);
+      pointer-events: none;
+    }
+
+    .model-fallback-icon {
+      position: absolute; inset: 0;
       display: none;
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      background: var(--surface);
-      padding: 24px;
-    }
-    .adv-card.visible { display: block; }
-    .adv-card-title {
-      font-family: var(--font-display);
-      font-size: 24px;
-      font-weight: 900;
-      margin-bottom: 4px;
-    }
-    .adv-card-sub {
-      font-size: 13px;
-      color: var(--text-dim);
-      margin-bottom: 16px;
+      align-items: center; justify-content: center;
+      font-size: 80px; opacity: 0.12;
+      pointer-events: none;
     }
 
-    /* ── CLOSED STATE ──────────────────── */
-    .closed-state {
-      text-align: center;
-      padding: 60px 20px;
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      background: var(--surface);
+    /* Float spacers that push text around the center model */
+    .float-left-spacer {
+      float: left;
+      width: 50%;
+      height: 1px;
     }
-    .closed-state h2 {
-      font-family: var(--font-display);
-      font-size: 28px;
-      font-weight: 900;
-      margin-bottom: 8px;
+    .float-right-spacer {
+      float: right;
+      width: 50%;
+      height: 1px;
     }
-    .closed-state p { color: var(--text-mid); font-size: 15px; }
+    .float-left-block {
+      float: left;
+      clear: left;
+      width: calc(50% - 150px);
+      height: 280px;
+    }
+    .float-right-block {
+      float: right;
+      clear: right;
+      width: calc(50% - 150px);
+      height: 280px;
+    }
 
-    /* ── BACK BUTTON ───────────────────── */
-    .back-btn {
-      position: fixed;
-      z-index: 90;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--surface);
-      border: 1px solid var(--border-warm);
-      border-radius: var(--radius-pill);
-      padding: 12px 28px;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: var(--text);
-      font-family: var(--font-body);
+    /* The item columns that sit on left/right */
+    .lunch-3d-items-flow {
+      width: 100%;
+    }
+
+    .lunch-3d-item {
+      padding: 10px 14px;
+      margin-bottom: 6px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: rgba(22, 18, 14, 0.85);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      overflow: hidden;
+    }
+    .lunch-3d-item:hover {
+      border-color: var(--border-warm);
+      background: rgba(30, 26, 22, 0.92);
+      transform: translateX(2px);
+    }
+    .lunch-3d-item .l3d-name {
       font-weight: 700;
       font-size: 14px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.5);
-      transition: all 0.2s ease;
-      backdrop-filter: blur(12px);
     }
-    .back-btn:hover {
-      transform: translateX(-50%) translateY(-2px);
-      border-color: var(--accent);
-      box-shadow: var(--shadow-glow);
+    .lunch-3d-item .l3d-desc {
+      max-height: 0; opacity: 0; overflow: hidden;
+      transition: all 0.3s ease;
+      font-size: 12px; color: var(--text-mid); line-height: 1.5;
     }
+    .lunch-3d-item.expanded .l3d-desc {
+      max-height: 60px; opacity: 1; margin-top: 4px;
+    }
+    .lunch-3d-item .l3d-hint {
+      font-size: 10px; color: var(--text-dim); font-weight: 600; margin-top: 1px;
+    }
+    .lunch-3d-item.expanded .l3d-hint { display: none; }
+
+    /* ── ADVANCED ──────────────── */
+    .adv-day-tabs { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px; }
+    .adv-day-tab {
+      font-size: 12px; font-weight: 700; padding: 9px 16px;
+      border-radius: var(--radius-pill); border: 1px solid var(--border);
+      background: var(--surface); color: var(--text-dim); cursor: pointer; transition: all 0.2s;
+    }
+    .adv-day-tab.active { background: var(--surface-raised); border-color: var(--border-warm); color: var(--accent-light); }
+    .adv-card { display: none; border-radius: var(--radius-lg); border: 1px solid var(--border); background: var(--surface); padding: 24px; }
+    .adv-card.visible { display: block; }
+    .adv-card-title { font-family: var(--font-display); font-size: 24px; font-weight: 900; margin-bottom: 4px; }
+    .adv-card-sub { font-size: 13px; color: var(--text-dim); margin-bottom: 16px; }
+
+    .closed-state { text-align: center; padding: 60px 20px; border-radius: var(--radius-lg); border: 1px solid var(--border); background: var(--surface); }
+    .closed-state h2 { font-family: var(--font-display); font-size: 28px; font-weight: 900; margin-bottom: 8px; }
+    .closed-state p { color: var(--text-mid); font-size: 15px; }
+
+    .back-btn {
+      position: fixed; z-index: 90; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: var(--surface); border: 1px solid var(--border-warm);
+      border-radius: var(--radius-pill); padding: 12px 28px;
+      display: inline-flex; align-items: center; gap: 10px;
+      text-decoration: none; color: var(--text); font-weight: 700; font-size: 14px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.5); transition: all 0.2s; backdrop-filter: blur(12px);
+    }
+    .back-btn:hover { transform: translateX(-50%) translateY(-2px); border-color: var(--accent); box-shadow: var(--shadow-glow); }
     .back-btn .arrow { color: var(--accent); font-size: 18px; }
 
-    /* ── FLASH/MODAL ───────────────────── */
     .flash-overlay {
-      position: fixed; inset: 0;
-      display: none; place-items: center;
-      z-index: 200;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      padding: 18px;
+      position: fixed; inset: 0; display: none; place-items: center; z-index: 200;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(12px); padding: 18px;
     }
     .flash-overlay.show { display: grid; }
     .flash-card {
-      width: min(480px, calc(100vw - 32px));
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border-warm);
-      background: var(--surface);
-      padding: 32px;
-      text-align: center;
-      animation: flashIn 0.3s ease;
+      width: min(480px, calc(100vw - 32px)); border-radius: var(--radius-lg);
+      border: 1px solid var(--border-warm); background: var(--surface);
+      padding: 32px; text-align: center; animation: flashIn 0.3s ease;
     }
     @keyframes flashIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    .flash-title {
-      font-family: var(--font-display);
-      font-size: 26px;
-      font-weight: 900;
-      color: var(--accent);
-      margin-bottom: 10px;
-    }
+    .flash-title { font-family: var(--font-display); font-size: 26px; font-weight: 900; color: var(--accent); margin-bottom: 10px; }
     .flash-text { color: var(--text-mid); font-size: 15px; line-height: 1.6; margin-bottom: 16px; }
     .flash-countdown {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 56px; height: 56px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #fff;
-      font-weight: 900;
-      font-size: 22px;
-      box-shadow: 0 0 30px var(--accent-glow);
-      margin-bottom: 12px;
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 56px; height: 56px; border-radius: 50%; background: var(--accent);
+      color: #fff; font-weight: 900; font-size: 22px;
+      box-shadow: 0 0 30px var(--accent-glow); margin-bottom: 12px;
     }
     .flash-sub { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); }
 
-    /* ── UTILITIES ──────────────────────── */
     .hide { display: none !important; }
 
-    /* ── RESPONSIVE ─────────────────────── */
     @media (max-width: 640px) {
-      .model-grid { grid-template-columns: 1fr; }
       .plates-row { grid-template-columns: 1fr; }
       .salad-grid { grid-template-columns: 1fr; }
       .app { padding: 0 10px 120px; }
+      .lunch-3d-model-container { width: 200px; height: 200px; }
+      .float-left-block { width: calc(50% - 110px); height: 200px; }
+      .float-right-block { width: calc(50% - 110px); height: 200px; }
+    }
+
+    @media (max-width: 420px) {
+      .lunch-3d-model-container { width: 160px; height: 160px; }
+      .float-left-block { width: calc(50% - 90px); height: 160px; }
+      .float-right-block { width: calc(50% - 90px); height: 160px; }
     }
   </style>
 </head>
@@ -678,7 +447,6 @@
 
 <div class="app">
 
-  <!-- HEADER -->
   <header class="hero">
     <div class="hero-eyebrow">DeRidder, Louisiana</div>
     <h1 class="hero-title">Hot Headz <em>Southern</em> Foods</h1>
@@ -689,7 +457,6 @@
     </div>
   </header>
 
-  <!-- DAY TABS (sticky) -->
   <nav class="day-tabs-wrap">
     <div class="day-tabs">
       <button class="day-tab active" id="tabToday">Today</button>
@@ -698,59 +465,43 @@
     </div>
   </nav>
 
-  <!-- ═══════ 3D TOGGLE ═══════ -->
-  <div class="toggle-3d-bar" id="toggle3dBar">
+  <!-- 3D TOGGLE — defaults ON -->
+  <div class="toggle-3d-bar glow-on" id="toggle3dBar">
     <span class="toggle-3d-icon">🍽</span>
-    <span class="toggle-3d-label" id="toggle3dLabel">View in 3D</span>
+    <span class="toggle-3d-label" id="toggle3dLabel">3D View ON</span>
     <label class="toggle-switch">
-      <input type="checkbox" id="toggle3dCheckbox" />
+      <input type="checkbox" id="toggle3dCheckbox" checked />
       <div class="toggle-track"></div>
       <div class="toggle-knob"></div>
     </label>
     <span class="toggle-3d-icon">🎲</span>
   </div>
 
-  <!-- ════════════ TODAY PANEL ════════════ -->
   <div class="panel visible" id="panelToday">
     <div class="hours-line" id="todayHours"></div>
     <nav class="cat-nav" id="todayCatNav"></nav>
     <div id="todayCatSections"></div>
-    <div class="closed-state hide" id="todayClosed">
-      <h2>Closed Today</h2>
-      <p id="todayClosedMsg">See you next time!</p>
-    </div>
+    <div class="closed-state hide" id="todayClosed"><h2>Closed Today</h2><p id="todayClosedMsg">See you next time!</p></div>
   </div>
 
-  <!-- ════════════ TOMORROW PANEL ════════════ -->
   <div class="panel" id="panelTomorrow">
     <div class="hours-line" id="tomorrowHours"></div>
     <nav class="cat-nav" id="tomorrowCatNav"></nav>
     <div id="tomorrowCatSections"></div>
-    <div class="closed-state hide" id="tomorrowClosed">
-      <h2>Closed</h2>
-      <p id="tomorrowClosedMsg">See you next time!</p>
-    </div>
+    <div class="closed-state hide" id="tomorrowClosed"><h2>Closed</h2><p id="tomorrowClosedMsg">See you next time!</p></div>
   </div>
 
-  <!-- ════════════ ADVANCED PANEL ════════════ -->
   <div class="panel" id="panelAdvanced">
     <div class="hours-line" id="advDisclaimer"></div>
     <div class="adv-day-tabs" id="advDayTabs"></div>
     <div id="advCards"></div>
   </div>
 
-  <!-- LOAD ERROR -->
-  <div class="closed-state hide" id="loadError">
-    <h2>Menu couldn't load</h2>
-    <p id="loadErrorMsg">Try again in a moment.</p>
-  </div>
+  <div class="closed-state hide" id="loadError"><h2>Menu couldn't load</h2><p id="loadErrorMsg">Try again in a moment.</p></div>
 </div>
 
-<a class="back-btn" href="index.html">
-  <span class="arrow">&#8592;</span> Back to Home
-</a>
+<a class="back-btn" href="index.html"><span class="arrow">&#8592;</span> Back to Home</a>
 
-<!-- FLASH MODAL -->
 <div class="flash-overlay" id="flashModal">
   <div class="flash-card">
     <div class="flash-countdown" id="flashCount">5</div>
@@ -760,580 +511,309 @@
   </div>
 </div>
 
-<!-- ═══════════════ DATA ═══════════════ -->
 <script src="menu-data.js"></script>
 
 <script>
 (function () {
   "use strict";
 
-  // ── HELPERS ────────────────────────────
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 
-  function toISO(d) { return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
-  function fmtDate(d) { return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }); }
-  function wkDay(d) { return d.toLocaleDateString("en-US", { weekday: "long" }); }
-  function parseISO(iso) { const [y,m,d] = String(iso).split("-").map(Number); return new Date(y,(m||1)-1,d||1); }
+  function toISO(d) { return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+  function fmtDate(d) { return d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"}); }
+  function wkDay(d) { return d.toLocaleDateString("en-US",{weekday:"long"}); }
+  function parseISO(iso) { const[y,m,d]=String(iso).split("-").map(Number); return new Date(y,(m||1)-1,d||1); }
   function normKey(k) {
-    const m = String(k||"").trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-    if (!m) return null;
-    return `${m[1]}-${String(Number(m[2])).padStart(2,"0")}-${String(Number(m[3])).padStart(2,"0")}`;
+    const m=String(k||"").trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if(!m)return null;
+    return`${m[1]}-${String(Number(m[2])).padStart(2,"0")}-${String(Number(m[3])).padStart(2,"0")}`;
   }
-
   function biz(day) {
-    const l = String(day||"").toLowerCase();
-    const o = l === "sunday" ? "7:00 AM" : (l === "saturday" ? "6:00 AM" : "5:30 AM");
-    const c = l === "sunday" ? "3:00 PM" : "2:00 PM";
-    return {
-      day, open: o, close: c,
-      breakfast: `${o} – 10:30 AM`,
-      lunch: `11:00 AM – ${c}`,
-      crawfish: ["thursday","friday","saturday","sunday"].includes(l) ? "4:00 PM – 8:00 PM" : ""
-    };
+    const l=String(day||"").toLowerCase();
+    const o=l==="sunday"?"7:00 AM":(l==="saturday"?"6:00 AM":"5:30 AM");
+    const c=l==="sunday"?"3:00 PM":"2:00 PM";
+    return{day,open:o,close:c,breakfast:`${o} – 10:30 AM`,lunch:`11:00 AM – ${c}`,crawfish:["thursday","friday","saturday","sunday"].includes(l)?"4:00 PM – 8:00 PM":""};
   }
-
   function t12(s) {
-    if (!s) return null;
-    const m = String(s).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-    if (!m) return null;
-    let h = parseInt(m[1],10);
-    const min = parseInt(m[2],10);
-    const ap = m[3].toUpperCase();
-    if (ap === "PM" && h !== 12) h += 12;
-    if (ap === "AM" && h === 12) h = 0;
-    return h * 60 + min;
+    if(!s)return null;const m=String(s).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if(!m)return null;let h=parseInt(m[1],10);const min=parseInt(m[2],10);const ap=m[3].toUpperCase();
+    if(ap==="PM"&&h!==12)h+=12;if(ap==="AM"&&h===12)h=0;return h*60+min;
   }
-
-  function inRange(mins, r) {
-    if (!r || !String(r).includes("–") && !String(r).includes("-")) return false;
-    const [a,b] = String(r).split(/[–-]/).map(s => s.trim());
-    const s = t12(a), e = t12(b);
-    if (s == null || e == null) return false;
-    return mins >= s && mins <= e;
+  function inRange(mins,r) {
+    if(!r||!String(r).includes("–")&&!String(r).includes("-"))return false;
+    const[a,b]=String(r).split(/[–-]/).map(s=>s.trim());
+    const s=t12(a),e=t12(b);if(s==null||e==null)return false;return mins>=s&&mins<=e;
   }
-
   function pastClose(day) {
-    const h = biz(day);
-    const cl = t12(h.close);
-    if (cl == null) return false;
-    const n = new Date();
-    return (n.getHours() * 60 + n.getMinutes()) >= cl;
+    const h=biz(day);const cl=t12(h.close);if(cl==null)return false;
+    const n=new Date();return(n.getHours()*60+n.getMinutes())>=cl;
   }
 
-  // ── MODEL PATH BUILDER ────────────────
   function modelPath(itemName) {
-    const base = MENU_DATA.settings.modelBasePath || "models/";
-    const ext = MENU_DATA.settings.modelExtension || ".glb";
-    const slug = String(itemName).toLowerCase()
-      .replace(/&/g, "and")
-      .replace(/[^a-z0-9\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
-      .trim();
-    return base + slug + ext;
+    const base=MENU_DATA.settings.modelBasePath||"models/";
+    const ext=MENU_DATA.settings.modelExtension||".glb";
+    const slug=String(itemName).toLowerCase().replace(/&/g,"and").replace(/[^a-z0-9\s-]/g,"").replace(/\s+/g,"-").replace(/-+/g,"-").trim();
+    return base+slug+ext;
   }
 
-  // ── 3D TOGGLE STATE ───────────────────
-  let is3D = false;
-  const toggle3dCheckbox = $("toggle3dCheckbox");
-  const toggle3dBar = $("toggle3dBar");
-  const toggle3dLabel = $("toggle3dLabel");
+  // 3D toggle state — defaults ON
+  let is3D = true;
 
-  // ── DATA ACCESS ───────────────────────
   const data = (typeof MENU_DATA !== "undefined") ? MENU_DATA : null;
   if (!data) { $("loadError")?.classList.remove("hide"); return; }
 
-  // Normalize menu keys
   const rawMenus = data.menus || {};
   const menus = {};
-  Object.keys(rawMenus).forEach(k => { const nk = normKey(k); if (nk) menus[nk] = rawMenus[k]; });
+  Object.keys(rawMenus).forEach(k => { const nk=normKey(k); if(nk) menus[nk]=rawMenus[k]; });
   data.menus = menus;
 
-  function getMenu(iso) { return menus[iso] || null; }
+  function getMenu(iso) { return menus[iso]||null; }
   function getClosure(dayName) {
-    const c = data.closures || {};
-    const k = Object.keys(c).find(k => k.toLowerCase() === String(dayName||"").toLowerCase());
-    return k ? c[k] : null;
+    const c=data.closures||{};
+    const k=Object.keys(c).find(k=>k.toLowerCase()===String(dayName||"").toLowerCase());
+    return k?c[k]:null;
   }
-  function normItems(a) { return Array.isArray(a) ? a.map(x => String(x||"").trim()).filter(Boolean) : []; }
+  function normItems(a) { return Array.isArray(a)?a.map(x=>String(x||"").trim()).filter(Boolean):[]; }
   function normLunch(a) {
-    if (!Array.isArray(a)) return [];
-    return a.map(r => {
-      if (r && typeof r === "object") return { name: String(r.name||"").trim(), desc: String(r.desc||"").trim() };
-      const s = String(r||"").trim();
-      return s ? { name: s, desc: "" } : null;
-    }).filter(Boolean).filter(x => x.name);
+    if(!Array.isArray(a))return[];
+    return a.map(r=>{
+      if(r&&typeof r==="object")return{name:String(r.name||"").trim(),desc:String(r.desc||"").trim()};
+      const s=String(r||"").trim();return s?{name:s,desc:""}:null;
+    }).filter(Boolean).filter(x=>x.name);
   }
 
-  // ── BUILD CATEGORIES ──────────────────
   function buildCats(isoDate) {
-    const menu = getMenu(isoDate) || {};
-    const def = data.defaults || {};
-    const cats = [];
-
-    const bkPlates = normItems(menu.breakfast?.plates ?? def.breakfast?.plates ?? []);
-    const bkItems = normItems(menu.breakfast?.items ?? def.breakfast?.items ?? []);
-    if (bkPlates.length || bkItems.length) {
-      cats.push({ id: "breakfast", name: "Breakfast", icon: "🍳", plates: bkPlates, items: bkItems });
-    }
-
-    const lPlates = normItems(menu.lunch?.plates ?? def.lunch?.plates ?? []);
-    const lItems = normLunch(menu.lunch?.items ?? []);
-    if (lPlates.length || lItems.length) {
-      cats.push({ id: "lunch", name: "Lunch", icon: "🍽", plates: lPlates, items: lItems, hasLunchItems: true });
-    }
-
-    const beers = data.beer || [];
-    if (beers.length) {
-      cats.push({ id: "beer", name: "Beer", icon: "🍺", items: beers, isBeer: true });
-    }
-
-    const cf = menu.crawfish || {};
-    const cfShow = cf.show !== false;
-    const cfItems = normItems(cf.items ?? def.crawfish?.items ?? []);
-    if (cfShow && cfItems.length) {
-      cats.push({ id: "crawfish", name: "Crawfish", icon: "🦞", items: cfItems, isCrawfish: true });
-    }
-
-    const salad = menu.salad || def.salad || {};
-    const sPricing = normItems(salad.items ?? []);
-    const sBar = salad.saladBar || {};
-    if (sPricing.length || sBar.lettuce?.length || sBar.toppings?.length) {
-      cats.push({ id: "salad", name: "Salad Bar", icon: "🥗", pricing: sPricing, saladBar: sBar });
-    }
-
-    const drItems = normItems(menu.drinks?.items ?? def.drinks?.items ?? []);
-    if (drItems.length) {
-      cats.push({ id: "drinks", name: "Drinks", icon: "🥤", items: drItems });
-    }
-
-    const dsItems = normItems(menu.dessert?.items ?? def.dessert?.items ?? []);
-    if (dsItems.length) {
-      cats.push({ id: "dessert", name: "Dessert", icon: "🍮", items: dsItems });
-    }
-
+    const menu=getMenu(isoDate)||{};const def=data.defaults||{};const cats=[];
+    const bkP=normItems(menu.breakfast?.plates??def.breakfast?.plates??[]);
+    const bkI=normItems(menu.breakfast?.items??def.breakfast?.items??[]);
+    if(bkP.length||bkI.length)cats.push({id:"breakfast",name:"Breakfast",icon:"🍳",plates:bkP,items:bkI});
+    const lP=normItems(menu.lunch?.plates??def.lunch?.plates??[]);
+    const lI=normLunch(menu.lunch?.items??[]);
+    if(lP.length||lI.length)cats.push({id:"lunch",name:"Lunch",icon:"🍽",plates:lP,items:lI,hasLunchItems:true});
+    const beers=data.beer||[];
+    if(beers.length)cats.push({id:"beer",name:"Beer",icon:"🍺",items:beers,isBeer:true});
+    const cf=menu.crawfish||{};const cfShow=cf.show!==false;
+    const cfI=normItems(cf.items??def.crawfish?.items??[]);
+    if(cfShow&&cfI.length)cats.push({id:"crawfish",name:"Crawfish",icon:"🦞",items:cfI,isCrawfish:true});
+    const salad=menu.salad||def.salad||{};const sP=normItems(salad.items??[]);const sB=salad.saladBar||{};
+    if(sP.length||sB.lettuce?.length||sB.toppings?.length)cats.push({id:"salad",name:"Salad Bar",icon:"🥗",pricing:sP,saladBar:sB});
+    const drI=normItems(menu.drinks?.items??def.drinks?.items??[]);
+    if(drI.length)cats.push({id:"drinks",name:"Drinks",icon:"🥤",items:drI});
+    const dsI=normItems(menu.dessert?.items??def.dessert?.items??[]);
+    if(dsI.length)cats.push({id:"dessert",name:"Dessert",icon:"🍮",items:dsI});
     return cats;
   }
 
-  // ── RENDER: LUNCH ITEMS AS REGULAR LIST ──
+  // ── RENDER: Lunch items as flat list ──
   function renderLunchList(items) {
-    let html = `<ul class="item-list">`;
-    items.forEach(item => {
-      const desc = item.desc || data.settings.noDescriptionText || "";
-      html += `
-        <li class="lunch-list-item" onclick="this.classList.toggle('expanded')">
-          <div class="lunch-item-name">${esc(item.name)}</div>
-          <div class="lunch-item-desc">${esc(desc)}</div>
-          <div class="lunch-hint">tap for details</div>
-        </li>`;
+    let h=`<ul class="item-list">`;
+    items.forEach(item=>{
+      const desc=item.desc||data.settings.noDescriptionText||"";
+      h+=`<li class="lunch-list-item" onclick="this.classList.toggle('expanded')"><div class="lunch-item-name">${esc(item.name)}</div><div class="lunch-item-desc">${esc(desc)}</div><div class="lunch-hint">tap for details</div></li>`;
     });
-    html += `</ul>`;
-    return html;
+    return h+`</ul>`;
   }
 
-  // ── RENDER: LUNCH ITEMS AS 3D MODEL CARDS ──
-  function renderLunch3D(items) {
-    let html = `<div class="model-grid">`;
+  // ── RENDER: Lunch items wrapping around 3D model ──
+  function renderLunch3DWrap(items) {
+    const togoPath = (data.settings.modelBasePath||"models/") + "to-go-box" + (data.settings.modelExtension||".glb");
+    let h = `<div class="lunch-3d-wrap">`;
+
+    // Float spacers to create the exclusion zone in the center
+    h += `<div class="float-left-block"></div>`;
+    h += `<div class="float-right-block"></div>`;
+
+    // The 3D model, absolutely positioned in the center gap
+    h += `<div style="position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:2;pointer-events:none;width:100%;display:flex;justify-content:center;padding-top:20px;">`;
+    h += `<div class="lunch-3d-model-container" style="pointer-events:auto;">`;
+    h += `<model-viewer
+            src="${esc(togoPath)}"
+            alt="To-go box 3D model"
+            auto-rotate
+            rotation-per-second="14deg"
+            camera-orbit="25deg 70deg 105%"
+            shadow-intensity="0.5"
+            environment-image="neutral"
+            style="width:100%;height:100%;--poster-color:transparent;"
+            onerror="this.style.display='none';this.parentElement.querySelector('.model-fallback-icon').style.display='flex';"
+          ></model-viewer>`;
+    h += `<div class="model-fallback-icon">📦</div>`;
+    h += `</div></div>`;
+
+    // The flowing items
+    h += `<div class="lunch-3d-items-flow">`;
     items.forEach(item => {
-      const mp = modelPath(item.name);
-      html += `
-        <div class="model-card" onclick="this.classList.toggle('expanded')">
-          <div class="model-stage">
-            <model-viewer
-              src="${esc(mp)}"
-              alt="${esc(item.name)} 3D model"
-              auto-rotate
-              rotation-per-second="20deg"
-              camera-orbit="0deg 65deg 105%"
-              shadow-intensity="0.4"
-              environment-image="neutral"
-              style="width:100%;height:100%;--poster-color:transparent;"
-              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-            ></model-viewer>
-            <div class="model-placeholder" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;">🍽</div>
-          </div>
-          <div class="model-info">
-            <div class="model-item-name">${esc(item.name)}</div>
-          </div>
-          <div class="model-desc">${esc(item.desc || data.settings.noDescriptionText)}</div>
-          <div class="model-card-hint">tap for details</div>
-        </div>`;
+      h += `<div class="lunch-3d-item" onclick="this.classList.toggle('expanded')">
+              <div class="l3d-name">${esc(item.name)}</div>
+              <div class="l3d-desc">${esc(item.desc || data.settings.noDescriptionText || "")}</div>
+              <div class="l3d-hint">tap for details</div>
+            </div>`;
     });
-    html += `</div>`;
-    return html;
+    h += `</div>`;
+
+    // Clear floats
+    h += `<div style="clear:both"></div>`;
+    h += `</div>`;
+    return h;
   }
 
-  // ── RENDER CATEGORY HTML ──────────────
   function renderCatHTML(cat) {
-    let html = `<div class="cat-header"><span class="cat-name">${cat.icon} ${esc(cat.name)}</span><span class="cat-tag">${cat.isBeer ? "Ice Cold" : cat.isCrawfish ? "Seasonal" : cat.id === "salad" ? "Build Your Own" : "Daily"}</span></div>`;
+    let html=`<div class="cat-header"><span class="cat-name">${cat.icon} ${esc(cat.name)}</span><span class="cat-tag">${cat.isBeer?"Ice Cold":cat.isCrawfish?"Seasonal":cat.id==="salad"?"Build Your Own":"Daily"}</span></div>`;
+    if(cat.plates?.length)html+=`<div class="section-label">Plates &amp; Pricing</div><div class="plates-row">${cat.plates.map(p=>`<div class="plate-card">${esc(p)}</div>`).join("")}</div>`;
 
-    // Plates
-    if (cat.plates?.length) {
-      html += `<div class="section-label">Plates &amp; Pricing</div><div class="plates-row">${cat.plates.map(p => `<div class="plate-card">${esc(p)}</div>`).join("")}</div>`;
-    }
-
-    // Lunch items — render based on 3D toggle state
-    if (cat.hasLunchItems && cat.items?.length) {
-      html += `<div class="section-label">Today's Items</div>`;
-      html += `<div class="lunch-items-container" data-lunch="true">`;
-      if (is3D) {
-        html += renderLunch3D(cat.items);
+    if(cat.hasLunchItems&&cat.items?.length){
+      html+=`<div class="section-label">Today's Items</div>`;
+      if(is3D){
+        html+=renderLunch3DWrap(cat.items);
       } else {
-        html += renderLunchList(cat.items);
+        html+=renderLunchList(cat.items);
       }
-      html += `</div>`;
     }
 
-    // Simple item list (breakfast, drinks, dessert, beer)
-    if (!cat.hasLunchItems && cat.items?.length) {
-      html += `<div class="section-label">${cat.isBeer ? "Available" : "Items"}</div><ul class="item-list">`;
-      cat.items.forEach(item => {
-        const name = typeof item === "string" ? item : item.name;
-        html += `<li class="${cat.isBeer ? "beer-item" : ""}">${cat.isBeer ? "🍺 " : ""}${esc(name)}</li>`;
-      });
-      html += `</ul>`;
+    if(!cat.hasLunchItems&&cat.items?.length){
+      html+=`<div class="section-label">${cat.isBeer?"Available":"Items"}</div><ul class="item-list">`;
+      cat.items.forEach(item=>{const name=typeof item==="string"?item:item.name;html+=`<li class="${cat.isBeer?"beer-item":""}">${cat.isBeer?"🍺 ":""}${esc(name)}</li>`;});
+      html+=`</ul>`;
     }
 
-    // Salad Bar
-    if (cat.id === "salad") {
-      if (cat.pricing?.length) {
-        html += `<div class="section-label">Pricing</div><ul class="item-list">${cat.pricing.map(p => `<li>${esc(p)}</li>`).join("")}</ul>`;
-      }
-      const sb = cat.saladBar || {};
-      html += `<div class="section-label">Salad Bar</div><div class="salad-grid">`;
-      if (sb.lettuce?.length) html += `<div><div class="salad-col-title">Lettuce</div><ul class="item-list">${sb.lettuce.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
-      if (sb.toppings?.length) html += `<div><div class="salad-col-title">Toppings</div><ul class="item-list">${sb.toppings.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
-      if (sb.dressing?.length) html += `<div><div class="salad-col-title">Dressing</div><ul class="item-list">${sb.dressing.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
-      html += `</div>`;
+    if(cat.id==="salad"){
+      if(cat.pricing?.length)html+=`<div class="section-label">Pricing</div><ul class="item-list">${cat.pricing.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`;
+      const sb=cat.saladBar||{};
+      html+=`<div class="section-label">Salad Bar</div><div class="salad-grid">`;
+      if(sb.lettuce?.length)html+=`<div><div class="salad-col-title">Lettuce</div><ul class="item-list">${sb.lettuce.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`;
+      if(sb.toppings?.length)html+=`<div><div class="salad-col-title">Toppings</div><ul class="item-list">${sb.toppings.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`;
+      if(sb.dressing?.length)html+=`<div><div class="salad-col-title">Dressing</div><ul class="item-list">${sb.dressing.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`;
+      html+=`</div>`;
     }
 
-    // Crawfish
-    if (cat.isCrawfish) {
-      html = `<div class="crawfish-banner">${html}</div>`;
-    }
-
+    if(cat.isCrawfish)html=`<div class="crawfish-banner">${html}</div>`;
     return html;
   }
 
-  // ── STORE PANEL STATE for rebuild on toggle ──
-  let panelConfigs = [];  // { prefix, isoDate, dayName }
+  let panelConfigs = [];
 
-  // ── INIT A PANEL (today/tomorrow) ─────
   function initPanel(prefix, isoDate, dayName) {
-    // Store config for rebuilds
     panelConfigs.push({ prefix, isoDate, dayName });
-
-    const h = biz(dayName);
-    const closure = getClosure(dayName);
-    const hoursEl = $(`${prefix}Hours`);
-
-    if (closure?.closed) {
+    const h=biz(dayName);const closure=getClosure(dayName);const hoursEl=$(`${prefix}Hours`);
+    if(closure?.closed){
       $(`${prefix}Closed`)?.classList.remove("hide");
-      const msg = $(`${prefix}ClosedMsg`);
-      if (msg) msg.textContent = closure.message || "See you next time!";
-      if (hoursEl) hoursEl.textContent = `${dayName}: Closed`;
-      return;
+      const msg=$(`${prefix}ClosedMsg`);if(msg)msg.textContent=closure.message||"See you next time!";
+      if(hoursEl)hoursEl.textContent=`${dayName}: Closed`;return;
     }
-
-    if (hoursEl) {
-      hoursEl.innerHTML = `<strong>${dayName}</strong> ${h.open} – ${h.close} · Breakfast ${h.breakfast} · Lunch ${h.lunch}${h.crawfish ? ` · Crawfish ${h.crawfish}` : ""}`;
-    }
-
-    buildPanelContent(prefix, isoDate, dayName);
+    if(hoursEl)hoursEl.innerHTML=`<strong>${dayName}</strong> ${h.open} – ${h.close} · Breakfast ${h.breakfast} · Lunch ${h.lunch}${h.crawfish?` · Crawfish ${h.crawfish}`:""}`;
+    buildPanelContent(prefix,isoDate,dayName);
   }
 
   function buildPanelContent(prefix, isoDate, dayName) {
-    const catNavEl = $(`${prefix}CatNav`);
-    const sectionsEl = $(`${prefix}CatSections`);
-    if (!catNavEl || !sectionsEl) return;
-
-    // Remember which category was active
-    const activeBtn = catNavEl.querySelector(".cat-btn.active");
-    const activeIdx = activeBtn ? activeBtn.dataset.idx : "0";
-
-    const cats = buildCats(isoDate);
-
-    catNavEl.innerHTML = cats.map((c, i) =>
-      `<button class="cat-btn${c.isBeer ? " beer-btn" : ""}${String(i) === activeIdx ? " active" : ""}" data-idx="${i}">${c.icon} ${esc(c.name)}</button>`
-    ).join("");
-
-    sectionsEl.innerHTML = cats.map((c, i) =>
-      `<div class="cat-section${String(i) === activeIdx ? " visible" : ""}" data-idx="${i}">${renderCatHTML(c)}</div>`
-    ).join("");
-
-    const btns = catNavEl.querySelectorAll(".cat-btn");
-    const secs = sectionsEl.querySelectorAll(".cat-section");
-    btns.forEach(btn => {
-      btn.addEventListener("click", () => {
-        const idx = btn.dataset.idx;
-        btns.forEach(b => b.classList.toggle("active", b.dataset.idx === idx));
-        secs.forEach(s => s.classList.toggle("visible", s.dataset.idx === idx));
-      });
-    });
-
-    return { selectByName(name) {
-      const idx = cats.findIndex(c => c.name === name);
-      if (idx < 0) return;
-      btns.forEach(b => b.classList.toggle("active", b.dataset.idx === String(idx)));
-      secs.forEach(s => s.classList.toggle("visible", s.dataset.idx === String(idx)));
-    }};
+    const catNavEl=$(`${prefix}CatNav`);const sectionsEl=$(`${prefix}CatSections`);
+    if(!catNavEl||!sectionsEl)return;
+    const activeBtn=catNavEl.querySelector(".cat-btn.active");
+    const activeIdx=activeBtn?activeBtn.dataset.idx:"0";
+    const cats=buildCats(isoDate);
+    catNavEl.innerHTML=cats.map((c,i)=>`<button class="cat-btn${c.isBeer?" beer-btn":""}${String(i)===activeIdx?" active":""}" data-idx="${i}">${c.icon} ${esc(c.name)}</button>`).join("");
+    sectionsEl.innerHTML=cats.map((c,i)=>`<div class="cat-section${String(i)===activeIdx?" visible":""}" data-idx="${i}">${renderCatHTML(c)}</div>`).join("");
+    const btns=catNavEl.querySelectorAll(".cat-btn");const secs=sectionsEl.querySelectorAll(".cat-section");
+    btns.forEach(btn=>{btn.addEventListener("click",()=>{const idx=btn.dataset.idx;btns.forEach(b=>b.classList.toggle("active",b.dataset.idx===idx));secs.forEach(s=>s.classList.toggle("visible",s.dataset.idx===idx));});});
+    return{selectByName(name){const idx=cats.findIndex(c=>c.name===name);if(idx<0)return;btns.forEach(b=>b.classList.toggle("active",b.dataset.idx===String(idx)));secs.forEach(s=>s.classList.toggle("visible",s.dataset.idx===String(idx)));}};
   }
 
-  // ── REBUILD ALL PANELS (on 3D toggle) ──
   function rebuildAllPanels() {
-    panelConfigs.forEach(cfg => {
-      buildPanelContent(cfg.prefix, cfg.isoDate, cfg.dayName);
-    });
-    // Also rebuild advanced
-    const tabsEl = $("advDayTabs");
-    const cardsEl = $("advCards");
-    if (tabsEl && cardsEl) {
-      tabsEl.innerHTML = "";
-      cardsEl.innerHTML = "";
-      buildAdvanced(panelConfigs[0]?.isoDate || toISO(new Date()));
-    }
+    panelConfigs.forEach(cfg=>buildPanelContent(cfg.prefix,cfg.isoDate,cfg.dayName));
+    const tabsEl=$("advDayTabs"),cardsEl=$("advCards");
+    if(tabsEl&&cardsEl){tabsEl.innerHTML="";cardsEl.innerHTML="";buildAdvanced(panelConfigs[0]?.isoDate||toISO(new Date()));}
   }
 
-  // ── 3D TOGGLE HANDLER ─────────────────
-  toggle3dCheckbox.addEventListener("change", function() {
+  // 3D toggle handler
+  $("toggle3dCheckbox").addEventListener("change", function() {
     is3D = this.checked;
-    toggle3dBar.classList.toggle("glow-on", is3D);
-    toggle3dLabel.textContent = is3D ? "3D View ON" : "View in 3D";
+    $("toggle3dBar").classList.toggle("glow-on", is3D);
+    $("toggle3dLabel").textContent = is3D ? "3D View ON" : "View in 3D";
     rebuildAllPanels();
   });
 
-  // ── STATUS BADGE ──────────────────────
   function updateStatus(dayName, isoDate) {
-    const todayISO = toISO(new Date());
-    const isToday = isoDate === todayISO;
-    const h = biz(dayName);
-    const closure = getClosure(dayName);
-    const dot = $("statusDot");
-    const txt = $("statusText");
-    const sub = $("heroSub");
-
-    if (closure?.closed) {
-      dot.className = "status-dot closed";
-      txt.textContent = "CLOSED – " + (closure.message || "");
-      if (sub) sub.textContent = dayName + " · Closed";
-      return;
-    }
-
-    if (!isToday) {
-      dot.className = "status-dot warn";
-      txt.textContent = dayName + " · Opens at " + h.open;
-      if (sub) sub.textContent = `${dayName} · ${h.open} – ${h.close}`;
-      return;
-    }
-
-    const now = new Date();
-    const mins = now.getHours() * 60 + now.getMinutes();
-    const isOpen = inRange(mins, `${h.open} – ${h.close}`) || (h.crawfish && inRange(mins, h.crawfish));
-
-    dot.className = "status-dot " + (isOpen ? "open" : "closed");
-
-    if (isOpen) {
-      if (mins < t12("10:30 AM")) {
-        const left = t12("10:30 AM") - mins;
-        txt.textContent = `BREAKFAST · ${left} min left`;
-      } else if (mins < t12("11:00 AM")) {
-        txt.textContent = "TRANSITION · Lunch at 11:00 AM";
-      } else if (h.crawfish && inRange(mins, h.crawfish)) {
-        txt.textContent = "NOW SERVING CRAWFISH";
-      } else {
-        txt.textContent = "NOW SERVING LUNCH";
-      }
-    } else {
-      txt.textContent = "CLOSED · Opens " + h.open;
-    }
-
-    if (sub) sub.textContent = `${dayName} · ${h.open} – ${h.close}`;
+    const todayISO=toISO(new Date());const isToday=isoDate===todayISO;
+    const h=biz(dayName);const closure=getClosure(dayName);
+    const dot=$("statusDot"),txt=$("statusText"),sub=$("heroSub");
+    if(closure?.closed){dot.className="status-dot closed";txt.textContent="CLOSED – "+(closure.message||"");if(sub)sub.textContent=dayName+" · Closed";return;}
+    if(!isToday){dot.className="status-dot warn";txt.textContent=dayName+" · Opens at "+h.open;if(sub)sub.textContent=`${dayName} · ${h.open} – ${h.close}`;return;}
+    const now=new Date();const mins=now.getHours()*60+now.getMinutes();
+    const isOpen=inRange(mins,`${h.open} – ${h.close}`)||(h.crawfish&&inRange(mins,h.crawfish));
+    dot.className="status-dot "+(isOpen?"open":"closed");
+    if(isOpen){
+      if(mins<t12("10:30 AM")){const left=t12("10:30 AM")-mins;txt.textContent=`BREAKFAST · ${left} min left`;}
+      else if(mins<t12("11:00 AM"))txt.textContent="TRANSITION · Lunch at 11:00 AM";
+      else if(h.crawfish&&inRange(mins,h.crawfish))txt.textContent="NOW SERVING CRAWFISH";
+      else txt.textContent="NOW SERVING LUNCH";
+    } else txt.textContent="CLOSED · Opens "+h.open;
+    if(sub)sub.textContent=`${dayName} · ${h.open} – ${h.close}`;
   }
 
-  // ── ADVANCED / WEEKLY FORECAST ────────
   function buildAdvanced(startISO) {
-    const tabsEl = $("advDayTabs");
-    const cardsEl = $("advCards");
-    const discEl = $("advDisclaimer");
-    if (!tabsEl || !cardsEl) return;
-
-    if (discEl) discEl.textContent = data.settings.advancedDisclaimer || "Lunch forecast — subject to change.";
-
-    const start = parseISO(startISO);
-    const entries = [];
-
-    for (let i = 0; i < (data.settings.advancedWindowDays || 7); i++) {
-      const d = new Date(start);
-      d.setDate(start.getDate() + i);
-      const iso = toISO(d);
-      const dayName = wkDay(d);
-      const h = biz(dayName);
-      const closure = getClosure(dayName);
-      const dayMenu = getMenu(iso);
-      const def = data.defaults || {};
-
-      const tab = document.createElement("button");
-      tab.className = "adv-day-tab" + (i === 0 ? " active" : "");
-      tab.textContent = `${dayName.slice(0,3)} ${d.getMonth()+1}/${d.getDate()}`;
-      tabsEl.appendChild(tab);
-
-      const card = document.createElement("div");
-      card.className = "adv-card" + (i === 0 ? " visible" : "");
-
-      const lp = normItems(dayMenu?.lunch?.plates ?? def.lunch?.plates ?? []);
-      const li = normLunch(dayMenu?.lunch?.items ?? []);
-
-      let inner = `<div class="adv-card-title">${esc(dayName)}</div>`;
-      inner += `<div class="adv-card-sub">${esc(fmtDate(d))} · ${closure?.closed ? "Closed" : `Lunch ${h.lunch}`}</div>`;
-
-      if (closure?.closed) {
-        inner += `<p style="color:var(--text-mid)">${esc(closure.message || "Closed")}</p>`;
-      } else {
-        if (lp.length) {
-          inner += `<div class="section-label">Plates</div><div class="plates-row">${lp.map(p => `<div class="plate-card">${esc(p)}</div>`).join("")}</div>`;
-        }
-        if (li.length) {
-          inner += `<div class="section-label">Lunch Items</div>`;
-          if (is3D) {
-            // 3D mode
-            inner += `<div class="model-grid">`;
-            li.forEach(item => {
-              const mp = modelPath(item.name);
-              inner += `
-                <div class="model-card" onclick="this.classList.toggle('expanded')">
-                  <div class="model-stage" style="height:160px">
-                    <model-viewer
-                      src="${esc(mp)}"
-                      alt="${esc(item.name)}"
-                      auto-rotate
-                      rotation-per-second="20deg"
-                      camera-orbit="0deg 65deg 105%"
-                      shadow-intensity="0.3"
-                      environment-image="neutral"
-                      style="width:100%;height:100%;--poster-color:transparent;"
-                      onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-                    ></model-viewer>
-                    <div class="model-placeholder" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;">🍽</div>
-                  </div>
-                  <div class="model-info"><div class="model-item-name">${esc(item.name)}</div></div>
-                  <div class="model-desc">${esc(item.desc || "")}</div>
-                  <div class="model-card-hint">tap for details</div>
-                </div>`;
-            });
-            inner += `</div>`;
-          } else {
-            // Regular list mode
-            inner += `<ul class="item-list">`;
-            li.forEach(item => {
-              inner += `
-                <li class="lunch-list-item" onclick="this.classList.toggle('expanded')">
-                  <div class="lunch-item-name">${esc(item.name)}</div>
-                  <div class="lunch-item-desc">${esc(item.desc || "")}</div>
-                  <div class="lunch-hint">tap for details</div>
-                </li>`;
-            });
-            inner += `</ul>`;
-          }
-        } else {
-          inner += `<p style="color:var(--text-dim);margin-top:12px">Lunch menu not posted yet — check back soon.</p>`;
-        }
+    const tabsEl=$("advDayTabs"),cardsEl=$("advCards"),discEl=$("advDisclaimer");
+    if(!tabsEl||!cardsEl)return;
+    if(discEl)discEl.textContent=data.settings.advancedDisclaimer||"Lunch forecast — subject to change.";
+    const start=parseISO(startISO);const entries=[];
+    for(let i=0;i<(data.settings.advancedWindowDays||7);i++){
+      const d=new Date(start);d.setDate(start.getDate()+i);
+      const iso=toISO(d);const dayName=wkDay(d);const h=biz(dayName);
+      const closure=getClosure(dayName);const dayMenu=getMenu(iso);const def=data.defaults||{};
+      const tab=document.createElement("button");tab.className="adv-day-tab"+(i===0?" active":"");
+      tab.textContent=`${dayName.slice(0,3)} ${d.getMonth()+1}/${d.getDate()}`;tabsEl.appendChild(tab);
+      const card=document.createElement("div");card.className="adv-card"+(i===0?" visible":"");
+      const lp=normItems(dayMenu?.lunch?.plates??def.lunch?.plates??[]);
+      const li=normLunch(dayMenu?.lunch?.items??[]);
+      let inner=`<div class="adv-card-title">${esc(dayName)}</div><div class="adv-card-sub">${esc(fmtDate(d))} · ${closure?.closed?"Closed":`Lunch ${h.lunch}`}</div>`;
+      if(closure?.closed){inner+=`<p style="color:var(--text-mid)">${esc(closure.message||"Closed")}</p>`;}
+      else{
+        if(lp.length)inner+=`<div class="section-label">Plates</div><div class="plates-row">${lp.map(p=>`<div class="plate-card">${esc(p)}</div>`).join("")}</div>`;
+        if(li.length){
+          inner+=`<div class="section-label">Lunch Items</div>`;
+          if(is3D){inner+=renderLunch3DWrap(li);}
+          else{inner+=renderLunchList(li);}
+        }else{inner+=`<p style="color:var(--text-dim);margin-top:12px">Lunch menu not posted yet — check back soon.</p>`;}
       }
-
-      card.innerHTML = inner;
-      cardsEl.appendChild(card);
-      entries.push({ tab, card });
+      card.innerHTML=inner;cardsEl.appendChild(card);entries.push({tab,card});
     }
-
-    entries.forEach((e, idx) => {
-      e.tab.addEventListener("click", () => {
-        entries.forEach((item, i) => {
-          item.tab.classList.toggle("active", i === idx);
-          item.card.classList.toggle("visible", i === idx);
-        });
-      });
-    });
+    entries.forEach((e,idx)=>{e.tab.addEventListener("click",()=>{entries.forEach((item,i)=>{item.tab.classList.toggle("active",i===idx);item.card.classList.toggle("visible",i===idx);});});});
   }
 
-  // ── DAY TAB SWITCHING ─────────────────
   function setupDayTabs() {
-    const tabs = [$("tabToday"), $("tabTomorrow"), $("tabAdvanced")];
-    const panels = [$("panelToday"), $("panelTomorrow"), $("panelAdvanced")];
-    tabs.forEach((tab, i) => {
-      tab?.addEventListener("click", () => {
-        tabs.forEach((t, ti) => t.classList.toggle("active", ti === i));
-        panels.forEach((p, pi) => p.classList.toggle("visible", pi === i));
-      });
-    });
+    const tabs=[$("tabToday"),$("tabTomorrow"),$("tabAdvanced")];
+    const panels=[$("panelToday"),$("panelTomorrow"),$("panelAdvanced")];
+    tabs.forEach((tab,i)=>{tab?.addEventListener("click",()=>{tabs.forEach((t,ti)=>t.classList.toggle("active",ti===i));panels.forEach((p,pi)=>p.classList.toggle("visible",pi===i));});});
   }
 
-  // ── FLASH MODAL ───────────────────────
-  let flashTimer = null, flashInterval = null;
-  function showFlash(title, text) {
-    const modal = $("flashModal");
-    const cnt = $("flashCount");
-    if (!modal) return;
-    $("flashTitle").textContent = title;
-    $("flashText").textContent = text;
-    if (flashTimer) clearTimeout(flashTimer);
-    if (flashInterval) clearInterval(flashInterval);
-    let r = 5;
-    cnt.textContent = r;
-    modal.classList.add("show");
-    flashInterval = setInterval(() => { r--; if (r > 0) cnt.textContent = r; else clearInterval(flashInterval); }, 1000);
-    flashTimer = setTimeout(() => hideFlash(), 5000);
-  }
-  function hideFlash() {
-    if (flashTimer) { clearTimeout(flashTimer); flashTimer = null; }
-    if (flashInterval) { clearInterval(flashInterval); flashInterval = null; }
-    $("flashModal")?.classList.remove("show");
-  }
-  $("flashModal")?.addEventListener("click", hideFlash);
-  $("flashModal")?.querySelector(".flash-card")?.addEventListener("click", e => e.stopPropagation());
-  window.addEventListener("keydown", e => { if (e.key === "Escape") hideFlash(); });
+  let flashTimer=null,flashInterval=null;
+  function showFlash(title,text){const modal=$("flashModal"),cnt=$("flashCount");if(!modal)return;$("flashTitle").textContent=title;$("flashText").textContent=text;if(flashTimer)clearTimeout(flashTimer);if(flashInterval)clearInterval(flashInterval);let r=5;cnt.textContent=r;modal.classList.add("show");flashInterval=setInterval(()=>{r--;if(r>0)cnt.textContent=r;else clearInterval(flashInterval);},1000);flashTimer=setTimeout(()=>hideFlash(),5000);}
+  function hideFlash(){if(flashTimer){clearTimeout(flashTimer);flashTimer=null;}if(flashInterval){clearInterval(flashInterval);flashInterval=null;}$("flashModal")?.classList.remove("show");}
+  $("flashModal")?.addEventListener("click",hideFlash);
+  $("flashModal")?.querySelector(".flash-card")?.addEventListener("click",e=>e.stopPropagation());
+  window.addEventListener("keydown",e=>{if(e.key==="Escape")hideFlash();});
 
-  // ── HASH ROUTING ──────────────────────
-  function handleHash(todayApi) {
-    const hash = (window.location.hash || "").replace("#","").toLowerCase();
-    if (!hash) return;
-    if (hash === "tomorrow") { $("tabTomorrow")?.click(); return; }
-    if (hash === "advanced" || hash === "forecast") { $("tabAdvanced")?.click(); return; }
-    const catMap = { breakfast: "Breakfast", lunch: "Lunch", beer: "Beer", crawfish: "Crawfish", salad: "Salad Bar", drinks: "Drinks", dessert: "Dessert" };
-    if (catMap[hash] && todayApi) todayApi.selectByName(catMap[hash]);
+  function handleHash(todayApi){
+    const hash=(window.location.hash||"").replace("#","").toLowerCase();if(!hash)return;
+    if(hash==="tomorrow"){$("tabTomorrow")?.click();return;}
+    if(hash==="advanced"||hash==="forecast"){$("tabAdvanced")?.click();return;}
+    const catMap={breakfast:"Breakfast",lunch:"Lunch",beer:"Beer",crawfish:"Crawfish",salad:"Salad Bar",drinks:"Drinks",dessert:"Dessert"};
+    if(catMap[hash]&&todayApi)todayApi.selectByName(catMap[hash]);
   }
 
-  // ── INIT ──────────────────────────────
   setupDayTabs();
-
-  const now = new Date();
-  const todayISO = toISO(now);
-  const todayName = wkDay(now);
-  const tom = new Date(now); tom.setDate(now.getDate() + 1);
-  const tomorrowISO = toISO(tom);
-  const tomorrowName = wkDay(tom);
-
-  let dTI = todayISO, dTN = todayName, dToI = tomorrowISO, dToN = tomorrowName;
-  const ct = getClosure(todayName);
-  if (pastClose(todayName) && !ct?.closed) {
-    dTI = tomorrowISO; dTN = tomorrowName;
-    const da = new Date(now); da.setDate(now.getDate() + 2);
-    dToI = toISO(da); dToN = wkDay(da);
-  }
-
-  $("tabToday").textContent = dTN;
-  $("tabTomorrow").textContent = dToN;
-
-  panelConfigs = [];  // reset before building
-  initPanel("today", dTI, dTN);
-  initPanel("tomorrow", dToI, dToN);
-  buildAdvanced(dTI);
-  updateStatus(dTN, dTI);
-
-  setInterval(() => updateStatus(dTN, dTI), 60000);
-
-  setTimeout(() => handleHash(null), 150);
-  window.addEventListener("hashchange", () => handleHash(null));
-
+  const now=new Date();const todayISO=toISO(now);const todayName=wkDay(now);
+  const tom=new Date(now);tom.setDate(now.getDate()+1);
+  const tomorrowISO=toISO(tom);const tomorrowName=wkDay(tom);
+  let dTI=todayISO,dTN=todayName,dToI=tomorrowISO,dToN=tomorrowName;
+  const ct=getClosure(todayName);
+  if(pastClose(todayName)&&!ct?.closed){dTI=tomorrowISO;dTN=tomorrowName;const da=new Date(now);da.setDate(now.getDate()+2);dToI=toISO(da);dToN=wkDay(da);}
+  $("tabToday").textContent=dTN;$("tabTomorrow").textContent=dToN;
+  panelConfigs=[];
+  initPanel("today",dTI,dTN);initPanel("tomorrow",dToI,dToN);
+  buildAdvanced(dTI);updateStatus(dTN,dTI);
+  setInterval(()=>updateStatus(dTN,dTI),60000);
+  setTimeout(()=>handleHash(null),150);
+  window.addEventListener("hashchange",()=>handleHash(null));
 })();
 </script>
 
