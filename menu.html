@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hot Headz Southern Foods – Menu</title>
+  <title>Hot Headz Southern Foods – Menu (Test)</title>
   <meta name="description" content="Hot Headz Southern Foods full menu — breakfast, lunch, beer, salad bar, drinks and dessert. DeRidder, LA." />
 
   <!-- Fonts -->
@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- model-viewer for 3D -->
+  <!-- model-viewer for 3D (only loaded when toggled on) -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 
   <style>
@@ -269,6 +269,87 @@
     }
     .section-label:first-child { margin-top: 0; }
 
+    /* ══════════════════════════════════════
+       3D TOGGLE SWITCH
+       ══════════════════════════════════════ */
+    .toggle-3d-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin: 6px 0 18px;
+      padding: 14px 20px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      transition: all 0.3s ease;
+    }
+    .toggle-3d-bar.glow-on {
+      border-color: var(--accent);
+      box-shadow: 0 0 24px var(--accent-glow), 0 0 60px rgba(232,121,43,0.08);
+      background: linear-gradient(135deg, var(--surface) 0%, rgba(232,121,43,0.06) 100%);
+    }
+    .toggle-3d-label {
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-mid);
+      user-select: none;
+      transition: color 0.2s;
+    }
+    .toggle-3d-bar.glow-on .toggle-3d-label {
+      color: var(--accent-light);
+    }
+    .toggle-3d-icon {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    /* The actual toggle switch */
+    .toggle-switch {
+      position: relative;
+      width: 56px;
+      height: 30px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      transition: all 0.3s ease;
+    }
+    .toggle-switch input:checked + .toggle-track {
+      background: var(--accent);
+      border-color: var(--accent-light);
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+    .toggle-knob {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+    }
+    .toggle-switch input:checked ~ .toggle-knob {
+      left: 29px;
+      background: #fff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3), 0 0 8px var(--accent-glow);
+    }
+
     /* ── 3D MODEL GRID ─────────────────── */
     .model-grid {
       display: grid;
@@ -360,6 +441,38 @@
     .item-list li:hover {
       border-color: var(--border-warm);
       background: var(--surface-raised);
+    }
+
+    /* ── LUNCH LIST ITEM (with tap-to-expand desc) ── */
+    .lunch-list-item {
+      cursor: pointer;
+    }
+    .lunch-list-item .lunch-item-name {
+      font-weight: 600;
+    }
+    .lunch-list-item .lunch-item-desc {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      font-size: 13px;
+      color: var(--text-mid);
+      line-height: 1.5;
+      margin-top: 0;
+    }
+    .lunch-list-item.expanded .lunch-item-desc {
+      max-height: 80px;
+      opacity: 1;
+      margin-top: 6px;
+    }
+    .lunch-list-item .lunch-hint {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 2px;
+      font-weight: 600;
+    }
+    .lunch-list-item.expanded .lunch-hint {
+      display: none;
     }
 
     /* Beer items */
@@ -585,6 +698,18 @@
     </div>
   </nav>
 
+  <!-- ═══════ 3D TOGGLE ═══════ -->
+  <div class="toggle-3d-bar" id="toggle3dBar">
+    <span class="toggle-3d-icon">🍽</span>
+    <span class="toggle-3d-label" id="toggle3dLabel">View in 3D</span>
+    <label class="toggle-switch">
+      <input type="checkbox" id="toggle3dCheckbox" />
+      <div class="toggle-track"></div>
+      <div class="toggle-knob"></div>
+    </label>
+    <span class="toggle-3d-icon">🎲</span>
+  </div>
+
   <!-- ════════════ TODAY PANEL ════════════ -->
   <div class="panel visible" id="panelToday">
     <div class="hours-line" id="todayHours"></div>
@@ -709,6 +834,12 @@
     return base + slug + ext;
   }
 
+  // ── 3D TOGGLE STATE ───────────────────
+  let is3D = false;
+  const toggle3dCheckbox = $("toggle3dCheckbox");
+  const toggle3dBar = $("toggle3dBar");
+  const toggle3dLabel = $("toggle3dLabel");
+
   // ── DATA ACCESS ───────────────────────
   const data = (typeof MENU_DATA !== "undefined") ? MENU_DATA : null;
   if (!data) { $("loadError")?.classList.remove("hide"); return; }
@@ -741,27 +872,23 @@
     const def = data.defaults || {};
     const cats = [];
 
-    // Breakfast
     const bkPlates = normItems(menu.breakfast?.plates ?? def.breakfast?.plates ?? []);
     const bkItems = normItems(menu.breakfast?.items ?? def.breakfast?.items ?? []);
     if (bkPlates.length || bkItems.length) {
       cats.push({ id: "breakfast", name: "Breakfast", icon: "🍳", plates: bkPlates, items: bkItems });
     }
 
-    // Lunch (with 3D models)
     const lPlates = normItems(menu.lunch?.plates ?? def.lunch?.plates ?? []);
     const lItems = normLunch(menu.lunch?.items ?? []);
     if (lPlates.length || lItems.length) {
-      cats.push({ id: "lunch", name: "Lunch", icon: "🍽", plates: lPlates, items: lItems, has3d: true });
+      cats.push({ id: "lunch", name: "Lunch", icon: "🍽", plates: lPlates, items: lItems, hasLunchItems: true });
     }
 
-    // Beer
     const beers = data.beer || [];
     if (beers.length) {
       cats.push({ id: "beer", name: "Beer", icon: "🍺", items: beers, isBeer: true });
     }
 
-    // Crawfish
     const cf = menu.crawfish || {};
     const cfShow = cf.show !== false;
     const cfItems = normItems(cf.items ?? def.crawfish?.items ?? []);
@@ -769,7 +896,6 @@
       cats.push({ id: "crawfish", name: "Crawfish", icon: "🦞", items: cfItems, isCrawfish: true });
     }
 
-    // Salad Bar
     const salad = menu.salad || def.salad || {};
     const sPricing = normItems(salad.items ?? []);
     const sBar = salad.saladBar || {};
@@ -777,19 +903,65 @@
       cats.push({ id: "salad", name: "Salad Bar", icon: "🥗", pricing: sPricing, saladBar: sBar });
     }
 
-    // Drinks
     const drItems = normItems(menu.drinks?.items ?? def.drinks?.items ?? []);
     if (drItems.length) {
       cats.push({ id: "drinks", name: "Drinks", icon: "🥤", items: drItems });
     }
 
-    // Dessert
     const dsItems = normItems(menu.dessert?.items ?? def.dessert?.items ?? []);
     if (dsItems.length) {
       cats.push({ id: "dessert", name: "Dessert", icon: "🍮", items: dsItems });
     }
 
     return cats;
+  }
+
+  // ── RENDER: LUNCH ITEMS AS REGULAR LIST ──
+  function renderLunchList(items) {
+    let html = `<ul class="item-list">`;
+    items.forEach(item => {
+      const desc = item.desc || data.settings.noDescriptionText || "";
+      html += `
+        <li class="lunch-list-item" onclick="this.classList.toggle('expanded')">
+          <div class="lunch-item-name">${esc(item.name)}</div>
+          <div class="lunch-item-desc">${esc(desc)}</div>
+          <div class="lunch-hint">tap for details</div>
+        </li>`;
+    });
+    html += `</ul>`;
+    return html;
+  }
+
+  // ── RENDER: LUNCH ITEMS AS 3D MODEL CARDS ──
+  function renderLunch3D(items) {
+    let html = `<div class="model-grid">`;
+    items.forEach(item => {
+      const mp = modelPath(item.name);
+      html += `
+        <div class="model-card" onclick="this.classList.toggle('expanded')">
+          <div class="model-stage">
+            <model-viewer
+              src="${esc(mp)}"
+              alt="${esc(item.name)} 3D model"
+              auto-rotate
+              rotation-per-second="20deg"
+              camera-orbit="0deg 65deg 105%"
+              shadow-intensity="0.4"
+              environment-image="neutral"
+              style="width:100%;height:100%;--poster-color:transparent;"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+            ></model-viewer>
+            <div class="model-placeholder" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;">🍽</div>
+          </div>
+          <div class="model-info">
+            <div class="model-item-name">${esc(item.name)}</div>
+          </div>
+          <div class="model-desc">${esc(item.desc || data.settings.noDescriptionText)}</div>
+          <div class="model-card-hint">tap for details</div>
+        </div>`;
+    });
+    html += `</div>`;
+    return html;
   }
 
   // ── RENDER CATEGORY HTML ──────────────
@@ -801,39 +973,20 @@
       html += `<div class="section-label">Plates &amp; Pricing</div><div class="plates-row">${cat.plates.map(p => `<div class="plate-card">${esc(p)}</div>`).join("")}</div>`;
     }
 
-    // 3D Model cards (lunch items)
-    if (cat.has3d && cat.items?.length) {
-      html += `<div class="section-label">Today's Items</div><div class="model-grid">`;
-      cat.items.forEach(item => {
-        const mp = modelPath(item.name);
-        html += `
-          <div class="model-card" onclick="this.classList.toggle('expanded')">
-            <div class="model-stage">
-              <model-viewer
-                src="${esc(mp)}"
-                alt="${esc(item.name)} 3D model"
-                auto-rotate
-                rotation-per-second="20deg"
-                camera-orbit="0deg 65deg 105%"
-                shadow-intensity="0.4"
-                environment-image="neutral"
-                style="width:100%;height:100%;--poster-color:transparent;"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-              ></model-viewer>
-              <div class="model-placeholder" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;">🍽</div>
-            </div>
-            <div class="model-info">
-              <div class="model-item-name">${esc(item.name)}</div>
-            </div>
-            <div class="model-desc">${esc(item.desc || data.settings.noDescriptionText)}</div>
-            <div class="model-card-hint">tap for details</div>
-          </div>`;
-      });
+    // Lunch items — render based on 3D toggle state
+    if (cat.hasLunchItems && cat.items?.length) {
+      html += `<div class="section-label">Today's Items</div>`;
+      html += `<div class="lunch-items-container" data-lunch="true">`;
+      if (is3D) {
+        html += renderLunch3D(cat.items);
+      } else {
+        html += renderLunchList(cat.items);
+      }
       html += `</div>`;
     }
 
     // Simple item list (breakfast, drinks, dessert, beer)
-    if (!cat.has3d && cat.items?.length) {
+    if (!cat.hasLunchItems && cat.items?.length) {
       html += `<div class="section-label">${cat.isBeer ? "Available" : "Items"}</div><ul class="item-list">`;
       cat.items.forEach(item => {
         const name = typeof item === "string" ? item : item.name;
@@ -863,13 +1016,17 @@
     return html;
   }
 
+  // ── STORE PANEL STATE for rebuild on toggle ──
+  let panelConfigs = [];  // { prefix, isoDate, dayName }
+
   // ── INIT A PANEL (today/tomorrow) ─────
   function initPanel(prefix, isoDate, dayName) {
+    // Store config for rebuilds
+    panelConfigs.push({ prefix, isoDate, dayName });
+
     const h = biz(dayName);
     const closure = getClosure(dayName);
     const hoursEl = $(`${prefix}Hours`);
-    const catNavEl = $(`${prefix}CatNav`);
-    const sectionsEl = $(`${prefix}CatSections`);
 
     if (closure?.closed) {
       $(`${prefix}Closed`)?.classList.remove("hide");
@@ -883,20 +1040,28 @@
       hoursEl.innerHTML = `<strong>${dayName}</strong> ${h.open} – ${h.close} · Breakfast ${h.breakfast} · Lunch ${h.lunch}${h.crawfish ? ` · Crawfish ${h.crawfish}` : ""}`;
     }
 
-    const cats = buildCats(isoDate);
+    buildPanelContent(prefix, isoDate, dayName);
+  }
+
+  function buildPanelContent(prefix, isoDate, dayName) {
+    const catNavEl = $(`${prefix}CatNav`);
+    const sectionsEl = $(`${prefix}CatSections`);
     if (!catNavEl || !sectionsEl) return;
 
-    // Category nav buttons
+    // Remember which category was active
+    const activeBtn = catNavEl.querySelector(".cat-btn.active");
+    const activeIdx = activeBtn ? activeBtn.dataset.idx : "0";
+
+    const cats = buildCats(isoDate);
+
     catNavEl.innerHTML = cats.map((c, i) =>
-      `<button class="cat-btn${c.isBeer ? " beer-btn" : ""}${i === 0 ? " active" : ""}" data-idx="${i}">${c.icon} ${esc(c.name)}</button>`
+      `<button class="cat-btn${c.isBeer ? " beer-btn" : ""}${String(i) === activeIdx ? " active" : ""}" data-idx="${i}">${c.icon} ${esc(c.name)}</button>`
     ).join("");
 
-    // Category sections
     sectionsEl.innerHTML = cats.map((c, i) =>
-      `<div class="cat-section${i === 0 ? " visible" : ""}" data-idx="${i}">${renderCatHTML(c)}</div>`
+      `<div class="cat-section${String(i) === activeIdx ? " visible" : ""}" data-idx="${i}">${renderCatHTML(c)}</div>`
     ).join("");
 
-    // Nav click handler
     const btns = catNavEl.querySelectorAll(".cat-btn");
     const secs = sectionsEl.querySelectorAll(".cat-section");
     btns.forEach(btn => {
@@ -914,6 +1079,29 @@
       secs.forEach(s => s.classList.toggle("visible", s.dataset.idx === String(idx)));
     }};
   }
+
+  // ── REBUILD ALL PANELS (on 3D toggle) ──
+  function rebuildAllPanels() {
+    panelConfigs.forEach(cfg => {
+      buildPanelContent(cfg.prefix, cfg.isoDate, cfg.dayName);
+    });
+    // Also rebuild advanced
+    const tabsEl = $("advDayTabs");
+    const cardsEl = $("advCards");
+    if (tabsEl && cardsEl) {
+      tabsEl.innerHTML = "";
+      cardsEl.innerHTML = "";
+      buildAdvanced(panelConfigs[0]?.isoDate || toISO(new Date()));
+    }
+  }
+
+  // ── 3D TOGGLE HANDLER ─────────────────
+  toggle3dCheckbox.addEventListener("change", function() {
+    is3D = this.checked;
+    toggle3dBar.classList.toggle("glow-on", is3D);
+    toggle3dLabel.textContent = is3D ? "3D View ON" : "View in 3D";
+    rebuildAllPanels();
+  });
 
   // ── STATUS BADGE ──────────────────────
   function updateStatus(dayName, isoDate) {
@@ -985,13 +1173,11 @@
       const dayMenu = getMenu(iso);
       const def = data.defaults || {};
 
-      // Tab
       const tab = document.createElement("button");
       tab.className = "adv-day-tab" + (i === 0 ? " active" : "");
       tab.textContent = `${dayName.slice(0,3)} ${d.getMonth()+1}/${d.getDate()}`;
       tabsEl.appendChild(tab);
 
-      // Card
       const card = document.createElement("div");
       card.className = "adv-card" + (i === 0 ? " visible" : "");
 
@@ -1008,31 +1194,47 @@
           inner += `<div class="section-label">Plates</div><div class="plates-row">${lp.map(p => `<div class="plate-card">${esc(p)}</div>`).join("")}</div>`;
         }
         if (li.length) {
-          inner += `<div class="section-label">Lunch Items</div><div class="model-grid">`;
-          li.forEach(item => {
-            const mp = modelPath(item.name);
-            inner += `
-              <div class="model-card" onclick="this.classList.toggle('expanded')">
-                <div class="model-stage" style="height:160px">
-                  <model-viewer
-                    src="${esc(mp)}"
-                    alt="${esc(item.name)}"
-                    auto-rotate
-                    rotation-per-second="20deg"
-                    camera-orbit="0deg 65deg 105%"
-                    shadow-intensity="0.3"
-                    environment-image="neutral"
-                    style="width:100%;height:100%;--poster-color:transparent;"
-                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-                  ></model-viewer>
-                  <div class="model-placeholder" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;">🍽</div>
-                </div>
-                <div class="model-info"><div class="model-item-name">${esc(item.name)}</div></div>
-                <div class="model-desc">${esc(item.desc || "")}</div>
-                <div class="model-card-hint">tap for details</div>
-              </div>`;
-          });
-          inner += `</div>`;
+          inner += `<div class="section-label">Lunch Items</div>`;
+          if (is3D) {
+            // 3D mode
+            inner += `<div class="model-grid">`;
+            li.forEach(item => {
+              const mp = modelPath(item.name);
+              inner += `
+                <div class="model-card" onclick="this.classList.toggle('expanded')">
+                  <div class="model-stage" style="height:160px">
+                    <model-viewer
+                      src="${esc(mp)}"
+                      alt="${esc(item.name)}"
+                      auto-rotate
+                      rotation-per-second="20deg"
+                      camera-orbit="0deg 65deg 105%"
+                      shadow-intensity="0.3"
+                      environment-image="neutral"
+                      style="width:100%;height:100%;--poster-color:transparent;"
+                      onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+                    ></model-viewer>
+                    <div class="model-placeholder" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;">🍽</div>
+                  </div>
+                  <div class="model-info"><div class="model-item-name">${esc(item.name)}</div></div>
+                  <div class="model-desc">${esc(item.desc || "")}</div>
+                  <div class="model-card-hint">tap for details</div>
+                </div>`;
+            });
+            inner += `</div>`;
+          } else {
+            // Regular list mode
+            inner += `<ul class="item-list">`;
+            li.forEach(item => {
+              inner += `
+                <li class="lunch-list-item" onclick="this.classList.toggle('expanded')">
+                  <div class="lunch-item-name">${esc(item.name)}</div>
+                  <div class="lunch-item-desc">${esc(item.desc || "")}</div>
+                  <div class="lunch-hint">tap for details</div>
+                </li>`;
+            });
+            inner += `</ul>`;
+          }
         } else {
           inner += `<p style="color:var(--text-dim);margin-top:12px">Lunch menu not posted yet — check back soon.</p>`;
         }
@@ -1110,7 +1312,6 @@
   const tomorrowISO = toISO(tom);
   const tomorrowName = wkDay(tom);
 
-  // If past closing, shift to tomorrow
   let dTI = todayISO, dTN = todayName, dToI = tomorrowISO, dToN = tomorrowName;
   const ct = getClosure(todayName);
   if (pastClose(todayName) && !ct?.closed) {
@@ -1122,17 +1323,16 @@
   $("tabToday").textContent = dTN;
   $("tabTomorrow").textContent = dToN;
 
-  const todayApi = initPanel("today", dTI, dTN);
+  panelConfigs = [];  // reset before building
+  initPanel("today", dTI, dTN);
   initPanel("tomorrow", dToI, dToN);
   buildAdvanced(dTI);
   updateStatus(dTN, dTI);
 
-  // Refresh status every minute
   setInterval(() => updateStatus(dTN, dTI), 60000);
 
-  // Handle hash links
-  setTimeout(() => handleHash(todayApi), 150);
-  window.addEventListener("hashchange", () => handleHash(todayApi));
+  setTimeout(() => handleHash(null), 150);
+  window.addEventListener("hashchange", () => handleHash(null));
 
 })();
 </script>
