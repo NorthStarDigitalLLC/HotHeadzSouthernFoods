@@ -1,392 +1,1141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-  <script defer src="/_vercel/insights/script.js"></script>
-  
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hot Headz Southern Foods – Menu</title>
   <meta name="description" content="Hot Headz Southern Foods full menu — breakfast, lunch, beer, salad bar, drinks and dessert. DeRidder, LA." />
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- model-viewer for 3D -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+
   <style>
-    *{box-sizing:border-box;margin:0;padding:0;}html,body{overflow-x:hidden;}
-    body{font-family:Inter,system-ui,sans-serif;color:rgba(255,255,255,.94);background:radial-gradient(900px 600px at 10% 10%,rgba(255,110,70,.18),transparent 60%),radial-gradient(900px 600px at 90% 0%,rgba(42,127,98,.16),transparent 60%),linear-gradient(180deg,#070604,#0b0806 45%,#050403);min-height:100vh;padding-bottom:90px;}
-    .app{min-height:100vh;padding:18px 14px 80px;position:relative;isolation:isolate;}
-    .app::before{content:"";position:absolute;inset:0;opacity:.1;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");}
-    .app>*{position:relative;z-index:1;}
-    .daybar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:10px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 16px 40px rgba(0,0,0,.28);}
-    .sticky{position:sticky;top:10px;z-index:20;margin-bottom:14px;}
-    .daybtn{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;border-radius:999px;font-weight:800;cursor:pointer;transition:.18s ease;white-space:nowrap;padding:10px 16px;}
-    .daybtn:hover{transform:translateY(-1px);}
-    .daybtn.active{background:linear-gradient(180deg,rgba(192,90,42,.75),rgba(160,65,28,.92));border-color:rgba(255,200,130,.5);box-shadow:0 10px 28px rgba(192,90,42,.32);}
-    .cat-tabbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0 16px;}
-    .cat-tab{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;border-radius:999px;font-weight:800;font-size:13px;cursor:pointer;padding:9px 16px;transition:.18s ease;white-space:nowrap;}
-    .cat-tab:hover{transform:translateY(-1px);}
-    .cat-tab.active{background:linear-gradient(180deg,rgba(192,90,42,.75),rgba(160,65,28,.92));border-color:rgba(255,200,130,.5);box-shadow:0 10px 22px rgba(192,90,42,.22);}
-    .cat-tab.beer-tab{border-color:rgba(130,180,255,.25);color:rgba(180,210,255,.9);}
-    .cat-tab.beer-tab.active{background:linear-gradient(180deg,rgba(40,80,160,.75),rgba(20,50,120,.92));border-color:rgba(130,180,255,.5);box-shadow:0 10px 22px rgba(40,80,160,.3);}
-    .header{text-align:center;padding:10px 8px 0;margin-bottom:12px;display:grid;gap:8px;justify-items:center;}
-    .title{font-size:clamp(24px,3.2vw,34px);font-weight:900;line-height:1.06;letter-spacing:-.03em;}
-    .subline{color:rgba(255,255,255,.76);font-weight:700;font-size:14px;text-align:center;line-height:1.5;}
-    .note{color:rgba(255,255,255,.6);font-size:13px;font-weight:600;text-align:center;line-height:1.5;width:min(760px,100%);}
-    .nowbar{white-space:normal;line-height:1.4;margin-top:8px;padding:10px 14px;border-radius:999px;font-weight:900;font-size:13px;letter-spacing:.05em;text-align:center;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);}
-    .nowbar.open{color:#5effad;box-shadow:0 0 12px rgba(94,255,173,.4);}
-    .nowbar.warn{color:#ffd27a;box-shadow:0 0 12px rgba(255,210,122,.4);}
-    .nowbar.closed{color:#ff8a8a;box-shadow:0 0 12px rgba(255,138,138,.4);}
-    .swipe-shell{margin-top:16px;display:grid;gap:10px;justify-items:center;}
-    .swipe-head{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;}
-    .swipe-track{width:min(760px,calc(100vw - 28px));display:flex;gap:16px;overflow-x:auto;padding:8px 4px 10px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
-    .swipe-track::-webkit-scrollbar{display:none;}
-    .chipnav{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:min(760px,calc(100vw - 28px));margin-top:4px;}
-    .chip{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;border-radius:999px;padding:9px 12px;font-size:12px;font-weight:800;cursor:pointer;transition:.18s ease;}
-    .chip.active{background:linear-gradient(180deg,rgba(192,90,42,.75),rgba(160,65,28,.92));border-color:rgba(255,200,130,.5);box-shadow:0 10px 22px rgba(192,90,42,.22);}
-    .pill{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;border-radius:999px;font-weight:800;cursor:pointer;transition:.18s ease;padding:10px 16px;}
-    .pill:hover{transform:translateY(-1px);}
-    .modehint{color:rgba(255,255,255,.66);font-size:12px;font-weight:700;text-align:center;margin-top:2px;}
-    .swipe-card{position:relative;flex:0 0 100%;scroll-snap-align:center;min-height:380px;border-radius:30px;padding:22px;overflow:hidden;background:radial-gradient(500px 240px at 10% 0%,rgba(255,148,92,.18),transparent 60%),radial-gradient(500px 240px at 100% 100%,rgba(68,224,170,.14),transparent 60%),linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.15);box-shadow:0 24px 60px rgba(0,0,0,.36);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);transform-style:preserve-3d;will-change:transform;animation:floatCard 6s ease-in-out infinite;}
-    .swipe-card.beer-card{background:radial-gradient(500px 240px at 10% 0%,rgba(40,80,200,.22),transparent 60%),radial-gradient(500px 240px at 100% 100%,rgba(68,170,224,.18),transparent 60%),linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));}
-    @keyframes floatCard{0%,100%{transform:translateY(0px)}50%{transform:translateY(-6px)}}
-    .swipe-card::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 20%,rgba(255,255,255,.1) 45%,transparent 70%);transform:translateX(-120%);animation:hologram 7s linear infinite;pointer-events:none;}
-    @keyframes hologram{to{transform:translateX(120%);}}
-    .swipe-card.active{box-shadow:0 0 40px rgba(255,149,91,.24),0 24px 60px rgba(0,0,0,.42);}
-    .card-meta{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:900;color:rgba(255,255,255,.7);padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);margin-bottom:10px;}
-    .card-meta.beer-meta{background:rgba(40,80,200,.15);border-color:rgba(130,180,255,.25);color:rgba(180,210,255,.9);}
-    .cat-title{font-size:clamp(24px,4vw,32px);font-weight:900;color:#ffb35a;margin-bottom:8px;border-bottom:2px solid rgba(255,179,90,.24);padding-bottom:8px;}
-    .cat-title.beer-title{color:#7eb8ff;border-bottom-color:rgba(126,184,255,.24);}
-    .section-label{margin:14px 0 8px;font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.68);}
-    .list{list-style:none;display:grid;gap:8px;text-align:left;}
-    .list li{background:rgba(255,255,255,.06);border-left:4px solid #c05a2a;border-radius:14px;padding:11px 12px;color:#f0e6d8;font-size:15px;}
-    .list li.beer-item{border-left-color:#4a80c8;color:#d8eaf0;background:rgba(40,80,180,.1);}
-    .list details{width:100%;}
-    .list details summary{cursor:pointer;font-weight:700;list-style:none;}
-    .list details summary::-webkit-details-marker{display:none;}
-    .desc{margin-top:7px;color:rgba(255,255,255,.78);font-size:13px;padding-left:4px;line-height:1.5;}
-    .beer-sign-wrap{margin:16px auto 0;border-radius:16px;overflow:hidden;border:1px solid rgba(130,180,255,.2);box-shadow:0 12px 36px rgba(0,0,0,.45);max-width:300px;display:block;}
-    .beer-sign-wrap img{width:100%;display:block;}
-    .beer-sign-caption{text-align:center;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(180,210,255,.45);margin-top:8px;}
-    .advanced-tabs{width:min(1100px,calc(100vw - 28px));display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:8px 4px 6px;}
-    .advanced-tab{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;border-radius:999px;padding:10px 14px;font-size:12px;font-weight:900;letter-spacing:.02em;cursor:pointer;transition:.18s ease;}
-    .advanced-tab.active{background:linear-gradient(180deg,rgba(192,90,42,.75),rgba(160,65,28,.92));border-color:rgba(255,200,130,.5);box-shadow:0 10px 22px rgba(192,90,42,.22);}
-    .advanced-card-wrap{width:min(760px,calc(100vw - 28px));padding:8px 4px 10px;}
-    .state{width:min(760px,calc(100vw - 28px));border:1px solid rgba(255,255,255,.12);border-radius:28px;padding:20px;background:rgba(255,255,255,.05);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 16px 44px rgba(0,0,0,.26);}
-    .statusbar{display:inline-flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:10px;color:rgba(255,255,255,.74);font-size:12px;font-weight:800;letter-spacing:.04em;text-align:center;}
-    .statusdot{width:8px;height:8px;border-radius:50%;background:#5effad;box-shadow:0 0 12px rgba(94,255,173,.7);}
-    .statusdot.closed{background:#ff8a8a;box-shadow:0 0 12px rgba(255,138,138,.7);}
-    .back-btn{position:fixed;z-index:90;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(25,25,25,.92);border:1px solid rgba(192,90,42,.5);border-radius:999px;display:inline-flex;align-items:center;gap:10px;cursor:pointer;box-shadow:0 4px 24px rgba(0,0,0,.4);transition:all .2s ease;backdrop-filter:blur(8px);padding:12px 24px;text-decoration:none;color:#fff;font-family:Inter,sans-serif;font-weight:800;font-size:.9rem;letter-spacing:.08em;}
-    .back-btn:hover{transform:translateX(-50%) translateY(-2px);border-color:rgba(192,90,42,.85);box-shadow:0 8px 32px rgba(192,90,42,.25);}
-    .back-btn .back-arrow{font-size:1.1rem;color:#c05a2a;transition:transform .2s;}
-    .back-btn:hover .back-arrow{transform:translateX(-3px);}
-    .back-btn .back-label{color:rgba(255,255,255,.9);}
-    .back-btn .back-sub{font-size:.65rem;font-weight:600;opacity:.5;text-transform:uppercase;letter-spacing:.1em;margin-left:2px;}
-    .flash-overlay{position:fixed;inset:0;display:none;place-items:center;z-index:200;background:radial-gradient(circle at center,rgba(255,140,90,.18),rgba(0,0,0,.72));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:18px;}
-    .flash-overlay.show{display:grid;}
-    .flash-card{width:min(560px,calc(100vw - 24px));border-radius:30px;background:radial-gradient(500px 200px at 0% 0%,rgba(255,140,90,.24),transparent 60%),radial-gradient(500px 220px at 100% 100%,rgba(60,220,170,.18),transparent 60%),linear-gradient(180deg,rgba(255,255,255,.11),rgba(255,255,255,.05));border:1px solid rgba(255,255,255,.18);box-shadow:0 0 60px rgba(255,149,91,.22),0 20px 60px rgba(0,0,0,.45);padding:24px;text-align:center;animation:flashPop .32s ease;}
-    @keyframes flashPop{0%{transform:scale(.92);opacity:0}100%{transform:scale(1);opacity:1}}
-    .flash-title{font-size:30px;font-weight:900;color:#ffb35a;margin-bottom:10px;letter-spacing:-.03em;}
-    .flash-text{color:rgba(255,255,255,.86);font-size:15px;line-height:1.6;margin-bottom:16px;font-weight:700;}
-    .flash-count{display:inline-flex;align-items:center;justify-content:center;min-width:66px;height:66px;border-radius:999px;background:linear-gradient(180deg,rgba(255,160,90,.9),rgba(200,90,44,.95));color:#fff;font-weight:900;font-size:26px;box-shadow:0 0 30px rgba(255,149,91,.45);margin-bottom:12px;}
-    .flash-sub{color:rgba(255,255,255,.68);font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;}
-    .hide{display:none!important;}
+    :root {
+      --bg: #0c0a08;
+      --surface: #161210;
+      --surface-raised: #1e1a16;
+      --surface-glass: rgba(22, 18, 14, 0.75);
+      --border: rgba(255,255,255,0.08);
+      --border-warm: rgba(210,120,60,0.2);
+      --text: #f5f0ea;
+      --text-mid: rgba(245,240,234,0.7);
+      --text-dim: rgba(245,240,234,0.45);
+      --accent: #e8792b;
+      --accent-light: #ffb36b;
+      --accent-glow: rgba(232,121,43,0.35);
+      --ember: #c0421a;
+      --sage: #5a8a6a;
+      --sage-glow: rgba(90,138,106,0.3);
+      --beer-accent: #d4a843;
+      --beer-glow: rgba(212,168,67,0.25);
+      --radius-sm: 12px;
+      --radius-md: 20px;
+      --radius-lg: 28px;
+      --radius-pill: 999px;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+      --shadow-lg: 0 20px 60px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.3);
+      --shadow-glow: 0 0 40px var(--accent-glow), 0 0 80px rgba(232,121,43,0.1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      color: var(--text);
+      background: var(--bg);
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── GRAIN OVERLAY ─────────────────── */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ── AMBIENT BACKGROUND ────────────── */
+    .bg-glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 800px 500px at 15% 10%, rgba(232,121,43,0.08), transparent),
+        radial-gradient(ellipse 600px 600px at 85% 80%, rgba(90,138,106,0.06), transparent),
+        radial-gradient(ellipse 400px 400px at 50% 50%, rgba(192,66,26,0.04), transparent);
+    }
+
+    /* ── LAYOUT ─────────────────────────── */
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 16px 120px;
+    }
+
+    /* ── HEADER ─────────────────────────── */
+    .hero {
+      text-align: center;
+      padding: 40px 0 20px;
+    }
+    .hero-eyebrow {
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 6vw, 52px);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+    .hero-sub {
+      font-size: 15px;
+      color: var(--text-mid);
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    /* ── STATUS BADGE ──────────────────── */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      padding: 10px 20px;
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+    }
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .status-dot.open { background: #4ade80; box-shadow: 0 0 12px rgba(74,222,128,0.6); }
+    .status-dot.closed { background: #f87171; box-shadow: 0 0 12px rgba(248,113,113,0.6); }
+    .status-dot.warn { background: #fbbf24; box-shadow: 0 0 12px rgba(251,191,36,0.6); }
+
+    /* ── DAY TABS (sticky) ─────────────── */
+    .day-tabs-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: 12px 0;
+      background: linear-gradient(180deg, var(--bg) 60%, transparent);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .day-tabs {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .day-tab {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 22px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-mid);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .day-tab:hover { border-color: rgba(255,255,255,0.15); color: var(--text); }
+    .day-tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+
+    /* ── CATEGORY NAV ──────────────────── */
+    .cat-nav {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 8px 0 12px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .cat-nav::-webkit-scrollbar { display: none; }
+    .cat-btn {
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .cat-btn:hover { color: var(--text-mid); border-color: rgba(255,255,255,0.12); }
+    .cat-btn.active {
+      background: var(--surface-raised);
+      border-color: var(--border-warm);
+      color: var(--accent-light);
+    }
+    .cat-btn.beer-btn.active {
+      border-color: rgba(212,168,67,0.3);
+      color: var(--beer-accent);
+    }
+
+    /* ── PANEL ──────────────────────────── */
+    .panel { display: none; }
+    .panel.visible { display: block; }
+
+    /* ── HOURS LINE ─────────────────────── */
+    .hours-line {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-dim);
+      font-weight: 500;
+      padding: 4px 0 16px;
+      line-height: 1.6;
+    }
+    .hours-line strong { color: var(--text-mid); font-weight: 700; }
+
+    /* ── CATEGORY SECTION ──────────────── */
+    .cat-section { display: none; }
+    .cat-section.visible { display: block; }
+
+    .cat-header {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .cat-name {
+      font-family: var(--font-display);
+      font-size: clamp(26px, 4vw, 36px);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+    .cat-tag {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 24px 0 12px;
+      padding-left: 2px;
+    }
+    .section-label:first-child { margin-top: 0; }
+
+    /* ── 3D MODEL GRID ─────────────────── */
+    .model-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .model-card {
+      position: relative;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .model-card:hover {
+      border-color: var(--border-warm);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+    .model-card.expanded .model-desc {
+      max-height: 120px;
+      opacity: 1;
+      padding: 0 16px 16px;
+    }
+
+    .model-stage {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      background: radial-gradient(ellipse at center bottom, rgba(232,121,43,0.06), transparent 70%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .model-stage model-viewer {
+      width: 100%;
+      height: 100%;
+      --poster-color: transparent;
+    }
+    .model-placeholder {
+      font-size: 56px;
+      opacity: 0.15;
+      user-select: none;
+    }
+
+    .model-info {
+      padding: 14px 16px 6px;
+    }
+    .model-item-name {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .model-desc {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.35s ease;
+      font-size: 13px;
+      color: var(--text-mid);
+      line-height: 1.6;
+    }
+    .model-card-hint {
+      padding: 0 16px 12px;
+      font-size: 11px;
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+
+    /* ── SIMPLE LIST (breakfast, drinks, etc.) ── */
+    .item-list {
+      list-style: none;
+      display: grid;
+      gap: 6px;
+    }
+    .item-list li {
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.2s ease;
+    }
+    .item-list li:hover {
+      border-color: var(--border-warm);
+      background: var(--surface-raised);
+    }
+
+    /* Beer items */
+    .item-list li.beer-item {
+      border-color: rgba(212,168,67,0.12);
+    }
+    .item-list li.beer-item:hover {
+      border-color: rgba(212,168,67,0.25);
+      background: rgba(212,168,67,0.06);
+    }
+
+    /* ── PLATES (pricing cards) ─────────── */
+    .plates-row {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+    .plate-card {
+      padding: 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-warm);
+      background: linear-gradient(135deg, var(--surface) 0%, rgba(232,121,43,0.04) 100%);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* ── SALAD BAR COLUMNS ─────────────── */
+    .salad-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .salad-col-title {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--sage);
+      margin-bottom: 8px;
+    }
+
+    /* ── CRAWFISH SECTION ──────────────── */
+    .crawfish-banner {
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(192,66,26,0.2);
+      background: linear-gradient(135deg, var(--surface) 0%, rgba(192,66,26,0.06) 100%);
+      padding: 24px;
+    }
+    .crawfish-banner .cat-name { color: var(--ember); }
+
+    /* ── ADVANCED TAB ──────────────────── */
+    .adv-day-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .adv-day-tab {
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 9px 16px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .adv-day-tab.active {
+      background: var(--surface-raised);
+      border-color: var(--border-warm);
+      color: var(--accent-light);
+    }
+    .adv-card {
+      display: none;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 24px;
+    }
+    .adv-card.visible { display: block; }
+    .adv-card-title {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+    .adv-card-sub {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 16px;
+    }
+
+    /* ── CLOSED STATE ──────────────────── */
+    .closed-state {
+      text-align: center;
+      padding: 60px 20px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .closed-state h2 {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+    .closed-state p { color: var(--text-mid); font-size: 15px; }
+
+    /* ── BACK BUTTON ───────────────────── */
+    .back-btn {
+      position: fixed;
+      z-index: 90;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface);
+      border: 1px solid var(--border-warm);
+      border-radius: var(--radius-pill);
+      padding: 12px 28px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+      transition: all 0.2s ease;
+      backdrop-filter: blur(12px);
+    }
+    .back-btn:hover {
+      transform: translateX(-50%) translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: var(--shadow-glow);
+    }
+    .back-btn .arrow { color: var(--accent); font-size: 18px; }
+
+    /* ── FLASH/MODAL ───────────────────── */
+    .flash-overlay {
+      position: fixed; inset: 0;
+      display: none; place-items: center;
+      z-index: 200;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 18px;
+    }
+    .flash-overlay.show { display: grid; }
+    .flash-card {
+      width: min(480px, calc(100vw - 32px));
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-warm);
+      background: var(--surface);
+      padding: 32px;
+      text-align: center;
+      animation: flashIn 0.3s ease;
+    }
+    @keyframes flashIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .flash-title {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .flash-text { color: var(--text-mid); font-size: 15px; line-height: 1.6; margin-bottom: 16px; }
+    .flash-countdown {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 900;
+      font-size: 22px;
+      box-shadow: 0 0 30px var(--accent-glow);
+      margin-bottom: 12px;
+    }
+    .flash-sub { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); }
+
+    /* ── UTILITIES ──────────────────────── */
+    .hide { display: none !important; }
+
+    /* ── RESPONSIVE ─────────────────────── */
+    @media (max-width: 640px) {
+      .model-grid { grid-template-columns: 1fr; }
+      .plates-row { grid-template-columns: 1fr; }
+      .salad-grid { grid-template-columns: 1fr; }
+      .app { padding: 0 10px 120px; }
+    }
   </style>
 </head>
 <body>
+
+<div class="bg-glow"></div>
+
 <div class="app">
-  <div class="sticky">
-    <div class="daybar" role="tablist">
-      <button class="daybtn active" id="dayBtnToday" role="tab" aria-selected="true">Today</button>
-      <button class="daybtn" id="dayBtnTomorrow" role="tab" aria-selected="false">Tomorrow</button>
-      <button class="daybtn" id="dayBtnAdvanced" role="tab" aria-selected="false">Advanced Menu</button>
+
+  <!-- HEADER -->
+  <header class="hero">
+    <div class="hero-eyebrow">DeRidder, Louisiana</div>
+    <h1 class="hero-title">Hot Headz <em>Southern</em> Foods</h1>
+    <p class="hero-sub" id="heroSub">Loading menu&hellip;</p>
+    <div class="status-badge" id="statusBadge">
+      <span class="status-dot closed" id="statusDot"></span>
+      <span id="statusText">Checking&hellip;</span>
+    </div>
+  </header>
+
+  <!-- DAY TABS (sticky) -->
+  <nav class="day-tabs-wrap">
+    <div class="day-tabs">
+      <button class="day-tab active" id="tabToday">Today</button>
+      <button class="day-tab" id="tabTomorrow">Tomorrow</button>
+      <button class="day-tab" id="tabAdvanced">Weekly Forecast</button>
+    </div>
+  </nav>
+
+  <!-- ════════════ TODAY PANEL ════════════ -->
+  <div class="panel visible" id="panelToday">
+    <div class="hours-line" id="todayHours"></div>
+    <nav class="cat-nav" id="todayCatNav"></nav>
+    <div id="todayCatSections"></div>
+    <div class="closed-state hide" id="todayClosed">
+      <h2>Closed Today</h2>
+      <p id="todayClosedMsg">See you next time!</p>
     </div>
   </div>
 
-  <section class="panel" id="panel-today" role="tabpanel">
-    <div class="header">
-      <div class="title" id="todayTitle">Today's Menu</div>
-      <div class="subline" id="todayHours">Loading hours…</div>
-      <div class="note" id="todayNote"></div>
-      <div class="nowbar" id="todayNow"></div>
+  <!-- ════════════ TOMORROW PANEL ════════════ -->
+  <div class="panel" id="panelTomorrow">
+    <div class="hours-line" id="tomorrowHours"></div>
+    <nav class="cat-nav" id="tomorrowCatNav"></nav>
+    <div id="tomorrowCatSections"></div>
+    <div class="closed-state hide" id="tomorrowClosed">
+      <h2>Closed</h2>
+      <p id="tomorrowClosedMsg">See you next time!</p>
     </div>
-    <div class="cat-tabbar" id="todayCatTabs">
-      <button class="cat-tab active" data-cat="Breakfast" id="cat-breakfast">🍳 Breakfast</button>
-      <button class="cat-tab" data-cat="Lunch" id="cat-lunch">🍽 Lunch</button>
-      <button class="cat-tab beer-tab" data-cat="Beer" id="cat-beer">🍺 Beer</button>
-      <button class="cat-tab" data-cat="Crawfish" id="cat-crawfish">🦞 Crawfish</button>
-      <button class="cat-tab" data-cat="Salad Bar" id="cat-salad">🥗 Salad Bar</button>
-      <button class="cat-tab" data-cat="Drinks" id="cat-drinks">🥤 Drinks</button>
-      <button class="cat-tab" data-cat="Dessert" id="cat-dessert">🍮 Dessert</button>
-    </div>
-    <div id="todaySwipeView">
-      <div class="swipe-shell">
-        <div class="swipe-head">
-          <button class="pill" id="todayPrevCard"><i class="fas fa-chevron-left"></i></button>
-          <div class="subline" id="todayCardStatus">Swipe categories</div>
-          <button class="pill" id="todayNextCard"><i class="fas fa-chevron-right"></i></button>
-        </div>
-        <div class="swipe-track" id="todaySwipeTrack"></div>
-      </div>
-    </div>
-    <div class="state hide" id="todayClosed">
-      <div class="title" style="font-size:24px;">Closed</div>
-      <div class="subline" id="todayClosedMsg"></div>
-    </div>
-  </section>
+  </div>
 
-  <section class="panel hide" id="panel-tomorrow" role="tabpanel">
-    <div class="header">
-      <div class="title" id="tomorrowTitle">Tomorrow's Menu</div>
-      <div class="subline" id="tomorrowHours">Loading hours…</div>
-      <div class="note" id="tomorrowNote"></div>
-      <div class="nowbar" id="tomorrowNow"></div>
-    </div>
-    <div class="cat-tabbar" id="tomorrowCatTabs">
-      <button class="cat-tab active" data-cat="Breakfast">🍳 Breakfast</button>
-      <button class="cat-tab" data-cat="Lunch">🍽 Lunch</button>
-      <button class="cat-tab beer-tab" data-cat="Beer">🍺 Beer</button>
-      <button class="cat-tab" data-cat="Crawfish">🦞 Crawfish</button>
-      <button class="cat-tab" data-cat="Salad Bar">🥗 Salad Bar</button>
-      <button class="cat-tab" data-cat="Drinks">🥤 Drinks</button>
-      <button class="cat-tab" data-cat="Dessert">🍮 Dessert</button>
-    </div>
-    <div id="tomorrowSwipeView">
-      <div class="swipe-shell">
-        <div class="swipe-head">
-          <button class="pill" id="tomorrowPrevCard"><i class="fas fa-chevron-left"></i></button>
-          <div class="subline" id="tomorrowCardStatus">Swipe categories</div>
-          <button class="pill" id="tomorrowNextCard"><i class="fas fa-chevron-right"></i></button>
-        </div>
-        <div class="swipe-track" id="tomorrowSwipeTrack"></div>
-      </div>
-    </div>
-    <div class="state hide" id="tomorrowClosed">
-      <div class="title" style="font-size:24px;">Closed</div>
-      <div class="subline" id="tomorrowClosedMsg"></div>
-    </div>
-  </section>
+  <!-- ════════════ ADVANCED PANEL ════════════ -->
+  <div class="panel" id="panelAdvanced">
+    <div class="hours-line" id="advDisclaimer"></div>
+    <div class="adv-day-tabs" id="advDayTabs"></div>
+    <div id="advCards"></div>
+  </div>
 
-  <section class="panel hide" id="panel-advanced" role="tabpanel">
-    <div class="header">
-      <div class="title">Advanced Menu Forecast</div>
-      <div class="subline" id="advancedDisclaimer"></div>
-    </div>
-    <div class="swipe-shell">
-      <div class="advanced-tabs" id="advancedTabs"></div>
-      <div class="advanced-card-wrap" id="advancedTrack"></div>
-    </div>
-  </section>
-
-  <div class="state hide" id="loadError">
-    <div class="title" style="font-size:24px;">Menu couldn't load</div>
-    <div class="subline" id="loadErrorMsg">Try again in a moment.</div>
+  <!-- LOAD ERROR -->
+  <div class="closed-state hide" id="loadError">
+    <h2>Menu couldn't load</h2>
+    <p id="loadErrorMsg">Try again in a moment.</p>
   </div>
 </div>
 
 <a class="back-btn" href="index.html">
-  <span class="back-arrow">&#8592;</span>
-  <span class="back-label">Back</span>
-  <span class="back-sub">Home</span>
+  <span class="arrow">&#8592;</span> Back to Home
 </a>
 
-<div class="flash-overlay" id="luckModal">
+<!-- FLASH MODAL -->
+<div class="flash-overlay" id="flashModal">
   <div class="flash-card">
-    <div class="flash-count" id="luckCountdown">5</div>
-    <div class="flash-title" id="luckModalTitle">Currently closed</div>
-    <div class="flash-text" id="luckModalText"></div>
+    <div class="flash-countdown" id="flashCount">5</div>
+    <div class="flash-title" id="flashTitle">Closed</div>
+    <div class="flash-text" id="flashText"></div>
     <div class="flash-sub">Closing automatically</div>
   </div>
 </div>
 
+<!-- ═══════════════ DATA ═══════════════ -->
+<script src="menu-data.js"></script>
+
 <script>
-(function(){
-const $=id=>document.getElementById(id);
-const BEER_ITEMS=["Natural Light","Miller Lite","Coors Light","Bud Light","Budweiser","Michelob Ultra","Corona","Modelo"];
-function esc(s){return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");}
-function setText(id,t){const el=$(id);if(el)el.textContent=t||"";}
-function normItems(a){return Array.isArray(a)?a.map(x=>String(x||"").trim()).filter(Boolean):[];}
-function normLunch(a){const items=Array.isArray(a)?a:[];return items.map(r=>{if(r&&typeof r==="object")return{name:String(r.name||"").trim(),desc:String(r.desc||"").trim()};const s=String(r||"").trim();if(!s)return null;return{name:s,desc:""};}).filter(Boolean).filter(x=>x.name);}
-function toISO(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
-function fmtDate(d){return d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});}
-function wkDay(d){return d.toLocaleDateString("en-US",{weekday:"long"});}
-function parseISO(iso){const[y,m,d]=String(iso).split("-").map(Number);return new Date(y,(m||1)-1,d||1);}
-function normKey(k){const m=String(k||"").trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);if(!m)return null;return`${m[1]}-${String(Number(m[2])).padStart(2,"0")}-${String(Number(m[3])).padStart(2,"0")}`;}
-function biz(day){const l=String(day||"").toLowerCase();const o=l==="sunday"?"7:00 AM":(l==="saturday"?"6:00 AM":"5:30 AM");const c=l==="sunday"?"3:00 PM":"2:00 PM";return{day,open:o,close:c,breakfast:`${o} - 10:30 AM`,lunch:`11:00 AM - ${c}`,crawfish:["thursday","friday","saturday"].includes(l)?"4:00 PM - 8:00 PM":""};}
-function t12(s){if(!s)return null;const m=String(s).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);if(!m)return null;let h=parseInt(m[1],10);const min=parseInt(m[2],10);const ap=m[3].toUpperCase();if(ap==="PM"&&h!==12)h+=12;if(ap==="AM"&&h===12)h=0;return h*60+min;}
-function inRange(mins,r){if(!r||!String(r).includes("-"))return false;const[a,b]=String(r).split("-").map(s=>s.trim());const s=t12(a),e=t12(b);if(s==null||e==null)return false;return mins>=s&&mins<=e;}
-function getMenu(data,iso){return(data?.menus||{})[iso]||null;}
-function getCf(data,menu){const def=data?.defaults?.crawfish||{};const c=menu?.crawfish||{};return{show:c.show===false?false:true,items:normItems(c.items??def.items??[])};}
-function getClosure(data,day){const c=data?.closures||{};const k=Object.keys(c).find(k=>k.toLowerCase()===String(day||"").toLowerCase());return k?c[k]:null;}
-function pastClose(day){const h=biz(day);const cl=t12(h.close);if(cl==null)return false;const n=new Date();return(n.getHours()*60+n.getMinutes())>=cl;}
-function openMsg(day){const h=biz(day);return`${day} opens at ${h.open}. Breakfast until 10:30 AM, lunch at 11:00 AM${h.crawfish?`, crawfish ${h.crawfish}`:""}.`;}
+(function () {
+  "use strict";
 
-let lT=null,lC=null;
-function showFlash(title,text){const modal=$("luckModal"),cnt=$("luckCountdown");if(!modal||!cnt)return;setText("luckModalTitle",title);setText("luckModalText",text);if(lT)clearTimeout(lT);if(lC)clearInterval(lC);let r=5;cnt.textContent=r;modal.classList.add("show");lC=setInterval(()=>{r--;if(r>0)cnt.textContent=r;else{clearInterval(lC);lC=null;}},1000);lT=setTimeout(()=>hideFlash(),5000);}
-function hideFlash(){if(lT){clearTimeout(lT);lT=null;}if(lC){clearInterval(lC);lC=null;}$("luckModal")?.classList.remove("show");}
+  // ── HELPERS ────────────────────────────
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 
-async function fetchH(url){const r=await fetch(url,{credentials:"same-origin",cache:"no-store"});if(!r.ok)throw new Error(`Fetch failed ${r.status}`);return r.text();}
-function extractJson(html,label){const doc=new DOMParser().parseFromString(html,"text/html");const s=doc.querySelector("#hh-menu-data");if(!s)throw new Error(`No #hh-menu-data on ${label}`);const raw=(s.textContent||"").trim();if(!raw)throw new Error(`Empty on ${label}`);return JSON.parse(raw);}
-async function readData(){const urls=["menu-data.html","./menu-data.html","/menu-data.html"];let le=null;for(const url of urls){try{const html=await fetchH(url);const data=extractJson(html,url);const rm=data?.menus||{};const nm={};Object.keys(rm).forEach(k=>{const nk=normKey(k);if(nk)nm[nk]=rm[k];});data.menus=nm;return data;}catch(e){le=e;}}throw le||new Error("menu-data.html not found.");}
-
-function buildCats(data,isoDate){
-  const menu=getMenu(data,isoDate)||{};const def=data?.defaults||{};
-  const lunchItems=normLunch(menu.lunch?.items??def.lunch?.items??[]);
-  const cats=[
-    {name:"Breakfast",meta:"Morning favorites",plates:normItems(menu.breakfast?.plates??def.breakfast?.plates??[]),items:normItems(menu.breakfast?.items??def.breakfast?.items??[])},
-    {name:"Lunch",meta:"Daily plates",plates:normItems(menu.lunch?.plates??def.lunch?.plates??[]),items:lunchItems},
-    {name:"Beer",meta:"Ice cold",isBeer:true,items:BEER_ITEMS}
-  ];
-  const cf=getCf(data,menu);if(cf.show)cats.push({name:"Crawfish",meta:"Seasonal special",items:cf.items});
-  cats.push(
-    {name:"Salad Bar",meta:"Build your own",pricing:normItems(menu.salad?.items??def.salad?.items??[]),lettuce:normItems(menu.salad?.saladBar?.lettuce??def.salad?.saladBar?.lettuce??[]),toppings:normItems(menu.salad?.saladBar?.toppings??def.salad?.saladBar?.toppings??[]),dressing:normItems(menu.salad?.saladBar?.dressing??def.salad?.saladBar?.dressing??[])},
-    {name:"Drinks",meta:"Cold & hot",items:normItems(menu.drinks?.items??def.drinks?.items??[])},
-    {name:"Dessert",meta:"Sweet finish",items:normItems(menu.dessert?.items??def.dessert?.items??[])}
-  );
-  return cats.filter(c=>c.isBeer||(c.plates&&c.plates.length)||(c.items&&c.items.length)||(c.pricing&&c.pricing.length)||(c.lettuce&&c.lettuce.length)||(c.toppings&&c.toppings.length)||(c.dressing&&c.dressing.length));
-}
-
-function renderCat(cat,data){
-  if(cat.isBeer)return`<div class="section-label">Available Beers</div><ul class="list">${BEER_ITEMS.map(b=>`<li class="beer-item">🍺 ${esc(b)}</li>`).join("")}</ul>`;
-  let html="";
-  if(cat.plates?.length)html+=`<div class="section-label">Plates</div><ul class="list">${cat.plates.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
-  if(cat.items?.length)html+=`<div class="section-label">Items</div><ul class="list">`+cat.items.map(it=>{if(typeof it==="string")return`<li>${esc(it)}</li>`;return`<li><details><summary>${esc(it.name)}</summary><div class="desc">${esc(it.desc||"No description.")}</div></details></li>`;}).join("")+`</ul>`;
-  if(cat.pricing?.length)html+=`<div class="section-label">Pricing</div><ul class="list">${cat.pricing.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
-  if(cat.lettuce?.length)html+=`<div class="section-label">Lettuce</div><ul class="list">${cat.lettuce.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
-  if(cat.toppings?.length)html+=`<div class="section-label">Toppings</div><ul class="list">${cat.toppings.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
-  if(cat.dressing?.length)html+=`<div class="section-label">Dressing</div><ul class="list">${cat.dressing.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
-  return html||`<div class="subline">No items available.</div>`;
-}
-
-function initSwipe(prefix,cats,data){
-  const track=$(`${prefix}SwipeTrack`),prev=$(`${prefix}PrevCard`),next=$(`${prefix}NextCard`),chipNav=$(`${prefix}ChipNav`);
-  if(!track)return null;
-  track.innerHTML=cats.map((cat,i)=>`<article class="swipe-card${cat.isBeer?" beer-card":""}${i===0?" active":""}" data-index="${i}"><div class="card-meta${cat.isBeer?" beer-meta":""}">${esc(cat.meta||"")}</div><div class="cat-title${cat.isBeer?" beer-title":""}">${esc(cat.name)}</div>${renderCat(cat,data)}</article>`).join("");
-  if(chipNav)chipNav.innerHTML=cats.map((c,i)=>`<button class="chip${c.isBeer?" beer-tab":""}${i===0?" active":""}" data-index="${i}">${esc(c.name)}</button>`).join("");
-  const cards=Array.from(track.querySelectorAll(".swipe-card"));
-  const chips=Array.from((chipNav||document.createElement("div")).querySelectorAll(".chip"));
-  function ai(){return Math.round(track.scrollLeft/(track.clientWidth||1));}
-  function upd(){const idx=Math.max(0,Math.min(cats.length-1,ai()));setText(`${prefix}CardStatus`,`${cats[idx]?.name||""} \u2022 ${idx+1} / ${cats.length}`);cards.forEach((c,i)=>c.classList.toggle("active",i===idx));chips.forEach((c,i)=>c.classList.toggle("active",i===idx));}
-  function goTo(idx){const c=Math.max(0,Math.min(cats.length-1,idx));track.scrollTo({left:c*track.clientWidth,behavior:"smooth"});window.setTimeout(upd,220);}
-  prev?.addEventListener("click",()=>goTo(ai()-1));
-  next?.addEventListener("click",()=>goTo(ai()+1));
-  chips.forEach(ch=>ch.addEventListener("click",()=>goTo(Number(ch.dataset.index||0))));
-  track.addEventListener("scroll",()=>requestAnimationFrame(upd));
-  window.addEventListener("resize",upd);
-  const tabBar=$(`${prefix}CatTabs`);
-  if(tabBar)tabBar.querySelectorAll(".cat-tab").forEach(tab=>{tab.addEventListener("click",()=>{tabBar.querySelectorAll(".cat-tab").forEach(t=>t.classList.remove("active"));tab.classList.add("active");const idx=cats.findIndex(c=>c.name===tab.getAttribute("data-cat"));if(idx>=0)goTo(idx);});});
-  cards.forEach(card=>{card.addEventListener("pointermove",e=>{const r=card.getBoundingClientRect();card.style.transform=`perspective(1000px) rotateY(${((e.clientX-r.left)/r.width-0.5)*10}deg) rotateX(${((e.clientY-r.top)/r.height-0.5)*-10}deg)`;});card.addEventListener("pointerleave",()=>{card.style.transform="";});});
-  upd();
-  return{
-    selectByName(name){const idx=cats.findIndex(c=>c.name===name);if(idx>=0){goTo(idx);const card=cards[idx];if(card){card.classList.add("pulse");setTimeout(()=>card.classList.remove("pulse"),900);}}}
-  };
-}
-
-function updateNowBar(prefix,dayName,isoDate){
-  const el=document.getElementById(prefix+"Now");if(!el)return;
-  const todayISO=toISO(new Date());const h=biz(dayName);
-  if(isoDate!==todayISO){el.className="nowbar warn";el.textContent=dayName+" \u2022 Opens at "+h.open;return;}
-  const now=new Date();const mins=now.getHours()*60+now.getMinutes();
-  let text="",cls="";
-  if(!inRange(mins,h.open+" - "+h.close)&&!(h.crawfish&&inRange(mins,h.crawfish))){text="Closed \u2022 Opens "+h.open;cls="closed";}
-  else if(mins<10*60+30){const r=10*60+30-mins;text="Breakfast \u2022 Ends in "+r+" min";cls=r<30?"warn":"open";}
-  else if(mins<11*60){text="Transition \u2022 Lunch starts at 11:00 AM";cls="warn";}
-  else if(inRange(mins,h.lunch)){text="Now Serving Lunch";cls="open";}
-  else if(h.crawfish&&inRange(mins,h.crawfish)){text="Now Serving Crawfish";cls="open";}
-  else{text="Closed \u2022 Opens "+h.open;cls="closed";}
-  el.className="nowbar "+cls;el.textContent=text;
-}
-
-function initPanel(prefix,data,isoDate,displayName){
-  const h=biz(displayName);const closure=getClosure(data,displayName);
-  setText(`${prefix}Title`,`${displayName} (${fmtDate(parseISO(isoDate))}) Menu`);
-  setText(`${prefix}Hours`,closure?.closed?`${displayName}: Closed`:`${displayName}: ${h.open} \u2013 ${h.close} \u2022 Breakfast ${h.breakfast} \u2022 Lunch ${h.lunch}${h.crawfish?` \u2022 Crawfish ${h.crawfish}`:""}`);
-  const todayISO=toISO(new Date());const isToday=isoDate===todayISO;const nowMins=new Date().getHours()*60+new Date().getMinutes();
-  const noteEl=$(`${prefix}Note`);
-  let nowStatus="";
-  if(closure?.closed)nowStatus=`<span class="statusdot closed"></span> CLOSED`;
-  else if(!isToday)nowStatus=`<span class="statusdot closed"></span> SCHEDULED`;
-  else{const open=inRange(nowMins,`${h.open} - ${h.close}`)||(!!h.crawfish&&inRange(nowMins,h.crawfish));nowStatus=`<span class="statusdot ${open?"":"closed"}"></span>${open?"OPEN NOW":"CURRENTLY CLOSED"}`;}
-  if(noteEl)noteEl.innerHTML=`${esc(data?.hours?.note||"")}<div class="statusbar">${nowStatus}</div>`;
-  updateNowBar(prefix,displayName,isoDate);
-  if(closure?.closed){$(`${prefix}Closed`)?.classList.remove("hide");setText(`${prefix}ClosedMsg`,closure.message||"See you next time!");}
-  else $(`${prefix}Closed`)?.classList.add("hide");
-  const cats=buildCats(data,isoDate);
-  return initSwipe(prefix,cats,data);
-}
-
-function buildAdvanced(data,startISO){
-  const tabs=$("advancedTabs"),track=$("advancedTrack");if(!track||!tabs)return;
-  tabs.innerHTML="";track.innerHTML="";setText("advancedDisclaimer","Next 7 days — lunch forecast.");
-  const start=parseISO(startISO);const cards=[];
-  for(let i=0;i<7;i++){
-    const d=new Date(start);d.setDate(start.getDate()+i);
-    const iso=toISO(d);const dayName=wkDay(d);const h=biz(dayName);const closure=getClosure(data,dayName);const dayMenu=getMenu(data,iso);
-    const tab=document.createElement("button");tab.className="advanced-tab"+(i===0?" active":"");tab.type="button";tab.textContent=`${dayName.slice(0,3)} ${d.getMonth()+1}/${d.getDate()}`;tabs.appendChild(tab);
-    const card=document.createElement("article");card.className="swipe-card active"+(i===0?"":" hide");
-    const lp=normItems(dayMenu?.lunch?.plates??data?.defaults?.lunch?.plates??[]);
-    const li=normLunch(dayMenu?.lunch?.items??[]);
-    card.innerHTML=`<div class="card-meta">${esc(fmtDate(d))}</div><div class="cat-title">${esc(dayName)}</div><div class="subline">${closure?.closed?"Closed":(h.lunch?`Lunch ${esc(h.lunch)}`:"")}</div>${closure?.closed?`<div class="section-label">Status</div><ul class="list"><li>${esc(closure.message||"Closed")}</li></ul>`:`<div class="section-label">Plates</div><ul class="list">${lp.length?lp.map(x=>`<li>${esc(x)}</li>`).join(""):`<li>Check back for the menu.</li>`}</ul><div class="section-label">Lunch Items</div><ul class="list">${li.length?li.map(x=>`<li>${esc(x.name)}</li>`).join(""):`<li>Check back for the menu.</li>`}</ul>`}`;
-    track.appendChild(card);cards.push({tab,card});
+  function toISO(d) { return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+  function fmtDate(d) { return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }); }
+  function wkDay(d) { return d.toLocaleDateString("en-US", { weekday: "long" }); }
+  function parseISO(iso) { const [y,m,d] = String(iso).split("-").map(Number); return new Date(y,(m||1)-1,d||1); }
+  function normKey(k) {
+    const m = String(k||"").trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (!m) return null;
+    return `${m[1]}-${String(Number(m[2])).padStart(2,"0")}-${String(Number(m[3])).padStart(2,"0")}`;
   }
-  cards.forEach((e,idx)=>e.tab.addEventListener("click",()=>cards.forEach((item,i)=>{item.tab.classList.toggle("active",i===idx);item.card.classList.toggle("hide",i!==idx);})));
-}
 
-function setupDayTabs(){
-  const btns=[$("dayBtnToday"),$("dayBtnTomorrow"),$("dayBtnAdvanced")];
-  const panels=[$("panel-today"),$("panel-tomorrow"),$("panel-advanced")];
-  btns.forEach((btn,i)=>btn?.addEventListener("click",()=>{btns.forEach((b,bi)=>{b.classList.toggle("active",bi===i);b.setAttribute("aria-selected",bi===i?"true":"false");});panels.forEach((p,pi)=>p.classList.toggle("hide",pi!==i));}));
-}
-
-function initNav(){
-  $("luckModal")?.querySelector(".flash-card")?.addEventListener("click",e=>e.stopPropagation());
-  $("luckModal")?.addEventListener("click",()=>hideFlash());
-  window.addEventListener("keydown",e=>{if(e.key==="Escape")hideFlash();});
-}
-
-// HASH ROUTING — used by hotheadz-index.html for direct deep links
-// menu.html#lunch      → Lunch card
-// menu.html#beer       → Beer card  
-// menu.html#breakfast  → Breakfast card
-// menu.html#crawfish   → Crawfish card
-// menu.html#tomorrow   → Tomorrow tab
-// menu.html#advanced   → Advanced tab
-function handleHash(todayApi){
-  const hash=(window.location.hash||"").replace("#","").toLowerCase();
-  if(!hash)return;
-  if(hash==="tomorrow"){$("dayBtnTomorrow")?.click();return;}
-  if(hash==="advanced"){$("dayBtnAdvanced")?.click();return;}
-  const catMap={breakfast:"Breakfast",lunch:"Lunch",beer:"Beer",crawfish:"Crawfish",salad:"Salad Bar",drinks:"Drinks",dessert:"Dessert"};
-  const catName=catMap[hash];
-  if(catName&&todayApi){
-    todayApi.selectByName(catName);
-    const tabBar=$("todayCatTabs");
-    if(tabBar)tabBar.querySelectorAll(".cat-tab").forEach(t=>t.classList.toggle("active",t.getAttribute("data-cat")===catName));
+  function biz(day) {
+    const l = String(day||"").toLowerCase();
+    const o = l === "sunday" ? "7:00 AM" : (l === "saturday" ? "6:00 AM" : "5:30 AM");
+    const c = l === "sunday" ? "3:00 PM" : "2:00 PM";
+    return {
+      day, open: o, close: c,
+      breakfast: `${o} – 10:30 AM`,
+      lunch: `11:00 AM – ${c}`,
+      crawfish: ["thursday","friday","saturday","sunday"].includes(l) ? "4:00 PM – 8:00 PM" : ""
+    };
   }
-}
 
-setupDayTabs();initNav();
-(async function init(){
-  try{
-    const data=await readData();
-    const now=new Date();
-    const todayISO=toISO(now);const todayName=wkDay(now);
-    const tom=new Date(now);tom.setDate(now.getDate()+1);
-    const tomorrowISO=toISO(tom);const tomorrowName=wkDay(tom);
-    let dTI=todayISO,dTN=todayName,dToI=tomorrowISO,dToN=tomorrowName;
-    const ct=getClosure(data,todayName);
-    if(pastClose(todayName)&&!ct?.closed){dTI=tomorrowISO;dTN=tomorrowName;const da=new Date(now);da.setDate(now.getDate()+2);dToI=toISO(da);dToN=wkDay(da);}
-    setText("dayBtnToday",dTN);setText("dayBtnTomorrow",dToN);
-    const todayApi=initPanel("today",data,dTI,dTN);
-    initPanel("tomorrow",data,dToI,dToN);
-    buildAdvanced(data,dTI);
-    setTimeout(()=>{handleHash(todayApi);},150);
-    window.addEventListener("hashchange",()=>handleHash(todayApi));
-  }catch(e){
-    console.error(e);$("loadError")?.classList.remove("hide");setText("loadErrorMsg",String(e?.message||e));
+  function t12(s) {
+    if (!s) return null;
+    const m = String(s).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if (!m) return null;
+    let h = parseInt(m[1],10);
+    const min = parseInt(m[2],10);
+    const ap = m[3].toUpperCase();
+    if (ap === "PM" && h !== 12) h += 12;
+    if (ap === "AM" && h === 12) h = 0;
+    return h * 60 + min;
   }
-})();
+
+  function inRange(mins, r) {
+    if (!r || !String(r).includes("–") && !String(r).includes("-")) return false;
+    const [a,b] = String(r).split(/[–-]/).map(s => s.trim());
+    const s = t12(a), e = t12(b);
+    if (s == null || e == null) return false;
+    return mins >= s && mins <= e;
+  }
+
+  function pastClose(day) {
+    const h = biz(day);
+    const cl = t12(h.close);
+    if (cl == null) return false;
+    const n = new Date();
+    return (n.getHours() * 60 + n.getMinutes()) >= cl;
+  }
+
+  // ── MODEL PATH BUILDER ────────────────
+  function modelPath(itemName) {
+    const base = MENU_DATA.settings.modelBasePath || "models/";
+    const ext = MENU_DATA.settings.modelExtension || ".glb";
+    const slug = String(itemName).toLowerCase()
+      .replace(/&/g, "and")
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .trim();
+    return base + slug + ext;
+  }
+
+  // ── DATA ACCESS ───────────────────────
+  const data = (typeof MENU_DATA !== "undefined") ? MENU_DATA : null;
+  if (!data) { $("loadError")?.classList.remove("hide"); return; }
+
+  // Normalize menu keys
+  const rawMenus = data.menus || {};
+  const menus = {};
+  Object.keys(rawMenus).forEach(k => { const nk = normKey(k); if (nk) menus[nk] = rawMenus[k]; });
+  data.menus = menus;
+
+  function getMenu(iso) { return menus[iso] || null; }
+  function getClosure(dayName) {
+    const c = data.closures || {};
+    const k = Object.keys(c).find(k => k.toLowerCase() === String(dayName||"").toLowerCase());
+    return k ? c[k] : null;
+  }
+  function normItems(a) { return Array.isArray(a) ? a.map(x => String(x||"").trim()).filter(Boolean) : []; }
+  function normLunch(a) {
+    if (!Array.isArray(a)) return [];
+    return a.map(r => {
+      if (r && typeof r === "object") return { name: String(r.name||"").trim(), desc: String(r.desc||"").trim() };
+      const s = String(r||"").trim();
+      return s ? { name: s, desc: "" } : null;
+    }).filter(Boolean).filter(x => x.name);
+  }
+
+  // ── BUILD CATEGORIES ──────────────────
+  function buildCats(isoDate) {
+    const menu = getMenu(isoDate) || {};
+    const def = data.defaults || {};
+    const cats = [];
+
+    // Breakfast
+    const bkPlates = normItems(menu.breakfast?.plates ?? def.breakfast?.plates ?? []);
+    const bkItems = normItems(menu.breakfast?.items ?? def.breakfast?.items ?? []);
+    if (bkPlates.length || bkItems.length) {
+      cats.push({ id: "breakfast", name: "Breakfast", icon: "🍳", plates: bkPlates, items: bkItems });
+    }
+
+    // Lunch (with 3D models)
+    const lPlates = normItems(menu.lunch?.plates ?? def.lunch?.plates ?? []);
+    const lItems = normLunch(menu.lunch?.items ?? []);
+    if (lPlates.length || lItems.length) {
+      cats.push({ id: "lunch", name: "Lunch", icon: "🍽", plates: lPlates, items: lItems, has3d: true });
+    }
+
+    // Beer
+    const beers = data.beer || [];
+    if (beers.length) {
+      cats.push({ id: "beer", name: "Beer", icon: "🍺", items: beers, isBeer: true });
+    }
+
+    // Crawfish
+    const cf = menu.crawfish || {};
+    const cfShow = cf.show !== false;
+    const cfItems = normItems(cf.items ?? def.crawfish?.items ?? []);
+    if (cfShow && cfItems.length) {
+      cats.push({ id: "crawfish", name: "Crawfish", icon: "🦞", items: cfItems, isCrawfish: true });
+    }
+
+    // Salad Bar
+    const salad = menu.salad || def.salad || {};
+    const sPricing = normItems(salad.items ?? []);
+    const sBar = salad.saladBar || {};
+    if (sPricing.length || sBar.lettuce?.length || sBar.toppings?.length) {
+      cats.push({ id: "salad", name: "Salad Bar", icon: "🥗", pricing: sPricing, saladBar: sBar });
+    }
+
+    // Drinks
+    const drItems = normItems(menu.drinks?.items ?? def.drinks?.items ?? []);
+    if (drItems.length) {
+      cats.push({ id: "drinks", name: "Drinks", icon: "🥤", items: drItems });
+    }
+
+    // Dessert
+    const dsItems = normItems(menu.dessert?.items ?? def.dessert?.items ?? []);
+    if (dsItems.length) {
+      cats.push({ id: "dessert", name: "Dessert", icon: "🍮", items: dsItems });
+    }
+
+    return cats;
+  }
+
+  // ── RENDER CATEGORY HTML ──────────────
+  function renderCatHTML(cat) {
+    let html = `<div class="cat-header"><span class="cat-name">${cat.icon} ${esc(cat.name)}</span><span class="cat-tag">${cat.isBeer ? "Ice Cold" : cat.isCrawfish ? "Seasonal" : cat.id === "salad" ? "Build Your Own" : "Daily"}</span></div>`;
+
+    // Plates
+    if (cat.plates?.length) {
+      html += `<div class="section-label">Plates &amp; Pricing</div><div class="plates-row">${cat.plates.map(p => `<div class="plate-card">${esc(p)}</div>`).join("")}</div>`;
+    }
+
+    // 3D Model cards (lunch items)
+    if (cat.has3d && cat.items?.length) {
+      html += `<div class="section-label">Today's Items</div><div class="model-grid">`;
+      cat.items.forEach(item => {
+        const mp = modelPath(item.name);
+        html += `
+          <div class="model-card" onclick="this.classList.toggle('expanded')">
+            <div class="model-stage">
+              <model-viewer
+                src="${esc(mp)}"
+                alt="${esc(item.name)} 3D model"
+                auto-rotate
+                rotation-per-second="20deg"
+                camera-orbit="0deg 65deg 105%"
+                shadow-intensity="0.4"
+                environment-image="neutral"
+                style="width:100%;height:100%;--poster-color:transparent;"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+              ></model-viewer>
+              <div class="model-placeholder" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;">🍽</div>
+            </div>
+            <div class="model-info">
+              <div class="model-item-name">${esc(item.name)}</div>
+            </div>
+            <div class="model-desc">${esc(item.desc || data.settings.noDescriptionText)}</div>
+            <div class="model-card-hint">tap for details</div>
+          </div>`;
+      });
+      html += `</div>`;
+    }
+
+    // Simple item list (breakfast, drinks, dessert, beer)
+    if (!cat.has3d && cat.items?.length) {
+      html += `<div class="section-label">${cat.isBeer ? "Available" : "Items"}</div><ul class="item-list">`;
+      cat.items.forEach(item => {
+        const name = typeof item === "string" ? item : item.name;
+        html += `<li class="${cat.isBeer ? "beer-item" : ""}">${cat.isBeer ? "🍺 " : ""}${esc(name)}</li>`;
+      });
+      html += `</ul>`;
+    }
+
+    // Salad Bar
+    if (cat.id === "salad") {
+      if (cat.pricing?.length) {
+        html += `<div class="section-label">Pricing</div><ul class="item-list">${cat.pricing.map(p => `<li>${esc(p)}</li>`).join("")}</ul>`;
+      }
+      const sb = cat.saladBar || {};
+      html += `<div class="section-label">Salad Bar</div><div class="salad-grid">`;
+      if (sb.lettuce?.length) html += `<div><div class="salad-col-title">Lettuce</div><ul class="item-list">${sb.lettuce.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
+      if (sb.toppings?.length) html += `<div><div class="salad-col-title">Toppings</div><ul class="item-list">${sb.toppings.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
+      if (sb.dressing?.length) html += `<div><div class="salad-col-title">Dressing</div><ul class="item-list">${sb.dressing.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
+      html += `</div>`;
+    }
+
+    // Crawfish
+    if (cat.isCrawfish) {
+      html = `<div class="crawfish-banner">${html}</div>`;
+    }
+
+    return html;
+  }
+
+  // ── INIT A PANEL (today/tomorrow) ─────
+  function initPanel(prefix, isoDate, dayName) {
+    const h = biz(dayName);
+    const closure = getClosure(dayName);
+    const hoursEl = $(`${prefix}Hours`);
+    const catNavEl = $(`${prefix}CatNav`);
+    const sectionsEl = $(`${prefix}CatSections`);
+
+    if (closure?.closed) {
+      $(`${prefix}Closed`)?.classList.remove("hide");
+      const msg = $(`${prefix}ClosedMsg`);
+      if (msg) msg.textContent = closure.message || "See you next time!";
+      if (hoursEl) hoursEl.textContent = `${dayName}: Closed`;
+      return;
+    }
+
+    if (hoursEl) {
+      hoursEl.innerHTML = `<strong>${dayName}</strong> ${h.open} – ${h.close} · Breakfast ${h.breakfast} · Lunch ${h.lunch}${h.crawfish ? ` · Crawfish ${h.crawfish}` : ""}`;
+    }
+
+    const cats = buildCats(isoDate);
+    if (!catNavEl || !sectionsEl) return;
+
+    // Category nav buttons
+    catNavEl.innerHTML = cats.map((c, i) =>
+      `<button class="cat-btn${c.isBeer ? " beer-btn" : ""}${i === 0 ? " active" : ""}" data-idx="${i}">${c.icon} ${esc(c.name)}</button>`
+    ).join("");
+
+    // Category sections
+    sectionsEl.innerHTML = cats.map((c, i) =>
+      `<div class="cat-section${i === 0 ? " visible" : ""}" data-idx="${i}">${renderCatHTML(c)}</div>`
+    ).join("");
+
+    // Nav click handler
+    const btns = catNavEl.querySelectorAll(".cat-btn");
+    const secs = sectionsEl.querySelectorAll(".cat-section");
+    btns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const idx = btn.dataset.idx;
+        btns.forEach(b => b.classList.toggle("active", b.dataset.idx === idx));
+        secs.forEach(s => s.classList.toggle("visible", s.dataset.idx === idx));
+      });
+    });
+
+    return { selectByName(name) {
+      const idx = cats.findIndex(c => c.name === name);
+      if (idx < 0) return;
+      btns.forEach(b => b.classList.toggle("active", b.dataset.idx === String(idx)));
+      secs.forEach(s => s.classList.toggle("visible", s.dataset.idx === String(idx)));
+    }};
+  }
+
+  // ── STATUS BADGE ──────────────────────
+  function updateStatus(dayName, isoDate) {
+    const todayISO = toISO(new Date());
+    const isToday = isoDate === todayISO;
+    const h = biz(dayName);
+    const closure = getClosure(dayName);
+    const dot = $("statusDot");
+    const txt = $("statusText");
+    const sub = $("heroSub");
+
+    if (closure?.closed) {
+      dot.className = "status-dot closed";
+      txt.textContent = "CLOSED – " + (closure.message || "");
+      if (sub) sub.textContent = dayName + " · Closed";
+      return;
+    }
+
+    if (!isToday) {
+      dot.className = "status-dot warn";
+      txt.textContent = dayName + " · Opens at " + h.open;
+      if (sub) sub.textContent = `${dayName} · ${h.open} – ${h.close}`;
+      return;
+    }
+
+    const now = new Date();
+    const mins = now.getHours() * 60 + now.getMinutes();
+    const isOpen = inRange(mins, `${h.open} – ${h.close}`) || (h.crawfish && inRange(mins, h.crawfish));
+
+    dot.className = "status-dot " + (isOpen ? "open" : "closed");
+
+    if (isOpen) {
+      if (mins < t12("10:30 AM")) {
+        const left = t12("10:30 AM") - mins;
+        txt.textContent = `BREAKFAST · ${left} min left`;
+      } else if (mins < t12("11:00 AM")) {
+        txt.textContent = "TRANSITION · Lunch at 11:00 AM";
+      } else if (h.crawfish && inRange(mins, h.crawfish)) {
+        txt.textContent = "NOW SERVING CRAWFISH";
+      } else {
+        txt.textContent = "NOW SERVING LUNCH";
+      }
+    } else {
+      txt.textContent = "CLOSED · Opens " + h.open;
+    }
+
+    if (sub) sub.textContent = `${dayName} · ${h.open} – ${h.close}`;
+  }
+
+  // ── ADVANCED / WEEKLY FORECAST ────────
+  function buildAdvanced(startISO) {
+    const tabsEl = $("advDayTabs");
+    const cardsEl = $("advCards");
+    const discEl = $("advDisclaimer");
+    if (!tabsEl || !cardsEl) return;
+
+    if (discEl) discEl.textContent = data.settings.advancedDisclaimer || "Lunch forecast — subject to change.";
+
+    const start = parseISO(startISO);
+    const entries = [];
+
+    for (let i = 0; i < (data.settings.advancedWindowDays || 7); i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      const iso = toISO(d);
+      const dayName = wkDay(d);
+      const h = biz(dayName);
+      const closure = getClosure(dayName);
+      const dayMenu = getMenu(iso);
+      const def = data.defaults || {};
+
+      // Tab
+      const tab = document.createElement("button");
+      tab.className = "adv-day-tab" + (i === 0 ? " active" : "");
+      tab.textContent = `${dayName.slice(0,3)} ${d.getMonth()+1}/${d.getDate()}`;
+      tabsEl.appendChild(tab);
+
+      // Card
+      const card = document.createElement("div");
+      card.className = "adv-card" + (i === 0 ? " visible" : "");
+
+      const lp = normItems(dayMenu?.lunch?.plates ?? def.lunch?.plates ?? []);
+      const li = normLunch(dayMenu?.lunch?.items ?? []);
+
+      let inner = `<div class="adv-card-title">${esc(dayName)}</div>`;
+      inner += `<div class="adv-card-sub">${esc(fmtDate(d))} · ${closure?.closed ? "Closed" : `Lunch ${h.lunch}`}</div>`;
+
+      if (closure?.closed) {
+        inner += `<p style="color:var(--text-mid)">${esc(closure.message || "Closed")}</p>`;
+      } else {
+        if (lp.length) {
+          inner += `<div class="section-label">Plates</div><div class="plates-row">${lp.map(p => `<div class="plate-card">${esc(p)}</div>`).join("")}</div>`;
+        }
+        if (li.length) {
+          inner += `<div class="section-label">Lunch Items</div><div class="model-grid">`;
+          li.forEach(item => {
+            const mp = modelPath(item.name);
+            inner += `
+              <div class="model-card" onclick="this.classList.toggle('expanded')">
+                <div class="model-stage" style="height:160px">
+                  <model-viewer
+                    src="${esc(mp)}"
+                    alt="${esc(item.name)}"
+                    auto-rotate
+                    rotation-per-second="20deg"
+                    camera-orbit="0deg 65deg 105%"
+                    shadow-intensity="0.3"
+                    environment-image="neutral"
+                    style="width:100%;height:100%;--poster-color:transparent;"
+                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+                  ></model-viewer>
+                  <div class="model-placeholder" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;">🍽</div>
+                </div>
+                <div class="model-info"><div class="model-item-name">${esc(item.name)}</div></div>
+                <div class="model-desc">${esc(item.desc || "")}</div>
+                <div class="model-card-hint">tap for details</div>
+              </div>`;
+          });
+          inner += `</div>`;
+        } else {
+          inner += `<p style="color:var(--text-dim);margin-top:12px">Lunch menu not posted yet — check back soon.</p>`;
+        }
+      }
+
+      card.innerHTML = inner;
+      cardsEl.appendChild(card);
+      entries.push({ tab, card });
+    }
+
+    entries.forEach((e, idx) => {
+      e.tab.addEventListener("click", () => {
+        entries.forEach((item, i) => {
+          item.tab.classList.toggle("active", i === idx);
+          item.card.classList.toggle("visible", i === idx);
+        });
+      });
+    });
+  }
+
+  // ── DAY TAB SWITCHING ─────────────────
+  function setupDayTabs() {
+    const tabs = [$("tabToday"), $("tabTomorrow"), $("tabAdvanced")];
+    const panels = [$("panelToday"), $("panelTomorrow"), $("panelAdvanced")];
+    tabs.forEach((tab, i) => {
+      tab?.addEventListener("click", () => {
+        tabs.forEach((t, ti) => t.classList.toggle("active", ti === i));
+        panels.forEach((p, pi) => p.classList.toggle("visible", pi === i));
+      });
+    });
+  }
+
+  // ── FLASH MODAL ───────────────────────
+  let flashTimer = null, flashInterval = null;
+  function showFlash(title, text) {
+    const modal = $("flashModal");
+    const cnt = $("flashCount");
+    if (!modal) return;
+    $("flashTitle").textContent = title;
+    $("flashText").textContent = text;
+    if (flashTimer) clearTimeout(flashTimer);
+    if (flashInterval) clearInterval(flashInterval);
+    let r = 5;
+    cnt.textContent = r;
+    modal.classList.add("show");
+    flashInterval = setInterval(() => { r--; if (r > 0) cnt.textContent = r; else clearInterval(flashInterval); }, 1000);
+    flashTimer = setTimeout(() => hideFlash(), 5000);
+  }
+  function hideFlash() {
+    if (flashTimer) { clearTimeout(flashTimer); flashTimer = null; }
+    if (flashInterval) { clearInterval(flashInterval); flashInterval = null; }
+    $("flashModal")?.classList.remove("show");
+  }
+  $("flashModal")?.addEventListener("click", hideFlash);
+  $("flashModal")?.querySelector(".flash-card")?.addEventListener("click", e => e.stopPropagation());
+  window.addEventListener("keydown", e => { if (e.key === "Escape") hideFlash(); });
+
+  // ── HASH ROUTING ──────────────────────
+  function handleHash(todayApi) {
+    const hash = (window.location.hash || "").replace("#","").toLowerCase();
+    if (!hash) return;
+    if (hash === "tomorrow") { $("tabTomorrow")?.click(); return; }
+    if (hash === "advanced" || hash === "forecast") { $("tabAdvanced")?.click(); return; }
+    const catMap = { breakfast: "Breakfast", lunch: "Lunch", beer: "Beer", crawfish: "Crawfish", salad: "Salad Bar", drinks: "Drinks", dessert: "Dessert" };
+    if (catMap[hash] && todayApi) todayApi.selectByName(catMap[hash]);
+  }
+
+  // ── INIT ──────────────────────────────
+  setupDayTabs();
+
+  const now = new Date();
+  const todayISO = toISO(now);
+  const todayName = wkDay(now);
+  const tom = new Date(now); tom.setDate(now.getDate() + 1);
+  const tomorrowISO = toISO(tom);
+  const tomorrowName = wkDay(tom);
+
+  // If past closing, shift to tomorrow
+  let dTI = todayISO, dTN = todayName, dToI = tomorrowISO, dToN = tomorrowName;
+  const ct = getClosure(todayName);
+  if (pastClose(todayName) && !ct?.closed) {
+    dTI = tomorrowISO; dTN = tomorrowName;
+    const da = new Date(now); da.setDate(now.getDate() + 2);
+    dToI = toISO(da); dToN = wkDay(da);
+  }
+
+  $("tabToday").textContent = dTN;
+  $("tabTomorrow").textContent = dToN;
+
+  const todayApi = initPanel("today", dTI, dTN);
+  initPanel("tomorrow", dToI, dToN);
+  buildAdvanced(dTI);
+  updateStatus(dTN, dTI);
+
+  // Refresh status every minute
+  setInterval(() => updateStatus(dTN, dTI), 60000);
+
+  // Handle hash links
+  setTimeout(() => handleHash(todayApi), 150);
+  window.addEventListener("hashchange", () => handleHash(todayApi));
+
 })();
 </script>
+
 </body>
 </html>
