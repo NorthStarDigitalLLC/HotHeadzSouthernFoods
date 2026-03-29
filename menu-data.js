@@ -162,7 +162,7 @@ const MENU_DATA = {
       lunch: {
         show: true,
         items: [
-          { name: "Tomatoes", desc: "Fresh sliced tomatoes." }
+          { name: "Tomato", desc: "Fresh sliced tomatoes." }
         ]
       },
       crawfish: { show: true },
