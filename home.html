@@ -390,143 +390,45 @@ img{max-width:100%;display:block}
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
 
-<!--
-  ╔═══════════════════════════════════════════════════════════════╗
-  ║  GOOGLE MAPS API KEY — REPLACE "YOUR_API_KEY" BELOW          ║
-  ║                                                               ║
-  ║  1. Go to https://console.cloud.google.com                    ║
-  ║  2. Enable "Maps JavaScript API" and "Places API"             ║
-  ║  3. Create an API key and restrict it to your domain           ║
-  ║  4. Replace YOUR_API_KEY with your actual key                  ║
-  ║                                                               ║
-  ║  Without a valid key, the fallback reviews will display.       ║
-  ╚═══════════════════════════════════════════════════════════════╝
--->
-<script async defer
-  src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initGoogleReviews"
-  onerror="handleGoogleApiError()">
-</script>
-
 <script>
 document.getElementById('yr').textContent=new Date().getFullYear();
 
 /* ═══════════════════════════════════════
-   GOOGLE REVIEWS INTEGRATION
-   Place ID: ChIJmxBqtouzO4YRF0HMS2USmLs
+   GOOGLE REVIEWS
+   
+   To add reviews: Go to your Google listing, copy real reviews,
+   and paste them below. Format:
+   {n:"Customer Name", s:5, t:"Review text here."},
 ═══════════════════════════════════════ */
 const PLACE_ID = 'ChIJmxBqtouzO4YRF0HMS2USmLs';
 const GOOGLE_REVIEW_URL = 'https://search.google.com/local/reviews?placeid=' + PLACE_ID;
 
-// No fallback reviews — only real Google reviews are shown
-const FALLBACK_POOL = [];
+const REVIEWS = [
+  // ▼ PASTE REAL GOOGLE REVIEWS BELOW — just name, stars (1-5), and text ▼
+  {n:"Jack Phillips", s:5, t:"Great little place. Good food, nice portions, very friendly staff, I don’t just review every place I go, it has to stand out, and this place does. Walked out with a full belly and a big smile. I’ll be back to try some more of their menu.
+Food: 4/5Service: 5/5Atmosphere: 5/5
+Noise level
+Quiet, easy to talk
+Wait time
+No wait"},
 
-let googleReviewsLoaded = false;
+  // {n:"Customer Name", s:5, t:"Their review text here."},
+  // {n:"Customer Name", s:5, t:"Their review text here."},
+];
 
-function relativeTime(ts) {
-  if (!ts) return 'Google Review';
-  const diff = Date.now() / 1000 - ts;
-  const days = Math.floor(diff / 86400);
-  if (days < 1) return 'Today';
-  if (days < 7) return days + ' day' + (days > 1 ? 's' : '') + ' ago';
-  const weeks = Math.floor(days / 7);
-  if (weeks < 5) return weeks + ' week' + (weeks > 1 ? 's' : '') + ' ago';
-  const months = Math.floor(days / 30);
-  if (months < 12) return months + ' month' + (months > 1 ? 's' : '') + ' ago';
-  const years = Math.floor(days / 365);
-  return years + ' year' + (years > 1 ? 's' : '') + ' ago';
-}
-
-function renderGoogleBadge(rating, total) {
-  var scoreEl = document.getElementById('rvGScore');
-  var starsEl = document.getElementById('rvGStarsStatic');
+// Show the Google badge with link
+!function(){
   var countEl = document.getElementById('rvGCount');
-  if (rating) {
-    scoreEl.textContent = rating.toFixed(1);
-    var starsHTML = '';
-    for (var i = 1; i <= 5; i++) {
-      var fill = i <= Math.round(rating) ? '#ffb050' : '#5a5248';
-      var op = i <= Math.round(rating) ? '0.9' : '0.2';
-      starsHTML += '<svg viewBox="0 0 24 24" fill="' + fill + '" style="opacity:' + op + '"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
-    }
-    starsEl.innerHTML = starsHTML;
+  countEl.innerHTML = '<a href="' + GOOGLE_REVIEW_URL + '" target="_blank" rel="noopener">See all reviews on Google</a>';
+}();
+
+// Show carousel if we have reviews, otherwise show the "visit Google" message
+!function(){
+  if (REVIEWS.length > 0) {
+    document.getElementById('rvAwaiting').style.display = 'none';
+    document.getElementById('rvCarouselWrap').classList.add('active');
   }
-  if (total) {
-    countEl.innerHTML = '<a href="' + GOOGLE_REVIEW_URL + '" target="_blank" rel="noopener">' + total + ' reviews</a>';
-  }
-}
-
-function processGoogleReviews(reviews) {
-  return reviews
-    .filter(function(r) { return r.text && r.text.length > 20; })
-    .map(function(r) {
-      return {
-        n: r.author_name || 'Google User',
-        s: r.rating || 5,
-        t: r.text,
-        d: 'Google · ' + relativeTime(r.time),
-        photo: r.profile_photo_url || ''
-      };
-    });
-}
-
-// Show the carousel and hide the awaiting message
-function showCarousel() {
-  document.getElementById('rvAwaiting').style.display = 'none';
-  document.getElementById('rvCarouselWrap').classList.add('active');
-}
-
-// Called when Google Maps JS API loads successfully
-function initGoogleReviews() {
-  try {
-    var mapDiv = document.createElement('div');
-    mapDiv.style.display = 'none';
-    document.body.appendChild(mapDiv);
-    var map = new google.maps.Map(mapDiv);
-    var service = new google.maps.places.PlacesService(map);
-
-    service.getDetails({
-      placeId: PLACE_ID,
-      fields: ['rating', 'user_ratings_total', 'reviews']
-    }, function(place, status) {
-      if (status === google.maps.places.PlacesServiceStatus.OK && place) {
-        renderGoogleBadge(place.rating, place.user_ratings_total);
-
-        if (place.reviews && place.reviews.length > 0) {
-          var googleRevs = processGoogleReviews(place.reviews);
-          if (googleRevs.length > 0) {
-            googleReviewsLoaded = true;
-            rvSlots = googleRevs;
-            rvCur = 0;
-            rvElapsed = 0;
-            showCarousel();
-            rvShow(0, true);
-          }
-        }
-      } else {
-        useFallbackBadge();
-      }
-    });
-  } catch (e) {
-    console.warn('Google Reviews API error:', e);
-    useFallbackBadge();
-  }
-}
-
-function handleGoogleApiError() {
-  console.warn('Google Maps API failed to load, using fallback reviews');
-  useFallbackBadge();
-}
-
-function useFallbackBadge() {
-  // Don't show fake numbers — just link to Google
-  document.getElementById('rvGScore').textContent = '';
-  document.getElementById('rvGCount').innerHTML = '<a href="' + GOOGLE_REVIEW_URL + '" target="_blank" rel="noopener">See reviews on Google</a>';
-}
-
-// Safety timeout — if API hasn't loaded in 8s, show fallback badge
-setTimeout(function() {
-  if (!googleReviewsLoaded) useFallbackBadge();
-}, 8000);
+}();
 
 
 /* ══ SMOKE ══ */
@@ -554,9 +456,7 @@ setInterval(()=>{const d=document.createElement('div');d.className='ember-dot';d
 /* ══════════════════════════════════
    REVIEW CAROUSEL
 ══════════════════════════════════ */
-const RV_COUNT=6;let rvSlots=[],rvCur=0,rvCycle=1,rvPaused=false,rvAnimating=false,rvElapsed=0,rvChars=[];
-
-// No initial rvRandom() — carousel stays empty until Google reviews load
+const RV_COUNT=Math.min(REVIEWS.length,6);let rvSlots=REVIEWS.slice(0,RV_COUNT),rvCur=0,rvCycle=1,rvPaused=false,rvAnimating=false,rvElapsed=0,rvChars=[];
 
 const rvQ=document.getElementById('rvQuote'),rvStars=document.getElementById('rvStars'),rvAuthor=document.getElementById('rvAuthor'),rvName=document.getElementById('rvName'),rvDetail=document.getElementById('rvDetail'),rvLine=document.getElementById('rvLine'),rvBigNum=document.getElementById('rvBigNum'),rvProg=document.getElementById('rvProg'),rvPhoto=document.getElementById('rvPhoto'),rvEmberDot=document.getElementById('rvEmberDot');
 
@@ -569,18 +469,9 @@ function rvShow(idx,skip){
   setTimeout(()=>{rvBigNum.textContent=String(idx+1).padStart(2,'0');rvBigNum.style.opacity='';rvBigNum.style.transform=''},350);
   rvAuthor.classList.remove('in');rvLine.classList.remove('in');
   rvName.textContent=r.n;
-  rvDetail.textContent=r.d;
-
-  // Show author photo if available from Google, otherwise show ember dot
-  if(r.photo){
-    rvPhoto.src=r.photo;
-    rvPhoto.alt=r.n;
-    rvPhoto.style.display='block';
-    rvEmberDot.style.display='none';
-  } else {
-    rvPhoto.style.display='none';
-    rvEmberDot.style.display='block';
-  }
+  rvDetail.textContent='Google Review';
+  rvPhoto.style.display='none';
+  rvEmberDot.style.display='block';
 
   rvQ.innerHTML='';rvChars=[];
   const frag=document.createDocumentFragment();
@@ -605,7 +496,8 @@ function rvNext(){
   rvGo(next);
 }
 function rvPrev(){if(rvSlots.length===0)return;rvElapsed=0;rvGo((rvCur-1+rvSlots.length)%rvSlots.length)}
-// Carousel doesn't auto-start — waits for Google reviews
+// Start carousel if we have reviews
+if(rvSlots.length>0) rvShow(0);
 document.getElementById('rvNext').addEventListener('click',rvNext);
 document.getElementById('rvPrev').addEventListener('click',rvPrev);
 document.getElementById('rvPause').addEventListener('click',function(){rvPaused=!rvPaused;this.classList.toggle('on',rvPaused);document.getElementById('rvPauseIco').innerHTML=rvPaused?'<polygon points="5 3 19 12 5 21 5 3"/>':'<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>'});
