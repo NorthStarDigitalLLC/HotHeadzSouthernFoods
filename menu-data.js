@@ -162,7 +162,20 @@ const MENU_DATA = {
       lunch: {
         show: true,
         items: [
-          { name: "Tomato", desc: "Fresh sliced tomatoes." }
+          { "name": "Beef Tips", "desc": "Tender beef tips cooked in a savory gravy." },
+{ "name": "Red Beans & Rice", "desc": "Slow-cooked red beans served over seasoned rice." },
+{ "name": "Baked Potato & Chicken Casserole", "desc": "Hearty casserole with chicken, potatoes, and creamy sauce baked to perfection." },
+{ "name": "Rice", "desc": "Steamed white rice." },
+{ "name": "Taters", "desc": "Seasoned potatoes cooked until golden and tender." },
+{ "name": "Corn", "desc": "Sweet seasoned corn." },
+{ "name": "Fried Okra", "desc": "Crispy golden fried okra." },
+{ "name": "Sweet Potato Casserole", "desc": "Sweet and creamy sweet potato casserole baked to perfection." },
+{ "name": "Black Eyed Peas", "desc": "Seasoned black eyed peas cooked low and slow." },
+{ "name": "Greens", "desc": "Seasoned greens cooked low and slow for rich flavor." },
+{ "name": "Cornbread", "desc": "Soft, warm cornbread baked to a golden finish." },
+          { name: "Turkey Clubs", desc: "Classic club sandwiches stacked with turkey, bacon, lettuce, tomato, and mayo." },
+          { name: "Chicken Salad", desc: "Creamy house-made chicken salad served chilled and ready to enjoy." },
+          { name: "Croissants", desc: "Flaky, buttery croissants baked until golden and tender." }
         ]
       },
       crawfish: { show: true },
