@@ -159,6 +159,45 @@
       50% { transform: scale(2.2); opacity: 0; }
     }
 
+    /* ═══ COUNTDOWN TIMER ═══ */
+    .countdown-wrap {
+      text-align: center; margin-top: 16px;
+      opacity: 0; animation: fadeUp 0.8s var(--ease-out-expo) 1.2s forwards;
+    }
+    .countdown-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .countdown-timer {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 14px 28px; border-radius: 20px;
+      border: 1px solid var(--border-warm);
+      background: var(--surface);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+    .countdown-block { text-align: center; min-width: 48px; }
+    .countdown-num {
+      display: block; font-family: var(--font-body);
+      font-size: 28px; font-weight: 900; letter-spacing: -0.02em;
+      line-height: 1; color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+    .countdown-unit {
+      display: block; font-size: 9px; font-weight: 700;
+      letter-spacing: 0.14em; color: var(--text-dim); margin-top: 4px;
+    }
+    .countdown-sep {
+      font-size: 24px; font-weight: 800; color: var(--accent);
+      padding: 0 2px; margin-top: -10px;
+      animation: countSepBlink 1s step-end infinite;
+    }
+    @keyframes countSepBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
     /* ═══ DAY TABS — STICKY ═══ */
     .day-tabs-wrap {
       position: sticky; top: 0; z-index: 50; padding: 14px 0 10px;
@@ -465,6 +504,16 @@
         <span id="statusText">Checking&hellip;</span>
       </div>
     </div>
+    <div class="countdown-wrap" id="countdownWrap" style="display:none;">
+      <div class="countdown-label" id="countdownLabel"></div>
+      <div class="countdown-timer">
+        <div class="countdown-block"><span class="countdown-num" id="cdHours">00</span><span class="countdown-unit">HR</span></div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-block"><span class="countdown-num" id="cdMins">00</span><span class="countdown-unit">MIN</span></div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-block"><span class="countdown-num" id="cdSecs">00</span><span class="countdown-unit">SEC</span></div>
+      </div>
+    </div>
   </header>
 
   <nav class="day-tabs-wrap">
@@ -707,22 +756,180 @@
     secs.forEach(s=>{if(s.classList.contains("visible"))observeItems(s);});
   }
 
-  function updateStatus(dayName,isoDate){
-    const todayISO=toISO(new Date());const isToday=isoDate===todayISO;
-    const h=biz(dayName);const closure=getClosure(dayName);
-    const dot=$("statusDot"),txt=$("statusText"),sub=$("heroSub");
-    if(closure?.closed){dot.className="status-dot closed";txt.textContent="CLOSED – "+(closure.message||"");if(sub)sub.textContent=dayName+" · Closed";return;}
-    if(!isToday){dot.className="status-dot warn";txt.textContent=dayName+" · OPENS AT "+h.open;if(sub)sub.textContent=`${dayName} · ${h.open} – ${h.close}`;return;}
-    const now=new Date();const mins=now.getHours()*60+now.getMinutes();
-    const isOpen=inRange(mins,`${h.open} – ${h.close}`)||(h.crawfish&&inRange(mins,h.crawfish));
-    dot.className="status-dot "+(isOpen?"open":"closed");
-    if(isOpen){
-      if(mins<t12("10:30 AM")){const left=t12("10:30 AM")-mins;txt.textContent=`BREAKFAST · ${left} MIN LEFT`;}
-      else if(mins<t12("11:00 AM"))txt.textContent="TRANSITION · LUNCH AT 11:00 AM";
-      else if(h.crawfish&&inRange(mins,h.crawfish))txt.textContent="NOW SERVING CRAWFISH";
-      else txt.textContent="NOW SERVING LUNCH";
-    }else txt.textContent="CLOSED · OPENS "+h.open;
-    if(sub)sub.textContent=`${dayName} · ${h.open} – ${h.close}`;
+  // ── Countdown target helpers ──
+  function todayAt(timeStr) {
+    // Returns a Date object for today at the given "H:MM AM/PM" time
+    const m = t12(timeStr);
+    if (m == null) return null;
+    const d = new Date();
+    d.setHours(Math.floor(m / 60), m % 60, 0, 0);
+    return d;
+  }
+
+  function tomorrowAt(timeStr) {
+    const d = todayAt(timeStr);
+    if (!d) return null;
+    d.setDate(d.getDate() + 1);
+    return d;
+  }
+
+  function fmtCountdown(diffMs) {
+    if (diffMs <= 0) return { h: "00", m: "00", s: "00" };
+    const totalSec = Math.floor(diffMs / 1000);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    return {
+      h: String(h).padStart(2, "0"),
+      m: String(m).padStart(2, "0"),
+      s: String(s).padStart(2, "0")
+    };
+  }
+
+  function updateStatus(dayName, isoDate) {
+    const todayISO = toISO(new Date());
+    const isToday = isoDate === todayISO;
+    const h = biz(dayName);
+    const closure = getClosure(dayName);
+    const dot = $("statusDot"), txt = $("statusText"), sub = $("heroSub");
+    const cdWrap = $("countdownWrap"), cdLabel = $("countdownLabel");
+    const cdH = $("cdHours"), cdM = $("cdMins"), cdS = $("cdSecs");
+
+    // Hide countdown by default
+    if (cdWrap) cdWrap.style.display = "none";
+
+    if (closure?.closed) {
+      dot.className = "status-dot closed";
+      txt.textContent = "CLOSED – " + (closure.message || "");
+      if (sub) sub.textContent = dayName + " · Closed";
+      return;
+    }
+
+    if (!isToday) {
+      dot.className = "status-dot warn";
+      txt.textContent = dayName + " · OPENS AT " + h.open;
+      if (sub) sub.textContent = `${dayName} · ${h.open} – ${h.close}`;
+      // Countdown to opening (tomorrow or future)
+      const openTarget = todayAt(h.open);
+      if (openTarget) {
+        // If the target day is not today, calculate days ahead
+        const targetDate = parseISO(isoDate);
+        targetDate.setHours(Math.floor(t12(h.open) / 60), t12(h.open) % 60, 0, 0);
+        const diff = targetDate - new Date();
+        if (diff > 0) {
+          const cd = fmtCountdown(diff);
+          cdLabel.textContent = "Opens in";
+          cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s;
+          cdWrap.style.display = "";
+        }
+      }
+      return;
+    }
+
+    // It IS today — figure out where we are in the schedule
+    const now = new Date();
+    const mins = now.getHours() * 60 + now.getMinutes();
+    const openMin = t12(h.open);
+    const closeMin = t12(h.close);
+    const bkEnd = t12("10:30 AM");
+    const lunchStart = t12("11:00 AM");
+    const cfStart = h.crawfish ? t12("4:00 PM") : null;
+    const cfEnd = h.crawfish ? t12("8:00 PM") : null;
+
+    const isInMain = openMin != null && closeMin != null && mins >= openMin && mins < closeMin;
+    const isInCrawfish = cfStart != null && cfEnd != null && mins >= cfStart && mins < cfEnd;
+    const isOpen = isInMain || isInCrawfish;
+
+    dot.className = "status-dot " + (isOpen ? "open" : "closed");
+    if (sub) sub.textContent = `${dayName} · ${h.open} – ${h.close}`;
+
+    if (mins < openMin) {
+      // Before opening
+      txt.textContent = "CLOSED · OPENS AT " + h.open;
+      const target = todayAt(h.open);
+      const diff = target - now;
+      if (diff > 0) {
+        const cd = fmtCountdown(diff);
+        cdLabel.textContent = "Opens in";
+        cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s;
+        cdWrap.style.display = "";
+      }
+    } else if (mins < bkEnd) {
+      // During breakfast
+      txt.textContent = "NOW SERVING BREAKFAST";
+      const target = todayAt("10:30 AM");
+      const diff = target - now;
+      if (diff > 0) {
+        const cd = fmtCountdown(diff);
+        cdLabel.textContent = "Breakfast ends in";
+        cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s;
+        cdWrap.style.display = "";
+      }
+    } else if (mins < lunchStart) {
+      // Transition
+      txt.textContent = "TRANSITION · LUNCH AT 11:00 AM";
+      const target = todayAt("11:00 AM");
+      const diff = target - now;
+      if (diff > 0) {
+        const cd = fmtCountdown(diff);
+        cdLabel.textContent = "Lunch starts in";
+        cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s;
+        cdWrap.style.display = "";
+      }
+    } else if (mins < closeMin) {
+      // During lunch
+      txt.textContent = "NOW SERVING LUNCH";
+      const target = todayAt(h.close);
+      const diff = target - now;
+      if (diff > 0) {
+        const cd = fmtCountdown(diff);
+        cdLabel.textContent = "Lunch ends in";
+        cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s;
+        cdWrap.style.display = "";
+      }
+    } else if (cfStart && mins < cfStart) {
+      // After lunch, before crawfish
+      txt.textContent = "CRAWFISH AT 4:00 PM";
+      const target = todayAt("4:00 PM");
+      const diff = target - now;
+      if (diff > 0) {
+        const cd = fmtCountdown(diff);
+        cdLabel.textContent = "Crawfish starts in";
+        cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s;
+        cdWrap.style.display = "";
+      }
+    } else if (cfEnd && mins < cfEnd) {
+      // During crawfish
+      txt.textContent = "NOW SERVING CRAWFISH";
+      const target = todayAt("8:00 PM");
+      const diff = target - now;
+      if (diff > 0) {
+        const cd = fmtCountdown(diff);
+        cdLabel.textContent = "Crawfish ends in";
+        cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s;
+        cdWrap.style.display = "";
+      }
+    } else {
+      // Closed for the day — count to tomorrow's opening
+      txt.textContent = "CLOSED · SEE YOU TOMORROW";
+      // Figure out tomorrow's opening
+      const tomDate = new Date(now);
+      tomDate.setDate(tomDate.getDate() + 1);
+      const tomDay = wkDay(tomDate);
+      const tomH = biz(tomDay);
+      const tomOpen = t12(tomH.open);
+      if (tomOpen != null) {
+        const target = new Date(tomDate);
+        target.setHours(Math.floor(tomOpen / 60), tomOpen % 60, 0, 0);
+        const diff = target - now;
+        if (diff > 0) {
+          const cd = fmtCountdown(diff);
+          cdLabel.textContent = `Opens ${tomDay} at ${tomH.open}`;
+          cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s;
+          cdWrap.style.display = "";
+        }
+      }
+    }
   }
 
   function buildAdvanced(startISO){
@@ -787,7 +994,7 @@
   panelConfigs=[];
   initPanel("today",dTI,dTN);initPanel("tomorrow",dToI,dToN);
   buildAdvanced(dTI);updateStatus(dTN,dTI);
-  setInterval(()=>updateStatus(dTN,dTI),60000);
+  setInterval(()=>updateStatus(dTN,dTI),1000);
   setTimeout(handleHash,150);
   window.addEventListener("hashchange",handleHash);
 })();
