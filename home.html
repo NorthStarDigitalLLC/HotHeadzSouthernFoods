@@ -141,6 +141,15 @@ img{max-width:100%;display:block}
 .rv-progress-fill{height:100%;background:linear-gradient(90deg,var(--ember),var(--flame));border-radius:1px;transition:width .15s linear;width:0%}
 @media(max-width:700px){.ch-reviews .big-num{display:none}.rv-google-badge{gap:10px}.rv-google-write{display:none}}
 
+/* Reviews waiting/no-API state */
+.rv-awaiting{max-width:700px;padding:40px 0}
+.rv-awaiting-text{font-family:var(--ff-hero);font-size:clamp(20px,3vw,32px);font-weight:300;font-style:italic;line-height:1.5;color:var(--bone3);margin-bottom:24px}
+.rv-awaiting-link{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border:1px solid var(--dim2);font-family:var(--ff-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--bone2);text-decoration:none;transition:all .2s;background:transparent}
+.rv-awaiting-link:hover{border-color:var(--ember);color:var(--ember);background:rgba(212,86,30,.04)}
+.rv-awaiting-link svg{width:14px;height:14px}
+.rv-carousel-wrap{display:none}
+.rv-carousel-wrap.active{display:block}
+
 /* ═══ STORY ═══ */
 .ch-story{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;border-top:1px solid var(--dim)}
 @media(max-width:900px){.ch-story{grid-template-columns:1fr}}
@@ -284,21 +293,33 @@ img{max-width:100%;display:block}
     <a class="rv-google-write" href="https://search.google.com/local/writereview?placeid=ChIJmxBqtouzO4YRF0HMS2USmLs" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Write a Review</a>
   </div>
 
-  <div class="rv-stars" id="rvStars"></div>
-  <div id="rvQuote"></div>
-  <div class="rv-author" id="rvAuthor">
-    <img class="rv-author-photo" id="rvPhoto" src="" alt="" style="display:none">
-    <div class="rv-ember" id="rvEmberDot"></div>
-    <div class="rv-name" id="rvName"></div>
-    <div class="rv-detail" id="rvDetail"></div>
+  <!-- Shown when Google API hasn't loaded yet / no API key -->
+  <div class="rv-awaiting" id="rvAwaiting">
+    <div class="rv-awaiting-text">See what our customers are saying about us on Google.</div>
+    <a class="rv-awaiting-link" href="https://search.google.com/local/reviews?placeid=ChIJmxBqtouzO4YRF0HMS2USmLs" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Read Our Reviews on Google
+    </a>
   </div>
-  <div class="rv-line" id="rvLine"></div>
-  <div class="rv-controls">
-    <button class="rv-btn" id="rvPrev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
-    <button class="rv-btn" id="rvPause"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="rvPauseIco"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></button>
-    <button class="rv-btn" id="rvNext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+
+  <!-- Carousel — only shown once real Google reviews load -->
+  <div class="rv-carousel-wrap" id="rvCarouselWrap">
+    <div class="rv-stars" id="rvStars"></div>
+    <div id="rvQuote"></div>
+    <div class="rv-author" id="rvAuthor">
+      <img class="rv-author-photo" id="rvPhoto" src="" alt="" style="display:none">
+      <div class="rv-ember" id="rvEmberDot"></div>
+      <div class="rv-name" id="rvName"></div>
+      <div class="rv-detail" id="rvDetail"></div>
+    </div>
+    <div class="rv-line" id="rvLine"></div>
+    <div class="rv-controls">
+      <button class="rv-btn" id="rvPrev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <button class="rv-btn" id="rvPause"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="rvPauseIco"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></button>
+      <button class="rv-btn" id="rvNext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+    </div>
+    <div class="rv-progress"><div class="rv-progress-fill" id="rvProg"></div></div>
   </div>
-  <div class="rv-progress"><div class="rv-progress-fill" id="rvProg"></div></div>
 </section>
 
 <section class="ch-story">
@@ -396,23 +417,8 @@ document.getElementById('yr').textContent=new Date().getFullYear();
 const PLACE_ID = 'ChIJmxBqtouzO4YRF0HMS2USmLs';
 const GOOGLE_REVIEW_URL = 'https://search.google.com/local/reviews?placeid=' + PLACE_ID;
 
-// Fallback reviews used when Google API isn't available
-const FALLBACK_POOL = [
-  {n:"Miranda C.",s:5,t:"Best home cooking in DeRidder, hands down. The smothered pork chops taste just like my grandmother used to make.",d:"Google Review",photo:""},
-  {n:"James T.",s:5,t:"Everything is fresh and made that morning — you can taste the difference. The catfish plate is unreal.",d:"Google Review",photo:""},
-  {n:"Brenda L.",s:5,t:"The real deal Southern food. Red beans and rice on Mondays are worth planning your whole week around.",d:"Google Review",photo:""},
-  {n:"David R.",s:5,t:"Crawfish season here is something else. Perfectly seasoned, great price, and the staff treats you like family.",d:"Google Review",photo:""},
-  {n:"Ashley M.",s:5,t:"We come here every Saturday for breakfast. The biscuits and gravy are unbelievable. Kids love it too.",d:"Google Review",photo:""},
-  {n:"Marcus W.",s:5,t:"I've eaten at restaurants all over Louisiana and this spot hangs with the best of them. The gumbo is top tier.",d:"Google Review",photo:""},
-  {n:"Tanya H.",s:4,t:"Great food, great people. Thursday crawfish nights are a must.",d:"Google Review",photo:""},
-  {n:"Chris B.",s:5,t:"Cafeteria style means you see everything before you pick. The mac and cheese is legendary.",d:"Google Review",photo:""},
-  {n:"Patricia D.",s:5,t:"Brought my whole family from Texas. They couldn't believe the quality for the price.",d:"Google Review",photo:""},
-  {n:"Robert K.",s:5,t:"The jambalaya here has ruined every other jambalaya for me. Staff is always friendly.",d:"Google Review",photo:""},
-  {n:"Donna F.",s:5,t:"Been coming since they opened in 2020. They haven't changed a thing — that's why I keep coming back.",d:"Google Review",photo:""},
-  {n:"Angela P.",s:5,t:"The étouffée is the best I've ever had outside of my own kitchen.",d:"Google Review",photo:""},
-  {n:"Kevin S.",s:5,t:"Stopped on a road trip and now I plan routes through DeRidder just to eat here. Fried chicken is perfection.",d:"Google Review",photo:""},
-  {n:"Lisa N.",s:5,t:"Everything tastes homemade because it IS homemade. No shortcuts. These people actually care.",d:"Google Review",photo:""},
-];
+// No fallback reviews — only real Google reviews are shown
+const FALLBACK_POOL = [];
 
 let googleReviewsLoaded = false;
 
@@ -463,6 +469,12 @@ function processGoogleReviews(reviews) {
     });
 }
 
+// Show the carousel and hide the awaiting message
+function showCarousel() {
+  document.getElementById('rvAwaiting').style.display = 'none';
+  document.getElementById('rvCarouselWrap').classList.add('active');
+}
+
 // Called when Google Maps JS API loads successfully
 function initGoogleReviews() {
   try {
@@ -483,15 +495,10 @@ function initGoogleReviews() {
           var googleRevs = processGoogleReviews(place.reviews);
           if (googleRevs.length > 0) {
             googleReviewsLoaded = true;
-            // Merge Google reviews with fallback to fill carousel
-            var merged = googleRevs.slice();
-            var needed = Math.max(0, RV_COUNT - merged.length);
-            for (var i = 0; i < needed && i < FALLBACK_POOL.length; i++) {
-              merged.push(FALLBACK_POOL[i]);
-            }
-            rvSlots = merged.slice(0, RV_COUNT);
+            rvSlots = googleRevs;
             rvCur = 0;
             rvElapsed = 0;
+            showCarousel();
             rvShow(0, true);
           }
         }
@@ -511,7 +518,9 @@ function handleGoogleApiError() {
 }
 
 function useFallbackBadge() {
-  renderGoogleBadge(4.9, '100+');
+  // Don't show fake numbers — just link to Google
+  document.getElementById('rvGScore').textContent = '';
+  document.getElementById('rvGCount').innerHTML = '<a href="' + GOOGLE_REVIEW_URL + '" target="_blank" rel="noopener">See reviews on Google</a>';
 }
 
 // Safety timeout — if API hasn't loaded in 8s, show fallback badge
@@ -547,11 +556,7 @@ setInterval(()=>{const d=document.createElement('div');d.className='ember-dot';d
 ══════════════════════════════════ */
 const RV_COUNT=6;let rvSlots=[],rvCur=0,rvCycle=1,rvPaused=false,rvAnimating=false,rvElapsed=0,rvChars=[];
 
-function rvRandom(){
-  rvSlots=[];
-  for(let i=0;i<RV_COUNT;i++) rvSlots.push(FALLBACK_POOL[Math.floor(Math.random()*FALLBACK_POOL.length)]);
-}
-rvRandom();
+// No initial rvRandom() — carousel stays empty until Google reviews load
 
 const rvQ=document.getElementById('rvQuote'),rvStars=document.getElementById('rvStars'),rvAuthor=document.getElementById('rvAuthor'),rvName=document.getElementById('rvName'),rvDetail=document.getElementById('rvDetail'),rvLine=document.getElementById('rvLine'),rvBigNum=document.getElementById('rvBigNum'),rvProg=document.getElementById('rvProg'),rvPhoto=document.getElementById('rvPhoto'),rvEmberDot=document.getElementById('rvEmberDot');
 
@@ -591,22 +596,22 @@ function rvDissolve(cb){
 }
 function rvGo(idx,skip){if(rvAnimating)return;if(rvChars.length)rvDissolve(()=>{rvCur=idx;rvShow(rvCur,skip)});else{rvCur=idx;rvShow(rvCur,skip)}}
 function rvNext(){
+  if(rvSlots.length===0)return;
   rvElapsed=0;const next=(rvCur+1)%rvSlots.length;
   if(next===0){
     rvCycle++;
     const fl=document.getElementById('flash');fl.classList.add('fire');setTimeout(()=>fl.classList.remove('fire'),120);
-    if(!googleReviewsLoaded) rvRandom();
   }
   rvGo(next);
 }
-function rvPrev(){rvElapsed=0;rvGo((rvCur-1+rvSlots.length)%rvSlots.length)}
-rvShow(0);
+function rvPrev(){if(rvSlots.length===0)return;rvElapsed=0;rvGo((rvCur-1+rvSlots.length)%rvSlots.length)}
+// Carousel doesn't auto-start — waits for Google reviews
 document.getElementById('rvNext').addEventListener('click',rvNext);
 document.getElementById('rvPrev').addEventListener('click',rvPrev);
 document.getElementById('rvPause').addEventListener('click',function(){rvPaused=!rvPaused;this.classList.toggle('on',rvPaused);document.getElementById('rvPauseIco').innerHTML=rvPaused?'<polygon points="5 3 19 12 5 21 5 3"/>':'<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>'});
 
 const RV_SEC=10;let rvLast=performance.now();
-!function rvTick(){requestAnimationFrame(rvTick);const now=performance.now(),dt=Math.min((now-rvLast)/1000,.1);rvLast=now;if(rvPaused||rvAnimating)return;rvElapsed+=dt;rvProg.style.width=(rvElapsed/RV_SEC*100)+'%';if(rvElapsed>=RV_SEC){rvElapsed=0;rvNext()}}();
+!function rvTick(){requestAnimationFrame(rvTick);const now=performance.now(),dt=Math.min((now-rvLast)/1000,.1);rvLast=now;if(rvPaused||rvAnimating||rvSlots.length===0)return;rvElapsed+=dt;rvProg.style.width=(rvElapsed/RV_SEC*100)+'%';if(rvElapsed>=RV_SEC){rvElapsed=0;rvNext()}}();
 
 /* ══════════════════════════════════
    3D RESTAURANT
