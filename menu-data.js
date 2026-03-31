@@ -186,7 +186,19 @@ const MENU_DATA = {
       lunch: {
         show: true,
         items: [
-          { name: "Tomatoes", desc: "Fresh sliced tomatoes." }
+          { "name": "Country Fried Steaks", "desc": "Breaded country fried steaks served with creamy white gravy." },
+{ "name": "Red Beans & Rice", "desc": "Slow-cooked red beans served over seasoned rice." },
+{ "name": "Smoked Chicken", "desc": "Slow-smoked chicken with rich, savory flavor." },
+{ "name": "Mashed Potatoes & White Gravy", "desc": "Creamy mashed potatoes topped with smooth white gravy." },
+{ "name": "Greens", "desc": "Seasoned greens cooked low and slow for rich flavor." },
+{ "name": "Cabbage", "desc": "Tender seasoned cabbage." },
+{ "name": "Corn", "desc": "Sweet seasoned corn." },
+{ "name": "Green Beans", "desc": "Seasoned green beans cooked until tender." },
+{ "name": "Fried Okra", "desc": "Crispy golden fried okra." },
+{ "name": "Rolls", "desc": "Soft rolls served warm." },
+          { name: "Turkey Clubs", desc: "Classic club sandwiches stacked with turkey, bacon, lettuce, tomato, and mayo." },
+          { name: "Chicken Salad", desc: "Creamy house-made chicken salad served chilled and ready to enjoy." },
+          { name: "Croissants", desc: "Flaky, buttery croissants baked until golden and tender." }
         ]
       },
       crawfish: { show: true },
