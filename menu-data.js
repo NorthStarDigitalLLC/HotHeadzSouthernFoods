@@ -209,7 +209,17 @@ const MENU_DATA = {
       lunch: {
         show: true,
         items: [
-          { name: "Tomatoes", desc: "Fresh sliced tomatoes." }
+          { "name": "Street Tacos", "desc": "Authentic street-style tacos with bold, seasoned flavor." },
+{ "name": "Chicken Enchiladas", "desc": "Rolled tortillas filled with chicken and topped with savory sauce." },
+{ "name": "Beef Nachos", "desc": "Crispy chips topped with seasoned beef and melted cheese." },
+{ "name": "Rice", "desc": "Seasoned rice cooked to perfection." },
+{ "name": "Mexican Corn", "desc": "Sweet corn with a creamy, seasoned Mexican-style flavor." },
+{ "name": "Black Beans", "desc": "Slow-cooked black beans with rich seasoning." },
+{ "name": "Country Fried Steak (Limited)", "desc": "Breaded country fried steak served with gravy (limited availability)." },
+{ "name": "Mashed Potatoes (Limited)", "desc": "Creamy mashed potatoes served hot (limited availability)." },
+          { name: "Turkey Clubs", desc: "Classic club sandwiches stacked with turkey, bacon, lettuce, tomato, and mayo." },
+          { name: "Chicken Salad", desc: "Creamy house-made chicken salad served chilled and ready to enjoy." },
+          { name: "Croissants", desc: "Flaky, buttery croissants baked until golden and tender." }
         ]
       },
       crawfish: { show: true },
