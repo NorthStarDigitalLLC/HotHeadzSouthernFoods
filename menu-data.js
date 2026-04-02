@@ -230,6 +230,15 @@ const MENU_DATA = {
       lunch: {
         show: true,
         items: [
+          { "name": "Hamburger Steak", "desc": "Seasoned hamburger steak cooked and served hot." },
+{ "name": "Smothered Chicken", "desc": "Tender chicken smothered in rich gravy." },
+{ "name": "Rice", "desc": "Steamed white rice." },
+{ "name": "Mashed Potatoes", "desc": "Creamy mashed potatoes served hot." },
+{ "name": "Brown Gravy", "desc": "Rich brown gravy served over your choice of items." },
+{ "name": "Corn", "desc": "Sweet seasoned corn." },
+{ "name": "Green Beans", "desc": "Seasoned green beans cooked until tender." },
+{ "name": "Fried Okra", "desc": "Crispy golden fried okra." },
+{ "name": "Cornbread", "desc": "Soft, warm cornbread baked to a golden finish." },
           { name: "Turkey Clubs", desc: "Classic club sandwiches stacked with turkey, bacon, lettuce, tomato, and mayo." },
           { name: "Chicken Salad", desc: "Creamy house-made chicken salad served chilled and ready to enjoy." },
           { name: "Croissants", desc: "Flaky, buttery croissants baked until golden and tender." }
