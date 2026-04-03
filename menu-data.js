@@ -252,7 +252,17 @@ const MENU_DATA = {
       lunch: {
         show: true,
         items: [
-          { name: "Corn Nuggets", desc: "Sweet corn fritters fried to a crispy golden bite." },
+          { "name": "Fried Fish & Hushpuppies", "desc": "Crispy fried fish served with golden hushpuppies." },
+{ "name": "Fried Shrimp", "desc": "Crispy fried shrimp cooked until golden." },
+{ "name": "Smoked Chicken", "desc": "Slow-smoked chicken with rich, savory flavor." },
+{ "name": "Shrimp Alfredo", "desc": "Shrimp served in a creamy Alfredo sauce over pasta." },
+{ "name": "Corn", "desc": "Sweet seasoned corn." },
+{ "name": "Cabbage", "desc": "Tender seasoned cabbage." },
+{ "name": "French Fries", "desc": "Hot crispy French fries." },
+{ "name": "Rice", "desc": "Steamed white rice." },
+{ "name": "Corn Nuggets", "desc": "Sweet corn fritters fried to a crispy golden bite." },
+{ "name": "Greens", "desc": "Seasoned greens cooked low and slow for rich flavor." },
+{ "name": "Cornbread", "desc": "Soft, warm cornbread baked to a golden finish." },
           { name: "Turkey Clubs", desc: "Classic club sandwiches stacked with turkey, bacon, lettuce, tomato, and mayo." },
           { name: "Chicken Salad", desc: "Creamy house-made chicken salad served chilled and ready to enjoy." },
           { name: "Croissants", desc: "Flaky, buttery croissants baked until golden and tender." }
