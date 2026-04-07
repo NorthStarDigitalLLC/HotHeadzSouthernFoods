@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schedule Manager — Hot Headz Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#C0392B;--red-hot:#E74C3C;--ember:#E67E22;--ember-light:#F39C12;
+  --black:#0A0A0A;--dark:#111;--dark2:#1A1A1A;--dark3:#222;--dark4:#2A2A2A;
+  --white:#F5F0E8;--muted:#7A7060;--mid:#9A9080;
+  --border:rgba(255,255,255,.07);--border-hot:rgba(231,76,60,.25);
+  --green:#27AE60;--green-dark:#1E8449;
+}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
+
+/* SETUP SCREEN */
+#setupScreen{position:fixed;inset:0;z-index:9999;background:var(--black);display:flex;align-items:center;justify-content:center;padding:1rem;overflow-y:auto}
+.setup-box{width:100%;max-width:560px;background:var(--dark2);border:1px solid var(--border);padding:2.5rem;position:relative;margin:auto}
+.setup-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ember),var(--red))}
+.setup-step{display:none}.setup-step.active{display:block}
+.setup-icon{font-size:2.2rem;margin-bottom:.5rem}
+.setup-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.1em;margin-bottom:.25rem}
+.setup-title span{color:var(--ember)}
+.setup-sub{font-size:.8rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.7}
+.setup-sub strong{color:var(--ember-light)}
+.steps-list{list-style:none;display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem}
+.steps-list li{display:flex;gap:.75rem;align-items:flex-start;font-size:.82rem;line-height:1.6}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--ember);color:white;font-weight:700;font-size:.7rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem}
+.code-block{background:var(--dark3);border:1px solid var(--border);padding:1rem;font-family:'Space Mono',monospace;font-size:.72rem;color:var(--ember-light);line-height:1.8;margin:1rem 0;word-break:break-all;position:relative}
+.copy-btn{position:absolute;top:.5rem;right:.5rem;background:var(--dark4);border:1px solid var(--border);color:var(--muted);font-size:.55rem;padding:.25rem .6rem;cursor:pointer;font-family:'Space Mono',monospace;letter-spacing:.1em;text-transform:uppercase;transition:all .2s}
+.copy-btn:hover{color:var(--ember-light);border-color:rgba(230,126,34,.4)}
+.f-label{font-size:.62rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;display:block}
+.f-input{width:100%;background:var(--dark3);border:1px solid var(--border);color:var(--white);padding:.7rem 1rem;font-family:'Space Mono',monospace;font-size:.82rem;outline:none;transition:border-color .2s;margin-bottom:.75rem}
+.f-input:focus{border-color:var(--ember)}
+.f-btn-row{display:flex;gap:.75rem;flex-wrap:wrap}
+.f-btn{padding:.8rem 1.5rem;background:var(--ember);color:white;border:none;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.12em;cursor:pointer;transition:background .2s;flex-shrink:0}
+.f-btn:hover{background:var(--ember-light)}
+.f-btn.red{background:var(--red)}.f-btn.red:hover{background:var(--red-hot)}
+.f-btn.ghost{background:none;border:1px solid var(--border);color:var(--muted)}.f-btn.ghost:hover{border-color:var(--border-hot);color:var(--red-hot)}
+.setup-error{font-size:.75rem;color:var(--red-hot);margin-top:.5rem;min-height:1rem}
+.setup-note{font-size:.7rem;color:var(--muted);margin-top:1rem;line-height:1.6;padding:1rem;background:rgba(230,126,34,.05);border:1px solid rgba(230,126,34,.15)}
+
+/* ADMIN LOGIN */
+#adminLogin{position:fixed;inset:0;z-index:998;background:var(--black);display:none;align-items:center;justify-content:center}
+.al-box{width:100%;max-width:360px;background:var(--dark2);border:1px solid var(--border);padding:2.5rem;position:relative}
+.al-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ember),var(--red))}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.12em}
+.logo-text span{color:var(--ember)}
+.admin-badge{font-family:'Space Mono',monospace;font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ember);border:1px solid rgba(230,126,34,.35);padding:.25rem .7rem}
+.hdr-right{display:flex;gap:.75rem;align-items:center}
+.hdr-btn{font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;padding:.45rem .9rem;background:none;border:1px solid var(--border);color:var(--mid);cursor:pointer;transition:all .2s}
+.hdr-btn:hover{border-color:var(--border-hot);color:var(--red-hot)}
+.hdr-btn.green{background:var(--green);border-color:var(--green);color:white}.hdr-btn.green:hover{background:var(--green-dark)}
+
+/* MAIN */
+#adminApp{display:none;position:relative;z-index:1}
+.wrap{max-width:1100px;margin:0 auto;padding:2rem 1.5rem}
+
+/* LOADING OVERLAY */
+.loading-overlay{position:fixed;inset:0;z-index:500;background:rgba(10,10,10,.8);display:none;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
+.loading-overlay.show{display:flex}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--ember);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:2rem;overflow-x:auto}
+.tab-btn{font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.1em;padding:.7rem 1.5rem;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;position:relative;top:1px;white-space:nowrap}
+.tab-btn:hover{color:var(--white)}
+.tab-btn.active{color:var(--ember-light);border-bottom-color:var(--ember)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* SECTION */
+.sec-hdr{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.08em}
+.sec-title span{color:var(--ember-light)}
+.sec-sub{font-size:.75rem;color:var(--muted);margin-top:.2rem}
+
+/* FORM */
+.card{background:var(--dark2);border:1px solid var(--border);padding:1.5rem;margin-bottom:2rem;position:relative}
+.card.accent-ember::before{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:var(--ember)}
+.card.accent-red::before{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:var(--red-hot)}
+.card.accent-green::before{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:var(--green)}
+.form-grid{display:grid;gap:1rem;align-items:end}
+.fg-5{grid-template-columns:1fr 1fr 1fr 1fr 1fr}
+.fg-4{grid-template-columns:1fr 1fr 1fr 1fr}
+.fg-3{grid-template-columns:1fr 1fr 1fr}
+.fg-2{grid-template-columns:1fr 1fr}
+.form-group{display:flex;flex-direction:column}
+.f-select{width:100%;background:var(--dark3);border:1px solid var(--border);color:var(--white);padding:.7rem 1rem;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;cursor:pointer;transition:border-color .2s;appearance:none}
+.f-select:focus,.f-input:focus{border-color:var(--ember)}
+.fi{width:100%;background:var(--dark3);border:1px solid var(--border);color:var(--white);padding:.7rem 1rem;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s}
+.ab{padding:.7rem 1.2rem;border:none;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.1em;cursor:pointer;transition:background .2s;align-self:flex-end;white-space:nowrap}
+.ab.red{background:var(--red);color:white}.ab.red:hover{background:var(--red-hot)}
+.ab.ghost{background:var(--dark4);border:1px solid var(--border);color:var(--mid)}.ab.ghost:hover{border-color:var(--border-hot);color:var(--red-hot)}
+.ab.green{background:var(--green);color:white}.ab.green:hover{background:var(--green-dark)}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;background:var(--dark2);border:1px solid var(--border)}
+.tbl th{background:var(--dark3);padding:.65rem 1rem;text-align:left;font-size:.62rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)}
+.tbl td{padding:.7rem 1rem;border-bottom:1px solid var(--border);font-size:.82rem;color:var(--white)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--dark3)}
+.badge{display:inline-block;padding:.15rem .6rem;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:2px}
+.br{background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.3);color:var(--red-hot)}
+.be{background:rgba(230,126,34,.15);border:1px solid rgba(230,126,34,.3);color:var(--ember-light)}
+.bg{background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.3);color:#2ECC71}
+.del-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.8rem;padding:.2rem .5rem;transition:color .2s}
+.del-btn:hover{color:var(--red-hot)}
+.empty-row td{text-align:center;padding:2rem;color:var(--muted);font-size:.82rem}
+
+/* FILTER */
+.filter-row{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;flex-wrap:wrap}
+.fl{font-size:.72rem;color:var(--muted);white-space:nowrap}
+.fi-sm{background:var(--dark3);border:1px solid var(--border);color:var(--white);padding:.45rem .75rem;font-family:'Space Mono',monospace;font-size:.72rem;outline:none}
+.fi-sm:focus{border-color:var(--ember)}
+
+/* EMPLOYEES */
+.emp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-bottom:2rem}
+.emp-card{background:var(--dark2);border:1px solid var(--border);padding:1.2rem;position:relative;transition:border-color .2s}
+.emp-card:hover{border-color:var(--border-hot)}
+.emp-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--ember);opacity:0;transition:opacity .2s}
+.emp-card:hover::before{opacity:1}
+.emp-name{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.06em;margin-bottom:.2rem}
+.emp-role{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.75rem}
+.emp-actions{display:flex;gap:.5rem;margin-top:.75rem}
+.emp-btn{font-family:'Space Mono',monospace;font-size:.5rem;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .7rem;background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .2s}
+.emp-btn:hover{border-color:var(--border-hot);color:var(--red-hot)}
+
+/* NOTICES */
+.notice-list-item{display:flex;align-items:flex-start;gap:1rem;padding:1rem 1.25rem;background:var(--dark2);border:1px solid var(--border);margin-bottom:.5rem}
+.nli-dot{width:8px;height:8px;border-radius:50%;background:var(--red-hot);flex-shrink:0;margin-top:.35rem}
+.nli-dot.info{background:var(--ember)}.nli-dot.ok{background:var(--green)}
+.nli-text{font-size:.82rem;color:var(--white);line-height:1.5}
+.nli-date{font-size:.62rem;color:var(--muted);margin-top:.2rem}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;right:2rem;z-index:9999;background:var(--green);color:white;padding:.75rem 1.5rem;font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:.1em;transform:translateY(100px);opacity:0;transition:all .3s;pointer-events:none;max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.err{background:var(--red-hot)}
+
+@media(max-width:800px){
+  .fg-5{grid-template-columns:1fr 1fr}.fg-4{grid-template-columns:1fr 1fr}.fg-3{grid-template-columns:1fr 1fr}
+  header{padding:0 1rem}.wrap{padding:1rem}
+}
+@media(max-width:500px){.fg-5,.fg-4,.fg-3,.fg-2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loadingText">Saving...</div>
+</div>
+
+<!-- SETUP SCREEN -->
+<div id="setupScreen">
+  <div class="setup-box">
+
+    <!-- STEP 1: No URL yet -->
+    <div class="setup-step active" id="step1">
+      <div class="setup-icon">🌶️</div>
+      <div class="setup-title">Hot Headz <span>Setup</span></div>
+      <div class="setup-sub">First time setup — this takes about <strong>5 minutes</strong> and only needs to be done once. Follow these steps to connect your schedule to Google Sheets so all employees see live data.</div>
+
+      <ol class="steps-list">
+        <li><div class="step-num">1</div><div>Go to <strong style="color:var(--ember-light)">sheets.google.com</strong> and create a new blank spreadsheet. Name it <em>"Hot Headz Schedule"</em></div></li>
+        <li><div class="step-num">2</div><div>In the spreadsheet, click <strong style="color:var(--ember-light)">Extensions → Apps Script</strong></div></li>
+        <li><div class="step-num">3</div><div>Delete all existing code in the editor, then paste the code from the file <strong style="color:var(--ember-light)">apps-script.js</strong> (included in your download)</div></li>
+        <li><div class="step-num">4</div><div>Click <strong style="color:var(--ember-light)">Save</strong>, then click <strong style="color:var(--ember-light)">Deploy → New Deployment</strong></div></li>
+        <li><div class="step-num">5</div><div>Set type to <strong style="color:var(--ember-light)">"Web App"</strong>, set "Execute as" to <strong>Me</strong>, set "Who has access" to <strong>Anyone</strong>. Click Deploy.</div></li>
+        <li><div class="step-num">6</div><div>Copy the <strong style="color:var(--ember-light)">Web App URL</strong> it gives you and paste it below</div></li>
+      </ol>
+
+      <label class="f-label" for="urlInput">Google Apps Script Web App URL</label>
+      <input class="f-input" type="url" id="urlInput" placeholder="https://script.google.com/macros/s/...">
+      <div class="f-btn-row">
+        <button class="f-btn red" onclick="saveURL()">SAVE & CONNECT ›</button>
+      </div>
+      <div class="setup-error" id="urlError"></div>
+      <div class="setup-note">⚠️ Already set up before? If you have a URL saved, enter it above and click Save & Connect.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="adminLogin" style="display:none;position:fixed;inset:0;z-index:998;background:var(--black);align-items:center;justify-content:center">
+  <div class="al-box">
+    <div style="font-size:2rem;text-align:center;margin-bottom:.5rem">🔐</div>
+    <div class="setup-title" style="text-align:center">Admin <span>Access</span></div>
+    <div style="font-size:.72rem;color:var(--muted);text-align:center;margin-bottom:1.5rem">Hot Headz Schedule Manager</div>
+    <label class="f-label" for="adminPass">Admin Password</label>
+    <input class="f-input" type="password" id="adminPass" placeholder="Enter admin password">
+    <div style="display:flex;gap:.75rem">
+      <button class="f-btn red" style="flex:1" onclick="adminLogin()">ENTER ›</button>
+      <button class="f-btn ghost" onclick="showSetup()">Change URL</button>
+    </div>
+    <div class="setup-error" id="adminError"></div>
+    <div class="setup-note" style="margin-top:1rem">Default password: <span style="color:var(--ember-light)">hotheadz2025</span></div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="adminApp">
+  <header>
+    <div style="display:flex;align-items:center;gap:.75rem">
+      <span style="font-size:1.1rem">🌶️</span>
+      <span class="logo-text">Hot Headz <span>Admin</span></span>
+    </div>
+    <span class="admin-badge">Schedule Manager</span>
+    <div class="hdr-right">
+      <button class="hdr-btn" onclick="showSetup()">⚙ URL</button>
+      <button class="hdr-btn" onclick="adminLogout()">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('schedule')">📅 Schedule</button>
+      <button class="tab-btn" onclick="showTab('employees')">👥 Employees</button>
+      <button class="tab-btn" onclick="showTab('notices')">📋 Notices</button>
+      <button class="tab-btn" onclick="showTab('settings')">⚙️ Settings</button>
+    </div>
+
+    <!-- ══ SCHEDULE ══ -->
+    <div class="tab-panel active" id="tab-schedule">
+      <div class="sec-hdr">
+        <div><div class="sec-title">Add <span>Shift</span></div><div class="sec-sub">Assign an employee to a date and time. Changes are live instantly.</div></div>
+      </div>
+      <div class="card accent-ember">
+        <div class="form-grid fg-5">
+          <div class="form-group"><label class="f-label">Employee</label><select class="f-select" id="sf-name"><option value="">— Select —</option></select></div>
+          <div class="form-group"><label class="f-label">Date</label><input class="fi" type="date" id="sf-date"></div>
+          <div class="form-group"><label class="f-label">Start Time</label><input class="fi" type="time" id="sf-start"></div>
+          <div class="form-group"><label class="f-label">End Time</label><input class="fi" type="time" id="sf-end"></div>
+          <div class="form-group"><label class="f-label">Role</label>
+            <select class="f-select" id="sf-role">
+              <option>Cook</option><option>Cashier</option><option>Server</option>
+              <option>Prep</option><option>Dishwasher</option><option>Manager</option><option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:1rem;display:flex;gap:.75rem;flex-wrap:wrap;align-items:flex-end">
+          <div class="form-group" style="flex:1;min-width:200px"><label class="f-label">Notes (optional)</label><input class="fi" type="text" id="sf-notes" placeholder="e.g. Crawfish night, cover for John..."></div>
+          <button class="ab red" onclick="addShift()">+ ADD SHIFT</button>
+          <button class="ab ghost" onclick="clearShiftForm()">Clear</button>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <span class="fl">Filter:</span>
+        <input class="fi-sm" type="date" id="filterFrom">
+        <span class="fl">to</span>
+        <input class="fi-sm" type="date" id="filterTo">
+        <button class="ab ghost" style="padding:.4rem .9rem;font-size:.75rem" onclick="applyFilter()">Apply</button>
+        <button class="ab ghost" style="padding:.4rem .9rem;font-size:.75rem" onclick="clearFilter()">Clear</button>
+        <input class="fi-sm" type="text" id="filterName" placeholder="Name..." style="min-width:140px" oninput="renderShiftTable()">
+        <button class="ab ghost" style="padding:.4rem .9rem;font-size:.75rem;margin-left:auto" onclick="loadSchedule()">↺ Refresh</button>
+      </div>
+
+      <div style="overflow-x:auto">
+        <table class="tbl" id="shiftTable">
+          <thead><tr>
+            <th>Employee</th><th>Date</th><th>Day</th><th>Start</th><th>End</th>
+            <th>Hours</th><th>Role</th><th>Notes</th><th>Del</th>
+          </tr></thead>
+          <tbody id="shiftTableBody"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:1rem;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center">
+        <span style="font-size:.72rem;color:var(--muted)" id="shiftCount"></span>
+        <button class="ab ghost" style="padding:.4rem .9rem;font-size:.72rem;margin-left:auto" onclick="if(confirm('Delete ALL shifts?')){clearAllShifts()}">🗑 Clear All</button>
+      </div>
+    </div>
+
+    <!-- ══ EMPLOYEES ══ -->
+    <div class="tab-panel" id="tab-employees">
+      <div class="sec-hdr"><div><div class="sec-title">Manage <span>Employees</span></div><div class="sec-sub">Add employees and set PINs. Employees log in with name + PIN.</div></div></div>
+      <div class="card accent-green">
+        <div class="form-grid fg-4">
+          <div class="form-group"><label class="f-label">Full Name</label><input class="fi" type="text" id="emp-name" placeholder="e.g. Sarah Johnson"></div>
+          <div class="form-group"><label class="f-label">Default Role</label>
+            <select class="f-select" id="emp-role">
+              <option>Cook</option><option>Cashier</option><option>Server</option>
+              <option>Prep</option><option>Dishwasher</option><option>Manager</option><option>Other</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="f-label">PIN (4–6 digits)</label><input class="fi" type="text" id="emp-pin" placeholder="e.g. 1234" maxlength="6" inputmode="numeric"></div>
+          <button class="ab green" onclick="addEmployee()">+ ADD</button>
+        </div>
+      </div>
+      <div class="emp-grid" id="empGrid"></div>
+      <div style="text-align:center;padding:1rem"><button class="ab ghost" style="font-size:.75rem" onclick="loadEmployees()">↺ Refresh List</button></div>
+    </div>
+
+    <!-- ══ NOTICES ══ -->
+    <div class="tab-panel" id="tab-notices">
+      <div class="sec-hdr"><div><div class="sec-title">Notice <span>Board</span></div><div class="sec-sub">Post announcements visible to all employees on the portal.</div></div></div>
+      <div class="card accent-red">
+        <div class="form-grid fg-3">
+          <div class="form-group" style="grid-column:span 2"><label class="f-label">Message</label><input class="fi" type="text" id="notice-text" placeholder="e.g. Kitchen closes early Friday — deep clean day"></div>
+          <div class="form-group"><label class="f-label">Type</label>
+            <select class="f-select" id="notice-type">
+              <option value="">Alert (red)</option>
+              <option value="info">Info (orange)</option>
+              <option value="ok">Good News (green)</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:1rem"><button class="ab red" onclick="addNotice()">+ POST NOTICE</button></div>
+      </div>
+      <div id="noticeList"></div>
+      <div style="text-align:center;padding:1rem"><button class="ab ghost" style="font-size:.75rem" onclick="loadNotices()">↺ Refresh</button></div>
+    </div>
+
+    <!-- ══ SETTINGS ══ -->
+    <div class="tab-panel" id="tab-settings">
+      <div class="sec-hdr"><div><div class="sec-title">Settings & <span>Info</span></div></div></div>
+      <div class="card accent-ember">
+        <div class="sec-title" style="font-size:1rem;margin-bottom:1rem">Change Admin Password</div>
+        <div class="form-grid fg-3">
+          <div class="form-group"><label class="f-label">New Password</label><input class="fi" type="password" id="newPass1" placeholder="New password"></div>
+          <div class="form-group"><label class="f-label">Confirm</label><input class="fi" type="password" id="newPass2" placeholder="Confirm"></div>
+          <button class="ab red" onclick="changePassword()">Save Password</button>
+        </div>
+        <div id="passMsg" style="font-size:.72rem;margin-top:.75rem;min-height:1rem"></div>
+      </div>
+      <div class="card" style="background:var(--dark2)">
+        <div class="sec-title" style="font-size:1rem;margin-bottom:.75rem">Connected Sheet</div>
+        <div style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--ember-light);word-break:break-all;margin-bottom:1rem" id="displayURL"></div>
+        <button class="ab ghost" onclick="showSetup()">Change URL</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// =============================================
+// CONFIG
+// =============================================
+const API_URL = 'https://script.google.com/a/macros/northstardigitalweb.com/s/AKfycbxnCSfbRk15e66t3rhDCMYzVmc6fpwptTxh611NIqPn8KV3mybvqxoFe97wpXM1YqtMrQ/exec';
+function getURL() { return API_URL; }
+function saveURL_ls(u) { /* hardcoded */ }
+
+// =============================================
+// BOOT
+// =============================================
+window.onload = function() {
+  showAdminLogin();
+};
+
+function showSetup() {
+  showAdminLogin(); // no setup needed - URL is hardcoded
+}
+
+function showAdminLogin() {
+  document.getElementById('setupScreen').style.display  = 'none';
+  document.getElementById('adminLogin').style.display   = 'flex';
+  document.getElementById('adminApp').style.display     = 'none';
+}
+
+function saveURL() {
+  var url = document.getElementById('urlInput').value.trim();
+  if(!url || !url.startsWith('https://script.google.com')) {
+    document.getElementById('urlError').textContent = 'Please enter a valid Google Apps Script URL';
+    return;
+  }
+  saveURL_ls(url);
+  document.getElementById('urlError').textContent = '';
+  // Init sheets then go to login
+  loading('Initializing sheets...');
+  api({action:'init'}).then(function(r) {
+    stopLoading();
+    if(r.ok) { toast('Connected! Now log in.'); showAdminLogin(); }
+    else { document.getElementById('urlError').textContent = 'Could not connect: ' + (r.error||'Unknown error'); }
+  }).catch(function(e) {
+    stopLoading();
+    document.getElementById('urlError').textContent = 'Connection failed. Check the URL and try again.';
+  });
+}
+
+// =============================================
+// API
+// =============================================
+function api(params) {
+  var url = getURL();
+  if(!url) return Promise.reject(new Error('No API URL set'));
+  // Build query string for GET
+  var qs = Object.keys(params).map(function(k){ return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
+  return fetch(url + '?' + qs)
+    .then(function(r){ return r.json(); });
+}
+
+// =============================================
+// LOADING
+// =============================================
+function loading(msg) {
+  document.getElementById('loadingText').textContent = msg || 'Loading...';
+  document.getElementById('loadingOverlay').classList.add('show');
+}
+function stopLoading() { document.getElementById('loadingOverlay').classList.remove('show'); }
+
+// =============================================
+// ADMIN LOGIN
+// =============================================
+function adminLogin() {
+  var pass = document.getElementById('adminPass').value;
+  if(!pass) { document.getElementById('adminError').textContent = 'Enter your password.'; return; }
+  loading('Checking password...');
+  api({action:'checkAdmin', pass:pass}).then(function(r) {
+    stopLoading();
+    if(r.ok) {
+      document.getElementById('adminLogin').style.display = 'none';
+      document.getElementById('adminApp').style.display   = 'block';
+      initAdmin();
+    } else {
+      document.getElementById('adminError').textContent = 'Incorrect password.';
+    }
+  }).catch(function(){ stopLoading(); document.getElementById('adminError').textContent = 'Connection error. Check your internet.'; });
+}
+document.addEventListener('keydown', function(e){ if(e.key==='Enter' && document.getElementById('adminLogin').style.display==='flex') adminLogin(); });
+
+function adminLogout() {
+  document.getElementById('adminApp').style.display = 'none';
+  showAdminLogin();
+  document.getElementById('adminPass').value = '';
+}
+
+// =============================================
+// INIT
+// =============================================
+var _schedule  = [];
+var _employees = [];
+var _filterFrom = '', _filterTo = '', _filterName = '';
+
+function initAdmin() {
+  document.getElementById('sf-date').value  = new Date().toISOString().slice(0,10);
+  document.getElementById('sf-start').value = '05:30';
+  document.getElementById('sf-end').value   = '14:00';
+  var now = new Date(), day = now.getDay();
+  var sun = new Date(now); sun.setDate(now.getDate()-day); sun.setHours(0,0,0,0);
+  var sat = new Date(sun); sat.setDate(sun.getDate()+6);
+  document.getElementById('filterFrom').value = sun.toISOString().slice(0,10);
+  document.getElementById('filterTo').value   = sat.toISOString().slice(0,10);
+  _filterFrom = document.getElementById('filterFrom').value;
+  _filterTo   = document.getElementById('filterTo').value;
+  document.getElementById('displayURL').textContent = getURL();
+  loadAll();
+}
+
+function loadAll() {
+  loading('Loading data...');
+  Promise.all([
+    api({action:'getSchedule'}),
+    api({action:'getEmployees'}),
+    api({action:'getNotices'})
+  ]).then(function(results) {
+    stopLoading();
+    if(results[0].ok) _schedule  = results[0].data || [];
+    if(results[1].ok) _employees = results[1].data || [];
+    renderShiftTable();
+    renderEmpSelect();
+    renderEmpGrid();
+    if(results[2].ok) renderNoticeList(results[2].data || []);
+  }).catch(function(){ stopLoading(); toast('Failed to load data — check connection', true); });
+}
+
+function loadSchedule() {
+  loading('Refreshing schedule...');
+  api({action:'getSchedule'}).then(function(r){
+    stopLoading();
+    if(r.ok){ _schedule = r.data||[]; renderShiftTable(); toast('Schedule refreshed'); }
+  }).catch(function(){ stopLoading(); toast('Refresh failed', true); });
+}
+function loadEmployees() {
+  loading('Loading employees...');
+  api({action:'getEmployees'}).then(function(r){
+    stopLoading();
+    if(r.ok){ _employees = r.data||[]; renderEmpGrid(); renderEmpSelect(); toast('Employees refreshed'); }
+  }).catch(function(){ stopLoading(); toast('Refresh failed', true); });
+}
+function loadNotices() {
+  loading('Loading notices...');
+  api({action:'getNotices'}).then(function(r){
+    stopLoading();
+    if(r.ok) renderNoticeList(r.data||[]);
+  }).catch(function(){ stopLoading(); toast('Refresh failed', true); });
+}
+
+// =============================================
+// TABS
+// =============================================
+function showTab(id) {
+  document.querySelectorAll('.tab-btn').forEach(function(b,i){
+    b.classList.toggle('active', ['schedule','employees','notices','settings'][i]===id);
+  });
+  document.querySelectorAll('.tab-panel').forEach(function(p){
+    p.classList.toggle('active', p.id==='tab-'+id);
+  });
+}
+
+// =============================================
+// HELPERS
+// =============================================
+var DAYS  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+var MONTHS= ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function fmtDate(s){ if(!s) return ''; var d=new Date(s+'T00:00:00'); return MONTHS[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear(); }
+function fmtDay(s) { if(!s) return ''; var d=new Date(s+'T00:00:00'); return DAYS[d.getDay()]; }
+function fmt12(t)  { if(!t) return '—'; var p=t.split(':').map(Number),h=p[0],m=p[1]; return (h%12||12)+':'+(m<10?'0':'')+m+(h>=12?'pm':'am'); }
+function calcH(s,e){ if(!s||!e) return 0; var a=s.split(':').map(Number),b=e.split(':').map(Number),d=(b[0]*60+b[1])-(a[0]*60+a[1]); return d>0?+(d/60).toFixed(1):0; }
+
+function toast(msg, isErr) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show' + (isErr?' err':'');
+  clearTimeout(t._t); t._t = setTimeout(function(){ t.className='toast'; }, 2800);
+}
+
+// =============================================
+// SHIFTS
+// =============================================
+function renderEmpSelect() {
+  var sel = document.getElementById('sf-name');
+  var cur = sel.value;
+  sel.innerHTML = '<option value="">— Select Employee —</option>';
+  _employees.slice().sort(function(a,b){return a.name.localeCompare(b.name);}).forEach(function(e){
+    var o = document.createElement('option');
+    o.value = e.name; o.textContent = e.name;
+    if(e.name===cur) o.selected=true;
+    sel.appendChild(o);
+  });
+}
+
+function addShift() {
+  var name  = document.getElementById('sf-name').value.trim();
+  var date  = document.getElementById('sf-date').value;
+  var start = document.getElementById('sf-start').value;
+  var end   = document.getElementById('sf-end').value;
+  var role  = document.getElementById('sf-role').value;
+  var notes = document.getElementById('sf-notes').value.trim();
+  if(!name) { toast('Select an employee', true); return; }
+  if(!date) { toast('Pick a date', true); return; }
+  loading('Adding shift...');
+  api({action:'addShift', name:name, date:date, startTime:start, endTime:end, role:role, notes:notes})
+    .then(function(r){
+      stopLoading();
+      if(r.ok){ _schedule.push({id:r.id,name:name,date:date,startTime:start,endTime:end,role:role,notes:notes}); renderShiftTable(); toast('Shift added for '+name); document.getElementById('sf-notes').value=''; }
+      else toast('Error: '+(r.error||'failed'), true);
+    }).catch(function(){ stopLoading(); toast('Connection error', true); });
+}
+
+function deleteShift(id) {
+  if(!confirm('Delete this shift?')) return;
+  loading('Deleting...');
+  api({action:'deleteShift', id:id}).then(function(r){
+    stopLoading();
+    if(r.ok){ _schedule = _schedule.filter(function(s){return s.id!==id;}); renderShiftTable(); toast('Shift deleted'); }
+    else toast('Error: '+(r.error||'failed'), true);
+  }).catch(function(){ stopLoading(); toast('Connection error', true); });
+}
+
+function clearAllShifts() {
+  loading('Clearing all shifts...');
+  api({action:'clearShifts'}).then(function(r){
+    stopLoading();
+    if(r.ok){ _schedule=[]; renderShiftTable(); toast('All shifts cleared'); }
+    else toast('Error', true);
+  }).catch(function(){ stopLoading(); toast('Connection error', true); });
+}
+
+function clearShiftForm() {
+  document.getElementById('sf-name').value = '';
+  document.getElementById('sf-notes').value = '';
+  document.getElementById('sf-date').value = new Date().toISOString().slice(0,10);
+}
+
+function applyFilter() {
+  _filterFrom = document.getElementById('filterFrom').value;
+  _filterTo   = document.getElementById('filterTo').value;
+  renderShiftTable();
+}
+function clearFilter() {
+  _filterFrom=''; _filterTo='';
+  document.getElementById('filterFrom').value='';
+  document.getElementById('filterTo').value='';
+  document.getElementById('filterName').value='';
+  renderShiftTable();
+}
+
+function renderShiftTable() {
+  var fn = document.getElementById('filterName').value.toLowerCase().trim();
+  var data = _schedule.slice();
+  if(_filterFrom) data = data.filter(function(s){return s.date>=_filterFrom;});
+  if(_filterTo)   data = data.filter(function(s){return s.date<=_filterTo;});
+  if(fn)          data = data.filter(function(s){return s.name.toLowerCase().includes(fn);});
+  data.sort(function(a,b){return a.date.localeCompare(b.date)||a.name.localeCompare(b.name);});
+
+  var tbody = document.getElementById('shiftTableBody');
+  tbody.innerHTML = '';
+  if(!data.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="9">No shifts found. Add one above or adjust filters.</td></tr>'; document.getElementById('shiftCount').textContent=''; return; }
+
+  var total = data.reduce(function(a,s){return a+calcH(s.startTime,s.endTime);},0);
+  document.getElementById('shiftCount').textContent = data.length+' shift'+(data.length!==1?'s':'')+' · '+total.toFixed(1)+' total hours';
+
+  data.forEach(function(s){
+    var h = calcH(s.startTime,s.endTime);
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td><strong>'+s.name+'</strong></td><td>'+fmtDate(s.date)+'</td><td style="color:var(--muted)">'+fmtDay(s.date)+'</td><td>'+fmt12(s.startTime)+'</td><td>'+fmt12(s.endTime)+'</td><td><span class="badge be">'+(h>0?h+'h':'—')+'</span></td><td><span class="badge br">'+(s.role||'Staff')+'</span></td><td style="color:var(--muted);font-size:.75rem">'+(s.notes||'')+'</td><td><button class="del-btn" onclick="deleteShift(\''+s.id+'\')">🗑</button></td>';
+    tbody.appendChild(tr);
+  });
+}
+
+// =============================================
+// EMPLOYEES
+// =============================================
+function addEmployee() {
+  var name = document.getElementById('emp-name').value.trim();
+  var role = document.getElementById('emp-role').value;
+  var pin  = document.getElementById('emp-pin').value.trim();
+  if(!name){ toast('Enter a name', true); return; }
+  if(!pin||pin.length<4){ toast('PIN must be at least 4 digits', true); return; }
+  if(!/^\d+$/.test(pin)){ toast('PIN must be numbers only', true); return; }
+  loading('Adding employee...');
+  api({action:'addEmployee', name:name, pin:pin, role:role}).then(function(r){
+    stopLoading();
+    if(r.ok){ _employees.push({name:name,role:role}); renderEmpGrid(); renderEmpSelect(); document.getElementById('emp-name').value=''; document.getElementById('emp-pin').value=''; toast(name+' added'); }
+    else toast('Error: '+(r.error||'failed'), true);
+  }).catch(function(){ stopLoading(); toast('Connection error', true); });
+}
+
+function deleteEmployee(name) {
+  if(!confirm('Remove '+name+'? Their shifts will NOT be deleted.')) return;
+  loading('Removing...');
+  api({action:'deleteEmployee', name:name}).then(function(r){
+    stopLoading();
+    if(r.ok){ _employees=_employees.filter(function(e){return e.name!==name;}); renderEmpGrid(); renderEmpSelect(); toast(name+' removed'); }
+    else toast('Error', true);
+  }).catch(function(){ stopLoading(); toast('Connection error', true); });
+}
+
+function resetPin(name) {
+  var p = prompt('New PIN for '+name+' (4–6 digits):');
+  if(!p) return;
+  if(!/^\d{4,6}$/.test(p)){ alert('PIN must be 4–6 digits.'); return; }
+  loading('Updating PIN...');
+  api({action:'updatePin', name:name, pin:p}).then(function(r){
+    stopLoading();
+    if(r.ok) toast('PIN updated for '+name);
+    else toast('Error', true);
+  }).catch(function(){ stopLoading(); toast('Connection error', true); });
+}
+
+function renderEmpGrid() {
+  var g = document.getElementById('empGrid');
+  if(!_employees.length){ g.innerHTML='<p style="color:var(--muted);font-size:.82rem;grid-column:1/-1">No employees yet.</p>'; return; }
+  g.innerHTML='';
+  _employees.slice().sort(function(a,b){return a.name.localeCompare(b.name);}).forEach(function(e){
+    var c = document.createElement('div'); c.className='emp-card';
+    c.innerHTML='<div class="emp-name">'+e.name+'</div><div class="emp-role">'+(e.role||'Staff')+'</div><div class="emp-actions"><button class="emp-btn" onclick="resetPin(\''+e.name+'\')">🔑 Reset PIN</button><button class="emp-btn" onclick="deleteEmployee(\''+e.name+'\')">✕ Remove</button></div>';
+    g.appendChild(c);
+  });
+}
+
+// =============================================
+// NOTICES
+// =============================================
+function addNotice() {
+  var text = document.getElementById('notice-text').value.trim();
+  var type = document.getElementById('notice-type').value;
+  if(!text){ toast('Enter a message', true); return; }
+  loading('Posting...');
+  api({action:'addNotice', text:text, type:type}).then(function(r){
+    stopLoading();
+    if(r.ok){ document.getElementById('notice-text').value=''; loadNotices(); toast('Notice posted'); }
+    else toast('Error', true);
+  }).catch(function(){ stopLoading(); toast('Connection error', true); });
+}
+
+function deleteNotice(id) {
+  loading('Deleting...');
+  api({action:'deleteNotice', id:id}).then(function(r){
+    stopLoading();
+    if(r.ok){ loadNotices(); toast('Notice removed'); }
+    else toast('Error', true);
+  }).catch(function(){ stopLoading(); toast('Connection error', true); });
+}
+
+function renderNoticeList(notices) {
+  var el = document.getElementById('noticeList');
+  if(!notices.length){ el.innerHTML='<p style="color:var(--muted);font-size:.82rem">No notices yet.</p>'; return; }
+  el.innerHTML='';
+  notices.slice().reverse().forEach(function(n){
+    var d=document.createElement('div'); d.className='notice-list-item';
+    d.innerHTML='<div class="nli-dot '+(n.type||'')+'"></div><div style="flex:1"><div class="nli-text">'+n.text+'</div><div class="nli-date">'+(n.date||'')+'</div></div><button class="del-btn" onclick="deleteNotice(\''+n.id+'\')">🗑</button>';
+    el.appendChild(d);
+  });
+}
+
+// =============================================
+// PASSWORD
+// =============================================
+function changePassword() {
+  var p1=document.getElementById('newPass1').value, p2=document.getElementById('newPass2').value;
+  var msg=document.getElementById('passMsg');
+  if(!p1){ msg.style.color='var(--red-hot)'; msg.textContent='Enter a new password.'; return; }
+  if(p1!==p2){ msg.style.color='var(--red-hot)'; msg.textContent='Passwords do not match.'; return; }
+  loading('Saving...');
+  api({action:'setAdmin', pass:p1}).then(function(r){
+    stopLoading();
+    if(r.ok){ msg.style.color='var(--green)'; msg.textContent='Password updated.'; document.getElementById('newPass1').value=''; document.getElementById('newPass2').value=''; }
+    else { msg.style.color='var(--red-hot)'; msg.textContent='Error saving.'; }
+  }).catch(function(){ stopLoading(); msg.style.color='var(--red-hot)'; msg.textContent='Connection error.'; });
+}
+</script>
+</body>
+</html>
