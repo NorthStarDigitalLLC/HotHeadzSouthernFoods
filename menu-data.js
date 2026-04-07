@@ -58,7 +58,16 @@ menus: {
       show: true,
       items: [
         
-
+        { "name": "Country Fried Steak", "desc": "Breaded country fried steak served with creamy gravy." },
+{ "name": "Smoked Chicken", "desc": "Slow-smoked chicken with rich, savory flavor." },
+{ "name": "Smoked Sausage with Red Gravy", "desc": "Smoked sausage served with a rich red gravy." },
+{ "name": "Rice", "desc": "Steamed white rice." },
+{ "name": "Mashed Potatoes & White Gravy", "desc": "Creamy mashed potatoes topped with smooth white gravy." },
+{ "name": "Cabbage", "desc": "Tender seasoned cabbage." },
+{ "name": "Green Beans", "desc": "Seasoned green beans cooked until tender." },
+{ "name": "Corn", "desc": "Sweet seasoned corn." },
+{ "name": "Fried Okra", "desc": "Crispy golden fried okra." },
+{ "name": "Cornbread", "desc": "Soft, warm cornbread baked to a golden finish." },
         { name: "Turkey Clubs", desc: "Classic club sandwiches stacked with turkey, bacon, lettuce, tomato, and mayo." },
         { name: "Chicken Salad", desc: "Creamy house-made chicken salad served chilled and ready to enjoy." },
         { name: "Croissants", desc: "Flaky, buttery croissants baked until golden and tender." }
