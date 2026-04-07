@@ -769,7 +769,7 @@ function ownLogin() {
   api({action:'checkAdmin', pass:pass}).then(function(r){
     stopLoading();
     if(r.ok){ showOwnApp(); }
-    else { document.getElementById('ownError').textContent='Incorrect password.'; }
+    else { document.getElementById('ownError').textContent = 'Failed. Debug: ' + (r.debug || JSON.stringify(r)); }
   }).catch(function(err){
     stopLoading();
     document.getElementById('ownError').textContent = err.message || 'Connection error — check Apps Script deployment';
