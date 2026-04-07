@@ -532,7 +532,15 @@ const API_URL = 'https://script.google.com/a/macros/northstardigitalweb.com/s/AK
 
 function api(params) {
   var qs = Object.keys(params).map(function(k){ return encodeURIComponent(k)+'='+encodeURIComponent(params[k]); }).join('&');
-  return fetch(API_URL+'?'+qs).then(function(r){ return r.json(); });
+  return fetch(API_URL+'?'+qs, { method:'GET', mode:'cors' })
+    .then(function(r){
+      if(!r.ok) throw new Error('Server error ' + r.status);
+      return r.text();
+    })
+    .then(function(text){
+      try { return JSON.parse(text); }
+      catch(e) { throw new Error('Invalid response from server — check Apps Script deployment'); }
+    });
 }
 
 // =============================================
@@ -762,7 +770,10 @@ function ownLogin() {
     stopLoading();
     if(r.ok){ showOwnApp(); }
     else { document.getElementById('ownError').textContent='Incorrect password.'; }
-  }).catch(function(){ stopLoading(); document.getElementById('ownError').textContent='Connection error.'; });
+  }).catch(function(err){
+    stopLoading();
+    document.getElementById('ownError').textContent = err.message || 'Connection error — check Apps Script deployment';
+  });
 }
 
 function showOwnApp() {
@@ -971,7 +982,7 @@ function changePassword() {
 // =============================================
 // SPINNING LOGO RINGS (Three.js — same as BHI)
 // =============================================
-var HH_LOGO = 'https://northstardigitalweb.com/Images/HotHeadzLogo.png';
+var HH_LOGO = 'https://northstardigitalweb.com/Images/Hotheadzshare.png';
 
 function makeLogoRings(canvasId, size) {
   var canvas = document.getElementById(canvasId);
