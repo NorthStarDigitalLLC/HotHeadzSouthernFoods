@@ -82,6 +82,15 @@ menus: {
       show: true,
       items: [
 
+        { "name": "Chicken Enchiladas", "desc": "Rolled tortillas filled with chicken and topped with savory sauce." },
+{ "name": "Fried Pork Chops", "desc": "Crispy fried pork chops cooked until golden." },
+{ "name": "Taco Ring", "desc": "Seasoned taco filling baked in a flaky ring crust." },
+{ "name": "Spanish Rice", "desc": "Flavorful seasoned Spanish-style rice." },
+{ "name": "Mexican Corn", "desc": "Sweet corn with a creamy, seasoned Mexican-style flavor." },
+{ "name": "Mashed Potatoes", "desc": "Creamy mashed potatoes served hot." },
+{ "name": "Gravy", "desc": "Rich gravy served over your choice of items." },
+{ "name": "Salsa", "desc": "Fresh salsa with bold flavor." },
+{ "name": "Pinto Beans", "desc": "Slow-cooked pinto beans with savory seasoning." },
         
         { name: "Turkey Clubs", desc: "Classic club sandwiches stacked with turkey, bacon, lettuce, tomato, and mayo." },
         { name: "Chicken Salad", desc: "Creamy house-made chicken salad served chilled and ready to enjoy." },
