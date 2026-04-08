@@ -2,27 +2,26 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Hot Headz — Navigate</title>
 <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=DM+Sans:wght@400;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;overflow:hidden;background:#080407;font-family:'DM Sans',sans-serif;cursor:none;-webkit-tap-highlight-color:transparent;}
-canvas#c{position:fixed;inset:0;display:block;}
-#cur{position:fixed;width:8px;height:8px;border-radius:50%;background:#f05020;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);box-shadow:0 0 10px #f05020;}
-#cur2{position:fixed;width:30px;height:30px;border-radius:50%;border:1px solid rgba(240,80,32,.4);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .25s,height .25s;}
+#c{position:fixed;top:0;left:0;z-index:1;}
+#cur{position:fixed;width:8px;height:8px;border-radius:50%;background:#f05020;pointer-events:none;z-index:9000;transform:translate(-50%,-50%);box-shadow:0 0 10px #f05020;}
+#cur2{position:fixed;width:30px;height:30px;border-radius:50%;border:1px solid rgba(240,80,32,.4);pointer-events:none;z-index:8999;transform:translate(-50%,-50%);transition:width .25s,height .25s;}
 body.hov #cur2{width:50px;height:50px;border-color:rgba(240,80,32,.7);}
 #topbar{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:12px clamp(16px,3vw,44px);border-bottom:1px solid rgba(232,180,160,.06);background:rgba(8,4,7,.75);backdrop-filter:blur(20px);}
 .tb-sm{font-size:7.5px;letter-spacing:.28em;text-transform:uppercase;color:rgba(232,180,160,.28);}
 #tb-st{display:flex;align-items:center;gap:5px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;margin-top:2px;}
 .dot{width:5px;height:5px;border-radius:50%;animation:dp 1.8s ease-in-out infinite;}
-.dot-o{background:#ffa048;box-shadow:0 0 5px #ffa048;color:#f05020;}
-.dot-c{background:rgba(232,180,160,.2);color:rgba(232,180,160,.35);}
+.dot-o{background:#ffa048;box-shadow:0 0 5px #ffa048;}
+.dot-c{background:rgba(232,180,160,.2);}
 @keyframes dp{0%,100%{opacity:1}50%{opacity:.25}}
 #brand-n{font-family:'Abril Fatface',serif;font-size:clamp(16px,2.2vw,26px);color:#f5ede8;text-align:center;line-height:1;}
 #brand-t{font-size:7px;letter-spacing:.22em;text-transform:uppercase;color:rgba(232,180,160,.22);text-align:center;margin-top:3px;}
-/* info panel */
-#info{position:fixed;left:clamp(14px,3vw,48px);top:50%;transform:translateY(-50%);z-index:100;width:clamp(160px,17vw,230px);opacity:0;transition:opacity .5s;}
+#info{position:fixed;left:clamp(14px,3vw,48px);top:50%;transform:translateY(-50%);z-index:100;width:clamp(160px,17vw,230px);opacity:0;transition:opacity .5s;pointer-events:none;}
 #info.show{opacity:1;}
 .i-n{font-family:'Abril Fatface',serif;font-size:clamp(55px,8vw,95px);line-height:1;color:rgba(232,180,160,.04);margin-bottom:-10px;}
 .i-ey{font-size:7.5px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:#f05020;opacity:.8;display:flex;align-items:center;gap:8px;margin-bottom:7px;}
@@ -33,35 +32,43 @@ body.hov #cur2{width:50px;height:50px;border-color:rgba(240,80,32,.7);}
 .i-chip{font-size:6.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border:1px solid rgba(232,180,160,.1);color:rgba(232,180,160,.3);}
 .i-chip.h{border-color:rgba(240,80,32,.28);color:#f05020;}
 .i-rule{font-family:'DM Serif Display',serif;font-style:italic;font-size:10px;color:rgba(232,180,160,.16);padding-top:9px;border-top:1px solid rgba(232,180,160,.05);}
-/* countdown */
-#cdw{position:fixed;right:clamp(14px,3vw,48px);top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;align-items:center;gap:11px;opacity:0;transition:opacity .5s;pointer-events:none;}
+#cdw{position:fixed;right:clamp(14px,3vw,48px);top:50%;transform:translateY(-50%);z-index:200;display:flex;flex-direction:column;align-items:center;gap:11px;opacity:0;transition:opacity .5s;pointer-events:none;}
 #cdw.show{opacity:1;pointer-events:all;}
 #cd-arc{fill:none;stroke:#f05020;stroke-width:2.5;stroke-linecap:round;stroke-dasharray:289;stroke-dashoffset:0;transform-origin:55px 55px;transform:rotate(-90deg);filter:drop-shadow(0 0 6px rgba(240,80,32,.55));}
 #cd-bg{fill:none;stroke:rgba(232,180,160,.07);stroke-width:2;}
 #cd-n{font-family:'Abril Fatface',serif;font-size:40px;fill:#f5ede8;text-anchor:middle;dominant-baseline:central;}
 #cd-lbl{font-size:7px;letter-spacing:.2em;text-transform:uppercase;fill:rgba(232,180,160,.28);text-anchor:middle;}
 #cd-dest{font-family:'DM Serif Display',serif;font-style:italic;font-size:11px;color:rgba(232,180,160,.42);text-align:center;width:115px;line-height:1.5;}
-#cd-go{font-family:'DM Sans',sans-serif;font-weight:700;font-size:7.5px;letter-spacing:.2em;text-transform:uppercase;padding:11px 24px;background:#f05020;color:#080407;border:none;cursor:none;clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);transition:background .2s;}
+#cd-go{font-family:'DM Sans',sans-serif;font-weight:700;font-size:7.5px;letter-spacing:.2em;text-transform:uppercase;padding:11px 24px;background:#f05020;color:#080407;border:none;cursor:pointer;transition:background .2s;z-index:300;position:relative;}
 #cd-go:hover{background:#e83010;}
-#cd-cancel{font-size:7.5px;letter-spacing:.2em;text-transform:uppercase;color:rgba(232,180,160,.28);background:none;border:1px solid rgba(232,180,160,.1);padding:8px 18px;cursor:none;transition:all .2s;}
-#cd-cancel:hover{color:rgba(232,180,160,.65);border-color:rgba(232,180,160,.3);}
 #hint{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);font-size:7px;letter-spacing:.26em;text-transform:uppercase;color:rgba(232,180,160,.14);z-index:200;pointer-events:none;animation:hfade 5s ease-in-out 2s both;}
 @keyframes hfade{0%{opacity:0}20%{opacity:1}72%{opacity:1}100%{opacity:0}}
-@media(max-width:680px){#info{display:none;}#cdw{right:auto;left:50%;bottom:20px;top:auto;transform:translateX(-50%);flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px;max-width:90vw;background:rgba(8,4,7,.85);padding:10px 14px;border:1px solid rgba(232,180,160,.08);}#cdw svg{width:70px;height:70px;}#cd-n{font-size:26px;}#cd-lbl{font-size:6px;}}
+
+  #cdw{right:auto;left:50%;bottom:20px;top:auto;transform:translateX(-50%);flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px;max-width:90vw;background:rgba(8,4,7,.9);padding:10px 14px;border:1px solid rgba(232,180,160,.08);}
+  #cdw svg{width:70px;height:70px;}
+  #cd-n{font-size:26px;}
+}
 </style>
 </head>
 <body>
-<div id="cur"></div><div id="cur2"></div>
+<div id="cur"></div>
+<div id="cur2"></div>
 <canvas id="c"></canvas>
 <div id="topbar">
-  <div><div class="tb-sm">DeRidder · Louisiana</div><div id="tb-st"><span class="dot" id="tb-dot"></span><span id="tb-stxt">—</span></div></div>
-  <div><div id="brand-n">Hot Headz</div><div id="brand-t">Southern Foods · Est. 2020</div></div>
+  <div>
+    <div class="tb-sm">DeRidder &middot; Louisiana</div>
+    <div id="tb-st"><span class="dot" id="tb-dot"></span><span id="tb-stxt">Closed</span></div>
+  </div>
+  <div><div id="brand-n">Hot Headz</div><div id="brand-t">Southern Foods &middot; Est. 2020</div></div>
   <div style="text-align:right"><div class="tb-sm">(337) 221-1035</div><div class="tb-sm" id="tb-hr"></div></div>
 </div>
 <div id="info">
-  <div class="i-n" id="i-n"></div><div class="i-ey" id="i-ey"></div>
-  <div class="i-title" id="i-title"></div><div class="i-sub" id="i-sub"></div>
-  <div class="i-chips" id="i-chips"></div><div class="i-rule" id="i-rule"></div>
+  <div class="i-n" id="i-n"></div>
+  <div class="i-ey" id="i-ey"></div>
+  <div class="i-title" id="i-title"></div>
+  <div class="i-sub" id="i-sub"></div>
+  <div class="i-chips" id="i-chips"></div>
+  <div class="i-rule" id="i-rule"></div>
 </div>
 <div id="cdw">
   <svg width="110" height="110" viewBox="0 0 110 110">
@@ -71,722 +78,657 @@ body.hov #cur2{width:50px;height:50px;border-color:rgba(240,80,32,.7);}
     <text id="cd-lbl" x="55" y="73">navigating</text>
   </svg>
   <div id="cd-dest"></div>
-  <button id="cd-go">Go Now →</button>
-  <button id="cd-cancel" style="display:none">Cancel</button>
+  <button id="cd-go">Go Now &rarr;</button>
 </div>
-<div id="hint">Click any word to navigate</div>
+<div id="hint">Tap any word to navigate</div>
 
 <script>
-const PAGES={
-  home:    {num:'01',ey:'Home',        cta:'Go to Home Page',    title:'Hot Headz\nSouthern Foods.',  sub:'Fresh · From Scratch · Est. 2020',          chips:['Est. 2020','DeRidder, LA','From Scratch','(337) 221-1035'],rule:'Home is where the food is.',    dest:'index.html',       mood:[58,8,0]},
-  menu:    {num:'02',ey:'The Menu',    cta:'See Full Menu',      title:'Fresh.\nFrom Scratch.',       sub:'Breakfast · Lunch · Daily Specials',         chips:['Breakfast','Fried Chicken','Catfish','Daily Specials'],   rule:'From scratch, every time.',    dest:'menu.html',        mood:[58,8,0]},
-  lunch:   {num:'✦', ey:'Lunch',       cta:'See Lunch Menu',     title:'Lunch.\nDone Right.',         sub:'Daily Southern plates · changes every day',  chips:['Changes Daily','Southern Plates','Check Facebook','Sides'],rule:'Check Facebook every morning.', dest:'menu.html#lunch',  mood:[58,8,0]},
-  beer:    {num:'✦', ey:'Beer',        cta:'See Beer Menu',      title:'Cold.\nCold Beer.',           sub:'Ice cold · Natural Light · Modelo',          chips:['Natural Light','Miller Lite','Modelo','Budweiser'],       rule:'Best with fried chicken.',     dest:'menu.html#beer',   mood:[26,4,0]},
-  delivery:{num:'03',ey:'Delivery',    cta:'Delivery Info',      title:'We Bring\nThe Food.',         sub:'10+ plates · within 10 miles',               chips:['10+ Plates','10 Miles','Call Ahead','Group Orders'],      rule:'Delivered hot and fresh.',     dest:'delivery.html',    mood:[42,4,0]},
-  order:   {num:'04',ey:'Order Now',   cta:'Call (337) 221-1035',title:'Call\nAhead.',                sub:'Skip the line · Ready when you arrive',      chips:['(337) 221-1035','Mon–Fri 5:30am','Skip Line','Carry-Out'],rule:"We'll have it ready.",          dest:'order.html',       mood:[50,8,0]},
-  about:   {num:'05',ey:'About Us',    cta:'Read Our Story',     title:'Comfort\nFood Done Right.',   sub:'Family-owned · DeRidder proud · Since 2020', chips:['Est. 2020','Family Owned','From Scratch','DeRidder'],     rule:'Real Southern cooking.',       dest:'about.html',       mood:[40,16,0]},
-  facebook:{num:'06',ey:'Facebook',    cta:'Visit Our Facebook', title:'Follow\nThe Feed.',           sub:'Daily specials posted every morning',         chips:['Daily Specials','Morning Posts','Photos','Follow Us'],    rule:'Posted fresh every morning.',  dest:'https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/',mood:[30,8,0]},
-  find:    {num:'07',ey:'Find Us',     cta:'Get Directions',     title:"We're on\nUS-190.",           sub:'2741 US-190 · DeRidder, LA 70634',           chips:['2741 US-190','(337) 221-1035','Easy Parking','Open Daily'],rule:'Follow the smell.',            dest:'https://maps.google.com/?q=2741+US-190+DeRidder+LA',mood:[24,6,0]},
-  staff:   {num:'08',ey:'Staff Portal',cta:'Open Staff Portal',  title:'Employee\nPortal.',           sub:'Schedule · Shifts · Notices',                chips:['View Schedule','My Shifts','Notice Board','Manager'],     rule:'Made from scratch. Like the food.',dest:'staff-portal.html',mood:[42,14,0]},
+/* ── DATA ── */
+const PAGES = {
+  home:    {num:'01',ey:'Home',        cta:'Go to Home Page',     title:'Hot Headz\nSouthern Foods.', sub:'Fresh &middot; From Scratch &middot; Est. 2020',          chips:['Est. 2020','DeRidder, LA','From Scratch','(337) 221-1035'],rule:'Home is where the food is.',    dest:'index.html',      mood:[58,8,0]},
+  menu:    {num:'02',ey:'The Menu',    cta:'See Full Menu',       title:'Fresh.\nFrom Scratch.',      sub:'Breakfast &middot; Lunch &middot; Daily Specials',         chips:['Breakfast','Fried Chicken','Catfish','Daily Specials'],   rule:'From scratch, every time.',    dest:'menu.html',       mood:[58,8,0]},
+  lunch:   {num:'03',ey:'Lunch',       cta:'See Lunch Menu',      title:'Lunch.\nDone Right.',        sub:'Daily Southern plates',                                   chips:['Changes Daily','Southern Plates','Check Facebook','Sides'],rule:'Check Facebook every morning.', dest:'menu.html#lunch', mood:[58,8,0]},
+  beer:    {num:'04',ey:'Beer',        cta:'See Beer Menu',       title:'Cold.\nCold Beer.',          sub:'Ice cold &middot; Natural Light &middot; Modelo',          chips:['Natural Light','Miller Lite','Modelo','Budweiser'],       rule:'Best with fried chicken.',     dest:'menu.html#beer',  mood:[26,4,0]},
+  delivery:{num:'05',ey:'Delivery',    cta:'Delivery Info',       title:'We Bring\nThe Food.',        sub:'10+ plates &middot; within 10 miles',                      chips:['10+ Plates','10 Miles','Call Ahead','Group Orders'],      rule:'Delivered hot and fresh.',     dest:'delivery.html',   mood:[42,4,0]},
+  order:   {num:'06',ey:'Order Now',   cta:'Call (337) 221-1035', title:'Call\nAhead.',               sub:'Skip the line &middot; Ready when you arrive',             chips:['(337) 221-1035','Mon-Fri 5:30am','Skip Line','Carry-Out'],rule:"We'll have it ready.",         dest:'order.html',      mood:[50,8,0]},
+  about:   {num:'07',ey:'About Us',    cta:'Read Our Story',      title:'Comfort\nFood Done Right.',  sub:'Family-owned &middot; DeRidder proud',                     chips:['Est. 2020','Family Owned','From Scratch','DeRidder'],    rule:'Real Southern cooking.',       dest:'about.html',      mood:[40,16,0]},
+  facebook:{num:'08',ey:'Facebook',    cta:'Visit Our Facebook',  title:'Follow\nThe Feed.',          sub:'Daily specials posted every morning',                      chips:['Daily Specials','Morning Posts','Photos','Follow Us'],   rule:'Posted fresh every morning.',  dest:'https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/',mood:[30,8,0]},
+  find:    {num:'09',ey:'Find Us',     cta:'Get Directions',      title:"We're on\nUS-190.",          sub:'2741 US-190 &middot; DeRidder, LA',                        chips:['2741 US-190','(337) 221-1035','Easy Parking','Open Daily'],rule:'Follow the smell.',           dest:'https://maps.google.com/?q=2741+US-190+DeRidder+LA',mood:[24,6,0]},
+  staff:   {num:'10',ey:'Staff Portal',cta:'Open Staff Portal',   title:'Employee\nPortal.',          sub:'Schedule &middot; Shifts &middot; Notices',                chips:['View Schedule','My Shifts','Notice Board','Manager'],    rule:'Made from scratch. Like the food.',dest:'staff-portal.html',mood:[42,14,0]},
 };
-const KEYS=Object.keys(PAGES);
+const KEYS = Object.keys(PAGES);
 
 /* ── CANVAS ── */
-const canvas=document.getElementById('c');
-const ctx=canvas.getContext('2d');
-let W,H,CX,CY,NAV_R,INN_R;
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H, CX, CY, NAV_R, INN_R;
 
-function resize(){
-  W=canvas.width=window.innerWidth;
-  H=canvas.height=window.innerHeight;
-  CX=W/2; CY=H/2;
-  NAV_R=W<500?Math.min(W,H)*0.30:W<768?Math.min(W,H)*0.32:Math.min(W,H)*0.36;
-  INN_R=Math.min(W,H)*0.065;
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  CX = W/2; CY = H/2;
+  NAV_R = W < 500 ? Math.min(W,H)*.30 : W < 768 ? Math.min(W,H)*.32 : Math.min(W,H)*.36;
+  INN_R = Math.min(W,H) * .065;
 }
+resize();
 
 /* ── CURSOR ── */
-const cur=document.getElementById('cur'),cur2=document.getElementById('cur2');
-let mx=300,my=300,lx=300,ly=300;
-document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
-(function cl(){cur.style.left=mx+'px';cur.style.top=my+'px';lx+=(mx-lx)*.11;ly+=(my-ly)*.11;cur2.style.left=lx+'px';cur2.style.top=ly+'px';requestAnimationFrame(cl);})();
-
-/* ── STATUS ── */
-(function(){
-  const n=new Date(),mins=n.getHours()*60+n.getMinutes();
-  const d=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][n.getDay()];
-  document.getElementById('tb-hr').textContent=d==='Sunday'?'7am–3pm':d==='Saturday'?'6am–2pm':'5:30am–2pm';
-  const o=d==='Sunday'?420:d==='Saturday'?360:330,cl=d==='Sunday'?900:840,open=mins>=o&&mins<cl;
-  document.getElementById('tb-stxt').textContent=open?'Open Now':'Closed';
-  document.getElementById('tb-stxt').style.color=open?'#f05020':'rgba(232,180,160,.35)';
-  const dot=document.getElementById('tb-dot');
-  dot.className='dot '+(open?'dot-o':'dot-c');
+const curEl = document.getElementById('cur');
+const cur2El = document.getElementById('cur2');
+let mx = W/2, my = H/2, lcx = W/2, lcy = H/2;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function curLoop() {
+  curEl.style.left = mx + 'px'; curEl.style.top = my + 'px';
+  lcx += (mx - lcx) * .11; lcy += (my - lcy) * .11;
+  cur2El.style.left = lcx + 'px'; cur2El.style.top = lcy + 'px';
+  requestAnimationFrame(curLoop);
 })();
 
+/* ── STATUS BAR ── */
+(function() {
+  var n = new Date(), mins = n.getHours()*60 + n.getMinutes();
+  var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var d = days[n.getDay()];
+  document.getElementById('tb-hr').textContent = d==='Sunday'?'7am-3pm': d==='Saturday'?'6am-2pm':'5:30am-2pm';
+  var o = d==='Sunday'?420: d==='Saturday'?360:330;
+  var cl = d==='Sunday'?900:840;
+  var open = mins >= o && mins < cl;
+  document.getElementById('tb-stxt').textContent = open ? 'Open Now' : 'Closed';
+  document.getElementById('tb-stxt').style.color = open ? '#f05020' : 'rgba(232,180,160,.35)';
+  document.getElementById('tb-dot').className = 'dot ' + (open ? 'dot-o' : 'dot-c');
+})();
 
-/* ── CENTER CLOCK & STATUS ── */
-// Mirrors the logic from menu.html — live countdown to close/open/crawfish
-const HOURS={
-  Sunday:   {open:7*60,    close:15*60},
-  Saturday: {open:6*60,    close:14*60},
-  Monday:   {open:5*60+30, close:14*60},
-  Tuesday:  {open:5*60+30, close:14*60},
-  Wednesday:{open:5*60+30, close:14*60},
-  Thursday: {open:5*60+30, close:14*60},
-  Friday:   {open:5*60+30, close:14*60},
-};
-const CF_DAYS=['Thursday','Friday','Saturday']; // crawfish nights
-const CF_START=16*60, CF_END=20*60;
-const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+/* ── CLOCK ── */
+var HOURS = {Sunday:{o:420,c:900},Saturday:{o:360,c:840},Monday:{o:330,c:840},Tuesday:{o:330,c:840},Wednesday:{o:330,c:840},Thursday:{o:330,c:840},Friday:{o:330,c:840}};
+var CF_DAYS = ['Thursday','Friday','Saturday'];
+var DNAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+var clockState = {label:'CLOSED',sub:'',h:'00',m:'00',s:'00',isOpen:false};
 
-function getTodayName(){ return DAYS[new Date().getDay()]; }
-function fmtTime(h){
-  const hh=Math.floor(h/60),mm=h%60,ampm=hh>=12?'pm':'am';
-  return (hh>12?hh-12:hh||12)+':'+(mm<10?'0'+mm:mm)+ampm;
+function updateClock() {
+  var now = new Date();
+  var day = DNAMES[now.getDay()];
+  var hr = HOURS[day];
+  var nm = now.getHours()*60 + now.getMinutes();
+  var ns = now.getHours()*3600 + now.getMinutes()*60 + now.getSeconds();
+  var isCf = CF_DAYS.indexOf(day) >= 0;
+  var isOpen = nm >= hr.o && nm < hr.c;
+  var isCfOpen = isCf && nm >= 960 && nm < 1200;
+  clockState.isOpen = isOpen || isCfOpen;
+  var secs = 0, label = '', sub = '';
+  if (ns < hr.o*60) { label='CLOSED'; sub='Opens soon'; secs=hr.o*60-ns; }
+  else if (ns < hr.c*60) {
+    if (ns < 37800) { label='BREAKFAST'; sub='Breakfast ends in'; secs=37800-ns; }
+    else if (ns < 39600) { label='TRANSITIONING'; sub='Lunch starts in'; secs=39600-ns; }
+    else { label='OPEN'; sub='Closes in'; secs=hr.c*60-ns; }
+  } else if (isCf && ns < 57600) { label='CRAWFISH AT 4PM'; sub='Crawfish starts in'; secs=57600-ns; }
+  else if (isCf && ns < 72000) { label='CRAWFISH NIGHT'; sub='Crawfish ends in'; secs=72000-ns; }
+  else { label='CLOSED'; sub='See you tomorrow'; secs=86400-ns+hr.o*60; }
+  var hh=Math.floor(secs/3600), mm=Math.floor((secs%3600)/60), ss=secs%60;
+  clockState.label=label; clockState.sub=sub;
+  clockState.h=String(hh).padStart(2,'0');
+  clockState.m=String(mm).padStart(2,'0');
+  clockState.s=String(ss).padStart(2,'0');
 }
-function fmtCountdown(totalSecs){
-  const h=Math.floor(totalSecs/3600);
-  const m=Math.floor((totalSecs%3600)/60);
-  const s=totalSecs%60;
-  return {h:String(h).padStart(2,'0'), m:String(m).padStart(2,'0'), s:String(s).padStart(2,'0')};
-}
+updateClock();
+setInterval(updateClock, 1000);
 
-// Holds current clock state — updated every second
-let clockState={
-  label:'',       // e.g. "OPEN NOW" / "CLOSED" / "CRAWFISH TONIGHT"
-  sublabel:'',    // e.g. "Closes in" / "Opens in"
-  h:'00',m:'00',s:'00',
-  isOpen:false,
-  isCrawfish:false,
-};
-
-function updateClockState(){
-  const now=new Date();
-  const dayName=getTodayName();
-  const hr=HOURS[dayName];
-  const nowMins=now.getHours()*60+now.getMinutes();
-  const nowSecs=now.getHours()*3600+now.getMinutes()*60+now.getSeconds();
-  const isCfDay=CF_DAYS.includes(dayName);
-
-  const isMainOpen=nowMins>=hr.open&&nowMins<hr.close;
-  const isCfOpen=isCfDay&&nowMins>=CF_START&&nowMins<CF_END;
-  clockState.isOpen=isMainOpen||isCfOpen;
-  clockState.isCrawfish=isCfOpen;
-
-  let targetSecs=0,label='',sublabel='';
-
-  if(nowSecs<hr.open*60){
-    // Before open
-    label='CLOSED';sublabel='Opens '+fmtTime(hr.open);
-    targetSecs=hr.open*60-nowSecs;
-  } else if(nowSecs<hr.close*60){
-    // During main hours
-    if(nowSecs<10*60+30*60){ label='BREAKFAST';sublabel='Breakfast ends in'; targetSecs=10*60*60+30*60-nowSecs; }
-    else if(nowSecs<11*60*60){ label='TRANSITIONING';sublabel='Lunch starts in'; targetSecs=11*60*60-nowSecs; }
-    else { label='OPEN';sublabel='Closes in'; targetSecs=hr.close*60-nowSecs; }
-  } else if(isCfDay&&nowSecs<CF_START*60){
-    // Between close and crawfish
-    label='CRAWFISH AT 4PM';sublabel='Crawfish starts in';
-    targetSecs=CF_START*60-nowSecs;
-  } else if(isCfDay&&nowSecs<CF_END*60){
-    // Crawfish hours
-    label='CRAWFISH NIGHT';sublabel='Crawfish ends in';
-    targetSecs=CF_END*60-nowSecs;
-  } else {
-    // Closed for the day
-    const tom=new Date(now); tom.setDate(tom.getDate()+1);
-    const tomName=DAYS[tom.getDay()];
-    const tomHr=HOURS[tomName];
-    label='CLOSED';sublabel='Opens '+fmtTime(tomHr.open)+' '+tomName;
-    const secsTilMidnight=86400-nowSecs;
-    targetSecs=secsTilMidnight+tomHr.open*60;
-  }
-
-  const cd=fmtCountdown(Math.max(0,Math.floor(targetSecs)));
-  clockState.label=label;
-  clockState.sublabel=sublabel;
-  clockState.h=cd.h; clockState.m=cd.m; clockState.s=cd.s;
-}
-
-updateClockState();
-setInterval(updateClockState,1000);
-
-/* drawCenterClock is now particle-based — no canvas text */
-function drawCenterClock(){ /* particles handle this */ }
-
-/* ── DOT-MATRIX TEXT SAMPLER ──
-   Samples text as a grid of evenly-spaced dots.
-   DOT_STEP controls spacing — larger = fewer, bigger dots = more readable.
-   Returns array of {x,y} screen coordinates. */
-function sampleDotMatrix(text, cx, cy, targetW, targetH, dotStep){
-  // Render at 4x scale for good antialiasing, then downsample to dot grid
-  const SCALE=4;
-  const OW=Math.round(targetW*SCALE);
-  const OH=Math.round(targetH*SCALE);
-  const oc=document.createElement('canvas');
+/* ── DOT-MATRIX SAMPLER ── */
+function sampleDots(text, cx, cy, tw, th, step) {
+  var SC=4, OW=Math.round(tw*SC), OH=Math.round(th*SC);
+  var oc = document.createElement('canvas');
   oc.width=OW; oc.height=OH;
-  const ox=oc.getContext('2d');
-  ox.clearRect(0,0,OW,OH);
-  // Fit font to canvas
-  let fs=Math.round(OH*0.72);
-  ox.font=`700 ${fs}px DM Sans,Arial Black,Arial,sans-serif`;
-  const mw=ox.measureText(text).width;
-  if(mw>OW*0.9) fs=Math.round(fs*(OW*0.9/mw));
-  ox.font=`700 ${fs}px DM Sans,Arial Black,Arial,sans-serif`;
-  ox.fillStyle='#fff';
-  ox.textAlign='center';
-  ox.textBaseline='middle';
-  ox.fillText(text,OW/2,OH/2);
-  const d=ox.getImageData(0,0,OW,OH).data;
-  const pts=[];
-  // Sample on a dot grid — dotStep is in screen pixels
-  const gridStep=Math.round(dotStep*SCALE);
-  const offX=cx-targetW/2;
-  const offY=cy-targetH/2;
-  for(let gy=Math.round(gridStep/2);gy<OH;gy+=gridStep){
-    for(let gx=Math.round(gridStep/2);gx<OW;gx+=gridStep){
-      // Average alpha in a small region around this grid point
-      let sum=0,count=0;
-      for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){
-        const ix=gx+dx,iy=gy+dy;
-        if(ix>=0&&ix<OW&&iy>=0&&iy<OH){sum+=d[(iy*OW+ix)*4+3];count++;}
+  var ox = oc.getContext('2d');
+  var fs = Math.round(OH*.72);
+  ox.font = '700 '+fs+'px DM Sans,Arial,sans-serif';
+  var mw = ox.measureText(text).width;
+  if (mw > OW*.9) fs = Math.round(fs*(OW*.9/mw));
+  ox.font = '700 '+fs+'px DM Sans,Arial,sans-serif';
+  ox.fillStyle = '#fff'; ox.textAlign='center'; ox.textBaseline='middle';
+  ox.fillText(text, OW/2, OH/2);
+  var d = ox.getImageData(0,0,OW,OH).data;
+  var gs = Math.round(step*SC);
+  var pts = [], ox2=cx-tw/2, oy2=cy-th/2;
+  for (var gy=Math.round(gs/2); gy<OH; gy+=gs) {
+    for (var gx=Math.round(gs/2); gx<OW; gx+=gs) {
+      var sum=0, cnt=0;
+      for (var dy=-1; dy<=1; dy++) for (var dx=-1; dx<=1; dx++) {
+        var ix=gx+dx, iy=gy+dy;
+        if (ix>=0&&ix<OW&&iy>=0&&iy<OH) { sum+=d[(iy*OW+ix)*4+3]; cnt++; }
       }
-      const avg=sum/count;
-      if(avg>80){
-        // Map back to screen coordinates
-        pts.push({
-          x: offX+(gx/OW)*targetW,
-          y: offY+(gy/OH)*targetH,
-          bright: avg/255
-        });
-      }
+      if (sum/cnt > 80) pts.push({x:ox2+(gx/OW)*tw, y:oy2+(gy/OH)*th, b:(sum/cnt)/255});
     }
   }
   return pts;
 }
 
-/* ── PARTICLE SYSTEM ── */
-// Each nav word: pre-sampled dot positions
-// Particles travel FROM random positions TO their dot positions
-let selKey=null;
-let cancelHover=false;
-let cancelY=0,cancelBw=0,cancelBh=0;
-let wordDots={}; // key -> [{x,y,bright}]
-let selDots=[];  // selected center title dots
-let cancelDots=[];  // cancel button as particles
-// clock particles managed by clockParts/clockSegs
-let particles=[];// [{x,y,tx,ty,spd,r,a,bright,wb,ws,wm,type}]
-// type: 0=ambient 1=nav-active 2=nav-dimmed 3=selected 4=inner 5=cancel 6=clock-label 7=clock-digits 8=clock-sub
+/* ── PARTICLES ── */
+var selKey = null, navDest = '';
+var cancelHover = false;
+var particles = [];
+var wordDots = {}, selDots = [], cancelDots = [];
+var clockParts = {}, clockSegs = {};
+var prevCH='', prevCM='', prevCS='', prevCL='';
 
-function navAngle(i){ return (i/KEYS.length)*Math.PI*2-Math.PI/2+Math.PI*0.1; }
-function navPos(i){ const a=navAngle(i); return{x:CX+Math.cos(a)*NAV_R,y:CY+Math.sin(a)*NAV_R}; }
+function navAngle(i) { return (i/KEYS.length)*Math.PI*2 - Math.PI/2 + Math.PI*.1; }
+function navPos(i) { var a=navAngle(i); return {x:CX+Math.cos(a)*NAV_R, y:CY+Math.sin(a)*NAV_R}; }
 
-function buildWordDots(){
-  wordDots={};
-  KEYS.forEach((key,i)=>{
-    const pos=navPos(i);
-    // Word bounding box — width based on arc spacing, height tall enough to read
-    const arcSpacing=2*Math.PI*NAV_R/KEYS.length;
-    const bw=arcSpacing*0.80;
-    const bh=bw*(W<600?0.72:0.60);
-    // DOT_STEP = spacing between dots in screen pixels
-    // Larger = fewer bigger dots, more readable
-    const dotStep=Math.max(0.4, bh/62);
-    wordDots[key]=sampleDotMatrix(PAGES[key].ey, pos.x, pos.y, bw, bh, dotStep);
-  });
-}
-
-function buildSelDots(){
-  selDots=[];
-  cancelDots=[];
-  if(!selKey) return;
-  const lines=PAGES[selKey].ey.split('\n');
-  const bw=Math.min(W*0.72,360);
-  const bh=bw*(W<500?0.32:0.28);
-  const lh=bh/lines.length;
-  const dotStep=Math.max(0.5, lh/62);
-  // Title lines — centered vertically in upper half of center
-  const titleTotalH=lh*lines.length;
-  lines.forEach((ln,li)=>{
-    const ly=CY-titleTotalH*0.6+li*lh;
-    selDots=selDots.concat(sampleDotMatrix(ln,CX,ly,bw,lh,dotStep));
-  });
-  // Cancel button text — below title, smaller
-  const cancelBw=Math.min(W*0.18,140);
-  const cancelBh=cancelBw*0.28;
-  const cancelStep=Math.max(0.5, cancelBh/40);
-  cancelY=CY+titleTotalH*0.55+cancelBh;
-  window._cY=cancelY; window._cBw=cancelBw; window._cBh=cancelBh;
-  cancelDots=sampleDotMatrix('✕  Cancel',CX,cancelY,cancelBw,cancelBh,cancelStep);
-}
-
-/* ── SEGMENTED CLOCK ──
-   Each part of HH:MM:SS is sampled and tracked separately.
-   Only the changed part gets retargeted — everything else stays frozen. */
-let clockSegs={};
-let clockParts={};  // segId -> particle array (refs into main particles array)
-let prevH='',prevM='',prevS='',prevLbl='',prevSub2='';
-
-function getSegLayout(){
-  const sc=Math.min(W,H);
-  const dh=sc*(W<500?0.08:0.10);
-  const cw=dh*0.30;   // colon width
-  const dw=dh*1.20;   // digit pair width (HH or MM or SS)
-  const total=dw*3+cw*2;
-  const sx=CX-total/2;
-  const dy=CY+sc*0.01;
-  return{
-    HH: {x:sx+dw/2,        y:dy, w:dw,    h:dh},
-    C1: {x:sx+dw+cw/2,     y:dy, w:cw,    h:dh},
-    MM: {x:sx+dw+cw+dw/2,  y:dy, w:dw,    h:dh},
-    C2: {x:sx+dw*2+cw*1.5, y:dy, w:cw,    h:dh},
-    SS: {x:sx+dw*2+cw*2+dw/2, y:dy, w:dw, h:dh},
-    LBL:{x:CX, y:CY-sc*0.10, w:Math.min(W*0.35,260), h:sc*0.04},
-    SUB:{x:CX, y:CY+sc*0.09, w:Math.min(W*0.42,300), h:sc*0.032},
-  };
-}
-
-function sampleSeg(text, box){
-  const step=Math.max(0.4, box.h/50);
-  return sampleDotMatrix(text, box.x, box.y, box.w, box.h, step);
-}
-
-function segColor(segId){
-  const isD=['HH','C1','MM','C2','SS'].includes(segId);
-  if(isD) return clockState.isOpen?{rc:255,gc:200,bc:80}:{rc:210,gc:170,bc:145};
-  if(segId==='LBL') return clockState.isOpen?{rc:255,gc:148,bc:60}:{rc:210,gc:170,bc:145};
-  return{rc:210,gc:170,bc:145};
-}
-function segAlpha(segId,bright){
-  const isD=['HH','C1','MM','C2','SS'].includes(segId);
-  if(isD) return clockState.isOpen?0.72+bright*0.28:0.20+bright*0.08;
-  if(segId==='LBL') return clockState.isOpen?0.55:0.16;
-  return 0.15;
-}
-
-function retargetSeg(segId, dots){
-  const existing=clockParts[segId]||[];
-  const col=segColor(segId);
-  const isD=['HH','C1','MM','C2','SS'].includes(segId);
-  const take=Math.min(existing.length, dots.length);
-  // Retarget existing — they glide from current position
-  for(let i=0;i<take;i++){
-    existing[i].tx=dots[i].x;
-    existing[i].ty=dots[i].y;
-    existing[i].spd=0.16+Math.random()*0.06;
-    existing[i].wm=0.03;
-    existing[i].rc=col.rc;existing[i].gc=col.gc;existing[i].bc=col.bc;
-    existing[i].a=segAlpha(segId,dots[i].bright);
+function buildWordDots() {
+  wordDots = {};
+  for (var i=0; i<KEYS.length; i++) {
+    var key = KEYS[i], pos = navPos(i);
+    var sp = 2*Math.PI*NAV_R/KEYS.length;
+    var bw = sp*.80, bh = bw*(W<600?.72:.60);
+    wordDots[key] = sampleDots(PAGES[key].ey, pos.x, pos.y, bw, bh, Math.max(.4,bh/62));
   }
-  // Add extras starting near their target (not random screen)
-  for(let i=take;i<dots.length;i++){
-    const d=dots[i];
-    const p={x:d.x+(Math.random()-.5)*5,y:d.y+(Math.random()-.5)*5,
-      tx:d.x,ty:d.y,spd:0.16+Math.random()*0.06,
-      r:isD?0.65+Math.random()*0.25:0.38+Math.random()*0.14,
-      a:segAlpha(segId,d.bright),
-      wb:Math.random()*Math.PI*2,ws:0.002+Math.random()*0.003,wm:0.03,
-      rc:col.rc,gc:col.gc,bc:col.bc,isClock:true,segId};
-    existing.push(p);
-    particles.push(p);
-  }
-  // Retire surplus — make invisible
-  for(let i=dots.length;i<existing.length;i++) existing[i].a=0;
-  clockParts[segId]=existing.slice(0,dots.length);
 }
 
-function buildAllClockSegs(forceAll){
-  if(selKey) return;
-  const L=getSegLayout();
-  const texts={
-    HH:clockState.h, C1:':', MM:clockState.m,
-    C2:':', SS:clockState.s,
-    LBL:clockState.label||'', SUB:clockState.sublabel||''
+function buildSelDots() {
+  selDots=[]; cancelDots=[];
+  if (!selKey) return;
+  var lines = PAGES[selKey].ey.split('\n');
+  var bw=Math.min(W*.72,360), bh=bw*(W<500?.32:.28);
+  var lh=bh/lines.length, step=Math.max(.5,lh/62);
+  var totalH = lh*lines.length;
+  for (var li=0; li<lines.length; li++) {
+    var ly = CY - totalH*.6 + li*lh;
+    selDots = selDots.concat(sampleDots(lines[li], CX, ly, bw, lh, step));
+  }
+  var cbw=Math.min(W*.18,140), cbh=cbw*.28;
+  var cy2 = CY + totalH*.55 + cbh;
+  window._cY=cy2; window._cBw=cbw; window._cBh=cbh;
+  cancelDots = sampleDots('X  Cancel', CX, cy2, cbw, cbh, Math.max(.5,cbh/40));
+}
+
+function getSegLayout() {
+  var sc=Math.min(W,H), dh=sc*(W<500?.08:.10);
+  var cw=dh*.30, dw=dh*1.20, tot=dw*3+cw*2, sx=CX-tot/2, dy=CY+sc*.01;
+  return {
+    HH:{x:sx+dw/2,y:dy,w:dw,h:dh},
+    C1:{x:sx+dw+cw/2,y:dy,w:cw,h:dh},
+    MM:{x:sx+dw+cw+dw/2,y:dy,w:dw,h:dh},
+    C2:{x:sx+dw*2+cw*1.5,y:dy,w:cw,h:dh},
+    SS:{x:sx+dw*2+cw*2+dw/2,y:dy,w:dw,h:dh},
+    LBL:{x:CX,y:CY-sc*.10,w:Math.min(W*.35,260),h:sc*.04},
+    SUB:{x:CX,y:CY+sc*.09,w:Math.min(W*.42,300),h:sc*.032}
   };
-  const changed={
-    HH:forceAll||clockState.h!==prevH,
-    C1:forceAll||!clockSegs.C1,
-    MM:forceAll||clockState.m!==prevM,
-    C2:forceAll||!clockSegs.C2,
-    SS:forceAll||clockState.s!==prevS,
-    LBL:forceAll||clockState.label!==prevLbl,
-    SUB:forceAll||clockState.sublabel!==prevSub2,
-  };
-  Object.keys(changed).forEach(sid=>{
-    if(changed[sid]){
-      clockSegs[sid]=sampleSeg(texts[sid],L[sid]);
+}
+
+function segCol(sid) {
+  var isD = ['HH','C1','MM','C2','SS'].indexOf(sid)>=0;
+  if (isD) return clockState.isOpen?{r:255,g:200,b:80}:{r:210,g:170,b:145};
+  if (sid==='LBL') return clockState.isOpen?{r:255,g:148,b:60}:{r:210,g:170,b:145};
+  return {r:210,g:170,b:145};
+}
+function segA(sid, bright) {
+  var isD = ['HH','C1','MM','C2','SS'].indexOf(sid)>=0;
+  if (isD) return clockState.isOpen ? .72+bright*.28 : .20+bright*.08;
+  if (sid==='LBL') return clockState.isOpen ? .55 : .16;
+  return .15;
+}
+
+function retargetSeg(sid, dots) {
+  var ex = clockParts[sid] || [];
+  var col = segCol(sid);
+  var isD = ['HH','C1','MM','C2','SS'].indexOf(sid)>=0;
+  var take = Math.min(ex.length, dots.length);
+  for (var i=0; i<take; i++) {
+    ex[i].tx=dots[i].x; ex[i].ty=dots[i].y;
+    ex[i].spd=.16+Math.random()*.06; ex[i].wm=.03;
+    ex[i].rc=col.r; ex[i].gc=col.g; ex[i].bc=col.b;
+    ex[i].a=segA(sid,dots[i].b);
+  }
+  for (var i=take; i<dots.length; i++) {
+    var d=dots[i], p={x:d.x+(Math.random()-.5)*5,y:d.y+(Math.random()-.5)*5,
+      tx:d.x,ty:d.y,spd:.16+Math.random()*.06,
+      r:isD?.65+Math.random()*.25:.38+Math.random()*.14,
+      a:segA(sid,d.b),wb:Math.random()*Math.PI*2,
+      ws:.002+Math.random()*.003,wm:.03,
+      rc:col.r,gc:col.g,bc:col.b,ck:true,sid:sid};
+    ex.push(p); particles.push(p);
+  }
+  for (var i=dots.length; i<ex.length; i++) ex[i].a=0;
+  clockParts[sid] = ex.slice(0,dots.length);
+}
+
+function buildAllClockSegs(force) {
+  if (selKey) return;
+  var L = getSegLayout();
+  var txt = {HH:clockState.h,C1:':',MM:clockState.m,C2:':',SS:clockState.s,LBL:clockState.label,SUB:clockState.sub};
+  var ch = {HH:force||clockState.h!==prevCH,C1:force||!clockSegs.C1,MM:force||clockState.m!==prevCM,
+    C2:force||!clockSegs.C2,SS:force||clockState.s!==prevCS,LBL:force||clockState.label!==prevCL,SUB:force||!clockSegs.SUB};
+  var sids = Object.keys(ch);
+  for (var i=0; i<sids.length; i++) {
+    var sid=sids[i];
+    if (ch[sid]) {
+      clockSegs[sid]=sampleDots(txt[sid],L[sid].x,L[sid].y,L[sid].w,L[sid].h,Math.max(.4,L[sid].h/50));
       retargetSeg(sid,clockSegs[sid]);
     }
-  });
-  prevH=clockState.h;prevM=clockState.m;prevS=clockState.s;
-  prevLbl=clockState.label;prevSub2=clockState.sublabel;
+  }
+  prevCH=clockState.h; prevCM=clockState.m; prevCS=clockState.s; prevCL=clockState.label;
 }
 
-function initClockParticles(){
-  // First build — create all particles starting at their target positions
-  if(selKey) return;
-  const L=getSegLayout();
-  const texts={HH:clockState.h,C1:':',MM:clockState.m,C2:':',SS:clockState.s,
-    LBL:clockState.label||'',SUB:clockState.sublabel||''};
-  Object.keys(texts).forEach(sid=>{
+function initClockParticles() {
+  if (selKey) return;
+  var L = getSegLayout();
+  var txt = {HH:clockState.h,C1:':',MM:clockState.m,C2:':',SS:clockState.s,LBL:clockState.label,SUB:clockState.sub};
+  var sids = Object.keys(txt);
+  for (var si=0; si<sids.length; si++) {
+    var sid=sids[si];
     clockParts[sid]=[];
-    const dots=sampleSeg(texts[sid],L[sid]);
+    var dots=sampleDots(txt[sid],L[sid].x,L[sid].y,L[sid].w,L[sid].h,Math.max(.4,L[sid].h/50));
     clockSegs[sid]=dots;
-    const col=segColor(sid);
-    const isD=['HH','C1','MM','C2','SS'].includes(sid);
-    dots.forEach(d=>{
-      const p={
-        x:CX+(Math.random()-.5)*W*0.8, y:CY+(Math.random()-.5)*H*0.8,
-        tx:d.x,ty:d.y,
-        spd:0.04+Math.random()*0.03,
-        r:isD?0.65+Math.random()*0.25:0.38+Math.random()*0.14,
-        a:segAlpha(sid,d.bright),
-        wb:Math.random()*Math.PI*2,ws:0.002+Math.random()*0.003,wm:0.03,
-        rc:col.rc,gc:col.gc,bc:col.bc,isClock:true,segId:sid
-      };
-      clockParts[sid].push(p);
-      particles.push(p);
-    });
-  });
-  prevH=clockState.h;prevM=clockState.m;prevS=clockState.s;
-  prevLbl=clockState.label;prevSub2=clockState.sublabel;
+    var col=segCol(sid), isD=['HH','C1','MM','C2','SS'].indexOf(sid)>=0;
+    for (var i=0; i<dots.length; i++) {
+      var d=dots[i];
+      var p={x:CX+(Math.random()-.5)*W*.8,y:CY+(Math.random()-.5)*H*.8,
+        tx:d.x,ty:d.y,spd:.04+Math.random()*.03,
+        r:isD?.65+Math.random()*.25:.38+Math.random()*.14,
+        a:segA(sid,d.b),wb:Math.random()*Math.PI*2,
+        ws:.002+Math.random()*.003,wm:.03,
+        rc:col.r,gc:col.g,bc:col.b,ck:true,sid:sid};
+      clockParts[sid].push(p); particles.push(p);
+    }
+  }
+  prevCH=clockState.h; prevCM=clockState.m; prevCS=clockState.s; prevCL=clockState.label;
 }
 
-// Keep old name for compat
-function buildClockDots(){}
-
-function buildParticles(){
+function buildParticles() {
   particles=[];
-  const rand=()=>({
-    x:CX+(Math.random()-.5)*W*0.9,
-    y:CY+(Math.random()-.5)*H*0.9
-  });
+  function rand() { return {x:CX+(Math.random()-.5)*W*.9,y:CY+(Math.random()-.5)*H*.9}; }
+  var s, i, d, key, dim;
 
-  // Selected center dots — most prominent
-  selDots.forEach(d=>{
-    const s=rand();
-    particles.push({x:s.x,y:s.y,tx:d.x,ty:d.y,
-      spd:0.022+Math.random()*0.016,
-      r:0.9+Math.random()*0.4,
-      a:0.85+d.bright*0.15,
-      wb:Math.random()*Math.PI*2,ws:0.003+Math.random()*0.006,wm:0.3,
-      type:3});
-  });
+  for (i=0;i<selDots.length;i++) { d=selDots[i];s=rand();particles.push({x:s.x,y:s.y,tx:d.x,ty:d.y,spd:.022+Math.random()*.016,r:.9+Math.random()*.4,a:.85+d.b*.15,wb:Math.random()*Math.PI*2,ws:.003+Math.random()*.006,wm:.3,t:3}); }
+  for (i=0;i<cancelDots.length;i++) { d=cancelDots[i];s=rand();particles.push({x:s.x,y:s.y,tx:d.x,ty:d.y,spd:.06+Math.random()*.04,r:.5+Math.random()*.25,a:.32+d.b*.12,wb:Math.random()*Math.PI*2,ws:.003+Math.random()*.006,wm:.1,t:5}); }
 
-  // Cancel button as particles — dimmer, clickable
-  cancelDots.forEach(d=>{
-    const s=rand();
-    particles.push({x:s.x,y:s.y,tx:d.x,ty:d.y,
-      spd:0.06+Math.random()*0.04,
-      r:0.5+Math.random()*0.25,
-      a:0.32+d.bright*0.12,
-      wb:Math.random()*Math.PI*2,ws:0.003+Math.random()*0.006,wm:0.1,
-      type:5});
-  });
-
-  // Nav word dots
-  KEYS.forEach(key=>{
-    // When something is selected, hide ALL nav words from the ring
-    const isDimmed=!!selKey;
-    const type=isDimmed?2:1;
-    const dotR=isDimmed?1.5:2.2+Math.random()*0.8;
-    (wordDots[key]||[]).forEach(d=>{
-      const s=rand();
-      particles.push({x:s.x,y:s.y,tx:d.x,ty:d.y,
-        spd:0.018+Math.random()*0.014,
-        r:isDimmed?0.35:0.55+Math.random()*0.25, // 0.55–0.80px nav
-        a:isDimmed?0.18:(0.7+d.bright*0.3),
-        wb:Math.random()*Math.PI*2,ws:0.003+Math.random()*0.007,wm:0.2,
-        type});
-    });
-  });
-
-  // Clock particles — built separately via buildClockParticles()
-  // Called after buildParticles so clock particles are added on top
-
-  // Inner ring
-  for(let i=0;i<80;i++){
-    const a=(i/80)*Math.PI*2;
-    const r=INN_R*(0.5+Math.random()*0.9);
-    const s=rand();
-    particles.push({x:s.x,y:s.y,tx:CX+Math.cos(a)*r,ty:CY+Math.sin(a)*r,
-      spd:0.025+Math.random()*0.02,r:1.2+Math.random()*0.8,a:0.5+Math.random()*0.4,
-      wb:Math.random()*Math.PI*2,ws:0.006+Math.random()*0.01,wm:0.4,type:4});
+  for (i=0;i<KEYS.length;i++) {
+    key=KEYS[i]; dim=!!selKey;
+    var wd = wordDots[key]||[];
+    for (var j=0;j<wd.length;j++) { d=wd[j];s=rand();particles.push({x:s.x,y:s.y,tx:d.x,ty:d.y,spd:.018+Math.random()*.014,r:dim?.35:.55+Math.random()*.25,a:dim?.18:.7+d.b*.3,wb:Math.random()*Math.PI*2,ws:.003+Math.random()*.007,wm:.2,t:dim?2:1}); }
   }
-
-  // Ambient
-  for(let i=0;i<180;i++){
-    const a=Math.random()*Math.PI*2,r=INN_R*1.5+Math.random()*NAV_R*1.4;
-    particles.push({x:Math.random()*W,y:Math.random()*H,
-      tx:CX+Math.cos(a)*r,ty:CY+Math.sin(a)*r,
-      spd:0.004+Math.random()*0.005,r:0.8+Math.random()*1.2,a:0.06+Math.random()*0.1,
-      wb:Math.random()*Math.PI*2,ws:0.002+Math.random()*0.006,wm:1.5+Math.random()*2,type:0});
-  }
+  for (i=0;i<80;i++) { var a=(i/80)*Math.PI*2,r=INN_R*(.5+Math.random()*.9);s=rand();particles.push({x:s.x,y:s.y,tx:CX+Math.cos(a)*r,ty:CY+Math.sin(a)*r,spd:.025+Math.random()*.02,r:1.2+Math.random()*.8,a:.5+Math.random()*.4,wb:Math.random()*Math.PI*2,ws:.006+Math.random()*.01,wm:.4,t:4}); }
+  for (i=0;i<180;i++) { var a2=Math.random()*Math.PI*2,r2=INN_R*1.5+Math.random()*NAV_R*1.4;particles.push({x:Math.random()*W,y:Math.random()*H,tx:CX+Math.cos(a2)*r2,ty:CY+Math.sin(a2)*r2,spd:.004+Math.random()*.005,r:.8+Math.random()*1.2,a:.06+Math.random()*.1,wb:Math.random()*Math.PI*2,ws:.002+Math.random()*.006,wm:1.5+Math.random()*2,t:0}); }
 }
 
-function rebuild(){
-  buildWordDots();
-  buildSelDots();
-  // Reset clock seg state
-  clockSegs={};clockParts={HH:[],C1:[],MM:[],C2:[],SS:[],LBL:[],SUB:[]};
-  prevH='';prevM='';prevS='';prevLbl='';prevSub2='';
-  buildParticles();     // nav/sel/cancel/inner/ambient
-  initClockParticles(); // clock segs added on top
+function rebuild() {
+  buildWordDots(); buildSelDots();
+  clockSegs={}; clockParts={}; prevCH=''; prevCM=''; prevCS=''; prevCL='';
+  buildParticles();
+  initClockParticles();
 }
 
-// Every second — only changed segments retarget
-setInterval(()=>{
-  if(!selKey) buildAllClockSegs(false);
-},1000);
+setInterval(function(){ if(!selKey) buildAllClockSegs(false); }, 1000);
 
-/* ── HIT TEST ── */
-canvas.addEventListener('mousemove',e=>{
-  let hit=false;
-  for(let i=0;i<KEYS.length;i++){const p=navPos(i);const dx=e.clientX-p.x,dy=e.clientY-p.y;const hitR=W<600?80:65;if(dx*dx+dy*dy<hitR*hitR){hit=true;break;}}
-  // cancel region hit
-  if(selKey&&window._cY){
-    const cx2=CX,cy2=window._cY,bw2=window._cBw||140,bh2=window._cBh||40;
-    if(Math.abs(e.clientX-cx2)<bw2/2&&Math.abs(e.clientY-cy2)<bh2/2){hit=true;cancelHover=true;}
-    else cancelHover=false;
-  } else cancelHover=false;
-  document.body.classList.toggle('hov',hit);
+/* ── HIT TESTS ── */
+function hitNav(x,y) {
+  var r = W<600?80:65;
+  for (var i=0;i<KEYS.length;i++) { var p=navPos(i); if((x-p.x)*(x-p.x)+(y-p.y)*(y-p.y)<r*r) return KEYS[i]; }
+  return null;
+}
+function hitCancel(x,y) {
+  if (!selKey||!window._cY) return false;
+  return Math.abs(x-CX)<(window._cBw||140)/2 && Math.abs(y-window._cY)<(window._cBh||40)/2;
+}
+
+canvas.addEventListener('mousemove', function(e) {
+  cancelHover = hitCancel(e.clientX,e.clientY);
+  document.body.classList.toggle('hov', !!hitNav(e.clientX,e.clientY)||cancelHover);
 });
-canvas.addEventListener('click',e=>{
-  // cancel region
-  if(selKey&&window._cY){
-    const cx2=CX,cy2=window._cY,bw2=window._cBw||140,bh2=window._cBh||40;
-    if(Math.abs(e.clientX-cx2)<bw2/2&&Math.abs(e.clientY-cy2)<bh2/2){cancelNav();return;}
-  }
-  for(let i=0;i<KEYS.length;i++){
-    const p=navPos(i);const dx=e.clientX-p.x,dy=e.clientY-p.y;
-    const hitR2=W<600?80:65;if(dx*dx+dy*dy<hitR2*hitR2){selectNav(KEYS[i]);return;}
-  }
+canvas.addEventListener('click', function(e) {
+  if (hitCancel(e.clientX,e.clientY)) { cancelNav(); return; }
+  var k = hitNav(e.clientX,e.clientY);
+  if (k) wormTransition(k, null); // worm then show second screen
 });
+canvas.addEventListener('touchend', function(e) {
+  var t=e.changedTouches[0];
+  if (hitCancel(t.clientX,t.clientY)) { cancelNav(); return; }
+  var k=hitNav(t.clientX,t.clientY);
+  if (k) wormTransition(k, null);
+}, {passive:true});
 
 /* ── COUNTDOWN ── */
-let cdInt=null,cdSec=5;
-const cdArc=document.getElementById('cd-arc'),cdNEl=document.getElementById('cd-n');
-const CIRC=2*Math.PI*46;
-function setArc(s){cdArc.style.strokeDashoffset=CIRC*(1-s/15);cdNEl.textContent=s;}
-function startCD(){stopCD();cdSec=15;setArc(15);cdInt=setInterval(()=>{cdSec--;setArc(cdSec);if(cdSec<=0){stopCD();doNav();}},1000);}
+var cdInt=null, cdSec=15;
+var cdArcEl=document.getElementById('cd-arc');
+var cdNEl=document.getElementById('cd-n');
+var CIRC=2*Math.PI*46;
+function setArc(s){cdArcEl.style.strokeDashoffset=CIRC*(1-s/15);cdNEl.textContent=s;}
+function startCD(){stopCD();cdSec=15;setArc(15);cdInt=setInterval(function(){cdSec--;setArc(cdSec);if(cdSec<=0){stopCD();setArc(0);}},1000);}
 function stopCD(){if(cdInt){clearInterval(cdInt);cdInt=null;}}
-/* ── TRANSITION ANIMATION ── */
 
-let _navDest='';
-function doNav(){
-  if(!_navDest) return;
+document.getElementById('cd-go').addEventListener('click', function() {
   stopCD();
-  const d=_navDest;
-  loadingScreen(d);
-}
+  if (!navDest) return;
+  var dest = navDest; navDest = '';
+  wormTransition(null, dest); // worm then navigate
+});
+document.addEventListener('keydown', function(e){if(e.key==='Escape')cancelNav();});
 
-/* ── SELECT ── */
-function selectNav(key){
-  selKey=key;
-  _navDest=PAGES[key].dest;
-  const pg=PAGES[key];
+/* ── SELECT / CANCEL ── */
+function selectNav(key) {
+  selKey=key; navDest=PAGES[key].dest;
+  var pg=PAGES[key];
   document.getElementById('i-n').textContent=pg.num;
   document.getElementById('i-ey').textContent=pg.ey;
   document.getElementById('i-title').innerHTML=pg.title.replace('\n','<br>');
   document.getElementById('i-sub').textContent=pg.sub;
-  document.getElementById('i-chips').innerHTML=pg.chips.map((c,j)=>`<span class="i-chip${j<2?' h':''}">${c}</span>`).join('');
+  document.getElementById('i-chips').innerHTML=pg.chips.map(function(ch,j){return '<span class="i-chip'+(j<2?' h':'')+'">'+ch+'</span>';}).join('');
   document.getElementById('i-rule').textContent=pg.rule;
   document.getElementById('info').classList.add('show');
   document.getElementById('cd-dest').textContent=pg.cta;
   document.getElementById('cdw').classList.add('show');
-  const m=pg.mood;tr=m[0];tg=m[1];tb=m[2];
-  rebuild();startCD();
+  var m=pg.mood; tR=m[0]; tG=m[1]; tB=m[2];
+  rebuild(); startCD();
 }
-function cancelNav(){
-  stopCD();selKey=null;_navDest='';
+function cancelNav() {
+  stopCD(); selKey=null; navDest='';
   document.getElementById('info').classList.remove('show');
   document.getElementById('cdw').classList.remove('show');
-  tr=8;tg=4;tb=7;
+  tR=8; tG=4; tB=7;
   rebuild();
 }
-document.getElementById('cd-cancel').addEventListener('click',cancelNav);
-document.getElementById('cd-go').addEventListener('click',()=>{stopCD();doNav();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')cancelNav();});
 
-/* ── MOOD ── */
-let mr=8,mg=4,mb=7,tr=8,tg=4,tb=7;
+/* ── WORM TRANSITION — uses existing particles, no new arrays ──
+   destKey set → show second screen after worm
+   dest set    → navigate to page after worm              */
+var wormActive = false;
 
-/* ── DRAW ── */
-let lastT=0;
-function loop(ts){
-  requestAnimationFrame(loop);
-  const dt=Math.min((ts-lastT)||16,32);lastT=ts;
-  mr+=(tr-mr)*.014;mg+=(tg-mg)*.014;mb+=(tb-mb)*.014;
+function wormTransition(destKey, dest) {
+  if (wormActive) return;
+  wormActive = true;
+  document.getElementById('hint').style.display='none';
 
-  // Run transition if active
-  ctx.fillStyle=`rgb(${Math.round(mr)},${Math.round(mg)},${Math.round(mb)})`;
-  ctx.fillRect(0,0,W,H);
+  // 0 (0-700ms)    collapse to center
+  // 1 (700-1500ms) 4 beams shoot N/E/S/W
+  // 2 (1500-2800ms) beams arc right into ring
+  // 3 (2800-4800ms) ring spins with twist for 2s
+  var B=[700,1500,2800,4800];
+  var elapsed=0,lastTs=null,wA=0,stage=0,done=false;
+  var N=particles.length;
+  var minD=Math.min(W,H);
+  var ringR=minD*0.28;
+  var LAYERS=5, TWISTS=3;
+  var tubeR=minD*0.030;
+  var beamDirs=[-Math.PI/2, 0, Math.PI/2, Math.PI]; // N E S W
 
-  // bottom glow
-  const bg=ctx.createRadialGradient(CX,H,0,CX,H,H*.85);
-  bg.addColorStop(0,`rgba(196,24,0,${.05+mr/900})`);
-  bg.addColorStop(1,'transparent');
-  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
-
-  // selected word spotlight on ring
-  if(selKey){
-    const si=KEYS.indexOf(selKey);
-    const sp=navPos(si);
-    const sg=ctx.createRadialGradient(sp.x,sp.y,0,sp.x,sp.y,80);
-    sg.addColorStop(0,'rgba(240,80,32,.12)');sg.addColorStop(1,'transparent');
-    ctx.fillStyle=sg;ctx.beginPath();ctx.arc(sp.x,sp.y,80,0,Math.PI*2);ctx.fill();
+  for(var i=0;i<N;i++){
+    particles[i]._beam  = i%4;
+    particles[i]._bt    = Math.floor(i/4)/(Math.ceil(N/4));
+    particles[i]._layer = i%LAYERS;
+    particles[i]._t     = (particles[i]._beam/4)+(particles[i]._bt/4);
+    particles[i].ck     = false;
   }
 
-  // guide circles
-  ctx.beginPath();ctx.arc(CX,CY,NAV_R,0,Math.PI*2);
-  ctx.strokeStyle='rgba(232,180,160,.05)';ctx.lineWidth=.5;ctx.stroke();
-  ctx.beginPath();ctx.arc(CX,CY,INN_R,0,Math.PI*2);
-  ctx.strokeStyle='rgba(240,80,32,.1)';ctx.lineWidth=.5;ctx.stroke();
+  // Stage 0: collapse
+  for(var i=0;i<N;i++){
+    var a=Math.random()*Math.PI*2, r=Math.random()*INN_R*0.3;
+    particles[i].tx  = CX+Math.cos(a)*r;
+    particles[i].ty  = CY+Math.sin(a)*r;
+    particles[i].spd = 0.055+Math.random()*0.03;
+    particles[i].wm  = 0.5;
+  }
 
-  // center clock
-  drawCenterClock();
+  function applyBeams(ext){
+    // ext 0..1 — how far beams have extended
+    var len=ringR*ext;
+    for(var i=0;i<N;i++){
+      var bd=beamDirs[particles[i]._beam];
+      var bt=particles[i]._bt;
+      var lf=(particles[i]._layer/(LAYERS-1))-0.5;
+      var dist=bt*len;
+      particles[i].tx = CX+Math.cos(bd)*dist + Math.cos(bd+Math.PI/2)*lf*tubeR;
+      particles[i].ty = CY+Math.sin(bd)*dist + Math.sin(bd+Math.PI/2)*lf*tubeR;
+      particles[i].spd=0.13+Math.random()*0.06;
+      particles[i].wm =0.01;
+    }
+  }
 
-  // spokes
-  KEYS.forEach((key,i)=>{
-    const angle=navAngle(i);
-    const isSel=selKey===key;
-    ctx.beginPath();
-    ctx.moveTo(CX+Math.cos(angle)*(INN_R+2),CY+Math.sin(angle)*(INN_R+2));
-    ctx.lineTo(CX+Math.cos(angle)*(NAV_R-52),CY+Math.sin(angle)*(NAV_R-52));
-    ctx.strokeStyle=isSel?'rgba(240,80,32,.2)':'rgba(232,180,160,.04)';
-    ctx.lineWidth=.5;ctx.stroke();
-    // number label
-    const nr=NAV_R+20;
-    ctx.font=`600 8px DM Sans,sans-serif`;
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillStyle=isSel?'rgba(240,80,32,.7)':selKey?'rgba(232,180,160,0)':'rgba(232,180,160,.18)';
-    ctx.fillText(PAGES[key].num,CX+Math.cos(angle)*nr,CY+Math.sin(angle)*nr);
-  });
+  function applyRing(arcP, spin){
+    // arcP 0..1 — beams arc clockwise into ring
+    for(var i=0;i<N;i++){
+      var beam =particles[i]._beam;
+      var bt   =particles[i]._bt;
+      var lf   =(particles[i]._layer/(LAYERS-1))-0.5;
+      var t    =particles[i]._t;
 
-  // update + draw particles
-  const P=particles;
-  for(let i=0;i<P.length;i++){
-    const p=P[i];
-    p.wb+=p.ws;
-    // wobble decays as particle approaches target
-    const dist=Math.hypot(p.tx-p.x,p.ty-p.y);
-    const wScale=Math.min(dist/60,1);
-    const ox=Math.sin(p.wb)*p.wm*wScale;
-    const oy=Math.cos(p.wb*.73)*p.wm*wScale;
-    p.x+=(p.tx+ox-p.x)*p.spd*(dt/16);
-    p.y+=(p.ty+oy-p.y)*p.spd*(dt/16);
+      // Beam tip angle (stays fixed at beam direction tip)
+      var tipAngle=beamDirs[beam];
+      // Final ring angle for this particle
+      var finalAngle=tipAngle+bt*(Math.PI/2)+spin;
+      // Interpolate from tip radially to ring arc
+      var ease=arcP<0.5?2*arcP*arcP:1-Math.pow(-2*arcP+2,2)/2;
+      var ra=tipAngle*(1-ease)+finalAngle*ease;
+      var rr=ringR*Math.max(0.05,ease);
 
-    // color by type
-    let rc=p.rc||245,gc=p.gc||237,bc=p.bc||232,a=p.a;
-    if(p.isClock){
-      // clock particles already have rc/gc/bc set correctly
-    } else if(p.type===3){rc=255;gc=255;bc=255;}
-    else if(p.type===4){rc=255;gc=148;bc=60;}
-    else if(p.type===2){rc=245;gc=237;bc=232;a*=0.22;}
-    else if(p.type===5){
-      rc=240;gc=80;bc=32;
-      if(cancelHover){a=Math.min(1,p.a*2.8);}
+      var hx=CX+Math.cos(ra)*rr;
+      var hy=CY+Math.sin(ra)*rr;
+      var twistA=t*Math.PI*2*TWISTS+spin*2;
+      var tang=ra+Math.PI/2;
+      particles[i].tx  = hx+Math.cos(tang+twistA)*lf*tubeR*ease;
+      particles[i].ty  = hy+Math.sin(tang+twistA)*lf*tubeR*ease;
+      particles[i].spd = 0.10+Math.random()*0.05;
+      particles[i].wm  = 0.01;
+    }
+  }
+
+  function applySpin(spin){
+    for(var i=0;i<N;i++){
+      var t =(particles[i]._t+spin/(Math.PI*2))%1;
+      var ra=t*Math.PI*2+spin;
+      var lf=(particles[i]._layer/(LAYERS-1))-0.5;
+      var twistA=t*Math.PI*2*TWISTS+spin*2;
+      var tang=ra+Math.PI/2;
+      particles[i].tx  = CX+Math.cos(ra)*ringR+Math.cos(tang+twistA)*lf*tubeR;
+      particles[i].ty  = CY+Math.sin(ra)*ringR+Math.sin(tang+twistA)*lf*tubeR;
+      particles[i].spd = 0.20;
+      particles[i].wm  = 0.01;
+    }
+  }
+
+  function wormFrame(ts){
+    if(done)return;
+    var dt=lastTs?Math.min(ts-lastTs,50):16;
+    lastTs=ts; elapsed+=dt;
+    var e=elapsed;
+
+    if(stage===0&&e>B[0]){ stage=1; }
+
+    if(stage===1){
+      var p=Math.min(1,(e-B[0])/(B[1]-B[0]));
+      var ease=p<0.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+      applyBeams(ease);
+      if(e>B[1]) stage=2;
     }
 
-    if(a<0.03) continue;
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle=`rgba(${rc},${gc},${bc},${a.toFixed(2)})`;
-    ctx.fill();
+    if(stage===2){
+      var p=Math.min(1,(e-B[1])/(B[2]-B[1]));
+      applyRing(p,0);
+      if(e>B[2]) stage=3;
+    }
+
+    if(stage===3){
+      wA+=0.022;
+      applySpin(wA);
+      if(e>B[3]){
+        done=true; wormActive=false;
+        if(destKey){ selectNav(destKey); }
+        else if(dest){
+          document.getElementById('info').style.display='none';
+          document.getElementById('cdw').style.display='none';
+          document.getElementById('topbar').style.display='none';
+          navLoopOn=false;
+          setTimeout(function(){
+            if(dest.indexOf('http')===0)window.open(dest,'_blank');
+            else window.location.href=dest;
+          },100);
+        }
+        return;
+      }
+    }
+
+    requestAnimationFrame(wormFrame);
   }
 
-  // inner pulse
-  const pR=INN_R*(.76+Math.sin(ts*.0017)*.14);
-  ctx.beginPath();ctx.arc(CX,CY,pR,0,Math.PI*2);
-  ctx.strokeStyle=`rgba(255,148,60,${.16+Math.sin(ts*.002)*.06})`;
-  ctx.lineWidth=1;ctx.stroke();
+  requestAnimationFrame(wormFrame);
 }
 
-/* ── BOOT ── */
-resize();
-document.fonts.ready.then(()=>{
-  rebuild();
-  requestAnimationFrame(loop);
-});
-window.addEventListener('resize',()=>{resize();rebuild();});
+/* ── NAVIGATION + LOADING SCREEN ── */
+function doNavTo(dest) {
+  if (!dest) return;
+  // Hide all HTML UI immediately
+  document.getElementById('info').style.display='none';
+  document.getElementById('cdw').style.display='none';
+  document.getElementById('topbar').style.display='none';
+  document.getElementById('hint').style.display='none';
+  // Stop nav loop
+  navLoopOn = false;
+  // Run loading screen
+  loadingScreen(dest);
+}
 
-/* ══════════════════════════════════════════
-   LOADING SCREEN — independent overlay
-   Worm collapses to center, spins, page loads
-══════════════════════════════════════════ */
-function loadingScreen(dest){
-  // Draw on a new canvas appended AFTER everything, with explicit stacking
-  const overlay=document.createElement('div');
-  overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;z-index:999999;background:#080407;';
-  const lc=document.createElement('canvas');
-  lc.width=window.innerWidth;
-  lc.height=window.innerHeight;
-  lc.style.cssText='display:block;';
-  overlay.appendChild(lc);
-  document.body.appendChild(overlay);
+function doNav() {
+  if (!navDest) return;
+  var dest = navDest;
+  navDest = '';
+  doNavTo(dest);
+}
 
-  const lx=lc.getContext('2d');
-  const W2=lc.width,H2=lc.height,cx=W2/2,cy=H2/2,minD=Math.min(W2,H2);
+function loadingScreen(dest) {
+  var N=2000;
+  var px=new Float32Array(N), py=new Float32Array(N);
+  var tx=new Float32Array(N), ty=new Float32Array(N);
+  var pr=new Float32Array(N), ph=new Float32Array(N);
+  var minD=Math.min(W,H);
 
-  // 2000 particles spread across screen
-  const N=2000;
-  const px=new Float32Array(N),py=new Float32Array(N);
-  const tx=new Float32Array(N),ty=new Float32Array(N);
-  const pr=new Float32Array(N),ph=new Float32Array(N);
-  for(let i=0;i<N;i++){
-    const a=Math.random()*Math.PI*2,r=minD*(0.05+Math.random()*0.55);
-    px[i]=cx+Math.cos(a)*r;py[i]=cy+Math.sin(a)*r;
-    tx[i]=cx;ty[i]=cy;
-    pr[i]=0.9+Math.random()*1.2;ph[i]=Math.random()*25;
+  for (var i=0;i<N;i++) {
+    var a=Math.random()*Math.PI*2, r=minD*(.05+Math.random()*.55);
+    px[i]=CX+Math.cos(a)*r; py[i]=CY+Math.sin(a)*r;
+    tx[i]=CX; ty[i]=CY;
+    pr[i]=.9+Math.random()*1.2; ph[i]=Math.random()*25;
   }
 
-  let t0=null,wA=0,stage=0,done=false;
-  const B=[600,1100,2000,2400]; // cumulative ms breakpoints
+  var B=[600,1100,2000,2400];
+  var elapsed=0, lastTs=null, wA=0, stage=0, done=false;
 
-  function worm(angle){
-    for(let i=0;i<N;i++){
-      const t=i/N,a=t*Math.PI*2+angle;
-      const twist=Math.sin(t*Math.PI*10+angle*3)*0.28;
-      const r=minD*(0.17+twist*0.05)+Math.sin(angle*2+t*8)*minD*0.03;
-      tx[i]=cx+Math.cos(a)*r;ty[i]=cy+Math.sin(a)*r;
+  function setWorm(angle) {
+    for (var i=0;i<N;i++) {
+      var t=i/N, a=t*Math.PI*2+angle;
+      var twist=Math.sin(t*Math.PI*10+angle*3)*.28;
+      var r=minD*(.17+twist*.05)+Math.sin(angle*2+t*8)*minD*.03;
+      tx[i]=CX+Math.cos(a)*r; ty[i]=CY+Math.sin(a)*r;
     }
   }
 
-  function frame(ts){
-    if(!t0)t0=ts;
-    const e=ts-t0;
-    const ns=e<B[0]?0:e<B[1]?1:e<B[2]?2:e<B[3]?3:4;
-    if(ns!==stage){
-      stage=ns;
-      if(stage===1)worm(0);
-      if(stage===3)for(let i=0;i<N;i++){tx[i]=cx+(Math.random()-.5)*3;ty[i]=cy+(Math.random()-.5)*3;}
+  function frame(ts) {
+    var dt = lastTs ? Math.min(ts-lastTs, 50) : 16;
+    lastTs = ts;
+    elapsed += dt;
+    var e = elapsed;
+
+    var ns = e<B[0]?0 : e<B[1]?1 : e<B[2]?2 : e<B[3]?3 : 4;
+    if (ns !== stage) {
+      stage = ns;
+      if (stage===1) setWorm(0);
+      if (stage===3) { for(var i=0;i<N;i++){tx[i]=CX+(Math.random()-.5)*4;ty[i]=CY+(Math.random()-.5)*4;} }
     }
-    if(stage===2){wA+=0.08;worm(wA);}
-    const spd=stage===0?0.12:stage===1?0.10:stage===2?0.26:0.45;
-    lx.fillStyle='#080407';lx.fillRect(0,0,W2,H2);
-    for(let i=0;i<N;i++){
-      px[i]+=(tx[i]-px[i])*spd;py[i]+=(ty[i]-py[i])*spd;
-      const hue=stage<2?20+ph[i]:10+ph[i]+Math.sin(wA*2+i/N*Math.PI)*20;
-      const lit=stage===2?50+Math.sin(wA*3+i/N*Math.PI*2)*15:55;
-      const alpha=stage===2?0.7+Math.sin(wA+i/N*Math.PI*2)*0.3:0.85;
-      lx.fillStyle=`hsla(${hue},100%,${lit}%,${alpha})`;
-      lx.beginPath();lx.arc(px[i],py[i],pr[i],0,Math.PI*2);lx.fill();
+    if (stage===2) { wA+=.08; setWorm(wA); }
+
+    var spd = stage===0?.14 : stage===1?.11 : stage===2?.28 : .45;
+
+    ctx.fillStyle='#080407';
+    ctx.fillRect(0,0,W,H);
+
+    for (var i=0;i<N;i++) {
+      px[i]+=(tx[i]-px[i])*spd;
+      py[i]+=(ty[i]-py[i])*spd;
+      var hue = stage<2 ? 20+ph[i] : 10+ph[i]+Math.sin(wA*2+i/N*Math.PI)*20;
+      var lit = stage===2 ? 50+Math.sin(wA*3+i/N*Math.PI*2)*15 : 55;
+      var alpha = stage===2 ? .7+Math.sin(wA+i/N*Math.PI*2)*.3 : .85;
+      ctx.fillStyle='hsla('+hue+',100%,'+lit+'%,'+alpha+')';
+      ctx.beginPath(); ctx.arc(px[i],py[i],pr[i],0,Math.PI*2); ctx.fill();
     }
-    if(stage>=3){
-      const prog=Math.min(1,(e-B[2])/(B[3]-B[2]));
-      lx.fillStyle=`rgba(180,0,0,${prog*0.95})`;lx.fillRect(0,0,W2,H2);
+
+    if (stage>=3) {
+      var prog=Math.min(1,(e-B[2])/(B[3]-B[2]));
+      ctx.fillStyle='rgba(180,0,0,'+prog*.95+')';
+      ctx.fillRect(0,0,W,H);
     }
-    if(stage>=4&&!done){
+
+    if (stage>=4 && !done) {
       done=true;
-      if(dest.startsWith('http'))window.open(dest,'_blank');
-      else window.location.href=dest;
+      setTimeout(function(){
+        if(dest.indexOf('http')===0) window.open(dest,'_blank');
+        else window.location.href=dest;
+      }, 150);
     }
+
     requestAnimationFrame(frame);
   }
+
   requestAnimationFrame(frame);
 }
 
+/* ── MOOD ── */
+var mr=8,mg=4,mb=7, tR=8,tG=4,tB=7;
 
+/* ── MAIN LOOP ── */
+var navLoopOn=false, lastT=0;
 
-</script>
+function loop(ts) {
+  if (!navLoopOn) return;
+  requestAnimationFrame(loop);
+  var dt=Math.min((ts-lastT)||16,32); lastT=ts;
+  mr+=(tR-mr)*.014; mg+=(tG-mg)*.014; mb+=(tB-mb)*.014;
+
+  ctx.fillStyle='rgb('+Math.round(mr)+','+Math.round(mg)+','+Math.round(mb)+')';
+  ctx.fillRect(0,0,W,H);
+
+  var bg=ctx.createRadialGradient(CX,H,0,CX,H,H*.85);
+  bg.addColorStop(0,'rgba(196,24,0,'+(.05+mr/900)+')'); bg.addColorStop(1,'transparent');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+  if(selKey){var si=KEYS.indexOf(selKey),sp=navPos(si);var sg=ctx.createRadialGradient(sp.x,sp.y,0,sp.x,sp.y,80);sg.addColorStop(0,'rgba(240,80,32,.12)');sg.addColorStop(1,'transparent');ctx.fillStyle=sg;ctx.beginPath();ctx.arc(sp.x,sp.y,80,0,Math.PI*2);ctx.fill();}
+
+  ctx.beginPath();ctx.arc(CX,CY,NAV_R,0,Math.PI*2);ctx.strokeStyle='rgba(232,180,160,.05)';ctx.lineWidth=.5;ctx.stroke();
+  ctx.beginPath();ctx.arc(CX,CY,INN_R,0,Math.PI*2);ctx.strokeStyle='rgba(240,80,32,.1)';ctx.lineWidth=.5;ctx.stroke();
+
+  for(var i=0;i<KEYS.length;i++){
+    var angle=navAngle(i),isSel=selKey===KEYS[i];
+    ctx.beginPath();ctx.moveTo(CX+Math.cos(angle)*(INN_R+2),CY+Math.sin(angle)*(INN_R+2));
+    ctx.lineTo(CX+Math.cos(angle)*(NAV_R-52),CY+Math.sin(angle)*(NAV_R-52));
+    ctx.strokeStyle=isSel?'rgba(240,80,32,.2)':'rgba(232,180,160,.04)';ctx.lineWidth=.5;ctx.stroke();
+    ctx.font='600 8px DM Sans,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle=isSel?'rgba(240,80,32,.7)':selKey?'rgba(232,180,160,0)':'rgba(232,180,160,.18)';
+    ctx.fillText(PAGES[KEYS[i]].num,CX+Math.cos(angle)*(NAV_R+20),CY+Math.sin(angle)*(NAV_R+20));
+  }
+
+  for(var i=0;i<particles.length;i++){
+    var p=particles[i];
+    p.wb+=p.ws;
+    var dist=Math.sqrt((p.tx-p.x)*(p.tx-p.x)+(p.ty-p.y)*(p.ty-p.y));
+    var wob=p.wm*Math.min(dist/60,1);
+    p.x+=(p.tx+Math.sin(p.wb)*wob-p.x)*p.spd*(dt/16);
+    p.y+=(p.ty+Math.cos(p.wb*.73)*wob-p.y)*p.spd*(dt/16);
+    var rc=p.rc||245,gc=p.gc||237,bc=p.bc||232,a=p.a;
+    if(p.ck){if(selKey){a=0;}} // hide clock when nav selected
+    else if(p.t===3){rc=255;gc=255;bc=255;}
+    else if(p.t===4){rc=255;gc=148;bc=60;}
+    else if(p.t===2){a*=.22;}
+    else if(p.t===5){rc=240;gc=80;bc=32;if(cancelHover)a=Math.min(1,a*2.8);}
+    if(a<.03)continue;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle='rgba('+rc+','+gc+','+bc+','+a.toFixed(2)+')';ctx.fill();
+  }
+
+  var pR=INN_R*(.76+Math.sin(ts*.0017)*.14);
+  ctx.beginPath();ctx.arc(CX,CY,pR,0,Math.PI*2);
+  ctx.strokeStyle='rgba(255,148,60,'+(.16+Math.sin(ts*.002)*.06)+')';ctx.lineWidth=1;ctx.stroke();
+}
+
+/* ── BOOT ── */
+document.fonts.ready.then(function(){
+  rebuild();
+  navLoopOn=true;
+  requestAnimationFrame(loop);
+});
+window.addEventListener('resize', function(){ resize(); rebuild(); });</script>
 </body>
 </html>
