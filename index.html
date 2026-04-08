@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=DM+Sans:wght@400;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;overflow:hidden;background:#080407;font-family:'DM Sans',sans-serif;cursor:none;}
+html,body{width:100%;height:100%;overflow:hidden;background:#080407;font-family:'DM Sans',sans-serif;cursor:none;-webkit-tap-highlight-color:transparent;}
 canvas{position:fixed;inset:0;display:block;}
 #cur{position:fixed;width:8px;height:8px;border-radius:50%;background:#f05020;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);box-shadow:0 0 10px #f05020;}
 #cur2{position:fixed;width:30px;height:30px;border-radius:50%;border:1px solid rgba(240,80,32,.4);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .25s,height .25s;}
@@ -47,7 +47,7 @@ body.hov #cur2{width:50px;height:50px;border-color:rgba(240,80,32,.7);}
 #cd-cancel:hover{color:rgba(232,180,160,.65);border-color:rgba(232,180,160,.3);}
 #hint{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);font-size:7px;letter-spacing:.26em;text-transform:uppercase;color:rgba(232,180,160,.14);z-index:200;pointer-events:none;animation:hfade 5s ease-in-out 2s both;}
 @keyframes hfade{0%{opacity:0}20%{opacity:1}72%{opacity:1}100%{opacity:0}}
-@media(max-width:680px){#info{display:none;}#cdw{right:50%;transform:translate(50%,-50%);}}
+@media(max-width:680px){#info{display:none;}#cdw{right:auto;left:50%;bottom:20px;top:auto;transform:translateX(-50%);flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px;max-width:90vw;background:rgba(8,4,7,.85);padding:10px 14px;border:1px solid rgba(232,180,160,.08);}#cdw svg{width:70px;height:70px;}#cd-n{font-size:26px;}#cd-lbl{font-size:6px;}}
 </style>
 </head>
 <body>
@@ -72,7 +72,7 @@ body.hov #cur2{width:50px;height:50px;border-color:rgba(240,80,32,.7);}
   </svg>
   <div id="cd-dest"></div>
   <button id="cd-go">Go Now →</button>
-  <button id="cd-cancel">Cancel</button>
+  <button id="cd-cancel" style="display:none">Cancel</button>
 </div>
 <div id="hint">Click any word to navigate</div>
 
@@ -100,7 +100,7 @@ function resize(){
   W=canvas.width=window.innerWidth;
   H=canvas.height=window.innerHeight;
   CX=W/2; CY=H/2;
-  NAV_R=Math.min(W,H)*0.36;
+  NAV_R=W<500?Math.min(W,H)*0.30:W<768?Math.min(W,H)*0.32:Math.min(W,H)*0.36;
   INN_R=Math.min(W,H)*0.065;
 }
 
@@ -121,6 +121,97 @@ document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
   const dot=document.getElementById('tb-dot');
   dot.className='dot '+(open?'dot-o':'dot-c');
 })();
+
+
+/* ── CENTER CLOCK & STATUS ── */
+// Mirrors the logic from menu.html — live countdown to close/open/crawfish
+const HOURS={
+  Sunday:   {open:7*60,    close:15*60},
+  Saturday: {open:6*60,    close:14*60},
+  Monday:   {open:5*60+30, close:14*60},
+  Tuesday:  {open:5*60+30, close:14*60},
+  Wednesday:{open:5*60+30, close:14*60},
+  Thursday: {open:5*60+30, close:14*60},
+  Friday:   {open:5*60+30, close:14*60},
+};
+const CF_DAYS=['Thursday','Friday','Saturday']; // crawfish nights
+const CF_START=16*60, CF_END=20*60;
+const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+function getTodayName(){ return DAYS[new Date().getDay()]; }
+function fmtTime(h){
+  const hh=Math.floor(h/60),mm=h%60,ampm=hh>=12?'pm':'am';
+  return (hh>12?hh-12:hh||12)+':'+(mm<10?'0'+mm:mm)+ampm;
+}
+function fmtCountdown(totalSecs){
+  const h=Math.floor(totalSecs/3600);
+  const m=Math.floor((totalSecs%3600)/60);
+  const s=totalSecs%60;
+  return {h:String(h).padStart(2,'0'), m:String(m).padStart(2,'0'), s:String(s).padStart(2,'0')};
+}
+
+// Holds current clock state — updated every second
+let clockState={
+  label:'',       // e.g. "OPEN NOW" / "CLOSED" / "CRAWFISH TONIGHT"
+  sublabel:'',    // e.g. "Closes in" / "Opens in"
+  h:'00',m:'00',s:'00',
+  isOpen:false,
+  isCrawfish:false,
+};
+
+function updateClockState(){
+  const now=new Date();
+  const dayName=getTodayName();
+  const hr=HOURS[dayName];
+  const nowMins=now.getHours()*60+now.getMinutes();
+  const nowSecs=now.getHours()*3600+now.getMinutes()*60+now.getSeconds();
+  const isCfDay=CF_DAYS.includes(dayName);
+
+  const isMainOpen=nowMins>=hr.open&&nowMins<hr.close;
+  const isCfOpen=isCfDay&&nowMins>=CF_START&&nowMins<CF_END;
+  clockState.isOpen=isMainOpen||isCfOpen;
+  clockState.isCrawfish=isCfOpen;
+
+  let targetSecs=0,label='',sublabel='';
+
+  if(nowSecs<hr.open*60){
+    // Before open
+    label='CLOSED';sublabel='Opens '+fmtTime(hr.open);
+    targetSecs=hr.open*60-nowSecs;
+  } else if(nowSecs<hr.close*60){
+    // During main hours
+    if(nowSecs<10*60+30*60){ label='BREAKFAST';sublabel='Breakfast ends in'; targetSecs=10*60*60+30*60-nowSecs; }
+    else if(nowSecs<11*60*60){ label='TRANSITIONING';sublabel='Lunch starts in'; targetSecs=11*60*60-nowSecs; }
+    else { label='OPEN';sublabel='Closes in'; targetSecs=hr.close*60-nowSecs; }
+  } else if(isCfDay&&nowSecs<CF_START*60){
+    // Between close and crawfish
+    label='CRAWFISH AT 4PM';sublabel='Crawfish starts in';
+    targetSecs=CF_START*60-nowSecs;
+  } else if(isCfDay&&nowSecs<CF_END*60){
+    // Crawfish hours
+    label='CRAWFISH NIGHT';sublabel='Crawfish ends in';
+    targetSecs=CF_END*60-nowSecs;
+  } else {
+    // Closed for the day
+    const tom=new Date(now); tom.setDate(tom.getDate()+1);
+    const tomName=DAYS[tom.getDay()];
+    const tomHr=HOURS[tomName];
+    label='CLOSED';sublabel='Opens '+fmtTime(tomHr.open)+' '+tomName;
+    const secsTilMidnight=86400-nowSecs;
+    targetSecs=secsTilMidnight+tomHr.open*60;
+  }
+
+  const cd=fmtCountdown(Math.max(0,Math.floor(targetSecs)));
+  clockState.label=label;
+  clockState.sublabel=sublabel;
+  clockState.h=cd.h; clockState.m=cd.m; clockState.s=cd.s;
+}
+
+updateClockState();
+setInterval(updateClockState,1000);
+
+/* drawCenterClock is now particle-based — no canvas text */
+function drawCenterClock(){ /* particles handle this */ }
 
 /* ── DOT-MATRIX TEXT SAMPLER ──
    Samples text as a grid of evenly-spaced dots.
@@ -177,10 +268,15 @@ function sampleDotMatrix(text, cx, cy, targetW, targetH, dotStep){
 // Each nav word: pre-sampled dot positions
 // Particles travel FROM random positions TO their dot positions
 let selKey=null;
+let cancelHover=false;
+let cancelY=0,cancelBw=0,cancelBh=0;
 let wordDots={}; // key -> [{x,y,bright}]
 let selDots=[];  // selected center title dots
+let cancelDots=[];  // cancel button as particles
+let clockDots=[];   // clock timer as particles — type 6=label, 7=digits, 8=sublabel
+let lastClockSec=-1; // track when time changes to rebuild clock particles
 let particles=[];// [{x,y,tx,ty,spd,r,a,bright,wb,ws,wm,type}]
-// type: 0=ambient 1=nav-active 2=nav-dimmed 3=selected 4=inner
+// type: 0=ambient 1=nav-active 2=nav-dimmed 3=selected 4=inner 5=cancel 6=clock-label 7=clock-digits 8=clock-sub
 
 function navAngle(i){ return (i/KEYS.length)*Math.PI*2-Math.PI/2+Math.PI*0.1; }
 function navPos(i){ const a=navAngle(i); return{x:CX+Math.cos(a)*NAV_R,y:CY+Math.sin(a)*NAV_R}; }
@@ -191,8 +287,8 @@ function buildWordDots(){
     const pos=navPos(i);
     // Word bounding box — width based on arc spacing, height tall enough to read
     const arcSpacing=2*Math.PI*NAV_R/KEYS.length;
-    const bw=arcSpacing*0.78;
-    const bh=bw*0.52;
+    const bw=arcSpacing*0.80;
+    const bh=bw*(W<600?0.72:0.60);
     // DOT_STEP = spacing between dots in screen pixels
     // Larger = fewer bigger dots, more readable
     const dotStep=Math.max(0.4, bh/62);
@@ -202,16 +298,56 @@ function buildWordDots(){
 
 function buildSelDots(){
   selDots=[];
+  cancelDots=[];
   if(!selKey) return;
   const lines=PAGES[selKey].title.split('\n');
-  const bw=Math.min(W*0.48,360);
-  const bh=bw*0.28;
+  const bw=Math.min(W*0.72,360);
+  const bh=bw*(W<500?0.32:0.28);
   const lh=bh/lines.length;
   const dotStep=Math.max(0.5, lh/62);
+  // Title lines — centered vertically in upper half of center
+  const titleTotalH=lh*lines.length;
   lines.forEach((ln,li)=>{
-    const ly=CY-lh*(lines.length-1)/2+li*lh;
+    const ly=CY-titleTotalH*0.6+li*lh;
     selDots=selDots.concat(sampleDotMatrix(ln,CX,ly,bw,lh,dotStep));
   });
+  // Cancel button text — below title, smaller
+  const cancelBw=Math.min(W*0.18,140);
+  const cancelBh=cancelBw*0.28;
+  const cancelStep=Math.max(0.5, cancelBh/40);
+  cancelY=CY+titleTotalH*0.55+cancelBh;
+  window._cY=cancelY; window._cBw=cancelBw; window._cBh=cancelBh;
+  cancelDots=sampleDotMatrix('✕  Cancel',CX,cancelY,cancelBw,cancelBh,cancelStep);
+}
+
+function buildClockDots(){
+  clockDots=[];
+  if(selKey) return; // clock hidden when nav selected
+
+  const sc=Math.min(W,H);
+  // Layout: status label above, HH:MM:SS big in center, sublabel below
+  const labelY   = CY - sc*0.10;
+  const digitsY  = CY + sc*0.01;
+  const subY     = CY + sc*0.09;
+
+  // Status label — small
+  const lbw=Math.min(W*0.35,260), lbh=sc*0.04;
+  const ldotStep=Math.max(0.4, lbh/28);
+  sampleDotMatrix(clockState.label||'--', CX, labelY, lbw, lbh, ldotStep)
+    .forEach(d=>clockDots.push({...d,ctype:6}));
+
+  // Time digits HH:MM:SS — big
+  const timeStr=clockState.h+':'+clockState.m+':'+clockState.s;
+  const dbw=Math.min(W*0.82,420), dbh=sc*(W<500?0.08:0.10);
+  const ddotStep=Math.max(0.4, dbh/55);
+  sampleDotMatrix(timeStr, CX, digitsY, dbw, dbh, ddotStep)
+    .forEach(d=>clockDots.push({...d,ctype:7}));
+
+  // Sublabel — small italic below
+  const sbw=Math.min(W*0.42,300), sbh=sc*0.032;
+  const sdotStep=Math.max(0.4, sbh/22);
+  sampleDotMatrix(clockState.sublabel||'', CX, subY, sbw, sbh, sdotStep)
+    .forEach(d=>clockDots.push({...d,ctype:8}));
 }
 
 function buildParticles(){
@@ -226,10 +362,21 @@ function buildParticles(){
     const s=rand();
     particles.push({x:s.x,y:s.y,tx:d.x,ty:d.y,
       spd:0.022+Math.random()*0.016,
-      r:0.9+Math.random()*0.4,    // 0.9–1.3px selected center
+      r:0.9+Math.random()*0.4,
       a:0.85+d.bright*0.15,
       wb:Math.random()*Math.PI*2,ws:0.003+Math.random()*0.006,wm:0.3,
       type:3});
+  });
+
+  // Cancel button as particles — dimmer, clickable
+  cancelDots.forEach(d=>{
+    const s=rand();
+    particles.push({x:s.x,y:s.y,tx:d.x,ty:d.y,
+      spd:0.06+Math.random()*0.04,
+      r:0.5+Math.random()*0.25,
+      a:0.32+d.bright*0.12,
+      wb:Math.random()*Math.PI*2,ws:0.003+Math.random()*0.006,wm:0.1,
+      type:5});
   });
 
   // Nav word dots
@@ -246,6 +393,31 @@ function buildParticles(){
         wb:Math.random()*Math.PI*2,ws:0.003+Math.random()*0.007,wm:0.2,
         type});
     });
+  });
+
+  // Clock timer particles (only when no selection)
+  clockDots.forEach(d=>{
+    const s=rand();
+    const isDigits=d.ctype===7;
+    const isLabel=d.ctype===6;
+    // digits: amber/fire when open, dim cream when closed
+    let rc=245,gc=237,bc=232,aa=0.6;
+    if(isDigits){
+      if(clockState.isOpen){rc=255;gc=200;bc=80;aa=0.75+d.bright*0.25;}
+      else{rc=232;gc=180;bc=160;aa=0.25+d.bright*0.15;}
+    } else if(isLabel){
+      if(clockState.isOpen){rc=255;gc=148;bc=60;aa=0.55;}
+      else{rc=232;gc=180;bc=160;aa=0.18;}
+    } else { // sublabel
+      rc=232;gc=180;bc=160;aa=0.2;
+    }
+    particles.push({x:s.x,y:s.y,tx:d.x,ty:d.y,
+      spd:0.055+Math.random()*0.035,  // fast — reforms every second
+      r:isDigits?0.7+Math.random()*0.3:0.45+Math.random()*0.2,
+      a:aa,
+      wb:Math.random()*Math.PI*2,ws:0.003+Math.random()*0.005,wm:0.15,
+      rc,gc,bc,  // store color on particle
+      type:d.ctype});
   });
 
   // Inner ring
@@ -271,19 +443,54 @@ function buildParticles(){
 function rebuild(){
   buildWordDots();
   buildSelDots();
+  buildClockDots();
   buildParticles();
 }
+
+// Rebuild clock particles every second when no selection
+setInterval(()=>{
+  if(!selKey){
+    buildClockDots();
+    // Only replace clock particles in the array — faster than full rebuild
+    particles=particles.filter(p=>p.type<6||p.type>8);
+    const rand=()=>({x:CX+(Math.random()-.5)*W*0.9,y:CY+(Math.random()-.5)*H*0.9});
+    clockDots.forEach(d=>{
+      const s=rand();
+      const isDigits=d.ctype===7,isLabel=d.ctype===6;
+      let rc=245,gc=237,bc=232,aa=0.6;
+      if(isDigits){if(clockState.isOpen){rc=255;gc=200;bc=80;aa=0.75+d.bright*0.25;}else{rc=232;gc=180;bc=160;aa=0.25+d.bright*0.15;}}
+      else if(isLabel){if(clockState.isOpen){rc=255;gc=148;bc=60;aa=0.55;}else{rc=232;gc=180;bc=160;aa=0.18;}}
+      else{rc=232;gc=180;bc=160;aa=0.2;}
+      particles.push({x:s.x,y:s.y,tx:d.x,ty:d.y,
+        spd:0.055+Math.random()*0.035,
+        r:isDigits?0.7+Math.random()*0.3:0.45+Math.random()*0.2,
+        a:aa,wb:Math.random()*Math.PI*2,ws:0.003+Math.random()*0.005,wm:0.15,
+        rc,gc,bc,type:d.ctype});
+    });
+  }
+},1000);
 
 /* ── HIT TEST ── */
 canvas.addEventListener('mousemove',e=>{
   let hit=false;
-  for(let i=0;i<KEYS.length;i++){const p=navPos(i);const dx=e.clientX-p.x,dy=e.clientY-p.y;if(dx*dx+dy*dy<65*65){hit=true;break;}}
+  for(let i=0;i<KEYS.length;i++){const p=navPos(i);const dx=e.clientX-p.x,dy=e.clientY-p.y;const hitR=W<600?80:65;if(dx*dx+dy*dy<hitR*hitR){hit=true;break;}}
+  // cancel region hit
+  if(selKey&&window._cY){
+    const cx2=CX,cy2=window._cY,bw2=window._cBw||140,bh2=window._cBh||40;
+    if(Math.abs(e.clientX-cx2)<bw2/2&&Math.abs(e.clientY-cy2)<bh2/2){hit=true;cancelHover=true;}
+    else cancelHover=false;
+  } else cancelHover=false;
   document.body.classList.toggle('hov',hit);
 });
 canvas.addEventListener('click',e=>{
+  // cancel region
+  if(selKey&&window._cY){
+    const cx2=CX,cy2=window._cY,bw2=window._cBw||140,bh2=window._cBh||40;
+    if(Math.abs(e.clientX-cx2)<bw2/2&&Math.abs(e.clientY-cy2)<bh2/2){cancelNav();return;}
+  }
   for(let i=0;i<KEYS.length;i++){
     const p=navPos(i);const dx=e.clientX-p.x,dy=e.clientY-p.y;
-    if(dx*dx+dy*dy<65*65){selectNav(KEYS[i]);return;}
+    const hitR2=W<600?80:65;if(dx*dx+dy*dy<hitR2*hitR2){selectNav(KEYS[i]);return;}
   }
 });
 
@@ -357,6 +564,9 @@ function loop(ts){
   ctx.beginPath();ctx.arc(CX,CY,INN_R,0,Math.PI*2);
   ctx.strokeStyle='rgba(240,80,32,.1)';ctx.lineWidth=.5;ctx.stroke();
 
+  // center clock
+  drawCenterClock();
+
   // spokes
   KEYS.forEach((key,i)=>{
     const angle=navAngle(i);
@@ -388,10 +598,15 @@ function loop(ts){
     p.y+=(p.ty+oy-p.y)*p.spd*(dt/16);
 
     // color by type
-    let rc=245,gc=237,bc=232,a=p.a;
-    if(p.type===3){rc=255;gc=255;bc=255;}         // selected: white
-    else if(p.type===4){rc=255;gc=148;bc=60;}      // inner: amber
-    else if(p.type===2){rc=245;gc=237;bc=232;a*=0.22;} // dimmed nav
+    let rc=p.rc||245,gc=p.gc||237,bc=p.bc||232,a=p.a;
+    if(p.type===3){rc=255;gc=255;bc=255;}              // selected: white
+    else if(p.type===4){rc=255;gc=148;bc=60;}           // inner: amber
+    else if(p.type===2){rc=p.rc||245;gc=p.gc||237;bc=p.bc||232;a*=0.22;}  // dimmed nav
+    else if(p.type===5){                                // cancel button
+      rc=240;gc=80;bc=32;
+      if(cancelHover){a=Math.min(1,p.a*2.8);}
+    }
+    // types 6,7,8 use per-particle rc/gc/bc already set above
 
     if(a<0.03) continue;
     ctx.beginPath();
