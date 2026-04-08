@@ -4,579 +4,416 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hot Headz — Navigate</title>
-<link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=DM+Sans:wght@400;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --void:#080407;--deep:#130509;--coal:#1e0a0c;
-  --pepper:#c41800;--fire:#e83010;--chili:#f05020;--heat:#f87038;--burn:#ffa048;
-  --cream:#f5ede8;--parch:#ead4c8;--sand:#c49888;
-  --serif:'DM Serif Display',Georgia,serif;
-  --display:'Abril Fatface',Georgia,serif;
-  --body:'DM Sans',sans-serif;
-}
-html,body{
-  width:100%;height:100%;overflow:hidden;
-  background:var(--void);color:var(--cream);
-  font-family:var(--body);cursor:none;
-  -webkit-tap-highlight-color:transparent;
-}
-
-/* ── CURSOR ── */
-#cursor{position:fixed;width:8px;height:8px;border-radius:50%;
-  background:var(--chili);pointer-events:none;z-index:9999;
-  transform:translate(-50%,-50%);
-  box-shadow:0 0 10px var(--chili),0 0 20px rgba(240,80,32,.3);
-  transition:width .2s,height .2s,background .2s;}
-#cursor.big{width:18px;height:18px;background:var(--fire);}
-#cursor-ring{position:fixed;width:32px;height:32px;border-radius:50%;
-  border:1px solid rgba(240,80,32,.35);pointer-events:none;z-index:9998;
-  transform:translate(-50%,-50%);transition:width .35s,height .35s,border-color .35s;}
-#cursor.big ~ #cursor-ring,body.hov #cursor-ring{width:54px;height:54px;border-color:rgba(240,80,32,.6);}
-
-/* ── CANVAS ── */
-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;}
-
-/* ── TOP BAR ── */
-#topbar{
-  position:fixed;top:0;left:0;right:0;z-index:50;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:clamp(12px,2vh,22px) clamp(16px,3vw,40px);
-  border-bottom:1px solid rgba(232,180,160,.06);
-}
-#tb-left{display:flex;flex-direction:column;gap:3px;}
-.tb-ey{font-family:var(--body);font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:rgba(232,180,160,.35);}
-#tb-status{display:flex;align-items:center;gap:6px;font-family:var(--body);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--chili);}
-.tb-dot{width:5px;height:5px;border-radius:50%;background:var(--burn);box-shadow:0 0 6px var(--burn);animation:pulse 1.8s ease-in-out infinite;}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.6)}}
-#brand{text-align:center;}
-#brand-name{font-family:var(--display);font-size:clamp(16px,2.2vw,26px);color:var(--cream);letter-spacing:.01em;line-height:1;}
-#brand-tag{font-family:var(--body);font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:rgba(232,180,160,.3);margin-top:3px;}
-#tb-right{text-align:right;display:flex;flex-direction:column;gap:3px;}
-.tb-meta{font-family:var(--body);font-size:clamp(9px,1vw,11px);letter-spacing:.06em;color:rgba(232,180,160,.35);}
-
-/* ── INFO PANEL — left side, shows selected page info ── */
-#info-panel{
-  position:fixed;left:clamp(16px,3vw,48px);top:50%;transform:translateY(-50%);
-  z-index:50;width:clamp(180px,20vw,260px);
-  opacity:0;transition:opacity .5s ease;pointer-events:none;
-}
-#info-panel.show{opacity:1;}
-.ip-num{font-family:var(--display);font-size:clamp(60px,8vw,100px);line-height:1;color:rgba(232,180,160,.05);margin-bottom:-10px;}
-.ip-ey{font-family:var(--body);font-weight:600;font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:var(--chili);opacity:.8;display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-.ip-ey::before{content:'';width:18px;height:1px;background:currentColor;}
-.ip-title{font-family:var(--display);font-size:clamp(22px,3vw,36px);line-height:.95;color:var(--cream);margin-bottom:8px;}
-.ip-italic{font-family:var(--serif);font-style:italic;font-size:clamp(10px,1.1vw,13px);color:rgba(232,180,160,.4);margin-bottom:14px;line-height:1.6;}
-.ip-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px;}
-.ip-chip{font-family:var(--body);font-size:7px;letter-spacing:.12em;text-transform:uppercase;padding:4px 8px;border:1px solid rgba(232,180,160,.1);color:rgba(232,180,160,.4);}
-.ip-chip.hot{border-color:rgba(240,80,32,.3);color:var(--chili);background:rgba(240,80,32,.06);}
-.ip-rule{font-family:var(--serif);font-style:italic;font-size:11px;color:rgba(232,180,160,.2);padding-top:12px;border-top:1px solid rgba(232,180,160,.06);}
-
-/* ── COUNTDOWN UI ── */
-#cd-wrap{
-  position:fixed;right:clamp(16px,3vw,48px);top:50%;transform:translateY(-50%);
-  z-index:50;display:flex;flex-direction:column;align-items:center;gap:12px;
-  opacity:0;transition:opacity .5s;pointer-events:none;
-}
-#cd-wrap.show{opacity:1;pointer-events:all;}
-#cd-svg{overflow:visible;}
-#cd-bg{fill:none;stroke:rgba(232,180,160,.06);stroke-width:2;}
-#cd-arc{fill:none;stroke:var(--chili);stroke-width:2;stroke-linecap:round;
-  transition:stroke-dashoffset .9s linear;transform:rotate(-90deg);transform-origin:50% 50%;
-  filter:drop-shadow(0 0 6px rgba(240,80,32,.5));}
-#cd-num-text{font-family:var(--display);font-size:36px;fill:var(--cream);text-anchor:middle;dominant-baseline:central;}
-#cd-label{font-family:var(--body);font-size:9px;letter-spacing:.2em;text-transform:uppercase;fill:rgba(232,180,160,.3);text-anchor:middle;}
-#cd-dest{font-family:var(--serif);font-style:italic;font-size:clamp(10px,1vw,12px);color:rgba(232,180,160,.5);text-align:center;max-width:120px;}
-#cd-cta{
-  font-family:var(--body);font-weight:700;font-size:8px;letter-spacing:.2em;text-transform:uppercase;
-  padding:10px 22px;background:var(--chili);color:var(--void);border:none;cursor:none;
-  clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);
-  transition:background .2s;
-}
-#cd-cta:hover{background:var(--fire);}
-#cd-cancel{
-  font-family:var(--body);font-size:8px;letter-spacing:.2em;text-transform:uppercase;
-  color:rgba(232,180,160,.3);background:none;border:1px solid rgba(232,180,160,.1);
-  padding:8px 18px;cursor:none;transition:all .2s;
-}
-#cd-cancel:hover{color:rgba(232,180,160,.7);border-color:rgba(232,180,160,.25);}
-
-/* ── HINT ── */
-#hint{
-  position:fixed;bottom:clamp(14px,3vh,28px);left:50%;transform:translateX(-50%);
-  font-family:var(--body);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
-  color:rgba(232,180,160,.18);z-index:50;pointer-events:none;
-  animation:hintFade 3s ease-in-out 2s both;
-}
-@keyframes hintFade{0%{opacity:0}20%{opacity:1}80%{opacity:1}100%{opacity:0}}
-
-/* ── MOBILE ── */
-@media(max-width:700px){
-  #info-panel{display:none}
-  #cd-wrap{right:50%;transform:translate(50%,-50%);}
-  #topbar{padding:10px 14px;}
-}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#080407;font-family:'DM Sans',sans-serif;cursor:none;}
+canvas{position:fixed;inset:0;display:block;}
+#cur{position:fixed;width:8px;height:8px;border-radius:50%;background:#f05020;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);box-shadow:0 0 10px #f05020;}
+#cur2{position:fixed;width:30px;height:30px;border-radius:50%;border:1px solid rgba(240,80,32,.4);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .25s,height .25s;}
+body.hov #cur2{width:50px;height:50px;border-color:rgba(240,80,32,.7);}
+#topbar{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:12px clamp(16px,3vw,44px);border-bottom:1px solid rgba(232,180,160,.06);background:rgba(8,4,7,.75);backdrop-filter:blur(20px);}
+.tb-sm{font-size:7.5px;letter-spacing:.28em;text-transform:uppercase;color:rgba(232,180,160,.28);}
+#tb-st{display:flex;align-items:center;gap:5px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;margin-top:2px;}
+.dot{width:5px;height:5px;border-radius:50%;animation:dp 1.8s ease-in-out infinite;}
+.dot-o{background:#ffa048;box-shadow:0 0 5px #ffa048;color:#f05020;}
+.dot-c{background:rgba(232,180,160,.2);color:rgba(232,180,160,.35);}
+@keyframes dp{0%,100%{opacity:1}50%{opacity:.25}}
+#brand-n{font-family:'Abril Fatface',serif;font-size:clamp(16px,2.2vw,26px);color:#f5ede8;text-align:center;line-height:1;}
+#brand-t{font-size:7px;letter-spacing:.22em;text-transform:uppercase;color:rgba(232,180,160,.22);text-align:center;margin-top:3px;}
+/* info panel */
+#info{position:fixed;left:clamp(14px,3vw,48px);top:50%;transform:translateY(-50%);z-index:100;width:clamp(160px,17vw,230px);opacity:0;transition:opacity .5s;}
+#info.show{opacity:1;}
+.i-n{font-family:'Abril Fatface',serif;font-size:clamp(55px,8vw,95px);line-height:1;color:rgba(232,180,160,.04);margin-bottom:-10px;}
+.i-ey{font-size:7.5px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:#f05020;opacity:.8;display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.i-ey::before{content:'';width:14px;height:1px;background:currentColor;}
+.i-title{font-family:'Abril Fatface',serif;font-size:clamp(18px,2.5vw,32px);line-height:.95;color:#f5ede8;margin-bottom:6px;}
+.i-sub{font-family:'DM Serif Display',serif;font-style:italic;font-size:clamp(9px,1vw,12px);color:rgba(232,180,160,.32);margin-bottom:12px;line-height:1.65;}
+.i-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:13px;}
+.i-chip{font-size:6.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border:1px solid rgba(232,180,160,.1);color:rgba(232,180,160,.3);}
+.i-chip.h{border-color:rgba(240,80,32,.28);color:#f05020;}
+.i-rule{font-family:'DM Serif Display',serif;font-style:italic;font-size:10px;color:rgba(232,180,160,.16);padding-top:9px;border-top:1px solid rgba(232,180,160,.05);}
+/* countdown */
+#cdw{position:fixed;right:clamp(14px,3vw,48px);top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;align-items:center;gap:11px;opacity:0;transition:opacity .5s;pointer-events:none;}
+#cdw.show{opacity:1;pointer-events:all;}
+#cd-arc{fill:none;stroke:#f05020;stroke-width:2.5;stroke-linecap:round;stroke-dasharray:289;stroke-dashoffset:0;transform-origin:55px 55px;transform:rotate(-90deg);filter:drop-shadow(0 0 6px rgba(240,80,32,.55));}
+#cd-bg{fill:none;stroke:rgba(232,180,160,.07);stroke-width:2;}
+#cd-n{font-family:'Abril Fatface',serif;font-size:40px;fill:#f5ede8;text-anchor:middle;dominant-baseline:central;}
+#cd-lbl{font-size:7px;letter-spacing:.2em;text-transform:uppercase;fill:rgba(232,180,160,.28);text-anchor:middle;}
+#cd-dest{font-family:'DM Serif Display',serif;font-style:italic;font-size:11px;color:rgba(232,180,160,.42);text-align:center;width:115px;line-height:1.5;}
+#cd-go{font-family:'DM Sans',sans-serif;font-weight:700;font-size:7.5px;letter-spacing:.2em;text-transform:uppercase;padding:11px 24px;background:#f05020;color:#080407;border:none;cursor:none;clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);transition:background .2s;}
+#cd-go:hover{background:#e83010;}
+#cd-cancel{font-size:7.5px;letter-spacing:.2em;text-transform:uppercase;color:rgba(232,180,160,.28);background:none;border:1px solid rgba(232,180,160,.1);padding:8px 18px;cursor:none;transition:all .2s;}
+#cd-cancel:hover{color:rgba(232,180,160,.65);border-color:rgba(232,180,160,.3);}
+#hint{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);font-size:7px;letter-spacing:.26em;text-transform:uppercase;color:rgba(232,180,160,.14);z-index:200;pointer-events:none;animation:hfade 5s ease-in-out 2s both;}
+@keyframes hfade{0%{opacity:0}20%{opacity:1}72%{opacity:1}100%{opacity:0}}
+@media(max-width:680px){#info{display:none;}#cdw{right:50%;transform:translate(50%,-50%);}}
 </style>
 </head>
 <body>
-
-<div id="cursor"></div>
-<div id="cursor-ring"></div>
+<div id="cur"></div><div id="cur2"></div>
 <canvas id="c"></canvas>
-
 <div id="topbar">
-  <div id="tb-left">
-    <div class="tb-ey">DeRidder · Louisiana</div>
-    <div id="tb-status"><span class="tb-dot"></span><span id="tb-status-text">Open Now</span></div>
-  </div>
-  <div id="brand">
-    <div id="brand-name">Hot Headz</div>
-    <div id="brand-tag">Southern Foods · Est. 2020</div>
-  </div>
-  <div id="tb-right">
-    <div class="tb-meta">(337) 221-1035</div>
-    <div class="tb-meta" id="tb-hours">5:30am – 2:00pm</div>
-  </div>
+  <div><div class="tb-sm">DeRidder · Louisiana</div><div id="tb-st"><span class="dot" id="tb-dot"></span><span id="tb-stxt">—</span></div></div>
+  <div><div id="brand-n">Hot Headz</div><div id="brand-t">Southern Foods · Est. 2020</div></div>
+  <div style="text-align:right"><div class="tb-sm">(337) 221-1035</div><div class="tb-sm" id="tb-hr"></div></div>
 </div>
-
-<div id="info-panel">
-  <div class="ip-num" id="ip-num">01</div>
-  <div class="ip-ey" id="ip-ey">Section</div>
-  <div class="ip-title" id="ip-title"></div>
-  <div class="ip-italic" id="ip-italic"></div>
-  <div class="ip-chips" id="ip-chips"></div>
-  <div class="ip-rule" id="ip-rule"></div>
+<div id="info">
+  <div class="i-n" id="i-n"></div><div class="i-ey" id="i-ey"></div>
+  <div class="i-title" id="i-title"></div><div class="i-sub" id="i-sub"></div>
+  <div class="i-chips" id="i-chips"></div><div class="i-rule" id="i-rule"></div>
 </div>
-
-<div id="cd-wrap">
-  <svg id="cd-svg" width="110" height="110" viewBox="0 0 110 110">
+<div id="cdw">
+  <svg width="110" height="110" viewBox="0 0 110 110">
     <circle id="cd-bg" cx="55" cy="55" r="46"/>
-    <circle id="cd-arc" cx="55" cy="55" r="46" stroke-dasharray="289" stroke-dashoffset="0"/>
-    <text id="cd-num-text" x="55" y="50">5</text>
-    <text id="cd-label" x="55" y="72">navigating</text>
+    <circle id="cd-arc" cx="55" cy="55" r="46"/>
+    <text id="cd-n" x="55" y="50">15</text>
+    <text id="cd-lbl" x="55" y="73">navigating</text>
   </svg>
   <div id="cd-dest"></div>
-  <button id="cd-cta">Go Now →</button>
+  <button id="cd-go">Go Now →</button>
   <button id="cd-cancel">Cancel</button>
 </div>
-
-<div id="hint">Click any nav word to select</div>
+<div id="hint">Click any word to navigate</div>
 
 <script>
-const PAGES = {
-  home:     {num:'01',eyebrow:'Home',       cta:'Go to Home Page',    title:'Hot Headz\nSouthern Foods.',      italic:'Fresh · From Scratch · Est. 2020',            meta:'2741 US-190 · DeRidder, LA · (337) 221-1035', chips:['Est. 2020','DeRidder, LA','Made From Scratch','(337) 221-1035','Mon–Fri 5:30am','Sun 7am–3pm'],rule:'Home is where the food is.',        dest:'index.html',         mood:[0x3a,0x08,0x00]},
-  menu:     {num:'02',eyebrow:'The Menu',   cta:'See Full Menu',      title:'Fresh.\nFrom Scratch.',           italic:'Breakfast · Lunch · Daily specials · Desserts', meta:'Made fresh every morning — no shortcuts',     chips:['Breakfast Plates','Red Beans & Rice','Fried Chicken','Catfish','Crawfish Étouffée','Daily Specials'],rule:'From scratch, every time.',        dest:'menu.html',          mood:[0x3a,0x08,0x00]},
-  lunch:    {num:'✦', eyebrow:'Lunch',      cta:'See Lunch Menu',     title:'Lunch.\nDone Right.',             italic:'Daily Southern plates · Changes every day',    meta:'Served Mon–Fri until 2pm · Sun until 3pm',    chips:['Changes Daily','Southern Plates','Includes Sides','Check Facebook','Mon–Fri to 2pm','Sun to 3pm'],rule:'Check Facebook for today\'s plate.',dest:'menu.html#lunch',    mood:[0x3a,0x08,0x00]},
-  beer:     {num:'✦', eyebrow:'Beer',       cta:'See Beer Menu',      title:'Cold.\nCold Beer.',               italic:'Ice cold · Natural Light · Modelo · Budweiser', meta:'Ask staff for what\'s available today',       chips:['Natural Light','Miller Lite','Coors Light','Bud Light','Budweiser','Modelo'],rule:'Best with a plate of fried chicken.',dest:'menu.html#beer',     mood:[0x1a,0x04,0x00]},
-  delivery: {num:'03',eyebrow:'Delivery',   cta:'See Delivery Info',  title:'We Bring\nThe Food.',             italic:'10+ plate orders · within 10 miles',           meta:'Call (337) 221-1035 to arrange',              chips:['10+ Plates','Within 10 Miles','Call Ahead','(337) 221-1035','Group Orders','Office Lunch'],rule:'Delivered hot and fresh.',         dest:'delivery.html',      mood:[0x2a,0x04,0x00]},
-  order:    {num:'04',eyebrow:'Order Now',  cta:'Call (337) 221-1035',title:'Call\nAhead.',                    italic:'Skip the line · Ready when you arrive',        meta:'(337) 221-1035 · Mon–Fri 5:30am',             chips:['(337) 221-1035','Mon–Fri from 5:30am','Sat from 6am','Sun from 7am','Skip the Line','Carry-Out Ready'],rule:'We\'ll have it ready.',            dest:'tel:3372211035',     mood:[0x32,0x08,0x00]},
-  about:    {num:'05',eyebrow:'About Us',   cta:'Read Our Story',     title:'Comfort\nFood Done Right.',       italic:'Family-owned · DeRidder proud · Since 2020',   meta:'2741 US-190, DeRidder, LA 70634',             chips:['Est. 2020','Family Owned','Made From Scratch','DeRidder Proud','Dine-In','Carry-Out'],rule:'Real Southern cooking.',            dest:'about.html',         mood:[0x28,0x10,0x00]},
-  facebook: {num:'06',eyebrow:'Facebook',   cta:'Visit Our Facebook', title:'Follow\nThe Feed.',               italic:'Daily specials posted every morning',           meta:'Check Facebook before you drive out',         chips:['Daily Specials','Morning Posts','Photos','Announcements','Community','Follow Us'],rule:'Posted fresh every morning.',      dest:'https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/',mood:[0x1e,0x08,0x00]},
-  find:     {num:'07',eyebrow:'Find Us',    cta:'Get Directions',     title:'We\'re on\nUS-190.',               italic:'2741 US-190 · DeRidder, LA 70634',             meta:'Mon–Fri 5:30am–2pm · Sat 6am–2pm · Sun 7am–3pm',chips:['2741 US-190','(337) 221-1035','Mon–Fri 5:30–2','Sat 6–2','Sun 7–3','Crawfish Thu–Sat PM'],rule:'Follow the smell of Southern cooking.',dest:'https://maps.google.com/?q=2741+US-190+DeRidder+LA+70634',mood:[0x18,0x06,0x00]},
-  staff:    {num:'08',eyebrow:'Staff Portal',cta:'Open Staff Portal', title:'Employee\nPortal.',                italic:'Schedule · Shifts · Notices',                  meta:'For Hot Headz staff only — sign in required', chips:['View Schedule','My Shifts','Notice Board','Manager Access','Live Updates','All Devices'],rule:'Made from scratch. Just like the food.',dest:'staff-portal.html',  mood:[0x2a,0x0e,0x00]},
+const PAGES={
+  home:    {num:'01',ey:'Home',        cta:'Go to Home Page',    title:'Hot Headz\nSouthern Foods.',  sub:'Fresh · From Scratch · Est. 2020',          chips:['Est. 2020','DeRidder, LA','From Scratch','(337) 221-1035'],rule:'Home is where the food is.',    dest:'index.html',       mood:[58,8,0]},
+  menu:    {num:'02',ey:'The Menu',    cta:'See Full Menu',      title:'Fresh.\nFrom Scratch.',       sub:'Breakfast · Lunch · Daily Specials',         chips:['Breakfast','Fried Chicken','Catfish','Daily Specials'],   rule:'From scratch, every time.',    dest:'menu.html',        mood:[58,8,0]},
+  lunch:   {num:'✦', ey:'Lunch',       cta:'See Lunch Menu',     title:'Lunch.\nDone Right.',         sub:'Daily Southern plates · changes every day',  chips:['Changes Daily','Southern Plates','Check Facebook','Sides'],rule:'Check Facebook every morning.', dest:'menu.html#lunch',  mood:[58,8,0]},
+  beer:    {num:'✦', ey:'Beer',        cta:'See Beer Menu',      title:'Cold.\nCold Beer.',           sub:'Ice cold · Natural Light · Modelo',          chips:['Natural Light','Miller Lite','Modelo','Budweiser'],       rule:'Best with fried chicken.',     dest:'menu.html#beer',   mood:[26,4,0]},
+  delivery:{num:'03',ey:'Delivery',    cta:'Delivery Info',      title:'We Bring\nThe Food.',         sub:'10+ plates · within 10 miles',               chips:['10+ Plates','10 Miles','Call Ahead','Group Orders'],      rule:'Delivered hot and fresh.',     dest:'delivery.html',    mood:[42,4,0]},
+  order:   {num:'04',ey:'Order Now',   cta:'Call (337) 221-1035',title:'Call\nAhead.',                sub:'Skip the line · Ready when you arrive',      chips:['(337) 221-1035','Mon–Fri 5:30am','Skip Line','Carry-Out'],rule:"We'll have it ready.",          dest:'tel:3372211035',   mood:[50,8,0]},
+  about:   {num:'05',ey:'About Us',    cta:'Read Our Story',     title:'Comfort\nFood Done Right.',   sub:'Family-owned · DeRidder proud · Since 2020', chips:['Est. 2020','Family Owned','From Scratch','DeRidder'],     rule:'Real Southern cooking.',       dest:'about.html',       mood:[40,16,0]},
+  facebook:{num:'06',ey:'Facebook',    cta:'Visit Our Facebook', title:'Follow\nThe Feed.',           sub:'Daily specials posted every morning',         chips:['Daily Specials','Morning Posts','Photos','Follow Us'],    rule:'Posted fresh every morning.',  dest:'https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/',mood:[30,8,0]},
+  find:    {num:'07',ey:'Find Us',     cta:'Get Directions',     title:"We're on\nUS-190.",           sub:'2741 US-190 · DeRidder, LA 70634',           chips:['2741 US-190','(337) 221-1035','Easy Parking','Open Daily'],rule:'Follow the smell.',            dest:'https://maps.google.com/?q=2741+US-190+DeRidder+LA',mood:[24,6,0]},
+  staff:   {num:'08',ey:'Staff Portal',cta:'Open Staff Portal',  title:'Employee\nPortal.',           sub:'Schedule · Shifts · Notices',                chips:['View Schedule','My Shifts','Notice Board','Manager'],     rule:'Made from scratch. Like the food.',dest:'staff-portal.html',mood:[42,14,0]},
 };
+const KEYS=Object.keys(PAGES);
 
-const NAV_KEYS = ['home','menu','lunch','beer','delivery','order','about','facebook','find','staff'];
-
-const canvas = document.getElementById('c');
-const ctx = canvas.getContext('2d');
-let W,H,cx,cy;
+/* ── CANVAS ── */
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+let W,H,CX,CY,NAV_R,INN_R;
 
 function resize(){
-  W = canvas.width = window.innerWidth;
-  H = canvas.height = window.innerHeight;
-  cx = W/2; cy = H/2;
-  buildTargets();
+  W=canvas.width=window.innerWidth;
+  H=canvas.height=window.innerHeight;
+  CX=W/2; CY=H/2;
+  NAV_R=Math.min(W,H)*0.36;
+  INN_R=Math.min(W,H)*0.065;
 }
-window.addEventListener('resize', resize);
 
-// ── CURSOR ──
-const curEl = document.getElementById('cursor');
-let mx=0,my=0,rx=0,ry=0;
+/* ── CURSOR ── */
+const cur=document.getElementById('cur'),cur2=document.getElementById('cur2');
+let mx=300,my=300,lx=300,ly=300;
 document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
-(function curLoop(){
-  curEl.style.left=mx+'px';curEl.style.top=my+'px';
-  rx+=(mx-rx)*0.1;ry+=(my-ry)*0.1;
-  document.getElementById('cursor-ring').style.left=rx+'px';
-  document.getElementById('cursor-ring').style.top=ry+'px';
-  requestAnimationFrame(curLoop);
-})();
+(function cl(){cur.style.left=mx+'px';cur.style.top=my+'px';lx+=(mx-lx)*.11;ly+=(my-ly)*.11;cur2.style.left=lx+'px';cur2.style.top=ly+'px';requestAnimationFrame(cl);})();
 
-// ── STATUS BAR ──
+/* ── STATUS ── */
 (function(){
-  const now=new Date(),h=now.getHours(),m=now.getMinutes(),mins=h*60+m;
-  const day=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][now.getDay()];
-  const open=day==='Sunday'?420:day==='Saturday'?360:330;
-  const close=day==='Sunday'?900:840;
-  const hrs={Sunday:'7:00am – 3:00pm',Saturday:'6:00am – 2:00pm'};
-  document.getElementById('tb-hours').textContent=hrs[day]||'5:30am – 2:00pm';
-  const isOpen=mins>=open&&mins<close;
-  document.getElementById('tb-status-text').textContent=isOpen?'Open Now':'Closed';
-  document.querySelector('.tb-dot').style.background=isOpen?'#ffa048':'rgba(232,180,160,.3)';
+  const n=new Date(),mins=n.getHours()*60+n.getMinutes();
+  const d=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][n.getDay()];
+  document.getElementById('tb-hr').textContent=d==='Sunday'?'7am–3pm':d==='Saturday'?'6am–2pm':'5:30am–2pm';
+  const o=d==='Sunday'?420:d==='Saturday'?360:330,cl=d==='Sunday'?900:840,open=mins>=o&&mins<cl;
+  document.getElementById('tb-stxt').textContent=open?'Open Now':'Closed';
+  document.getElementById('tb-stxt').style.color=open?'#f05020':'rgba(232,180,160,.35)';
+  const dot=document.getElementById('tb-dot');
+  dot.className='dot '+(open?'dot-o':'dot-c');
 })();
 
-// ── PARTICLES ──
-const TOTAL = 600;
-const particles = [];
-
-class P{
-  constructor(){
-    this.x = Math.random()*800-400;
-    this.y = Math.random()*600-300;
-    this.tx = 0; this.ty = 0;
-    this.r = Math.random()*1.8+0.3;
-    this.a = Math.random()*0.6+0.15;
-    this.spd = 0.035+Math.random()*0.045;
-    this.wb = Math.random()*Math.PI*2;
-    this.ws = 0.008+Math.random()*0.018;
-    this.wm = Math.random()*1.4+0.2;
-    this.group = 'float';
-  }
-}
-for(let i=0;i<TOTAL;i++) particles.push(new P());
-
-// ── TEXT → PARTICLE POSITIONS ──
-function textPts(txt, bx, by, bw, bh, step){
-  const off=document.createElement('canvas');
-  off.width=bw; off.height=bh;
-  const ox=off.getContext('2d');
-  const fs=Math.min(bh*0.72,bw/(txt.length*0.52+0.5));
+/* ── DOT-MATRIX TEXT SAMPLER ──
+   Samples text as a grid of evenly-spaced dots.
+   DOT_STEP controls spacing — larger = fewer, bigger dots = more readable.
+   Returns array of {x,y} screen coordinates. */
+function sampleDotMatrix(text, cx, cy, targetW, targetH, dotStep){
+  // Render at 4x scale for good antialiasing, then downsample to dot grid
+  const SCALE=4;
+  const OW=Math.round(targetW*SCALE);
+  const OH=Math.round(targetH*SCALE);
+  const oc=document.createElement('canvas');
+  oc.width=OW; oc.height=OH;
+  const ox=oc.getContext('2d');
+  ox.clearRect(0,0,OW,OH);
+  // Fit font to canvas
+  let fs=Math.round(OH*0.72);
+  ox.font=`700 ${fs}px DM Sans,Arial Black,Arial,sans-serif`;
+  const mw=ox.measureText(text).width;
+  if(mw>OW*0.9) fs=Math.round(fs*(OW*0.9/mw));
+  ox.font=`700 ${fs}px DM Sans,Arial Black,Arial,sans-serif`;
   ox.fillStyle='#fff';
-  ox.font=`700 ${fs}px 'DM Sans',sans-serif`;
-  ox.textAlign='center';ox.textBaseline='middle';
-  ox.fillText(txt,bw/2,bh/2);
-  const d=ox.getImageData(0,0,bw,bh).data;
+  ox.textAlign='center';
+  ox.textBaseline='middle';
+  ox.fillText(text,OW/2,OH/2);
+  const d=ox.getImageData(0,0,OW,OH).data;
   const pts=[];
-  for(let y=0;y<bh;y+=step) for(let x=0;x<bw;x+=step)
-    if(d[(y*bw+x)*4+3]>100) pts.push({x:bx+x,y:by+y});
-  return pts;
-}
-
-function circlePts(ocx,ocy,r,n){
-  const pts=[];
-  for(let i=0;i<n;i++){
-    const a=(i/n)*Math.PI*2;
-    pts.push({x:ocx+Math.cos(a)*r,y:ocy+Math.sin(a)*r});
+  // Sample on a dot grid — dotStep is in screen pixels
+  const gridStep=Math.round(dotStep*SCALE);
+  const offX=cx-targetW/2;
+  const offY=cy-targetH/2;
+  for(let gy=Math.round(gridStep/2);gy<OH;gy+=gridStep){
+    for(let gx=Math.round(gridStep/2);gx<OW;gx+=gridStep){
+      // Average alpha in a small region around this grid point
+      let sum=0,count=0;
+      for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){
+        const ix=gx+dx,iy=gy+dy;
+        if(ix>=0&&ix<OW&&iy>=0&&iy<OH){sum+=d[(iy*OW+ix)*4+3];count++;}
+      }
+      const avg=sum/count;
+      if(avg>80){
+        // Map back to screen coordinates
+        pts.push({
+          x: offX+(gx/OW)*targetW,
+          y: offY+(gy/OH)*targetH,
+          bright: avg/255
+        });
+      }
+    }
   }
   return pts;
 }
 
-function ringPts(ocx,ocy,r,thickness,n){
-  const pts=[];
-  for(let i=0;i<n;i++){
-    const a=Math.random()*Math.PI*2;
-    const rd=r-thickness/2+Math.random()*thickness;
-    pts.push({x:ocx+Math.cos(a)*rd,y:ocy+Math.sin(a)*rd});
-  }
-  return pts;
+/* ── PARTICLE SYSTEM ── */
+// Each nav word: pre-sampled dot positions
+// Particles travel FROM random positions TO their dot positions
+let selKey=null;
+let wordDots={}; // key -> [{x,y,bright}]
+let selDots=[];  // selected center title dots
+let particles=[];// [{x,y,tx,ty,spd,r,a,bright,wb,ws,wm,type}]
+// type: 0=ambient 1=nav-active 2=nav-dimmed 3=selected 4=inner
+
+function navAngle(i){ return (i/KEYS.length)*Math.PI*2-Math.PI/2+Math.PI*0.1; }
+function navPos(i){ const a=navAngle(i); return{x:CX+Math.cos(a)*NAV_R,y:CY+Math.sin(a)*NAV_R}; }
+
+function buildWordDots(){
+  wordDots={};
+  KEYS.forEach((key,i)=>{
+    const pos=navPos(i);
+    // Word bounding box — width based on arc spacing, height tall enough to read
+    const arcSpacing=2*Math.PI*NAV_R/KEYS.length;
+    const bw=arcSpacing*0.78;
+    const bh=bw*0.52;
+    // DOT_STEP = spacing between dots in screen pixels
+    // Larger = fewer bigger dots, more readable
+    const dotStep=Math.max(0.4, bh/62);
+    wordDots[key]=sampleDotMatrix(PAGES[key].ey, pos.x, pos.y, bw, bh, dotStep);
+  });
 }
 
-let groupTargets={};
-let selectedKey=null;
+function buildSelDots(){
+  selDots=[];
+  if(!selKey) return;
+  const lines=PAGES[selKey].title.split('\n');
+  const bw=Math.min(W*0.48,360);
+  const bh=bw*0.28;
+  const lh=bh/lines.length;
+  const dotStep=Math.max(0.5, lh/62);
+  lines.forEach((ln,li)=>{
+    const ly=CY-lh*(lines.length-1)/2+li*lh;
+    selDots=selDots.concat(sampleDotMatrix(ln,CX,ly,bw,lh,dotStep));
+  });
+}
 
-function buildTargets(){
-  if(!W||!H) return;
-  groupTargets={};
-  const navR=Math.min(W,H)*0.32;
-  const innerR=Math.min(W,H)*0.07;
-
-  // Center formation — glowing ring of particles
-  groupTargets.center=ringPts(cx,cy,innerR,6,60);
-
-  // Nav words around ring
-  NAV_KEYS.forEach((key,i)=>{
-    const angle=(i/NAV_KEYS.length)*Math.PI*2-Math.PI/2;
-    const lx=cx+Math.cos(angle)*navR;
-    const ly=cy+Math.sin(angle)*navR;
-    const label=PAGES[key].eyebrow;
-    const bw=Math.min(140,W*0.18),bh=34;
-    const pts=textPts(label,lx-bw/2,ly-bh/2,bw,bh,3);
-    groupTargets['nav_'+key]=pts.length?pts:[{x:lx,y:ly}];
+function buildParticles(){
+  particles=[];
+  const rand=()=>({
+    x:CX+(Math.random()-.5)*W*0.9,
+    y:CY+(Math.random()-.5)*H*0.9
   });
 
-  // Selected — big text in center
-  if(selectedKey){
-    const p=PAGES[selectedKey];
-    const lines=p.title.split('\n');
-    const bw=Math.min(W*0.55,380),bh=90;
-    let allPts=[];
-    lines.forEach((line,li)=>{
-      const lineH=bh/lines.length;
-      const pts=textPts(line,cx-bw/2,cy-bh/2+li*lineH,bw,lineH,2);
-      allPts=allPts.concat(pts);
+  // Selected center dots — most prominent
+  selDots.forEach(d=>{
+    const s=rand();
+    particles.push({x:s.x,y:s.y,tx:d.x,ty:d.y,
+      spd:0.022+Math.random()*0.016,
+      r:0.9+Math.random()*0.4,    // 0.9–1.3px selected center
+      a:0.85+d.bright*0.15,
+      wb:Math.random()*Math.PI*2,ws:0.003+Math.random()*0.006,wm:0.3,
+      type:3});
+  });
+
+  // Nav word dots
+  KEYS.forEach(key=>{
+    const isDimmed=selKey&&key!==selKey;
+    const type=isDimmed?2:1;
+    const dotR=isDimmed?1.5:2.2+Math.random()*0.8;
+    (wordDots[key]||[]).forEach(d=>{
+      const s=rand();
+      particles.push({x:s.x,y:s.y,tx:d.x,ty:d.y,
+        spd:0.018+Math.random()*0.014,
+        r:isDimmed?0.35:0.55+Math.random()*0.25, // 0.55–0.80px nav
+        a:isDimmed?0.18:(0.7+d.bright*0.3),
+        wb:Math.random()*Math.PI*2,ws:0.003+Math.random()*0.007,wm:0.2,
+        type});
     });
-    groupTargets.selected=allPts.length?allPts:[{x:cx,y:cy}];
-  }
+  });
 
-  // Scatter for overflow
-  groupTargets.scatter=[];
+  // Inner ring
   for(let i=0;i<80;i++){
-    const a=Math.random()*Math.PI*2;
-    const r=navR*1.25+Math.random()*Math.min(W,H)*0.2;
-    groupTargets.scatter.push({x:cx+Math.cos(a)*r,y:cy+Math.sin(a)*r});
+    const a=(i/80)*Math.PI*2;
+    const r=INN_R*(0.5+Math.random()*0.9);
+    const s=rand();
+    particles.push({x:s.x,y:s.y,tx:CX+Math.cos(a)*r,ty:CY+Math.sin(a)*r,
+      spd:0.025+Math.random()*0.02,r:1.2+Math.random()*0.8,a:0.5+Math.random()*0.4,
+      wb:Math.random()*Math.PI*2,ws:0.006+Math.random()*0.01,wm:0.4,type:4});
   }
 
-  assignParticles();
-}
-
-function assignParticles(){
-  const order=['selected','center',...NAV_KEYS.map(k=>'nav_'+k),'scatter'];
-  let pi=0;
-  order.forEach(gid=>{
-    const pts=groupTargets[gid];
-    if(!pts||!pts.length) return;
-    // how many particles for this group
-    let count;
-    if(gid==='selected') count=Math.min(pts.length,180);
-    else if(gid==='center') count=Math.min(pts.length,50);
-    else if(gid.startsWith('nav_')){
-      const key=gid.replace('nav_','');
-      count=Math.min(pts.length, selectedKey&&selectedKey!==key?Math.floor(pts.length*0.4):pts.length);
-    } else count=Math.min(pts.length,60);
-
-    for(let i=0;i<count&&pi<TOTAL;i++,pi++){
-      const pt=pts[i%pts.length];
-      particles[pi].tx=pt.x;
-      particles[pi].ty=pt.y;
-      particles[pi].group=gid;
-    }
-  });
-  // rest float
-  for(;pi<TOTAL;pi++){
-    const a=Math.random()*Math.PI*2;
-    const r=Math.min(W,H)*0.15+Math.random()*Math.min(W,H)*0.45;
-    particles[pi].tx=cx+Math.cos(a)*r;
-    particles[pi].ty=cy+Math.sin(a)*r;
-    particles[pi].group='float';
+  // Ambient
+  for(let i=0;i<180;i++){
+    const a=Math.random()*Math.PI*2,r=INN_R*1.5+Math.random()*NAV_R*1.4;
+    particles.push({x:Math.random()*W,y:Math.random()*H,
+      tx:CX+Math.cos(a)*r,ty:CY+Math.sin(a)*r,
+      spd:0.004+Math.random()*0.005,r:0.8+Math.random()*1.2,a:0.06+Math.random()*0.1,
+      wb:Math.random()*Math.PI*2,ws:0.002+Math.random()*0.006,wm:1.5+Math.random()*2,type:0});
   }
 }
 
-// ── HIT AREAS ──
-function navHit(key){
-  const i=NAV_KEYS.indexOf(key);
-  const angle=(i/NAV_KEYS.length)*Math.PI*2-Math.PI/2;
-  const navR=Math.min(W,H)*0.32;
-  return{x:cx+Math.cos(angle)*navR,y:cy+Math.sin(angle)*navR,r:58};
+function rebuild(){
+  buildWordDots();
+  buildSelDots();
+  buildParticles();
 }
 
-canvas.addEventListener('click',e=>{
-  const rect=canvas.getBoundingClientRect();
-  const mx=e.clientX-rect.left,my=e.clientY-rect.top;
-  for(const key of NAV_KEYS){
-    const h=navHit(key);
-    const dx=mx-h.x,dy=my-h.y;
-    if(dx*dx+dy*dy<h.r*h.r){selectNav(key);return;}
-  }
-});
-
+/* ── HIT TEST ── */
 canvas.addEventListener('mousemove',e=>{
-  const rect=canvas.getBoundingClientRect();
-  const mx=e.clientX-rect.left,my=e.clientY-rect.top;
   let hit=false;
-  for(const key of NAV_KEYS){
-    const h=navHit(key);
-    const dx=mx-h.x,dy=my-h.y;
-    if(dx*dx+dy*dy<h.r*h.r){hit=true;break;}
-  }
+  for(let i=0;i<KEYS.length;i++){const p=navPos(i);const dx=e.clientX-p.x,dy=e.clientY-p.y;if(dx*dx+dy*dy<65*65){hit=true;break;}}
   document.body.classList.toggle('hov',hit);
-  curEl.classList.toggle('big',hit);
+});
+canvas.addEventListener('click',e=>{
+  for(let i=0;i<KEYS.length;i++){
+    const p=navPos(i);const dx=e.clientX-p.x,dy=e.clientY-p.y;
+    if(dx*dx+dy*dy<65*65){selectNav(KEYS[i]);return;}
+  }
 });
 
-// ── COUNTDOWN ──
-let cdInterval=null,cdSecs=5;
-const cdArc=document.getElementById('cd-arc');
-const cdNum=document.getElementById('cd-num-text');
+/* ── COUNTDOWN ── */
+let cdInt=null,cdSec=5;
+const cdArc=document.getElementById('cd-arc'),cdNEl=document.getElementById('cd-n');
 const CIRC=2*Math.PI*46;
+function setArc(s){cdArc.style.strokeDashoffset=CIRC*(1-s/15);cdNEl.textContent=s;}
+function startCD(){stopCD();cdSec=15;setArc(15);cdInt=setInterval(()=>{cdSec--;setArc(cdSec);if(cdSec<=0){stopCD();doNav();}},1000);}
+function stopCD(){if(cdInt){clearInterval(cdInt);cdInt=null;}}
+function doNav(){if(!selKey)return;const d=PAGES[selKey].dest;if(d.startsWith('http')||d.startsWith('tel'))window.open(d,'_blank');else window.location.href=d;}
 
-function setArc(secs){
-  const pct=secs/5;
-  cdArc.style.strokeDashoffset=CIRC*(1-pct);
-  cdNum.textContent=secs;
-}
-
-function startCD(){
-  stopCD();
-  cdSecs=5;setArc(5);
-  cdInterval=setInterval(()=>{
-    cdSecs--;
-    setArc(cdSecs);
-    if(cdSecs<=0){stopCD();navigate();}
-  },1000);
-}
-
-function stopCD(){
-  if(cdInterval){clearInterval(cdInterval);cdInterval=null;}
-}
-
-function navigate(){
-  if(!selectedKey) return;
-  const dest=PAGES[selectedKey].dest;
-  if(dest.startsWith('http')||dest.startsWith('tel')) window.open(dest,'_blank');
-  else window.location.href=dest;
-}
-
-// ── INFO PANEL ──
-function showInfo(key){
-  const p=PAGES[key];
-  const ip=document.getElementById('info-panel');
-  document.getElementById('ip-num').textContent=p.num;
-  document.getElementById('ip-ey').textContent=p.eyebrow;
-  document.getElementById('ip-title').innerHTML=p.title.replace('\n','<br>');
-  document.getElementById('ip-italic').textContent=p.italic;
-  document.getElementById('ip-chips').innerHTML=p.chips.slice(0,4).map((c,i)=>`<span class="ip-chip${i<2?' hot':''}">${c}</span>`).join('');
-  document.getElementById('ip-rule').textContent=p.rule;
-  ip.classList.add('show');
-  document.getElementById('cd-dest').textContent=p.cta;
-  document.getElementById('cd-wrap').classList.add('show');
-}
-
-function hideInfo(){
-  document.getElementById('info-panel').classList.remove('show');
-  document.getElementById('cd-wrap').classList.remove('show');
-}
-
+/* ── SELECT ── */
 function selectNav(key){
-  if(selectedKey===key) return;
-  selectedKey=key;
-  showInfo(key);
-  buildTargets();
-  startCD();
+  selKey=key;
+  const pg=PAGES[key];
+  document.getElementById('i-n').textContent=pg.num;
+  document.getElementById('i-ey').textContent=pg.ey;
+  document.getElementById('i-title').innerHTML=pg.title.replace('\n','<br>');
+  document.getElementById('i-sub').textContent=pg.sub;
+  document.getElementById('i-chips').innerHTML=pg.chips.map((c,j)=>`<span class="i-chip${j<2?' h':''}">${c}</span>`).join('');
+  document.getElementById('i-rule').textContent=pg.rule;
+  document.getElementById('info').classList.add('show');
+  document.getElementById('cd-dest').textContent=pg.cta;
+  document.getElementById('cdw').classList.add('show');
+  const m=pg.mood;tr=m[0];tg=m[1];tb=m[2];
+  rebuild();startCD();
 }
-
-function cancel(){
-  stopCD();
-  selectedKey=null;
-  hideInfo();
-  buildTargets();
+function cancelNav(){
+  stopCD();selKey=null;
+  document.getElementById('info').classList.remove('show');
+  document.getElementById('cdw').classList.remove('show');
+  tr=8;tg=4;tb=7;
+  rebuild();
 }
+document.getElementById('cd-cancel').addEventListener('click',cancelNav);
+document.getElementById('cd-go').addEventListener('click',()=>{stopCD();doNav();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')cancelNav();});
 
-document.getElementById('cd-cancel').addEventListener('click',cancel);
-document.getElementById('cd-cta').addEventListener('click',()=>{stopCD();navigate();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape') cancel();});
+/* ── MOOD ── */
+let mr=8,mg=4,mb=7,tr=8,tg=4,tb=7;
 
-// ── BACKGROUND MOOD COLOR ──
-let moodR=8,moodG=4,moodB=7;
-let targetR=8,targetG=4,targetB=7;
-
-// ── DRAW LOOP ──
-resize();
-
-let last=0;
-(function loop(ts){
+/* ── DRAW ── */
+let lastT=0;
+function loop(ts){
   requestAnimationFrame(loop);
-  const dt=Math.min(ts-last,30);last=ts;
+  const dt=Math.min((ts-lastT)||16,32);lastT=ts;
+  mr+=(tr-mr)*.014;mg+=(tg-mg)*.014;mb+=(tb-mb)*.014;
 
-  // Blend mood color
-  if(selectedKey){
-    const m=PAGES[selectedKey].mood;
-    targetR=m[0];targetG=m[1];targetB=m[2];
-  } else {targetR=8;targetG=4;targetB=7;}
-  moodR+=(targetR-moodR)*0.015;
-  moodG+=(targetG-moodG)*0.015;
-  moodB+=(targetB-moodB)*0.015;
-
-  // Background
-  const r=Math.round(moodR),g=Math.round(moodG),b=Math.round(moodB);
-  ctx.fillStyle=`rgba(${r},${g},${b},0.22)`;
+  ctx.fillStyle=`rgb(${Math.round(mr)},${Math.round(mg)},${Math.round(mb)})`;
   ctx.fillRect(0,0,W,H);
 
-  // Radial heat glow at bottom
-  const grd=ctx.createRadialGradient(cx,H,0,cx,H,H*0.65);
-  grd.addColorStop(0,`rgba(196,24,0,${0.04+moodR/255*0.06})`);
-  grd.addColorStop(1,'transparent');
-  ctx.fillStyle=grd;
-  ctx.fillRect(0,0,W,H);
+  // bottom glow
+  const bg=ctx.createRadialGradient(CX,H,0,CX,H,H*.85);
+  bg.addColorStop(0,`rgba(196,24,0,${.05+mr/900})`);
+  bg.addColorStop(1,'transparent');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
 
-  const navR=Math.min(W,H)*0.32;
-  const innerR=Math.min(W,H)*0.07;
+  // selected word spotlight on ring
+  if(selKey){
+    const si=KEYS.indexOf(selKey);
+    const sp=navPos(si);
+    const sg=ctx.createRadialGradient(sp.x,sp.y,0,sp.x,sp.y,80);
+    sg.addColorStop(0,'rgba(240,80,32,.12)');sg.addColorStop(1,'transparent');
+    ctx.fillStyle=sg;ctx.beginPath();ctx.arc(sp.x,sp.y,80,0,Math.PI*2);ctx.fill();
+  }
 
-  // Outer ring guide
-  ctx.beginPath();ctx.arc(cx,cy,navR,0,Math.PI*2);
-  ctx.strokeStyle='rgba(232,180,160,0.04)';ctx.lineWidth=0.5;ctx.stroke();
+  // guide circles
+  ctx.beginPath();ctx.arc(CX,CY,NAV_R,0,Math.PI*2);
+  ctx.strokeStyle='rgba(232,180,160,.05)';ctx.lineWidth=.5;ctx.stroke();
+  ctx.beginPath();ctx.arc(CX,CY,INN_R,0,Math.PI*2);
+  ctx.strokeStyle='rgba(240,80,32,.1)';ctx.lineWidth=.5;ctx.stroke();
 
-  // Inner ring guide
-  ctx.beginPath();ctx.arc(cx,cy,innerR,0,Math.PI*2);
-  ctx.strokeStyle='rgba(240,80,32,0.08)';ctx.lineWidth=0.5;ctx.stroke();
-
-  // Spoke lines + nav labels
-  NAV_KEYS.forEach((key,i)=>{
-    const angle=(i/NAV_KEYS.length)*Math.PI*2-Math.PI/2;
-    const lx=cx+Math.cos(angle)*navR;
-    const ly=cy+Math.sin(angle)*navR;
-    const isSel=selectedKey===key;
-    const isDimmed=selectedKey&&!isSel;
-
-    // Spoke
+  // spokes
+  KEYS.forEach((key,i)=>{
+    const angle=navAngle(i);
+    const isSel=selKey===key;
     ctx.beginPath();
-    ctx.moveTo(cx+Math.cos(angle)*innerR,cy+Math.sin(angle)*innerR);
-    ctx.lineTo(cx+Math.cos(angle)*(navR-62),cy+Math.sin(angle)*(navR-62));
-    ctx.strokeStyle=isSel?'rgba(240,80,32,0.15)':'rgba(232,180,160,0.04)';
-    ctx.lineWidth=0.5;ctx.stroke();
-
-    // Hit glow when selected
-    if(isSel){
-      const grd2=ctx.createRadialGradient(lx,ly,0,lx,ly,62);
-      grd2.addColorStop(0,'rgba(240,80,32,0.08)');
-      grd2.addColorStop(1,'transparent');
-      ctx.fillStyle=grd2;ctx.beginPath();
-      ctx.arc(lx,ly,62,0,Math.PI*2);ctx.fill();
-      // ring accent
-      ctx.beginPath();ctx.arc(lx,ly,54,0,Math.PI*2);
-      ctx.strokeStyle='rgba(240,80,32,0.18)';ctx.lineWidth=0.5;ctx.stroke();
-    }
-
-    // Nav number
-    ctx.font=`500 9px 'DM Sans',sans-serif`;
-    ctx.fillStyle=isSel?'rgba(240,80,32,0.7)':isDimmed?'rgba(232,180,160,0.08)':'rgba(232,180,160,0.18)';
+    ctx.moveTo(CX+Math.cos(angle)*(INN_R+2),CY+Math.sin(angle)*(INN_R+2));
+    ctx.lineTo(CX+Math.cos(angle)*(NAV_R-52),CY+Math.sin(angle)*(NAV_R-52));
+    ctx.strokeStyle=isSel?'rgba(240,80,32,.2)':'rgba(232,180,160,.04)';
+    ctx.lineWidth=.5;ctx.stroke();
+    // number label
+    const nr=NAV_R+20;
+    ctx.font=`600 8px DM Sans,sans-serif`;
     ctx.textAlign='center';ctx.textBaseline='middle';
-    // position number above label
-    const numAngle=angle;
-    const nr=navR+24;
-    ctx.fillText(PAGES[key].num,cx+Math.cos(numAngle)*nr,cy+Math.sin(numAngle)*nr);
+    ctx.fillStyle=isSel?'rgba(240,80,32,.7)':selKey?'rgba(232,180,160,.06)':'rgba(232,180,160,.18)';
+    ctx.fillText(PAGES[key].num,CX+Math.cos(angle)*nr,CY+Math.sin(angle)*nr);
   });
 
-  // Particles
-  particles.forEach(p=>{
+  // update + draw particles
+  const P=particles;
+  for(let i=0;i<P.length;i++){
+    const p=P[i];
     p.wb+=p.ws;
-    const wx=Math.sin(p.wb)*p.wm;
-    const wy=Math.cos(p.wb*0.7)*p.wm;
-    p.x+=(p.tx+wx-p.x)*p.spd*(dt/16);
-    p.y+=(p.ty+wy-p.y)*p.spd*(dt/16);
+    // wobble decays as particle approaches target
+    const dist=Math.hypot(p.tx-p.x,p.ty-p.y);
+    const wScale=Math.min(dist/60,1);
+    const ox=Math.sin(p.wb)*p.wm*wScale;
+    const oy=Math.cos(p.wb*.73)*p.wm*wScale;
+    p.x+=(p.tx+ox-p.x)*p.spd*(dt/16);
+    p.y+=(p.ty+oy-p.y)*p.spd*(dt/16);
 
-    let alpha=p.a,radius=p.r;
-    const g=p.group;
+    // color by type
+    let rc=245,gc=237,bc=232,a=p.a;
+    if(p.type===3){rc=255;gc=255;bc=255;}         // selected: white
+    else if(p.type===4){rc=255;gc=148;bc=60;}      // inner: amber
+    else if(p.type===2){rc=245;gc=237;bc=232;a*=0.22;} // dimmed nav
 
-    if(g==='selected'){alpha=Math.min(1,p.a*2.4);radius=p.r*1.15;}
-    else if(g==='center'){alpha=p.a*1.6;radius=p.r*0.9;}
-    else if(g==='float'){alpha=p.a*0.25;}
-    else if(g.startsWith('nav_')){
-      const k=g.replace('nav_','');
-      if(selectedKey&&k!==selectedKey){alpha=p.a*0.18;radius=p.r*0.8;}
-      else if(!selectedKey){alpha=p.a;}
-    }
+    if(a<0.03) continue;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(${rc},${gc},${bc},${a.toFixed(2)})`;
+    ctx.fill();
+  }
 
-    // Color: selected = warm red, center = amber, nav = cream, float = dim
-    let fill;
-    if(g==='selected'){
-      const warm=Math.random()>0.3;
-      fill=warm?`rgba(240,80,32,${alpha})`:`rgba(245,237,232,${alpha})`;
-    } else if(g==='center'){
-      fill=`rgba(255,160,72,${alpha})`;
-    } else {
-      fill=`rgba(245,237,232,${alpha})`;
-    }
-
-    ctx.beginPath();ctx.arc(p.x,p.y,radius,0,Math.PI*2);
-    ctx.fillStyle=fill;ctx.fill();
-  });
-
-  // Center pulse ring
-  const pulseR=innerR*(0.82+Math.sin(ts*0.002)*0.08);
-  ctx.beginPath();ctx.arc(cx,cy,pulseR,0,Math.PI*2);
-  ctx.strokeStyle=`rgba(255,160,72,${0.12+Math.sin(ts*0.002)*0.05})`;
+  // inner pulse
+  const pR=INN_R*(.76+Math.sin(ts*.0017)*.14);
+  ctx.beginPath();ctx.arc(CX,CY,pR,0,Math.PI*2);
+  ctx.strokeStyle=`rgba(255,148,60,${.16+Math.sin(ts*.002)*.06})`;
   ctx.lineWidth=1;ctx.stroke();
+}
 
-})();
+/* ── BOOT ── */
+resize();
+document.fonts.ready.then(()=>{
+  rebuild();
+  requestAnimationFrame(loop);
+});
+window.addEventListener('resize',()=>{resize();rebuild();});
 </script>
 </body>
 </html>
