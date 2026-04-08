@@ -694,15 +694,14 @@ function renderScheduleGrid(gridId, rangeId, weekOffset, schedule, highlightUser
     var ds=fmtD(date), isToday=ds===today;
     var dayShifts=schedule.filter(function(s){return s.date===ds;});
     var col=document.createElement('div'); col.className='day-col'+(isToday?' today':'');
-    var hdr=document.createElement('div'); hdr.className='day-header';
-    hdr.innerHTML='<div class="day-name">'+DAYS[d]+'</div><div class="day-date">'+MONTHS[date.getMonth()]+' '+date.getDate()+'</div>';
+    var hdr=document.createElement('div'); hdr.className='day-header';    hdr.innerHTML='<div class="day-name">'+DAYS[d]+'</div><div class="day-date">'+MONTHS[date.getMonth()]+' '+date.getDate()+'</div>';
     col.appendChild(hdr);
     var slots=document.createElement('div'); slots.className='day-slots';
     if(!dayShifts.length){ var emp=document.createElement('div');emp.className='day-empty';emp.textContent='Off';slots.appendChild(emp); }
     else {
       dayShifts.forEach(function(s){
         var c=document.createElement('div');
-        c.className='shift-card'+(highlightUser&&s.name===highlightUser?' mine':'');
+        c.className='shift-card'+(highlightUser&&s.name.trim().toLowerCase()===highlightUser.trim().toLowerCase()?' mine':'');
         c.innerHTML='<div class="shift-name">'+s.name+'</div><div class="shift-time">'+fmt12(s.startTime)+(s.endTime?' – '+fmt12(s.endTime):'')+'</div><div class="shift-role">'+(s.role||'')+'</div>';
         slots.appendChild(c);
       });
@@ -715,7 +714,8 @@ function empRenderWeek(){ renderScheduleGrid('empScheduleGrid','empWeekRange',_e
 
 function empRenderMyShifts(){
   var today=new Date(); today.setHours(0,0,0,0);
-  var upcoming=_schedule.filter(function(s){return s.name===_currentUser&&new Date(s.date+'T00:00:00')>=today;})
+  var me = _currentUser.trim().toLowerCase();
+  var upcoming=_schedule.filter(function(s){return s.name.trim().toLowerCase()===me&&new Date(s.date+'T00:00:00')>=today;})
     .sort(function(a,b){return a.date.localeCompare(b.date);}).slice(0,10);
   var el=document.getElementById('empMyShifts');
   if(!upcoming.length){ el.innerHTML='<div class="no-shifts"><span class="ns-icon">📅</span>No upcoming shifts scheduled.<br>Check back after the schedule is updated.</div>'; return; }
@@ -730,7 +730,7 @@ function empRenderMyShifts(){
 
 function empRenderStats(){
   var ws=getWeekStart(_empWeekOffset), myWeek=[];
-  for(var d=0;d<7;d++){ var date=new Date(ws);date.setDate(ws.getDate()+d); _schedule.filter(function(s){return s.date===fmtD(date)&&s.name===_currentUser;}).forEach(function(s){myWeek.push(s);}); }
+  for(var d=0;d<7;d++){ var date=new Date(ws);date.setDate(ws.getDate()+d); _schedule.filter(function(s){return s.date===fmtD(date)&&s.name.trim().toLowerCase()===_currentUser.trim().toLowerCase();}).forEach(function(s){myWeek.push(s);}); }
   var totalHrs=myWeek.reduce(function(a,s){return a+calcH(s.startTime,s.endTime);},0);
   var totalDays=[...new Set(myWeek.map(function(s){return s.date;}))].length;
   var sorted=myWeek.slice().sort(function(a,b){return a.date.localeCompare(b.date);});
