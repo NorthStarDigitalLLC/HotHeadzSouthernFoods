@@ -83,7 +83,7 @@ const PAGES={
   lunch:   {num:'✦', ey:'Lunch',       cta:'See Lunch Menu',     title:'Lunch.\nDone Right.',         sub:'Daily Southern plates · changes every day',  chips:['Changes Daily','Southern Plates','Check Facebook','Sides'],rule:'Check Facebook every morning.', dest:'menu.html#lunch',  mood:[58,8,0]},
   beer:    {num:'✦', ey:'Beer',        cta:'See Beer Menu',      title:'Cold.\nCold Beer.',           sub:'Ice cold · Natural Light · Modelo',          chips:['Natural Light','Miller Lite','Modelo','Budweiser'],       rule:'Best with fried chicken.',     dest:'menu.html#beer',   mood:[26,4,0]},
   delivery:{num:'03',ey:'Delivery',    cta:'Delivery Info',      title:'We Bring\nThe Food.',         sub:'10+ plates · within 10 miles',               chips:['10+ Plates','10 Miles','Call Ahead','Group Orders'],      rule:'Delivered hot and fresh.',     dest:'delivery.html',    mood:[42,4,0]},
-  order:   {num:'04',ey:'Order Now',   cta:'Call (337) 221-1035',title:'Call\nAhead.',                sub:'Skip the line · Ready when you arrive',      chips:['(337) 221-1035','Mon–Fri 5:30am','Skip Line','Carry-Out'],rule:"We'll have it ready.",          dest:'tel:3372211035',   mood:[50,8,0]},
+  order:   {num:'04',ey:'Order Now',   cta:'Call (337) 221-1035',title:'Call\nAhead.',                sub:'Skip the line · Ready when you arrive',      chips:['(337) 221-1035','Mon–Fri 5:30am','Skip Line','Carry-Out'],rule:"We'll have it ready.",          dest:'order.html',       mood:[50,8,0]},
   about:   {num:'05',ey:'About Us',    cta:'Read Our Story',     title:'Comfort\nFood Done Right.',   sub:'Family-owned · DeRidder proud · Since 2020', chips:['Est. 2020','Family Owned','From Scratch','DeRidder'],     rule:'Real Southern cooking.',       dest:'about.html',       mood:[40,16,0]},
   facebook:{num:'06',ey:'Facebook',    cta:'Visit Our Facebook', title:'Follow\nThe Feed.',           sub:'Daily specials posted every morning',         chips:['Daily Specials','Morning Posts','Photos','Follow Us'],    rule:'Posted fresh every morning.',  dest:'https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/',mood:[30,8,0]},
   find:    {num:'07',ey:'Find Us',     cta:'Get Directions',     title:"We're on\nUS-190.",           sub:'2741 US-190 · DeRidder, LA 70634',           chips:['2741 US-190','(337) 221-1035','Easy Parking','Open Daily'],rule:'Follow the smell.',            dest:'https://maps.google.com/?q=2741+US-190+DeRidder+LA',mood:[24,6,0]},
@@ -273,8 +273,7 @@ let cancelY=0,cancelBw=0,cancelBh=0;
 let wordDots={}; // key -> [{x,y,bright}]
 let selDots=[];  // selected center title dots
 let cancelDots=[];  // cancel button as particles
-let clockDots=[];   // clock timer as particles — type 6=label, 7=digits, 8=sublabel
-let lastClockSec=-1; // track when time changes to rebuild clock particles
+// clock particles managed by clockParts/clockSegs
 let particles=[];// [{x,y,tx,ty,spd,r,a,bright,wb,ws,wm,type}]
 // type: 0=ambient 1=nav-active 2=nav-dimmed 3=selected 4=inner 5=cancel 6=clock-label 7=clock-digits 8=clock-sub
 
@@ -320,35 +319,140 @@ function buildSelDots(){
   cancelDots=sampleDotMatrix('✕  Cancel',CX,cancelY,cancelBw,cancelBh,cancelStep);
 }
 
-function buildClockDots(){
-  clockDots=[];
-  if(selKey) return; // clock hidden when nav selected
+/* ── SEGMENTED CLOCK ──
+   Each part of HH:MM:SS is sampled and tracked separately.
+   Only the changed part gets retargeted — everything else stays frozen. */
+let clockSegs={};
+let clockParts={};  // segId -> particle array (refs into main particles array)
+let prevH='',prevM='',prevS='',prevLbl='',prevSub2='';
 
+function getSegLayout(){
   const sc=Math.min(W,H);
-  // Layout: status label above, HH:MM:SS big in center, sublabel below
-  const labelY   = CY - sc*0.10;
-  const digitsY  = CY + sc*0.01;
-  const subY     = CY + sc*0.09;
-
-  // Status label — small
-  const lbw=Math.min(W*0.35,260), lbh=sc*0.04;
-  const ldotStep=Math.max(0.4, lbh/28);
-  sampleDotMatrix(clockState.label||'--', CX, labelY, lbw, lbh, ldotStep)
-    .forEach(d=>clockDots.push({...d,ctype:6}));
-
-  // Time digits HH:MM:SS — big
-  const timeStr=clockState.h+':'+clockState.m+':'+clockState.s;
-  const dbw=Math.min(W*0.82,420), dbh=sc*(W<500?0.08:0.10);
-  const ddotStep=Math.max(0.4, dbh/55);
-  sampleDotMatrix(timeStr, CX, digitsY, dbw, dbh, ddotStep)
-    .forEach(d=>clockDots.push({...d,ctype:7}));
-
-  // Sublabel — small italic below
-  const sbw=Math.min(W*0.42,300), sbh=sc*0.032;
-  const sdotStep=Math.max(0.4, sbh/22);
-  sampleDotMatrix(clockState.sublabel||'', CX, subY, sbw, sbh, sdotStep)
-    .forEach(d=>clockDots.push({...d,ctype:8}));
+  const dh=sc*(W<500?0.08:0.10);
+  const cw=dh*0.30;   // colon width
+  const dw=dh*1.20;   // digit pair width (HH or MM or SS)
+  const total=dw*3+cw*2;
+  const sx=CX-total/2;
+  const dy=CY+sc*0.01;
+  return{
+    HH: {x:sx+dw/2,        y:dy, w:dw,    h:dh},
+    C1: {x:sx+dw+cw/2,     y:dy, w:cw,    h:dh},
+    MM: {x:sx+dw+cw+dw/2,  y:dy, w:dw,    h:dh},
+    C2: {x:sx+dw*2+cw*1.5, y:dy, w:cw,    h:dh},
+    SS: {x:sx+dw*2+cw*2+dw/2, y:dy, w:dw, h:dh},
+    LBL:{x:CX, y:CY-sc*0.10, w:Math.min(W*0.35,260), h:sc*0.04},
+    SUB:{x:CX, y:CY+sc*0.09, w:Math.min(W*0.42,300), h:sc*0.032},
+  };
 }
+
+function sampleSeg(text, box){
+  const step=Math.max(0.4, box.h/50);
+  return sampleDotMatrix(text, box.x, box.y, box.w, box.h, step);
+}
+
+function segColor(segId){
+  const isD=['HH','C1','MM','C2','SS'].includes(segId);
+  if(isD) return clockState.isOpen?{rc:255,gc:200,bc:80}:{rc:210,gc:170,bc:145};
+  if(segId==='LBL') return clockState.isOpen?{rc:255,gc:148,bc:60}:{rc:210,gc:170,bc:145};
+  return{rc:210,gc:170,bc:145};
+}
+function segAlpha(segId,bright){
+  const isD=['HH','C1','MM','C2','SS'].includes(segId);
+  if(isD) return clockState.isOpen?0.72+bright*0.28:0.20+bright*0.08;
+  if(segId==='LBL') return clockState.isOpen?0.55:0.16;
+  return 0.15;
+}
+
+function retargetSeg(segId, dots){
+  const existing=clockParts[segId]||[];
+  const col=segColor(segId);
+  const isD=['HH','C1','MM','C2','SS'].includes(segId);
+  const take=Math.min(existing.length, dots.length);
+  // Retarget existing — they glide from current position
+  for(let i=0;i<take;i++){
+    existing[i].tx=dots[i].x;
+    existing[i].ty=dots[i].y;
+    existing[i].spd=0.16+Math.random()*0.06;
+    existing[i].wm=0.03;
+    existing[i].rc=col.rc;existing[i].gc=col.gc;existing[i].bc=col.bc;
+    existing[i].a=segAlpha(segId,dots[i].bright);
+  }
+  // Add extras starting near their target (not random screen)
+  for(let i=take;i<dots.length;i++){
+    const d=dots[i];
+    const p={x:d.x+(Math.random()-.5)*5,y:d.y+(Math.random()-.5)*5,
+      tx:d.x,ty:d.y,spd:0.16+Math.random()*0.06,
+      r:isD?0.65+Math.random()*0.25:0.38+Math.random()*0.14,
+      a:segAlpha(segId,d.bright),
+      wb:Math.random()*Math.PI*2,ws:0.002+Math.random()*0.003,wm:0.03,
+      rc:col.rc,gc:col.gc,bc:col.bc,isClock:true,segId};
+    existing.push(p);
+    particles.push(p);
+  }
+  // Retire surplus — make invisible
+  for(let i=dots.length;i<existing.length;i++) existing[i].a=0;
+  clockParts[segId]=existing.slice(0,dots.length);
+}
+
+function buildAllClockSegs(forceAll){
+  if(selKey) return;
+  const L=getSegLayout();
+  const texts={
+    HH:clockState.h, C1:':', MM:clockState.m,
+    C2:':', SS:clockState.s,
+    LBL:clockState.label||'', SUB:clockState.sublabel||''
+  };
+  const changed={
+    HH:forceAll||clockState.h!==prevH,
+    C1:forceAll||!clockSegs.C1,
+    MM:forceAll||clockState.m!==prevM,
+    C2:forceAll||!clockSegs.C2,
+    SS:forceAll||clockState.s!==prevS,
+    LBL:forceAll||clockState.label!==prevLbl,
+    SUB:forceAll||clockState.sublabel!==prevSub2,
+  };
+  Object.keys(changed).forEach(sid=>{
+    if(changed[sid]){
+      clockSegs[sid]=sampleSeg(texts[sid],L[sid]);
+      retargetSeg(sid,clockSegs[sid]);
+    }
+  });
+  prevH=clockState.h;prevM=clockState.m;prevS=clockState.s;
+  prevLbl=clockState.label;prevSub2=clockState.sublabel;
+}
+
+function initClockParticles(){
+  // First build — create all particles starting at their target positions
+  if(selKey) return;
+  const L=getSegLayout();
+  const texts={HH:clockState.h,C1:':',MM:clockState.m,C2:':',SS:clockState.s,
+    LBL:clockState.label||'',SUB:clockState.sublabel||''};
+  Object.keys(texts).forEach(sid=>{
+    clockParts[sid]=[];
+    const dots=sampleSeg(texts[sid],L[sid]);
+    clockSegs[sid]=dots;
+    const col=segColor(sid);
+    const isD=['HH','C1','MM','C2','SS'].includes(sid);
+    dots.forEach(d=>{
+      const p={
+        x:CX+(Math.random()-.5)*W*0.8, y:CY+(Math.random()-.5)*H*0.8,
+        tx:d.x,ty:d.y,
+        spd:0.04+Math.random()*0.03,
+        r:isD?0.65+Math.random()*0.25:0.38+Math.random()*0.14,
+        a:segAlpha(sid,d.bright),
+        wb:Math.random()*Math.PI*2,ws:0.002+Math.random()*0.003,wm:0.03,
+        rc:col.rc,gc:col.gc,bc:col.bc,isClock:true,segId:sid
+      };
+      clockParts[sid].push(p);
+      particles.push(p);
+    });
+  });
+  prevH=clockState.h;prevM=clockState.m;prevS=clockState.s;
+  prevLbl=clockState.label;prevSub2=clockState.sublabel;
+}
+
+// Keep old name for compat
+function buildClockDots(){}
 
 function buildParticles(){
   particles=[];
@@ -395,30 +499,8 @@ function buildParticles(){
     });
   });
 
-  // Clock timer particles (only when no selection)
-  clockDots.forEach(d=>{
-    const s=rand();
-    const isDigits=d.ctype===7;
-    const isLabel=d.ctype===6;
-    // digits: amber/fire when open, dim cream when closed
-    let rc=245,gc=237,bc=232,aa=0.6;
-    if(isDigits){
-      if(clockState.isOpen){rc=255;gc=200;bc=80;aa=0.75+d.bright*0.25;}
-      else{rc=232;gc=180;bc=160;aa=0.25+d.bright*0.15;}
-    } else if(isLabel){
-      if(clockState.isOpen){rc=255;gc=148;bc=60;aa=0.55;}
-      else{rc=232;gc=180;bc=160;aa=0.18;}
-    } else { // sublabel
-      rc=232;gc=180;bc=160;aa=0.2;
-    }
-    particles.push({x:s.x,y:s.y,tx:d.x,ty:d.y,
-      spd:0.055+Math.random()*0.035,  // fast — reforms every second
-      r:isDigits?0.7+Math.random()*0.3:0.45+Math.random()*0.2,
-      a:aa,
-      wb:Math.random()*Math.PI*2,ws:0.003+Math.random()*0.005,wm:0.15,
-      rc,gc,bc,  // store color on particle
-      type:d.ctype});
-  });
+  // Clock particles — built separately via buildClockParticles()
+  // Called after buildParticles so clock particles are added on top
 
   // Inner ring
   for(let i=0;i<80;i++){
@@ -443,31 +525,16 @@ function buildParticles(){
 function rebuild(){
   buildWordDots();
   buildSelDots();
-  buildClockDots();
-  buildParticles();
+  // Reset clock seg state
+  clockSegs={};clockParts={HH:[],C1:[],MM:[],C2:[],SS:[],LBL:[],SUB:[]};
+  prevH='';prevM='';prevS='';prevLbl='';prevSub2='';
+  buildParticles();     // nav/sel/cancel/inner/ambient
+  initClockParticles(); // clock segs added on top
 }
 
-// Rebuild clock particles every second when no selection
+// Every second — only changed segments retarget
 setInterval(()=>{
-  if(!selKey){
-    buildClockDots();
-    // Only replace clock particles in the array — faster than full rebuild
-    particles=particles.filter(p=>p.type<6||p.type>8);
-    const rand=()=>({x:CX+(Math.random()-.5)*W*0.9,y:CY+(Math.random()-.5)*H*0.9});
-    clockDots.forEach(d=>{
-      const s=rand();
-      const isDigits=d.ctype===7,isLabel=d.ctype===6;
-      let rc=245,gc=237,bc=232,aa=0.6;
-      if(isDigits){if(clockState.isOpen){rc=255;gc=200;bc=80;aa=0.75+d.bright*0.25;}else{rc=232;gc=180;bc=160;aa=0.25+d.bright*0.15;}}
-      else if(isLabel){if(clockState.isOpen){rc=255;gc=148;bc=60;aa=0.55;}else{rc=232;gc=180;bc=160;aa=0.18;}}
-      else{rc=232;gc=180;bc=160;aa=0.2;}
-      particles.push({x:s.x,y:s.y,tx:d.x,ty:d.y,
-        spd:0.055+Math.random()*0.035,
-        r:isDigits?0.7+Math.random()*0.3:0.45+Math.random()*0.2,
-        a:aa,wb:Math.random()*Math.PI*2,ws:0.003+Math.random()*0.005,wm:0.15,
-        rc,gc,bc,type:d.ctype});
-    });
-  }
+  if(!selKey) buildAllClockSegs(false);
 },1000);
 
 /* ── HIT TEST ── */
@@ -501,7 +568,12 @@ const CIRC=2*Math.PI*46;
 function setArc(s){cdArc.style.strokeDashoffset=CIRC*(1-s/15);cdNEl.textContent=s;}
 function startCD(){stopCD();cdSec=15;setArc(15);cdInt=setInterval(()=>{cdSec--;setArc(cdSec);if(cdSec<=0){stopCD();doNav();}},1000);}
 function stopCD(){if(cdInt){clearInterval(cdInt);cdInt=null;}}
-function doNav(){if(!selKey)return;const d=PAGES[selKey].dest;if(d.startsWith('http')||d.startsWith('tel'))window.open(d,'_blank');else window.location.href=d;}
+function doNav(){
+  if(!selKey) return;
+  const d=PAGES[selKey].dest;
+  if(d.startsWith('http')) window.open(d,'_blank');  // external — new tab
+  else window.location.href=d;                        // .html pages — same window
+}
 
 /* ── SELECT ── */
 function selectNav(key){
@@ -599,14 +671,15 @@ function loop(ts){
 
     // color by type
     let rc=p.rc||245,gc=p.gc||237,bc=p.bc||232,a=p.a;
-    if(p.type===3){rc=255;gc=255;bc=255;}              // selected: white
-    else if(p.type===4){rc=255;gc=148;bc=60;}           // inner: amber
-    else if(p.type===2){rc=p.rc||245;gc=p.gc||237;bc=p.bc||232;a*=0.22;}  // dimmed nav
-    else if(p.type===5){                                // cancel button
+    if(p.isClock){
+      // clock particles already have rc/gc/bc set correctly
+    } else if(p.type===3){rc=255;gc=255;bc=255;}
+    else if(p.type===4){rc=255;gc=148;bc=60;}
+    else if(p.type===2){rc=245;gc=237;bc=232;a*=0.22;}
+    else if(p.type===5){
       rc=240;gc=80;bc=32;
       if(cancelHover){a=Math.min(1,p.a*2.8);}
     }
-    // types 6,7,8 use per-particle rc/gc/bc already set above
 
     if(a<0.03) continue;
     ctx.beginPath();
