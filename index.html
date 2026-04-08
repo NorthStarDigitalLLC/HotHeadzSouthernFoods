@@ -526,6 +526,490 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
 @keyframes fadeSlideR{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:translateX(0)}}
 @keyframes fadeSlideL{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)}}
 @keyframes fadeSlideU{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* ════════════════════════════════════════
+   HOT HEADZ AI ASSISTANT
+════════════════════════════════════════ */
+#ai-panel{
+  position:fixed;inset:0;z-index:500;
+  display:grid;grid-template-columns:42% 58%;
+  opacity:0;pointer-events:none;
+  transition:opacity .45s ease;
+}
+#ai-panel.open{opacity:1;pointer-events:all;}
+
+/* Mood left */
+#ai-mood{
+  position:relative;overflow:hidden;background:var(--deep);
+  transform:translateX(-100%);
+  transition:transform .6s cubic-bezier(.77,0,.18,1);
+}
+#ai-panel.open #ai-mood{transform:translateX(0);}
+#ai-mood-bg{position:absolute;inset:0;transition:background 1s ease;}
+#ai-mood-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent 55%,var(--deep));}
+#ai-smoke-cv{position:absolute;inset:0;pointer-events:none;z-index:1;}
+.ai-mood-inner{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(24px,3.8vw,48px);}
+.ai-back{
+  position:absolute;top:clamp(16px,2.5vh,26px);left:clamp(16px,2.5vw,26px);
+  font-family:var(--body);font-weight:600;font-size:9px;letter-spacing:.22em;
+  text-transform:uppercase;color:rgba(245,220,210,.3);
+  background:none;border:none;cursor:none;transition:color .25s;padding:0;
+  display:flex;align-items:center;gap:8px;
+}
+.ai-back::before{content:'←';font-size:14px;}
+.ai-back:hover{color:var(--chili);}
+#ai-big-num{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(80px,14vw,160px);
+  line-height:1;color:rgba(245,220,210,.04);margin-bottom:-8px;
+}
+.ai-eyebrow{
+  font-family:var(--body);font-weight:600;font-size:9px;
+  letter-spacing:.3em;text-transform:uppercase;color:var(--chili);
+  opacity:.8;margin-bottom:10px;display:flex;align-items:center;gap:10px;
+}
+.ai-eyebrow::before{content:'';width:22px;height:1px;background:currentColor;}
+#ai-mood-title{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(28px,4.5vw,58px);
+  letter-spacing:.01em;line-height:.95;color:var(--cream);
+  transform:translateY(20px);opacity:0;
+  transition:transform .6s .15s cubic-bezier(.16,1,.3,1),opacity .5s .15s;
+  text-shadow:0 2px 20px rgba(0,0,0,.5);
+}
+#ai-panel.open #ai-mood-title{transform:translateY(0);opacity:1;}
+
+/* Chat right */
+#ai-chat{
+  background:var(--deep);border-left:1px solid rgba(232,180,160,.07);
+  display:flex;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .6s cubic-bezier(.77,0,.18,1);
+  overflow:hidden;
+}
+#ai-panel.open #ai-chat{transform:translateX(0);}
+
+.ai-chat-hdr{
+  flex-shrink:0;padding:1.1rem 1.5rem;
+  border-bottom:1px solid rgba(232,180,160,.07);
+  display:flex;align-items:center;gap:.85rem;
+  background:rgba(19,5,9,.8);backdrop-filter:blur(12px);
+}
+.ai-avatar{
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--pepper),var(--ember));
+  display:flex;align-items:center;justify-content:center;font-size:1.1rem;
+  box-shadow:0 0 14px rgba(196,24,0,.45);
+  animation:aiAvatarPulse 3s ease-in-out infinite;
+}
+@keyframes aiAvatarPulse{0%,100%{box-shadow:0 0 14px rgba(196,24,0,.4)}50%{box-shadow:0 0 26px rgba(196,24,0,.75)}}
+.ai-hdr-name{font-family:var(--display);font-weight:400;font-size:.9rem;color:var(--cream);line-height:1;}
+.ai-hdr-status{font-size:.62rem;color:var(--chili);margin-top:.2rem;display:flex;align-items:center;gap:.4rem;}
+.ai-status-dot{width:5px;height:5px;border-radius:50%;background:var(--burn);box-shadow:0 0 6px var(--burn);animation:dp 1.8s ease-in-out infinite;}
+.ai-hdr-hint{font-size:.6rem;color:rgba(232,180,160,.3);font-style:italic;margin-left:auto;}
+
+/* Messages area */
+#ai-messages{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  padding:1.1rem 1.25rem;
+  display:flex;flex-direction:column;gap:.75rem;
+  scrollbar-width:thin;scrollbar-color:rgba(196,24,0,.25) transparent;
+}
+#ai-messages::-webkit-scrollbar{width:3px;}
+#ai-messages::-webkit-scrollbar-thumb{background:rgba(196,24,0,.25);border-radius:2px;}
+
+/* Suggestion chips */
+#ai-suggestions{
+  padding:.5rem 1.25rem 1rem;
+  display:flex;flex-wrap:wrap;gap:.4rem;
+}
+#ai-suggestions.hidden{display:none;}
+.ai-chip{
+  font-family:var(--body);font-size:.68rem;
+  color:rgba(232,180,160,.55);
+  border:1px solid rgba(232,180,160,.12);
+  padding:.38rem .8rem;cursor:pointer;cursor:none;
+  transition:all .2s;background:none;
+  white-space:nowrap;
+}
+.ai-chip:hover{border-color:rgba(196,24,0,.4);color:var(--cream);background:rgba(196,24,0,.06);}
+
+/* Message bubbles */
+.ai-msg{display:flex;gap:.55rem;animation:aiMsgIn .3s ease;max-width:94%;}
+@keyframes aiMsgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.ai-msg.user{align-self:flex-end;flex-direction:row-reverse;}
+.ai-bubble{
+  padding:.6rem .85rem;font-family:var(--body);font-size:.8rem;
+  line-height:1.65;border-radius:2px;
+}
+.ai-msg.user .ai-bubble{background:rgba(196,24,0,.18);border:1px solid rgba(196,24,0,.28);color:var(--cream);}
+.ai-msg.bot .ai-bubble{background:rgba(245,220,210,.04);border:1px solid rgba(232,180,160,.1);color:rgba(245,220,210,.88);}
+.ai-msg-icon{width:26px;height:26px;border-radius:50%;background:rgba(196,24,0,.2);border:1px solid rgba(196,24,0,.25);display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0;margin-top:2px;}
+
+/* Typing indicator */
+.ai-typing{display:flex;gap:.55rem;align-items:center;}
+.ai-typing-dots{display:flex;gap:4px;padding:.6rem .85rem;background:rgba(245,220,210,.04);border:1px solid rgba(232,180,160,.1);}
+.ai-typing-dot{width:5px;height:5px;border-radius:50%;background:var(--chili);animation:aiDot 1.2s ease-in-out infinite;}
+.ai-typing-dot:nth-child(2){animation-delay:.2s;}
+.ai-typing-dot:nth-child(3){animation-delay:.4s;}
+@keyframes aiDot{0%,80%,100%{transform:scale(0.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+
+/* Input area */
+#ai-input-wrap{
+  flex-shrink:0;padding:.85rem 1.25rem;
+  border-top:1px solid rgba(232,180,160,.07);
+  display:flex;gap:.6rem;align-items:center;
+  background:rgba(13,5,9,.6);
+}
+#ai-input{
+  flex:1;background:rgba(245,220,210,.04);
+  border:1px solid rgba(232,180,160,.12);
+  color:var(--cream);padding:.6rem .9rem;
+  font-family:var(--body);font-size:.82rem;
+  outline:none;transition:border-color .2s;
+  resize:none;height:40px;line-height:1.4;
+}
+#ai-input:focus{border-color:rgba(196,24,0,.45);}
+#ai-input::placeholder{color:rgba(232,180,160,.28);}
+#ai-send{
+  width:38px;height:38px;flex-shrink:0;
+  background:var(--red);border:none;
+  color:white;font-size:.9rem;cursor:pointer;cursor:none;
+  transition:background .2s;
+  display:flex;align-items:center;justify-content:center;
+}
+#ai-send:hover{background:var(--red-hot);}
+#ai-send:disabled{background:rgba(196,24,0,.3);cursor:not-allowed;}
+
+/* ── MOBILE AI BOTTOM SHEET ── */
+#mob-ai-panel{position:fixed;inset:0;z-index:500;pointer-events:none;opacity:0;transition:opacity .4s;}
+#mob-ai-panel.open{opacity:1;pointer-events:all;}
+#mob-ai-backdrop{position:absolute;inset:0;background:rgba(8,4,7,.88);backdrop-filter:blur(4px);}
+#mob-ai-sheet{
+  position:absolute;left:0;right:0;bottom:0;
+  height:88vh;background:var(--coal);
+  border-top:1px solid rgba(232,180,160,.14);
+  border-radius:20px 20px 0 0;
+  display:flex;flex-direction:column;overflow:hidden;
+  transform:translateY(100%);
+  transition:transform .55s cubic-bezier(.16,1,.3,1);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+#mob-ai-panel.open #mob-ai-sheet{transform:translateY(0);}
+.mob-ai-handle{display:flex;align-items:center;justify-content:center;padding:10px 0 4px;flex-shrink:0;}
+.mob-ai-bar{width:38px;height:4px;border-radius:2px;background:rgba(232,180,160,.2);}
+.mob-ai-hdr{
+  flex-shrink:0;display:flex;align-items:center;gap:.75rem;
+  padding:.5rem 1.1rem .85rem;
+  border-bottom:1px solid rgba(232,180,160,.08);
+}
+.mob-ai-close{
+  margin-left:auto;font-family:var(--body);font-weight:600;font-size:.6rem;
+  letter-spacing:.15em;text-transform:uppercase;color:rgba(232,180,160,.3);
+  background:none;border:1px solid rgba(232,180,160,.1);padding:.38rem .9rem;
+  transition:all .25s;
+}
+.mob-ai-close:active{border-color:rgba(240,80,32,.4);color:var(--chili);}
+#mob-ai-messages{
+  flex:1;overflow-y:auto;padding:.9rem 1rem;
+  display:flex;flex-direction:column;gap:.7rem;
+  -webkit-overflow-scrolling:touch;
+}
+#mob-ai-messages::-webkit-scrollbar{display:none;}
+#mob-ai-suggestions{padding:.25rem 1rem .75rem;display:flex;flex-wrap:wrap;gap:.38rem;}
+#mob-ai-suggestions.hidden{display:none;}
+#mob-ai-input-wrap{
+  flex-shrink:0;padding:.75rem 1rem;
+  border-top:1px solid rgba(232,180,160,.07);
+  display:flex;gap:.5rem;align-items:center;
+  background:rgba(13,5,9,.8);
+}
+#mob-ai-input{
+  flex:1;background:rgba(245,220,210,.04);
+  border:1px solid rgba(232,180,160,.12);
+  color:var(--cream);padding:.65rem .85rem;
+  font-family:var(--body);font-size:16px;
+  outline:none;border-radius:4px;
+}
+#mob-ai-input:focus{border-color:rgba(196,24,0,.45);}
+#mob-ai-input::placeholder{color:rgba(232,180,160,.28);}
+#mob-ai-send{
+  width:40px;height:40px;flex-shrink:0;background:var(--red);
+  border:none;color:white;font-size:.9rem;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+}
+#mob-ai-send:disabled{background:rgba(196,24,0,.3);}
+
+@media(max-width:767px){
+  #ai-panel{display:none!important;}
+}
+@media(min-width:768px){
+  #mob-ai-panel{display:none!important;}
+}
+
+
+/* AI visit page button */
+.ai-goto-btn{
+  font-family:var(--body);font-weight:700;font-size:.58rem;
+  letter-spacing:.18em;text-transform:uppercase;
+  padding:.5rem 1.1rem;
+  background:var(--red);color:white;border:none;
+  cursor:pointer;cursor:none;
+  transition:all .25s;
+  clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);
+  display:flex;align-items:center;gap:.5rem;
+  white-space:nowrap;flex-shrink:0;
+}
+.ai-goto-btn:hover{background:var(--red-hot);transform:translateY(-1px);}
+.ai-goto-btn .ai-goto-arrow{transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
+.ai-goto-btn:hover .ai-goto-arrow{transform:translateX(3px);}
+
+/* AI in-chat navigation card */
+.ai-nav-card{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:.75rem;
+  padding:.75rem 1rem;
+  background:rgba(196,24,0,.1);
+  border:1px solid rgba(196,24,0,.3);
+  margin-top:.35rem;
+  cursor:pointer;cursor:none;
+  transition:all .25s;
+  animation:aiMsgIn .3s ease;
+}
+.ai-nav-card:hover{background:rgba(196,24,0,.18);border-color:rgba(240,80,32,.5);}
+.ai-nav-card-label{
+  font-family:var(--body);font-size:.72rem;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--chili);
+}
+.ai-nav-card-dest{
+  font-family:var(--body);font-size:.65rem;color:rgba(232,180,160,.45);
+  margin-top:.15rem;
+}
+.ai-nav-card-arrow{
+  font-size:1.1rem;color:var(--chili);flex-shrink:0;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+.ai-nav-card:hover .ai-nav-card-arrow{transform:translate(3px,-3px);}
+
+
+/* ════════════════════════════════════════
+   NAV CHOICE OVERLAY
+   Appears when any nav item is clicked.
+   Two options: Chat with AI  |  Go to Page
+════════════════════════════════════════ */
+#choice-panel{
+  position:fixed;inset:0;z-index:498;
+  display:grid;grid-template-columns:45% 55%;
+  opacity:0;pointer-events:none;
+  transition:opacity .45s ease;
+}
+#choice-panel.open{opacity:1;pointer-events:all;}
+
+/* Left mood — identical to original panel */
+#choice-mood{
+  position:relative;overflow:hidden;background:var(--deep);
+  transform:translateX(-100%);
+  transition:transform .65s cubic-bezier(.77,0,.18,1);
+}
+#choice-panel.open #choice-mood{transform:translateX(0);}
+#choice-mood-bg{position:absolute;inset:0;transition:background 1s ease;}
+#choice-mood-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent 60%,var(--deep));}
+#choice-smoke-cv{position:absolute;inset:0;pointer-events:none;z-index:1;}
+.choice-mood-inner{
+  position:absolute;inset:0;z-index:2;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:clamp(24px,3.8vw,48px);
+}
+.choice-back{
+  position:absolute;top:clamp(16px,2.5vh,26px);left:clamp(16px,2.5vw,26px);
+  font-family:var(--body);font-weight:600;font-size:9px;letter-spacing:.22em;
+  text-transform:uppercase;color:rgba(245,220,210,.3);
+  background:none;border:none;cursor:none;transition:color .25s;padding:0;
+  display:flex;align-items:center;gap:8px;
+}
+.choice-back::before{content:'←';font-size:14px;}
+.choice-back:hover{color:var(--chili);}
+#choice-big-num{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(90px,16vw,190px);
+  line-height:1;color:rgba(245,220,210,.04);margin-bottom:-10px;
+}
+.choice-eyebrow{
+  font-family:var(--body);font-weight:600;font-size:9px;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--chili);opacity:.8;margin-bottom:10px;
+  display:flex;align-items:center;gap:10px;
+}
+.choice-eyebrow::before{content:'';width:22px;height:1px;background:currentColor;}
+#choice-title{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(34px,5.5vw,68px);
+  letter-spacing:.01em;line-height:.95;color:var(--cream);
+  transform:translateY(20px);opacity:0;
+  transition:transform .65s .15s cubic-bezier(.16,1,.3,1),opacity .5s .15s;
+  text-shadow:0 2px 20px rgba(0,0,0,.5);
+}
+#choice-panel.open #choice-title{transform:translateY(0);opacity:1;}
+#choice-italic{
+  font-family:var(--serif);font-style:italic;font-size:clamp(12px,1.4vw,17px);
+  color:rgba(232,180,160,.5);margin-top:8px;
+  transform:translateY(14px);opacity:0;
+  transition:transform .65s .25s cubic-bezier(.16,1,.3,1),opacity .5s .25s;
+}
+#choice-panel.open #choice-italic{transform:translateY(0);opacity:1;}
+
+/* Right — the two choices */
+#choice-right{
+  background:var(--deep);
+  border-left:1px solid rgba(232,180,160,.07);
+  display:flex;flex-direction:column;
+  justify-content:center;
+  padding:clamp(24px,3.8vw,48px);
+  transform:translateX(100%);
+  transition:transform .65s cubic-bezier(.77,0,.18,1);
+  gap:1rem;
+  opacity:0;
+  transition:transform .65s cubic-bezier(.77,0,.18,1),opacity .5s .3s;
+}
+#choice-panel.open #choice-right{transform:translateX(0);opacity:1;}
+
+.choice-label{
+  font-family:var(--body);font-size:9px;letter-spacing:.25em;
+  text-transform:uppercase;color:rgba(232,180,160,.28);
+  margin-bottom:.5rem;
+}
+
+/* The two option cards */
+.choice-option{
+  position:relative;overflow:hidden;
+  padding:1.75rem 2rem;
+  border:1px solid rgba(232,180,160,.08);
+  background:var(--panel);
+  cursor:pointer;cursor:none;
+  transition:all .35s cubic-bezier(.16,1,.3,1);
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+}
+.choice-option::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  transform:scaleX(0);transform-origin:left;transition:transform .4s ease;
+}
+.choice-option.ai-option::before{background:linear-gradient(90deg,var(--pepper),var(--ember));}
+.choice-option.page-option::before{background:linear-gradient(90deg,rgba(232,180,160,.4),rgba(232,180,160,.1));}
+.choice-option:hover{
+  border-color:rgba(232,180,160,.16);
+  background:var(--panel2);
+  transform:translateX(6px);
+}
+.choice-option:hover::before{transform:scaleX(1);}
+.choice-option-left{}
+.choice-option-icon{
+  font-size:1.5rem;margin-bottom:.6rem;display:block;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+.choice-option:hover .choice-option-icon{transform:scale(1.15);}
+.choice-option-name{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(1.4rem,2.5vw,2rem);
+  color:var(--cream);line-height:1;margin-bottom:.3rem;
+}
+.choice-option.ai-option .choice-option-name{color:var(--chili);}
+.choice-option-desc{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(10px,1vw,13px);color:rgba(232,180,160,.35);line-height:1.5;
+}
+.choice-option-arrow{
+  font-size:1.3rem;color:rgba(232,180,160,.2);flex-shrink:0;
+  transition:all .35s cubic-bezier(.34,1.56,.64,1);
+}
+.choice-option:hover .choice-option-arrow{
+  color:rgba(232,180,160,.7);
+  transform:rotate(-45deg) scale(1.2);
+}
+.choice-option.ai-option:hover .choice-option-arrow{color:var(--chili);}
+
+/* ── MOBILE CHOICE SHEET ── */
+#mob-choice-panel{
+  position:fixed;inset:0;z-index:498;
+  pointer-events:none;opacity:0;transition:opacity .4s;
+}
+#mob-choice-panel.open{opacity:1;pointer-events:all;}
+#mob-choice-backdrop{
+  position:absolute;inset:0;background:rgba(8,4,7,.88);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+#mob-choice-sheet{
+  position:absolute;left:0;right:0;bottom:0;
+  background:var(--coal);
+  border-top:1px solid rgba(232,180,160,.14);
+  border-radius:20px 20px 0 0;
+  padding:0 0 env(safe-area-inset-bottom,0px);
+  transform:translateY(100%);
+  transition:transform .55s cubic-bezier(.16,1,.3,1);
+}
+#mob-choice-panel.open #mob-choice-sheet{transform:translateY(0);}
+.mob-choice-handle{display:flex;align-items:center;justify-content:center;padding:12px 0 4px;}
+.mob-choice-bar{width:38px;height:4px;border-radius:2px;background:rgba(232,180,160,.2);}
+.mob-choice-hdr{
+  padding:.5rem 1.25rem 1rem;
+  border-bottom:1px solid rgba(232,180,160,.08);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.mob-choice-title{
+  font-family:var(--display);font-size:1.1rem;color:var(--cream);
+}
+.mob-choice-sub{
+  font-family:var(--serif);font-style:italic;
+  font-size:.78rem;color:rgba(232,180,160,.4);margin-top:.15rem;
+}
+.mob-choice-close{
+  font-family:var(--body);font-weight:600;font-size:.6rem;
+  letter-spacing:.15em;text-transform:uppercase;
+  color:rgba(232,180,160,.3);background:none;
+  border:1px solid rgba(232,180,160,.1);padding:.38rem .9rem;
+  transition:all .25s;
+}
+.mob-choice-close:active{border-color:rgba(240,80,32,.4);color:var(--chili);}
+.mob-choice-options{
+  display:flex;flex-direction:column;gap:.75rem;
+  padding:1.1rem 1.25rem 1.5rem;
+}
+.mob-choice-option{
+  display:flex;align-items:center;gap:1rem;
+  padding:1.1rem 1.25rem;
+  border:1px solid rgba(232,180,160,.08);
+  background:var(--panel);
+  cursor:pointer;
+  transition:all .25s;
+  -webkit-tap-highlight-color:transparent;
+  border-radius:0;
+}
+.mob-choice-option:active{background:var(--panel2);}
+.mob-choice-option.ai-mob::before,.mob-choice-option.page-mob::before{
+  display:none;
+}
+.mob-choice-option-icon{font-size:1.6rem;flex-shrink:0;}
+.mob-choice-option-name{
+  font-family:var(--display);font-size:1.25rem;
+  color:var(--cream);line-height:1;margin-bottom:.2rem;
+}
+.mob-choice-option.ai-mob .mob-choice-option-name{color:var(--chili);}
+.mob-choice-option-desc{
+  font-family:var(--serif);font-style:italic;
+  font-size:.72rem;color:rgba(232,180,160,.35);
+}
+.mob-choice-arrow{
+  margin-left:auto;font-size:1.1rem;
+  color:rgba(232,180,160,.2);flex-shrink:0;
+}
+.mob-choice-option.ai-mob{border-left:2px solid var(--pepper);}
+.mob-choice-option.page-mob{border-left:2px solid rgba(232,180,160,.15);}
+
+@media(max-width:767px){
+  #choice-panel{display:none!important;}
+}
+@media(min-width:768px){
+  #mob-choice-panel{display:none!important;}
+}
+
 </style>
 </head>
 <body>
@@ -714,6 +1198,127 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
   </div>
 </div>
 
+
+<!-- ═══ AI ASSISTANT PANEL (DESKTOP) ═══ -->
+<div id="ai-panel">
+  <div id="ai-mood">
+    <div id="ai-mood-bg"></div>
+    <canvas id="ai-smoke-cv"></canvas>
+    <div class="ai-mood-inner">
+      <button class="ai-back" onclick="closeAI()">Back</button>
+      <div id="ai-big-num">🌶</div>
+      <div class="ai-eyebrow" id="ai-eyebrow">Ask Anything</div>
+      <div id="ai-mood-title">Hot Headz<br>Kitchen Assistant</div>
+    </div>
+  </div>
+  <div id="ai-chat">
+    <div class="ai-chat-hdr">
+      <div class="ai-avatar">🌶</div>
+      <div>
+        <div class="ai-hdr-name">Hot Headz Kitchen</div>
+        <div class="ai-hdr-status"><span class="ai-status-dot"></span>Ready to help</div>
+      </div>
+      <div class="ai-hdr-hint">Powered by AI · Knows today's menu</div>
+    </div>
+    <div id="ai-messages"></div>
+    <div id="ai-suggestions"></div>
+    <div id="ai-input-wrap">
+      <input id="ai-input" placeholder="Ask about the menu, hours, delivery…" autocomplete="off" />
+      <button id="ai-send">↑</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ AI ASSISTANT BOTTOM SHEET (MOBILE) ═══ -->
+<div id="mob-ai-panel">
+  <div id="mob-ai-backdrop" onclick="closeAI()"></div>
+  <div id="mob-ai-sheet">
+    <div class="mob-ai-handle"><div class="mob-ai-bar"></div></div>
+    <div class="mob-ai-hdr">
+      <div class="ai-avatar" style="width:32px;height:32px;font-size:.9rem">🌶</div>
+      <div>
+        <div class="ai-hdr-name" style="font-size:.82rem">Hot Headz Kitchen</div>
+        <div class="ai-hdr-status" style="font-size:.58rem"><span class="ai-status-dot"></span>Ready to help</div>
+      </div>
+      <button class="mob-ai-close" onclick="closeAI()">✕ Close</button>
+    </div>
+    <div id="mob-ai-messages"></div>
+    <div id="mob-ai-suggestions"></div>
+    <div id="mob-ai-input-wrap">
+      <input id="mob-ai-input" placeholder="Ask about the menu, hours…" autocomplete="off" />
+      <button id="mob-ai-send">↑</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ CHOICE OVERLAY (DESKTOP) ═══ -->
+<div id="choice-panel">
+  <div id="choice-mood">
+    <div id="choice-mood-bg"></div>
+    <canvas id="choice-smoke-cv"></canvas>
+    <div class="choice-mood-inner">
+      <button class="choice-back" onclick="closeChoice()">Back</button>
+      <div id="choice-big-num">01</div>
+      <div class="choice-eyebrow" id="choice-eyebrow">Section</div>
+      <div id="choice-title"></div>
+      <div id="choice-italic"></div>
+    </div>
+  </div>
+  <div id="choice-right">
+    <div class="choice-label">How would you like to continue?</div>
+    <div class="choice-option ai-option" onclick="choicePickAI()">
+      <div class="choice-option-left">
+        <span class="choice-option-icon">🌶</span>
+        <div class="choice-option-name">Ask the Kitchen</div>
+        <div class="choice-option-desc" id="choice-ai-desc">Chat with our AI — ask about today's menu, hours, ordering, anything</div>
+      </div>
+      <span class="choice-option-arrow">↗</span>
+    </div>
+    <div class="choice-option page-option" onclick="choicePickPage()">
+      <div class="choice-option-left">
+        <span class="choice-option-icon">↗</span>
+        <div class="choice-option-name" id="choice-page-name">Go to Page</div>
+        <div class="choice-option-desc" id="choice-page-desc">Go directly to this section</div>
+      </div>
+      <span class="choice-option-arrow">↗</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CHOICE SHEET (MOBILE) ═══ -->
+<div id="mob-choice-panel">
+  <div id="mob-choice-backdrop" onclick="closeChoice()"></div>
+  <div id="mob-choice-sheet">
+    <div class="mob-choice-handle"><div class="mob-choice-bar"></div></div>
+    <div class="mob-choice-hdr">
+      <div>
+        <div class="mob-choice-title" id="mob-choice-title">Section</div>
+        <div class="mob-choice-sub" id="mob-choice-sub"></div>
+      </div>
+      <button class="mob-choice-close" onclick="closeChoice()">✕ Close</button>
+    </div>
+    <div class="mob-choice-options">
+      <div class="mob-choice-option ai-mob" onclick="choicePickAI()">
+        <span class="mob-choice-option-icon">🌶</span>
+        <div>
+          <div class="mob-choice-option-name">Ask the Kitchen</div>
+          <div class="mob-choice-option-desc">Chat with our AI assistant</div>
+        </div>
+        <span class="mob-choice-arrow">→</span>
+      </div>
+      <div class="mob-choice-option page-mob" onclick="choicePickPage()">
+        <span class="mob-choice-option-icon">↗</span>
+        <div>
+          <div class="mob-choice-option-name" id="mob-choice-page-name">Go to Page</div>
+          <div class="mob-choice-option-desc" id="mob-choice-page-desc">Visit this section directly</div>
+        </div>
+        <span class="mob-choice-arrow">→</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- LOADER -->
 <div id="loader">
   <div class="ld-name">Hot Headz <em>Southern Foods</em></div>
@@ -722,6 +1327,8 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
   <div class="ld-track"><div class="ld-fill" id="ld-fill"></div></div>
   <div class="ld-msg">Heating things up...</div>
 </div>
+
+<script src="menu-data.js"></script>
 
 <script>
 /* CANVAS */
@@ -883,6 +1490,9 @@ function sizeChaserBorder(){
 }
 
 function openPanel(id){
+  openChoice(id); return;
+  // original panel code below (kept for reference, never reached)
+
   const p=PAGES[id];currentPage=p;
   document.getElementById('panel-mood-bg').style.background=p.mood;
   document.getElementById('panel-big-num').textContent=p.num;
@@ -919,6 +1529,9 @@ function closePanel(){
 document.getElementById('panel-info').addEventListener('dblclick',goTo);
 
 function openMobPanel(id){
+  openChoice(id); return;
+  // original mob panel code below (kept for reference, never reached)
+
   const p=PAGES[id];currentPage=p;
   document.getElementById('mob-sheet-eyebrow').textContent=p.eyebrow;
   document.getElementById('mob-sheet-title').innerHTML=p.title.replace('\n','<br>');
@@ -1068,6 +1681,601 @@ window.addEventListener('load', function() {
     makeLogoRings('mobCtaLogoCanvas', 34, {outerR:1.0,innerR:0.65,outerT:0.04,innerT:0.02,logoR:0.52,speed:0.6,camZ:3.0});
   }, 700);
 });
+
+
+/* ═══════════════════════════════════════════════════════
+   HOT HEADZ AI ASSISTANT
+   - Reads menu-data.js (MENU_DATA global)
+   - Calls Anthropic API
+   - Responds in character as a Hot Headz staff member
+═══════════════════════════════════════════════════════ */
+
+/* ── Build the menu context string from MENU_DATA ── */
+function buildMenuContext() {
+  // Support MENU_DATA = { menus: {} } global set by menu-data.js
+  var menus = {};
+  if (typeof MENU_DATA !== 'undefined' && MENU_DATA) {
+    menus = MENU_DATA.menus || {};
+  }
+
+  var today = new Date();
+  var iso = today.getFullYear() + '-' +
+    String(today.getMonth()+1).padStart(2,'0') + '-' +
+    String(today.getDate()).padStart(2,'0');
+
+  var todayMenu = menus[iso] || null;
+  var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var dayName = days[today.getDay()];
+  var hours = {
+    Monday:'5:30am-2pm', Tuesday:'5:30am-2pm', Wednesday:'5:30am-2pm',
+    Thursday:'5:30am-2pm', Friday:'5:30am-2pm',
+    Saturday:'6am-2pm', Sunday:'7am-3pm'
+  };
+  var crawfishDays = ['Thursday','Friday','Saturday','Sunday'];
+  var hasCrawfish = todayMenu && todayMenu.crawfish && todayMenu.crawfish.show !== false;
+  var crawfishTonight = crawfishDays.includes(dayName) && hasCrawfish;
+
+  var ctx = 'TODAY: ' + dayName + ', ' + iso + '\n';
+  ctx += 'HOURS TODAY: ' + (hours[dayName] || '5:30am-2pm') + '\n';
+  ctx += 'CRAWFISH TONIGHT: ' + (crawfishTonight ? 'YES - 4:00pm-8:00pm' : 'No') + '\n\n';
+
+  if (todayMenu && todayMenu.lunch && todayMenu.lunch.items && todayMenu.lunch.items.length) {
+    ctx += "TODAY'S FULL LUNCH MENU:\n";
+    todayMenu.lunch.items.forEach(function(item) {
+      if (!item) return;
+      var name = typeof item === 'string' ? item : (item.name || '');
+      var desc = (typeof item === 'object' && item.desc) ? item.desc : '';
+      if (name) ctx += '- ' + name + (desc ? ': ' + desc : '') + '\n';
+    });
+  } else {
+    ctx += "TODAY'S LUNCH MENU: Not posted yet - check our Facebook page\n";
+  }
+
+  if (todayMenu && todayMenu.dessert && todayMenu.dessert.items && todayMenu.dessert.items.length) {
+    ctx += '\nDESSERT TODAY: ' + todayMenu.dessert.items.join(', ') + '\n';
+  }
+
+  var tom = new Date(today); tom.setDate(today.getDate()+1);
+  var tomISO = tom.getFullYear() + '-' +
+    String(tom.getMonth()+1).padStart(2,'0') + '-' +
+    String(tom.getDate()).padStart(2,'0');
+  var tomDay = days[tom.getDay()];
+  var tomMenu = menus[tomISO] || null;
+  ctx += '\nTOMORROW (' + tomDay + '): ';
+  if (tomMenu && tomMenu.lunch && tomMenu.lunch.items && tomMenu.lunch.items.length) {
+    ctx += '\n';
+    tomMenu.lunch.items.forEach(function(item) {
+      if (!item) return;
+      var name = typeof item === 'string' ? item : (item.name || '');
+      if (name) ctx += '- ' + name + '\n';
+    });
+  } else {
+    ctx += 'Not posted yet\n';
+  }
+
+  ctx += '\nBEER: Natural Light, Miller Lite, Coors Light, Bud Light, Budweiser, Michelob Ultra, Corona, Modelo\n';
+
+  console.log('[HH AI] Menu items found for today:', todayMenu && todayMenu.lunch ? (todayMenu.lunch.items || []).length : 0);
+  return ctx;
+}
+
+/* ── System prompt ── */
+function buildSystemPrompt() {
+  var menuCtx = buildMenuContext();
+  return `You are the friendly kitchen assistant for Hot Headz Southern Foods in DeRidder, Louisiana. You work the counter and know everything about this place. You're warm, Southern, and helpful — like a real person who works here, not a robot.
+
+ABOUT HOT HEADZ:
+- Address: 2741 US-190, DeRidder, LA 70634
+- Phone: (337) 221-1035
+- Dine-in, carry-out, and delivery (10+ plates, within 10 miles)
+- Made from scratch every morning since 2020
+- Cafeteria-style comfort food — Southern plates, Cajun classics, po-boys, homemade desserts
+- Daily specials change every day — check the menu page or Facebook every morning
+
+HOURS:
+- Monday–Friday: 5:30am – 2:00pm
+- Saturday: 6:00am – 2:00pm  
+- Sunday: 7:00am – 3:00pm
+
+CRAWFISH NIGHTS: Thursday–Saturday 4:00pm–8:00pm (when in season)
+
+LIVE MENU DATA:
+${menuCtx}
+
+RULES:
+- Keep responses SHORT — 2-4 sentences max unless they ask for the full menu
+- Sound natural and Southern — "y'all", "hon", warmth — but not overdone
+- If someone asks what's on the menu, what's for lunch, or today's specials: LIST every single item from TODAY'S FULL LUNCH MENU exactly as given, one per line. Do not summarize. Do not skip items. If menu says not posted, tell them to check Facebook.
+- If they ask about something not on today's menu, say it's not on today but might come back
+- For ordering, always give the phone number: (337) 221-1035
+- For delivery, remind them it's 10+ plates within 10 miles — call to arrange
+- Never make up prices — we don't post prices online
+- If you don't know something, say "best to give us a call at (337) 221-1035"
+- Do NOT say you are an AI, do NOT say Claude, do NOT break character
+
+NAVIGATION — CRITICAL:
+When someone asks about a page, wants to see something, or you want to direct them somewhere, END your message with [GOTO:pageId] on its own line. Use exactly these IDs:
+- [GOTO:menu] — for the full menu, today's specials, what's for lunch
+- [GOTO:lunch] — specifically for lunch items
+- [GOTO:beer] — for beer/drinks
+- [GOTO:delivery] — for delivery info
+- [GOTO:order] — for placing an order, calling ahead
+- [GOTO:find] — for address, directions, location
+- [GOTO:facebook] — for daily specials on Facebook
+- [GOTO:about] — for the restaurant story
+- [GOTO:crawfish] — if they specifically ask about crawfish nights
+- [GOTO:staff] — for the staff portal
+
+Examples of when to use GOTO:
+- "Can I see the full menu?" → answer + [GOTO:menu]
+- "How do I order?" → answer + [GOTO:order]
+- "Where are you located?" → answer + [GOTO:find]
+- "I want to see what's on today" → answer + [GOTO:menu]
+Only add GOTO when it genuinely helps. Don't add it to every message.`;
+}
+
+/* ── Conversation state ── */
+var _aiHistory = [];
+var _aiOpen = false;
+var _aiContext = '';
+var _aiCurrentSection = null;
+
+/* ── Suggestion chips per section ── */
+var AI_SUGGESTIONS = {
+  default: [
+    "What's on the menu today?",
+    "Is crawfish available tonight?",
+    "What time do you open?",
+    "How do I place an order?"
+  ],
+  menu: [
+    "What are today's specials?",
+    "What's good for lunch today?",
+    "Do you have crawfish tonight?",
+    "What desserts do you have?"
+  ],
+  lunch: [
+    "What's the lunch special today?",
+    "What sides come with the plates?",
+    "What time does lunch end?"
+  ],
+  delivery: [
+    "How do I order delivery?",
+    "What's the delivery minimum?",
+    "How far do you deliver?"
+  ],
+  order: [
+    "What's the best way to order ahead?",
+    "Can I order online?",
+    "What's your phone number?"
+  ],
+  beer: [
+    "What beers do you have?",
+    "Do you have cold beer today?",
+    "Are drinks included with plates?"
+  ],
+  find: [
+    "What's your address?",
+    "Where are you located?",
+    "Is there parking?"
+  ],
+  about: [
+    "How long have you been open?",
+    "Is everything made from scratch?",
+    "What kind of food do you serve?"
+  ],
+  crawfish: [
+    "When is crawfish night?",
+    "How much is crawfish?",
+    "Do I need to call ahead for crawfish?"
+  ],
+  facebook: [
+    "When do you post the daily specials?",
+    "How do I follow you on Facebook?"
+  ],
+  home: [
+    "What's hot today?",
+    "What are your hours?",
+    "Do you do delivery?"
+  ],
+  staff: [
+    "How does the staff portal work?",
+    "Where can I sign in?"
+  ]
+};
+
+/* ── Open AI panel ── */
+function openAI(sectionId) {
+  _aiOpen = true;
+  _aiHistory = [];
+  _aiCurrentSection = sectionId;
+
+  var suggestions = AI_SUGGESTIONS[sectionId] || AI_SUGGESTIONS.default;
+  // Update visit page button labels
+  var page = PAGES[sectionId] || {};
+  var ctaLabel = page.cta || 'Visit Page';
+  var gotoBtn = document.getElementById('ai-goto-btn');
+  var mobGotoBtn = document.getElementById('mob-ai-goto-btn');
+  var aiGotoLabel = document.getElementById('ai-goto-label');
+  var mobGotoLabel = document.getElementById('mob-ai-goto-label');
+  if (aiGotoLabel) aiGotoLabel.textContent = ctaLabel;
+  if (mobGotoLabel) mobGotoLabel.textContent = ctaLabel;
+  // Hide goto btn for tel: links — replace with just the number display
+  if (gotoBtn) gotoBtn.style.display = (page.dest && page.dest.startsWith('tel:')) ? 'none' : 'flex';
+  if (mobGotoBtn) mobGotoBtn.style.display = (page.dest && page.dest.startsWith('tel:')) ? 'none' : 'flex';
+  var moodBg = (PAGES[sectionId] || {}).mood || 'radial-gradient(ellipse at 30% 80%,#3a0800 0%,#1c0404 50%,#08040a 100%)';
+  var eyebrow = (PAGES[sectionId] || {}).eyebrow || 'Ask Anything';
+  var num     = (PAGES[sectionId] || {}).num || '🌶';
+
+  // Desktop
+  var dPanel = document.getElementById('ai-panel');
+  if (dPanel) {
+    document.getElementById('ai-mood-bg').style.background = moodBg;
+    document.getElementById('ai-eyebrow').textContent = eyebrow;
+    document.getElementById('ai-big-num').textContent = num;
+    renderAISuggestions('ai-suggestions', suggestions);
+    clearAIMessages('ai-messages');
+    // Opening message
+    addAIMessage('ai-messages', 'bot', getOpeningMessage(sectionId));
+    dPanel.classList.add('open');
+    document.getElementById('shell').style.pointerEvents = 'none';
+    document.getElementById('ai-input').focus();
+  }
+
+  // Mobile
+  var mPanel = document.getElementById('mob-ai-panel');
+  if (mPanel) {
+    renderAISuggestions('mob-ai-suggestions', suggestions);
+    clearAIMessages('mob-ai-messages');
+    addAIMessage('mob-ai-messages', 'bot', getOpeningMessage(sectionId));
+    mPanel.classList.add('open');
+    setTimeout(function(){ document.getElementById('mob-ai-input').focus(); }, 400);
+  }
+}
+
+function getOpeningMessage(id) {
+  var msgs = {
+    menu:     "Hey there! 🌶 Looking at the menu? I can tell you exactly what's on today — want me to run through today's lunch specials?",
+    lunch:    "Hey! Lunch today is lookin' real good. Want me to tell you what's on the board?",
+    beer:     "Cold beer on a hot day — can't beat it! We've got a great selection. Want to know what we have on hand?",
+    crawfish: "You want crawfish? 🦞 Let me check what's going on with crawfish nights for you.",
+    delivery: "Looking to get some Hot Headz delivered? I can walk you through how that works!",
+    order:    "Ready to order? I'll get you all the info you need to place an order.",
+    about:    "Hot Headz has been cookin' from scratch since 2020. What do you want to know about us?",
+    facebook: "We post our daily specials every morning on Facebook! What can I help you with?",
+    find:     "We're right off US-190 in DeRidder — easy to find! Need directions or hours?",
+    home:     "Welcome to Hot Headz! 🌶 Kitchen's hot and the food is fresh. What can I help you with today?",
+    staff:    "Hey! The staff portal is at staff-portal.html. Need help getting in?"
+  };
+  return msgs[id] || "Hey there! Welcome to Hot Headz. What can I help you with today? 🌶";
+}
+
+/* ── Go to page from AI ── */
+function aiGoTo() {
+  var page = _aiCurrentSection ? PAGES[_aiCurrentSection] : null;
+  if (!page || !page.dest) return;
+  closeAI();
+  var dest = page.dest;
+  var isExternal = dest.startsWith('http') || dest.startsWith('tel');
+  var ld = document.getElementById('loader');
+  document.getElementById('ld-going').textContent = 'Heading to ' + (page.eyebrow || 'page').toLowerCase() + '...';
+  var fill = document.getElementById('ld-fill');
+  fill.style.animation = 'none'; void fill.offsetHeight;
+  ld.classList.add('show');
+  var extWin = isExternal ? window.open('', '_blank') : null;
+  setTimeout(function() {
+    if (isExternal) {
+      if (extWin && !extWin.closed) extWin.location.href = dest;
+      else window.location.href = dest;
+      ld.classList.remove('show');
+    } else {
+      window.location.href = dest;
+    }
+  }, 1800);
+}
+
+/* ── Close AI ── */
+function closeAI() {
+  _aiOpen = false;
+  var dPanel = document.getElementById('ai-panel');
+  var mPanel = document.getElementById('mob-ai-panel');
+  if (dPanel) { dPanel.classList.remove('open'); document.getElementById('shell').style.pointerEvents = ''; }
+  if (mPanel) { mPanel.classList.remove('open'); }
+}
+
+/* ── Render suggestion chips ── */
+function renderAISuggestions(containerId, suggestions) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = '';
+  el.classList.remove('hidden');
+  suggestions.forEach(function(s) {
+    var btn = document.createElement('button');
+    btn.className = 'ai-chip';
+    btn.textContent = s;
+    btn.onclick = function() {
+      el.classList.add('hidden');
+      sendAIMessage(s, containerId.startsWith('mob') ? 'mob' : 'desk');
+    };
+    el.appendChild(btn);
+  });
+}
+
+/* ── Add message to chat ── */
+function clearAIMessages(containerId) {
+  var el = document.getElementById(containerId);
+  if (el) el.innerHTML = '';
+}
+
+function addAIMessage(containerId, role, text) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+
+  // Parse GOTO tag from bot messages
+  var gotoId = null;
+  var cleanText = text;
+  if (role === 'bot') {
+    var gotoMatch = text.match(/\[GOTO:([a-z]+)\]/i);
+    if (gotoMatch) {
+      gotoId = gotoMatch[1];
+      cleanText = text.replace(/\[GOTO:[a-z]+\]/gi, '').trim();
+    }
+  }
+
+  // Message bubble
+  var div = document.createElement('div');
+  div.className = 'ai-msg ' + role;
+  var icon = role === 'bot' ? '<div class="ai-msg-icon">🌶</div>' : '';
+  div.innerHTML = icon + '<div class="ai-bubble">' + cleanText.replace(/\n/g,'<br>') + '</div>';
+  el.appendChild(div);
+
+  // Nav card if GOTO present
+  if (gotoId && PAGES[gotoId]) {
+    var page = PAGES[gotoId];
+    var card = document.createElement('div');
+    card.className = 'ai-nav-card';
+    card.innerHTML =
+      '<div>' +
+        '<div class="ai-nav-card-label">' + (page.cta || page.eyebrow) + '</div>' +
+        '<div class="ai-nav-card-dest">' + page.italic + '</div>' +
+      '</div>' +
+      '<div class="ai-nav-card-arrow">↗</div>';
+    card.onclick = function() {
+      _aiCurrentSection = gotoId;
+      aiGoTo();
+    };
+    el.appendChild(card);
+  }
+
+  el.scrollTop = el.scrollHeight;
+}
+
+function addTypingIndicator(containerId) {
+  var el = document.getElementById(containerId);
+  if (!el) return null;
+  var div = document.createElement('div');
+  div.className = 'ai-typing';
+  div.id = containerId + '-typing';
+  div.innerHTML = '<div class="ai-msg-icon">🌶</div><div class="ai-typing-dots"><div class="ai-typing-dot"></div><div class="ai-typing-dot"></div><div class="ai-typing-dot"></div></div>';
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+  return div;
+}
+
+function removeTypingIndicator(containerId) {
+  var el = document.getElementById(containerId + '-typing');
+  if (el) el.remove();
+}
+
+/* ── Send message to Claude API ── */
+function sendAIMessage(text, side) {
+  if (!text.trim()) return;
+  side = side || 'desk';
+  var msgId   = side === 'mob' ? 'mob-ai-messages'   : 'ai-messages';
+  var inputId = side === 'mob' ? 'mob-ai-input'      : 'ai-input';
+  var sendId  = side === 'mob' ? 'mob-ai-send'       : 'ai-send';
+  var sugId   = side === 'mob' ? 'mob-ai-suggestions': 'ai-suggestions';
+
+  // Hide chips on first send
+  var sugEl = document.getElementById(sugId);
+  if (sugEl) sugEl.classList.add('hidden');
+
+  var input = document.getElementById(inputId);
+  var send  = document.getElementById(sendId);
+  if (input) input.value = '';
+  if (send)  send.disabled = true;
+
+  // Add user message
+  addAIMessage(msgId, 'user', text);
+
+  // Add to history
+  _aiHistory.push({ role: 'user', content: text });
+
+  // Show typing
+  addTypingIndicator(msgId);
+
+  // Call Anthropic API
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 300,
+      system: buildSystemPrompt(),
+      messages: _aiHistory
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    removeTypingIndicator(msgId);
+    var reply = (data.content && data.content[0] && data.content[0].text) || "Sorry, I couldn't get that. Give us a call at (337) 221-1035!";
+    _aiHistory.push({ role: 'assistant', content: reply });
+    addAIMessage(msgId, 'bot', reply);
+    if (send) send.disabled = false;
+    if (input) input.focus();
+  })
+  .catch(function() {
+    removeTypingIndicator(msgId);
+    addAIMessage(msgId, 'bot', "Sorry, something went wrong on my end! Give us a call at (337) 221-1035 and we'll sort you right out. 🌶");
+    if (send) send.disabled = false;
+  });
+}
+
+/* ── Wire up input/send ── */
+document.addEventListener('DOMContentLoaded', function() {
+  // Desktop
+  var inp = document.getElementById('ai-input');
+  var snd = document.getElementById('ai-send');
+  if (inp) {
+    inp.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAIMessage(inp.value, 'desk'); }
+    });
+  }
+  if (snd) snd.addEventListener('click', function() {
+    sendAIMessage(document.getElementById('ai-input').value, 'desk');
+  });
+
+  // Mobile
+  var minp = document.getElementById('mob-ai-input');
+  var msnd = document.getElementById('mob-ai-send');
+  if (minp) {
+    minp.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); sendAIMessage(minp.value, 'mob'); }
+    });
+  }
+  if (msnd) msnd.addEventListener('click', function() {
+    sendAIMessage(document.getElementById('mob-ai-input').value, 'mob');
+  });
+
+  // Swipe down to close mobile
+  var sheet = document.getElementById('mob-ai-sheet');
+  var startY = 0;
+  if (sheet) {
+    sheet.addEventListener('touchstart', function(e){ startY = e.touches[0].clientY; }, {passive:true});
+    sheet.addEventListener('touchend',   function(e){ if (e.changedTouches[0].clientY - startY > 80) closeAI(); }, {passive:true});
+  }
+});
+
+/* ── Smoke canvas for AI mood panel ── */
+var aiSmCV = document.getElementById('ai-smoke-cv');
+var aiSmX  = aiSmCV ? aiSmCV.getContext('2d') : null;
+function rszAISm(){ if(aiSmCV){aiSmCV.width=window.innerWidth;aiSmCV.height=window.innerHeight;} }
+rszAISm(); window.addEventListener('resize', rszAISm);
+var aiPS = Array.from({length:10}, mkS);
+(function aiSmL(){
+  if(!aiSmX){return;}
+  aiSmX.clearRect(0,0,aiSmCV.width,aiSmCV.height);
+  for(var s of aiPS){
+    s.wb+=s.ws;s.x+=s.vx+Math.sin(s.wb)*.0002;s.y+=s.vy;s.r+=s.gr*.7;
+    s.a=s.a<s.ta?s.a+.0015:Math.max(0,s.a-.001);
+    if(s.y<-.2||s.a<=0){Object.assign(s,mkS());continue;}
+    var g=aiSmX.createRadialGradient(s.x*aiSmCV.width,s.y*aiSmCV.height,0,s.x*aiSmCV.width,s.y*aiSmCV.height,s.r);
+    g.addColorStop(0,`rgba(80,28,18,${s.a*.7})`);g.addColorStop(1,'transparent');
+    aiSmX.fillStyle=g;aiSmX.beginPath();aiSmX.arc(s.x*aiSmCV.width,s.y*aiSmCV.height,s.r,0,Math.PI*2);aiSmX.fill();
+  }
+  requestAnimationFrame(aiSmL);
+})();
+
+/* ── ESC closes AI ── */
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape') closeAI();
+});
+
+
+/* ═══════════════════════════════════════
+   CHOICE OVERLAY — Pick AI or Page
+═══════════════════════════════════════ */
+var _choiceSection = null;
+
+/* Smoke for choice mood panel — reuse mkS */
+var chSmCV = document.getElementById('choice-smoke-cv');
+var chSmX  = chSmCV ? chSmCV.getContext('2d') : null;
+function rszChSm(){ if(chSmCV){chSmCV.width=window.innerWidth;chSmCV.height=window.innerHeight;} }
+rszChSm(); window.addEventListener('resize', rszChSm);
+var chPS = Array.from({length:10}, mkS);
+(function chSmL(){
+  if(!chSmX){ return; }
+  chSmX.clearRect(0,0,chSmCV.width,chSmCV.height);
+  for(var s of chPS){
+    s.wb+=s.ws;s.x+=s.vx+Math.sin(s.wb)*.0002;s.y+=s.vy;s.r+=s.gr*.7;
+    s.a=s.a<s.ta?s.a+.0015:Math.max(0,s.a-.001);
+    if(s.y<-.2||s.a<=0){Object.assign(s,mkS());continue;}
+    var g=chSmX.createRadialGradient(s.x*chSmCV.width,s.y*chSmCV.height,0,s.x*chSmCV.width,s.y*chSmCV.height,s.r);
+    g.addColorStop(0,`rgba(80,28,18,${s.a*.7})`);g.addColorStop(1,'transparent');
+    chSmX.fillStyle=g;chSmX.beginPath();chSmX.arc(s.x*chSmCV.width,s.y*chSmCV.height,s.r,0,Math.PI*2);chSmX.fill();
+  }
+  requestAnimationFrame(chSmL);
+})();
+
+function openChoice(id) {
+  _choiceSection = id;
+  var p = PAGES[id] || {};
+
+  /* ── Desktop ── */
+  var dp = document.getElementById('choice-panel');
+  if (dp) {
+    document.getElementById('choice-mood-bg').style.background = p.mood || 'radial-gradient(ellipse at 30% 80%,#3a0800 0%,#1c0404 50%,#08040a 100%)';
+    document.getElementById('choice-big-num').textContent  = p.num || '—';
+    document.getElementById('choice-eyebrow').textContent  = p.eyebrow || '';
+    document.getElementById('choice-title').innerHTML      = (p.title || '').replace('\n','<br>');
+    document.getElementById('choice-italic').textContent   = p.italic || '';
+    document.getElementById('choice-page-name').textContent = p.cta || 'Go to Page';
+    document.getElementById('choice-page-desc').textContent = p.meta || p.italic || '';
+    dp.classList.add('open');
+    document.getElementById('shell').style.pointerEvents = 'none';
+  }
+
+  /* ── Mobile ── */
+  var mp = document.getElementById('mob-choice-panel');
+  if (mp) {
+    document.getElementById('mob-choice-title').innerHTML    = (p.title || '').replace('\n',' ');
+    document.getElementById('mob-choice-sub').textContent    = p.italic || '';
+    document.getElementById('mob-choice-page-name').textContent = p.cta || 'Go to Page';
+    document.getElementById('mob-choice-page-desc').textContent = p.meta || '';
+    mp.classList.add('open');
+  }
+}
+
+function closeChoice() {
+  var dp = document.getElementById('choice-panel');
+  var mp = document.getElementById('mob-choice-panel');
+  if (dp) { dp.classList.remove('open'); document.getElementById('shell').style.pointerEvents = ''; }
+  if (mp) { mp.classList.remove('open'); }
+  _choiceSection = null;
+}
+
+function choicePickAI() {
+  var id = _choiceSection;
+  closeChoice();
+  if (id) openAI(id);
+}
+
+function choicePickPage() {
+  var id = _choiceSection;
+  closeChoice();
+  if (!id) return;
+  var page = PAGES[id];
+  if (!page) return;
+  /* Reuse goTo logic */
+  var dest = page.dest;
+  if (!dest) return;
+  _aiCurrentSection = id;
+  aiGoTo();
+}
+
+/* ESC closes choice too */
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape'){ closeChoice(); closeAI(); }
+});
+
+/* Swipe down to close mobile choice sheet */
+var _chSheetStart = 0;
+var mobChSheet = document.getElementById('mob-choice-sheet');
+if (mobChSheet) {
+  mobChSheet.addEventListener('touchstart', function(e){ _chSheetStart = e.touches[0].clientY; }, {passive:true});
+  mobChSheet.addEventListener('touchend',   function(e){ if(e.changedTouches[0].clientY - _chSheetStart > 80) closeChoice(); }, {passive:true});
+}
+
 </script>
 </body>
 </html>
