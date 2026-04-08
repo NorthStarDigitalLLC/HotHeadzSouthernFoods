@@ -2068,6 +2068,253 @@ function removeTypingIndicator(containerId) {
 }
 
 /* ── Send message to Claude API ── */
+
+/* ═══════════════════════════════════════════════════
+   HOT HEADZ — LOCAL RESPONSE ENGINE
+   Handles 38 common questions instantly, free.
+   Falls back to Claude API only for open questions.
+═══════════════════════════════════════════════════ */
+
+/* ── Live menu helpers ── */
+function getTodayISO() {
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function getTodayName() {
+  return ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()];
+}
+function getTodayMenu() {
+  if (typeof MENU_DATA === 'undefined') return null;
+  return (MENU_DATA.menus || {})[getTodayISO()] || null;
+}
+function getTomorrowMenu() {
+  if (typeof MENU_DATA === 'undefined') return null;
+  var d = new Date(); d.setDate(d.getDate()+1);
+  var iso = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  return (MENU_DATA.menus || {})[iso] || null;
+}
+function getTodayHours() {
+  var hrs = {Sunday:'7:00am – 3:00pm', Saturday:'6:00am – 2:00pm'};
+  return hrs[getTodayName()] || '5:30am – 2:00pm';
+}
+function isOpenNow() {
+  var now = new Date(), h = now.getHours(), m = now.getMinutes(), mins = h*60+m;
+  var day = getTodayName();
+  var open  = day==='Sunday'?420 : day==='Saturday'?360 : 330;
+  var close = day==='Sunday'?900 : 840;
+  return mins >= open && mins < close;
+}
+function isCrawfishNight() {
+  var day = getTodayName();
+  var menu = getTodayMenu();
+  var cfDays = ['Thursday','Friday','Saturday'];
+  return cfDays.includes(day) && menu && menu.crawfish && menu.crawfish.show !== false;
+}
+function formatLunchList(menu) {
+  if (!menu || !menu.lunch || !menu.lunch.items || !menu.lunch.items.length) return null;
+  return menu.lunch.items.map(function(item) {
+    var name = typeof item === 'string' ? item : (item.name || '');
+    return name ? '• ' + name : null;
+  }).filter(Boolean).join('\n');
+}
+
+/* ── The 38 canned responses ── */
+function localResponse(msg) {
+  var t = msg.toLowerCase().trim();
+  var day = getTodayName();
+  var menu = getTodayMenu();
+  var tomMenu = getTomorrowMenu();
+
+  /* ── MENU / FOOD ── */
+
+  // What's on the menu / today's menu / today's specials
+  if (/today.s (menu|special|lunch|plate|food)|what.s (on|for) (lunch|today|the menu)|menu today|today.s board|what are (y.all|you all|yall) (serving|cooking)|what.s cooking|full menu today/.test(t)) {
+    var list = formatLunchList(menu);
+    if (!list) return "We haven't posted today's lunch yet — check our Facebook every morning for the freshest update! You can also call us at (337) 221-1035.";
+    return "Here's what's on the board today! 🌶\n\n" + list + (menu.dessert && menu.dessert.items && menu.dessert.items.length ? "\n\nDessert: " + menu.dessert.items.join(', ') : '') + "\n\nServed Mon–Fri 5:30am–2pm · Sat 6am–2pm · Sun 7am–3pm";
+  }
+
+  // Lunch special specifically
+  if (/lunch (special|plate|menu)|special (today|for lunch)|today.s special/.test(t)) {
+    var list = formatLunchList(menu);
+    if (!list) return "Lunch hasn't been posted yet today — check our Facebook page first thing in the morning! Or call us at (337) 221-1035.";
+    return "Today's lunch special 🍽\n\n" + list + "\n\nServed 11:00am until close.";
+  }
+
+  // What's good today / recommendations
+  if (/what.s good|what do you recommend|recommend|what should i (get|order|try)|best (thing|item|dish)|most popular/.test(t)) {
+    var list = formatLunchList(menu);
+    if (!list) return "I'd say call us at (337) 221-1035 and ask what just came out of the kitchen — everything's made fresh every morning! 🌶";
+    var items = menu.lunch.items.filter(function(i){ return i && (typeof i === 'string' ? i : i.name); });
+    var pick = items[0] ? (typeof items[0] === 'string' ? items[0] : items[0].name) : 'our daily plate';
+    return "Honestly everything's made from scratch so you can't go wrong! Today I'd say start with the " + pick + ". Here's the full board:\n\n" + list;
+  }
+
+  // Crawfish
+  if (/crawfish|craw ?fish/.test(t)) {
+    if (isCrawfishNight()) {
+      return "YES! 🦞 Crawfish is available tonight 4:00pm – 8:00pm. Come on in or call ahead at (337) 221-1035!";
+    }
+    var cfDays = ['Thursday','Friday','Saturday'];
+    if (cfDays.includes(day)) {
+      return "Crawfish should be available tonight starting at 4:00pm — but call us at (337) 221-1035 to confirm before heading out! 🦞";
+    }
+    return "Crawfish nights are Thursday, Friday, and Saturday from 4:00pm – 8:00pm (when in season). Call us at (337) 221-1035 to confirm availability! 🦞";
+  }
+
+  // Breakfast
+  if (/breakfast|biscuit|gravy|eggs|bacon|morning (food|menu|plate)/.test(t)) {
+    return "Breakfast is served every day at opening 🍳 We've got biscuits & gravy, scrambled eggs, bacon, sausage, hash browns, pancakes, and more — all made from scratch. Mon–Fri we open at 5:30am, Saturday 6am, Sunday 7am.";
+  }
+
+  // Dessert
+  if (/dessert|cake|sweet|pudding/.test(t)) {
+    var ds = menu && menu.dessert && menu.dessert.items;
+    if (ds && ds.length) return "Today's dessert: " + ds.join(', ') + " 🍰 Come on in and treat yourself!";
+    return "We usually have something sweet — call us at (337) 221-1035 or stop by to see what came out of the kitchen today!";
+  }
+
+  // Beer
+  if (/beer|drink|cold one|brew|natural light|miller|coors|bud|modelo|corona|michelob/.test(t)) {
+    return "We've got ice cold beer! 🍺\n\n• Natural Light\n• Miller Lite\n• Coors Light\n• Bud Light\n• Budweiser\n• Michelob Ultra\n• Corona\n• Modelo\n\nPerfect with a plate of Southern food!";
+  }
+
+  // Sides
+  if (/side(s| dish| item)|what sides|come with/.test(t)) {
+    return "Our sides change daily with the lunch menu! Today's board has everything listed — want me to pull up what's on today?";
+  }
+
+  // Tomorrow's menu
+  if (/tomorrow|next day/.test(t)) {
+    var tList = formatLunchList(tomMenu);
+    var tom = new Date(); tom.setDate(tom.getDate()+1);
+    var tomName = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][tom.getDay()];
+    if (!tList) return "We haven't posted " + tomName + "'s menu yet! Check our Facebook page tomorrow morning for the freshest update. 🌶";
+    return tomName + "'s lunch menu:\n\n" + tList;
+  }
+
+  /* ── HOURS / STATUS ── */
+
+  // Are you open now
+  if (/open (right)? ?(now|today|currently)|are y.all open|still open|open yet/.test(t)) {
+    if (isOpenNow()) {
+      return "Yes, we're open right now! 🌶 Kitchen hours today are " + getTodayHours() + ". Come on in!";
+    }
+    return "We're closed right now. Kitchen hours today are " + getTodayHours() + ". We'd love to see you next time!";
+  }
+
+  // What time open / close
+  if (/(what time|when) (do|does|are) (you|y.all) (open|close|start|stop)|hours|open at|close at|what are your hours/.test(t)) {
+    return "Here are our hours 🕐\n\n• Monday–Friday: 5:30am – 2:00pm\n• Saturday: 6:00am – 2:00pm\n• Sunday: 7:00am – 3:00pm\n\nCrawfish available Thu–Sat evenings 4pm–8pm (when in season)!";
+  }
+
+  // Weekend hours
+  if (/weekend|saturday|sunday/.test(t) && /hour|open|close|time/.test(t)) {
+    return "Weekend hours:\n• Saturday: 6:00am – 2:00pm\n• Sunday: 7:00am – 3:00pm\n\nSee you this weekend! 🌶";
+  }
+
+  // Lunch hours
+  if (/lunch (hour|time|start|end|when)|when (is|does) lunch/.test(t)) {
+    return "Lunch is served from 11:00am until we close (2pm weekdays, 3pm Sunday). Gets busy around noon so come early for the best selection!";
+  }
+
+  /* ── ORDERING ── */
+
+  // How to order / call ahead
+  if (/how (do i|to) order|call ahead|place an order|skip the line|order ahead|how (do i|can i) (get|buy)/.test(t)) {
+    return "Best way is to call ahead! 📞 (337) 221-1035\n\nWe'll have your order ready when you walk in — no waiting in line. Mon–Fri from 5:30am, Sat 6am, Sun 7am.";
+  }
+
+  // Phone number
+  if (/phone|number|call|contact|reach/.test(t)) {
+    return "Give us a call! 📞 (337) 221-1035\n\nMon–Fri 5:30am–2pm · Sat 6am–2pm · Sun 7am–3pm";
+  }
+
+  // Delivery
+  if (/deliver|delivery/.test(t)) {
+    return "Yes, we deliver! 🚗\n\nMinimum 10 plates, within 10 miles of 2741 US-190 in DeRidder. Call us at (337) 221-1035 to arrange. Great for office lunches and group orders!";
+  }
+
+  // Delivery minimum / distance
+  if (/minimum|how many|how far|mile|radius/.test(t) && /deliver/.test(t)) {
+    return "Delivery requires a minimum of 10 plates and we cover within 10 miles of 2741 US-190, DeRidder. Call (337) 221-1035 to set it up!";
+  }
+
+  // Catering / group orders
+  if (/cater|catering|group order|large order|office|event|party/.test(t)) {
+    return "We'd love to cater for y'all! 🌶 For large orders or events, call us at (337) 221-1035 to make arrangements. We deliver 10+ plates within 10 miles, and can work with you on bigger orders too.";
+  }
+
+  // Dine-in / carry-out
+  if (/dine.?in|eat in|sit down|tables|seating/.test(t)) {
+    return "Yes, we have dine-in! Come sit down and enjoy. We're at 2741 US-190, DeRidder. Kitchen hours are Mon–Fri 5:30am–2pm, Sat 6am–2pm, Sun 7am–3pm. 🌶";
+  }
+  if (/carry.?out|take.?out|to.?go|takeout/.test(t)) {
+    return "Absolutely! Carry-out is available any time we're open. Call ahead at (337) 221-1035 and we'll have it ready when you get here — no wait!";
+  }
+
+  /* ── LOCATION ── */
+
+  // Address / where located
+  if (/where (are|is)|address|located|location|find you|where y.all/.test(t)) {
+    return "We're at 2741 US-190, DeRidder, Louisiana 70634 📍\n\nRight off the highway — easy parking. Pop us in Google Maps and we're easy to find!";
+  }
+
+  // Directions
+  if (/direction|how (do i|to) (get|find)|map|navigate/.test(t)) {
+    return "We're at 2741 US-190, DeRidder, LA 70634 — right off the highway! 📍\n\nPop that address in Google Maps and it'll take you straight there. Plenty of parking when you arrive. [GOTO:find]";
+  }
+
+  // Parking
+  if (/park|parking/.test(t)) {
+    return "Yes, easy parking right off the highway at 2741 US-190! No stress finding a spot. 🚗";
+  }
+
+  /* ── RESTAURANT INFO ── */
+
+  // Scratch-made / fresh
+  if (/scratch|fresh|homemade|from scratch|made fresh/.test(t)) {
+    return "Every single thing we make is from scratch — no shortcuts, no frozen, no canned shortcuts. We start cooking every morning before dawn so everything is fresh by the time you walk in. That's the Hot Headz promise. 🌶";
+  }
+
+  // About / how long open / history
+  if (/about|history|how long|when (did|were) you (open|start)|since when|established/.test(t)) {
+    return "Hot Headz Southern Foods has been serving DeRidder since 2020! 🌶 Family-owned, made from scratch every morning, cafeteria-style Southern comfort food. We've been feeding the community with Cajun classics, crawfish, po-boys, and homemade desserts ever since. Come see us at 2741 US-190!";
+  }
+
+  // What kind of food
+  if (/what kind|type of food|cuisine|what do you (serve|make|cook)|what.s hot headz/.test(t)) {
+    return "Southern comfort food, Cajun classics, and everything in between! 🌶 We're talking red beans & rice, fried chicken, catfish plates, smothered pork chops, crawfish étouffée, jambalaya, po-boys, homemade desserts... all made from scratch every morning. Cafeteria-style — pick your plate and enjoy!";
+  }
+
+  // Facebook / daily specials online
+  if (/facebook|social|post|online|daily special online|where.*post/.test(t)) {
+    return "We post our daily specials every morning on Facebook! 📱 It's the fastest way to see what's on the board before you make the drive. Search 'Hot Headz Southern Foods' or follow the link on our site. [GOTO:facebook]";
+  }
+
+  // Payments / cards
+  if (/card|cash|credit|debit|payment|pay|accept/.test(t)) {
+    return "Best to give us a call at (337) 221-1035 to confirm payment options before heading over! We want to make sure your visit is smooth. 🌶";
+  }
+
+  /* ── GREETINGS / SMALL TALK ── */
+  if (/^(hi|hey|hello|howdy|what.s up|sup|yo|good (morning|afternoon|evening))[!?.]*$/.test(t)) {
+    return "Hey there! 🌶 Welcome to Hot Headz — kitchen's hot and the food is fresh! What can I help you with today?";
+  }
+
+  if (/thank|thanks|thank you/.test(t)) {
+    return "Of course! Come see us soon at 2741 US-190, DeRidder. We'd love to feed y'all! 🌶";
+  }
+
+  if (/good|great|awesome|amazing|love it|love y.all/.test(t)) {
+    return "That means the world to us — thank you! 🌶 See you next time at 2741 US-190!";
+  }
+
+  // No match — return null to fall through to AI
+  return null;
+}
+
+
 function sendAIMessage(text, side) {
   if (!text.trim()) return;
   side = side || 'desk';
@@ -2088,7 +2335,20 @@ function sendAIMessage(text, side) {
   // Add user message
   addAIMessage(msgId, 'user', text);
 
-  // Add to history
+  // ── Try local response engine first ──
+  var local = localResponse(text);
+  if (local) {
+    _aiHistory.push({ role: 'user', content: text });
+    _aiHistory.push({ role: 'assistant', content: local });
+    setTimeout(function() {
+      addAIMessage(msgId, 'bot', local);
+      if (send) send.disabled = false;
+      if (input) input.focus();
+    }, 320); // tiny delay so it feels natural, not instant
+    return;
+  }
+
+  // Add to history (AI fallback path)
   _aiHistory.push({ role: 'user', content: text });
 
   // Show typing
@@ -2122,7 +2382,7 @@ function sendAIMessage(text, side) {
   .catch(function(err) {
     removeTypingIndicator(msgId);
     console.error('[HH AI] Error:', err.message);
-    addAIMessage(msgId, 'bot', 'DEBUG: ' + err.message);
+    addAIMessage(msgId, 'bot', "Hmm, I hit a snag on that one! Give us a call at (337) 221-1035 and we'll help you out. 🌶");
     if (send) send.disabled = false;
   });
 }
