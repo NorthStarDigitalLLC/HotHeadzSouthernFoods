@@ -368,6 +368,10 @@ footer span{color:var(--red-hot)}
         <div class="welcome-name emp">Welcome back, <span id="empWelcomeName"></span></div>
         <div class="welcome-meta" id="empWelcomeMeta"></div>
       </div>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center">
+        <a href="index.html" style="font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);padding:.45rem .9rem;text-decoration:none;transition:all .2s" onmouseover="this.style.color='var(--ember-light)'" onmouseout="this.style.color='var(--muted)'">← Site</a>
+        <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+      </div>
     </div>
 
     <div class="week-nav">
@@ -407,7 +411,7 @@ footer span{color:var(--red-hot)}
       </div>
     </div>
   </div>
-  <footer><p>Hot Headz <span>Southern Foods</span> · Employee Portal · Made from scratch since 2020</p></footer>
+  <footer><p>Hot Headz <span>Southern Foods</span> · Employee Portal · Made from scratch since 2020 · <a href='index.html' style='color:var(--ember-light);text-decoration:none'>← Back to site</a></p></footer>
 </div>
 
 <!-- ═══ OWNER APP ═══ -->
@@ -417,6 +421,10 @@ footer span{color:var(--red-hot)}
       <div>
         <div class="welcome-name own">Manager <span>Dashboard</span></div>
         <div class="welcome-meta" id="ownWelcomeMeta"></div>
+      </div>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center">
+        <a href="index.html" style="font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);padding:.45rem .9rem;text-decoration:none;transition:all .2s" onmouseover="this.style.color='var(--ember-light)'" onmouseout="this.style.color='var(--muted)'">← Site</a>
+        <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
       </div>
     </div>
 
@@ -519,7 +527,7 @@ footer span{color:var(--red-hot)}
     </div>
 
   </div>
-  <footer><p>Hot Headz <span>Southern Foods</span> · Manager Portal · Made from scratch since 2020</p></footer>
+  <footer><p>Hot Headz <span>Southern Foods</span> · Manager Portal · Made from scratch since 2020 · <a href='index.html' style='color:var(--ember-light);text-decoration:none'>← Back to site</a></p></footer>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -667,13 +675,7 @@ function showEmpApp() {
       return s;
     });
     if(res[1].ok) _notices  = res[1].data||[];
-    // DEBUG — remove after fixing
-    var dbg = document.createElement('div');
-    dbg.id = 'schedDebug';
-    dbg.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#111;color:#0f0;font-family:monospace;font-size:11px;padding:8px;z-index:9999;max-height:160px;overflow-y:auto;border-top:1px solid #333';
-    dbg.innerHTML = '<strong>DEBUG</strong> — currentUser: "' + _currentUser + '" | shifts total: ' + _schedule.length + '<br>' +
-      _schedule.map(function(s){ return '"' + s.name + '" on ' + s.date + ' [match:' + (s.name.trim().toLowerCase()===_currentUser.trim().toLowerCase()) + ']'; }).join('<br>');
-    document.body.appendChild(dbg);
+
     empRenderWeek(); empRenderMyShifts(); empRenderNotices();
   }).catch(function(){ stopLoading(); });
 }
@@ -780,7 +782,7 @@ function ownLogin() {
   api({action:'checkAdmin', pass:pass}).then(function(r){
     stopLoading();
     if(r.ok){ showOwnApp(); }
-    else { document.getElementById('ownError').textContent = 'Failed. Debug: ' + (r.debug || JSON.stringify(r)); }
+    else { document.getElementById('ownError').textContent = 'Incorrect password.'; }
   }).catch(function(err){
     stopLoading();
     document.getElementById('ownError').textContent = err.message || 'Connection error — check Apps Script deployment';
@@ -993,9 +995,10 @@ function changePassword() {
 // =============================================
 // SPINNING LOGO RINGS (Three.js — same as BHI)
 // =============================================
-var HH_LOGO = 'https://northstardigitalweb.com/Images/Hotheadzshare.png';
+var HH_LOGO = 'https://www.hotheadzsouthernfoods.com/images/HotHeadzLogo.png';
 
-function makeLogoRings(canvasId, size) {
+function makeLogoRings(canvasId, size, opts) {
+  opts = opts || {};
   var canvas = document.getElementById(canvasId);
   if(!canvas || typeof THREE === 'undefined') return null;
 
@@ -1010,7 +1013,7 @@ function makeLogoRings(canvasId, size) {
 
   var scene  = new THREE.Scene();
   var camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
-  camera.position.z = 3.2;
+  camera.position.z = opts.camZ || 3.2;
 
   scene.add(new THREE.AmbientLight(0xffffff, 0.7));
   var redLight  = new THREE.PointLight(0xE74C3C, 2.0, 20); redLight.position.set(3, 3, 5);   scene.add(redLight);
@@ -1018,7 +1021,7 @@ function makeLogoRings(canvasId, size) {
 
   // Outer ring — red
   var outerRing = new THREE.Mesh(
-    new THREE.TorusGeometry(1.1, 0.045, 32, 100),
+    new THREE.TorusGeometry(opts.outerR||1.1, opts.outerT||0.045, 32, 100),
     new THREE.MeshStandardMaterial({color:0xE74C3C, emissive:0x8B1A28, emissiveIntensity:0.4, metalness:0.8, roughness:0.2})
   );
   outerRing.rotation.x = 0.4;
@@ -1026,7 +1029,7 @@ function makeLogoRings(canvasId, size) {
 
   // Inner ring — ember/gold
   var innerRing = new THREE.Mesh(
-    new THREE.TorusGeometry(0.72, 0.025, 24, 80),
+    new THREE.TorusGeometry(opts.innerR||0.72, opts.innerT||0.025, 24, 80),
     new THREE.MeshStandardMaterial({color:0xE67E22, emissive:0x8B4000, emissiveIntensity:0.3, metalness:0.9, roughness:0.15})
   );
   innerRing.rotation.x = 0.4;
@@ -1034,7 +1037,7 @@ function makeLogoRings(canvasId, size) {
 
   // Logo plane
   var logoPlane = new THREE.Mesh(
-    new THREE.CircleGeometry(0.58, 64),
+    new THREE.CircleGeometry(opts.logoR||0.58, 64),
     new THREE.MeshBasicMaterial({transparent:true, opacity:0, side:THREE.DoubleSide})
   );
   scene.add(logoPlane);
@@ -1071,10 +1074,10 @@ var _logoInstances = {};
 
 function initAllLogoRings() {
   if(typeof THREE === 'undefined') { setTimeout(initAllLogoRings, 200); return; }
-  _logoInstances.landing = makeLogoRings('landingLogoCanvas',   160);
-  _logoInstances.empLogin = makeLogoRings('empLoginLogoCanvas', 100);
-  _logoInstances.ownLogin = makeLogoRings('ownLoginLogoCanvas', 100);
-  _logoInstances.header   = makeLogoRings('headerLogoCanvas',    38);
+  _logoInstances.landing  = makeLogoRings('landingLogoCanvas',  160, {outerR:1.1,innerR:0.72,outerT:0.045,innerT:0.025,logoR:0.58,camZ:3.2});
+  _logoInstances.empLogin = makeLogoRings('empLoginLogoCanvas', 100, {outerR:1.0,innerR:0.65,outerT:0.04,innerT:0.022,logoR:0.52,camZ:3.0});
+  _logoInstances.ownLogin = makeLogoRings('ownLoginLogoCanvas', 100, {outerR:1.0,innerR:0.65,outerT:0.04,innerT:0.022,logoR:0.52,camZ:3.0});
+  _logoInstances.header   = makeLogoRings('headerLogoCanvas',    38, {outerR:0.9,innerR:0.58,outerT:0.04,innerT:0.02,logoR:0.46,camZ:2.8});
 }
 
 window.addEventListener('load', initAllLogoRings);
