@@ -661,7 +661,11 @@ function showEmpApp() {
   loading('Loading your schedule...','red');
   Promise.all([api({action:'getSchedule'}), api({action:'getNotices'})]).then(function(res){
     stopLoading();
-    if(res[0].ok) _schedule = res[0].data||[];
+    if(res[0].ok) _schedule = (res[0].data||[]).map(function(s){
+      // Normalize date — sheet sometimes returns full ISO timestamp, we only want YYYY-MM-DD
+      if(s.date && s.date.length > 10) s.date = s.date.slice(0,10);
+      return s;
+    });
     if(res[1].ok) _notices  = res[1].data||[];
     // DEBUG — remove after fixing
     var dbg = document.createElement('div');
@@ -805,7 +809,7 @@ function ownLoadAll() {
   loading('Loading all data...','ember');
   Promise.all([api({action:'getSchedule'}), api({action:'getEmployees'}), api({action:'getNotices'})]).then(function(res){
     stopLoading();
-    if(res[0].ok){ _ownSchedule=res[0].data||[]; renderScheduleGrid('ownScheduleGrid','ownWeekRange',_ownWeekOffset,_ownSchedule,null); renderShiftTable(); }
+    if(res[0].ok){ _ownSchedule=(res[0].data||[]).map(function(s){ if(s.date&&s.date.length>10)s.date=s.date.slice(0,10); return s; }); renderScheduleGrid('ownScheduleGrid','ownWeekRange',_ownWeekOffset,_ownSchedule,null); renderShiftTable(); }
     if(res[1].ok){ _ownEmployees=res[1].data||[]; renderEmpSelect(); renderEmpGrid(); }
     if(res[2].ok) renderNoticeList(res[2].data||[]);
   }).catch(function(){ stopLoading(); toast('Failed to load data — check connection','err'); });
