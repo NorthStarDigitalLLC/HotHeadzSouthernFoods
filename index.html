@@ -44,10 +44,7 @@ body.hov #cur2{width:50px;height:50px;border-color:rgba(240,80,32,.7);}
 #hint{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);font-size:7px;letter-spacing:.26em;text-transform:uppercase;color:rgba(232,180,160,.14);z-index:200;pointer-events:none;animation:hfade 5s ease-in-out 2s both;}
 @keyframes hfade{0%{opacity:0}20%{opacity:1}72%{opacity:1}100%{opacity:0}}
 
-  #cdw{right:auto;left:50%;bottom:20px;top:auto;transform:translateX(-50%);flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px;max-width:90vw;background:rgba(8,4,7,.9);padding:10px 14px;border:1px solid rgba(232,180,160,.08);}
-  #cdw svg{width:70px;height:70px;}
-  #cd-n{font-size:26px;}
-}
+
 </style>
 </head>
 <body>
@@ -62,24 +59,7 @@ body.hov #cur2{width:50px;height:50px;border-color:rgba(240,80,32,.7);}
   <div><div id="brand-n">Hot Headz</div><div id="brand-t">Southern Foods &middot; Est. 2020</div></div>
   <div style="text-align:right"><div class="tb-sm">(337) 221-1035</div><div class="tb-sm" id="tb-hr"></div></div>
 </div>
-<div id="info">
-  <div class="i-n" id="i-n"></div>
-  <div class="i-ey" id="i-ey"></div>
-  <div class="i-title" id="i-title"></div>
-  <div class="i-sub" id="i-sub"></div>
-  <div class="i-chips" id="i-chips"></div>
-  <div class="i-rule" id="i-rule"></div>
-</div>
-<div id="cdw">
-  <svg width="110" height="110" viewBox="0 0 110 110">
-    <circle id="cd-bg" cx="55" cy="55" r="46"/>
-    <circle id="cd-arc" cx="55" cy="55" r="46"/>
-    <text id="cd-n" x="55" y="50">15</text>
-    <text id="cd-lbl" x="55" y="73">navigating</text>
-  </svg>
-  <div id="cd-dest"></div>
-  <button id="cd-go">Go Now &rarr;</button>
-</div>
+
 <div id="hint">Tap any word to navigate</div>
 
 <script>
@@ -374,57 +354,37 @@ canvas.addEventListener('mousemove', function(e) {
   document.body.classList.toggle('hov', !!hitNav(e.clientX,e.clientY)||cancelHover);
 });
 canvas.addEventListener('click', function(e) {
-  if (hitCancel(e.clientX,e.clientY)) { cancelNav(); return; }
+  if (wormCancelHit(e.clientX,e.clientY)) { abortWorm(); return; }
   var k = hitNav(e.clientX,e.clientY);
-  if (k) wormTransition(k, null); // worm then show second screen
+  if (k && !wormActive) wormTransition(null, PAGES[k].dest);
 });
 canvas.addEventListener('touchend', function(e) {
   var t=e.changedTouches[0];
-  if (hitCancel(t.clientX,t.clientY)) { cancelNav(); return; }
+  if (wormCancelHit(t.clientX,t.clientY)) { abortWorm(); return; }
   var k=hitNav(t.clientX,t.clientY);
-  if (k) wormTransition(k, null);
+  if (k && !wormActive) wormTransition(null, PAGES[k].dest);
 }, {passive:true});
 
-/* ── COUNTDOWN ── */
-var cdInt=null, cdSec=15;
-var cdArcEl=document.getElementById('cd-arc');
-var cdNEl=document.getElementById('cd-n');
-var CIRC=2*Math.PI*46;
-function setArc(s){cdArcEl.style.strokeDashoffset=CIRC*(1-s/15);cdNEl.textContent=s;}
-function startCD(){stopCD();cdSec=15;setArc(15);cdInt=setInterval(function(){cdSec--;setArc(cdSec);if(cdSec<=0){stopCD();setArc(0);}},1000);}
-function stopCD(){if(cdInt){clearInterval(cdInt);cdInt=null;}}
+/* ── WORM CANCEL — shown in center of ring during spin ── */
+var wormCancelActive=false, wormAborted=false;
+var wormCancelR=38; // hit radius
 
-document.getElementById('cd-go').addEventListener('click', function() {
-  stopCD();
-  if (!navDest) return;
-  var dest = navDest; navDest = '';
-  wormTransition(null, dest); // worm then navigate
-});
-document.addEventListener('keydown', function(e){if(e.key==='Escape')cancelNav();});
-
-/* ── SELECT / CANCEL ── */
-function selectNav(key) {
-  selKey=key; navDest=PAGES[key].dest;
-  var pg=PAGES[key];
-  document.getElementById('i-n').textContent=pg.num;
-  document.getElementById('i-ey').textContent=pg.ey;
-  document.getElementById('i-title').innerHTML=pg.title.replace('\n','<br>');
-  document.getElementById('i-sub').textContent=pg.sub;
-  document.getElementById('i-chips').innerHTML=pg.chips.map(function(ch,j){return '<span class="i-chip'+(j<2?' h':'')+'">'+ch+'</span>';}).join('');
-  document.getElementById('i-rule').textContent=pg.rule;
-  document.getElementById('info').classList.add('show');
-  document.getElementById('cd-dest').textContent=pg.cta;
-  document.getElementById('cdw').classList.add('show');
-  var m=pg.mood; tR=m[0]; tG=m[1]; tB=m[2];
-  rebuild(); startCD();
+function wormCancelHit(x,y){
+  if(!wormCancelActive) return false;
+  var dx=x-CX, dy=y-CY;
+  return dx*dx+dy*dy < wormCancelR*wormCancelR;
 }
-function cancelNav() {
-  stopCD(); selKey=null; navDest='';
-  document.getElementById('info').classList.remove('show');
-  document.getElementById('cdw').classList.remove('show');
+
+function abortWorm(){
+  if(!wormActive) return;
+  wormAborted=true;
+  wormActive=false;
+  wormCancelActive=false;
   tR=8; tG=4; tB=7;
   rebuild();
 }
+
+document.addEventListener('keydown', function(e){if(e.key==='Escape') abortWorm();});
 
 /* ── WORM TRANSITION — uses existing particles, no new arrays ──
    destKey set → show second screen after worm
@@ -436,160 +396,246 @@ function wormTransition(destKey, dest) {
   wormActive = true;
   document.getElementById('hint').style.display='none';
 
-  // 0 (0-700ms)    collapse to center
-  // 1 (700-1500ms) 4 beams shoot N/E/S/W
-  // 2 (1500-2800ms) beams arc right into ring
-  // 3 (2800-4800ms) ring spins with twist for 2s
-  var B=[700,1500,2800,4800];
-  var elapsed=0,lastTs=null,wA=0,stage=0,done=false;
+  var TOTAL=5500, elapsed=0, lastTs=null, done=false;
+  var PI=Math.PI, minD=Math.min(W,H);
+  var ringR=minD*0.28, tubeR=minD*0.050, TWISTS=3;
+
+  // Massive particle count — no limit
+  var EXTRA=28000, extraParticles=[];
+  for(var ei=0;ei<EXTRA;ei++){
+    var ep={x:CX+(Math.random()-.5)*12,y:CY+(Math.random()-.5)*12,
+      tx:CX,ty:CY,spd:0.99,r:0.4+Math.random()*0.4,
+      a:0.7+Math.random()*0.3,wb:0,ws:0,wm:0,rc:245,gc:237,bc:232,t:1};
+    extraParticles.push(ep); particles.push(ep);
+  }
+
+  // Cancel text particles
+  var cancelDots=sampleDots('CANCEL',CX,CY,minD*0.18,minD*0.045,Math.max(0.5,minD*0.045/40));
+  var cancelParticles=[];
+  for(var ci=0;ci<cancelDots.length;ci++){
+    var cd=cancelDots[ci];
+    var cp={x:CX+(Math.random()-.5)*6,y:CY+(Math.random()-.5)*6,
+      tx:cd.x,ty:cd.y,spd:0.99,r:0.8+Math.random()*0.3,
+      a:0,wb:0,ws:0,wm:0,rc:240,gc:80,bc:32,t:1,_cx:cd.x,_cy:cd.y};
+    cancelParticles.push(cp); particles.push(cp); extraParticles.push(cp);
+  }
+
   var N=particles.length;
-  var minD=Math.min(W,H);
-  var ringR=minD*0.28;
-  var LAYERS=5, TWISTS=3;
-  var tubeR=minD*0.030;
-  var beamDirs=[-Math.PI/2, 0, Math.PI/2, Math.PI]; // N E S W
+  var cdLastDigit=-1, cdParticles=[], spinAccum=0;
+  var ringN=N-cancelParticles.length;
 
-  for(var i=0;i<N;i++){
-    particles[i]._beam  = i%4;
-    particles[i]._bt    = Math.floor(i/4)/(Math.ceil(N/4));
-    particles[i]._layer = i%LAYERS;
-    particles[i]._t     = (particles[i]._beam/4)+(particles[i]._bt/4);
-    particles[i].ck     = false;
+  var PER_RING=18, SLOTS=Math.ceil(ringN/PER_RING);
+  for(var i=0;i<ringN;i++){
+    var slot=i%SLOTS, inner=Math.floor(i/SLOTS);
+    particles[i]._t   = slot/SLOTS;
+    particles[i]._ca  = (inner/PER_RING)*PI*2;
+    particles[i]._cr  = Math.sqrt((inner+0.5)/PER_RING)*tubeR;
+    particles[i]._arm = Math.floor(particles[i]._t*4)%4;
+    particles[i]._at  = (particles[i]._t*4)%1;
+    particles[i]._sx  = particles[i].x;
+    particles[i]._sy  = particles[i].y;
+    // Pre-compute full arm position — FROZEN at pArms=1
+    // So during sweep, source is always the fully-extended arm, never partial
+    var _ad = [-(PI/2),0,PI/2,PI][particles[i]._arm];
+    var _at = particles[i]._at;
+    var _len = ringR*_at;
+    var _tw  = _at*PI*2*TWISTS+particles[i]._ca;
+    var _cr  = particles[i]._cr*(0.3+_at*0.7);
+    var _perp= _ad+PI/2;
+    var _twist = Math.sin(_at*PI*6)*0.28;
+    var _r = _len*(1+_twist*0.08);
+    particles[i]._armX = CX+Math.cos(_ad)*_r+Math.cos(_perp)*Math.cos(_tw)*_cr;
+    particles[i]._armY = CY+Math.sin(_ad)*_r+Math.sin(_perp)*Math.cos(_tw)*_cr;
+    particles[i].ck=false;
+    particles[i].rc=245; particles[i].gc=237; particles[i].bc=232;
+    particles[i].a=0.75+Math.random()*0.25;
+    particles[i].wm=0;
   }
 
-  // Stage 0: collapse
-  for(var i=0;i<N;i++){
-    var a=Math.random()*Math.PI*2, r=Math.random()*INN_R*0.3;
-    particles[i].tx  = CX+Math.cos(a)*r;
-    particles[i].ty  = CY+Math.sin(a)*r;
-    particles[i].spd = 0.055+Math.random()*0.03;
-    particles[i].wm  = 0.5;
+  var armDirs=[-(PI/2),0,PI/2,PI];
+
+  function io(t){return t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2;}
+  function clamp(v,a,b){return v<a?a:v>b?b:v;}
+  function lerp(a,b,t){return a+(b-a)*t;}
+
+  function ringPos(t,ca,cr){
+    // No spinAngle during formation — ring forms at its true position
+    var angle=t*PI*2-PI/2;
+    var cx2=CX+Math.cos(angle)*ringR, cy2=CY+Math.sin(angle)*ringR;
+    var tang=angle+PI/2, tw=t*PI*2*TWISTS+ca;
+    return {x:cx2+Math.cos(tang+tw)*cr, y:cy2+Math.sin(tang+tw)*cr};
   }
 
-  function applyBeams(ext){
-    // ext 0..1 — how far beams have extended
-    var len=ringR*ext;
-    for(var i=0;i<N;i++){
-      var bd=beamDirs[particles[i]._beam];
-      var bt=particles[i]._bt;
-      var lf=(particles[i]._layer/(LAYERS-1))-0.5;
-      var dist=bt*len;
-      particles[i].tx = CX+Math.cos(bd)*dist + Math.cos(bd+Math.PI/2)*lf*tubeR;
-      particles[i].ty = CY+Math.sin(bd)*dist + Math.sin(bd+Math.PI/2)*lf*tubeR;
-      particles[i].spd=0.13+Math.random()*0.06;
-      particles[i].wm =0.01;
-    }
-  }
-
-  function applyRing(arcP, spin){
-    // arcP 0..1 — beams arc clockwise into ring
-    for(var i=0;i<N;i++){
-      var beam =particles[i]._beam;
-      var bt   =particles[i]._bt;
-      var lf   =(particles[i]._layer/(LAYERS-1))-0.5;
-      var t    =particles[i]._t;
-
-      // Beam tip angle (stays fixed at beam direction tip)
-      var tipAngle=beamDirs[beam];
-      // Final ring angle for this particle
-      var finalAngle=tipAngle+bt*(Math.PI/2)+spin;
-      // Interpolate from tip radially to ring arc
-      var ease=arcP<0.5?2*arcP*arcP:1-Math.pow(-2*arcP+2,2)/2;
-      var ra=tipAngle*(1-ease)+finalAngle*ease;
-      var rr=ringR*Math.max(0.05,ease);
-
-      var hx=CX+Math.cos(ra)*rr;
-      var hy=CY+Math.sin(ra)*rr;
-      var twistA=t*Math.PI*2*TWISTS+spin*2;
-      var tang=ra+Math.PI/2;
-      particles[i].tx  = hx+Math.cos(tang+twistA)*lf*tubeR*ease;
-      particles[i].ty  = hy+Math.sin(tang+twistA)*lf*tubeR*ease;
-      particles[i].spd = 0.10+Math.random()*0.05;
-      particles[i].wm  = 0.01;
-    }
-  }
-
-  function applySpin(spin){
-    for(var i=0;i<N;i++){
-      var t =(particles[i]._t+spin/(Math.PI*2))%1;
-      var ra=t*Math.PI*2+spin;
-      var lf=(particles[i]._layer/(LAYERS-1))-0.5;
-      var twistA=t*Math.PI*2*TWISTS+spin*2;
-      var tang=ra+Math.PI/2;
-      particles[i].tx  = CX+Math.cos(ra)*ringR+Math.cos(tang+twistA)*lf*tubeR;
-      particles[i].ty  = CY+Math.sin(ra)*ringR+Math.sin(tang+twistA)*lf*tubeR;
-      particles[i].spd = 0.20;
-      particles[i].wm  = 0.01;
-    }
+  function ringPosSpin(t,ca,cr,spinAngle){
+    var angle=t*PI*2-PI/2+spinAngle;
+    var cx2=CX+Math.cos(angle)*ringR, cy2=CY+Math.sin(angle)*ringR;
+    var tang=angle+PI/2, tw=t*PI*2*TWISTS+ca;
+    return {x:cx2+Math.cos(tang+tw)*cr, y:cy2+Math.sin(tang+tw)*cr};
   }
 
   function wormFrame(ts){
     if(done)return;
-    var dt=lastTs?Math.min(ts-lastTs,50):16;
-    lastTs=ts; elapsed+=dt;
-    var e=elapsed;
+    var dt=lastTs?Math.min(ts-lastTs,50):16; lastTs=ts; elapsed+=dt;
 
-    if(stage===0&&e>B[0]){ stage=1; }
-
-    if(stage===1){
-      var p=Math.min(1,(e-B[0])/(B[1]-B[0]));
-      var ease=p<0.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
-      applyBeams(ease);
-      if(e>B[1]) stage=2;
+    if(wormAborted){
+      wormAborted=false; wormCancelActive=false;
+      for(var ei=0;ei<extraParticles.length;ei++){
+        var idx=particles.indexOf(extraParticles[ei]);
+        if(idx>=0) particles.splice(idx,1);
+      }
+      extraParticles=[]; cdParticles=[]; tR=8; tG=4; tB=7; rebuild(); return;
     }
 
-    if(stage===2){
-      var p=Math.min(1,(e-B[1])/(B[2]-B[1]));
-      applyRing(p,0);
-      if(e>B[2]) stage=3;
+    var p=clamp(elapsed/TOTAL,0,1);
+
+    // Formation phases driven by p (fixed duration)
+    // Spin is FREE — accumulates independently after formation done
+    var pCollapse = io(clamp(p/0.13,        0,1));
+    var pArms     = io(clamp((p-0.11)/0.20, 0,1));
+    var pSweep    = io(clamp((p-0.30)/0.38, 0,1));
+    var formDone  = p >= 0.68; // ring fully formed
+
+    // Spin accumulates freely once formation done
+    if(formDone) spinAccum += dt * 0.0018; // ~1 rotation per 3.5s
+    var spinAngle = spinAccum;
+    var cancelFade= io(clamp((p-0.38)/0.28, 0,1));
+
+    // Navigate when countdown hits 0
+    var spinStartMs = TOTAL * 0.68;
+    var spinMs2 = Math.max(0, elapsed - spinStartMs);
+    if(formDone && spinMs2 >= 5000 && !done) {
+      done=true; wormActive=false; wormCancelActive=false;
+      for(var ei=0;ei<extraParticles.length;ei++){
+        var idx=particles.indexOf(extraParticles[ei]);
+        if(idx>=0) particles.splice(idx,1);
+      }
+      extraParticles=[]; cdParticles=[];
+      if(dest){
+        document.getElementById('topbar').style.display='none';
+        navLoopOn=false;
+        setTimeout(function(){
+          if(dest.indexOf('http')===0)window.open(dest,'_blank');
+          else window.location.href=dest;
+        },100);
+      }
+      return;
     }
 
-    if(stage===3){
-      wA+=0.022;
-      applySpin(wA);
-      if(e>B[3]){
-        done=true; wormActive=false;
-        if(destKey){ selectNav(destKey); }
-        else if(dest){
-          document.getElementById('info').style.display='none';
-          document.getElementById('cdw').style.display='none';
-          document.getElementById('topbar').style.display='none';
-          navLoopOn=false;
-          setTimeout(function(){
-            if(dest.indexOf('http')===0)window.open(dest,'_blank');
-            else window.location.href=dest;
-          },100);
+    wormCancelActive = cancelFade > 0.3;
+
+    for(var i=0;i<ringN;i++){
+      var t   = particles[i]._t;
+      var ca  = particles[i]._ca;
+      var cr  = particles[i]._cr;
+      var at  = particles[i]._at;
+      var ad  = armDirs[particles[i]._arm];
+
+      particles[i].rc=245; particles[i].gc=237; particles[i].bc=232;
+      particles[i].wm=0;
+
+      // Collapse to center
+      var colX=lerp(particles[i]._sx,CX,pCollapse);
+      var colY=lerp(particles[i]._sy,CY,pCollapse);
+
+      // Arm — lerp from collapse toward FROZEN full arm position
+      var armX=particles[i]._armX, armY=particles[i]._armY;
+      var fromX=lerp(colX,armX,pArms);
+      var fromY=lerp(colY,armY,pArms);
+
+      // Sweep — tip leaves first (at=1, delay=0), base leaves last (at=0, delay=0.88)
+      // Source is ALWAYS the frozen full arm position — never partial arm
+      // So particles travel outward FROM arm TO ring — no falling in
+      var delay  = (1-at)*0.88;
+      var window2= 1.0-delay;
+      var localE = at<0.02 ? io(clamp((pSweep-delay)/0.12,0,1))
+                           : io(clamp((pSweep-delay)/window2,0,1));
+
+      var rp = spinAngle>0.001 ? ringPosSpin(t,ca,cr,spinAngle) : ringPos(t,ca,cr);
+
+      var x,y;
+      if(pArms<0.001){
+        x=colX; y=colY;
+      } else if(pSweep<0.001){
+        x=fromX; y=fromY;
+      } else {
+        // Always lerp FROM full arm position TO ring — clean outward motion
+        x=lerp(armX,rp.x,localE);
+        y=lerp(armY,rp.y,localE);
+        // Show arm for particles not yet swept (localE<1)
+        if(localE<1){
+          // Blend: show arm position while waiting, then sweep to ring
+          var blend=io(clamp(pArms,0,1));
+          x=lerp(lerp(colX,armX,blend), rp.x, localE);
+          y=lerp(lerp(colY,armY,blend), rp.y, localE);
         }
-        return;
+      }
+
+      particles[i].x=x; particles[i].y=y;
+      particles[i].tx=x; particles[i].ty=y; particles[i].spd=0.99;
+    }
+
+    // Cancel particles bloom from center as ring forms
+    for(var ci=0;ci<cancelParticles.length;ci++){
+      var cp=cancelParticles[ci];
+      var cx2=lerp(CX,cp._cx,cancelFade);
+      var cy2=lerp(CY,cp._cy,cancelFade);
+      cp.a=cancelFade*0.95; cp.x=cx2; cp.y=cy2; cp.tx=cx2; cp.ty=cy2;
+    }
+
+    // Particle-based countdown — 5 real seconds during spin
+    if(spinAngle > 0.05) {
+      var spinMs = spinMs2;
+      var cdSecs = Math.max(0, 5 - Math.floor(spinMs / 1000));
+      if(cdSecs !== cdLastDigit) {
+        cdLastDigit = cdSecs;
+        // Sample new digit as dots
+        var dh = minD*0.10;
+        var dw = dh*0.75;
+        var ddots = sampleDots(String(cdSecs), CX, CY-minD*0.055, dw, dh, Math.max(0.5,dh/40));
+        // Retarget existing digit particles or create new ones
+        var need = ddots.length;
+        // Reuse existing, add/remove as needed
+        while(cdParticles.length > need) {
+          var rem = cdParticles.pop();
+          var ri = particles.indexOf(rem);
+          if(ri>=0) particles.splice(ri,1);
+          var ei2 = extraParticles.indexOf(rem);
+          if(ei2>=0) extraParticles.splice(ei2,1);
+        }
+        while(cdParticles.length < need) {
+          var np={x:CX+(Math.random()-.5)*8,y:CY-minD*0.055+(Math.random()-.5)*8,
+            tx:CX,ty:CY,spd:0.99,r:0.7+Math.random()*0.25,a:0,
+            wb:0,ws:0,wm:0,rc:245,gc:237,bc:232,t:1};
+          cdParticles.push(np); particles.push(np); extraParticles.push(np);
+        }
+        // Assign targets
+        for(var di=0;di<ddots.length;di++){
+          cdParticles[di].tx=ddots[di].x;
+          cdParticles[di].ty=ddots[di].y;
+          cdParticles[di]._cdx=ddots[di].x;
+          cdParticles[di]._cdy=ddots[di].y;
+          cdParticles[di].spd=0.99;
+        }
+      }
+      // Move digit particles to their positions
+      var cdAlpha = Math.min(1, spinMs/300);
+      for(var di=0;di<cdParticles.length;di++){
+        cdParticles[di].x=cdParticles[di]._cdx||cdParticles[di].tx;
+        cdParticles[di].y=cdParticles[di]._cdy||cdParticles[di].ty;
+        cdParticles[di].tx=cdParticles[di].x;
+        cdParticles[di].ty=cdParticles[di].y;
+        cdParticles[di].a=cdAlpha*0.9;
+        cdParticles[di].rc=245;cdParticles[di].gc=237;cdParticles[di].bc=232;
       }
     }
 
     requestAnimationFrame(wormFrame);
   }
-
   requestAnimationFrame(wormFrame);
 }
 
-/* ── NAVIGATION + LOADING SCREEN ── */
-function doNavTo(dest) {
-  if (!dest) return;
-  // Hide all HTML UI immediately
-  document.getElementById('info').style.display='none';
-  document.getElementById('cdw').style.display='none';
-  document.getElementById('topbar').style.display='none';
-  document.getElementById('hint').style.display='none';
-  // Stop nav loop
-  navLoopOn = false;
-  // Run loading screen
-  loadingScreen(dest);
-}
 
-function doNav() {
-  if (!navDest) return;
-  var dest = navDest;
-  navDest = '';
-  doNavTo(dest);
-}
+
 
 function loadingScreen(dest) {
   var N=2000;
