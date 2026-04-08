@@ -299,7 +299,7 @@ function buildSelDots(){
   selDots=[];
   cancelDots=[];
   if(!selKey) return;
-  const lines=PAGES[selKey].title.split('\n');
+  const lines=PAGES[selKey].ey.split('\n');
   const bw=Math.min(W*0.72,360);
   const bh=bw*(W<500?0.32:0.28);
   const lh=bh/lines.length;
@@ -485,7 +485,8 @@ function buildParticles(){
 
   // Nav word dots
   KEYS.forEach(key=>{
-    const isDimmed=selKey&&key!==selKey;
+    // When something is selected, hide ALL nav words from the ring
+    const isDimmed=!!selKey;
     const type=isDimmed?2:1;
     const dotR=isDimmed?1.5:2.2+Math.random()*0.8;
     (wordDots[key]||[]).forEach(d=>{
@@ -652,7 +653,7 @@ function loop(ts){
     const nr=NAV_R+20;
     ctx.font=`600 8px DM Sans,sans-serif`;
     ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillStyle=isSel?'rgba(240,80,32,.7)':selKey?'rgba(232,180,160,.06)':'rgba(232,180,160,.18)';
+    ctx.fillStyle=isSel?'rgba(240,80,32,.7)':selKey?'rgba(232,180,160,0)':'rgba(232,180,160,.18)';
     ctx.fillText(PAGES[key].num,CX+Math.cos(angle)*nr,CY+Math.sin(angle)*nr);
   });
 
