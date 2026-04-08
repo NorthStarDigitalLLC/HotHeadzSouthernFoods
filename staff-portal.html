@@ -663,6 +663,13 @@ function showEmpApp() {
     stopLoading();
     if(res[0].ok) _schedule = res[0].data||[];
     if(res[1].ok) _notices  = res[1].data||[];
+    // DEBUG — remove after fixing
+    var dbg = document.createElement('div');
+    dbg.id = 'schedDebug';
+    dbg.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#111;color:#0f0;font-family:monospace;font-size:11px;padding:8px;z-index:9999;max-height:160px;overflow-y:auto;border-top:1px solid #333';
+    dbg.innerHTML = '<strong>DEBUG</strong> — currentUser: "' + _currentUser + '" | shifts total: ' + _schedule.length + '<br>' +
+      _schedule.map(function(s){ return '"' + s.name + '" on ' + s.date + ' [match:' + (s.name.trim().toLowerCase()===_currentUser.trim().toLowerCase()) + ']'; }).join('<br>');
+    document.body.appendChild(dbg);
     empRenderWeek(); empRenderMyShifts(); empRenderNotices();
   }).catch(function(){ stopLoading(); });
 }
