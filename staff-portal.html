@@ -1,1073 +1,1393 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-  <script defer src="/_vercel/insights/script.js"></script>
-  
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Hot Headz Southern Foods — DeRidder, LA</title>
-<meta name="description" content="Hot Headz Southern Foods. Fresh, made-from-scratch breakfast and lunch in DeRidder, Louisiana. Cafeteria-style comfort food since 2020. Dine-in, carry-out, delivery. Open daily." />
-
-<!-- Open Graph -->
-<meta property="og:type" content="website" />
-<meta property="og:site_name" content="Hot Headz Southern Foods" />
-<meta property="og:title" content="Hot Headz Southern Foods — DeRidder, LA" />
-<meta property="og:description" content="Fresh, made-from-scratch Southern breakfast & lunch. Cafeteria-style comfort food since 2020. Dine-in, carry-out & delivery." />
-<meta property="og:image" content="https://hotheadzsouthernfoods.com/images/Hotheadzshare.png" />
-<meta property="og:image:type" content="image/png" />
-<meta property="og:image:alt" content="Hot Headz Southern Foods — DeRidder, Louisiana" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
-<meta property="og:url" content="https://hotheadzsouthernfoods.com/" />
-<meta property="og:locale" content="en_US" />
-
-<!-- Twitter -->
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Hot Headz Southern Foods — DeRidder, LA" />
-<meta name="twitter:description" content="Fresh Southern breakfast & lunch. Cafeteria-style comfort food since 2020." />
-<meta name="twitter:image" content="https://hotheadzsouthernfoods.com/images/Hotheadzshare.png" />
-
-<link rel="icon" type="image/png" href="/images/HotHeadzLogo.png" />
-<link rel="apple-touch-icon" href="/images/HotHeadzLogo.png" />
-<meta name="theme-color" content="#080407" />
-
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
-
-<!-- Three.js for spinning logo rings -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hot Headz Staff Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --void:#080407;--deep:#130509;--coal:#1e0a0c;
-  --pepper:#c41800;--fire:#e83010;--chili:#f05020;--heat:#f87038;--burn:#ffa048;
-  --cream:#f5ede8;--parch:#ead4c8;--sand:#c49888;
-  --serif:'DM Serif Display',Georgia,serif;
-  --display:'Abril Fatface',Georgia,serif;
-  --body:'DM Sans',sans-serif;
+  --red:#C0392B;--red-hot:#E74C3C;--ember:#E67E22;--ember-light:#F39C12;
+  --black:#0A0A0A;--dark:#111;--dark2:#1A1A1A;--dark3:#222;--dark4:#2A2A2A;
+  --white:#F5F0E8;--muted:#7A7060;--mid:#9A9080;
+  --border:rgba(255,255,255,.07);--border-hot:rgba(231,76,60,.25);--green:#27AE60;--green-dark:#1E8449;
+}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
+
+
+/* ═══ SPINNING LOGO RINGS ═══ */
+.logo-rings-wrap{position:relative;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem}
+.logo-rings-wrap canvas{display:block;width:100%!important;height:100%!important}
+/* Landing size */
+#landingLogoWrap{width:160px;height:160px;margin-bottom:1.25rem}
+/* Login box size */
+.logo-rings-sm{width:100px;height:100px;margin-bottom:.75rem}
+/* Header size */
+.logo-rings-hdr{width:38px;height:38px;margin:0;flex-shrink:0}
+
+/* ═══════════════════════════════════════
+   LANDING — choose employee or owner
+══════════════════════════════════════ */
+#landing{position:fixed;inset:0;z-index:900;background:var(--black);display:flex;align-items:center;justify-content:center;padding:1.5rem}
+.landing-wrap{width:100%;max-width:560px;text-align:center}
+.land-pepper{font-size:3rem;margin-bottom:.75rem;animation:pepperBob 2s ease-in-out infinite}
+@keyframes pepperBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.land-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,6vw,3.5rem);letter-spacing:.1em;margin-bottom:.25rem}
+.land-title span{color:var(--red-hot)}
+.land-sub{font-size:.78rem;color:var(--muted);letter-spacing:.06em;margin-bottom:2.5rem}
+.land-cards{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.land-card{background:var(--dark2);border:1px solid var(--border);padding:2rem 1.5rem;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;text-align:center}
+.land-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.land-card.employee::before{background:linear-gradient(90deg,var(--red),var(--ember))}
+.land-card.owner::before{background:linear-gradient(90deg,var(--ember),var(--ember-light))}
+.land-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.12)}
+.land-card:hover::before{transform:scaleX(1)}
+.land-card-icon{font-size:2.2rem;margin-bottom:.75rem}
+.land-card-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.1em;margin-bottom:.4rem}
+.land-card.employee .land-card-title{color:var(--red-hot)}
+.land-card.owner .land-card-title{color:var(--ember-light)}
+.land-card-desc{font-size:.72rem;color:var(--muted);line-height:1.6}
+@media(max-width:460px){.land-cards{grid-template-columns:1fr}}
+
+/* ═══════════════════════════════════════
+   SHARED LOGIN SHELL
+══════════════════════════════════════ */
+#loginScreen{position:fixed;inset:0;z-index:800;background:var(--black);display:none;align-items:center;justify-content:center;padding:1rem}
+.login-box{width:100%;max-width:380px;background:var(--dark2);border:1px solid var(--border);padding:2.5rem;position:relative}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.login-box.emp-box::before{background:linear-gradient(90deg,var(--red),var(--ember))}
+.login-box.own-box::before{background:linear-gradient(90deg,var(--ember),var(--ember-light))}
+.login-back{position:absolute;top:1rem;left:1rem;background:none;border:none;color:var(--muted);font-size:.65rem;font-family:'Space Mono',monospace;letter-spacing:.1em;cursor:pointer;text-transform:uppercase;transition:color .2s;padding:.25rem .5rem}
+.login-back:hover{color:var(--white)}
+.login-title{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:.1em;text-align:center;margin-bottom:.2rem}
+.login-title.emp span{color:var(--red-hot)}
+.login-title.own span{color:var(--ember-light)}
+.login-sub{font-size:.7rem;color:var(--muted);text-align:center;margin-bottom:1.75rem;line-height:1.6}
+.f-label{font-size:.62rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;display:block}
+.f-input,.f-select{width:100%;background:var(--dark3);border:1px solid var(--border);color:var(--white);padding:.75rem 1rem;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s;margin-bottom:1rem;appearance:none}
+.f-input:focus,.f-select:focus{border-color:var(--red-hot)}
+.login-box.own-box .f-input:focus{border-color:var(--ember)}
+.login-btn{width:100%;padding:.85rem;color:white;border:none;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.12em;cursor:pointer;transition:background .2s}
+.login-btn.emp-btn{background:var(--red)}.login-btn.emp-btn:hover{background:var(--red-hot)}
+.login-btn.own-btn{background:var(--ember)}.login-btn.own-btn:hover{background:var(--ember-light)}
+.login-error{font-size:.75rem;color:var(--red-hot);text-align:center;margin-top:.75rem;min-height:1rem}
+.login-note{font-size:.65rem;color:var(--muted);text-align:center;margin-top:1.25rem}
+
+/* ═══════════════════════════════════════
+   LOADING
+══════════════════════════════════════ */
+.loading-overlay{position:fixed;inset:0;z-index:9000;background:rgba(10,10,10,.85);display:none;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
+.loading-overlay.show{display:flex}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-radius:50%;animation:spin .8s linear infinite}
+.spinner.red{border-top-color:var(--red-hot)}
+.spinner.ember{border-top-color:var(--ember)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em}
+
+/* ═══════════════════════════════════════
+   SHARED HEADER
+══════════════════════════════════════ */
+header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:58px}
+.logo{display:flex;align-items:center;gap:.75rem}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.12em}
+.logo-text span{color:var(--red-hot)}
+.mode-badge{font-family:'Space Mono',monospace;font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;padding:.25rem .7rem;border:1px solid}
+.mode-badge.emp{color:var(--red-hot);border-color:rgba(231,76,60,.35)}
+.mode-badge.own{color:var(--ember-light);border-color:rgba(241,196,15,.35)}
+.hdr-right{display:flex;align-items:center;gap:.75rem}
+.clock{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--muted)}
+.sign-out-btn{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);background:none;padding:.45rem .9rem;cursor:pointer;transition:all .2s}
+.sign-out-btn:hover{color:var(--red-hot);border-color:var(--border-hot)}
+
+/* ═══════════════════════════════════════
+   APPS
+══════════════════════════════════════ */
+#empApp,#ownApp{display:none;position:relative;z-index:1}
+.wrap{max-width:1100px;margin:0 auto;padding:2rem 1.5rem}
+
+/* ═══ WELCOME STRIP ═══ */
+.welcome-strip{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;padding:1.5rem 2rem;background:var(--dark2);border:1px solid var(--border);position:relative;overflow:hidden;margin-bottom:1.5rem}
+.welcome-strip::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.welcome-strip.emp::before{background:linear-gradient(to bottom,var(--red),var(--ember))}
+.welcome-strip.own::before{background:linear-gradient(to bottom,var(--ember),var(--ember-light))}
+.welcome-name{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em}
+.welcome-name.emp span{color:var(--red-hot)}
+.welcome-name.own span{color:var(--ember-light)}
+.welcome-meta{font-size:.75rem;color:var(--muted);margin-top:.2rem}
+
+/* ═══ WEEK NAV ═══ */
+.week-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem}
+.week-label{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.08em}
+.week-label span{color:var(--red-hot)}
+.week-btns{display:flex;gap:.5rem}
+.wbtn{font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:.5rem 1rem;background:var(--dark3);border:1px solid var(--border);color:var(--mid);cursor:pointer;transition:all .2s}
+.wbtn:hover{border-color:var(--border-hot);color:var(--red-hot)}
+.wbtn.today{background:var(--red);color:white;border-color:var(--red)}
+.wbtn.today:hover{background:var(--red-hot)}
+
+/* ═══ SCHEDULE GRID ═══ */
+.schedule-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2rem}
+.day-col{background:var(--dark2);min-height:160px}
+.day-header{padding:.6rem .75rem;border-bottom:1px solid var(--border);background:var(--dark3)}
+.day-name{font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.1em;color:var(--muted)}
+.day-date{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--white)}
+.day-col.today .day-header{background:rgba(231,76,60,.1);border-bottom-color:var(--red-hot)}
+.day-col.today .day-name{color:var(--red-hot)}
+.day-col.today .day-date{color:var(--ember-light)}
+.day-slots{padding:.5rem}
+.shift-card{padding:.5rem .6rem;margin-bottom:.4rem;border-left:2px solid var(--red);background:rgba(231,76,60,.06);border-radius:0 3px 3px 0;transition:background .2s}
+.shift-card.mine{border-left-color:var(--ember-light);background:rgba(241,196,15,.07)}
+.shift-name{font-size:.75rem;font-weight:600;color:var(--white);line-height:1.3}
+.shift-time{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--ember-light);margin-top:.15rem}
+.shift-role{font-size:.6rem;color:var(--muted);margin-top:.1rem;text-transform:uppercase;letter-spacing:.08em}
+.day-empty{font-size:.65rem;color:var(--muted);text-align:center;padding:1.5rem .5rem;opacity:.5}
+
+/* ═══ PANELS ═══ */
+.panel-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.1em;margin-bottom:1rem;display:flex;align-items:center;gap:.75rem}
+.panel-title::before{content:'';width:3px;height:1.2rem;background:var(--red-hot);display:inline-block;flex-shrink:0}
+.panel-box{background:var(--dark2);border:1px solid var(--border);margin-bottom:2rem}
+.panel-row{display:flex;align-items:center;gap:1rem;padding:1rem 1.5rem;border-bottom:1px solid var(--border);transition:background .2s}
+.panel-row:last-child{border-bottom:none}
+.panel-row:hover{background:var(--dark3)}
+.sdb{width:42px;height:42px;background:var(--dark4);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+.sdb.next{background:rgba(231,76,60,.1);border-color:var(--border-hot)}
+.sdb-day{font-size:.55rem;letter-spacing:.15em;color:var(--muted);text-transform:uppercase}
+.sdb-num{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;line-height:1;color:var(--white)}
+.sdb.next .sdb-num{color:var(--red-hot)}
+.pi{flex:1}
+.pi-title{font-weight:600;font-size:.9rem;color:var(--white)}
+.pi-meta{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--ember-light);margin-top:.2rem}
+.pi-role{font-size:.7rem;color:var(--muted);margin-top:.15rem}
+.hrs-badge{font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;color:var(--ember-light);text-align:right;flex-shrink:0}
+.hrs-badge span{display:block;font-size:.55rem;color:var(--muted);font-weight:400}
+.no-shifts{text-align:center;padding:3rem 1rem;color:var(--muted);font-size:.85rem}
+.ns-icon{font-size:2.5rem;display:block;margin-bottom:.75rem;opacity:.4}
+
+/* NOTICES */
+.notice-item{padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;gap:1rem;align-items:flex-start}
+.notice-item:last-child{border-bottom:none}
+.ndot{width:8px;height:8px;border-radius:50%;background:var(--red-hot);flex-shrink:0;margin-top:.35rem}
+.ndot.info{background:var(--ember)}.ndot.ok{background:var(--green)}
+.n-text{font-size:.82rem;line-height:1.6;color:var(--white)}
+.n-date{font-size:.62rem;color:var(--muted);margin-top:.2rem}
+
+/* STATS */
+.btm-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border)}
+.stat-cell{padding:1.2rem 1.5rem;background:var(--dark2)}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--white);line-height:1}
+.stat-num span{color:var(--red-hot)}
+.stat-label{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:.25rem}
+.contact-card{background:var(--dark2);border:1px solid var(--border);padding:1.5rem}
+.c-row{display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--border)}
+.c-row:last-child{border-bottom:none}
+.c-ico{font-size:1rem;width:28px;text-align:center;flex-shrink:0}
+.c-val{font-size:.82rem;color:var(--white)}
+.c-val a{color:var(--ember-light);text-decoration:none}
+.c-val a:hover{color:var(--ember)}
+.c-lbl{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+
+/* ═══ OWNER TABS ═══ */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:2rem;overflow-x:auto}
+.tab-btn{font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.1em;padding:.7rem 1.5rem;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;position:relative;top:1px;white-space:nowrap}
+.tab-btn:hover{color:var(--white)}
+.tab-btn.active{color:var(--ember-light);border-bottom-color:var(--ember)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* OWNER FORMS */
+.card{background:var(--dark2);border:1px solid var(--border);padding:1.5rem;margin-bottom:2rem;position:relative}
+.card.ac-ember::before{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:var(--ember)}
+.card.ac-red::before{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:var(--red-hot)}
+.card.ac-green::before{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:var(--green)}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.08em}
+.sec-title span{color:var(--ember-light)}
+.sec-sub{font-size:.75rem;color:var(--muted);margin-top:.2rem}
+.form-grid{display:grid;gap:1rem;align-items:end}
+.fg5{grid-template-columns:1fr 1fr 1fr 1fr 1fr}
+.fg4{grid-template-columns:1fr 1fr 1fr 1fr}
+.fg3{grid-template-columns:1fr 1fr 1fr}
+.fg2{grid-template-columns:1fr 1fr}
+.form-group{display:flex;flex-direction:column}
+.fi{width:100%;background:var(--dark3);border:1px solid var(--border);color:var(--white);padding:.7rem 1rem;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s}
+.fi:focus{border-color:var(--ember)}
+.fsel{width:100%;background:var(--dark3);border:1px solid var(--border);color:var(--white);padding:.7rem 1rem;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;cursor:pointer;appearance:none;transition:border-color .2s}
+.fsel:focus{border-color:var(--ember)}
+.ab{padding:.7rem 1.2rem;border:none;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.1em;cursor:pointer;transition:background .2s;align-self:flex-end;white-space:nowrap}
+.ab.red{background:var(--red);color:white}.ab.red:hover{background:var(--red-hot)}
+.ab.ember{background:var(--ember);color:white}.ab.ember:hover{background:var(--ember-light)}
+.ab.ghost{background:var(--dark4);border:1px solid var(--border);color:var(--mid)}.ab.ghost:hover{border-color:var(--border-hot);color:var(--red-hot)}
+.ab.green{background:var(--green);color:white}.ab.green:hover{background:var(--green-dark)}
+
+/* OWNER TABLE */
+.tbl{width:100%;border-collapse:collapse;background:var(--dark2);border:1px solid var(--border)}
+.tbl th{background:var(--dark3);padding:.65rem 1rem;text-align:left;font-size:.62rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)}
+.tbl td{padding:.7rem 1rem;border-bottom:1px solid var(--border);font-size:.82rem;color:var(--white)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--dark3)}
+.badge{display:inline-block;padding:.15rem .6rem;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:2px}
+.br{background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.3);color:var(--red-hot)}
+.be{background:rgba(230,126,34,.15);border:1px solid rgba(230,126,34,.3);color:var(--ember-light)}
+.del-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.8rem;padding:.2rem .5rem;transition:color .2s}
+.del-btn:hover{color:var(--red-hot)}
+.empty-row td{text-align:center;padding:2rem;color:var(--muted);font-size:.82rem}
+
+/* FILTER */
+.filter-row{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;flex-wrap:wrap}
+.fl{font-size:.72rem;color:var(--muted);white-space:nowrap}
+.fi-sm{background:var(--dark3);border:1px solid var(--border);color:var(--white);padding:.45rem .75rem;font-family:'Space Mono',monospace;font-size:.72rem;outline:none}
+.fi-sm:focus{border-color:var(--ember)}
+
+/* EMPLOYEE CARDS */
+.emp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
+.emp-card{background:var(--dark2);border:1px solid var(--border);padding:1.2rem;position:relative;transition:border-color .2s}
+.emp-card:hover{border-color:var(--border-hot)}
+.emp-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--ember);opacity:0;transition:opacity .2s}
+.emp-card:hover::before{opacity:1}
+.emp-name{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.06em;margin-bottom:.2rem}
+.emp-role{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem}
+.emp-actions{display:flex;gap:.4rem;margin-top:.6rem}
+.emp-btn{font-family:'Space Mono',monospace;font-size:.5rem;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .6rem;background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .2s}
+.emp-btn:hover{border-color:var(--border-hot);color:var(--red-hot)}
+
+/* NOTICE LIST */
+.nli{display:flex;align-items:flex-start;gap:1rem;padding:1rem 1.25rem;background:var(--dark2);border:1px solid var(--border);margin-bottom:.5rem}
+.nli-body{flex:1}
+.nli-text{font-size:.82rem;color:var(--white);line-height:1.5}
+.nli-date{font-size:.62rem;color:var(--muted);margin-top:.2rem}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;right:2rem;z-index:9999;color:white;padding:.75rem 1.5rem;font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:.1em;transform:translateY(100px);opacity:0;transition:all .3s;pointer-events:none;max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{background:var(--green)}
+.toast.err{background:var(--red-hot)}
+
+footer{border-top:1px solid var(--border);padding:1.5rem;text-align:center;position:relative;z-index:1}
+footer p{font-size:.65rem;color:var(--muted);letter-spacing:.08em}
+footer span{color:var(--red-hot)}
+
+/* ═══════════════════════════════════
+   TABLET  (≤ 900px)
+═══════════════════════════════════ */
+@media(max-width:900px){
+  header{padding:0 1.25rem}
+  .wrap{padding:1.25rem}
+  .schedule-grid{grid-template-columns:repeat(4,1fr)}
+  .btm-grid{grid-template-columns:1fr}
+  .fg5,.fg4{grid-template-columns:1fr 1fr}
+  .fg3{grid-template-columns:1fr 1fr}
+  .welcome-strip{padding:1.25rem 1.25rem}
+  .tbl th,.tbl td{padding:.5rem .75rem;font-size:.75rem}
+  .card{padding:1.25rem}
 }
 
-html,body{width:100%;height:100%;overflow:hidden;background:var(--void);
-  color:var(--cream);font-family:var(--body);cursor:none;-webkit-tap-highlight-color:transparent;}
-@media(hover:none){html,body{cursor:auto;}}
+/* ═══════════════════════════════════
+   MOBILE  (≤ 600px)  — premium rewrite
+═══════════════════════════════════ */
+@media(max-width:600px){
 
-/* GRAIN */
-body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.048'/%3E%3C/svg%3E");}
+  /* ── Base ── */
+  body{-webkit-text-size-adjust:100%}
+  .wrap{padding:1rem .9rem}
 
-/* CANVASES */
-#cv-bg,#cv-smoke,#cv-ember{position:fixed;inset:0;pointer-events:none;}
-#cv-bg{z-index:0;}#cv-smoke{z-index:1;}#cv-ember{z-index:2;}
+  /* ── Header ── */
+  header{
+    padding:0 1rem;
+    height:56px;
+  }
+  header .mode-badge{display:none}
+  header .clock{display:none}
+  .logo-rings-hdr{width:34px;height:34px}
+  .logo-text{font-size:.9rem;letter-spacing:.08em}
+  .sign-out-btn{
+    font-size:.6rem;padding:.4rem .8rem;
+    border-radius:4px;
+  }
+  .hdr-right{gap:.5rem}
 
-/* CURSOR */
-#cursor{position:fixed;z-index:9999;pointer-events:none;top:0;left:0;}
-#c-dot{position:absolute;width:7px;height:7px;border-radius:50%;background:var(--chili);
-  transform:translate(-50%,-50%);box-shadow:0 0 8px var(--chili),0 0 16px rgba(240,80,32,.25);
-  animation:cursor-breathe 2.5s ease-in-out infinite;}
-@keyframes cursor-breathe{0%,100%{box-shadow:0 0 6px var(--chili),0 0 12px rgba(240,80,32,.2)}50%{box-shadow:0 0 12px var(--chili),0 0 24px rgba(240,80,32,.4)}}
-@media(hover:none){#cursor{display:none;}}
+  /* ── Loading overlay ── */
+  .loading-text{font-size:.65rem}
 
-/* ══════════════════════════════
-   DESKTOP SHELL
-══════════════════════════════ */
-#shell{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;
-  opacity:0;transition:opacity .9s ease;}
-#shell.on{opacity:1;}
+  /* ── Landing page ── */
+  #landing{padding:1.25rem 1rem;align-items:flex-start;padding-top:max(1.5rem,env(safe-area-inset-top))}
+  .landing-wrap{text-align:center;padding-top:.5rem}
+  #landingLogoWrap{width:110px;height:110px;margin-bottom:1rem}
+  .land-title{font-size:2rem;margin-bottom:.2rem}
+  .land-sub{font-size:.7rem;margin-bottom:1.5rem;letter-spacing:.04em}
+  .land-cards{
+    grid-template-columns:1fr;
+    gap:.75rem;
+    text-align:left;
+  }
+  .land-card{
+    padding:1.25rem 1.25rem;
+    display:flex;align-items:center;gap:1rem;
+    border-radius:4px;
+  }
+  .land-card-title{font-size:1.3rem;margin-bottom:.2rem}
+  .land-card-desc{font-size:.72rem;line-height:1.5}
 
-/* TOP BAR */
-#topbar{flex-shrink:0;display:flex;align-items:stretch;
-  height:clamp(48px,6.5vh,62px);
-  border-bottom:1px solid rgba(232,180,160,.1);
-  background:linear-gradient(to bottom,rgba(8,4,7,.95),rgba(8,4,7,.5));
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
-.tb-cell{display:flex;flex-direction:column;justify-content:center;
-  padding:0 clamp(12px,2vw,28px);border-right:1px solid rgba(232,180,160,.07);}
-.tb-cell:last-child{border-right:none;}
-.tb-cell.grow{flex:1;align-items:center;}
-.tb-eyebrow{font-family:var(--body);font-weight:500;font-size:8px;letter-spacing:.3em;
-  text-transform:uppercase;color:rgba(232,180,160,.35);margin-bottom:2px;}
-.tb-val{font-family:var(--body);font-weight:400;font-size:clamp(10px,1.2vw,13px);
-  letter-spacing:.04em;color:rgba(245,220,210,.6);}
-#brand-name{font-family:var(--display);font-weight:400;font-size:clamp(14px,2vw,22px);
-  letter-spacing:.01em;color:var(--cream);text-align:center;line-height:1;
-  text-shadow:0 0 40px rgba(240,80,32,.25);}
-#brand-name em{font-style:italic;color:var(--heat);}
-#brand-tagline{font-family:var(--body);font-weight:400;font-size:9px;letter-spacing:.22em;
-  text-transform:uppercase;color:rgba(232,180,160,.28);margin-top:3px;text-align:center;}
-.tb-status{display:flex;align-items:center;gap:7px;font-family:var(--body);font-weight:600;
-  font-size:clamp(10px,1.2vw,12px);letter-spacing:.1em;text-transform:uppercase;color:var(--chili);}
-.status-pepper{animation:flkr 2s ease-in-out infinite;filter:drop-shadow(0 0 4px rgba(240,80,32,.6));}
-@keyframes flkr{0%,100%{opacity:.7;transform:scaleY(1)}35%{opacity:1;transform:scaleY(1.1) translateY(-1px)}70%{opacity:.85;transform:scaleY(.95)}}
+  /* ── Login boxes ── */
+  #loginScreen{padding:.75rem;align-items:flex-end;padding-bottom:max(1.5rem,env(safe-area-inset-bottom))}
+  .login-box{
+    padding:1.75rem 1.25rem 1.5rem;
+    border-radius:8px 8px 0 0;
+    max-width:100%;
+    width:100%;
+  }
+  .login-back{font-size:.6rem;padding:.3rem .6rem}
+  .logo-rings-sm{width:72px;height:72px;margin-bottom:.6rem}
+  .login-title{font-size:1.7rem;margin-bottom:.15rem}
+  .login-sub{font-size:.68rem;margin-bottom:1.25rem;line-height:1.5}
+  .f-label{font-size:.6rem;letter-spacing:.12em;margin-bottom:.3rem}
+  .f-input,.f-select{
+    font-size:1rem; /* 1rem prevents iOS zoom */
+    padding:.8rem 1rem;
+    margin-bottom:.85rem;
+    border-radius:4px;
+  }
+  .login-btn{
+    font-size:1.05rem;
+    padding:.9rem;
+    border-radius:4px;
+    letter-spacing:.15em;
+  }
+  .login-error{font-size:.72rem;margin-top:.6rem}
+  .login-note{font-size:.62rem;margin-top:1rem}
 
-/* MAIN 3-COL */
-#main{flex:1;overflow:hidden;display:grid;grid-template-columns:clamp(155px,17vw,220px) 1fr clamp(155px,17vw,220px);}
-#main>*+*{border-left:1px solid rgba(232,180,160,.08);}
+  /* ── Welcome strip ── */
+  .welcome-strip{
+    padding:1rem 1rem;
+    margin-bottom:1.25rem;
+    border-radius:4px;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:.75rem;
+  }
+  .welcome-strip > div:last-child{
+    width:100%;
+    display:flex;
+    gap:.6rem;
+    justify-content:flex-end;
+  }
+  .welcome-strip > div:last-child a,
+  .welcome-strip > div:last-child button{
+    flex:1;
+    text-align:center;
+    justify-content:center;
+    border-radius:4px;
+    padding:.55rem .75rem;
+    font-size:.6rem;
+  }
+  .welcome-name{font-size:1.35rem;letter-spacing:.05em}
+  .welcome-meta{font-size:.68rem}
 
-/* SIDEBARS */
-#sidebar-l,#sidebar-r{display:flex;flex-direction:column;justify-content:space-between;
-  padding:clamp(8px,1.4vh,18px) clamp(10px,1.4vw,20px);}
-#sidebar-l{animation:fadeSlideR .8s .5s ease both;}
-#sidebar-r{animation:fadeSlideL .8s .5s ease both;}
-.sb-group{display:flex;flex-direction:column;gap:clamp(7px,1.2vh,14px);}
-.sb-block{display:flex;flex-direction:column;gap:2px;}
-.sb-label{font-family:var(--body);font-weight:600;font-size:8px;letter-spacing:.3em;
-  text-transform:uppercase;color:rgba(232,180,160,.33);}
-.sb-text{font-family:var(--serif);font-style:italic;font-weight:400;
-  font-size:clamp(9px,.9vw,12px);color:rgba(245,220,210,.55);line-height:1.45;}
-.sb-hot{font-family:var(--body);font-weight:600;font-size:10px;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--chili);display:flex;align-items:center;gap:5px;}
-.sb-hot::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--burn);
-  box-shadow:0 0 7px var(--burn);animation:dp 1.8s ease-in-out infinite;flex-shrink:0;}
-@keyframes dp{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
-.sb-links{display:flex;flex-direction:column;gap:6px;}
-.sb-link{font-family:var(--body);font-weight:500;font-size:9px;letter-spacing:.18em;
-  text-transform:uppercase;color:rgba(232,180,160,.33);text-decoration:none;
-  transition:color .25s;cursor:none;display:flex;align-items:center;gap:6px;}
-.sb-link::before{content:'—';color:rgba(240,80,32,.28);font-size:8px;}
-.sb-link:hover{color:var(--chili);}
+  /* ── Week navigation ── */
+  .week-nav{
+    flex-direction:row;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:1rem;
+    gap:.5rem;
+  }
+  .week-label{font-size:1rem;letter-spacing:.05em}
+  .week-label span{display:block;font-size:.75rem}
+  .week-btns{gap:.35rem}
+  .wbtn{
+    font-size:.55rem;
+    padding:.45rem .7rem;
+    border-radius:4px;
+    letter-spacing:.08em;
+  }
 
-/* NAV CENTER */
-#nav-center{display:flex;flex-direction:column;justify-content:center;
-  padding:clamp(4px,1vh,12px) clamp(18px,2.8vw,44px);position:relative;
-  overflow-y:auto;overflow-x:hidden;}
-#nav-center::before{content:'';position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(ellipse at 50% 85%,rgba(196,24,0,.07),transparent 65%);}
-.nav-item{position:relative;display:flex;align-items:center;
-  padding:clamp(5px,1.1vh,13px) 0;
-  border-bottom:1px solid rgba(232,180,160,.07);
-  cursor:none;overflow:hidden;transition:border-color .4s;-webkit-tap-highlight-color:transparent;}
-.nav-item:first-child{border-top:1px solid rgba(232,180,160,.07);}
-.nav-item:hover{border-bottom-color:rgba(240,80,32,.15);}
-.nav-item:first-child:hover{border-top-color:rgba(240,80,32,.15);}
-.nav-item::before{content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg,rgba(196,24,0,.0) 0%,rgba(196,24,0,.08) 25%,rgba(232,48,16,.12) 50%,rgba(248,112,56,.06) 75%,transparent 100%);
-  transform:translateX(-105%);transition:transform .7s cubic-bezier(.77,0,.18,1);}
-.nav-item:hover::before{transform:translateX(0);}
-.nav-item::after{content:'';position:absolute;left:0;top:20%;bottom:20%;width:2px;
-  background:linear-gradient(to bottom,transparent,var(--fire),var(--chili),transparent);
-  border-radius:2px;transform:scaleY(0);transform-origin:center;
-  transition:transform .45s .05s cubic-bezier(.16,1,.3,1);box-shadow:0 0 8px var(--fire);}
-.nav-item:hover::after{transform:scaleY(1);}
+  /* ── Schedule grid — horizontal scroll ── */
+  .schedule-grid{
+    display:flex;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    gap:0;
+    background:none;
+    border:none;
+    margin:0 -.9rem 1.5rem;
+    padding:0 .9rem .5rem;
+  }
+  .schedule-grid::-webkit-scrollbar{height:2px}
+  .schedule-grid::-webkit-scrollbar-track{background:var(--dark3);border-radius:1px}
+  .schedule-grid::-webkit-scrollbar-thumb{background:var(--red);border-radius:1px}
+  .day-col{
+    min-width:140px;
+    max-width:140px;
+    flex-shrink:0;
+    scroll-snap-align:start;
+    border:1px solid var(--border);
+    border-radius:6px;
+    margin-right:.5rem;
+    background:var(--dark2);
+    min-height:auto;
+    overflow:hidden;
+  }
+  .day-col:last-child{margin-right:0}
+  .day-col.today{border-color:rgba(231,76,60,.35)}
+  .day-header{
+    padding:.6rem .75rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .day-name{font-size:.8rem;letter-spacing:.08em}
+  .day-date{font-size:.65rem;margin-top:0}
+  .day-slots{padding:.5rem .5rem .6rem}
+  .shift-card{
+    padding:.5rem .6rem;
+    border-radius:0 4px 4px 0;
+    margin-bottom:.35rem;
+  }
+  .shift-name{font-size:.72rem}
+  .shift-time{font-size:.58rem}
+  .shift-role{font-size:.55rem}
+  .day-empty{font-size:.62rem;padding:1rem .5rem}
 
-/* Portal nav item — extra glow on hover */
-.nav-item--portal::before{background:linear-gradient(90deg,rgba(248,112,56,.0) 0%,rgba(248,112,56,.07) 25%,rgba(248,112,56,.11) 50%,rgba(248,160,72,.05) 75%,transparent 100%);}
-.nav-item--portal::after{background:linear-gradient(to bottom,transparent,var(--heat),var(--burn),transparent);}
+  /* ── Panel title ── */
+  .panel-title{font-size:1.05rem;margin-bottom:.75rem;letter-spacing:.08em}
 
-.ni-num{position:relative;z-index:1;font-family:var(--body);font-weight:400;font-size:9px;
-  letter-spacing:.2em;color:rgba(232,180,160,.22);min-width:clamp(34px,3.5vw,50px);
-  padding-left:12px;transition:color .4s;}
-.nav-item:hover .ni-num{color:rgba(240,80,32,.5);}
-.ni-name{position:relative;z-index:1;font-family:var(--display);font-weight:400;
-  font-size:clamp(18px,2.8vw,44px);letter-spacing:.01em;line-height:1;flex:1;
-  color:rgba(245,220,210,.72);transition:color .35s,letter-spacing .55s cubic-bezier(.16,1,.3,1),text-shadow .4s;}
-.nav-item:hover .ni-name{color:var(--cream);letter-spacing:.02em;text-shadow:0 0 60px rgba(240,80,32,.25);}
-.ni-sub{position:relative;z-index:1;font-family:var(--serif);font-style:italic;font-weight:400;
-  font-size:clamp(10px,.95vw,13px);color:rgba(232,180,160,.2);
-  padding:0 clamp(8px,1.4vw,18px);transition:color .35s;display:none;}
-@media(min-width:900px){.ni-sub{display:block;}}
-.nav-item:hover .ni-sub{color:rgba(240,80,32,.48);}
-.ni-arrow{position:relative;z-index:1;width:clamp(26px,2.8vw,38px);height:clamp(26px,2.8vw,38px);
-  border:1px solid rgba(232,180,160,.1);border-radius:50%;display:flex;align-items:center;
-  justify-content:center;color:rgba(232,180,160,.22);font-size:12px;
-  transition:transform .45s cubic-bezier(.34,1.56,.64,1),border-color .35s,color .35s,background .35s,box-shadow .35s;}
-.nav-item:hover .ni-arrow{transform:rotate(-45deg) scale(1.1);border-color:rgba(240,80,32,.5);
-  color:var(--chili);background:rgba(240,80,32,.08);box-shadow:0 0 16px rgba(240,80,32,.15);}
+  /* ── My Shifts rows ── */
+  .panel-box{border-radius:6px;overflow:hidden}
+  .panel-row{padding:.85rem 1rem;gap:.75rem}
+  .sdb{width:40px;height:40px;border-radius:4px}
+  .sdb-day{font-size:.5rem;letter-spacing:.12em}
+  .sdb-num{font-size:1rem}
+  .pi-title{font-size:.85rem}
+  .pi-meta{font-size:.6rem}
+  .pi-role{font-size:.65rem}
+  .hrs-badge{font-size:.68rem;min-width:36px}
+  .hrs-badge span{font-size:.52rem}
+  .no-shifts{padding:2rem 1rem;font-size:.8rem}
+  .ns-icon{font-size:2rem}
 
-.nav-item:nth-child(1){animation:fadeSlideU .6s .4s ease both}
-.nav-item:nth-child(2){animation:fadeSlideU .6s .5s ease both}
-.nav-item:nth-child(3){animation:fadeSlideU .6s .6s ease both}
-.nav-item:nth-child(4){animation:fadeSlideU .6s .7s ease both}
-.nav-item:nth-child(5){animation:fadeSlideU .6s .8s ease both}
-.nav-item:nth-child(6){animation:fadeSlideU .6s .9s ease both}
-.nav-item:nth-child(7){animation:fadeSlideU .6s 1.0s ease both}
-.nav-item:nth-child(8){animation:fadeSlideU .6s 1.1s ease both}
-.nav-item:nth-child(9){animation:fadeSlideU .6s 1.15s ease both}
+  /* ── Notices ── */
+  .notice-item{padding:.85rem 1rem;gap:.75rem}
+  .n-text{font-size:.8rem;line-height:1.55}
+  .n-date{font-size:.6rem}
+  .ndot{margin-top:.28rem}
 
-/* RIGHT PREVIEW */
-.pv-label{font-family:var(--body);font-weight:600;font-size:8px;letter-spacing:.3em;
-  text-transform:uppercase;color:rgba(232,180,160,.25);margin-bottom:7px;}
-#pv-title{font-family:var(--display);font-weight:400;font-size:clamp(11px,1.1vw,14px);
-  line-height:1.25;color:rgba(245,220,210,.68);transition:all .4s;min-height:0;}
-#pv-desc{margin-top:5px;font-family:var(--serif);font-style:italic;font-size:clamp(9px,.85vw,11px);
-  line-height:1.5;color:rgba(232,180,160,.32);transition:all .4s;min-height:0;}
-#pv-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;min-height:26px;}
-.pv-chip{font-family:var(--body);font-weight:500;font-size:7px;letter-spacing:.1em;
-  text-transform:uppercase;padding:3px 8px;border-radius:2px;
-  border:1px solid rgba(232,180,160,.1);color:rgba(232,180,160,.28);transition:all .35s;}
-.pv-chip.on{border-color:rgba(240,80,32,.3);color:var(--chili);background:rgba(240,80,32,.06);}
-#pv-num{font-family:var(--display);font-weight:400;font-size:clamp(40px,7vw,80px);
-  line-height:1;letter-spacing:.02em;color:rgba(196,24,0,.06);text-align:right;
-  margin-top:auto;transition:color .5s;}
-#pv-num.lit{color:rgba(240,80,32,.17);}
+  /* ── Stats bottom grid ── */
+  .btm-grid{grid-template-columns:1fr;gap:1rem;margin-bottom:1.5rem}
+  .stat-row{
+    grid-template-columns:1fr 1fr;
+    border-radius:6px;overflow:hidden;
+  }
+  .stat-cell{padding:1rem 1rem}
+  .stat-num{font-size:1.8rem}
+  .stat-label{font-size:.58rem;letter-spacing:.1em}
+  .contact-card{padding:1rem;border-radius:6px}
+  .c-row{padding:.55rem 0}
+  .c-val{font-size:.8rem}
+  .c-lbl{font-size:.58rem}
 
-/* BOTTOM TICKER */
-#botbar{flex-shrink:0;height:32px;display:flex;align-items:center;justify-content:space-between;
-  padding:0 clamp(14px,2.5vw,28px);border-top:1px solid rgba(232,180,160,.07);
-  background:linear-gradient(to top,rgba(8,4,7,.9),transparent);overflow:hidden;}
-#ticker-track{display:flex;white-space:nowrap;animation:tkr 32s linear infinite;flex:1;overflow:hidden;}
-.t-item{font-family:var(--body);font-weight:400;font-size:9px;letter-spacing:.2em;
-  text-transform:uppercase;color:rgba(232,180,160,.2);padding:0 26px;
-  display:inline-flex;align-items:center;gap:26px;flex-shrink:0;}
-.t-item::after{content:'🌶';font-size:8px;opacity:.4;}
-@keyframes tkr{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-#botbar-right{flex-shrink:0;padding-left:20px;font-family:var(--body);font-weight:400;
-  font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(232,180,160,.18);}
+  /* ── Owner tabs ── */
+  .tabs{
+    margin:0 -.9rem 1.25rem;
+    padding:0 .9rem;
+    gap:0;
+    -webkit-overflow-scrolling:touch;
+  }
+  .tab-btn{
+    font-size:.8rem;
+    padding:.6rem 1.1rem;
+    letter-spacing:.06em;
+  }
 
-/* ══════════════════════════════
-   MOBILE SHELL
-══════════════════════════════ */
-#mobile-shell{display:none;position:fixed;inset:0;z-index:10;flex-direction:column;
-  background:var(--void);opacity:0;transition:opacity .9s ease;}
-#mobile-shell.on{opacity:1;}
-@media(max-width:767px){
-  #shell{display:none!important;}
-  #mobile-shell{display:flex;}
+  /* ── Owner forms ── */
+  .card{padding:1rem;border-radius:6px;margin-bottom:1.25rem}
+  .fg5,.fg4,.fg3,.fg2{grid-template-columns:1fr}
+  .fi,.fsel{
+    font-size:1rem; /* prevent iOS zoom */
+    padding:.8rem .9rem;
+    border-radius:4px;
+  }
+  .fi:focus,.fsel:focus{border-color:var(--ember)}
+  .ab{
+    width:100%;text-align:center;
+    padding:.8rem 1rem;
+    border-radius:4px;
+    font-size:.95rem;
+    align-self:stretch;
+  }
+  .f-label{font-size:.6rem;letter-spacing:.12em}
+  .sec-title{font-size:1.2rem}
+  .sec-sub{font-size:.7rem}
+
+  /* ── Filter row ── */
+  .filter-row{
+    flex-wrap:wrap;gap:.5rem;
+    padding:.75rem;
+    background:var(--dark2);
+    border:1px solid var(--border);
+    border-radius:6px;
+    margin-bottom:1rem;
+  }
+  .fi-sm{
+    font-size:.85rem; /* prevent iOS zoom */
+    padding:.55rem .75rem;
+    border-radius:4px;
+    flex:1;min-width:100px;
+  }
+  .fl{font-size:.62rem;width:auto}
+
+  /* ── Shift table wrapper ── */
+  .tbl-wrap{
+    margin:0 -.9rem;
+    border-radius:0;
+    border-left:none;border-right:none;
+  }
+  .tbl{min-width:520px}
+  .tbl th{font-size:.58rem;padding:.5rem .65rem;letter-spacing:.1em}
+  .tbl td{font-size:.75rem;padding:.55rem .65rem}
+
+  /* ── Employee cards ── */
+  .emp-grid{grid-template-columns:1fr 1fr;gap:.75rem}
+  .emp-card{padding:1rem;border-radius:6px}
+  .emp-name{font-size:1rem}
+  .emp-role{font-size:.62rem;margin-bottom:.5rem}
+  .emp-actions{gap:.35rem}
+  .emp-btn{
+    font-size:.52rem;padding:.35rem .6rem;
+    border-radius:3px;
+  }
+
+  /* ── Notice list (owner) ── */
+  .nli{padding:.85rem 1rem;gap:.75rem;border-radius:4px}
+  .nli-text{font-size:.8rem}
+  .nli-date{font-size:.6rem}
+
+  /* ── Footer ── */
+  footer{padding:1.25rem 1rem}
+  footer p{font-size:.62rem;line-height:1.9}
+
+  /* ── Toast ── */
+  .toast{
+    bottom:.75rem;
+    left:.75rem;right:.75rem;
+    font-size:.65rem;
+    padding:.65rem 1rem;
+    border-radius:4px;
+    text-align:center;
+  }
 }
 
-#mob-header{flex-shrink:0;position:relative;overflow:hidden;
-  padding:env(safe-area-inset-top,16px) 0 0;
-  background:linear-gradient(to bottom,rgba(8,4,7,.98),rgba(8,4,7,.7));
-  border-bottom:1px solid rgba(232,180,160,.1);}
-#mob-header-inner{padding:20px 20px 0;display:flex;flex-direction:column;align-items:center;gap:4px;}
-.mob-eyebrow{font-family:var(--body);font-weight:600;font-size:9px;letter-spacing:.35em;
-  text-transform:uppercase;color:rgba(232,180,160,.32);display:flex;align-items:center;gap:10px;}
-.mob-eyebrow::before,.mob-eyebrow::after{content:'';flex:1;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(232,180,160,.2),transparent);}
-#mob-brand{font-family:var(--display);font-weight:400;font-size:clamp(26px,8vw,38px);
-  letter-spacing:.01em;color:var(--cream);text-align:center;line-height:1;
-  text-shadow:0 0 40px rgba(240,80,32,.25);}
-#mob-brand em{font-style:italic;color:var(--heat);}
-.mob-tagline{font-family:var(--serif);font-style:italic;font-weight:400;font-size:13px;
-  color:rgba(232,180,160,.4);text-align:center;letter-spacing:.03em;}
-#mob-info-strip{display:flex;justify-content:space-between;align-items:center;
-  padding:12px 20px 14px;margin-top:10px;border-top:1px solid rgba(232,180,160,.07);}
-.mob-info-bit{display:flex;flex-direction:column;gap:2px;align-items:center;}
-.mob-info-lbl{font-family:var(--body);font-weight:600;font-size:7px;letter-spacing:.25em;
-  text-transform:uppercase;color:rgba(232,180,160,.28);}
-.mob-info-val{font-family:var(--body);font-weight:500;font-size:11px;letter-spacing:.04em;
-  color:rgba(245,220,210,.6);}
-.mob-status{color:var(--chili);display:flex;align-items:center;gap:5px;font-size:11px;}
-.mob-status-dot{width:5px;height:5px;border-radius:50%;background:var(--burn);
-  box-shadow:0 0 7px var(--burn);animation:dp 1.8s ease-in-out infinite;}
-
-#mob-nav{flex:1;overflow-y:auto;overflow-x:hidden;
-  padding:8px 0 calc(env(safe-area-inset-bottom,16px) + 16px);-webkit-overflow-scrolling:touch;}
-#mob-nav::-webkit-scrollbar{display:none;}
-.mob-nav-item{position:relative;display:flex;align-items:center;
-  padding:0 20px;height:clamp(68px,11vh,88px);
-  border-bottom:1px solid rgba(232,180,160,.07);overflow:hidden;
-  -webkit-tap-highlight-color:transparent;cursor:pointer;transition:background .3s;}
-.mob-nav-item:first-child{border-top:1px solid rgba(232,180,160,.07);}
-.mob-nav-item:active{background:rgba(240,80,32,.05);}
-.mob-nav-item::before{content:'';position:absolute;left:0;top:15%;bottom:15%;width:2px;
-  background:linear-gradient(to bottom,transparent,var(--fire),transparent);
-  border-radius:2px;transform:scaleY(0);transform-origin:center;
-  transition:transform .4s cubic-bezier(.16,1,.3,1);box-shadow:0 0 8px var(--fire);}
-.mob-nav-item:active::before,.mob-nav-item.touched::before{transform:scaleY(1);}
-.mob-nav-item::after{content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg,rgba(196,24,0,.1),rgba(240,80,32,.04),transparent);
-  opacity:0;transition:opacity .3s;}
-.mob-nav-item:active::after,.mob-nav-item.touched::after{opacity:1;}
-.mni-num{font-family:var(--body);font-weight:400;font-size:9px;letter-spacing:.2em;
-  color:rgba(232,180,160,.22);width:36px;flex-shrink:0;padding-left:10px;}
-.mni-body{flex:1;display:flex;flex-direction:column;gap:3px;padding:0 12px 0 8px;}
-.mni-name{font-family:var(--display);font-weight:400;font-size:clamp(18px,5vw,24px);
-  letter-spacing:.01em;line-height:1;color:rgba(245,220,210,.78);transition:color .3s;}
-.mob-nav-item:active .mni-name,.mob-nav-item.touched .mni-name{color:var(--cream);}
-.mni-sub{font-family:var(--serif);font-style:italic;font-weight:400;font-size:11px;
-  color:rgba(232,180,160,.3);transition:color .3s;line-height:1;}
-.mob-nav-item:active .mni-sub,.mob-nav-item.touched .mni-sub{color:rgba(240,80,32,.5);}
-.mni-arrow{width:32px;height:32px;border-radius:50%;border:1px solid rgba(232,180,160,.1);
-  display:flex;align-items:center;justify-content:center;font-size:13px;
-  color:rgba(232,180,160,.22);flex-shrink:0;transition:all .35s;}
-.mob-nav-item:active .mni-arrow,.mob-nav-item.touched .mni-arrow{
-  border-color:rgba(240,80,32,.4);color:var(--chili);background:rgba(240,80,32,.08);}
-
-.mob-nav-item:nth-child(1){animation:fadeSlideU .5s .35s ease both}
-.mob-nav-item:nth-child(2){animation:fadeSlideU .5s .43s ease both}
-.mob-nav-item:nth-child(3){animation:fadeSlideU .5s .51s ease both}
-.mob-nav-item:nth-child(4){animation:fadeSlideU .5s .59s ease both}
-.mob-nav-item:nth-child(5){animation:fadeSlideU .5s .67s ease both}
-.mob-nav-item:nth-child(6){animation:fadeSlideU .5s .75s ease both}
-.mob-nav-item:nth-child(7){animation:fadeSlideU .5s .83s ease both}
-.mob-nav-item:nth-child(8){animation:fadeSlideU .5s .91s ease both}
-.mob-nav-item:nth-child(9){animation:fadeSlideU .5s .99s ease both}
-
-#mob-botbar{flex-shrink:0;height:36px;display:flex;align-items:center;justify-content:center;
-  border-top:1px solid rgba(232,180,160,.07);
-  background:linear-gradient(to top,rgba(8,4,7,.95),transparent);
-  padding-bottom:env(safe-area-inset-bottom,0px);overflow:hidden;}
-#mob-ticker-track{display:flex;white-space:nowrap;animation:tkr 28s linear infinite;}
-.mt-item{font-family:var(--body);font-weight:400;font-size:8px;letter-spacing:.18em;
-  text-transform:uppercase;color:rgba(232,180,160,.18);padding:0 22px;
-  display:inline-flex;align-items:center;gap:22px;flex-shrink:0;}
-.mt-item::after{content:'🌶';font-size:7px;opacity:.35;}
-
-/* ══════════════════════════════
-   DESKTOP PANEL
-══════════════════════════════ */
-#panel{position:fixed;inset:0;z-index:500;display:grid;grid-template-columns:45% 55%;
-  opacity:0;pointer-events:none;transition:opacity .5s;}
-#panel.open{opacity:1;pointer-events:all;}
-#panel-mood{position:relative;overflow:hidden;background:var(--deep);
-  transform:translateX(-100%);transition:transform .65s cubic-bezier(.77,0,.18,1);}
-#panel.open #panel-mood{transform:translateX(0);}
-#panel-mood-bg{position:absolute;inset:0;transition:background 1s ease;}
-#panel-mood-bg::after{content:'';position:absolute;inset:0;
-  background:linear-gradient(to right,transparent 60%,var(--deep));}
-#panel-smoke-cv{position:absolute;inset:0;pointer-events:none;z-index:1;}
-.pm-inner{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;
-  justify-content:flex-end;padding:clamp(24px,3.8vw,48px);}
-.pm-back{position:absolute;top:clamp(16px,2.5vh,26px);left:clamp(16px,2.5vw,26px);
-  font-family:var(--body);font-weight:600;font-size:9px;letter-spacing:.22em;
-  text-transform:uppercase;color:rgba(245,220,210,.3);background:none;border:none;
-  cursor:none;transition:color .25s;padding:0;display:flex;align-items:center;gap:8px;}
-.pm-back::before{content:'←';font-size:14px;}
-.pm-back:hover{color:var(--chili);}
-#panel-big-num{font-family:var(--display);font-weight:400;
-  font-size:clamp(70px,12vw,150px);line-height:1;letter-spacing:.02em;
-  color:rgba(245,220,210,.04);margin-bottom:-10px;}
-.pm-eyebrow{font-family:var(--body);font-weight:600;font-size:9px;letter-spacing:.3em;
-  text-transform:uppercase;color:var(--chili);opacity:.8;margin-bottom:10px;
-  display:flex;align-items:center;gap:10px;}
-.pm-eyebrow::before{content:'';width:22px;height:1px;background:currentColor;}
-#panel-title{font-family:var(--display);font-weight:400;font-size:clamp(34px,5.5vw,68px);
-  letter-spacing:.01em;line-height:.95;color:var(--cream);
-  transform:translateY(20px);opacity:0;
-  transition:transform .65s .15s cubic-bezier(.16,1,.3,1),opacity .5s .15s;
-  text-shadow:0 2px 20px rgba(0,0,0,.5);}
-#panel.open #panel-title{transform:translateY(0);opacity:1;}
-#panel-italic{font-family:var(--serif);font-style:italic;font-weight:400;
-  font-size:clamp(12px,1.4vw,17px);color:rgba(232,180,160,.5);margin-top:8px;
-  transform:translateY(14px);opacity:0;
-  transition:transform .65s .25s cubic-bezier(.16,1,.3,1),opacity .5s .25s;}
-#panel.open #panel-italic{transform:translateY(0);opacity:1;}
-
-#panel-info{background:var(--deep);display:flex;flex-direction:column;justify-content:space-between;
-  padding:clamp(24px,3.8vw,48px);transform:translateX(100%);
-  transition:transform .65s cubic-bezier(.77,0,.18,1);
-  border-left:1px solid rgba(232,180,160,.07);overflow-y:auto;}
-#panel.open #panel-info{transform:translateX(0);}
-.pi-top{display:flex;justify-content:flex-end;margin-bottom:8px;}
-.pi-hint{font-family:var(--body);font-size:9px;letter-spacing:.18em;
-  text-transform:uppercase;color:rgba(232,180,160,.2);}
-.pi-body-wrap{flex:1;display:flex;flex-direction:column;gap:clamp(12px,2vh,20px);
-  transform:translateY(18px);opacity:0;
-  transition:transform .6s .3s cubic-bezier(.16,1,.3,1),opacity .5s .3s;}
-#panel.open .pi-body-wrap{transform:translateY(0);opacity:1;}
-.pi-meta{font-family:var(--body);font-weight:500;font-size:9px;letter-spacing:.25em;
-  text-transform:uppercase;color:rgba(232,180,160,.3);display:flex;align-items:center;gap:8px;}
-.pi-meta::before{content:'';width:18px;height:1px;background:rgba(240,80,32,.3);}
-#panel-desc{font-family:var(--body);font-weight:300;font-size:clamp(12px,1.25vw,15px);
-  line-height:1.85;letter-spacing:.01em;color:rgba(232,180,160,.52);}
-#panel-desc strong{color:var(--parch);font-weight:400;}
-#panel-chips{display:flex;flex-wrap:wrap;gap:6px;}
-.panel-chip{font-family:var(--body);font-weight:500;font-size:8px;letter-spacing:.13em;
-  text-transform:uppercase;padding:4px 11px;border-radius:2px;
-  border:1px solid rgba(232,180,160,.1);color:rgba(232,180,160,.28);transition:all .3s;}
-.panel-chip.lit{border-color:rgba(240,80,32,.35);color:var(--chili);background:rgba(240,80,32,.07);}
-.pi-cta-wrap{display:flex;flex-direction:column;gap:12px;}
-.pi-dbl-note{display:none;}
-
-/* AUTO-REDIRECT COUNTDOWN */
-.pi-countdown-row{display:flex;align-items:center;gap:12px;margin-bottom:4px;}
-.pi-countdown-ring{position:relative;width:38px;height:38px;flex-shrink:0;}
-.pi-countdown-ring svg{position:absolute;inset:0;transform:rotate(-90deg);}
-.pi-countdown-ring .ring-bg{fill:none;stroke:rgba(240,80,32,.12);stroke-width:3;}
-.pi-countdown-ring .ring-fill{fill:none;stroke:var(--chili);stroke-width:3;stroke-linecap:round;
-  stroke-dasharray:100;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear;}
-.pi-countdown-ring .ring-num{position:absolute;inset:0;display:flex;align-items:center;
-  justify-content:center;font-family:var(--body);font-weight:800;font-size:13px;color:var(--chili);}
-.pi-countdown-text{font-family:var(--body);font-size:11px;letter-spacing:.08em;
-  text-transform:uppercase;color:rgba(232,180,160,.4);line-height:1.4;}
-
-/* CTA BUTTON */
-.cta-wrap{position:relative;align-self:flex-start;display:inline-block;}
-.cta-border-svg{position:absolute;top:-1px;left:-1px;width:calc(100% + 2px);height:calc(100% + 2px);
-  pointer-events:none;overflow:visible;z-index:5;}
-.cta-border-track{fill:none;stroke:rgba(240,80,32,.18);stroke-width:1.5;}
-.cta-border-chaser{fill:none;stroke:var(--chili);stroke-width:2;stroke-linecap:round;
-  filter:drop-shadow(0 0 5px var(--chili)) drop-shadow(0 0 10px rgba(240,80,32,.7));
-  stroke-dasharray:50 9999;stroke-dashoffset:0;animation:chaserMove 1.8s linear infinite;}
-@keyframes chaserMove{from{stroke-dashoffset:0}to{stroke-dashoffset:-9999}}
-#panel-cta{position:relative;overflow:hidden;font-family:var(--body);
-  font-weight:700;font-size:clamp(11px,1.2vw,13px);letter-spacing:.18em;text-transform:uppercase;
-  color:var(--cream);border:1px solid rgba(240,80,32,.28);cursor:none;
-  padding:clamp(12px,1.7vh,16px) clamp(22px,2.8vw,34px);background:rgba(240,80,32,.07);
-  transition:letter-spacing .35s;display:flex;align-items:center;gap:6px;}
-#panel-cta::before{content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg,var(--pepper) 0%,var(--fire) 50%,var(--chili) 100%);
-  transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.77,0,.18,1);z-index:0;}
-#panel-cta:hover::before{transform:scaleX(1);}
-#panel-cta:hover{letter-spacing:.26em;}
-#panel-cta span{position:relative;z-index:1;}
-#panel-cta .cta-arrow{position:relative;z-index:1;transition:transform .4s cubic-bezier(.34,1.56,.64,1);}
-#panel-cta:hover .cta-arrow{transform:translateX(5px);}
-/* spinning logo wrapper inside CTA */
-#cta-logo-ring{width:0;height:0;overflow:hidden;flex-shrink:0;
-  transition:width .3s cubic-bezier(.16,1,.3,1),height .3s cubic-bezier(.16,1,.3,1),margin-right .3s;
-  position:relative;z-index:1;}
-
-/* Mobile countdown */
-.mob-countdown-row{display:flex;align-items:center;gap:10px;justify-content:center;}
-.mob-countdown-ring{position:relative;width:34px;height:34px;flex-shrink:0;}
-.mob-countdown-ring svg{position:absolute;inset:0;transform:rotate(-90deg);}
-.mob-countdown-ring .ring-bg{fill:none;stroke:rgba(240,80,32,.12);stroke-width:3;}
-.mob-countdown-ring .ring-fill{fill:none;stroke:var(--chili);stroke-width:3;stroke-linecap:round;
-  stroke-dasharray:88;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear;}
-.mob-countdown-ring .ring-num{position:absolute;inset:0;display:flex;align-items:center;
-  justify-content:center;font-family:var(--body);font-weight:800;font-size:12px;color:var(--chili);}
-.mob-countdown-text{font-family:var(--body);font-size:11px;letter-spacing:.06em;
-  text-transform:uppercase;color:rgba(232,180,160,.4);}
-.pi-bottom{display:flex;justify-content:space-between;align-items:flex-end;
-  margin-top:8px;padding-top:14px;border-top:1px solid rgba(232,180,160,.07);}
-.pi-foot-rule{font-family:var(--serif);font-style:italic;font-size:11px;color:rgba(232,180,160,.22);}
-.pi-foot-idx{font-family:var(--display);font-weight:400;font-size:50px;line-height:1;
-  color:rgba(232,180,160,.05);}
-
-/* MOBILE BOTTOM SHEET */
-#mob-panel{position:fixed;inset:0;z-index:500;pointer-events:none;opacity:0;transition:opacity .4s;}
-#mob-panel.open{opacity:1;pointer-events:all;}
-#mob-panel-backdrop{position:absolute;inset:0;background:rgba(8,4,7,.85);
-  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
-#mob-sheet{position:absolute;left:0;right:0;bottom:0;max-height:88vh;
-  background:var(--coal);border-top:1px solid rgba(232,180,160,.12);
-  border-radius:20px 20px 0 0;display:flex;flex-direction:column;overflow:hidden;
-  transform:translateY(100%);transition:transform .55s cubic-bezier(.16,1,.3,1);
-  padding-bottom:env(safe-area-inset-bottom,0px);}
-#mob-panel.open #mob-sheet{transform:translateY(0);}
-#mob-sheet-handle{flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:12px 0 6px;}
-.handle-bar{width:40px;height:4px;border-radius:2px;background:rgba(232,180,160,.2);}
-#mob-sheet-hdr{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;
-  padding:6px 20px 14px;border-bottom:1px solid rgba(232,180,160,.08);}
-.msh-eyebrow{font-family:var(--body);font-weight:600;font-size:9px;letter-spacing:.28em;
-  text-transform:uppercase;color:var(--chili);opacity:.8;display:flex;align-items:center;gap:8px;}
-.msh-eyebrow::before{content:'';width:18px;height:1px;background:currentColor;}
-#mob-sheet-close{font-family:var(--body);font-weight:600;font-size:10px;letter-spacing:.18em;
-  text-transform:uppercase;color:rgba(232,180,160,.3);background:none;
-  border:1px solid rgba(232,180,160,.1);padding:5px 14px;border-radius:2px;
-  -webkit-tap-highlight-color:transparent;transition:all .25s;}
-#mob-sheet-close:active{border-color:rgba(240,80,32,.4);color:var(--chili);}
-#mob-sheet-body{flex:1;overflow-y:auto;padding:16px 20px 20px;-webkit-overflow-scrolling:touch;
-  display:flex;flex-direction:column;gap:16px;}
-#mob-sheet-body::-webkit-scrollbar{display:none;}
-#mob-sheet-title{font-family:var(--display);font-weight:400;font-size:clamp(26px,7vw,38px);
-  letter-spacing:.01em;line-height:.95;color:var(--cream);}
-#mob-sheet-italic{font-family:var(--serif);font-style:italic;font-weight:400;
-  font-size:14px;color:rgba(232,180,160,.45);margin-top:4px;}
-.msh-meta{font-family:var(--body);font-weight:500;font-size:9px;letter-spacing:.22em;
-  text-transform:uppercase;color:rgba(232,180,160,.28);display:flex;align-items:center;gap:8px;}
-.msh-meta::before{content:'';width:16px;height:1px;background:rgba(240,80,32,.3);}
-#mob-sheet-desc{font-family:var(--body);font-weight:300;font-size:14px;
-  line-height:1.8;color:rgba(232,180,160,.5);}
-#mob-sheet-desc strong{color:var(--parch);font-weight:400;}
-#mob-sheet-chips{display:flex;flex-wrap:wrap;gap:6px;}
-.msc{font-family:var(--body);font-weight:500;font-size:8px;letter-spacing:.12em;
-  text-transform:uppercase;padding:5px 11px;border-radius:2px;
-  border:1px solid rgba(232,180,160,.1);color:rgba(232,180,160,.28);}
-.msc.lit{border-color:rgba(240,80,32,.35);color:var(--chili);background:rgba(240,80,32,.07);}
-#mob-sheet-cta{width:100%;padding:16px;font-family:var(--body);font-weight:700;font-size:13px;
-  letter-spacing:.2em;text-transform:uppercase;color:var(--cream);border:none;
-  background:linear-gradient(90deg,var(--pepper),var(--fire),var(--chili));
-  border-radius:4px;display:flex;align-items:center;justify-content:center;gap:10px;
-  -webkit-tap-highlight-color:transparent;box-shadow:0 8px 30px rgba(196,24,0,.35);
-  transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;}
-#mob-sheet-cta::after{content:'';position:absolute;top:0;left:-100%;width:55%;height:100%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
-  animation:mobShine 2s ease-in-out infinite;}
-@keyframes mobShine{0%{left:-100%}60%,100%{left:140%}}
-#mob-sheet-cta:active{transform:scale(.98);box-shadow:0 4px 15px rgba(196,24,0,.25);}
-.msc-arrow{transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
-#mob-sheet-cta:active .msc-arrow{transform:translateX(4px);}
-.msh-foot-rule{font-family:var(--serif);font-style:italic;font-size:11px;
-  color:rgba(232,180,160,.2);text-align:center;}
-
-/* LOADER */
-#loader{position:fixed;inset:0;z-index:700;background:var(--void);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
-  opacity:0;pointer-events:none;transition:opacity .4s;}
-#loader.show{opacity:1;pointer-events:all;}
-.ld-name{font-family:var(--display);font-weight:400;font-size:clamp(22px,5vw,42px);
-  letter-spacing:.02em;color:var(--cream);text-shadow:0 0 60px rgba(240,80,32,.2);text-align:center;}
-.ld-name em{font-style:italic;color:var(--heat);}
-.ld-going{font-family:var(--serif);font-style:italic;font-size:clamp(12px,1.5vw,16px);
-  color:rgba(232,180,160,.32);letter-spacing:.04em;text-align:center;}
-.ld-fire{display:flex;align-items:flex-end;gap:4px;height:30px;}
-.lff{width:4px;border-radius:2px;background:linear-gradient(to top,var(--pepper),var(--burn));
-  animation:lffA .5s ease-in-out infinite alternate;}
-.lff:nth-child(1){height:9px;animation-delay:0s}
-.lff:nth-child(2){height:20px;animation-delay:.07s}
-.lff:nth-child(3){height:27px;animation-delay:.14s}
-.lff:nth-child(4){height:15px;animation-delay:.21s}
-.lff:nth-child(5){height:23px;animation-delay:.28s}
-.lff:nth-child(6){height:12px;animation-delay:.35s}
-.lff:nth-child(7){height:21px;animation-delay:.42s}
-@keyframes lffA{from{transform:scaleY(1);opacity:.65}to{transform:scaleY(1.3);opacity:1}}
-.ld-track{width:clamp(140px,22vw,240px);height:1px;background:rgba(232,180,160,.08);position:relative;}
-.ld-fill{position:absolute;top:0;left:0;bottom:0;
-  background:linear-gradient(90deg,var(--pepper),var(--chili),var(--burn));
-  transform:scaleX(0);transform-origin:left;border-radius:1px;}
-#loader.show .ld-fill{animation:ldFill 1.8s .1s cubic-bezier(.77,0,.18,1) forwards;}
-@keyframes ldFill{to{transform:scaleX(1);}}
-.ld-msg{font-family:var(--body);font-weight:500;font-size:9px;letter-spacing:.28em;
-  text-transform:uppercase;color:rgba(232,180,160,.2);animation:msgBlink 1.3s ease-in-out infinite;}
-@keyframes msgBlink{0%,100%{opacity:.2}50%{opacity:.55}}
-
-.ripple{position:fixed;border-radius:50%;pointer-events:none;z-index:50;
-  border:1px solid rgba(240,80,32,.3);animation:rip .6s ease-out forwards;}
-@keyframes rip{from{width:0;height:0;opacity:.7;transform:translate(-50%,-50%)}to{width:80px;height:80px;opacity:0;transform:translate(-50%,-50%)}}
-
-#nav-center::-webkit-scrollbar{width:0;background:transparent}
-#nav-center{scrollbar-width:none}
-
-@keyframes fadeSlideR{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:translateX(0)}}
-@keyframes fadeSlideL{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)}}
-@keyframes fadeSlideU{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+/* ── Very small phones ── */
+@media(max-width:360px){
+  .emp-grid{grid-template-columns:1fr}
+  .stat-row{grid-template-columns:1fr}
+  .land-card-title{font-size:1.15rem}
+}
 </style>
 </head>
 <body>
 
-<div id="cursor"><div id="c-dot"></div></div>
-<canvas id="cv-bg"></canvas>
-<canvas id="cv-smoke"></canvas>
-<canvas id="cv-ember"></canvas>
+<!-- LOADING -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner red" id="spinner"></div>
+  <div class="loading-text" id="loadingText">Loading...</div>
+</div>
 
-<!-- DESKTOP SHELL -->
-<div id="shell">
-  <div id="topbar">
-    <div class="tb-cell"><div class="tb-eyebrow">Location</div><div class="tb-val">DeRidder, LA</div></div>
-    <div class="tb-cell"><div class="tb-eyebrow">Phone</div><div class="tb-val">(337) 221-1035</div></div>
-    <div class="tb-cell grow">
-      <div id="brand-name">Hot Headz <em>Southern Foods</em></div>
-      <div id="brand-tagline">Made from scratch · Est. 2020 · 2741 US-190</div>
+<!-- ═══ LANDING ═══ -->
+<div id="landing">
+  <div class="landing-wrap">
+    <a href="index.html" style="display:inline-flex;align-items:center;gap:.4rem;font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);text-decoration:none;margin-bottom:1.5rem;transition:color .2s;border:1px solid var(--border);padding:.4rem .9rem" onmouseover="this.style.color='var(--ember-light)';this.style.borderColor='rgba(241,196,15,.3)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">← Back to Site</a>
+    <div class="logo-rings-wrap" id="landingLogoWrap">
+      <canvas id="landingLogoCanvas"></canvas>
     </div>
-    <div class="tb-cell"><div class="tb-eyebrow">Hours</div><div class="tb-val" id="hours-today">Mon–Fri 5:30am–2pm</div></div>
-    <div class="tb-cell"><div class="tb-status"><span class="status-pepper">🌶️</span><span>Kitchen's Hot</span></div></div>
+    <div class="land-title">Hot Headz <span>Staff Portal</span></div>
+    <div class="land-sub">HotHeadzSouthernFoods.com · DeRidder, Louisiana</div>
+    <div class="land-cards">
+      <div class="land-card employee" onclick="showLogin('employee')">
+        <div class="land-card-title">Employee</div>
+        <div class="land-card-desc">View your schedule, upcoming shifts, and kitchen notices</div>
+      </div>
+      <div class="land-card owner" onclick="showLogin('owner')">
+        <div class="land-card-title">Owner / Manager</div>
+        <div class="land-card-desc">Manage the full schedule, employees, and post notices</div>
+      </div>
+    </div>
   </div>
+</div>
 
-  <div id="main">
-    <!-- LEFT -->
-    <div id="sidebar-l">
-      <div class="sb-group">
-        <div class="sb-block"><span class="sb-label">The Kitchen</span><span class="sb-text">Made from scratch every morning. Breakfast & lunch done right.</span></div>
-        <div class="sb-block"><span class="sb-label">Specialty</span><span class="sb-text">Southern plates, Cajun classics, crawfish, po-boys & homemade desserts</span></div>
-        <div class="sb-block"><span class="sb-label">Service</span><span class="sb-text">Dine-in · Carry-out · Delivery (10+ plates within 10 miles)</span></div>
-        <div class="sb-block"><span class="sb-label">Tonight</span><span class="sb-hot">Crawfish available Thu–Sat 4–8pm</span></div>
+<!-- ═══ LOGIN ═══ -->
+<div id="loginScreen">
+  <!-- Employee login -->
+  <div class="login-box emp-box" id="empLoginBox">
+    <button class="login-back" onclick="goLanding()">‹ Back</button>
+    <div class="logo-rings-wrap logo-rings-sm" id="empLoginLogoWrap">
+      <canvas id="empLoginLogoCanvas"></canvas>
+    </div>
+    <div class="login-title emp">Employee <span>Sign In</span></div>
+    <div class="login-sub">Select your name and enter your PIN</div>
+    <label class="f-label">Your Name</label>
+    <select class="f-select" id="empName"><option value="">— Select your name —</option></select>
+    <label class="f-label">Your PIN</label>
+    <input class="f-input" type="password" id="empPin" placeholder="Enter your PIN" maxlength="6" inputmode="numeric">
+    <button class="login-btn emp-btn" onclick="empLogin()">SIGN IN ›</button>
+    <div class="login-error" id="empError"></div>
+    <div class="login-note">Contact your manager if you need your PIN reset</div>
+  </div>
+  <!-- Owner login -->
+  <div class="login-box own-box" id="ownLoginBox" style="display:none">
+    <button class="login-back" onclick="goLanding()">‹ Back</button>
+    <div class="logo-rings-wrap logo-rings-sm" id="ownLoginLogoWrap">
+      <canvas id="ownLoginLogoCanvas"></canvas>
+    </div>
+    <div class="login-title own">Manager <span>Sign In</span></div>
+    <div class="login-sub">Enter the admin password</div>
+    <label class="f-label">Admin Password</label>
+    <input class="f-input" type="password" id="ownPass" placeholder="Enter password">
+    <button class="login-btn own-btn" onclick="ownLogin()">ENTER ›</button>
+    <div class="login-error" id="ownError"></div>
+    <div class="login-note" style="color:var(--muted)">Default: <span style="color:var(--ember-light)">hotheadz2025</span></div>
+  </div>
+</div>
+
+<!-- ═══ SHARED HEADER (shown when logged in) ═══ -->
+<header id="mainHeader" style="display:none">
+  <div class="logo">
+    <div class="logo-rings-wrap logo-rings-hdr" id="headerLogoWrap">
+      <canvas id="headerLogoCanvas"></canvas>
+    </div>
+    <span class="logo-text">Hot Headz <span>Portal</span></span>
+  </div>
+  <span class="mode-badge" id="modeBadge"></span>
+  <div class="hdr-right">
+    <div class="clock" id="liveClock"></div>
+    <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+  </div>
+</header>
+
+<!-- ═══ EMPLOYEE APP ═══ -->
+<div id="empApp">
+  <div class="wrap">
+    <div class="welcome-strip emp">
+      <div>
+        <div class="welcome-name emp">Welcome back, <span id="empWelcomeName"></span></div>
+        <div class="welcome-meta" id="empWelcomeMeta"></div>
+      </div>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center">
+        <a href="index.html" style="font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);padding:.45rem .9rem;text-decoration:none;transition:all .2s" onmouseover="this.style.color='var(--ember-light)'" onmouseout="this.style.color='var(--muted)'">← Site</a>
+        <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+      </div>
+    </div>
+
+    <div class="week-nav">
+      <div class="week-label">Schedule — <span id="empWeekRange"></span></div>
+      <div class="week-btns">
+        <button class="wbtn" onclick="empChangeWeek(-1)">‹ Prev</button>
+        <button class="wbtn today" onclick="empGoToday()">This Week</button>
+        <button class="wbtn" onclick="empChangeWeek(1)">Next ›</button>
+      </div>
+    </div>
+
+    <div class="schedule-grid" id="empScheduleGrid"></div>
+
+    <div class="panel-title">My Upcoming Shifts</div>
+    <div class="panel-box" id="empMyShifts"></div>
+
+    <div class="panel-title">Notice Board</div>
+    <div class="panel-box" id="empNoticeBoard"></div>
+
+    <div class="btm-grid">
+      <div>
+        <div class="panel-title">My Hours This Week</div>
+        <div class="stat-row">
+          <div class="stat-cell"><div class="stat-num" id="empStatHours">0<span>h</span></div><div class="stat-label">Hours</div></div>
+          <div class="stat-cell"><div class="stat-num" id="empStatDays">0</div><div class="stat-label">Days</div></div>
+          <div class="stat-cell"><div class="stat-num" id="empStatIn">–</div><div class="stat-label">First In</div></div>
+          <div class="stat-cell"><div class="stat-num" id="empStatOut">–</div><div class="stat-label">Last Out</div></div>
+        </div>
       </div>
       <div>
-        <div class="sb-label" style="margin-bottom:8px">Connect</div>
-        <div class="sb-links">
-          <a class="sb-link" href="https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/" target="_blank">Facebook</a>
-          <a class="sb-link" href="tel:3372211035">Call to Order</a>
-          <a class="sb-link" href="https://maps.google.com/?q=2741+US-190+DeRidder+LA+70634" target="_blank">Google Maps</a>
-          <a class="sb-link" href="delivery.html">Delivery Info</a>
+        <div class="panel-title">Contact & Info</div>
+        <div class="contact-card">
+          <div class="c-row"><span class="c-ico">📍</span><div><div class="c-lbl">Location</div><div class="c-val">2741 US-190 · DeRidder, LA 70634</div></div></div>
+          <div class="c-row"><span class="c-ico">📞</span><div><div class="c-lbl">Phone</div><div class="c-val"><a href="tel:3372211035">(337) 221-1035</a></div></div></div>
+          <div class="c-row"><span class="c-ico">⏰</span><div><div class="c-lbl">Kitchen Hours</div><div class="c-val">Mon–Fri 5:30am – 2pm</div></div></div>
         </div>
       </div>
     </div>
-
-    <!-- CENTER NAV -->
-    <div id="nav-center">
-      <nav>
-        <div class="nav-item" onclick="openPanel('home')"     onmouseenter="setPreview('home')"     onmouseleave="clearPreview()"><span class="ni-num">01</span><span class="ni-name">Home</span><span class="ni-sub">Back to the landing page</span><span class="ni-arrow">↗</span></div>
-        <div class="nav-item" onclick="openPanel('menu')"     onmouseenter="setPreview('menu')"     onmouseleave="clearPreview()"><span class="ni-num">02</span><span class="ni-name">The Menu</span><span class="ni-sub">Breakfast, lunch, daily specials</span><span class="ni-arrow">↗</span></div>
-        <div class="nav-item" onclick="openPanel('lunch')" onmouseenter="setPreview('lunch')" onmouseleave="clearPreview()" style="padding-left:clamp(18px,2.8vw,44px);opacity:.85;"><span class="ni-num" style="font-size:8px;opacity:.6;">✦</span><span class="ni-name" style="font-size:clamp(14px,2.2vw,32px);color:rgba(248,112,56,.7);">Lunch</span><span class="ni-sub">Daily plates · Southern classics</span><span class="ni-arrow" style="width:clamp(20px,2vw,28px);height:clamp(20px,2vw,28px);">↗</span></div>
-        <div class="nav-item" onclick="openPanel('beer')"  onmouseenter="setPreview('beer')"  onmouseleave="clearPreview()" style="padding-left:clamp(18px,2.8vw,44px);opacity:.85;"><span class="ni-num" style="font-size:8px;opacity:.6;">✦</span><span class="ni-name" style="font-size:clamp(14px,2.2vw,32px);color:rgba(248,112,56,.7);">Beer</span><span class="ni-sub">Cold drinks · What's on tap</span><span class="ni-arrow" style="width:clamp(20px,2vw,28px);height:clamp(20px,2vw,28px);">↗</span></div>
-        <div class="nav-item" onclick="openPanel('delivery')" onmouseenter="setPreview('delivery')" onmouseleave="clearPreview()"><span class="ni-num">03</span><span class="ni-name">Delivery</span><span class="ni-sub">10+ plates · within 10 miles</span><span class="ni-arrow">↗</span></div>
-        <div class="nav-item" onclick="openPanel('order')"    onmouseenter="setPreview('order')"    onmouseleave="clearPreview()"><span class="ni-num">04</span><span class="ni-name">Order Now</span><span class="ni-sub">Call ahead for faster pickup</span><span class="ni-arrow">↗</span></div>
-        <div class="nav-item" onclick="openPanel('about')"    onmouseenter="setPreview('about')"    onmouseleave="clearPreview()"><span class="ni-num">05</span><span class="ni-name">About Us</span><span class="ni-sub">Comfort food done right since 2020</span><span class="ni-arrow">↗</span></div>
-        <div class="nav-item" onclick="openPanel('facebook')" onmouseenter="setPreview('facebook')" onmouseleave="clearPreview()"><span class="ni-num">06</span><span class="ni-name">Facebook</span><span class="ni-sub">Daily specials posted every morning</span><span class="ni-arrow">↗</span></div>
-        <div class="nav-item" onclick="openPanel('find')"     onmouseenter="setPreview('find')"     onmouseleave="clearPreview()"><span class="ni-num">07</span><span class="ni-name">Find Us</span><span class="ni-sub">2741 US-190 · DeRidder, LA</span><span class="ni-arrow">↗</span></div>
-        <!-- ★ STAFF PORTAL ★ -->
-        <div class="nav-item nav-item--portal" onclick="openPanel('staff')" onmouseenter="setPreview('staff')" onmouseleave="clearPreview()">
-          <span class="ni-num" style="color:rgba(248,160,72,.45)">08</span>
-          <span class="ni-name" style="color:var(--heat)">Staff Portal</span>
-          <span class="ni-sub">Employees &amp; Scheduling</span>
-          <span class="ni-arrow" style="border:none;background:none;padding:0;width:clamp(28px,3vw,40px);height:clamp(28px,3vw,40px);overflow:visible;flex-shrink:0">
-            <canvas id="navLogoCanvas" style="width:100%;height:100%;display:block"></canvas>
-          </span>
-        </div>
-      </nav>
-    </div>
-
-    <!-- RIGHT -->
-    <div id="sidebar-r">
-      <div><div class="pv-label">Section Preview</div><div id="pv-title">Hover any item to explore</div><div id="pv-desc">Each destination has its own story. Take your time.</div><div id="pv-chips"></div></div>
-      <div id="pv-num">—</div>
-    </div>
   </div>
-
-  <div id="botbar">
-    <div id="ticker-track"></div>
-    <div id="botbar-right">© 2025 Hot Headz Southern Foods</div>
-  </div>
+  <footer><p>Hot Headz <span>Southern Foods</span> · Employee Portal · Made from scratch since 2020 · <a href='index.html' style='color:var(--ember-light);text-decoration:none'>← Back to site</a></p></footer>
 </div>
 
-<!-- MOBILE SHELL -->
-<div id="mobile-shell">
-  <div id="mob-header">
-    <div id="mob-header-inner">
-      <div class="mob-eyebrow">DeRidder, Louisiana</div>
-      <div id="mob-brand">Hot Headz <em>Southern Foods</em></div>
-      <div class="mob-tagline">Made from scratch · Est. 2020</div>
-    </div>
-    <div id="mob-info-strip">
-      <div class="mob-info-bit"><span class="mob-info-lbl">Phone</span><span class="mob-info-val">(337) 221-1035</span></div>
-      <div class="mob-info-bit"><span class="mob-info-lbl">Status</span><span class="mob-info-val mob-status"><span class="mob-status-dot"></span>Kitchen's Hot</span></div>
-      <div class="mob-info-bit"><span class="mob-info-lbl">Hours</span><span class="mob-info-val" id="mob-hours">5:30am – 2pm</span></div>
-    </div>
-  </div>
-  <div id="mob-nav">
-    <div class="mob-nav-item" onclick="openMobPanel('home')"><span class="mni-num">01</span><div class="mni-body"><div class="mni-name">Home</div><div class="mni-sub">Back to the landing page</div></div><span class="mni-arrow">↗</span></div>
-    <div class="mob-nav-item" onclick="openMobPanel('menu')"><span class="mni-num">02</span><div class="mni-body"><div class="mni-name">The Menu</div><div class="mni-sub">Breakfast, lunch & daily specials</div></div><span class="mni-arrow">↗</span></div>
-    <div class="mob-nav-item" onclick="openMobPanel('lunch')" style="padding-left:36px;"><span class="mni-num" style="font-size:8px;opacity:.5;">✦</span><div class="mni-body"><div class="mni-name" style="font-size:clamp(17px,4.2vw,22px);color:rgba(248,112,56,.75);">Lunch</div><div class="mni-sub">Daily plates · Southern classics</div></div><span class="mni-arrow">↗</span></div>
-    <div class="mob-nav-item" onclick="openMobPanel('beer')" style="padding-left:36px;"><span class="mni-num" style="font-size:8px;opacity:.5;">✦</span><div class="mni-body"><div class="mni-name" style="font-size:clamp(17px,4.2vw,22px);color:rgba(248,112,56,.75);">Beer</div><div class="mni-sub">Cold drinks · What's on tap</div></div><span class="mni-arrow">↗</span></div>
-    <div class="mob-nav-item" onclick="openMobPanel('delivery')"><span class="mni-num">03</span><div class="mni-body"><div class="mni-name">Delivery</div><div class="mni-sub">10+ plates · within 10 miles</div></div><span class="mni-arrow">↗</span></div>
-    <div class="mob-nav-item" onclick="openMobPanel('order')"><span class="mni-num">04</span><div class="mni-body"><div class="mni-name">Order Now</div><div class="mni-sub">Call ahead for faster pickup</div></div><span class="mni-arrow">↗</span></div>
-    <div class="mob-nav-item" onclick="openMobPanel('about')"><span class="mni-num">05</span><div class="mni-body"><div class="mni-name">About Us</div><div class="mni-sub">Comfort food done right since 2020</div></div><span class="mni-arrow">↗</span></div>
-    <div class="mob-nav-item" onclick="openMobPanel('facebook')"><span class="mni-num">06</span><div class="mni-body"><div class="mni-name">Facebook</div><div class="mni-sub">Daily specials posted every morning</div></div><span class="mni-arrow">↗</span></div>
-    <div class="mob-nav-item" onclick="openMobPanel('find')"><span class="mni-num">07</span><div class="mni-body"><div class="mni-name">Find Us</div><div class="mni-sub">2741 US-190 · DeRidder, LA</div></div><span class="mni-arrow">↗</span></div>
-    <!-- ★ STAFF PORTAL MOBILE ★ -->
-    <div class="mob-nav-item" onclick="openMobPanel('staff')">
-      <span class="mni-num" style="color:rgba(248,160,72,.45)">08</span>
-      <div class="mni-body">
-        <div class="mni-name" style="color:var(--heat)">Staff Portal</div>
-        <div class="mni-sub">Employees &amp; Scheduling</div>
+<!-- ═══ OWNER APP ═══ -->
+<div id="ownApp">
+  <div class="wrap">
+    <div class="welcome-strip own">
+      <div>
+        <div class="welcome-name own">Manager <span>Dashboard</span></div>
+        <div class="welcome-meta" id="ownWelcomeMeta"></div>
       </div>
-      <span class="mni-arrow" style="border:none;background:none;padding:0;width:34px;height:34px;overflow:visible;flex-shrink:0">
-        <canvas id="mobNavLogoCanvas" style="width:100%;height:100%;display:block"></canvas>
-      </span>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center">
+        <a href="index.html" style="font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);padding:.45rem .9rem;text-decoration:none;transition:all .2s" onmouseover="this.style.color='var(--ember-light)'" onmouseout="this.style.color='var(--muted)'">← Site</a>
+        <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+      </div>
     </div>
-  </div>
-  <div id="mob-botbar"><div id="mob-ticker-track"></div></div>
-</div>
 
-<!-- DESKTOP PANEL -->
-<div id="panel">
-  <div id="panel-mood">
-    <div id="panel-mood-bg"></div>
-    <canvas id="panel-smoke-cv"></canvas>
-    <div class="pm-inner">
-      <button class="pm-back" onclick="closePanel()">Back</button>
-      <div id="panel-big-num">01</div>
-      <div class="pm-eyebrow" id="panel-eyebrow">Section</div>
-      <div id="panel-title"></div>
-      <div id="panel-italic"></div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('schedule')">📅 Schedule</button>
+      <button class="tab-btn" onclick="showTab('employees')">👥 Employees</button>
+      <button class="tab-btn" onclick="showTab('notices')">📋 Notices</button>
+      <button class="tab-btn" onclick="showTab('settings')">⚙️ Settings</button>
     </div>
-  </div>
-  <div id="panel-info">
-    <div class="pi-top"><span class="pi-hint">Double-click or confirm to enter · ESC to close</span></div>
-    <div class="pi-body-wrap">
-      <div class="pi-meta" id="panel-meta"></div>
-      <p id="panel-desc"></p>
-      <div id="panel-chips"></div>
-      <div class="pi-cta-wrap">
-        <div class="pi-countdown-row" id="panel-countdown-row" style="display:none;">
-          <div class="pi-countdown-ring" id="panel-countdown-ring">
-            <svg viewBox="0 0 38 38"><circle class="ring-bg" cx="19" cy="19" r="16"/><circle class="ring-fill" id="panel-ring-fill" cx="19" cy="19" r="16"/></svg>
-            <div class="ring-num" id="panel-ring-num">5</div>
+
+    <!-- SCHEDULE TAB -->
+    <div class="tab-panel active" id="tab-schedule">
+      <div style="margin-bottom:1.5rem"><div class="sec-title">Add <span>Shift</span></div><div class="sec-sub">Assign an employee to a date and time. Live instantly for all staff.</div></div>
+      <div class="card ac-ember">
+        <div class="form-grid fg5">
+          <div class="form-group"><label class="f-label">Employee</label><select class="fsel" id="sf-name"><option value="">— Select —</option></select></div>
+          <div class="form-group"><label class="f-label">Date</label><input class="fi" type="date" id="sf-date"></div>
+          <div class="form-group"><label class="f-label">Start Time</label><input class="fi" type="time" id="sf-start"></div>
+          <div class="form-group"><label class="f-label">End Time</label><input class="fi" type="time" id="sf-end"></div>
+          <div class="form-group"><label class="f-label">Role</label>
+            <select class="fsel" id="sf-role"><option>Cook</option><option>Cashier</option><option>Server</option><option>Prep</option><option>Dishwasher</option><option>Manager</option><option>Other</option></select>
           </div>
-          <div class="pi-countdown-text">Redirecting in <strong id="panel-countdown-sec" style="color:var(--chili);">5</strong> seconds</div>
         </div>
-        <div class="cta-wrap">
-          <button id="panel-cta" onclick="goTo()">
-            <div id="cta-logo-ring"><canvas id="ctaLogoCanvas" style="width:100%;height:100%;display:block"></canvas></div>
-            <span id="cta-label">Enter</span><span class="cta-arrow">→</span>
-          </button>
-          <svg class="cta-border-svg" id="cta-border-svg"><rect class="cta-border-track" id="cta-track" rx="0"/><rect class="cta-border-chaser" id="cta-chaser" rx="0"/></svg>
+        <div style="margin-top:1rem;display:flex;gap:.75rem;flex-wrap:wrap;align-items:flex-end">
+          <div class="form-group" style="flex:1;min-width:200px"><label class="f-label">Notes (optional)</label><input class="fi" type="text" id="sf-notes" placeholder="e.g. Crawfish night, cover for John..."></div>
+          <button class="ab red" onclick="addShift()">+ ADD SHIFT</button>
+          <button class="ab ghost" onclick="clearShiftForm()">Clear</button>
         </div>
       </div>
-    </div>
-    <div class="pi-bottom"><span class="pi-foot-rule" id="panel-rule"></span><span class="pi-foot-idx" id="panel-idx"></span></div>
-  </div>
-</div>
 
-<!-- MOBILE SHEET -->
-<div id="mob-panel">
-  <div id="mob-panel-backdrop" onclick="closeMobPanel()"></div>
-  <div id="mob-sheet">
-    <div id="mob-sheet-handle"><div class="handle-bar"></div></div>
-    <div id="mob-sheet-hdr">
-      <div class="msh-eyebrow" id="mob-sheet-eyebrow">Section</div>
-      <button id="mob-sheet-close" onclick="closeMobPanel()">✕ Close</button>
-    </div>
-    <div id="mob-sheet-body">
-      <div><div id="mob-sheet-title"></div><div id="mob-sheet-italic"></div></div>
-      <div class="msh-meta" id="mob-sheet-meta"></div>
-      <p id="mob-sheet-desc"></p>
-      <div id="mob-sheet-chips"></div>
-      <div class="mob-countdown-row" id="mob-countdown-row" style="display:none;">
-        <div class="mob-countdown-ring" id="mob-countdown-ring">
-          <svg viewBox="0 0 34 34"><circle class="ring-bg" cx="17" cy="17" r="14"/><circle class="ring-fill" id="mob-ring-fill" cx="17" cy="17" r="14"/></svg>
-          <div class="ring-num" id="mob-ring-num">5</div>
+      <div class="week-nav" style="margin-top:1.5rem">
+        <div class="week-label">Viewing — <span id="ownWeekRange"></span></div>
+        <div class="week-btns">
+          <button class="wbtn" onclick="ownChangeWeek(-1)">‹ Prev</button>
+          <button class="wbtn today" onclick="ownGoToday()">This Week</button>
+          <button class="wbtn" onclick="ownChangeWeek(1)">Next ›</button>
         </div>
-        <div class="mob-countdown-text">Redirecting in <strong id="mob-countdown-sec" style="color:var(--chili);">5</strong>s</div>
       </div>
-      <button id="mob-sheet-cta" onclick="goTo()">
-        <canvas id="mobCtaLogoCanvas" style="width:34px;height:34px;display:block;flex-shrink:0;border-radius:50%"></canvas>
-        <span id="mob-cta-label">Enter</span><span class="msc-arrow">→</span>
-      </button>
-      <div class="msh-foot-rule" id="mob-sheet-rule"></div>
+      <div class="schedule-grid" id="ownScheduleGrid" style="margin-bottom:1.5rem"></div>
+
+      <div class="filter-row">
+        <span class="fl">Filter table:</span>
+        <input class="fi-sm" type="date" id="filterFrom">
+        <span class="fl">to</span>
+        <input class="fi-sm" type="date" id="filterTo">
+        <button class="ab ghost" style="padding:.4rem .9rem;font-size:.72rem" onclick="applyFilter()">Apply</button>
+        <button class="ab ghost" style="padding:.4rem .9rem;font-size:.72rem" onclick="clearFilter()">Clear</button>
+        <input class="fi-sm" type="text" id="filterName" placeholder="Name..." style="min-width:130px" oninput="renderShiftTable()">
+        <button class="ab ghost" style="padding:.4rem .9rem;font-size:.72rem;margin-left:auto" onclick="ownLoadAll()">↺ Refresh</button>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl"><thead><tr><th>Employee</th><th>Date</th><th>Day</th><th>Start</th><th>End</th><th>Hours</th><th>Role</th><th>Notes</th><th></th></tr></thead>
+        <tbody id="shiftTableBody"></tbody></table>
+      </div>
+      <div style="margin-top:1rem;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
+        <span style="font-size:.72rem;color:var(--muted)" id="shiftCount"></span>
+        <button class="ab ghost" style="padding:.4rem .9rem;font-size:.72rem;margin-left:auto" onclick="if(confirm('Delete ALL shifts? Cannot be undone.')){clearAllShifts()}">🗑 Clear All Shifts</button>
+      </div>
     </div>
+
+    <!-- EMPLOYEES TAB -->
+    <div class="tab-panel" id="tab-employees">
+      <div style="margin-bottom:1.5rem"><div class="sec-title">Manage <span>Employees</span></div><div class="sec-sub">Add employees and set their login PINs.</div></div>
+      <div class="card ac-green">
+        <div class="form-grid fg4">
+          <div class="form-group"><label class="f-label">Full Name</label><input class="fi" type="text" id="emp-name" placeholder="e.g. Sarah Johnson"></div>
+          <div class="form-group"><label class="f-label">Role</label><select class="fsel" id="emp-role"><option>Cook</option><option>Cashier</option><option>Server</option><option>Prep</option><option>Dishwasher</option><option>Manager</option><option>Other</option></select></div>
+          <div class="form-group"><label class="f-label">PIN (4–6 digits)</label><input class="fi" type="text" id="emp-pin" placeholder="e.g. 1234" maxlength="6" inputmode="numeric"></div>
+          <button class="ab green" onclick="addEmployee()">+ ADD</button>
+        </div>
+      </div>
+      <div class="emp-grid" id="empGrid"></div>
+    </div>
+
+    <!-- NOTICES TAB -->
+    <div class="tab-panel" id="tab-notices">
+      <div style="margin-bottom:1.5rem"><div class="sec-title">Notice <span>Board</span></div><div class="sec-sub">Post announcements for all employees. Visible immediately on their portal.</div></div>
+      <div class="card ac-red">
+        <div class="form-grid fg3">
+          <div class="form-group" style="grid-column:span 2"><label class="f-label">Message</label><input class="fi" type="text" id="notice-text" placeholder="e.g. Kitchen closes early Friday — deep clean day"></div>
+          <div class="form-group"><label class="f-label">Type</label><select class="fsel" id="notice-type"><option value="">Alert (red)</option><option value="info">Info (orange)</option><option value="ok">Good News (green)</option></select></div>
+        </div>
+        <div style="margin-top:1rem"><button class="ab red" onclick="addNotice()">+ POST NOTICE</button></div>
+      </div>
+      <div id="noticeList"></div>
+    </div>
+
+    <!-- SETTINGS TAB -->
+    <div class="tab-panel" id="tab-settings">
+      <div style="margin-bottom:1.5rem"><div class="sec-title">Settings & <span>Security</span></div></div>
+      <div class="card ac-ember">
+        <div class="sec-title" style="font-size:1rem;margin-bottom:1rem">Change Admin Password</div>
+        <div class="form-grid fg3">
+          <div class="form-group"><label class="f-label">New Password</label><input class="fi" type="password" id="newPass1" placeholder="New password"></div>
+          <div class="form-group"><label class="f-label">Confirm</label><input class="fi" type="password" id="newPass2" placeholder="Confirm"></div>
+          <button class="ab ember" onclick="changePassword()">Save Password</button>
+        </div>
+        <div id="passMsg" style="font-size:.72rem;margin-top:.75rem;min-height:1rem"></div>
+      </div>
+    </div>
+
   </div>
+  <footer><p>Hot Headz <span>Southern Foods</span> · Manager Portal · Made from scratch since 2020 · <a href='index.html' style='color:var(--ember-light);text-decoration:none'>← Back to site</a></p></footer>
 </div>
 
-<!-- LOADER -->
-<div id="loader">
-  <div class="ld-name">Hot Headz <em>Southern Foods</em></div>
-  <div class="ld-going" id="ld-going">Loading...</div>
-  <div class="ld-fire"><div class="lff"></div><div class="lff"></div><div class="lff"></div><div class="lff"></div><div class="lff"></div><div class="lff"></div><div class="lff"></div></div>
-  <div class="ld-track"><div class="ld-fill" id="ld-fill"></div></div>
-  <div class="ld-msg">Heating things up...</div>
-</div>
+<div class="toast" id="toast"></div>
 
 <script>
-/* CANVAS */
-const cvBg=document.getElementById('cv-bg'),bx=cvBg.getContext('2d');
-const cvSm=document.getElementById('cv-smoke'),sx=cvSm.getContext('2d');
-const cvEm=document.getElementById('cv-ember'),ex=cvEm.getContext('2d');
-let W,H;
-function rsz(){W=cvBg.width=cvSm.width=cvEm.width=window.innerWidth;H=cvBg.height=cvSm.height=cvEm.height=window.innerHeight;}
-rsz();window.addEventListener('resize',rsz);
+// =============================================
+// API
+// =============================================
+const API_URL = 'https://script.google.com/macros/s/AKfycbxnCSfbRk15e66t3rhDCMYzVmc6fpwptTxh611NIqPn8KV3mybvqxoFe97wpXM1YqtMrQ/exec';
 
-let bgP=0;
-function drawBg(){
-  bgP+=.003;const pulse=.5+.5*Math.sin(bgP);
-  const g=bx.createRadialGradient(W*.5,H*.85,0,W*.5,H*.85,W*.9);
-  g.addColorStop(0,`rgba(32,8,4,${.8+pulse*.08})`);g.addColorStop(.35,'rgba(20,5,3,1)');g.addColorStop(1,'rgba(8,4,7,1)');
-  bx.fillStyle=g;bx.fillRect(0,0,W,H);
-  const g2=bx.createRadialGradient(W*.5,H,0,W*.5,H,W*.6);
-  g2.addColorStop(0,`rgba(196,24,0,${.07+pulse*.05})`);g2.addColorStop(.5,'rgba(120,16,0,.03)');g2.addColorStop(1,'transparent');
-  bx.fillStyle=g2;bx.fillRect(0,0,W,H);
+function api(params) {
+  var qs = Object.keys(params).map(function(k){ return encodeURIComponent(k)+'='+encodeURIComponent(params[k]); }).join('&');
+  return fetch(API_URL+'?'+qs, { method:'GET', mode:'cors' })
+    .then(function(r){
+      if(!r.ok) throw new Error('Server error ' + r.status);
+      return r.text();
+    })
+    .then(function(text){
+      try { return JSON.parse(text); }
+      catch(e) { throw new Error('Invalid response from server — check Apps Script deployment'); }
+    });
 }
-function mkS(){return{x:.15+Math.random()*.7,y:1.05+Math.random()*.05,vx:(Math.random()-.5)*.0003,vy:-.0006-Math.random()*.0005,r:35+Math.random()*55,a:0,ta:.018+Math.random()*.02,gr:.06+Math.random()*.04,wb:Math.random()*Math.PI*2,ws:.004+Math.random()*.007};}
-const SM=Array.from({length:18},mkS);
-function drawSmoke(){
-  sx.clearRect(0,0,W,H);
-  for(const s of SM){
-    s.wb+=s.ws;s.x+=s.vx+Math.sin(s.wb)*.00025;s.y+=s.vy;s.r+=s.gr;
-    s.a=s.a<s.ta?s.a+.0018:Math.max(0,s.a-.0012);
-    if(s.y<-.25||s.a<=0){Object.assign(s,mkS());continue;}
-    const g=sx.createRadialGradient(s.x*W,s.y*H,0,s.x*W,s.y*H,s.r);
-    g.addColorStop(0,`rgba(100,40,30,${s.a})`);g.addColorStop(.5,`rgba(70,28,20,${s.a*.45})`);g.addColorStop(1,'transparent');
-    sx.fillStyle=g;sx.beginPath();sx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);sx.fill();
+
+// =============================================
+// LOADING / TOAST / CLOCK
+// =============================================
+function loading(msg, color) {
+  document.getElementById('loadingText').textContent = msg||'Loading...';
+  document.getElementById('spinner').className = 'spinner '+(color||'red');
+  document.getElementById('loadingOverlay').classList.add('show');
+}
+function stopLoading(){ document.getElementById('loadingOverlay').classList.remove('show'); }
+
+function toast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show '+(type||'ok');
+  clearTimeout(t._t); t._t = setTimeout(function(){ t.className='toast'; }, 2800);
+}
+
+function updateClock(){
+  var el=document.getElementById('liveClock'); if(!el) return;
+  var n=new Date();
+  el.textContent=n.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true})+' · '+n.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+}
+setInterval(updateClock,1000); updateClock();
+
+// =============================================
+// NAVIGATION
+// =============================================
+var _mode = null; // 'employee' or 'owner'
+
+function showLogin(mode) {
+  _mode = mode;
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  if(mode === 'employee') {
+    document.getElementById('empLoginBox').style.display = 'block';
+    document.getElementById('ownLoginBox').style.display = 'none';
+    loadEmployeeNames();
+  } else {
+    document.getElementById('empLoginBox').style.display = 'none';
+    document.getElementById('ownLoginBox').style.display = 'block';
+    setTimeout(function(){ document.getElementById('ownPass').focus(); }, 100);
   }
 }
-function mkE(){return{x:.12+Math.random()*.76,y:1.02+Math.random()*.04,vx:(Math.random()-.5)*.0028,vy:-.004-Math.random()*.008,r:.6+Math.random()*1.6,life:1,decay:.003+Math.random()*.006,h:Math.random()<.5?0:15+Math.random()*10,tw:(Math.random()-.5)*.001};}
-const EM=Array.from({length:26},mkE);
-function drawEmbers(){
-  ex.clearRect(0,0,W,H);
-  for(let i=0;i<EM.length;i++){
-    const e=EM[i];e.x+=e.vx+e.tw;e.y+=e.vy;e.life-=e.decay;
-    if(e.life<=0||e.y<-.02){EM[i]=mkE();continue;}
-    ex.beginPath();ex.arc(e.x*W,e.y*H,e.r,0,Math.PI*2);
-    ex.fillStyle=`hsla(${e.h},100%,${52+e.life*34}%,${e.life*.82})`;
-    ex.shadowBlur=8;ex.shadowColor=`hsla(${e.h},100%,58%,${e.life*.5})`;
-    ex.fill();ex.shadowBlur=0;
+
+function goLanding() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('empApp').style.display = 'none';
+  document.getElementById('ownApp').style.display = 'none';
+  document.getElementById('mainHeader').style.display = 'none';
+  document.getElementById('landing').style.display = 'flex';
+  document.getElementById('empError').textContent = '';
+  document.getElementById('ownError').textContent = '';
+  document.getElementById('empPin').value = '';
+  document.getElementById('ownPass').value = '';
+}
+
+function signOut() { goLanding(); }
+
+function showHeader(mode, name) {
+  var hdr = document.getElementById('mainHeader');
+  hdr.style.display = 'flex';
+  var badge = document.getElementById('modeBadge');
+  if(mode === 'employee') { badge.textContent = 'Employee'; badge.className = 'mode-badge emp'; }
+  else { badge.textContent = 'Manager'; badge.className = 'mode-badge own'; }
+}
+
+// Enter key support
+document.addEventListener('keydown', function(e) {
+  if(e.key !== 'Enter') return;
+  if(document.getElementById('loginScreen').style.display === 'flex') {
+    if(_mode === 'employee') empLogin();
+    else if(_mode === 'owner') ownLogin();
   }
-}
-(function loop(){drawBg();drawSmoke();drawEmbers();requestAnimationFrame(loop);})();
-
-/* Panel smoke */
-const psCV=document.getElementById('panel-smoke-cv'),psx=psCV.getContext('2d');
-function rszPS(){psCV.width=window.innerWidth;psCV.height=window.innerHeight;}
-rszPS();window.addEventListener('resize',rszPS);
-const PS=Array.from({length:10},mkS);
-(function psL(){
-  psx.clearRect(0,0,psCV.width,psCV.height);
-  for(const s of PS){
-    s.wb+=s.ws;s.x+=s.vx+Math.sin(s.wb)*.0002;s.y+=s.vy;s.r+=s.gr*.7;
-    s.a=s.a<s.ta?s.a+.0015:Math.max(0,s.a-.001);
-    if(s.y<-.2||s.a<=0){Object.assign(s,mkS());continue;}
-    const g=psx.createRadialGradient(s.x*psCV.width,s.y*psCV.height,0,s.x*psCV.width,s.y*psCV.height,s.r);
-    g.addColorStop(0,`rgba(80,28,18,${s.a*.7})`);g.addColorStop(1,'transparent');
-    psx.fillStyle=g;psx.beginPath();psx.arc(s.x*psCV.width,s.y*psCV.height,s.r,0,Math.PI*2);psx.fill();
-  }
-  requestAnimationFrame(psL);
-})();
-
-/* CURSOR */
-const curEl=document.getElementById('cursor');
-document.addEventListener('mousemove',e=>{curEl.style.left=e.clientX+'px';curEl.style.top=e.clientY+'px';});
-
-/* TICKERS */
-const tkItems=['Red Beans & Rice','Fried Chicken Plate','Catfish Plate','Meatloaf','Smothered Pork Chops','Chicken & Sausage Gumbo','Shrimp Po\' Boy','Crawfish Étouffée','Jambalaya','Mac & Cheese','Cornbread','Breakfast Plate','Biscuits & Gravy','Cajun Boudin','Sweet Tea','Bread Pudding'];
-const d4=[...tkItems,...tkItems,...tkItems,...tkItems];
-const html=d4.map(t=>`<span class="t-item">${t}</span>`).join('');
-document.getElementById('ticker-track').innerHTML=html;
-document.getElementById('mob-ticker-track').innerHTML=d4.map(t=>`<span class="mt-item">${t}</span>`).join('');
-
-/* HOURS */
-const dow=new Date().getDay();
-const hoursStr=dow===0?'Sun: 7am – 3pm':dow===6?'Sat: 6am – 2pm':'Mon–Fri 5:30am–2pm';
-const mobHoursStr=dow===0?'7am – 3pm':dow===6?'6am – 2pm':'5:30am – 2pm';
-document.getElementById('hours-today').textContent=hoursStr;
-document.getElementById('mob-hours').textContent=mobHoursStr;
-
-/* PAGE DATA */
-const PAGES={
-  home:{num:'01',eyebrow:'Home',cta:'Go to Home Page',title:'Hot Headz\nSouthern Foods.',italic:'Fresh · From Scratch · Est. 2020',meta:'2741 US-190 · DeRidder, LA · (337) 221-1035',mood:'radial-gradient(ellipse at 30% 80%,#3a0800 0%,#1c0404 50%,#08040a 100%)',desc:`<strong>Hot Headz Southern Foods</strong> — fresh, made-from-scratch breakfast and lunch in DeRidder, Louisiana. Open Mon–Fri 5:30am, Saturday 6am, Sunday 7am. Cafeteria-style comfort food done right since 2020.`,chips:['Est. 2020','DeRidder, LA','Made From Scratch','(337) 221-1035','Mon–Fri 5:30am','Sun 7am–3pm'],rule:'Home is where the food is.',dest:'home.html'},
-  menu:{num:'02',eyebrow:'The Menu',cta:'See Full Menu',title:'Fresh.\nFrom Scratch.',italic:'Breakfast · Lunch · Daily specials · Desserts',meta:'Made fresh every morning — no shortcuts',mood:'radial-gradient(ellipse at 30% 80%,#3a0800 0%,#1c0404 50%,#08040a 100%)',desc:`Everything at Hot Headz is <strong>made from scratch every morning.</strong> Breakfast plates, lunch specials, Southern sides, Cajun classics and homemade desserts. Red beans & rice, fried chicken, catfish, smothered pork chops, crawfish étouffée and more. Cafeteria-style comfort food done right.`,chips:['Breakfast Plates','Red Beans & Rice','Fried Chicken','Catfish','Crawfish Étouffée','Daily Specials'],rule:'From scratch, every time.',dest:'menu.html'},
-  lunch:{num:'✦',eyebrow:'Lunch',cta:'See Lunch Menu',title:'Lunch.\nDone Right.',italic:'Daily Southern plates · Changes every day',meta:'Served Mon–Fri until 2pm · Sat until 2pm · Sun until 3pm',mood:'radial-gradient(ellipse at 30% 80%,#3a0800 0%,#1c0404 50%,#08040a 100%)',desc:`Hot Headz lunch is <strong>made fresh every morning</strong> and changes daily. Expect classics like red beans & rice, fried chicken, smothered pork chops, catfish plates, jambalaya, meatloaf and crawfish étouffée. Southern sides included. <strong>Check Facebook every morning</strong> to see what's on the board before you drive out.`,chips:['Changes Daily','Southern Plates','Includes Sides','Check Facebook','Mon–Fri to 2pm','Sun to 3pm'],rule:'Check Facebook for today\'s plate.',dest:'menu.html#lunch'},
-  beer:{num:'✦',eyebrow:'Beer',cta:'See Beer Menu',title:'Cold.\nCold Beer.',italic:'Ice cold · Natural Light · Modelo · Budweiser',meta:'Ask staff for what\'s available today',mood:'radial-gradient(ellipse at 30% 80%,#1a0400 0%,#100200 50%,#08040a 100%)',desc:`Hot Headz keeps it cold. <strong>Natural Light, Miller Lite, Coors Light, Bud Light, Budweiser, Michelob Ultra, Corona and Modelo</strong> — all ice cold. The perfect end to a Southern lunch.`,chips:['Natural Light','Miller Lite','Coors Light','Bud Light','Budweiser','Modelo'],rule:'Best with a plate of fried chicken.',dest:'menu.html#beer'},
-  delivery:{num:'03',eyebrow:'Delivery',cta:'See Delivery Info',title:'We Bring\nThe Food.',italic:'10+ plate orders · within 10 miles',meta:'Call (337) 221-1035 to arrange',mood:'radial-gradient(ellipse at 30% 80%,#2a0400 0%,#160200 50%,#08040a 100%)',desc:`Hot Headz delivers for <strong>orders of 10 or more plates within a 10-mile radius</strong> of 2741 US-190 in DeRidder. Call ahead at <strong>(337) 221-1035</strong> to arrange. Great for office lunches, family gatherings, and group orders. Check the delivery page for full details.`,chips:['10+ Plates','Within 10 Miles','Call Ahead','(337) 221-1035','Group Orders','Office Lunch'],rule:'Delivered hot and fresh.',dest:'delivery.html'},
-  order:{num:'04',eyebrow:'Order Now',cta:'Call (337) 221-1035',title:'Call\nAhead.',italic:'Skip the line · Ready when you arrive',meta:'(337) 221-1035 · Mon–Fri 5:30am',mood:'radial-gradient(ellipse at 30% 80%,#320800 0%,#1a0400 50%,#08040a 100%)',desc:`Call us at <strong>(337) 221-1035</strong> to place your order ahead of time and skip the line. Open Mon–Fri from 5:30am, Saturday 6am, Sunday 7am. We'll have everything ready when you walk in. Fast, friendly, and worth every minute.`,chips:['(337) 221-1035','Mon–Fri from 5:30am','Sat from 6am','Sun from 7am','Skip the Line','Carry-Out Ready'],rule:'We\'ll have it ready.',dest:'tel:3372211035'},
-  about:{num:'05',eyebrow:'About Us',cta:'Read Our Story',title:'Comfort\nFood Done Right.',italic:'Family-owned · DeRidder proud · Since 2020',meta:'2741 US-190, DeRidder, LA 70634',mood:'radial-gradient(ellipse at 30% 80%,#281000 0%,#140800 50%,#08040a 100%)',desc:`Hot Headz Southern Foods has been serving <strong>DeRidder, Louisiana</strong> since 2020 with fresh, made-from-scratch comfort food that tastes like home. Cafeteria-style, generous portions, fast and friendly service. The kind of place locals call their go-to for breakfast and lunch every day.`,chips:['Est. 2020','Family Owned','Made From Scratch','DeRidder Proud','Dine-In','Carry-Out'],rule:'Real Southern cooking.',dest:'about.html'},
-  facebook:{num:'06',eyebrow:'Facebook',cta:'Visit Our Facebook',title:'Follow\nThe Feed.',italic:'Daily specials posted every morning',meta:'Check Facebook before you drive out',mood:'radial-gradient(ellipse at 30% 80%,#1e0800 0%,#100400 50%,#08040a 100%)',desc:`We post our <strong>daily specials every morning</strong> on Facebook. The fastest way to see what's on the board before you make the drive. Follow us for updates, photos, announcements and community posts.`,chips:['Daily Specials','Morning Posts','Photos','Announcements','Community','Follow Us'],rule:'Posted fresh every morning.',dest:'https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/'},
-  find:{num:'07',eyebrow:'Find Us',cta:'Get Directions',title:'We\'re on\nUS-190.',italic:'2741 US-190 · DeRidder, LA 70634',meta:'Mon–Fri 5:30am–2pm · Sat 6am–2pm · Sun 7am–3pm',mood:'radial-gradient(ellipse at 30% 80%,#180600 0%,#0c0200 50%,#08040a 100%)',desc:`We're at <strong>2741 US-190, DeRidder, Louisiana 70634.</strong> Mon–Fri 5:30am–2pm, Saturday 6am–2pm, Sunday 7am–3pm. Crawfish available Thursday–Saturday 4–8pm. Easy parking right off the highway.`,chips:['2741 US-190','(337) 221-1035','Mon–Fri 5:30–2','Sat 6–2','Sun 7–3','Crawfish Thu–Sat PM'],rule:"Follow the smell of Southern cooking.",dest:'https://maps.google.com/?q=2741+US-190+DeRidder+LA+70634'},
-  /* ★ STAFF PORTAL ★ */
-  staff:{num:'08',eyebrow:'Staff Portal',cta:'Open Staff Portal',title:'Employee\nPortal.',italic:'Schedule · Shifts · Notices',meta:'For Hot Headz staff only — sign in required',mood:'radial-gradient(ellipse at 30% 80%,#2a0e00 0%,#180600 50%,#08040a 100%)',desc:`The <strong>Hot Headz Staff Portal</strong> gives employees access to their schedule, upcoming shifts, hours, and kitchen notices in real time. Managers can add shifts, manage employees, and post announcements — all visible instantly to the entire team on any device.`,chips:['View Schedule','My Shifts','Notice Board','Manager Access','Live Updates','All Devices'],rule:'Made from scratch. Just like the food.',dest:'staff-portal.html'},
-};
-
-const pvNums={home:'01',menu:'02',lunch:'✦',beer:'✦',delivery:'03',order:'04',about:'05',facebook:'06',find:'07',staff:'08'};
-function setPreview(id){
-  const p=PAGES[id];
-  document.getElementById('pv-title').textContent=p.title.replace('\n',' ');
-  document.getElementById('pv-desc').textContent=p.italic;
-  document.getElementById('pv-num').textContent=pvNums[id];
-  document.getElementById('pv-num').classList.add('lit');
-  document.getElementById('pv-chips').innerHTML=p.chips.slice(0,4).map((c,i)=>`<span class="pv-chip${i<2?' on':''}">${c}</span>`).join('');
-}
-function clearPreview(){
-  document.getElementById('pv-title').textContent='Hover any item to explore';
-  document.getElementById('pv-desc').textContent='Each destination has its own story. Take your time.';
-  document.getElementById('pv-num').classList.remove('lit');
-  document.getElementById('pv-num').textContent='—';
-  document.getElementById('pv-chips').innerHTML='';
-}
-
-let currentPage=null,navigating=false;
-
-/* AUTO-REDIRECT COUNTDOWN */
-let _cdTimer=null,_cdInterval=null;
-const CD_SECS=15,RING_D=100,RING_M=88;
-function stopCountdown(){
-  if(_cdTimer){clearTimeout(_cdTimer);_cdTimer=null;}
-  if(_cdInterval){clearInterval(_cdInterval);_cdInterval=null;}
-  const dr=document.getElementById('panel-countdown-row');
-  const mr=document.getElementById('mob-countdown-row');
-  if(dr)dr.style.display='none';
-  if(mr)mr.style.display='none';
-}
-function startCountdown(){
-  stopCountdown();
-  let secs=CD_SECS;
-  const dr=document.getElementById('panel-countdown-row');
-  const mr=document.getElementById('mob-countdown-row');
-  if(dr)dr.style.display='flex';
-  if(mr)mr.style.display='flex';
-  function tick(){
-    const ds=document.getElementById('panel-countdown-sec'),dn=document.getElementById('panel-ring-num'),df=document.getElementById('panel-ring-fill');
-    if(ds)ds.textContent=secs;if(dn)dn.textContent=secs;
-    if(df)df.style.strokeDashoffset=String(RING_D*(1-secs/CD_SECS));
-    const ms=document.getElementById('mob-countdown-sec'),mn=document.getElementById('mob-ring-num'),mf=document.getElementById('mob-ring-fill');
-    if(ms)ms.textContent=secs;if(mn)mn.textContent=secs;
-    if(mf)mf.style.strokeDashoffset=String(RING_M*(1-secs/CD_SECS));
-  }
-  tick();
-  _cdInterval=setInterval(()=>{secs--;if(secs>=0)tick();},1000);
-  _cdTimer=setTimeout(()=>{stopCountdown();goTo();},CD_SECS*1000);
-}
-function sizeChaserBorder(){
-  const btn=document.getElementById('panel-cta');
-  const track=document.getElementById('cta-track');
-  const chaser=document.getElementById('cta-chaser');
-  if(!btn||!track||!chaser)return;
-  const w=btn.offsetWidth,h=btn.offsetHeight;
-  const perimeter=2*(w+h);
-  [track,chaser].forEach(el=>{el.setAttribute('x','0');el.setAttribute('y','0');el.setAttribute('width',w);el.setAttribute('height',h);});
-  chaser.style.strokeDasharray='50 '+perimeter;
-  chaser.style.animationDuration=(perimeter/150)+'s';
-}
-
-function openPanel(id){
-  const p=PAGES[id];currentPage=p;
-  document.getElementById('panel-mood-bg').style.background=p.mood;
-  document.getElementById('panel-big-num').textContent=p.num;
-  document.getElementById('panel-eyebrow').textContent=p.eyebrow;
-  document.getElementById('panel-title').innerHTML=p.title.replace('\n','<br>');
-  document.getElementById('panel-italic').textContent=p.italic;
-  document.getElementById('panel-meta').textContent=p.meta;
-  document.getElementById('panel-desc').innerHTML=p.desc;
-  document.getElementById('panel-rule').textContent=p.rule;
-  document.getElementById('panel-idx').textContent=p.num;
-  document.getElementById('cta-label').textContent=p.cta;
-  document.getElementById('panel-chips').innerHTML=p.chips.map((c,i)=>`<span class="panel-chip${i<3?' lit':''}">${c}</span>`).join('');
-  document.getElementById('panel').classList.add('open');
-  document.getElementById('shell').style.pointerEvents='none';
-  navigating=false;
-  /* Show/hide spinning logo in CTA for staff panel */
-  var ring=document.getElementById('cta-logo-ring');
-  if(ring){
-    if(id==='staff'){
-      ring.style.width='28px';ring.style.height='28px';ring.style.marginRight='6px';
-      setTimeout(function(){makeLogoRings('ctaLogoCanvas',28,{outerR:.9,innerR:.58,outerT:.04,innerT:.02,logoR:.46,speed:.7});},60);
-    } else {
-      ring.style.width='0';ring.style.height='0';ring.style.marginRight='0';
-    }
-  }
-  requestAnimationFrame(()=>{sizeChaserBorder();startCountdown();});
-}
-function closePanel(){
-  stopCountdown();
-  document.getElementById('panel').classList.remove('open');
-  document.getElementById('shell').style.pointerEvents='';
-  currentPage=null;
-}
-document.getElementById('panel-info').addEventListener('dblclick',goTo);
-
-function openMobPanel(id){
-  const p=PAGES[id];currentPage=p;
-  document.getElementById('mob-sheet-eyebrow').textContent=p.eyebrow;
-  document.getElementById('mob-sheet-title').innerHTML=p.title.replace('\n','<br>');
-  document.getElementById('mob-sheet-italic').textContent=p.italic;
-  document.getElementById('mob-sheet-meta').textContent=p.meta;
-  document.getElementById('mob-sheet-desc').innerHTML=p.desc;
-  document.getElementById('mob-sheet-rule').textContent=p.rule;
-  document.getElementById('mob-cta-label').textContent=p.cta;
-  document.getElementById('mob-sheet-chips').innerHTML=p.chips.map((c,i)=>`<span class="msc${i<3?' lit':''}">${c}</span>`).join('');
-  document.getElementById('mob-panel').classList.add('open');
-  navigating=false;
-  document.getElementById('mob-sheet-body').scrollTop=0;
-  startCountdown();
-}
-function closeMobPanel(){stopCountdown();document.getElementById('mob-panel').classList.remove('open');currentPage=null;}
-
-function goTo(){
-  if(!currentPage||navigating)return;
-  navigating=true;
-  const ld=document.getElementById('loader');
-  document.getElementById('ld-going').textContent='Heading to '+currentPage.eyebrow.toLowerCase()+'...';
-  const fill=document.getElementById('ld-fill');
-  fill.style.animation='none';void fill.offsetHeight;
-  ld.classList.add('show');
-  const dest=currentPage.dest;
-  const isExternal=dest.startsWith('http')||dest.startsWith('tel');
-  const extWin=isExternal?window.open('','_blank'):null;
-  setTimeout(()=>{
-    if(isExternal){
-      if(extWin&&!extWin.closed){extWin.location.href=dest;}
-      else{window.location.href=dest;}
-      ld.classList.remove('show');navigating=false;
-    } else {
-      window.location.href=dest;
-    }
-  },1900);
-}
-
-document.addEventListener('touchstart',e=>{
-  const t=e.touches[0];
-  const r=document.createElement('div');r.className='ripple';
-  r.style.left=t.clientX+'px';r.style.top=t.clientY+'px';
-  document.body.appendChild(r);setTimeout(()=>r.remove(),700);
-},{passive:true});
-
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closePanel();closeMobPanel();}});
-
-let sheetStartY=0;
-document.getElementById('mob-sheet').addEventListener('touchstart',e=>{sheetStartY=e.touches[0].clientY;},{passive:true});
-document.getElementById('mob-sheet').addEventListener('touchend',e=>{
-  const dy=e.changedTouches[0].clientY-sheetStartY;
-  if(dy>80)closeMobPanel();
-},{passive:true});
-
-document.body.style.opacity='0';
-document.body.style.transition='opacity .6s';
-window.addEventListener('load',()=>{
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    document.body.style.opacity='1';
-    const isMobile=window.innerWidth<768;
-    setTimeout(()=>{
-      if(isMobile)document.getElementById('mobile-shell').classList.add('on');
-      else document.getElementById('shell').classList.add('on');
-    },200);
-  }));
 });
 
-/* ═══════════════════════════════════════
-   SPINNING LOGO RINGS (Three.js)
-   Logo: /images/HotHeadzLogo.png
-═══════════════════════════════════════ */
-const HH_LOGO_URL = '/images/HotHeadzLogo.png';
-var _logoInstances = {};
+// =============================================
+// EMPLOYEE LOGIN + APP
+// =============================================
+var _currentUser = null;
+var _empWeekOffset = 0;
+var _schedule = [], _notices = [];
+
+function loadEmployeeNames() {
+  loading('Loading staff list...','red');
+  api({action:'getEmployees'}).then(function(r){
+    stopLoading();
+    if(!r.ok) return;
+    var sel = document.getElementById('empName');
+    sel.innerHTML = '<option value="">— Select your name —</option>';
+    (r.data||[]).slice().sort(function(a,b){return a.name.localeCompare(b.name);}).forEach(function(e){
+      var o = document.createElement('option'); o.value=e.name; o.textContent=e.name; sel.appendChild(o);
+    });
+  }).catch(function(){ stopLoading(); });
+}
+
+function empLogin() {
+  var name = document.getElementById('empName').value.trim();
+  var pin  = document.getElementById('empPin').value.trim();
+  var err  = document.getElementById('empError');
+  if(!name){ err.textContent='Please select your name.'; return; }
+  if(!pin) { err.textContent='Please enter your PIN.'; return; }
+  loading('Checking PIN...','red');
+  api({action:'checkPin', name:name, pin:pin}).then(function(r){
+    stopLoading();
+    if(r.ok){ _currentUser=name; showEmpApp(); }
+    else { err.textContent = r.error||'Incorrect PIN. Try again.'; }
+  }).catch(function(){ stopLoading(); err.textContent='Connection error. Try again.'; });
+}
+
+function showEmpApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('empApp').style.display = 'block';
+  showHeader('employee', _currentUser);
+  document.getElementById('empWelcomeName').textContent = _currentUser;
+  var now = new Date();
+  document.getElementById('empWelcomeMeta').textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  loading('Loading your schedule...','red');
+  Promise.all([api({action:'getSchedule'}), api({action:'getNotices'})]).then(function(res){
+    stopLoading();
+    if(res[0].ok) _schedule = (res[0].data||[]).map(function(s){
+      // Normalize date — sheet sometimes returns full ISO timestamp, we only want YYYY-MM-DD
+      if(s.date && s.date.length > 10) s.date = s.date.slice(0,10);
+      return s;
+    });
+    if(res[1].ok) _notices  = res[1].data||[];
+
+    empRenderWeek(); empRenderMyShifts(); empRenderNotices();
+  }).catch(function(){ stopLoading(); });
+}
+
+// ── EMP WEEK ──
+var DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fmtD(d){ return d.toISOString().slice(0,10); }
+function fmt12(t){ if(!t)return'—'; var p=t.split(':').map(Number),h=p[0],m=p[1]; return(h%12||12)+':'+(m<10?'0':'')+m+(h>=12?'pm':'am'); }
+function calcH(s,e){ if(!s||!e)return 0; var a=s.split(':').map(Number),b=e.split(':').map(Number),d=(b[0]*60+b[1])-(a[0]*60+a[1]); return d>0?+(d/60).toFixed(1):0; }
+function fmtDate(s){ if(!s)return''; var d=new Date(s+'T00:00:00'); return MONTHS[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear(); }
+function fmtDay(s){ if(!s)return''; return ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date(s+'T00:00:00').getDay()]; }
+
+function getWeekStart(offset){
+  var now=new Date(), day=now.getDay();
+  var sun=new Date(now); sun.setDate(now.getDate()-day+offset*7); sun.setHours(0,0,0,0); return sun;
+}
+
+function empChangeWeek(d){ _empWeekOffset+=d; empRenderWeek(); empRenderMyShifts(); }
+function empGoToday(){ _empWeekOffset=0; empRenderWeek(); empRenderMyShifts(); }
+
+function renderScheduleGrid(gridId, rangeId, weekOffset, schedule, highlightUser) {
+  var ws=getWeekStart(weekOffset), we=new Date(ws); we.setDate(we.getDate()+6);
+  if(rangeId) document.getElementById(rangeId).textContent=MONTHS[ws.getMonth()]+' '+ws.getDate()+' – '+MONTHS[we.getMonth()]+' '+we.getDate()+', '+we.getFullYear();
+  var today=fmtD(new Date()), grid=document.getElementById(gridId);
+  grid.innerHTML='';
+  for(var d=0;d<7;d++){
+    var date=new Date(ws); date.setDate(ws.getDate()+d);
+    var ds=fmtD(date), isToday=ds===today;
+    var dayShifts=schedule.filter(function(s){return s.date===ds;});
+    var col=document.createElement('div'); col.className='day-col'+(isToday?' today':'');
+    var hdr=document.createElement('div'); hdr.className='day-header';    hdr.innerHTML='<div class="day-name">'+DAYS[d]+'</div><div class="day-date">'+MONTHS[date.getMonth()]+' '+date.getDate()+'</div>';
+    col.appendChild(hdr);
+    var slots=document.createElement('div'); slots.className='day-slots';
+    if(!dayShifts.length){ var emp=document.createElement('div');emp.className='day-empty';emp.textContent='Off';slots.appendChild(emp); }
+    else {
+      dayShifts.forEach(function(s){
+        var c=document.createElement('div');
+        c.className='shift-card'+(highlightUser&&s.name.trim().toLowerCase()===highlightUser.trim().toLowerCase()?' mine':'');
+        c.innerHTML='<div class="shift-name">'+s.name+'</div><div class="shift-time">'+fmt12(s.startTime)+(s.endTime?' – '+fmt12(s.endTime):'')+'</div><div class="shift-role">'+(s.role||'')+'</div>';
+        slots.appendChild(c);
+      });
+    }
+    col.appendChild(slots); grid.appendChild(col);
+  }
+}
+
+function empRenderWeek(){ renderScheduleGrid('empScheduleGrid','empWeekRange',_empWeekOffset,_schedule,_currentUser); empRenderStats(); }
+
+function empRenderMyShifts(){
+  var today=new Date(); today.setHours(0,0,0,0);
+  var me = _currentUser.trim().toLowerCase();
+  var upcoming=_schedule.filter(function(s){return s.name.trim().toLowerCase()===me&&new Date(s.date+'T00:00:00')>=today;})
+    .sort(function(a,b){return a.date.localeCompare(b.date);}).slice(0,10);
+  var el=document.getElementById('empMyShifts');
+  if(!upcoming.length){ el.innerHTML='<div class="no-shifts"><span class="ns-icon">📅</span>No upcoming shifts scheduled.<br>Check back after the schedule is updated.</div>'; return; }
+  el.innerHTML='';
+  upcoming.forEach(function(s,i){
+    var d=new Date(s.date+'T00:00:00'), hrs=calcH(s.startTime,s.endTime);
+    var row=document.createElement('div'); row.className='panel-row';
+    row.innerHTML='<div class="sdb '+(i===0?'next':'')+'"><div class="sdb-day">'+DAYS[d.getDay()]+'</div><div class="sdb-num">'+d.getDate()+'</div></div><div class="pi"><div class="pi-title">'+MONTHS[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear()+'</div><div class="pi-meta">'+fmt12(s.startTime)+(s.endTime?' – '+fmt12(s.endTime):'')+'</div><div class="pi-role">'+(s.role||'Staff')+(s.notes?' · '+s.notes:'')+'</div></div><div class="hrs-badge">'+(hrs>0?hrs+'h':'–')+'<span>hours</span></div>';
+    el.appendChild(row);
+  });
+}
+
+function empRenderStats(){
+  var ws=getWeekStart(_empWeekOffset), myWeek=[];
+  for(var d=0;d<7;d++){ var date=new Date(ws);date.setDate(ws.getDate()+d); _schedule.filter(function(s){return s.date===fmtD(date)&&s.name.trim().toLowerCase()===_currentUser.trim().toLowerCase();}).forEach(function(s){myWeek.push(s);}); }
+  var totalHrs=myWeek.reduce(function(a,s){return a+calcH(s.startTime,s.endTime);},0);
+  var totalDays=[...new Set(myWeek.map(function(s){return s.date;}))].length;
+  var sorted=myWeek.slice().sort(function(a,b){return a.date.localeCompare(b.date);});
+  document.getElementById('empStatHours').innerHTML=totalHrs+'<span>h</span>';
+  document.getElementById('empStatDays').textContent=totalDays;
+  document.getElementById('empStatIn').textContent=sorted.length?fmt12(sorted[0].startTime):'–';
+  document.getElementById('empStatOut').textContent=sorted.length?fmt12(sorted[sorted.length-1].endTime):'–';
+}
+
+function empRenderNotices(){
+  var el=document.getElementById('empNoticeBoard');
+  var defaults=[
+    {text:'Kitchen hours: <strong>Mon–Fri 5:30am – 2pm</strong>. Crawfish Thu–Sat 4–8pm.',type:'info',date:'Standing'},
+    {text:'Call <strong>(337) 221-1035</strong> if you are going to be late or cannot make your shift.',type:'ok',date:'Standing'},
+  ];
+  var all=defaults.concat(_notices.slice().reverse()).slice(0,8);
+  el.innerHTML='';
+  all.forEach(function(n){
+    var item=document.createElement('div'); item.className='notice-item';
+    item.innerHTML='<div class="ndot '+(n.type||'')+'"></div><div><div class="n-text">'+n.text+'</div><div class="n-date">'+(n.date||'')+'</div></div>';
+    el.appendChild(item);
+  });
+}
+
+// =============================================
+// OWNER LOGIN + APP
+// =============================================
+var _ownWeekOffset = 0;
+var _ownSchedule = [], _ownEmployees = [];
+var _filterFrom='', _filterTo='', _filterName='';
+
+function ownLogin() {
+  var pass = document.getElementById('ownPass').value;
+  if(!pass){ document.getElementById('ownError').textContent='Enter your password.'; return; }
+  loading('Checking password...','ember');
+  api({action:'checkAdmin', pass:pass}).then(function(r){
+    stopLoading();
+    if(r.ok){ showOwnApp(); }
+    else { document.getElementById('ownError').textContent = 'Incorrect password.'; }
+  }).catch(function(err){
+    stopLoading();
+    document.getElementById('ownError').textContent = err.message || 'Connection error — check Apps Script deployment';
+  });
+}
+
+function showOwnApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('ownApp').style.display = 'block';
+  showHeader('owner');
+  var now = new Date();
+  document.getElementById('ownWelcomeMeta').textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  document.getElementById('sf-date').value  = now.toISOString().slice(0,10);
+  document.getElementById('sf-start').value = '05:30';
+  document.getElementById('sf-end').value   = '14:00';
+  var day=now.getDay(), sun=new Date(now); sun.setDate(now.getDate()-day); sun.setHours(0,0,0,0);
+  var sat=new Date(sun); sat.setDate(sun.getDate()+6);
+  document.getElementById('filterFrom').value = sun.toISOString().slice(0,10);
+  document.getElementById('filterTo').value   = sat.toISOString().slice(0,10);
+  _filterFrom = document.getElementById('filterFrom').value;
+  _filterTo   = document.getElementById('filterTo').value;
+  ownLoadAll();
+}
+
+function ownLoadAll() {
+  loading('Loading all data...','ember');
+  Promise.all([api({action:'getSchedule'}), api({action:'getEmployees'}), api({action:'getNotices'})]).then(function(res){
+    stopLoading();
+    if(res[0].ok){ _ownSchedule=(res[0].data||[]).map(function(s){ if(s.date&&s.date.length>10)s.date=s.date.slice(0,10); return s; }); renderScheduleGrid('ownScheduleGrid','ownWeekRange',_ownWeekOffset,_ownSchedule,null); renderShiftTable(); }
+    if(res[1].ok){ _ownEmployees=res[1].data||[]; renderEmpSelect(); renderEmpGrid(); }
+    if(res[2].ok) renderNoticeList(res[2].data||[]);
+  }).catch(function(){ stopLoading(); toast('Failed to load data — check connection','err'); });
+}
+
+function ownChangeWeek(d){ _ownWeekOffset+=d; renderScheduleGrid('ownScheduleGrid','ownWeekRange',_ownWeekOffset,_ownSchedule,null); }
+function ownGoToday(){ _ownWeekOffset=0; renderScheduleGrid('ownScheduleGrid','ownWeekRange',_ownWeekOffset,_ownSchedule,null); }
+
+// ── TABS ──
+function showTab(id) {
+  document.querySelectorAll('.tab-btn').forEach(function(b,i){
+    b.classList.toggle('active',['schedule','employees','notices','settings'][i]===id);
+  });
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.toggle('active',p.id==='tab-'+id); });
+}
+
+// ── SHIFTS ──
+function renderEmpSelect() {
+  var sel=document.getElementById('sf-name'), cur=sel.value;
+  sel.innerHTML='<option value="">— Select Employee —</option>';
+  _ownEmployees.slice().sort(function(a,b){return a.name.localeCompare(b.name);}).forEach(function(e){
+    var o=document.createElement('option'); o.value=e.name; o.textContent=e.name; if(e.name===cur)o.selected=true; sel.appendChild(o);
+  });
+}
+
+function addShift() {
+  var name=document.getElementById('sf-name').value.trim();
+  var date=document.getElementById('sf-date').value;
+  var start=document.getElementById('sf-start').value;
+  var end=document.getElementById('sf-end').value;
+  var role=document.getElementById('sf-role').value;
+  var notes=document.getElementById('sf-notes').value.trim();
+  if(!name){ toast('Select an employee','err'); return; }
+  if(!date){ toast('Pick a date','err'); return; }
+  loading('Adding shift...','ember');
+  api({action:'addShift',name:name,date:date,startTime:start,endTime:end,role:role,notes:notes}).then(function(r){
+    stopLoading();
+    if(r.ok){ _ownSchedule.push({id:r.id,name:name,date:date,startTime:start,endTime:end,role:role,notes:notes}); renderScheduleGrid('ownScheduleGrid','ownWeekRange',_ownWeekOffset,_ownSchedule,null); renderShiftTable(); document.getElementById('sf-notes').value=''; toast(name+' shift added'); }
+    else toast('Error: '+(r.error||'failed'),'err');
+  }).catch(function(){ stopLoading(); toast('Connection error','err'); });
+}
+
+function deleteShift(id) {
+  if(!confirm('Delete this shift?')) return;
+  loading('Deleting...','ember');
+  api({action:'deleteShift',id:id}).then(function(r){
+    stopLoading();
+    if(r.ok){ _ownSchedule=_ownSchedule.filter(function(s){return s.id!==id;}); renderScheduleGrid('ownScheduleGrid','ownWeekRange',_ownWeekOffset,_ownSchedule,null); renderShiftTable(); toast('Shift deleted'); }
+    else toast('Error','err');
+  }).catch(function(){ stopLoading(); toast('Connection error','err'); });
+}
+
+function clearAllShifts() {
+  loading('Clearing...','ember');
+  api({action:'clearShifts'}).then(function(r){
+    stopLoading();
+    if(r.ok){ _ownSchedule=[]; renderScheduleGrid('ownScheduleGrid','ownWeekRange',_ownWeekOffset,_ownSchedule,null); renderShiftTable(); toast('All shifts cleared'); }
+    else toast('Error','err');
+  }).catch(function(){ stopLoading(); toast('Connection error','err'); });
+}
+
+function clearShiftForm(){ document.getElementById('sf-name').value=''; document.getElementById('sf-notes').value=''; document.getElementById('sf-date').value=new Date().toISOString().slice(0,10); }
+
+function applyFilter(){ _filterFrom=document.getElementById('filterFrom').value; _filterTo=document.getElementById('filterTo').value; renderShiftTable(); }
+function clearFilter(){ _filterFrom='';_filterTo=''; document.getElementById('filterFrom').value='';document.getElementById('filterTo').value='';document.getElementById('filterName').value=''; renderShiftTable(); }
+
+function renderShiftTable() {
+  var fn=document.getElementById('filterName').value.toLowerCase().trim();
+  var data=_ownSchedule.slice();
+  if(_filterFrom) data=data.filter(function(s){return s.date>=_filterFrom;});
+  if(_filterTo)   data=data.filter(function(s){return s.date<=_filterTo;});
+  if(fn)          data=data.filter(function(s){return s.name.toLowerCase().includes(fn);});
+  data.sort(function(a,b){return a.date.localeCompare(b.date)||a.name.localeCompare(b.name);});
+  var tbody=document.getElementById('shiftTableBody'); tbody.innerHTML='';
+  if(!data.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="9">No shifts found.</td></tr>'; document.getElementById('shiftCount').textContent=''; return; }
+  var total=data.reduce(function(a,s){return a+calcH(s.startTime,s.endTime);},0);
+  document.getElementById('shiftCount').textContent=data.length+' shift'+(data.length!==1?'s':'')+' · '+total.toFixed(1)+' total hours';
+  data.forEach(function(s){
+    var h=calcH(s.startTime,s.endTime), tr=document.createElement('tr');
+    tr.innerHTML='<td><strong>'+s.name+'</strong></td><td>'+fmtDate(s.date)+'</td><td style="color:var(--muted)">'+fmtDay(s.date)+'</td><td>'+fmt12(s.startTime)+'</td><td>'+fmt12(s.endTime)+'</td><td><span class="badge be">'+(h>0?h+'h':'—')+'</span></td><td><span class="badge br">'+(s.role||'Staff')+'</span></td><td style="color:var(--muted);font-size:.75rem">'+(s.notes||'')+'</td><td><button class="del-btn" onclick="deleteShift(\''+s.id+'\')">🗑</button></td>';
+    tbody.appendChild(tr);
+  });
+}
+
+// ── EMPLOYEES ──
+function addEmployee() {
+  var name=document.getElementById('emp-name').value.trim();
+  var role=document.getElementById('emp-role').value;
+  var pin=document.getElementById('emp-pin').value.trim();
+  if(!name){ toast('Enter a name','err'); return; }
+  if(!pin||pin.length<4){ toast('PIN must be 4+ digits','err'); return; }
+  if(!/^\d+$/.test(pin)){ toast('PIN must be numbers only','err'); return; }
+  loading('Adding employee...','ember');
+  api({action:'addEmployee',name:name,pin:pin,role:role}).then(function(r){
+    stopLoading();
+    if(r.ok){ _ownEmployees.push({name:name,role:role}); renderEmpGrid(); renderEmpSelect(); document.getElementById('emp-name').value=''; document.getElementById('emp-pin').value=''; toast(name+' added'); }
+    else toast('Error: '+(r.error||'failed'),'err');
+  }).catch(function(){ stopLoading(); toast('Connection error','err'); });
+}
+
+function deleteEmployee(name) {
+  if(!confirm('Remove '+name+'?')) return;
+  loading('Removing...','ember');
+  api({action:'deleteEmployee',name:name}).then(function(r){
+    stopLoading();
+    if(r.ok){ _ownEmployees=_ownEmployees.filter(function(e){return e.name!==name;}); renderEmpGrid(); renderEmpSelect(); toast(name+' removed'); }
+    else toast('Error','err');
+  }).catch(function(){ stopLoading(); toast('Connection error','err'); });
+}
+
+function resetPin(name) {
+  var p=prompt('New PIN for '+name+' (4–6 digits):');
+  if(!p) return;
+  if(!/^\d{4,6}$/.test(p)){ alert('PIN must be 4–6 digits.'); return; }
+  loading('Updating PIN...','ember');
+  api({action:'updatePin',name:name,pin:p}).then(function(r){
+    stopLoading();
+    if(r.ok) toast('PIN updated for '+name);
+    else toast('Error','err');
+  }).catch(function(){ stopLoading(); toast('Connection error','err'); });
+}
+
+function renderEmpGrid() {
+  var g=document.getElementById('empGrid');
+  if(!_ownEmployees.length){ g.innerHTML='<p style="color:var(--muted);font-size:.82rem;grid-column:1/-1">No employees yet. Add one above.</p>'; return; }
+  g.innerHTML='';
+  _ownEmployees.slice().sort(function(a,b){return a.name.localeCompare(b.name);}).forEach(function(e){
+    var c=document.createElement('div'); c.className='emp-card';
+    c.innerHTML='<div class="emp-name">'+e.name+'</div><div class="emp-role">'+(e.role||'Staff')+'</div><div class="emp-actions"><button class="emp-btn" onclick="resetPin(\''+e.name+'\')">🔑 Reset PIN</button><button class="emp-btn" onclick="deleteEmployee(\''+e.name+'\')">✕ Remove</button></div>';
+    g.appendChild(c);
+  });
+}
+
+// ── NOTICES ──
+function addNotice() {
+  var text=document.getElementById('notice-text').value.trim();
+  var type=document.getElementById('notice-type').value;
+  if(!text){ toast('Enter a message','err'); return; }
+  loading('Posting...','ember');
+  api({action:'addNotice',text:text,type:type}).then(function(r){
+    stopLoading();
+    if(r.ok){ document.getElementById('notice-text').value=''; api({action:'getNotices'}).then(function(r2){ if(r2.ok) renderNoticeList(r2.data||[]); }); toast('Notice posted'); }
+    else toast('Error','err');
+  }).catch(function(){ stopLoading(); toast('Connection error','err'); });
+}
+
+function deleteNotice(id) {
+  loading('Deleting...','ember');
+  api({action:'deleteNotice',id:id}).then(function(r){
+    stopLoading();
+    if(r.ok){ api({action:'getNotices'}).then(function(r2){ if(r2.ok) renderNoticeList(r2.data||[]); }); toast('Notice removed'); }
+    else toast('Error','err');
+  }).catch(function(){ stopLoading(); toast('Connection error','err'); });
+}
+
+function renderNoticeList(notices) {
+  var el=document.getElementById('noticeList');
+  if(!notices.length){ el.innerHTML='<p style="color:var(--muted);font-size:.82rem">No notices posted yet.</p>'; return; }
+  el.innerHTML='';
+  notices.slice().reverse().forEach(function(n){
+    var d=document.createElement('div'); d.className='nli';
+    d.innerHTML='<div class="ndot '+(n.type||'')+'"></div><div class="nli-body"><div class="nli-text">'+n.text+'</div><div class="nli-date">'+(n.date||'')+'</div></div><button class="del-btn" onclick="deleteNotice(\''+n.id+'\')">🗑</button>';
+    el.appendChild(d);
+  });
+}
+
+// ── PASSWORD ──
+function changePassword() {
+  var p1=document.getElementById('newPass1').value, p2=document.getElementById('newPass2').value;
+  var msg=document.getElementById('passMsg');
+  if(!p1){ msg.style.color='var(--red-hot)'; msg.textContent='Enter a new password.'; return; }
+  if(p1!==p2){ msg.style.color='var(--red-hot)'; msg.textContent='Passwords do not match.'; return; }
+  loading('Saving...','ember');
+  api({action:'setAdmin',pass:p1}).then(function(r){
+    stopLoading();
+    if(r.ok){ msg.style.color='var(--green)'; msg.textContent='Password updated.'; document.getElementById('newPass1').value=''; document.getElementById('newPass2').value=''; }
+    else{ msg.style.color='var(--red-hot)'; msg.textContent='Error saving.'; }
+  }).catch(function(){ stopLoading(); msg.style.color='var(--red-hot)'; msg.textContent='Connection error.'; });
+}
+
+// =============================================
+// SPINNING LOGO RINGS (Three.js — same as BHI)
+// =============================================
+var HH_LOGO = 'https://www.hotheadzsouthernfoods.com/images/HotHeadzLogo.png';
 
 function makeLogoRings(canvasId, size, opts) {
-  if (_logoInstances[canvasId]) return;
-  var canvas = document.getElementById(canvasId);
-  if (!canvas || typeof THREE === 'undefined') return;
   opts = opts || {};
+  var canvas = document.getElementById(canvasId);
+  if(!canvas || typeof THREE === 'undefined') return null;
 
-  var dpr = Math.min(window.devicePixelRatio || 1, 2);
-  canvas.width  = size * dpr;
-  canvas.height = size * dpr;
+  var W = size, H = size;
+  canvas.width  = W * Math.min(window.devicePixelRatio, 2);
+  canvas.height = H * Math.min(window.devicePixelRatio, 2);
 
-  var renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-  renderer.setSize(size, size);
-  renderer.setPixelRatio(dpr);
+  var renderer = new THREE.WebGLRenderer({canvas:canvas, alpha:true, antialias:true});
+  renderer.setSize(W, H);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setClearColor(0x000000, 0);
 
   var scene  = new THREE.Scene();
   var camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
   camera.position.z = opts.camZ || 3.2;
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-  var rl = new THREE.PointLight(0xc41800, 2.2, 20); rl.position.set(3, 3, 5);   scene.add(rl);
-  var wl = new THREE.PointLight(0xf87038, 1.4, 15); wl.position.set(-3, -2, 4); scene.add(wl);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+  var redLight  = new THREE.PointLight(0xE74C3C, 2.0, 20); redLight.position.set(3, 3, 5);   scene.add(redLight);
+  var warmLight = new THREE.PointLight(0xE67E22, 1.2, 15); warmLight.position.set(-3, -2, 4); scene.add(warmLight);
 
+  // Outer ring — red
   var outerRing = new THREE.Mesh(
-    new THREE.TorusGeometry(opts.outerR || 1.08, opts.outerT || 0.042, 32, 100),
-    new THREE.MeshStandardMaterial({color:0xc41800,emissive:0x6b0d00,emissiveIntensity:0.45,metalness:0.8,roughness:0.2})
+    new THREE.TorusGeometry(opts.outerR||1.1, opts.outerT||0.045, 32, 100),
+    new THREE.MeshStandardMaterial({color:0xE74C3C, emissive:0x8B1A28, emissiveIntensity:0.4, metalness:0.8, roughness:0.2})
   );
-  outerRing.rotation.x = 0.38;
+  outerRing.rotation.x = 0.4;
   scene.add(outerRing);
 
+  // Inner ring — ember/gold
   var innerRing = new THREE.Mesh(
-    new THREE.TorusGeometry(opts.innerR || 0.70, opts.innerT || 0.022, 24, 80),
-    new THREE.MeshStandardMaterial({color:0xf87038,emissive:0x7a2800,emissiveIntensity:0.3,metalness:0.9,roughness:0.15})
+    new THREE.TorusGeometry(opts.innerR||0.72, opts.innerT||0.025, 24, 80),
+    new THREE.MeshStandardMaterial({color:0xE67E22, emissive:0x8B4000, emissiveIntensity:0.3, metalness:0.9, roughness:0.15})
   );
-  innerRing.rotation.x = 0.38;
+  innerRing.rotation.x = 0.4;
   scene.add(innerRing);
 
+  // Logo plane
   var logoPlane = new THREE.Mesh(
-    new THREE.CircleGeometry(opts.logoR || 0.56, 64),
-    new THREE.MeshBasicMaterial({transparent:true,opacity:0,side:THREE.DoubleSide})
+    new THREE.CircleGeometry(opts.logoR||0.58, 64),
+    new THREE.MeshBasicMaterial({transparent:true, opacity:0, side:THREE.DoubleSide})
   );
   scene.add(logoPlane);
 
-  new THREE.TextureLoader().load(HH_LOGO_URL, function(tex) {
+  // Load logo texture
+  new THREE.TextureLoader().load(HH_LOGO, function(tex) {
     tex.minFilter = THREE.LinearFilter;
     logoPlane.material.map     = tex;
     logoPlane.material.opacity = 0.95;
     logoPlane.material.needsUpdate = true;
   });
 
-  _logoInstances[canvasId] = true;
-
+  var _running = true;
   (function animate() {
+    if(!_running) return;
     requestAnimationFrame(animate);
     var t = Date.now() * 0.001;
-    outerRing.rotation.x = 0.38 + Math.sin(t * 0.3) * 0.1;
-    outerRing.rotation.y = t * (opts.speed || 0.55);
-    innerRing.rotation.x = 0.38 + Math.sin(t * 0.25) * 0.08;
-    innerRing.rotation.y = t * (opts.speed || 0.55) * -0.55;
+    outerRing.rotation.x = 0.4 + Math.sin(t * 0.3) * 0.1;
+    outerRing.rotation.y = t * 0.4;
+    innerRing.rotation.x = 0.4 + Math.sin(t * 0.25) * 0.08;
+    innerRing.rotation.y = t * 0.28 * -1;
     innerRing.rotation.z = Math.sin(t * 0.15) * 0.05;
-    logoPlane.rotation.y  = t * 0.06;
-    rl.intensity = 2.2 + Math.sin(t * 1.5) * 0.4;
-    wl.intensity = 1.4 + Math.cos(t * 1.2) * 0.25;
+    logoPlane.rotation.y = t * 0.08;
+    redLight.intensity  = 2.0 + Math.sin(t * 1.5) * 0.35;
+    warmLight.intensity = 1.2 + Math.cos(t * 1.2) * 0.2;
     renderer.render(scene, camera);
   })();
+
+  return { stop: function(){ _running = false; } };
 }
 
-/* Init nav logo rings after page load */
-window.addEventListener('load', function() {
-  setTimeout(function() {
-    makeLogoRings('navLogoCanvas',    38, {outerR:1.0,innerR:0.65,outerT:0.04,innerT:0.02,logoR:0.52,speed:0.5,camZ:3.0});
-    makeLogoRings('mobNavLogoCanvas', 32, {outerR:1.0,innerR:0.65,outerT:0.04,innerT:0.02,logoR:0.52,speed:0.5,camZ:3.0});
-    makeLogoRings('mobCtaLogoCanvas', 34, {outerR:1.0,innerR:0.65,outerT:0.04,innerT:0.02,logoR:0.52,speed:0.6,camZ:3.0});
-  }, 700);
-});
+// Init all logo rings once DOM is ready
+var _logoInstances = {};
+
+function initAllLogoRings() {
+  if(typeof THREE === 'undefined') { setTimeout(initAllLogoRings, 200); return; }
+  _logoInstances.landing  = makeLogoRings('landingLogoCanvas',  160, {outerR:1.1,innerR:0.72,outerT:0.045,innerT:0.025,logoR:0.58,camZ:3.2});
+  _logoInstances.empLogin = makeLogoRings('empLoginLogoCanvas', 100, {outerR:1.0,innerR:0.65,outerT:0.04,innerT:0.022,logoR:0.52,camZ:3.0});
+  _logoInstances.ownLogin = makeLogoRings('ownLoginLogoCanvas', 100, {outerR:1.0,innerR:0.65,outerT:0.04,innerT:0.022,logoR:0.52,camZ:3.0});
+  _logoInstances.header   = makeLogoRings('headerLogoCanvas',    38, {outerR:0.9,innerR:0.58,outerT:0.04,innerT:0.02,logoR:0.46,camZ:2.8});
+}
+
+window.addEventListener('load', initAllLogoRings);
+
 </script>
 </body>
 </html>
