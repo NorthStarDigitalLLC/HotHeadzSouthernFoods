@@ -129,7 +129,7 @@ body.hov #cur2{width:46px;height:46px;border-color:rgba(240,80,32,.7);}
 
 <script>
 const PAGES={
-  home:    {num:'01',ey:'Home',        dest:'index.html',       color:[255,140,60]},
+  home:    {num:'01',ey:'Home',        dest:'home.html',       color:[255,140,60]},
   menu:    {num:'02',ey:'The Menu',    dest:'menu.html',        color:[255,200,40]},
   lunch:   {num:'✦', ey:'Lunch',       dest:'menu.html#lunch',  color:[255,180,20]},
   beer:    {num:'✦', ey:'Beer',        dest:'menu.html#beer',   color:[80,180,255]},
@@ -315,8 +315,16 @@ setInterval(()=>{if(!navActive)buildAllClockSegs(false);},1000);
 
 function hitNav(x,y){const r=W<600?80:65;for(let i=0;i<KEYS.length;i++){const p=navPos(i);if((x-p.x)**2+(y-p.y)**2<r*r)return KEYS[i];}return null;}
 canvas.addEventListener('mousemove',e=>{hovKey=hitNav(e.clientX,e.clientY);document.body.classList.toggle('hov',!!hovKey);});
-canvas.addEventListener('click',e=>{const k=hitNav(e.clientX,e.clientY);if(k&&!navActive)doNavigate(PAGES[k].dest,PAGES[k].color);});
-canvas.addEventListener('touchend',e=>{const t=e.changedTouches[0];const k=hitNav(t.clientX,t.clientY);if(k&&!navActive)doNavigate(PAGES[k].dest,PAGES[k].color);},{passive:true});
+let lastTouch=0;
+canvas.addEventListener('click',e=>{
+  if(performance.now()-lastTouch<600)return; // suppress click after touch
+  const k=hitNav(e.clientX,e.clientY);if(k&&!navActive)doNavigate(PAGES[k].dest,PAGES[k].color);
+});
+canvas.addEventListener('touchend',e=>{
+  e.preventDefault();
+  lastTouch=performance.now();
+  const t=e.changedTouches[0];const k=hitNav(t.clientX,t.clientY);if(k&&!navActive)doNavigate(PAGES[k].dest,PAGES[k].color);
+},{passive:false});
 
 const stars=[];
 function spawnStar(){
