@@ -113,30 +113,8 @@ body.hov #cur2{width:50px;height:50px;border-color:rgba(240,80,32,.7);}
 @keyframes dp{0%,100%{opacity:1}50%{opacity:.25}}
 #brand-n{font-family:'Abril Fatface',serif;font-size:clamp(16px,2.2vw,26px);color:#f5ede8;text-align:center;line-height:1;}
 #brand-t{font-size:7px;letter-spacing:.22em;text-transform:uppercase;color:rgba(232,180,160,.22);text-align:center;margin-top:3px;}
-#info{position:fixed;left:clamp(14px,3vw,48px);top:50%;transform:translateY(-50%);z-index:100;width:clamp(160px,17vw,230px);opacity:0;transition:opacity .5s;pointer-events:none;}
-#info.show{opacity:1;}
-.i-n{font-family:'Abril Fatface',serif;font-size:clamp(55px,8vw,95px);line-height:1;color:rgba(232,180,160,.04);margin-bottom:-10px;}
-.i-ey{font-size:7.5px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:#f05020;opacity:.8;display:flex;align-items:center;gap:8px;margin-bottom:7px;}
-.i-ey::before{content:'';width:14px;height:1px;background:currentColor;}
-.i-title{font-family:'Abril Fatface',serif;font-size:clamp(18px,2.5vw,32px);line-height:.95;color:#f5ede8;margin-bottom:6px;}
-.i-sub{font-family:'DM Serif Display',serif;font-style:italic;font-size:clamp(9px,1vw,12px);color:rgba(232,180,160,.32);margin-bottom:12px;line-height:1.65;}
-.i-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:13px;}
-.i-chip{font-size:6.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border:1px solid rgba(232,180,160,.1);color:rgba(232,180,160,.3);}
-.i-chip.h{border-color:rgba(240,80,32,.28);color:#f05020;}
-.i-rule{font-family:'DM Serif Display',serif;font-style:italic;font-size:10px;color:rgba(232,180,160,.16);padding-top:9px;border-top:1px solid rgba(232,180,160,.05);}
-#cdw{position:fixed;right:clamp(14px,3vw,48px);top:50%;transform:translateY(-50%);z-index:200;display:flex;flex-direction:column;align-items:center;gap:11px;opacity:0;transition:opacity .5s;pointer-events:none;}
-#cdw.show{opacity:1;pointer-events:all;}
-#cd-arc{fill:none;stroke:#f05020;stroke-width:2.5;stroke-linecap:round;stroke-dasharray:289;stroke-dashoffset:0;transform-origin:55px 55px;transform:rotate(-90deg);filter:drop-shadow(0 0 6px rgba(240,80,32,.55));}
-#cd-bg{fill:none;stroke:rgba(232,180,160,.07);stroke-width:2;}
-#cd-n{font-family:'Abril Fatface',serif;font-size:40px;fill:#f5ede8;text-anchor:middle;dominant-baseline:central;}
-#cd-lbl{font-size:7px;letter-spacing:.2em;text-transform:uppercase;fill:rgba(232,180,160,.28);text-anchor:middle;}
-#cd-dest{font-family:'DM Serif Display',serif;font-style:italic;font-size:11px;color:rgba(232,180,160,.42);text-align:center;width:115px;line-height:1.5;}
-#cd-go{font-family:'DM Sans',sans-serif;font-weight:700;font-size:7.5px;letter-spacing:.2em;text-transform:uppercase;padding:11px 24px;background:#f05020;color:#080407;border:none;cursor:pointer;transition:background .2s;z-index:300;position:relative;}
-#cd-go:hover{background:#e83010;}
 #hint{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);font-size:7px;letter-spacing:.26em;text-transform:uppercase;color:rgba(232,180,160,.14);z-index:200;pointer-events:none;animation:hfade 5s ease-in-out 2s both;}
 @keyframes hfade{0%{opacity:0}20%{opacity:1}72%{opacity:1}100%{opacity:0}}
-
-
 </style>
 </head>
 <body>
@@ -151,22 +129,22 @@ body.hov #cur2{width:50px;height:50px;border-color:rgba(240,80,32,.7);}
   <div><div id="brand-n">Hot Headz</div><div id="brand-t">Southern Foods &middot; Est. 2020</div></div>
   <div style="text-align:right"><div class="tb-sm">(337) 221-1035</div><div class="tb-sm" id="tb-hr"></div></div>
 </div>
-
 <div id="hint">Tap any word to navigate</div>
 
 <script>
+
 /* ── DATA ── */
 const PAGES = {
-  home:    {num:'01',ey:'Home',        cta:'Go to Home Page',     title:'Hot Headz\nSouthern Foods.', sub:'Fresh &middot; From Scratch &middot; Est. 2020',          chips:['Est. 2020','DeRidder, LA','From Scratch','(337) 221-1035'],rule:'Home is where the food is.',    dest:'home.html',      mood:[58,8,0]},
-  menu:    {num:'02',ey:'The Menu',    cta:'See Full Menu',       title:'Fresh.\nFrom Scratch.',      sub:'Breakfast &middot; Lunch &middot; Daily Specials',         chips:['Breakfast','Fried Chicken','Catfish','Daily Specials'],   rule:'From scratch, every time.',    dest:'menu.html',       mood:[58,8,0]},
-  lunch:   {num:'03',ey:'Lunch',       cta:'See Lunch Menu',      title:'Lunch.\nDone Right.',        sub:'Daily Southern plates',                                   chips:['Changes Daily','Southern Plates','Check Facebook','Sides'],rule:'Check Facebook every morning.', dest:'menu.html#lunch', mood:[58,8,0]},
-  beer:    {num:'04',ey:'Beer',        cta:'See Beer Menu',       title:'Cold.\nCold Beer.',          sub:'Ice cold &middot; Natural Light &middot; Modelo',          chips:['Natural Light','Miller Lite','Modelo','Budweiser'],       rule:'Best with fried chicken.',     dest:'menu.html#beer',  mood:[26,4,0]},
-  delivery:{num:'05',ey:'Delivery',    cta:'Delivery Info',       title:'We Bring\nThe Food.',        sub:'10+ plates &middot; within 10 miles',                      chips:['10+ Plates','10 Miles','Call Ahead','Group Orders'],      rule:'Delivered hot and fresh.',     dest:'delivery.html',   mood:[42,4,0]},
-  order:   {num:'06',ey:'Order Now',   cta:'Call (337) 221-1035', title:'Call\nAhead.',               sub:'Skip the line &middot; Ready when you arrive',             chips:['(337) 221-1035','Mon-Fri 5:30am','Skip Line','Carry-Out'],rule:"We'll have it ready.",         dest:'order.html',      mood:[50,8,0]},
-  about:   {num:'07',ey:'About Us',    cta:'Read Our Story',      title:'Comfort\nFood Done Right.',  sub:'Family-owned &middot; DeRidder proud',                     chips:['Est. 2020','Family Owned','From Scratch','DeRidder'],    rule:'Real Southern cooking.',       dest:'about.html',      mood:[40,16,0]},
-  facebook:{num:'08',ey:'Facebook',    cta:'Visit Our Facebook',  title:'Follow\nThe Feed.',          sub:'Daily specials posted every morning',                      chips:['Daily Specials','Morning Posts','Photos','Follow Us'],   rule:'Posted fresh every morning.',  dest:'https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/',mood:[30,8,0]},
-  find:    {num:'09',ey:'Find Us',     cta:'Get Directions',      title:"We're on\nUS-190.",          sub:'2741 US-190 &middot; DeRidder, LA',                        chips:['2741 US-190','(337) 221-1035','Easy Parking','Open Daily'],rule:'Follow the smell.',           dest:'https://maps.google.com/?q=2741+US-190+DeRidder+LA',mood:[24,6,0]},
-  staff:   {num:'10',ey:'Staff Portal',cta:'Open Staff Portal',   title:'Employee\nPortal.',          sub:'Schedule &middot; Shifts &middot; Notices',                chips:['View Schedule','My Shifts','Notice Board','Manager'],    rule:'Made from scratch. Like the food.',dest:'staff-portal.html',mood:[42,14,0]},
+  home:    {num:'01',desc:'landing page',ey:'Home',        cta:'Go to Home Page',     title:'Hot Headz\nSouthern Foods.', sub:'Fresh &middot; From Scratch &middot; Est. 2020',          chips:['Est. 2020','DeRidder, LA','From Scratch','(337) 221-1035'],rule:'Home is where the food is.',    dest:'index.html',      mood:[58,8,0]},
+  menu:    {num:'02',desc:'breakfast · lunch · specials',ey:'The Menu',    cta:'See Full Menu',       title:'Fresh.\nFrom Scratch.',      sub:'Breakfast &middot; Lunch &middot; Daily Specials',         chips:['Breakfast','Fried Chicken','Catfish','Daily Specials'],   rule:'From scratch, every time.',    dest:'menu.html',       mood:[58,8,0]},
+  lunch:   {num:'03',desc:'daily southern plates',ey:'Lunch',       cta:'See Lunch Menu',      title:'Lunch.\nDone Right.',        sub:'Daily Southern plates',                                   chips:['Changes Daily','Southern Plates','Check Facebook','Sides'],rule:'Check Facebook every morning.', dest:'menu.html#lunch', mood:[58,8,0]},
+  beer:    {num:'04',desc:'ice cold beer',ey:'Beer',        cta:'See Beer Menu',       title:'Cold.\nCold Beer.',          sub:'Ice cold &middot; Natural Light &middot; Modelo',          chips:['Natural Light','Miller Lite','Modelo','Budweiser'],       rule:'Best with fried chicken.',     dest:'menu.html#beer',  mood:[26,4,0]},
+  delivery:{num:'05',desc:'10+ plates within 10 miles',ey:'Delivery',    cta:'Delivery Info',       title:'We Bring\nThe Food.',        sub:'10+ plates &middot; within 10 miles',                      chips:['10+ Plates','10 Miles','Call Ahead','Group Orders'],      rule:'Delivered hot and fresh.',     dest:'delivery.html',   mood:[42,4,0]},
+  order:   {num:'06',desc:'call ahead skip the line',ey:'Order Now',   cta:'Call (337) 221-1035', title:'Call\nAhead.',               sub:'Skip the line &middot; Ready when you arrive',             chips:['(337) 221-1035','Mon-Fri 5:30am','Skip Line','Carry-Out'],rule:"We'll have it ready.",         dest:'order.html',      mood:[50,8,0]},
+  about:   {num:'07',desc:'family owned since 2020',ey:'About Us',    cta:'Read Our Story',      title:'Comfort\nFood Done Right.',  sub:'Family-owned &middot; DeRidder proud',                     chips:['Est. 2020','Family Owned','From Scratch','DeRidder'],    rule:'Real Southern cooking.',       dest:'about.html',      mood:[40,16,0]},
+  facebook:{num:'08',desc:'daily specials every morning',ey:'Facebook',    cta:'Visit Our Facebook',  title:'Follow\nThe Feed.',          sub:'Daily specials posted every morning',                      chips:['Daily Specials','Morning Posts','Photos','Follow Us'],   rule:'Posted fresh every morning.',  dest:'https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/',mood:[30,8,0],extColor:[24,119,242]},
+  find:    {num:'09',desc:'2741 us-190 deridder la',ey:'Find Us',     cta:'Get Directions',      title:"We're on\nUS-190.",          sub:'2741 US-190 &middot; DeRidder, LA',                        chips:['2741 US-190','(337) 221-1035','Easy Parking','Open Daily'],rule:'Follow the smell.',           dest:'https://maps.google.com/?q=2741+US-190+DeRidder+LA',mood:[24,6,0],extColor:[52,168,83]},
+  staff:   {num:'10',desc:'schedule shifts notices',ey:'Staff Portal',cta:'Open Staff Portal',   title:'Employee\nPortal.',          sub:'Schedule &middot; Shifts &middot; Notices',                chips:['View Schedule','My Shifts','Notice Board','Manager'],    rule:'Made from scratch. Like the food.',dest:'staff-portal.html',mood:[42,14,0]},
 };
 const KEYS = Object.keys(PAGES);
 
@@ -188,7 +166,10 @@ resize();
 const curEl = document.getElementById('cur');
 const cur2El = document.getElementById('cur2');
 let mx = W/2, my = H/2, lcx = W/2, lcy = H/2;
-document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+// Cursor trail — circular buffer of recent positions
+var TRAIL_LEN=18, trailX=new Float32Array(TRAIL_LEN), trailY=new Float32Array(TRAIL_LEN), trailIdx=0;
+for(var ti=0;ti<TRAIL_LEN;ti++){trailX[ti]=W/2;trailY[ti]=H/2;}
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; trailX[trailIdx]=mx;trailY[trailIdx]=my;trailIdx=(trailIdx+1)%TRAIL_LEN; });
 (function curLoop() {
   curEl.style.left = mx + 'px'; curEl.style.top = my + 'px';
   lcx += (mx - lcx) * .11; lcy += (my - lcy) * .11;
@@ -282,7 +263,14 @@ var clockParts = {}, clockSegs = {};
 var prevCH='', prevCM='', prevCS='', prevCL='';
 
 function navAngle(i) { return (i/KEYS.length)*Math.PI*2 - Math.PI/2 + Math.PI*.1; }
-function navPos(i) { var a=navAngle(i); return {x:CX+Math.cos(a)*NAV_R, y:CY+Math.sin(a)*NAV_R}; }
+function navPos(i) {
+  var a=navAngle(i);
+  // Subtle orbital drift — each word bobs on its own sine wave
+  var drift=2.5, ph=orbitPhase[i]||0;
+  var ox=Math.cos(a+Math.PI/2)*Math.sin(performance.now()*0.0007+ph)*drift;
+  var oy=Math.sin(a+Math.PI/2)*Math.sin(performance.now()*0.0007+ph)*drift;
+  return {x:CX+Math.cos(a)*NAV_R+ox, y:CY+Math.sin(a)*NAV_R+oy};
+}
 
 function buildWordDots() {
   wordDots = {};
@@ -415,7 +403,7 @@ function buildParticles() {
   for (i=0;i<KEYS.length;i++) {
     key=KEYS[i]; dim=!!selKey;
     var wd = wordDots[key]||[];
-    for (var j=0;j<wd.length;j++) { d=wd[j];s=rand();particles.push({x:s.x,y:s.y,tx:d.x,ty:d.y,spd:.018+Math.random()*.014,r:dim?.35:.55+Math.random()*.25,a:dim?.18:.7+d.b*.3,wb:Math.random()*Math.PI*2,ws:.003+Math.random()*.007,wm:.2,t:dim?2:1}); }
+    for (var j=0;j<wd.length;j++) { d=wd[j];s=rand();particles.push({x:s.x,y:s.y,tx:d.x,ty:d.y,spd:.018+Math.random()*.014,r:dim?.35:.55+Math.random()*.25,a:dim?.18:.7+d.b*.3,wb:Math.random()*Math.PI*2,ws:.003+Math.random()*.007,wm:.2,t:dim?2:1,_key:key}); }
   }
   for (i=0;i<80;i++) { var a=(i/80)*Math.PI*2,r=INN_R*(.5+Math.random()*.9);s=rand();particles.push({x:s.x,y:s.y,tx:CX+Math.cos(a)*r,ty:CY+Math.sin(a)*r,spd:.025+Math.random()*.02,r:1.2+Math.random()*.8,a:.5+Math.random()*.4,wb:Math.random()*Math.PI*2,ws:.006+Math.random()*.01,wm:.4,t:4}); }
   for (i=0;i<180;i++) { var a2=Math.random()*Math.PI*2,r2=INN_R*1.5+Math.random()*NAV_R*1.4;particles.push({x:Math.random()*W,y:Math.random()*H,tx:CX+Math.cos(a2)*r2,ty:CY+Math.sin(a2)*r2,spd:.004+Math.random()*.005,r:.8+Math.random()*1.2,a:.06+Math.random()*.1,wb:Math.random()*Math.PI*2,ws:.002+Math.random()*.006,wm:1.5+Math.random()*2,t:0}); }
@@ -441,14 +429,54 @@ function hitCancel(x,y) {
   return Math.abs(x-CX)<(window._cBw||140)/2 && Math.abs(y-window._cY)<(window._cBh||40)/2;
 }
 
+var hovKey=null, prevHovKey=null, hovDescParts=[];
+function buildHovDesc(key){
+  hovDescParts.forEach(function(p){var idx=particles.indexOf(p);if(idx>=0)particles.splice(idx,1);});
+  hovDescParts=[];
+  if(!key||!PAGES[key]||!PAGES[key].desc)return;
+  var pos=navPos(KEYS.indexOf(key));
+  var ang=navAngle(KEYS.indexOf(key));
+  var offX=Math.cos(ang)*28, offY=Math.sin(ang)*28;
+  var sc=Math.min(W,H), tw=sc*0.18, th=sc*0.022;
+  var dots=sampleDots(PAGES[key].desc, pos.x+offX, pos.y+offY, tw, th, Math.max(0.4,th/28));
+  dots.forEach(function(d){
+    var p={x:pos.x,y:pos.y,tx:d.x,ty:d.y,spd:0.18+Math.random()*0.08,
+      r:0.45+Math.random()*0.25,a:0.45,wb:Math.random()*Math.PI*2,
+      ws:0.003,wm:0.1,rc:232,gc:180,bc:160,t:0,ck:false,_hovDesc:true};
+    hovDescParts.push(p); particles.push(p);
+  });
+}
 canvas.addEventListener('mousemove', function(e) {
   cancelHover = hitCancel(e.clientX,e.clientY);
-  document.body.classList.toggle('hov', !!hitNav(e.clientX,e.clientY)||cancelHover);
+  hovKey = hitNav(e.clientX,e.clientY);
+  document.body.classList.toggle('hov', !!hovKey||cancelHover);
+  if(hovKey!==prevHovKey){ buildHovDesc(hovKey); prevHovKey=hovKey; }
 });
 canvas.addEventListener('click', function(e) {
   if (wormCancelHit(e.clientX,e.clientY)) { abortWorm(); return; }
   var k = hitNav(e.clientX,e.clientY);
-  if (k && !wormActive) wormTransition(null, PAGES[k].dest);
+  if (k && !wormActive){
+    // Scatter all other words' particles — burst outward from their word center
+    for(var si3=0;si3<particles.length;si3++){
+      var sp3=particles[si3];
+      if(sp3._key && sp3._key!==k){
+        var kIdx=KEYS.indexOf(sp3._key);
+        var kpos=navPos(kIdx);
+        var sang=Math.atan2(kpos.y-CY,kpos.x-CX);
+        var burst=50+Math.random()*80;
+        sp3.tx=kpos.x+Math.cos(sang)*burst+(Math.random()-.5)*30;
+        sp3.ty=kpos.y+Math.sin(sang)*burst+(Math.random()-.5)*30;
+        sp3.spd=0.35+Math.random()*0.15; // fast — visible in 200ms
+      } else if(sp3._key===k){
+        // Clicked word: particles rush toward center
+        sp3.tx=CX+(Math.random()-.5)*20;
+        sp3.ty=CY+(Math.random()-.5)*20;
+        sp3.spd=0.4;
+      }
+    }
+    var _dest=PAGES[k].dest;
+    setTimeout(function(){ wormTransition(null,_dest); },220);
+  }
 });
 canvas.addEventListener('touchend', function(e) {
   var t=e.changedTouches[0];
@@ -472,8 +500,17 @@ function abortWorm(){
   wormAborted=true;
   wormActive=false;
   wormCancelActive=false;
+  // Explosion: blast all particles outward from center
+  for(var ei=0;ei<particles.length;ei++){
+    var p=particles[ei];
+    var ba=Math.random()*Math.PI*2;
+    var br=INN_R*1.5+Math.random()*NAV_R*1.8;
+    p.tx=CX+Math.cos(ba)*br; p.ty=CY+Math.sin(ba)*br;
+    p.spd=0.08+Math.random()*0.06; p.wm=2+Math.random()*3;
+  }
   tR=8; tG=4; tB=7;
-  rebuild();
+  // Rebuild after explosion settles
+  setTimeout(function(){ rebuild(); },600);
 }
 
 document.addEventListener('keydown', function(e){if(e.key==='Escape') abortWorm();});
@@ -489,6 +526,29 @@ function wormTransition(destKey, dest) {
   document.getElementById('hint').style.display='none';
 
   var TOTAL=5500, elapsed=0, lastTs=null, done=false;
+  // Destination worm color — vivid and distinct per page
+  var wormR=245, wormG=237, wormB=232;
+  var extC=null;
+  if(dest){
+    var _ek=Object.keys(PAGES).find(function(k){return PAGES[k].dest===dest;});
+    if(_ek){
+      extC=PAGES[_ek].extColor||null;
+      var m=PAGES[_ek].mood;
+      if(extC){
+        wormR=extC[0]; wormG=extC[1]; wormB=extC[2];
+      } else if(m){
+        // Map mood to vivid hues — each page gets a clearly different color
+        var hues={
+          home:[255,140,60],   menu:[255,200,40],  lunch:[255,180,20],
+          beer:[80,180,255],   delivery:[255,80,40], order:[255,120,20],
+          about:[200,140,255], facebook:[60,100,255], find:[60,200,80],
+          staff:[255,160,0]
+        };
+        var col=hues[_ek]||[245,237,232];
+        wormR=col[0]; wormG=col[1]; wormB=col[2];
+      }
+    }
+  }
   var PI=Math.PI, minD=Math.min(W,H);
   var ringR=minD*0.28, tubeR=minD*0.050, TWISTS=3;
 
@@ -497,7 +557,7 @@ function wormTransition(destKey, dest) {
   for(var ei=0;ei<EXTRA;ei++){
     var ep={x:CX+(Math.random()-.5)*12,y:CY+(Math.random()-.5)*12,
       tx:CX,ty:CY,spd:0.99,r:0.4+Math.random()*0.4,
-      a:0.7+Math.random()*0.3,wb:0,ws:0,wm:0,rc:245,gc:237,bc:232,t:1};
+      a:0.7+Math.random()*0.3,wb:0,ws:0,wm:0,rc:wormR,gc:wormG,bc:wormB,t:1};
     extraParticles.push(ep); particles.push(ep);
   }
 
@@ -512,36 +572,42 @@ function wormTransition(destKey, dest) {
     cancelParticles.push(cp); particles.push(cp); extraParticles.push(cp);
   }
 
-  var N=particles.length;
+  // Build ringParticles as direct refs — immune to array mutations during animation
+  var ringParticles=[];
+  var allWormParticles=particles.slice(); // snapshot of array at start
+  // Exclude cancel particles from ring
+  var cancelSet=new Set(cancelParticles);
+  for(var i=0;i<allWormParticles.length;i++){
+    if(!cancelSet.has(allWormParticles[i])) ringParticles.push(allWormParticles[i]);
+  }
+  var ringN=ringParticles.length;
   var cdLastDigit=-1, cdParticles=[], spinAccum=0;
-  var ringN=N-cancelParticles.length;
 
   var PER_RING=18, SLOTS=Math.ceil(ringN/PER_RING);
   for(var i=0;i<ringN;i++){
+    var rp0=ringParticles[i];
     var slot=i%SLOTS, inner=Math.floor(i/SLOTS);
-    particles[i]._t   = slot/SLOTS;
-    particles[i]._ca  = (inner/PER_RING)*PI*2;
-    particles[i]._cr  = Math.sqrt((inner+0.5)/PER_RING)*tubeR;
-    particles[i]._arm = Math.floor(particles[i]._t*4)%4;
-    particles[i]._at  = (particles[i]._t*4)%1;
-    particles[i]._sx  = particles[i].x;
-    particles[i]._sy  = particles[i].y;
-    // Pre-compute full arm position — FROZEN at pArms=1
-    // So during sweep, source is always the fully-extended arm, never partial
-    var _ad = [-(PI/2),0,PI/2,PI][particles[i]._arm];
-    var _at = particles[i]._at;
-    var _len = ringR*_at;
-    var _tw  = _at*PI*2*TWISTS+particles[i]._ca;
-    var _cr  = particles[i]._cr*(0.3+_at*0.7);
-    var _perp= _ad+PI/2;
-    var _twist = Math.sin(_at*PI*6)*0.28;
-    var _r = _len*(1+_twist*0.08);
-    particles[i]._armX = CX+Math.cos(_ad)*_r+Math.cos(_perp)*Math.cos(_tw)*_cr;
-    particles[i]._armY = CY+Math.sin(_ad)*_r+Math.sin(_perp)*Math.cos(_tw)*_cr;
-    particles[i].ck=false;
-    particles[i].rc=245; particles[i].gc=237; particles[i].bc=232;
-    particles[i].a=0.75+Math.random()*0.25;
-    particles[i].wm=0;
+    rp0._t   = slot/SLOTS;
+    rp0._ca  = (inner/PER_RING)*PI*2;
+    rp0._cr  = Math.sqrt((inner+0.5)/PER_RING)*tubeR;
+    rp0._arm = Math.floor(rp0._t*4)%4;
+    rp0._at  = (rp0._t*4)%1;
+    rp0._sx  = rp0.x;
+    rp0._sy  = rp0.y;
+    var _ad=[-(PI/2),0,PI/2,PI][rp0._arm];
+    var _at2=rp0._at;
+    var _len=ringR*_at2;
+    var _tw=_at2*PI*2*TWISTS+rp0._ca;
+    var _cr2=rp0._cr*(0.3+_at2*0.7);
+    var _perp=_ad+PI/2;
+    var _twist=Math.sin(_at2*PI*6)*0.28;
+    var _r=_len*(1+_twist*0.08);
+    rp0._armX=CX+Math.cos(_ad)*_r+Math.cos(_perp)*Math.cos(_tw)*_cr2;
+    rp0._armY=CY+Math.sin(_ad)*_r+Math.sin(_perp)*Math.cos(_tw)*_cr2;
+    rp0.ck=false;
+    rp0.rc=wormR; rp0.gc=wormG; rp0.bc=wormB;
+    rp0.a=0.75+Math.random()*0.25;
+    rp0.wm=0;
   }
 
   var armDirs=[-(PI/2),0,PI/2,PI];
@@ -595,6 +661,25 @@ function wormTransition(destKey, dest) {
     // Navigate when countdown hits 0
     var spinStartMs = TOTAL * 0.68;
     var spinMs2 = Math.max(0, elapsed - spinStartMs);
+    // ── Orbital electrons around ring during countdown ──
+    if(formDone && spinAccum>0.1){
+      var numOrb=6;
+      for(var oi2=0;oi2<numOrb;oi2++){
+        var orbA=spinAccum*2.5+(oi2/numOrb)*Math.PI*2;
+        var orbR=minD*0.28+minD*0.07;
+        var ox2=CX+Math.cos(orbA)*orbR, oy2=CY+Math.sin(orbA)*orbR;
+        ctx.beginPath();ctx.arc(ox2,oy2,2.5,0,Math.PI*2);
+        ctx.fillStyle='rgba(255,200,80,0.7)';ctx.fill();
+        // tail
+        for(var ot=1;ot<5;ot++){
+          var ta=orbA-(ot*0.12);
+          var tx2=CX+Math.cos(ta)*orbR,ty2=CY+Math.sin(ta)*orbR;
+          ctx.beginPath();ctx.arc(tx2,ty2,2.5*(1-ot/5),0,Math.PI*2);
+          ctx.fillStyle='rgba(255,200,80,'+(0.4*(1-ot/5))+')';ctx.fill();
+        }
+      }
+    }
+
     if(formDone && spinMs2 >= 5000 && !done) {
       done=true; wormActive=false; wormCancelActive=false;
       for(var ei=0;ei<extraParticles.length;ei++){
@@ -616,21 +701,23 @@ function wormTransition(destKey, dest) {
     wormCancelActive = cancelFade > 0.3;
 
     for(var i=0;i<ringN;i++){
-      var t   = particles[i]._t;
-      var ca  = particles[i]._ca;
-      var cr  = particles[i]._cr;
-      var at  = particles[i]._at;
-      var ad  = armDirs[particles[i]._arm];
+      var rpi=ringParticles[i];
+      var t   = rpi._t;
+      var ca  = rpi._ca;
+      var cr  = rpi._cr;
+      var at  = rpi._at;
+      var ad  = armDirs[rpi._arm];
 
-      particles[i].rc=245; particles[i].gc=237; particles[i].bc=232;
-      particles[i].wm=0;
+      var pulse=Math.sin(t*Math.PI*4+spinAccum)*12;
+      rpi.rc=Math.min(255,wormR+pulse|0);
+      rpi.gc=Math.min(255,wormG+pulse*0.5|0);
+      rpi.bc=Math.min(255,wormB|0);
+      rpi.wm=0;
 
-      // Collapse to center
-      var colX=lerp(particles[i]._sx,CX,pCollapse);
-      var colY=lerp(particles[i]._sy,CY,pCollapse);
+      var colX=lerp(rpi._sx,CX,pCollapse);
+      var colY=lerp(rpi._sy,CY,pCollapse);
 
-      // Arm — lerp from collapse toward FROZEN full arm position
-      var armX=particles[i]._armX, armY=particles[i]._armY;
+      var armX=rpi._armX, armY=rpi._armY;
       var fromX=lerp(colX,armX,pArms);
       var fromY=lerp(colY,armY,pArms);
 
@@ -662,8 +749,8 @@ function wormTransition(destKey, dest) {
         }
       }
 
-      particles[i].x=x; particles[i].y=y;
-      particles[i].tx=x; particles[i].ty=y; particles[i].spd=0.99;
+      rpi.x=x; rpi.y=y;
+      rpi.tx=x; rpi.ty=y; rpi.spd=0.99;
     }
 
     // Cancel particles bloom from center as ring forms
@@ -807,6 +894,136 @@ function loadingScreen(dest) {
 /* ── MOOD ── */
 var mr=8,mg=4,mb=7, tR=8,tG=4,tB=7;
 
+/* ── SHOOTING STARS ── */
+var stars=[];
+function spawnStar(){
+  var edge=Math.random();
+  var sx,sy,ang;
+  if(edge<0.25){sx=Math.random()*W;sy=-10;ang=Math.PI/2+(.3-Math.random()*.6);}
+  else if(edge<0.5){sx=W+10;sy=Math.random()*H;ang=Math.PI+(0.3-Math.random()*.6);}
+  else if(edge<0.75){sx=Math.random()*W;sy=H+10;ang=-Math.PI/2+(.3-Math.random()*.6);}
+  else{sx=-10;sy=Math.random()*H;ang=0.3-Math.random()*.6;}
+  stars.push({x:sx,y:sy,vx:Math.cos(ang)*12,vy:Math.sin(ang)*12,life:1,maxLen:60+Math.random()*80});
+}
+setInterval(function(){if(Math.random()<0.4)spawnStar();},1800);
+
+/* ── DOUBLE-CLICK RIPPLE ── */
+var ripples=[];
+canvas.addEventListener('dblclick',function(e){
+  if(wormActive)return;
+  ripples.push({x:e.clientX,y:e.clientY,r:0,life:1});
+  // knock nearby particles outward
+  for(var i=0;i<particles.length;i++){
+    var p=particles[i]; if(p.ck||p._key)continue;
+    var dx=p.x-e.clientX,dy=p.y-e.clientY,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<120&&d>0){
+      var f=(1-d/120)*18;
+      p.tx+=dx/d*f; p.ty+=dy/d*f;
+      setTimeout((function(pp){return function(){pp.tx=pp._otx||pp.tx;pp.ty=pp._oty||pp.ty;};})(p),800);
+    }
+  }
+});
+
+/* ── ATTRACT MODE (cursor still 3s) ── */
+var lastMoveTs=0, attractMode=false;
+document.addEventListener('mousemove',function(){lastMoveTs=performance.now();attractMode=false;});
+
+/* ── NAV RING ORBIT OFFSET ── */
+var orbitPhase=[];
+for(var oi=0;oi<10;oi++) orbitPhase.push(Math.random()*Math.PI*2);
+
+/* ── EASTER EGG ── */
+var centerClicks=0, centerClickTs=0;
+canvas.addEventListener('click',function(e){
+  var dx=e.clientX-CX,dy=e.clientY-CY;
+  if(dx*dx+dy*dy<INN_R*INN_R && !wormActive){
+    var now=performance.now();
+    if(now-centerClickTs>1200) centerClicks=0;
+    centerClickTs=now; centerClicks++;
+    if(centerClicks>=5){ centerClicks=0; triggerEasterEgg(); }
+  }
+});
+var easterEggActive=false, easterEggTs=0;
+function triggerEasterEgg(){
+  easterEggActive=true; easterEggTs=performance.now();
+  for(var i=0;i<particles.length;i++){
+    var p=particles[i];
+    var a2=Math.random()*Math.PI*2, r2=50+Math.random()*NAV_R*1.5;
+    p.tx=CX+Math.cos(a2)*r2; p.ty=CY+Math.sin(a2)*r2;
+    p.spd=0.05+Math.random()*0.08; p.wm=3+Math.random()*4;
+  }
+  setTimeout(function(){easterEggActive=false;rebuild();},2500);
+}
+
+/* ── DESATURATE when closed ── */
+var desatTarget=0, desatCurrent=0;
+
+/* ── DAY/DATE particles ── */
+var dateDots=[], dateParts=[], dateBuilt=false;
+function buildDateParticles(){
+  var now=new Date();
+  var days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var txt=days[now.getDay()]+' '+months[now.getMonth()]+' '+now.getDate();
+  var sc=Math.min(W,H), tw=sc*0.22, th=sc*0.025;
+  var dots=sampleDots(txt,CX,H-50,tw,th,Math.max(0.4,th/30));
+  dateParts=[];
+  dots.forEach(function(d){
+    var p={x:CX+(Math.random()-.5)*W,y:H-50+(Math.random()-.5)*30,
+      tx:d.x,ty:d.y,spd:0.03+Math.random()*0.02,r:0.5+Math.random()*0.3,
+      a:0.10,wb:Math.random()*Math.PI*2,ws:0.001,wm:0.05,
+      rc:232,gc:180,bc:160,t:0,ck:false};
+    dateParts.push(p); particles.push(p);
+  });
+  dateBuilt=true;
+}
+
+/* ── CRAWFISH BANNER ── */
+var crawfishBanner=[], crawfishBuilt=false, prevIsCrawfish=false;
+function buildCrawfishBanner(){
+  var sc=Math.min(W,H);
+  var dots=sampleDots('🦞 CRAWFISH NIGHT',CX,H-28,sc*0.45,sc*0.032,Math.max(0.5,sc*0.032/35));
+  crawfishBanner=[];
+  dots.forEach(function(d){
+    var p={x:CX+(Math.random()-.5)*W*0.5,y:H+20,
+      tx:d.x,ty:d.y,spd:0.06+Math.random()*0.03,r:0.7+Math.random()*0.3,
+      a:0.8,wb:Math.random()*Math.PI*2,ws:0.002,wm:0.08,
+      rc:240,gc:80,bc:32,t:0,ck:false};
+    crawfishBanner.push(p); particles.push(p);
+  });
+  crawfishBuilt=true;
+}
+function removeCrawfishBanner(){
+  crawfishBanner.forEach(function(p){
+    var idx=particles.indexOf(p); if(idx>=0)particles.splice(idx,1);
+  });
+  crawfishBanner=[]; crawfishBuilt=false;
+}
+
+/* ── OPEN TRANSITION: explode then reform when status changes ── */
+var prevClockLabel='';
+function checkStatusChange(){
+  if(clockState.label!==prevClockLabel && prevClockLabel!=='' && !wormActive){
+    if(clockState.label==='OPEN'||clockState.label==='CRAWFISH NIGHT'){
+      // Burst clock particles outward
+      for(var i=0;i<particles.length;i++){
+        if(particles[i].ck){
+          var a2=Math.random()*Math.PI*2,r2=INN_R*2+Math.random()*INN_R*3;
+          particles[i].tx=CX+Math.cos(a2)*r2;
+          particles[i].ty=CY+Math.sin(a2)*r2;
+          particles[i].spd=0.06; particles[i].wm=2;
+        }
+      }
+      setTimeout(function(){
+        clockSegs={}; clockParts={}; prevCH=''; prevCM=''; prevCS=''; prevCL='';
+        initClockParticles();
+      },800);
+    }
+  }
+  prevClockLabel=clockState.label;
+}
+setInterval(checkStatusChange,1000);
+
 /* ── MAIN LOOP ── */
 var navLoopOn=false, lastT=0;
 
@@ -816,6 +1033,8 @@ function loop(ts) {
   var dt=Math.min((ts-lastT)||16,32); lastT=ts;
   mr+=(tR-mr)*.014; mg+=(tG-mg)*.014; mb+=(tB-mb)*.014;
 
+  // ── Slow background hue cycle (several minutes) ──
+  var hueShift=Math.sin(ts*0.000008)*6; // ±6 hue degrees over ~13 min cycle
   ctx.fillStyle='rgb('+Math.round(mr)+','+Math.round(mg)+','+Math.round(mb)+')';
   ctx.fillRect(0,0,W,H);
 
@@ -823,10 +1042,106 @@ function loop(ts) {
   bg.addColorStop(0,'rgba(196,24,0,'+(.05+mr/900)+')'); bg.addColorStop(1,'transparent');
   ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
 
-  if(selKey){var si=KEYS.indexOf(selKey),sp=navPos(si);var sg=ctx.createRadialGradient(sp.x,sp.y,0,sp.x,sp.y,80);sg.addColorStop(0,'rgba(240,80,32,.12)');sg.addColorStop(1,'transparent');ctx.fillStyle=sg;ctx.beginPath();ctx.arc(sp.x,sp.y,80,0,Math.PI*2);ctx.fill();}
+  // ── Desaturate when closed ──
+  desatTarget=clockState.isOpen?0:0.55;
+  desatCurrent+=(desatTarget-desatCurrent)*0.003;
+  if(desatCurrent>0.02){
+    ctx.save(); ctx.globalCompositeOperation='saturation';
+    ctx.fillStyle='rgba(128,128,128,'+desatCurrent+')'; ctx.fillRect(0,0,W,H);
+    ctx.restore();
+  }
 
+  // ── Easter egg: rainbow chaos ──
+  if(easterEggActive){
+    var eAge=(performance.now()-easterEggTs)/2500;
+    for(var ei3=0;ei3<particles.length;ei3++){
+      var ep=particles[ei3];
+      var hue=(ep._t===undefined?0:ep._t)*360+ts*0.3+ei3*7;
+      ep.rc=Math.round(128+Math.sin(hue*Math.PI/180)*127);
+      ep.gc=Math.round(128+Math.sin((hue+120)*Math.PI/180)*127);
+      ep.bc=Math.round(128+Math.sin((hue+240)*Math.PI/180)*127);
+    }
+  }
+
+  // ── Compass rose grid ──
+  ctx.save(); ctx.globalAlpha=0.025;
+  for(var cr2=0;cr2<16;cr2++){
+    var cra=(cr2/16)*Math.PI*2;
+    ctx.beginPath();
+    ctx.moveTo(CX+Math.cos(cra)*INN_R*0.5,CY+Math.sin(cra)*INN_R*0.5);
+    ctx.lineTo(CX+Math.cos(cra)*W,CY+Math.sin(cra)*W);
+    ctx.strokeStyle='rgba(232,180,160,1)'; ctx.lineWidth=0.5; ctx.stroke();
+  }
+  // Concentric rings
+  for(var cr3=1;cr3<=4;cr3++){
+    ctx.beginPath(); ctx.arc(CX,CY,NAV_R*cr3*0.35,0,Math.PI*2);
+    ctx.strokeStyle='rgba(232,180,160,1)'; ctx.lineWidth=0.5; ctx.stroke();
+  }
+  ctx.restore();
+
+  // ── Crawfish banner: build/remove as needed ──
+  if(clockState.isCrawfish && !crawfishBuilt) buildCrawfishBanner();
+  if(!clockState.isCrawfish && crawfishBuilt) removeCrawfishBanner();
+
+  // ── Date particles: build once ──
+  if(!dateBuilt && navLoopOn) buildDateParticles();
+
+  // ── Attract mode: cursor still 3s → ambient particles spiral toward cursor ──
+  if(performance.now()-lastMoveTs>3000 && !wormActive){
+    attractMode=true;
+    for(var ai=0;ai<particles.length;ai++){
+      var ap=particles[ai];
+      if(ap.t===0){ // only ambient
+        var adx=mx-ap.x,ady=my-ap.y;
+        ap.tx=ap.x+adx*0.02; ap.ty=ap.y+ady*0.02;
+      }
+    }
+  }
+
+  // ── Shooting stars ──
+  for(var si2=stars.length-1;si2>=0;si2--){
+    var st=stars[si2];
+    st.x+=st.vx; st.y+=st.vy; st.life-=0.022;
+    if(st.life<=0||st.x<-50||st.x>W+50||st.y<-50||st.y>H+50){stars.splice(si2,1);continue;}
+    ctx.save();
+    ctx.globalAlpha=st.life*0.7;
+    ctx.beginPath();
+    ctx.moveTo(st.x,st.y);
+    ctx.lineTo(st.x-st.vx*(st.maxLen/12),st.y-st.vy*(st.maxLen/12));
+    var sg2=ctx.createLinearGradient(st.x,st.y,st.x-st.vx*5,st.y-st.vy*5);
+    sg2.addColorStop(0,'rgba(255,237,200,0.9)');
+    sg2.addColorStop(1,'rgba(255,148,60,0)');
+    ctx.strokeStyle=sg2; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.restore();
+  }
+
+  // ── Ripple effects ──
+  for(var ri=ripples.length-1;ri>=0;ri--){
+    var rp2=ripples[ri]; rp2.r+=5; rp2.life-=0.04;
+    if(rp2.life<=0){ripples.splice(ri,1);continue;}
+    ctx.beginPath();ctx.arc(rp2.x,rp2.y,rp2.r,0,Math.PI*2);
+    ctx.strokeStyle='rgba(240,80,32,'+rp2.life*0.4+')';ctx.lineWidth=1.5;ctx.stroke();
+  }
+
+  if(selKey){var ssi=KEYS.indexOf(selKey),ssp=navPos(ssi);var ssg=ctx.createRadialGradient(ssp.x,ssp.y,0,ssp.x,ssp.y,80);ssg.addColorStop(0,'rgba(240,80,32,.12)');ssg.addColorStop(1,'transparent');ctx.fillStyle=ssg;ctx.beginPath();ctx.arc(ssp.x,ssp.y,80,0,Math.PI*2);ctx.fill();}
+
+  // ── Inner ring: 4 arcs rotating in opposite pairs ──
+  for(var ai2=0;ai2<4;ai2++){
+    var arcStart=(ai2/4)*Math.PI*2 + (ai2%2===0?ts*0.0008:-ts*0.0008);
+    ctx.beginPath();
+    ctx.arc(CX,CY,INN_R,arcStart,arcStart+Math.PI*0.45);
+    ctx.strokeStyle='rgba(240,80,32,'+(0.12+Math.sin(ts*0.002+ai2)*0.06)+')';
+    ctx.lineWidth=1.5; ctx.stroke();
+  }
   ctx.beginPath();ctx.arc(CX,CY,NAV_R,0,Math.PI*2);ctx.strokeStyle='rgba(232,180,160,.05)';ctx.lineWidth=.5;ctx.stroke();
-  ctx.beginPath();ctx.arc(CX,CY,INN_R,0,Math.PI*2);ctx.strokeStyle='rgba(240,80,32,.1)';ctx.lineWidth=.5;ctx.stroke();
+
+  // Word echo pass — draw dim offset shadows first
+  for(var i=0;i<particles.length;i++){
+    var pe=particles[i];
+    if(pe.t!==1&&pe.t!==2)continue;
+    ctx.beginPath();ctx.arc(pe.x+2,pe.y+2,pe.r*0.7,0,Math.PI*2);
+    ctx.fillStyle='rgba(240,80,32,0.04)';ctx.fill();
+  }
 
   for(var i=0;i<KEYS.length;i++){
     var angle=navAngle(i),isSel=selKey===KEYS[i];
@@ -838,28 +1153,103 @@ function loop(ts) {
     ctx.fillText(PAGES[KEYS[i]].num,CX+Math.cos(angle)*(NAV_R+20),CY+Math.sin(angle)*(NAV_R+20));
   }
 
+  // ── Cursor trail — newest = brightest, oldest = faintest ──
+  for(var ti2=0;ti2<TRAIL_LEN;ti2++){
+    // Walk backward from current index so ti2=0 is newest
+    var tidx=(trailIdx-1-ti2+TRAIL_LEN)%TRAIL_LEN;
+    var tFrac=1-(ti2/TRAIL_LEN);
+    var tAlpha=tFrac*tFrac*0.35;
+    var tRad=tFrac*4.5;
+    ctx.beginPath();ctx.arc(trailX[tidx],trailY[tidx],tRad,0,Math.PI*2);
+    ctx.fillStyle='rgba(240,80,32,'+tAlpha.toFixed(2)+')';ctx.fill();
+  }
+
   for(var i=0;i<particles.length;i++){
     var p=particles[i];
     p.wb+=p.ws;
-    var dist=Math.sqrt((p.tx-p.x)*(p.tx-p.x)+(p.ty-p.y)*(p.ty-p.y));
+
+    // ── Hover magnetism: hovered word particles drift toward cursor ──
+    var ptx=p.tx, pty=p.ty;
+    if(hovKey && !wormActive && p._key===hovKey){
+      var pull=0.18;
+      ptx=p.tx+(mx-p.tx)*pull;
+      pty=p.ty+(my-p.ty)*pull;
+    }
+
+    var dist=Math.sqrt((ptx-p.x)*(ptx-p.x)+(pty-p.y)*(pty-p.y));
     var wob=p.wm*Math.min(dist/60,1);
-    p.x+=(p.tx+Math.sin(p.wb)*wob-p.x)*p.spd*(dt/16);
-    p.y+=(p.ty+Math.cos(p.wb*.73)*wob-p.y)*p.spd*(dt/16);
+    p.x+=(ptx+Math.sin(p.wb)*wob-p.x)*p.spd*(dt/16);
+    p.y+=(pty+Math.cos(p.wb*.73)*wob-p.y)*p.spd*(dt/16);
     var rc=p.rc||245,gc=p.gc||237,bc=p.bc||232,a=p.a;
-    if(p.ck){if(selKey){a=0;}} // hide clock when nav selected
+
+    if(p.ck){
+      if(selKey){ a=0; }
+      else {
+        // ── Clock heartbeat: sharp pulse on each second tick ──
+        var beat=Math.pow(Math.max(0,1-((ts%1000)/180)),3);
+        a=p.a*(1+beat*0.9);
+        // ── Crawfish night: clock turns red-orange ──
+        if(clockState.isCrawfish){ rc=255;gc=100;bc=20; }
+      }
+    }
     else if(p.t===3){rc=255;gc=255;bc=255;}
     else if(p.t===4){rc=255;gc=148;bc=60;}
     else if(p.t===2){a*=.22;}
     else if(p.t===5){rc=240;gc=80;bc=32;if(cancelHover)a=Math.min(1,a*2.8);}
+    else if(p.t===1 && !wormActive){
+      // ── Hover glow: brighten particles belonging to hovered word ──
+      if(hovKey && p._key===hovKey){
+        rc=255;gc=210;bc=170;a=Math.min(1,a*2.2);
+      }
+      // ── Staff portal amber pulse ──
+      if(p._key==='staff'){
+        var staffPulse=0.5+Math.sin(ts*0.0025)*0.5;
+        rc=255;gc=Math.round(120+staffPulse*60);bc=20;
+        a=Math.min(1,a*(1.1+staffPulse*0.3));
+      }
+    }
+
     if(a<.03)continue;
-    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    // ── Depth: particles closer to center slightly larger+brighter ──
+    var depthDx=p.x-CX, depthDy=p.y-CY;
+    var depthD=Math.sqrt(depthDx*depthDx+depthDy*depthDy);
+    var depthScale=1+Math.max(0,1-depthD/(NAV_R*1.2))*0.4;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r*depthScale,0,Math.PI*2);
     ctx.fillStyle='rgba('+rc+','+gc+','+bc+','+a.toFixed(2)+')';ctx.fill();
   }
 
-  var pR=INN_R*(.76+Math.sin(ts*.0017)*.14);
+  // Outer ambient glow pulse
+  var pR=NAV_R*(1.02+Math.sin(ts*.0011)*.008);
   ctx.beginPath();ctx.arc(CX,CY,pR,0,Math.PI*2);
-  ctx.strokeStyle='rgba(255,148,60,'+(.16+Math.sin(ts*.002)*.06)+')';ctx.lineWidth=1;ctx.stroke();
+  ctx.strokeStyle='rgba(232,180,160,'+(0.03+Math.sin(ts*.0011)*.02)+')';ctx.lineWidth=.5;ctx.stroke();
 }
+
+/* ── RIGHT-CLICK / LONG-PRESS TOOLTIP ── */
+var tooltipKey=null, tooltipParts=[], tooltipTs=0;
+canvas.addEventListener('contextmenu',function(e){
+  e.preventDefault();
+  var k=hitNav(e.clientX,e.clientY);
+  if(k&&!wormActive){
+    tooltipKey=k;
+    // Remove old tooltip parts
+    tooltipParts.forEach(function(p){var idx=particles.indexOf(p);if(idx>=0)particles.splice(idx,1);});
+    tooltipParts=[];
+    var pg=PAGES[k], url=pg.dest.replace('https://','').replace('http://','').slice(0,28);
+    var pos=navPos(KEYS.indexOf(k));
+    var tw2=Math.min(W*0.28,220), th2=Math.min(W,H)*0.028;
+    var dots=sampleDots(url,pos.x,pos.y-38,tw2,th2,Math.max(0.4,th2/30));
+    dots.forEach(function(d){
+      var p={x:pos.x,y:pos.y,tx:d.x,ty:d.y,spd:0.22,r:0.5+Math.random()*0.2,
+        a:0.5,wb:Math.random()*Math.PI*2,ws:0.002,wm:0.05,
+        rc:255,gc:200,bc:80,t:0,ck:false,_tooltip:true};
+      tooltipParts.push(p); particles.push(p);
+    });
+    setTimeout(function(){
+      tooltipParts.forEach(function(p){var idx=particles.indexOf(p);if(idx>=0)particles.splice(idx,1);});
+      tooltipParts=[]; tooltipKey=null;
+    },2200);
+  }
+});
 
 /* ── BOOT ── */
 document.fonts.ready.then(function(){
@@ -867,6 +1257,7 @@ document.fonts.ready.then(function(){
   navLoopOn=true;
   requestAnimationFrame(loop);
 });
-window.addEventListener('resize', function(){ resize(); rebuild(); });</script>
+window.addEventListener('resize', function(){ resize(); rebuild(); });
+</script>
 </body>
 </html>
