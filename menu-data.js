@@ -147,6 +147,18 @@ menus: {
     lunch: {
       show: true,
       items: [
+
+        { "name": "Hamburger Steak", "desc": "Seasoned hamburger steak cooked and served hot." },
+{ "name": "Smoked Chicken", "desc": "Slow-smoked chicken with rich, savory flavor." },
+{ "name": "Chicken Alfredo", "desc": "Chicken served in a creamy Alfredo sauce over pasta." },
+{ "name": "Mashed Potatoes", "desc": "Creamy mashed potatoes served hot." },
+{ "name": "Gravy", "desc": "Rich gravy served over your choice of items." },
+{ "name": "Cabbage", "desc": "Tender seasoned cabbage." },
+{ "name": "Green Beans", "desc": "Seasoned green beans cooked until tender." },
+{ "name": "Black Eyed Peas", "desc": "Seasoned black eyed peas cooked low and slow." },
+{ "name": "Fried Okra", "desc": "Crispy golden fried okra." },
+{ "name": "Garlic Bread", "desc": "Toasted bread with buttery garlic flavor." },
+        
         { name: "Turkey Clubs", desc: "Classic club sandwiches stacked with turkey, bacon, lettuce, tomato, and mayo." },
         { name: "Chicken Salad", desc: "Creamy house-made chicken salad served chilled and ready to enjoy." },
         { name: "Croissants", desc: "Flaky, buttery croissants baked until golden and tender." }
