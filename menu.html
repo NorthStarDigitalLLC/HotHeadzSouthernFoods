@@ -54,8 +54,12 @@
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
-    #particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    /* ═══ PARTICLE CANVAS ═══ */
+    #particles {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    }
 
+    /* ═══ AMBIENT GLOW ═══ */
     .bg-glow {
       position: fixed; inset: 0; pointer-events: none; z-index: 0;
       background:
@@ -64,14 +68,19 @@
         radial-gradient(ellipse 600px 300px at 50% 40%, rgba(255,200,120,0.03), transparent);
       animation: glowPulse 8s ease-in-out infinite alternate;
     }
-    @keyframes glowPulse { 0% { opacity: 1; } 100% { opacity: 0.6; } }
+    @keyframes glowPulse {
+      0% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
 
+    /* ═══ LAYOUT ═══ */
     .app {
       position: relative; z-index: 1;
       max-width: 880px; margin: 0 auto;
       padding: 0 18px 140px;
     }
 
+    /* ═══ HERO — CINEMATIC ENTRANCE ═══ */
     .hero {
       text-align: center; padding: 56px 0 32px;
       opacity: 0; animation: heroIn 1.4s var(--ease-out-expo) 0.2s forwards;
@@ -80,116 +89,392 @@
       from { opacity: 0; transform: translateY(30px) scale(0.97); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
-    .hero-flame { display: inline-block; font-size: 36px; animation: flameFloat 2s ease-in-out infinite; margin-bottom: 12px; }
-    @keyframes flameFloat { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-6px) scale(1.08); } }
-    .hero-eyebrow { font-family: var(--font-body); font-size: 11px; font-weight: 700; letter-spacing: 0.28em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; opacity: 0; animation: fadeUp 0.8s var(--ease-out-expo) 0.5s forwards; }
-    .hero-title { font-family: var(--font-display); font-size: clamp(38px, 7vw, 64px); font-weight: 700; line-height: 1.0; letter-spacing: -0.03em; margin-bottom: 6px; opacity: 0; animation: fadeUp 1s var(--ease-out-expo) 0.7s forwards; }
-    .hero-title em { font-style: italic; color: var(--accent-hot); text-shadow: 0 0 40px var(--accent-glow); }
-    .hero-sub { font-size: 15px; color: var(--text-mid); font-weight: 400; line-height: 1.6; margin-top: 4px; opacity: 0; animation: fadeUp 0.8s var(--ease-out-expo) 0.9s forwards; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
 
-    .status-wrap { display: flex; justify-content: center; margin-top: 20px; opacity: 0; animation: fadeUp 0.8s var(--ease-out-expo) 1.1s forwards; }
-    .status-badge { display: inline-flex; align-items: center; gap: 10px; padding: 12px 24px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; border: 1px solid var(--border); background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
-    .status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; position: relative; }
-    .status-dot::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; animation: statusPulse 2s ease-in-out infinite; }
-    .status-dot.open { background: #4ade80; } .status-dot.open::after { background: rgba(74,222,128,0.3); }
-    .status-dot.closed { background: #f87171; } .status-dot.closed::after { background: rgba(248,113,113,0.3); }
-    .status-dot.warn { background: #fbbf24; } .status-dot.warn::after { background: rgba(251,191,36,0.3); }
-    @keyframes statusPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(2.2); opacity: 0; } }
+    .hero-flame {
+      display: inline-block; font-size: 36px;
+      animation: flameFloat 2s ease-in-out infinite;
+      margin-bottom: 12px;
+    }
+    @keyframes flameFloat {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-6px) scale(1.08); }
+    }
 
-    .countdown-wrap { text-align: center; margin-top: 16px; opacity: 0; animation: fadeUp 0.8s var(--ease-out-expo) 1.2s forwards; }
-    .countdown-label { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
-    .countdown-timer { display: inline-flex; align-items: center; gap: 4px; padding: 14px 28px; border-radius: 20px; border: 1px solid var(--border-warm); background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03); }
+    .hero-eyebrow {
+      font-family: var(--font-body); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 14px;
+      opacity: 0; animation: fadeUp 0.8s var(--ease-out-expo) 0.5s forwards;
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(38px, 7vw, 64px); font-weight: 700;
+      line-height: 1.0; letter-spacing: -0.03em;
+      margin-bottom: 6px;
+      opacity: 0; animation: fadeUp 1s var(--ease-out-expo) 0.7s forwards;
+    }
+    .hero-title em {
+      font-style: italic; color: var(--accent-hot);
+      text-shadow: 0 0 40px var(--accent-glow);
+    }
+    .hero-sub {
+      font-size: 15px; color: var(--text-mid); font-weight: 400;
+      line-height: 1.6; margin-top: 4px;
+      opacity: 0; animation: fadeUp 0.8s var(--ease-out-expo) 0.9s forwards;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══ STATUS — PULSING ALIVE ═══ */
+    .status-wrap {
+      display: flex; justify-content: center; margin-top: 20px;
+      opacity: 0; animation: fadeUp 0.8s var(--ease-out-expo) 1.1s forwards;
+    }
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 12px 24px; border-radius: 999px;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      border: 1px solid var(--border); background: var(--surface);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    }
+    .status-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+      position: relative;
+    }
+    .status-dot::after {
+      content: ""; position: absolute; inset: -4px; border-radius: 50%;
+      animation: statusPulse 2s ease-in-out infinite;
+    }
+    .status-dot.open { background: #4ade80; }
+    .status-dot.open::after { background: rgba(74,222,128,0.3); }
+    .status-dot.closed { background: #f87171; }
+    .status-dot.closed::after { background: rgba(248,113,113,0.3); }
+    .status-dot.warn { background: #fbbf24; }
+    .status-dot.warn::after { background: rgba(251,191,36,0.3); }
+    @keyframes statusPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(2.2); opacity: 0; }
+    }
+
+    /* ═══ COUNTDOWN TIMER ═══ */
+    .countdown-wrap {
+      text-align: center; margin-top: 16px;
+      opacity: 0; animation: fadeUp 0.8s var(--ease-out-expo) 1.2s forwards;
+    }
+    .countdown-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .countdown-timer {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 14px 28px; border-radius: 20px;
+      border: 1px solid var(--border-warm);
+      background: var(--surface);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03);
+    }
     .countdown-block { text-align: center; min-width: 48px; }
-    .countdown-num { display: block; font-family: var(--font-body); font-size: 28px; font-weight: 900; letter-spacing: -0.02em; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums; }
-    .countdown-unit { display: block; font-size: 9px; font-weight: 700; letter-spacing: 0.14em; color: var(--text-dim); margin-top: 4px; }
-    .countdown-sep { font-size: 24px; font-weight: 800; color: var(--accent); padding: 0 2px; margin-top: -10px; animation: countSepBlink 1s step-end infinite; }
-    @keyframes countSepBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .countdown-num {
+      display: block; font-family: var(--font-body);
+      font-size: 28px; font-weight: 900; letter-spacing: -0.02em;
+      line-height: 1; color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+    .countdown-unit {
+      display: block; font-size: 9px; font-weight: 700;
+      letter-spacing: 0.14em; color: var(--text-dim); margin-top: 4px;
+    }
+    .countdown-sep {
+      font-size: 24px; font-weight: 800; color: var(--accent);
+      padding: 0 2px; margin-top: -10px;
+      animation: countSepBlink 1s step-end infinite;
+    }
+    @keyframes countSepBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
 
-    .day-tabs-wrap { position: sticky; top: 0; z-index: 50; padding: 14px 0 10px; background: linear-gradient(180deg, var(--bg) 50%, rgba(8,6,4,0.8) 80%, transparent); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); opacity: 0; animation: fadeUp 0.8s var(--ease-out-expo) 1.3s forwards; }
+    /* ═══ DAY TABS — STICKY ═══ */
+    .day-tabs-wrap {
+      position: sticky; top: 0; z-index: 50; padding: 14px 0 10px;
+      background: linear-gradient(180deg, var(--bg) 50%, rgba(8,6,4,0.8) 80%, transparent);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      opacity: 0; animation: fadeUp 0.8s var(--ease-out-expo) 1.3s forwards;
+    }
     .day-tabs { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-    .day-tab { font-family: var(--font-body); font-size: 13px; font-weight: 700; padding: 11px 26px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text-dim); cursor: pointer; transition: all 0.35s var(--ease-out-expo); position: relative; overflow: hidden; }
-    .day-tab::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at center, var(--accent-glow), transparent 70%); opacity: 0; transition: opacity 0.35s; }
+    .day-tab {
+      font-family: var(--font-body); font-size: 13px; font-weight: 700;
+      padding: 11px 26px; border-radius: 999px;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text-dim); cursor: pointer;
+      transition: all 0.35s var(--ease-out-expo);
+      position: relative; overflow: hidden;
+    }
+    .day-tab::before {
+      content: ""; position: absolute; inset: 0;
+      background: radial-gradient(circle at center, var(--accent-glow), transparent 70%);
+      opacity: 0; transition: opacity 0.35s;
+    }
     .day-tab:hover { color: var(--text); border-color: rgba(255,255,255,0.12); transform: translateY(-2px); }
-    .day-tab.active { background: linear-gradient(135deg, var(--accent) 0%, var(--ember) 100%); border-color: var(--accent-light); color: #fff; box-shadow: 0 6px 28px var(--accent-glow), 0 0 0 1px rgba(255,160,80,0.15); transform: translateY(-1px); }
+    .day-tab.active {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--ember) 100%);
+      border-color: var(--accent-light); color: #fff;
+      box-shadow: 0 6px 28px var(--accent-glow), 0 0 0 1px rgba(255,160,80,0.15);
+      transform: translateY(-1px);
+    }
     .day-tab.active::before { opacity: 0.3; }
 
-    .cat-nav { display: flex; gap: 6px; padding: 10px 0 16px; justify-content: center; flex-wrap: wrap; }
-    .cat-btn { font-family: var(--font-body); font-size: 12px; font-weight: 600; padding: 9px 18px; border-radius: 999px; border: 1px solid var(--border); background: transparent; color: var(--text-dim); cursor: pointer; transition: all 0.3s var(--ease-out-expo); }
+    /* ═══ CATEGORY NAV ═══ */
+    .cat-nav {
+      display: flex; gap: 6px; padding: 10px 0 16px;
+      justify-content: center; flex-wrap: wrap;
+    }
+    .cat-btn {
+      font-family: var(--font-body); font-size: 12px; font-weight: 600;
+      padding: 9px 18px; border-radius: 999px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--text-dim); cursor: pointer;
+      transition: all 0.3s var(--ease-out-expo);
+    }
     .cat-btn:hover { color: var(--text-mid); border-color: rgba(255,255,255,0.1); transform: translateY(-1px); }
-    .cat-btn.active { background: var(--surface-raised); border-color: var(--border-warm); color: var(--accent-light); box-shadow: 0 4px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04); }
+    .cat-btn.active {
+      background: var(--surface-raised); border-color: var(--border-warm);
+      color: var(--accent-light);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04);
+    }
     .cat-btn.beer-btn.active { border-color: rgba(212,168,67,0.25); color: var(--gold); }
 
-    .panel { display: none; } .panel.visible { display: block; }
-    .cat-section { display: none; } .cat-section.visible { display: block; animation: sectionIn 0.6s var(--ease-out-expo); }
-    @keyframes sectionIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    .hours-line { text-align: center; font-size: 13px; color: var(--text-dim); font-weight: 400; padding: 4px 0 8px; line-height: 1.6; }
+    /* ═══ PANELS ═══ */
+    .panel { display: none; }
+    .panel.visible { display: block; }
+    .cat-section { display: none; }
+    .cat-section.visible { display: block; animation: sectionIn 0.6s var(--ease-out-expo); }
+    @keyframes sectionIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hours-line {
+      text-align: center; font-size: 13px; color: var(--text-dim);
+      font-weight: 400; padding: 4px 0 8px; line-height: 1.6;
+    }
     .hours-line strong { color: var(--text-mid); font-weight: 600; }
 
-    .cat-header { margin-bottom: 28px; padding-bottom: 16px; border-bottom: 1px solid var(--border); position: relative; }
-    .cat-header::after { content: ""; position: absolute; bottom: -1px; left: 0; width: 80px; height: 2px; background: linear-gradient(90deg, var(--accent), transparent); }
-    .cat-name { font-family: var(--font-display); font-size: clamp(30px, 5vw, 44px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
-    .cat-subtitle { font-size: 13px; color: var(--text-dim); font-weight: 500; margin-top: 4px; letter-spacing: 0.04em; }
-    .section-label { font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin: 32px 0 14px; padding-left: 2px; position: relative; display: inline-block; }
-    .section-label::after { content: ""; position: absolute; bottom: -4px; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, var(--accent), transparent); opacity: 0.4; }
+    /* ═══ CATEGORY HEADER ═══ */
+    .cat-header {
+      margin-bottom: 28px; padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .cat-header::after {
+      content: ""; position: absolute; bottom: -1px; left: 0; width: 80px; height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+    }
+    .cat-name {
+      font-family: var(--font-display);
+      font-size: clamp(30px, 5vw, 44px); font-weight: 700;
+      letter-spacing: -0.02em; line-height: 1.1;
+    }
+    .cat-subtitle {
+      font-size: 13px; color: var(--text-dim); font-weight: 500;
+      margin-top: 4px; letter-spacing: 0.04em;
+    }
+
+    .section-label {
+      font-size: 10px; font-weight: 800; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--accent);
+      margin: 32px 0 14px; padding-left: 2px;
+      position: relative; display: inline-block;
+    }
+    .section-label::after {
+      content: ""; position: absolute; bottom: -4px; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      opacity: 0.4;
+    }
     .section-label:first-child { margin-top: 0; }
 
-    .plates-row { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
-    .plate-card { padding: 18px 20px; border-radius: 16px; border: 1px solid var(--border-warm); background: linear-gradient(145deg, var(--surface-solid) 0%, rgba(40,28,18,0.6) 100%); font-size: 14px; font-weight: 500; line-height: 1.5; color: var(--text); transition: all 0.3s var(--ease-out-expo); position: relative; overflow: hidden; }
-    .plate-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent-light), transparent); opacity: 0.15; }
-    .plate-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.4), 0 0 0 1px var(--border-warm); }
+    /* ═══ PLATES — PRICING CARDS ═══ */
+    .plates-row {
+      display: grid; gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+    .plate-card {
+      padding: 18px 20px; border-radius: 16px;
+      border: 1px solid var(--border-warm);
+      background: linear-gradient(145deg, var(--surface-solid) 0%, rgba(40,28,18,0.6) 100%);
+      font-size: 14px; font-weight: 500; line-height: 1.5; color: var(--text);
+      transition: all 0.3s var(--ease-out-expo);
+      position: relative; overflow: hidden;
+    }
+    .plate-card::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
+      opacity: 0.15;
+    }
+    .plate-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.4), 0 0 0 1px var(--border-warm);
+    }
 
+    /* ═══ ITEM LIST — THE STAR ═══ */
     .item-list { list-style: none; display: grid; gap: 4px; }
-    .menu-item { padding: 14px 18px; border-radius: 14px; border: 1px solid transparent; background: transparent; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.35s var(--ease-out-expo); position: relative; opacity: 0; transform: translateY(16px); }
-    .menu-item.revealed { opacity: 1; transform: translateY(0); }
-    .menu-item::before { content: ""; position: absolute; inset: 0; border-radius: 14px; background: linear-gradient(135deg, rgba(255,120,40,0.08), rgba(255,200,120,0.02)); opacity: 0; transition: opacity 0.3s; }
-    .menu-item:hover { border-color: var(--border-warm); background: var(--surface); transform: translateX(6px) translateY(0); box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+
+    .menu-item {
+      padding: 14px 18px; border-radius: 14px;
+      border: 1px solid transparent;
+      background: transparent;
+      font-size: 15px; font-weight: 500;
+      cursor: pointer;
+      transition: all 0.35s var(--ease-out-expo);
+      position: relative;
+      /* Scroll reveal — starts hidden */
+      opacity: 0; transform: translateY(16px);
+    }
+    .menu-item.revealed {
+      opacity: 1; transform: translateY(0);
+    }
+    .menu-item::before {
+      content: ""; position: absolute; inset: 0; border-radius: 14px;
+      background: linear-gradient(135deg, rgba(255,120,40,0.08), rgba(255,200,120,0.02));
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .menu-item:hover {
+      border-color: var(--border-warm);
+      background: var(--surface);
+      transform: translateX(6px) translateY(0);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
     .menu-item:hover::before { opacity: 1; }
-    .menu-item .item-name { font-weight: 700; position: relative; z-index: 1; transition: color 0.2s; }
+
+    .menu-item .item-name {
+      font-weight: 700; position: relative; z-index: 1;
+      transition: color 0.2s;
+    }
     .menu-item:hover .item-name { color: var(--accent-light); }
-    .menu-item .item-desc { max-height: 0; opacity: 0; overflow: hidden; transition: all 0.4s var(--ease-out-expo); font-size: 13px; color: var(--text-mid); line-height: 1.6; position: relative; z-index: 1; }
+
+    .menu-item .item-desc {
+      max-height: 0; opacity: 0; overflow: hidden;
+      transition: all 0.4s var(--ease-out-expo);
+      font-size: 13px; color: var(--text-mid); line-height: 1.6;
+      position: relative; z-index: 1;
+    }
     .menu-item.expanded .item-desc { max-height: 80px; opacity: 1; margin-top: 6px; }
-    .menu-item .item-hint { font-size: 10px; color: var(--text-dim); font-weight: 600; margin-top: 2px; position: relative; z-index: 1; transition: opacity 0.2s; }
+    .menu-item .item-hint {
+      font-size: 10px; color: var(--text-dim); font-weight: 600; margin-top: 2px;
+      position: relative; z-index: 1; transition: opacity 0.2s;
+    }
     .menu-item.expanded .item-hint { opacity: 0; height: 0; margin: 0; }
+
+    /* Beer items */
     .menu-item.beer-item:hover { border-color: rgba(212,168,67,0.2); }
     .menu-item.beer-item:hover .item-name { color: var(--gold); }
-    .menu-item.beer-item::before { background: linear-gradient(135deg, rgba(212,168,67,0.06), rgba(212,168,67,0.02)); }
+    .menu-item.beer-item::before {
+      background: linear-gradient(135deg, rgba(212,168,67,0.06), rgba(212,168,67,0.02));
+    }
 
-    .salad-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
-    .salad-col-title { font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sage); margin-bottom: 10px; }
+    /* ═══ SALAD ═══ */
+    .salad-grid {
+      display: grid; gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+    .salad-col-title {
+      font-size: 11px; font-weight: 800; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--sage); margin-bottom: 10px;
+    }
 
-    .crawfish-wrap { border-radius: 20px; padding: 28px; border: 1px solid rgba(196,58,24,0.15); background: linear-gradient(145deg, var(--surface-solid) 0%, rgba(60,20,10,0.3) 100%); position: relative; overflow: hidden; }
-    .crawfish-wrap::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--ember), transparent); opacity: 0.4; }
+    /* ═══ CRAWFISH ═══ */
+    .crawfish-wrap {
+      border-radius: 20px; padding: 28px;
+      border: 1px solid rgba(196,58,24,0.15);
+      background: linear-gradient(145deg, var(--surface-solid) 0%, rgba(60,20,10,0.3) 100%);
+      position: relative; overflow: hidden;
+    }
+    .crawfish-wrap::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--ember), transparent);
+      opacity: 0.4;
+    }
     .crawfish-wrap .cat-name { color: var(--ember); }
     .crawfish-wrap .cat-header::after { background: linear-gradient(90deg, var(--ember), transparent); }
 
+    /* ═══ ADVANCED ═══ */
     .adv-day-tabs { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-bottom: 18px; }
-    .adv-day-tab { font-size: 12px; font-weight: 600; padding: 9px 16px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text-dim); cursor: pointer; transition: all 0.3s var(--ease-out-expo); }
+    .adv-day-tab {
+      font-size: 12px; font-weight: 600; padding: 9px 16px;
+      border-radius: 999px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text-dim); cursor: pointer;
+      transition: all 0.3s var(--ease-out-expo);
+    }
     .adv-day-tab:hover { transform: translateY(-1px); }
     .adv-day-tab.active { background: var(--surface-raised); border-color: var(--border-warm); color: var(--accent-light); }
-    .adv-card { display: none; border-radius: 24px; border: 1px solid var(--border); background: var(--surface-solid); padding: 28px; animation: sectionIn 0.5s var(--ease-out-expo); }
+    .adv-card {
+      display: none; border-radius: 24px; border: 1px solid var(--border);
+      background: var(--surface-solid); padding: 28px;
+      animation: sectionIn 0.5s var(--ease-out-expo);
+    }
     .adv-card.visible { display: block; }
     .adv-card-title { font-family: var(--font-display); font-size: 28px; font-weight: 700; margin-bottom: 4px; }
     .adv-card-sub { font-size: 13px; color: var(--text-dim); margin-bottom: 18px; }
 
-    .closed-state { text-align: center; padding: 60px 20px; border-radius: 24px; border: 1px solid var(--border); background: var(--surface-solid); }
+    /* ═══ CLOSED ═══ */
+    .closed-state {
+      text-align: center; padding: 60px 20px; border-radius: 24px;
+      border: 1px solid var(--border); background: var(--surface-solid);
+    }
     .closed-state h2 { font-family: var(--font-display); font-size: 32px; font-weight: 700; margin-bottom: 8px; }
     .closed-state p { color: var(--text-mid); }
 
-    .back-btn { position: fixed; z-index: 90; bottom: 26px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--border-warm); border-radius: 999px; padding: 13px 30px; display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-weight: 700; font-size: 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); transition: all 0.3s var(--ease-out-expo); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
-    .back-btn:hover { transform: translateX(-50%) translateY(-3px); border-color: var(--accent); box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 30px var(--accent-glow); }
+    /* ═══ BACK BUTTON ═══ */
+    .back-btn {
+      position: fixed; z-index: 90; bottom: 26px; left: 50%; transform: translateX(-50%);
+      background: var(--surface); border: 1px solid var(--border-warm);
+      border-radius: 999px; padding: 13px 30px;
+      display: inline-flex; align-items: center; gap: 10px;
+      text-decoration: none; color: var(--text); font-weight: 700; font-size: 14px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6); transition: all 0.3s var(--ease-out-expo);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    }
+    .back-btn:hover {
+      transform: translateX(-50%) translateY(-3px);
+      border-color: var(--accent);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 30px var(--accent-glow);
+    }
     .back-btn .arrow { color: var(--accent-hot); font-size: 20px; transition: transform 0.3s; }
     .back-btn:hover .arrow { transform: translateX(-4px); }
 
-    .section-divider { width: 100%; height: 1px; border: none; background: linear-gradient(90deg, transparent, var(--border-warm), transparent); margin: 10px 0 4px; }
+    /* ═══ DIVIDER ═══ */
+    .section-divider {
+      width: 100%; height: 1px; border: none;
+      background: linear-gradient(90deg, transparent, var(--border-warm), transparent);
+      margin: 10px 0 4px;
+    }
 
-    .flash-overlay { position: fixed; inset: 0; display: none; place-items: center; z-index: 200; background: rgba(0,0,0,0.75); backdrop-filter: blur(16px); padding: 18px; }
+    /* ═══ FLASH MODAL ═══ */
+    .flash-overlay {
+      position: fixed; inset: 0; display: none; place-items: center; z-index: 200;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(16px); padding: 18px;
+    }
     .flash-overlay.show { display: grid; }
-    .flash-card { width: min(460px, calc(100vw - 32px)); border-radius: 28px; border: 1px solid var(--border-warm); background: var(--surface-solid); padding: 36px; text-align: center; animation: flashPop 0.4s var(--ease-spring); }
+    .flash-card {
+      width: min(460px, calc(100vw - 32px)); border-radius: 28px;
+      border: 1px solid var(--border-warm); background: var(--surface-solid);
+      padding: 36px; text-align: center;
+      animation: flashPop 0.4s var(--ease-spring);
+    }
     @keyframes flashPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     .flash-title { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
     .flash-text { color: var(--text-mid); font-size: 15px; line-height: 1.6; margin-bottom: 16px; }
-    .flash-countdown { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-hot), var(--ember)); color: #fff; font-weight: 900; font-size: 22px; box-shadow: 0 0 30px var(--accent-glow); margin-bottom: 12px; }
+    .flash-countdown {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-hot), var(--ember));
+      color: #fff; font-weight: 900; font-size: 22px;
+      box-shadow: 0 0 30px var(--accent-glow); margin-bottom: 12px;
+    }
     .flash-sub { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); }
 
     .hide { display: none !important; }
@@ -275,48 +560,11 @@
   </div>
 </div>
 
-<!--
-  REPLACED: <script src="menu-data.js"></script>
-  Now fetches from Google Sheet API instead.
-  The MENU_DATA variable is built from the API response + hardcoded defaults.
--->
+<script src="menu-data.js"></script>
 
 <script>
 (function () {
   "use strict";
-
-  /* ═══ API — fetch menu data from Google Sheet ═══ */
-  var API_URL = 'https://script.google.com/macros/s/AKfycbxnCSfbRk15e66t3rhDCMYzVmc6fpwptTxh611NIqPn8KV3mybvqxoFe97wpXM1YqtMrQ/exec';
-
-  function fetchAndBuildMenuData() {
-    return fetch(API_URL + '?action=getMenuData')
-      .then(function(r) { return r.json(); })
-      .then(function(result) {
-        var sheetMenus = {};
-        if (result.ok && result.data) {
-          (result.data || []).forEach(function(row) {
-            var date = String(row.date || '').trim();
-            if (!date) return;
-            try { sheetMenus[date] = JSON.parse(row.json); } catch(e) {}
-          });
-        }
-        // Build the same MENU_DATA object the old menu-data.js provided
-        return {
-          settings: {
-            advancedWindowDays: 7,
-            advancedDisclaimer: "Lunch forecast — subject to change. Check Facebook every morning for confirmed specials.",
-            noDescriptionText: "Ask staff for details."
-          },
-          defaults: {
-            breakfast: { items: ["Biscuits & Gravy","Scrambled Eggs","Bacon","Sausage","Hash Browns","Pancakes","French Toast","Breakfast Plate"] },
-            drinks: { items: ["Sweet Tea","Unsweet Tea","Lemonade","Soft Drinks","Coffee","Water"] }
-          },
-          beer: ["Natural Light","Miller Lite","Coors Light","Bud Light","Budweiser","Michelob Ultra","Corona","Modelo"],
-          closures: {},
-          menus: sheetMenus
-        };
-      });
-  }
 
   /* ═══════════════════════════════════════
      PARTICLE SYSTEM — smoke & embers
@@ -324,36 +572,83 @@
   const canvas = document.getElementById("particles");
   const ctx = canvas.getContext("2d");
   let W, H, particles = [], raf;
-  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-  resize(); window.addEventListener("resize", resize);
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener("resize", resize);
 
   class Particle {
     constructor() { this.reset(true); }
     reset(init) {
-      this.x = Math.random() * W; this.y = init ? Math.random() * H : H + 20;
-      this.size = Math.random() * 2.5 + 0.5; this.speedY = -(Math.random() * 0.4 + 0.1);
-      this.speedX = (Math.random() - 0.5) * 0.3; this.opacity = Math.random() * 0.25 + 0.05;
+      this.x = Math.random() * W;
+      this.y = init ? Math.random() * H : H + 20;
+      this.size = Math.random() * 2.5 + 0.5;
+      this.speedY = -(Math.random() * 0.4 + 0.1);
+      this.speedX = (Math.random() - 0.5) * 0.3;
+      this.opacity = Math.random() * 0.25 + 0.05;
       this.fadeSpeed = Math.random() * 0.0008 + 0.0002;
+      // Color: mix of warm embers and cool smoke
       const r = Math.random();
-      if (r < 0.3) { this.r = 255; this.g = 120 + Math.random()*60; this.b = 40; this.opacity *= 1.5; }
-      else if (r < 0.5) { this.r = 255; this.g = 180; this.b = 100; }
-      else { this.r = 180; this.g = 165; this.b = 150; }
+      if (r < 0.3) { this.r = 255; this.g = 120 + Math.random()*60; this.b = 40; this.opacity *= 1.5; } // ember
+      else if (r < 0.5) { this.r = 255; this.g = 180; this.b = 100; } // warm smoke
+      else { this.r = 180; this.g = 165; this.b = 150; } // cool smoke
     }
-    update() { this.y += this.speedY; this.x += this.speedX + Math.sin(this.y * 0.008) * 0.15; this.opacity -= this.fadeSpeed; if (this.opacity <= 0 || this.y < -20) this.reset(false); }
-    draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = `rgba(${this.r},${this.g},${this.b},${this.opacity})`; ctx.fill(); }
+    update() {
+      this.y += this.speedY;
+      this.x += this.speedX + Math.sin(this.y * 0.008) * 0.15;
+      this.opacity -= this.fadeSpeed;
+      if (this.opacity <= 0 || this.y < -20) this.reset(false);
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${this.r},${this.g},${this.b},${this.opacity})`;
+      ctx.fill();
+    }
   }
+
+  // Fewer particles for perf on mobile
   const COUNT = window.innerWidth < 640 ? 40 : 80;
   for (let i = 0; i < COUNT; i++) particles.push(new Particle());
-  function animateParticles() { ctx.clearRect(0, 0, W, H); particles.forEach(p => { p.update(); p.draw(); }); raf = requestAnimationFrame(animateParticles); }
+
+  function animateParticles() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => { p.update(); p.draw(); });
+    raf = requestAnimationFrame(animateParticles);
+  }
   animateParticles();
 
-  /* ═══ SCROLL REVEAL ═══ */
+  /* ═══════════════════════════════════════
+     SCROLL REVEAL — staggered item entrances
+     ═══════════════════════════════════════ */
   const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => { if (entry.isIntersecting) { const el = entry.target; setTimeout(() => { el.classList.add("revealed"); }, el.dataset.revealDelay || 0); revealObserver.unobserve(el); } });
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const delay = el.dataset.revealDelay || 0;
+        setTimeout(() => {
+          el.classList.add("revealed");
+        }, delay);
+        revealObserver.unobserve(el);
+      }
+    });
   }, { threshold: 0.1, rootMargin: "0px 0px -40px 0px" });
-  function observeItems(container) { const items = container.querySelectorAll(".menu-item"); items.forEach((item, i) => { item.style.transition = `opacity 0.55s cubic-bezier(0.16,1,0.3,1) ${i * 0.04}s, transform 0.55s cubic-bezier(0.16,1,0.3,1) ${i * 0.04}s`; item.dataset.revealDelay = 0; revealObserver.observe(item); }); }
 
-  /* ═══ CORE MENU LOGIC — identical to original ═══ */
+  function observeItems(container) {
+    const items = container.querySelectorAll(".menu-item");
+    items.forEach((item, i) => {
+      item.style.transition = `opacity 0.55s cubic-bezier(0.16,1,0.3,1) ${i * 0.04}s, transform 0.55s cubic-bezier(0.16,1,0.3,1) ${i * 0.04}s`;
+      item.dataset.revealDelay = 0;
+      revealObserver.observe(item);
+    });
+  }
+
+  /* ═══════════════════════════════════════
+     CORE MENU LOGIC
+     ═══════════════════════════════════════ */
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 
@@ -367,195 +662,341 @@
   function inRange(mins,r){if(!r||!String(r).includes("–")&&!String(r).includes("-"))return false;const[a,b]=String(r).split(/[–-]/).map(s=>s.trim());const s=t12(a),e=t12(b);if(s==null||e==null)return false;return mins>=s&&mins<=e;}
   function pastClose(day){const h=biz(day);const cl=t12(h.close);if(cl==null)return false;const n=new Date();return(n.getHours()*60+n.getMinutes())>=cl;}
 
-  /* ═══ INIT WITH DATA — called after fetch resolves ═══ */
-  function initWithData(data) {
-    if(!data){$("loadError")?.classList.remove("hide");return;}
-    const rawMenus=data.menus||{};const menus={};
-    Object.keys(rawMenus).forEach(k=>{const nk=normKey(k);if(nk)menus[nk]=rawMenus[k];});
-    data.menus=menus;
+  const data=(typeof MENU_DATA!=="undefined")?MENU_DATA:null;
+  if(!data){$("loadError")?.classList.remove("hide");return;}
+  const rawMenus=data.menus||{};const menus={};
+  Object.keys(rawMenus).forEach(k=>{const nk=normKey(k);if(nk)menus[nk]=rawMenus[k];});
+  data.menus=menus;
 
-    function getMenu(iso){return menus[iso]||null;}
-    function getClosure(dayName){const c=data.closures||{};const k=Object.keys(c).find(k=>k.toLowerCase()===String(dayName||"").toLowerCase());return k?c[k]:null;}
-    function normItems(a){return Array.isArray(a)?a.map(x=>String(x||"").trim()).filter(Boolean):[];}
-    function normLunch(a){if(!Array.isArray(a))return[];return a.map(r=>{if(r&&typeof r==="object")return{name:String(r.name||"").trim(),desc:String(r.desc||"").trim()};const s=String(r||"").trim();return s?{name:s,desc:""}:null;}).filter(Boolean).filter(x=>x.name);}
+  function getMenu(iso){return menus[iso]||null;}
+  function getClosure(dayName){const c=data.closures||{};const k=Object.keys(c).find(k=>k.toLowerCase()===String(dayName||"").toLowerCase());return k?c[k]:null;}
+  function normItems(a){return Array.isArray(a)?a.map(x=>String(x||"").trim()).filter(Boolean):[];}
+  function normLunch(a){if(!Array.isArray(a))return[];return a.map(r=>{if(r&&typeof r==="object")return{name:String(r.name||"").trim(),desc:String(r.desc||"").trim()};const s=String(r||"").trim();return s?{name:s,desc:""}:null;}).filter(Boolean).filter(x=>x.name);}
 
-    function buildCats(isoDate){
-      const menu=getMenu(isoDate)||{};const def=data.defaults||{};const cats=[];
-      const bkP=normItems(menu.breakfast?.plates??def.breakfast?.plates??[]);
-      const bkI=normItems(menu.breakfast?.items??def.breakfast?.items??[]);
-      if(bkP.length||bkI.length)cats.push({id:"breakfast",name:"Breakfast",icon:"🍳",sub:"Same daily · Served at opening",plates:bkP,items:bkI});
-      const lP=normItems(menu.lunch?.plates??def.lunch?.plates??[]);
-      const lI=normLunch(menu.lunch?.items??[]);
-      if(lP.length||lI.length)cats.push({id:"lunch",name:"Lunch",icon:"🍽",sub:"Changes daily",plates:lP,items:lI,hasLunchItems:true});
-      const beers=data.beer||[];
-      if(beers.length)cats.push({id:"beer",name:"Beer",icon:"🍺",sub:"Ice cold",items:beers,isBeer:true});
-      const cf=menu.crawfish||{};const cfShow=cf.show!==false;
-      const cfI=normItems(cf.items??def.crawfish?.items??[]);
-      if(cfShow&&cfI.length)cats.push({id:"crawfish",name:"Crawfish",icon:"🦞",sub:"Seasonal special",items:cfI,isCrawfish:true});
-      const salad=menu.salad||def.salad||{};const sP=normItems(salad.items??[]);const sB=salad.saladBar||{};
-      if(sP.length||sB.lettuce?.length||sB.toppings?.length)cats.push({id:"salad",name:"Salad Bar",icon:"🥗",sub:"Build your own",pricing:sP,saladBar:sB});
-      const drI=normItems(menu.drinks?.items??def.drinks?.items??[]);
-      if(drI.length)cats.push({id:"drinks",name:"Drinks",icon:"🥤",sub:"Cold & hot",items:drI});
-      const dsI=normItems(menu.dessert?.items??def.dessert?.items??[]);
-      if(dsI.length)cats.push({id:"dessert",name:"Dessert",icon:"🍮",sub:"Sweet finish",items:dsI});
-      return cats;
-    }
-
-    function renderCatHTML(cat){
-      let html=`<div class="cat-header"><div><div class="cat-name">${cat.icon} ${esc(cat.name)}</div><div class="cat-subtitle">${esc(cat.sub||"")}</div></div></div>`;
-      if(cat.plates?.length)html+=`<div class="section-label">Plates &amp; Pricing</div><div class="plates-row">${cat.plates.map(p=>`<div class="plate-card">${esc(p)}</div>`).join("")}</div>`;
-      if(cat.hasLunchItems&&cat.items?.length){
-        html+=`<div class="section-label">Today's Specials</div><ul class="item-list">`;
-        cat.items.forEach(item=>{const desc=item.desc||data.settings.noDescriptionText||"";html+=`<li class="menu-item" onclick="this.classList.toggle('expanded')"><div class="item-name">${esc(item.name)}</div><div class="item-desc">${esc(desc)}</div><div class="item-hint">tap for details</div></li>`;});
-        html+=`</ul>`;
-      }
-      if(!cat.hasLunchItems&&cat.items?.length){
-        html+=`<div class="section-label">${cat.isBeer?"Available":cat.isCrawfish?"Details":"Items"}</div><ul class="item-list">`;
-        cat.items.forEach(item=>{const name=typeof item==="string"?item:item.name;html+=`<li class="menu-item${cat.isBeer?" beer-item":""}""><div class="item-name">${cat.isBeer?"🍺 ":""}${esc(name)}</div></li>`;});
-        html+=`</ul>`;
-      }
-      if(cat.id==="salad"){
-        if(cat.pricing?.length)html+=`<div class="section-label">Pricing</div><ul class="item-list">${cat.pricing.map(p=>`<li class="menu-item"><div class="item-name">${esc(p)}</div></li>`).join("")}</ul>`;
-        const sb=cat.saladBar||{};
-        html+=`<div class="section-label">Build Your Salad</div><div class="salad-grid">`;
-        if(sb.lettuce?.length)html+=`<div><div class="salad-col-title">Lettuce</div><ul class="item-list">${sb.lettuce.map(x=>`<li class="menu-item"><div class="item-name">${esc(x)}</div></li>`).join("")}</ul></div>`;
-        if(sb.toppings?.length)html+=`<div><div class="salad-col-title">Toppings</div><ul class="item-list">${sb.toppings.map(x=>`<li class="menu-item"><div class="item-name">${esc(x)}</div></li>`).join("")}</ul></div>`;
-        if(sb.dressing?.length)html+=`<div><div class="salad-col-title">Dressing</div><ul class="item-list">${sb.dressing.map(x=>`<li class="menu-item"><div class="item-name">${esc(x)}</div></li>`).join("")}</ul></div>`;
-        html+=`</div>`;
-      }
-      if(cat.isCrawfish)html=`<div class="crawfish-wrap">${html}</div>`;
-      return html;
-    }
-
-    let panelConfigs=[];
-    function initPanel(prefix,isoDate,dayName){
-      panelConfigs.push({prefix,isoDate,dayName});
-      const h=biz(dayName);const closure=getClosure(dayName);const hoursEl=$(`${prefix}Hours`);
-      if(closure?.closed){$(`${prefix}Closed`)?.classList.remove("hide");const msg=$(`${prefix}ClosedMsg`);if(msg)msg.textContent=closure.message||"See you next time!";if(hoursEl)hoursEl.textContent=`${dayName}: Closed`;return;}
-      if(hoursEl)hoursEl.innerHTML=`<strong>${dayName}</strong> &nbsp;${h.open} – ${h.close} &nbsp;·&nbsp; Breakfast ${h.breakfast} &nbsp;·&nbsp; Lunch ${h.lunch}${h.crawfish?` &nbsp;·&nbsp; Crawfish ${h.crawfish}`:""}`;
-      buildPanelContent(prefix,isoDate,dayName);
-    }
-
-    function buildPanelContent(prefix,isoDate,dayName){
-      const catNavEl=$(`${prefix}CatNav`);const sectionsEl=$(`${prefix}CatSections`);
-      if(!catNavEl||!sectionsEl)return;
-      const activeBtn=catNavEl.querySelector(".cat-btn.active");
-      const activeIdx=activeBtn?activeBtn.dataset.idx:"0";
-      const cats=buildCats(isoDate);
-      catNavEl.innerHTML=cats.map((c,i)=>`<button class="cat-btn${c.isBeer?" beer-btn":""}${String(i)===activeIdx?" active":""}" data-idx="${i}">${c.icon} ${esc(c.name)}</button>`).join("");
-      sectionsEl.innerHTML=cats.map((c,i)=>`<div class="cat-section${String(i)===activeIdx?" visible":""}" data-idx="${i}">${renderCatHTML(c)}</div>`).join("");
-      const btns=catNavEl.querySelectorAll(".cat-btn");const secs=sectionsEl.querySelectorAll(".cat-section");
-      btns.forEach(btn=>{btn.addEventListener("click",()=>{const idx=btn.dataset.idx;btns.forEach(b=>b.classList.toggle("active",b.dataset.idx===idx));secs.forEach(s=>{s.classList.toggle("visible",s.dataset.idx===idx);if(s.dataset.idx===idx)observeItems(s);});});});
-      secs.forEach(s=>{if(s.classList.contains("visible"))observeItems(s);});
-    }
-
-    function todayAt(timeStr) { const m = t12(timeStr); if (m == null) return null; const d = new Date(); d.setHours(Math.floor(m / 60), m % 60, 0, 0); return d; }
-    function tomorrowAt(timeStr) { const d = todayAt(timeStr); if (!d) return null; d.setDate(d.getDate() + 1); return d; }
-    function fmtCountdown(diffMs) { if (diffMs <= 0) return { h: "00", m: "00", s: "00" }; const totalSec = Math.floor(diffMs / 1000); const h = Math.floor(totalSec / 3600); const m = Math.floor((totalSec % 3600) / 60); const s = totalSec % 60; return { h: String(h).padStart(2, "0"), m: String(m).padStart(2, "0"), s: String(s).padStart(2, "0") }; }
-
-    function updateStatus(dayName, isoDate) {
-      const todayISO = toISO(new Date()); const isToday = isoDate === todayISO;
-      const h = biz(dayName); const closure = getClosure(dayName);
-      const dot = $("statusDot"), txt = $("statusText"), sub = $("heroSub");
-      const cdWrap = $("countdownWrap"), cdLabel = $("countdownLabel");
-      const cdH = $("cdHours"), cdM = $("cdMins"), cdS = $("cdSecs");
-      if (cdWrap) cdWrap.style.display = "none";
-      if (closure?.closed) { dot.className = "status-dot closed"; txt.textContent = "CLOSED – " + (closure.message || ""); if (sub) sub.textContent = dayName + " · Closed"; return; }
-      if (!isToday) {
-        dot.className = "status-dot warn"; txt.textContent = dayName + " · OPENS AT " + h.open; if (sub) sub.textContent = `${dayName} · ${h.open} – ${h.close}`;
-        const targetDate = parseISO(isoDate); const openMin = t12(h.open);
-        if (openMin != null) { targetDate.setHours(Math.floor(openMin / 60), openMin % 60, 0, 0); const diff = targetDate - new Date(); if (diff > 0) { const cd = fmtCountdown(diff); cdLabel.textContent = "Opens in"; cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s; cdWrap.style.display = ""; } }
-        return;
-      }
-      const now = new Date(); const mins = now.getHours() * 60 + now.getMinutes();
-      const openMin = t12(h.open); const closeMin = t12(h.close); const bkEnd = t12("10:30 AM"); const lunchStart = t12("11:00 AM");
-      const cfStart = h.crawfish ? t12("4:00 PM") : null; const cfEnd = h.crawfish ? t12("8:00 PM") : null;
-      const isInMain = openMin != null && closeMin != null && mins >= openMin && mins < closeMin;
-      const isInCrawfish = cfStart != null && cfEnd != null && mins >= cfStart && mins < cfEnd;
-      const isOpen = isInMain || isInCrawfish;
-      dot.className = "status-dot " + (isOpen ? "open" : "closed");
-      if (sub) sub.textContent = `${dayName} · ${h.open} – ${h.close}`;
-      if (mins < openMin) { txt.textContent = "CLOSED · OPENS AT " + h.open; let target = todayAt(h.open); let diff = target - now; if (diff > 0) { let cd = fmtCountdown(diff); cdLabel.textContent = "Opens in"; cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s; cdWrap.style.display = ""; } }
-      else if (mins < bkEnd) { txt.textContent = "NOW SERVING BREAKFAST"; let target = todayAt("10:30 AM"); let diff = target - now; if (diff > 0) { let cd = fmtCountdown(diff); cdLabel.textContent = "Breakfast ends in"; cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s; cdWrap.style.display = ""; } }
-      else if (mins < lunchStart) { txt.textContent = "TRANSITION · LUNCH AT 11:00 AM"; let target = todayAt("11:00 AM"); let diff = target - now; if (diff > 0) { let cd = fmtCountdown(diff); cdLabel.textContent = "Lunch starts in"; cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s; cdWrap.style.display = ""; } }
-      else if (mins < closeMin) { txt.textContent = "NOW SERVING LUNCH"; let target = todayAt(h.close); let diff = target - now; if (diff > 0) { let cd = fmtCountdown(diff); cdLabel.textContent = "Lunch ends in"; cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s; cdWrap.style.display = ""; } }
-      else if (cfStart && mins < cfStart) { txt.textContent = "CRAWFISH AT 4:00 PM"; let target = todayAt("4:00 PM"); let diff = target - now; if (diff > 0) { let cd = fmtCountdown(diff); cdLabel.textContent = "Crawfish starts in"; cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s; cdWrap.style.display = ""; } }
-      else if (cfEnd && mins < cfEnd) { txt.textContent = "NOW SERVING CRAWFISH"; let target = todayAt("8:00 PM"); let diff = target - now; if (diff > 0) { let cd = fmtCountdown(diff); cdLabel.textContent = "Crawfish ends in"; cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s; cdWrap.style.display = ""; } }
-      else { txt.textContent = "CLOSED · SEE YOU TOMORROW"; const tomDate = new Date(now); tomDate.setDate(tomDate.getDate() + 1); const tomDay = wkDay(tomDate); const tomH = biz(tomDay); const tomOpen = t12(tomH.open); if (tomOpen != null) { const target = new Date(tomDate); target.setHours(Math.floor(tomOpen / 60), tomOpen % 60, 0, 0); const diff = target - now; if (diff > 0) { const cd = fmtCountdown(diff); cdLabel.textContent = `Opens ${tomDay} at ${tomH.open}`; cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s; cdWrap.style.display = ""; } } }
-    }
-
-    function buildAdvanced(startISO){
-      const tabsEl=$("advDayTabs"),cardsEl=$("advCards"),discEl=$("advDisclaimer");
-      if(!tabsEl||!cardsEl)return;
-      if(discEl)discEl.textContent=data.settings.advancedDisclaimer||"Lunch forecast — subject to change.";
-      const start=parseISO(startISO);const entries=[];
-      for(let i=0;i<(data.settings.advancedWindowDays||7);i++){
-        const d=new Date(start);d.setDate(start.getDate()+i);
-        const iso=toISO(d);const dayName=wkDay(d);const h=biz(dayName);
-        const closure=getClosure(dayName);const dayMenu=getMenu(iso);const def=data.defaults||{};
-        const tab=document.createElement("button");tab.className="adv-day-tab"+(i===0?" active":"");
-        tab.textContent=`${dayName.slice(0,3)} ${d.getMonth()+1}/${d.getDate()}`;tabsEl.appendChild(tab);
-        const card=document.createElement("div");card.className="adv-card"+(i===0?" visible":"");
-        const lp=normItems(dayMenu?.lunch?.plates??def.lunch?.plates??[]);
-        const li=normLunch(dayMenu?.lunch?.items??[]);
-        let inner=`<div class="adv-card-title">${esc(dayName)}</div><div class="adv-card-sub">${esc(fmtDate(d))} · ${closure?.closed?"Closed":`Lunch ${h.lunch}`}</div>`;
-        if(closure?.closed){inner+=`<p style="color:var(--text-mid)">${esc(closure.message||"Closed")}</p>`;}
-        else{
-          if(lp.length)inner+=`<div class="section-label">Plates</div><div class="plates-row">${lp.map(p=>`<div class="plate-card">${esc(p)}</div>`).join("")}</div>`;
-          if(li.length){
-            inner+=`<div class="section-label">Lunch Items</div><ul class="item-list">`;
-            li.forEach(item=>{inner+=`<li class="menu-item" onclick="this.classList.toggle('expanded')"><div class="item-name">${esc(item.name)}</div><div class="item-desc">${esc(item.desc||"")}</div><div class="item-hint">tap for details</div></li>`;});
-            inner+=`</ul>`;
-          }else inner+=`<p style="color:var(--text-dim);margin-top:12px">Lunch menu not posted yet — check back soon.</p>`;
-        }
-        card.innerHTML=inner;cardsEl.appendChild(card);entries.push({tab,card});
-      }
-      entries.forEach((e,idx)=>{e.tab.addEventListener("click",()=>{entries.forEach((item,i)=>{item.tab.classList.toggle("active",i===idx);item.card.classList.toggle("visible",i===idx);if(i===idx)observeItems(item.card);});});});
-      if(entries[0])observeItems(entries[0].card);
-    }
-
-    function setupDayTabs(){
-      const tabs=[$("tabToday"),$("tabTomorrow"),$("tabAdvanced")];
-      const panels=[$("panelToday"),$("panelTomorrow"),$("panelAdvanced")];
-      tabs.forEach((tab,i)=>{tab?.addEventListener("click",()=>{tabs.forEach((t,ti)=>t.classList.toggle("active",ti===i));panels.forEach((p,pi)=>{p.classList.toggle("visible",pi===i);if(pi===i){const secs=p.querySelectorAll(".cat-section.visible");secs.forEach(s=>observeItems(s));}});});});
-    }
-
-    let flashTimer=null,flashInterval=null;
-    function showFlash(title,text){const modal=$("flashModal"),cnt=$("flashCount");if(!modal)return;$("flashTitle").textContent=title;$("flashText").textContent=text;if(flashTimer)clearTimeout(flashTimer);if(flashInterval)clearInterval(flashInterval);let r=5;cnt.textContent=r;modal.classList.add("show");flashInterval=setInterval(()=>{r--;if(r>0)cnt.textContent=r;else clearInterval(flashInterval);},1000);flashTimer=setTimeout(()=>hideFlash(),5000);}
-    function hideFlash(){if(flashTimer){clearTimeout(flashTimer);flashTimer=null;}if(flashInterval){clearInterval(flashInterval);flashInterval=null;}$("flashModal")?.classList.remove("show");}
-    $("flashModal")?.addEventListener("click",hideFlash);
-    $("flashModal")?.querySelector(".flash-card")?.addEventListener("click",e=>e.stopPropagation());
-    window.addEventListener("keydown",e=>{if(e.key==="Escape")hideFlash();});
-
-    function handleHash(){const hash=(window.location.hash||"").replace("#","").toLowerCase();if(!hash)return;if(hash==="tomorrow"){$("tabTomorrow")?.click();return;}if(hash==="advanced"||hash==="forecast"){$("tabAdvanced")?.click();return;}}
-
-    // ═══ RUN ═══
-    setupDayTabs();
-    const now=new Date();const todayISO=toISO(now);const todayName=wkDay(now);
-    const tom=new Date(now);tom.setDate(now.getDate()+1);
-    const tomorrowISO=toISO(tom);const tomorrowName=wkDay(tom);
-    let dTI=todayISO,dTN=todayName,dToI=tomorrowISO,dToN=tomorrowName;
-    const ct=getClosure(todayName);
-    if(pastClose(todayName)&&!ct?.closed){dTI=tomorrowISO;dTN=tomorrowName;const da=new Date(now);da.setDate(now.getDate()+2);dToI=toISO(da);dToN=wkDay(da);}
-    $("tabToday").textContent=dTN;$("tabTomorrow").textContent=dToN;
-    panelConfigs=[];
-    initPanel("today",dTI,dTN);initPanel("tomorrow",dToI,dToN);
-    buildAdvanced(dTI);updateStatus(dTN,dTI);
-    setInterval(()=>updateStatus(dTN,dTI),1000);
-    setTimeout(handleHash,150);
-    window.addEventListener("hashchange",handleHash);
+  function buildCats(isoDate){
+    const menu=getMenu(isoDate)||{};const def=data.defaults||{};const cats=[];
+    const bkP=normItems(menu.breakfast?.plates??def.breakfast?.plates??[]);
+    const bkI=normItems(menu.breakfast?.items??def.breakfast?.items??[]);
+    if(bkP.length||bkI.length)cats.push({id:"breakfast",name:"Breakfast",icon:"🍳",sub:"Same daily · Served at opening",plates:bkP,items:bkI});
+    const lP=normItems(menu.lunch?.plates??def.lunch?.plates??[]);
+    const lI=normLunch(menu.lunch?.items??[]);
+    if(lP.length||lI.length)cats.push({id:"lunch",name:"Lunch",icon:"🍽",sub:"Changes daily",plates:lP,items:lI,hasLunchItems:true});
+    const beers=data.beer||[];
+    if(beers.length)cats.push({id:"beer",name:"Beer",icon:"🍺",sub:"Ice cold",items:beers,isBeer:true});
+    const cf=menu.crawfish||{};const cfShow=cf.show!==false;
+    const cfI=normItems(cf.items??def.crawfish?.items??[]);
+    if(cfShow&&cfI.length)cats.push({id:"crawfish",name:"Crawfish",icon:"🦞",sub:"Seasonal special",items:cfI,isCrawfish:true});
+    const salad=menu.salad||def.salad||{};const sP=normItems(salad.items??[]);const sB=salad.saladBar||{};
+    if(sP.length||sB.lettuce?.length||sB.toppings?.length)cats.push({id:"salad",name:"Salad Bar",icon:"🥗",sub:"Build your own",pricing:sP,saladBar:sB});
+    const drI=normItems(menu.drinks?.items??def.drinks?.items??[]);
+    if(drI.length)cats.push({id:"drinks",name:"Drinks",icon:"🥤",sub:"Cold & hot",items:drI});
+    const dsI=normItems(menu.dessert?.items??def.dessert?.items??[]);
+    if(dsI.length)cats.push({id:"dessert",name:"Dessert",icon:"🍮",sub:"Sweet finish",items:dsI});
+    return cats;
   }
 
-  /* ═══ BOOT — fetch menu data from API, then init ═══ */
-  fetchAndBuildMenuData()
-    .then(function(menuData) { initWithData(menuData); })
-    .catch(function(err) {
-      console.error("Menu load failed:", err);
-      $("loadError")?.classList.remove("hide");
-      const msg = $("loadErrorMsg");
-      if (msg) msg.textContent = "Could not load the menu. Please try refreshing.";
-    });
+  function renderCatHTML(cat){
+    let html=`<div class="cat-header"><div><div class="cat-name">${cat.icon} ${esc(cat.name)}</div><div class="cat-subtitle">${esc(cat.sub||"")}</div></div></div>`;
 
+    if(cat.plates?.length)html+=`<div class="section-label">Plates &amp; Pricing</div><div class="plates-row">${cat.plates.map(p=>`<div class="plate-card">${esc(p)}</div>`).join("")}</div>`;
+
+    if(cat.hasLunchItems&&cat.items?.length){
+      html+=`<div class="section-label">Today's Specials</div><ul class="item-list">`;
+      cat.items.forEach(item=>{
+        const desc=item.desc||data.settings.noDescriptionText||"";
+        html+=`<li class="menu-item" onclick="this.classList.toggle('expanded')"><div class="item-name">${esc(item.name)}</div><div class="item-desc">${esc(desc)}</div><div class="item-hint">tap for details</div></li>`;
+      });
+      html+=`</ul>`;
+    }
+
+    if(!cat.hasLunchItems&&cat.items?.length){
+      html+=`<div class="section-label">${cat.isBeer?"Available":cat.isCrawfish?"Details":"Items"}</div><ul class="item-list">`;
+      cat.items.forEach(item=>{
+        const name=typeof item==="string"?item:item.name;
+        html+=`<li class="menu-item${cat.isBeer?" beer-item":""}""><div class="item-name">${cat.isBeer?"🍺 ":""}${esc(name)}</div></li>`;
+      });
+      html+=`</ul>`;
+    }
+
+    if(cat.id==="salad"){
+      if(cat.pricing?.length)html+=`<div class="section-label">Pricing</div><ul class="item-list">${cat.pricing.map(p=>`<li class="menu-item"><div class="item-name">${esc(p)}</div></li>`).join("")}</ul>`;
+      const sb=cat.saladBar||{};
+      html+=`<div class="section-label">Build Your Salad</div><div class="salad-grid">`;
+      if(sb.lettuce?.length)html+=`<div><div class="salad-col-title">Lettuce</div><ul class="item-list">${sb.lettuce.map(x=>`<li class="menu-item"><div class="item-name">${esc(x)}</div></li>`).join("")}</ul></div>`;
+      if(sb.toppings?.length)html+=`<div><div class="salad-col-title">Toppings</div><ul class="item-list">${sb.toppings.map(x=>`<li class="menu-item"><div class="item-name">${esc(x)}</div></li>`).join("")}</ul></div>`;
+      if(sb.dressing?.length)html+=`<div><div class="salad-col-title">Dressing</div><ul class="item-list">${sb.dressing.map(x=>`<li class="menu-item"><div class="item-name">${esc(x)}</div></li>`).join("")}</ul></div>`;
+      html+=`</div>`;
+    }
+
+    if(cat.isCrawfish)html=`<div class="crawfish-wrap">${html}</div>`;
+    return html;
+  }
+
+  let panelConfigs=[];
+
+  function initPanel(prefix,isoDate,dayName){
+    panelConfigs.push({prefix,isoDate,dayName});
+    const h=biz(dayName);const closure=getClosure(dayName);const hoursEl=$(`${prefix}Hours`);
+    if(closure?.closed){$(`${prefix}Closed`)?.classList.remove("hide");const msg=$(`${prefix}ClosedMsg`);if(msg)msg.textContent=closure.message||"See you next time!";if(hoursEl)hoursEl.textContent=`${dayName}: Closed`;return;}
+    if(hoursEl)hoursEl.innerHTML=`<strong>${dayName}</strong> &nbsp;${h.open} – ${h.close} &nbsp;·&nbsp; Breakfast ${h.breakfast} &nbsp;·&nbsp; Lunch ${h.lunch}${h.crawfish?` &nbsp;·&nbsp; Crawfish ${h.crawfish}`:""}`;
+    buildPanelContent(prefix,isoDate,dayName);
+  }
+
+  function buildPanelContent(prefix,isoDate,dayName){
+    const catNavEl=$(`${prefix}CatNav`);const sectionsEl=$(`${prefix}CatSections`);
+    if(!catNavEl||!sectionsEl)return;
+    const activeBtn=catNavEl.querySelector(".cat-btn.active");
+    const activeIdx=activeBtn?activeBtn.dataset.idx:"0";
+    const cats=buildCats(isoDate);
+    catNavEl.innerHTML=cats.map((c,i)=>`<button class="cat-btn${c.isBeer?" beer-btn":""}${String(i)===activeIdx?" active":""}" data-idx="${i}">${c.icon} ${esc(c.name)}</button>`).join("");
+    sectionsEl.innerHTML=cats.map((c,i)=>`<div class="cat-section${String(i)===activeIdx?" visible":""}" data-idx="${i}">${renderCatHTML(c)}</div>`).join("");
+    const btns=catNavEl.querySelectorAll(".cat-btn");const secs=sectionsEl.querySelectorAll(".cat-section");
+    btns.forEach(btn=>{btn.addEventListener("click",()=>{const idx=btn.dataset.idx;btns.forEach(b=>b.classList.toggle("active",b.dataset.idx===idx));secs.forEach(s=>{s.classList.toggle("visible",s.dataset.idx===idx);if(s.dataset.idx===idx)observeItems(s);});});});
+    // Observe items in visible section
+    secs.forEach(s=>{if(s.classList.contains("visible"))observeItems(s);});
+  }
+
+  // ── Countdown target helpers ──
+  function todayAt(timeStr) {
+    // Returns a Date object for today at the given "H:MM AM/PM" time
+    const m = t12(timeStr);
+    if (m == null) return null;
+    const d = new Date();
+    d.setHours(Math.floor(m / 60), m % 60, 0, 0);
+    return d;
+  }
+
+  function tomorrowAt(timeStr) {
+    const d = todayAt(timeStr);
+    if (!d) return null;
+    d.setDate(d.getDate() + 1);
+    return d;
+  }
+
+  function fmtCountdown(diffMs) {
+    if (diffMs <= 0) return { h: "00", m: "00", s: "00" };
+    const totalSec = Math.floor(diffMs / 1000);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    return {
+      h: String(h).padStart(2, "0"),
+      m: String(m).padStart(2, "0"),
+      s: String(s).padStart(2, "0")
+    };
+  }
+
+  function updateStatus(dayName, isoDate) {
+    const todayISO = toISO(new Date());
+    const isToday = isoDate === todayISO;
+    const h = biz(dayName);
+    const closure = getClosure(dayName);
+    const dot = $("statusDot"), txt = $("statusText"), sub = $("heroSub");
+    const cdWrap = $("countdownWrap"), cdLabel = $("countdownLabel");
+    const cdH = $("cdHours"), cdM = $("cdMins"), cdS = $("cdSecs");
+
+    // Hide countdown by default
+    if (cdWrap) cdWrap.style.display = "none";
+
+    if (closure?.closed) {
+      dot.className = "status-dot closed";
+      txt.textContent = "CLOSED – " + (closure.message || "");
+      if (sub) sub.textContent = dayName + " · Closed";
+      return;
+    }
+
+    if (!isToday) {
+      dot.className = "status-dot warn";
+      txt.textContent = dayName + " · OPENS AT " + h.open;
+      if (sub) sub.textContent = `${dayName} · ${h.open} – ${h.close}`;
+      // Countdown to opening (tomorrow or future)
+      const openTarget = todayAt(h.open);
+      if (openTarget) {
+        // If the target day is not today, calculate days ahead
+        const targetDate = parseISO(isoDate);
+        targetDate.setHours(Math.floor(t12(h.open) / 60), t12(h.open) % 60, 0, 0);
+        const diff = targetDate - new Date();
+        if (diff > 0) {
+          const cd = fmtCountdown(diff);
+          cdLabel.textContent = "Opens in";
+          cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s;
+          cdWrap.style.display = "";
+        }
+      }
+      return;
+    }
+
+    // It IS today — figure out where we are in the schedule
+    const now = new Date();
+    const mins = now.getHours() * 60 + now.getMinutes();
+    const openMin = t12(h.open);
+    const closeMin = t12(h.close);
+    const bkEnd = t12("10:30 AM");
+    const lunchStart = t12("11:00 AM");
+    const cfStart = h.crawfish ? t12("4:00 PM") : null;
+    const cfEnd = h.crawfish ? t12("8:00 PM") : null;
+
+    const isInMain = openMin != null && closeMin != null && mins >= openMin && mins < closeMin;
+    const isInCrawfish = cfStart != null && cfEnd != null && mins >= cfStart && mins < cfEnd;
+    const isOpen = isInMain || isInCrawfish;
+
+    dot.className = "status-dot " + (isOpen ? "open" : "closed");
+    if (sub) sub.textContent = `${dayName} · ${h.open} – ${h.close}`;
+
+    if (mins < openMin) {
+      // Before opening
+      txt.textContent = "CLOSED · OPENS AT " + h.open;
+      const target = todayAt(h.open);
+      const diff = target - now;
+      if (diff > 0) {
+        const cd = fmtCountdown(diff);
+        cdLabel.textContent = "Opens in";
+        cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s;
+        cdWrap.style.display = "";
+      }
+    } else if (mins < bkEnd) {
+      // During breakfast
+      txt.textContent = "NOW SERVING BREAKFAST";
+      const target = todayAt("10:30 AM");
+      const diff = target - now;
+      if (diff > 0) {
+        const cd = fmtCountdown(diff);
+        cdLabel.textContent = "Breakfast ends in";
+        cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s;
+        cdWrap.style.display = "";
+      }
+    } else if (mins < lunchStart) {
+      // Transition
+      txt.textContent = "TRANSITION · LUNCH AT 11:00 AM";
+      const target = todayAt("11:00 AM");
+      const diff = target - now;
+      if (diff > 0) {
+        const cd = fmtCountdown(diff);
+        cdLabel.textContent = "Lunch starts in";
+        cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s;
+        cdWrap.style.display = "";
+      }
+    } else if (mins < closeMin) {
+      // During lunch
+      txt.textContent = "NOW SERVING LUNCH";
+      const target = todayAt(h.close);
+      const diff = target - now;
+      if (diff > 0) {
+        const cd = fmtCountdown(diff);
+        cdLabel.textContent = "Lunch ends in";
+        cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s;
+        cdWrap.style.display = "";
+      }
+    } else if (cfStart && mins < cfStart) {
+      // After lunch, before crawfish
+      txt.textContent = "CRAWFISH AT 4:00 PM";
+      const target = todayAt("4:00 PM");
+      const diff = target - now;
+      if (diff > 0) {
+        const cd = fmtCountdown(diff);
+        cdLabel.textContent = "Crawfish starts in";
+        cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s;
+        cdWrap.style.display = "";
+      }
+    } else if (cfEnd && mins < cfEnd) {
+      // During crawfish
+      txt.textContent = "NOW SERVING CRAWFISH";
+      const target = todayAt("8:00 PM");
+      const diff = target - now;
+      if (diff > 0) {
+        const cd = fmtCountdown(diff);
+        cdLabel.textContent = "Crawfish ends in";
+        cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s;
+        cdWrap.style.display = "";
+      }
+    } else {
+      // Closed for the day — count to tomorrow's opening
+      txt.textContent = "CLOSED · SEE YOU TOMORROW";
+      // Figure out tomorrow's opening
+      const tomDate = new Date(now);
+      tomDate.setDate(tomDate.getDate() + 1);
+      const tomDay = wkDay(tomDate);
+      const tomH = biz(tomDay);
+      const tomOpen = t12(tomH.open);
+      if (tomOpen != null) {
+        const target = new Date(tomDate);
+        target.setHours(Math.floor(tomOpen / 60), tomOpen % 60, 0, 0);
+        const diff = target - now;
+        if (diff > 0) {
+          const cd = fmtCountdown(diff);
+          cdLabel.textContent = `Opens ${tomDay} at ${tomH.open}`;
+          cdH.textContent = cd.h; cdM.textContent = cd.m; cdS.textContent = cd.s;
+          cdWrap.style.display = "";
+        }
+      }
+    }
+  }
+
+  function buildAdvanced(startISO){
+    const tabsEl=$("advDayTabs"),cardsEl=$("advCards"),discEl=$("advDisclaimer");
+    if(!tabsEl||!cardsEl)return;
+    if(discEl)discEl.textContent=data.settings.advancedDisclaimer||"Lunch forecast — subject to change.";
+    const start=parseISO(startISO);const entries=[];
+    for(let i=0;i<(data.settings.advancedWindowDays||7);i++){
+      const d=new Date(start);d.setDate(start.getDate()+i);
+      const iso=toISO(d);const dayName=wkDay(d);const h=biz(dayName);
+      const closure=getClosure(dayName);const dayMenu=getMenu(iso);const def=data.defaults||{};
+      const tab=document.createElement("button");tab.className="adv-day-tab"+(i===0?" active":"");
+      tab.textContent=`${dayName.slice(0,3)} ${d.getMonth()+1}/${d.getDate()}`;tabsEl.appendChild(tab);
+      const card=document.createElement("div");card.className="adv-card"+(i===0?" visible":"");
+      const lp=normItems(dayMenu?.lunch?.plates??def.lunch?.plates??[]);
+      const li=normLunch(dayMenu?.lunch?.items??[]);
+      let inner=`<div class="adv-card-title">${esc(dayName)}</div><div class="adv-card-sub">${esc(fmtDate(d))} · ${closure?.closed?"Closed":`Lunch ${h.lunch}`}</div>`;
+      if(closure?.closed){inner+=`<p style="color:var(--text-mid)">${esc(closure.message||"Closed")}</p>`;}
+      else{
+        if(lp.length)inner+=`<div class="section-label">Plates</div><div class="plates-row">${lp.map(p=>`<div class="plate-card">${esc(p)}</div>`).join("")}</div>`;
+        if(li.length){
+          inner+=`<div class="section-label">Lunch Items</div><ul class="item-list">`;
+          li.forEach(item=>{inner+=`<li class="menu-item" onclick="this.classList.toggle('expanded')"><div class="item-name">${esc(item.name)}</div><div class="item-desc">${esc(item.desc||"")}</div><div class="item-hint">tap for details</div></li>`;});
+          inner+=`</ul>`;
+        }else inner+=`<p style="color:var(--text-dim);margin-top:12px">Lunch menu not posted yet — check back soon.</p>`;
+      }
+      card.innerHTML=inner;cardsEl.appendChild(card);entries.push({tab,card});
+    }
+    entries.forEach((e,idx)=>{e.tab.addEventListener("click",()=>{entries.forEach((item,i)=>{item.tab.classList.toggle("active",i===idx);item.card.classList.toggle("visible",i===idx);if(i===idx)observeItems(item.card);});});});
+    // Observe first card
+    if(entries[0])observeItems(entries[0].card);
+  }
+
+  function setupDayTabs(){
+    const tabs=[$("tabToday"),$("tabTomorrow"),$("tabAdvanced")];
+    const panels=[$("panelToday"),$("panelTomorrow"),$("panelAdvanced")];
+    tabs.forEach((tab,i)=>{tab?.addEventListener("click",()=>{tabs.forEach((t,ti)=>t.classList.toggle("active",ti===i));panels.forEach((p,pi)=>{p.classList.toggle("visible",pi===i);if(pi===i){const secs=p.querySelectorAll(".cat-section.visible");secs.forEach(s=>observeItems(s));}});});});
+  }
+
+  let flashTimer=null,flashInterval=null;
+  function showFlash(title,text){const modal=$("flashModal"),cnt=$("flashCount");if(!modal)return;$("flashTitle").textContent=title;$("flashText").textContent=text;if(flashTimer)clearTimeout(flashTimer);if(flashInterval)clearInterval(flashInterval);let r=5;cnt.textContent=r;modal.classList.add("show");flashInterval=setInterval(()=>{r--;if(r>0)cnt.textContent=r;else clearInterval(flashInterval);},1000);flashTimer=setTimeout(()=>hideFlash(),5000);}
+  function hideFlash(){if(flashTimer){clearTimeout(flashTimer);flashTimer=null;}if(flashInterval){clearInterval(flashInterval);flashInterval=null;}$("flashModal")?.classList.remove("show");}
+  $("flashModal")?.addEventListener("click",hideFlash);
+  $("flashModal")?.querySelector(".flash-card")?.addEventListener("click",e=>e.stopPropagation());
+  window.addEventListener("keydown",e=>{if(e.key==="Escape")hideFlash();});
+
+  function handleHash(){
+    const hash=(window.location.hash||"").replace("#","").toLowerCase();if(!hash)return;
+    if(hash==="tomorrow"){$("tabTomorrow")?.click();return;}
+    if(hash==="advanced"||hash==="forecast"){$("tabAdvanced")?.click();return;}
+  }
+
+  // ═══ INIT ═══
+  setupDayTabs();
+  const now=new Date();const todayISO=toISO(now);const todayName=wkDay(now);
+  const tom=new Date(now);tom.setDate(now.getDate()+1);
+  const tomorrowISO=toISO(tom);const tomorrowName=wkDay(tom);
+  let dTI=todayISO,dTN=todayName,dToI=tomorrowISO,dToN=tomorrowName;
+  const ct=getClosure(todayName);
+  if(pastClose(todayName)&&!ct?.closed){dTI=tomorrowISO;dTN=tomorrowName;const da=new Date(now);da.setDate(now.getDate()+2);dToI=toISO(da);dToN=wkDay(da);}
+  $("tabToday").textContent=dTN;$("tabTomorrow").textContent=dToN;
+  panelConfigs=[];
+  initPanel("today",dTI,dTN);initPanel("tomorrow",dToI,dToN);
+  buildAdvanced(dTI);updateStatus(dTN,dTI);
+  setInterval(()=>updateStatus(dTN,dTI),1000);
+  setTimeout(handleHash,150);
+  window.addEventListener("hashchange",handleHash);
 })();
 </script>
 </body>
