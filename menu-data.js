@@ -56,7 +56,7 @@ menus: {
       items: [
 
         { "name": "BBQ Chicken", "desc": "Barbecue chicken cooked tender with bold flavor." },
-{ "name": "Smothered PorkChops (Bacon Wrapped)", "desc": "Juicy pork tenderloin wrapped in bacon and cooked to perfection." },
+{ "name": "Smothered PorkChops", "desc": "Juicy pork tenderloin wrapped in bacon and cooked to perfection." },
 { "name": "BBQ Beef", "desc": "Slow-cooked beef with rich barbecue flavor." },
 { "name": "Baked Beans", "desc": "Slow-baked beans in a savory sauce." },
 { "name": "Potato Salad", "desc": "Creamy potato salad served chilled." },
