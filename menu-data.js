@@ -1,544 +1,186 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hot Headz — Menu Editor</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --red:#C0392B;--red-hot:#E74C3C;--ember:#E67E22;--ember-light:#F39C12;
-  --black:#0A0A0A;--dark:#111;--dark2:#1A1A1A;--dark3:#222;--dark4:#2A2A2A;
-  --white:#F5F0E8;--muted:#7A7060;--mid:#9A9080;
-  --border:rgba(255,255,255,.07);--border-hot:rgba(231,76,60,.25);--green:#27AE60;--green-dark:#1E8449;
-}
-html{scroll-behavior:smooth}
-body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
+// Hot Headz Southern Foods — Menu Data
+// This file is loaded by both menu.html and index.html (for the AI assistant)
+// Format: MENU_DATA.menus["YYYY-MM-DD"] = { lunch, crawfish, dessert }
 
-header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:58px}
-.logo{display:flex;align-items:center;gap:.75rem}
-.logo-icon{font-size:1.4rem}
-.logo-text{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.12em}
-.logo-text span{color:var(--red-hot)}
-.hdr-right{display:flex;align-items:center;gap:.75rem}
-.hdr-badge{font-family:'Space Mono',monospace;font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;padding:.25rem .7rem;border:1px solid rgba(230,126,34,.35);color:var(--ember-light)}
-.sign-out-btn{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);background:none;padding:.45rem .9rem;cursor:pointer;transition:all .2s}
-.sign-out-btn:hover{color:var(--red-hot);border-color:var(--border-hot)}
+var MENU_DATA = {
 
-/* LOGIN */
-#loginScreen{position:fixed;inset:0;z-index:800;background:rgba(10,10,10,.97);display:flex;align-items:center;justify-content:center;padding:1rem}
-.login-box{width:100%;max-width:380px;background:var(--dark2);border:1px solid var(--border);padding:2.5rem;position:relative}
-.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ember),var(--ember-light))}
-.login-back{position:absolute;top:1rem;left:1rem;background:none;border:none;color:var(--muted);font-size:.65rem;font-family:'Space Mono',monospace;letter-spacing:.1em;cursor:pointer;text-transform:uppercase;transition:color .2s;padding:.25rem .5rem;text-decoration:none}
-.login-back:hover{color:var(--white)}
-.login-title{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:.1em;text-align:center;margin-bottom:.2rem;margin-top:1rem}
-.login-title span{color:var(--ember-light)}
-.login-sub{font-size:.7rem;color:var(--muted);text-align:center;margin-bottom:1.75rem;line-height:1.6}
-.f-label{font-size:.62rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;display:block}
-.f-input{width:100%;background:var(--dark3);border:1px solid var(--border);color:var(--white);padding:.75rem 1rem;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s;margin-bottom:1rem}
-.f-input:focus{border-color:var(--ember)}
-.login-btn{width:100%;padding:.85rem;color:white;border:none;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.12em;cursor:pointer;background:var(--ember);transition:background .2s}
-.login-btn:hover{background:var(--ember-light)}
-.login-error{font-size:.75rem;color:var(--red-hot);text-align:center;margin-top:.75rem;min-height:1rem}
-.login-note{font-size:.65rem;color:var(--muted);text-align:center;margin-top:1.25rem}
+settings: {
+  advancedWindowDays: 7,
+  advancedDisclaimer: "Lunch forecast — subject to change. Check Facebook every morning for confirmed specials.",
+  noDescriptionText: "Ask staff for details."
+},
 
-/* APP */
-#app{display:none;position:relative;z-index:1}
-.wrap{max-width:900px;margin:0 auto;padding:2rem 1.5rem}
-
-/* WELCOME */
-.welcome{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;padding:1.5rem 2rem;background:var(--dark2);border:1px solid var(--border);position:relative;overflow:hidden;margin-bottom:1.5rem}
-.welcome::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,var(--ember),var(--ember-light))}
-.welcome-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em}
-.welcome-title span{color:var(--ember-light)}
-.welcome-sub{font-size:.75rem;color:var(--muted);margin-top:.2rem}
-
-/* DATE PICKER */
-.date-row{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap}
-.date-row label{font-size:.62rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
-.date-input{background:var(--dark3);border:1px solid var(--border);color:var(--white);padding:.7rem 1rem;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s}
-.date-input:focus{border-color:var(--ember)}
-.date-btns{display:flex;gap:.4rem}
-.dbtn{font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;padding:.5rem .9rem;background:var(--dark3);border:1px solid var(--border);color:var(--mid);cursor:pointer;transition:all .2s}
-.dbtn:hover{border-color:var(--border-hot);color:var(--red-hot)}
-.dbtn.active{background:var(--ember);color:white;border-color:var(--ember)}
-
-/* CARDS */
-.card{background:var(--dark2);border:1px solid var(--border);padding:1.5rem;margin-bottom:1.5rem;position:relative}
-.card.ac-ember::before{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:var(--ember)}
-.card.ac-red::before{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:var(--red-hot)}
-.card.ac-green::before{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:var(--green)}
-.sec-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.08em}
-.sec-title span{color:var(--ember-light)}
-.sec-sub{font-size:.72rem;color:var(--muted);margin-top:.2rem;line-height:1.5}
-
-/* ITEM ROWS */
-.item-row{display:flex;gap:.5rem;align-items:flex-start;padding:.6rem 0;border-bottom:1px solid var(--border)}
-.item-row:last-child{border-bottom:none}
-.item-num{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);min-width:22px;padding-top:.7rem;text-align:right}
-.item-fields{flex:1;display:flex;flex-direction:column;gap:.35rem}
-.item-name-input{background:var(--dark3);border:1px solid var(--border);color:var(--white);padding:.55rem .75rem;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;outline:none;transition:border-color .2s;width:100%}
-.item-name-input:focus{border-color:var(--ember)}
-.item-name-input::placeholder{color:var(--muted);font-weight:400}
-.item-desc-input{background:var(--dark4);border:1px solid rgba(255,255,255,.04);color:var(--mid);padding:.45rem .75rem;font-family:'DM Sans',sans-serif;font-size:.78rem;outline:none;transition:border-color .2s;width:100%;resize:none}
-.item-desc-input:focus{border-color:rgba(230,126,34,.3);color:var(--white)}
-.item-desc-input::placeholder{color:rgba(122,112,96,.6)}
-.item-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem;padding:.5rem;transition:color .2s;flex-shrink:0;margin-top:.3rem}
-.item-del:hover{color:var(--red-hot)}
-
-/* ADD ITEM BUTTON */
-.add-item-btn{display:flex;align-items:center;gap:.5rem;padding:.65rem 1.2rem;background:none;border:1px dashed rgba(255,255,255,.1);color:var(--muted);font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:.75rem;width:100%}
-.add-item-btn:hover{border-color:var(--ember);color:var(--ember-light);background:rgba(230,126,34,.04)}
-.add-item-btn .plus{font-size:1.1rem;color:var(--ember);font-weight:700}
-
-/* TOGGLE */
-.toggle-row{display:flex;align-items:center;gap:1rem;padding:.75rem 0}
-.toggle-label{font-size:.85rem;font-weight:600;color:var(--white);flex:1}
-.toggle-sub{font-size:.68rem;color:var(--muted);font-weight:400;display:block;margin-top:.1rem}
-.toggle{position:relative;width:48px;height:26px;flex-shrink:0}
-.toggle input{opacity:0;width:0;height:0}
-.toggle-track{position:absolute;inset:0;background:var(--dark4);border:1px solid var(--border);border-radius:13px;cursor:pointer;transition:all .3s}
-.toggle-track::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;background:var(--muted);border-radius:50%;transition:all .3s}
-.toggle input:checked+.toggle-track{background:rgba(231,76,60,.2);border-color:rgba(231,76,60,.4)}
-.toggle input:checked+.toggle-track::after{transform:translateX(22px);background:var(--red-hot);box-shadow:0 0 8px rgba(231,76,60,.4)}
-
-/* SIMPLE LIST INPUT */
-.simple-input-row{display:flex;gap:.5rem;align-items:center;margin-bottom:.5rem}
-.simple-input{flex:1;background:var(--dark3);border:1px solid var(--border);color:var(--white);padding:.55rem .75rem;font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;transition:border-color .2s}
-.simple-input:focus{border-color:var(--ember)}
-.simple-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.85rem;padding:.3rem .5rem;transition:color .2s}
-.simple-del:hover{color:var(--red-hot)}
-
-/* ACTIONS */
-.actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)}
-.ab{padding:.75rem 1.5rem;border:none;font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.1em;cursor:pointer;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:.5rem}
-.ab.red{background:var(--red);color:white}.ab.red:hover{background:var(--red-hot)}
-.ab.ember{background:var(--ember);color:white}.ab.ember:hover{background:var(--ember-light)}
-.ab.green{background:var(--green);color:white}.ab.green:hover{background:var(--green-dark)}
-.ab.ghost{background:var(--dark4);border:1px solid var(--border);color:var(--mid)}.ab.ghost:hover{border-color:var(--border-hot);color:var(--red-hot)}
-
-/* TOAST */
-.toast{position:fixed;bottom:2rem;right:2rem;z-index:9999;color:white;padding:.75rem 1.5rem;font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:.1em;transform:translateY(100px);opacity:0;transition:all .3s;pointer-events:none;max-width:360px}
-.toast.show{transform:translateY(0);opacity:1}
-.toast.ok{background:var(--green)}
-.toast.err{background:var(--red-hot)}
-
-/* LOADING */
-.loading-overlay{position:fixed;inset:0;z-index:9000;background:rgba(10,10,10,.85);display:none;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
-.loading-overlay.show{display:flex}
-.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--ember);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em}
-
-/* WEEK VIEW */
-.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:1.5rem}
-.week-day{background:var(--dark2);padding:.75rem .6rem;min-height:80px;cursor:pointer;transition:background .2s}
-.week-day:hover{background:var(--dark3)}
-.week-day.today{background:rgba(231,76,60,.06)}
-.week-day.today .wd-name{color:var(--red-hot)}
-.week-day.has-menu{border-bottom:2px solid var(--green)}
-.week-day.selected{background:rgba(230,126,34,.08);outline:2px solid var(--ember)}
-.wd-name{font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem}
-.wd-date{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--white)}
-.wd-count{font-size:.55rem;color:var(--green);margin-top:.35rem;font-weight:600}
-.wd-empty{font-size:.55rem;color:var(--muted);margin-top:.35rem;opacity:.5}
-
-footer{border-top:1px solid var(--border);padding:1.5rem;text-align:center;position:relative;z-index:1}
-footer p{font-size:.65rem;color:var(--muted);letter-spacing:.08em}
-footer span{color:var(--red-hot)}
-footer a{color:var(--ember-light);text-decoration:none}
-
-/* RESPONSIVE */
-@media(max-width:700px){
-  header{padding:0 1rem;height:52px}
-  .hdr-badge{display:none}
-  .wrap{padding:1rem .75rem}
-  .card{padding:1rem}
-  .welcome{padding:1rem}
-  .welcome-title{font-size:1.2rem}
-  .week-grid{grid-template-columns:repeat(4,1fr)}
-  .date-row{flex-direction:column;align-items:stretch;gap:.5rem}
-  .item-row{flex-direction:column}
-  .item-num{display:none}
-  .item-del{align-self:flex-end}
-  .actions{flex-direction:column}
-  .ab{width:100%;justify-content:center;padding:.8rem}
-  .f-input,.date-input,.item-name-input,.item-desc-input,.simple-input{font-size:16px}
-}
-@media(max-width:420px){
-  .week-grid{grid-template-columns:repeat(3,1fr)}
-}
-</style>
-</head>
-<body>
-
-<div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><div class="loading-text" id="loadingText">Loading...</div></div>
-
-<!-- LOGIN -->
-<div id="loginScreen">
-  <div class="login-box">
-    <a href="index.html" class="login-back">← Back to Site</a>
-    <div style="text-align:center;font-size:2.2rem;margin-bottom:.5rem">🔥</div>
-    <div class="login-title">Menu <span>Editor</span></div>
-    <div class="login-sub">Manager access required to edit the daily menu</div>
-    <label class="f-label">Admin Password</label>
-    <input class="f-input" type="password" id="passInput" placeholder="Enter password">
-    <button class="login-btn" onclick="doLogin()">ENTER ›</button>
-    <div class="login-error" id="loginError"></div>
-    <div class="login-note">Same password as the Staff Portal</div>
-  </div>
-</div>
-
-<!-- HEADER -->
-<header id="mainHeader" style="display:none">
-  <div class="logo">
-    <span class="logo-icon">🔥</span>
-    <span class="logo-text">Hot Headz <span>Menu Editor</span></span>
-  </div>
-  <div class="hdr-right">
-    <span class="hdr-badge">Manager</span>
-    <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
-  </div>
-</header>
-
-<!-- APP -->
-<div id="app">
-  <div class="wrap">
-
-    <div class="welcome">
-      <div>
-        <div class="welcome-title">Daily <span>Menu Editor</span></div>
-        <div class="welcome-sub" id="welcomeSub">Edit lunch specials, crawfish, and desserts — updates the live menu instantly</div>
-      </div>
-      <div style="display:flex;gap:.5rem">
-        <a href="staff-portal.html" class="sign-out-btn" style="text-decoration:none">Staff Portal</a>
-        <a href="menu.html" class="sign-out-btn" style="text-decoration:none;color:var(--ember-light);border-color:rgba(230,126,34,.3)">View Menu →</a>
-      </div>
-    </div>
-
-    <!-- WEEK OVERVIEW -->
-    <div class="card ac-ember">
-      <div class="sec-title">Week <span>Overview</span></div>
-      <div class="sec-sub">Green bar = menu posted. Click a day to edit it.</div>
-      <div style="display:flex;align-items:center;gap:.75rem;margin:1rem 0 .5rem">
-        <button class="dbtn" onclick="weekNav(-1)">‹ Prev</button>
-        <span style="font-family:'Space Mono',monospace;font-size:.68rem;color:var(--mid)" id="weekLabel"></span>
-        <button class="dbtn" onclick="weekNav(1)">Next ›</button>
-        <button class="dbtn active" onclick="weekNav(0)">This Week</button>
-      </div>
-      <div class="week-grid" id="weekGrid"></div>
-    </div>
-
-    <!-- DATE SELECTOR -->
-    <div class="date-row">
-      <label>Editing menu for:</label>
-      <input type="date" class="date-input" id="editDate">
-      <div class="date-btns">
-        <button class="dbtn" onclick="setToday()">Today</button>
-        <button class="dbtn" onclick="setTomorrow()">Tomorrow</button>
-      </div>
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.06em;color:var(--ember-light)" id="editDayName"></span>
-    </div>
-
-    <!-- LUNCH ITEMS -->
-    <div class="card ac-red">
-      <div class="sec-title">🍽 Lunch <span>Specials</span></div>
-      <div class="sec-sub">Add today's lunch items. Name is required, description is optional but recommended.</div>
-      <div id="lunchItems" style="margin-top:1rem"></div>
-      <button class="add-item-btn" onclick="addLunchItem()"><span class="plus">+</span> Add Lunch Item</button>
-    </div>
-
-    <!-- CRAWFISH -->
-    <div class="card ac-red">
-      <div class="sec-title">🦞 Crawfish</div>
-      <div class="toggle-row">
-        <label class="toggle-label">Crawfish Available<span class="toggle-sub">Thu–Sun 4pm–8pm · Toggle on if serving crawfish today</span></label>
-        <label class="toggle"><input type="checkbox" id="crawfishToggle"><span class="toggle-track"></span></label>
-      </div>
-    </div>
-
-    <!-- DESSERT -->
-    <div class="card ac-ember">
-      <div class="sec-title">🍮 Dessert</div>
-      <div class="sec-sub">List today's dessert items</div>
-      <div id="dessertItems" style="margin-top:.75rem"></div>
-      <button class="add-item-btn" onclick="addDessertItem()"><span class="plus">+</span> Add Dessert</button>
-    </div>
-
-    <!-- ALWAYS-ON ITEMS (info only) -->
-    <div class="card" style="opacity:.7">
-      <div class="sec-title" style="font-size:1rem">ℹ️ Auto-included every day</div>
-      <div class="sec-sub" style="margin-top:.5rem;line-height:1.8">
-        <strong style="color:var(--white)">Breakfast:</strong> Biscuits & Gravy, Scrambled Eggs, Bacon, Sausage, Hash Browns, Pancakes, French Toast, Breakfast Plate<br>
-        <strong style="color:var(--white)">Drinks:</strong> Sweet Tea, Unsweet Tea, Lemonade, Soft Drinks, Coffee, Water<br>
-        <strong style="color:var(--white)">Beer:</strong> Natural Light, Miller Lite, Coors Light, Bud Light, Budweiser, Michelob Ultra, Corona, Modelo
-      </div>
-    </div>
-
-    <!-- ACTIONS -->
-    <div class="actions">
-      <button class="ab green" onclick="saveMenu()">💾 Save This Day's Menu</button>
-      <button class="ab ghost" onclick="loadDay()">↺ Reload Day</button>
-      <button class="ab ghost" onclick="clearDay()">🗑 Clear Day</button>
-    </div>
-
-  </div>
-  <footer><p>Hot Headz <span>Southern Foods</span> · Menu Editor · <a href="index.html">← Back to site</a></p></footer>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script>
-// =============================================
-// CONFIG
-// =============================================
-var API_URL='https://script.google.com/macros/s/AKfycbxnCSfbRk15e66t3rhDCMYzVmc6fpwptTxh611NIqPn8KV3mybvqxoFe97wpXM1YqtMrQ/exec';
-
-function api(params){
-  var qs=Object.keys(params).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(params[k]);}).join('&');
-  return fetch(API_URL+'?'+qs,{method:'GET',mode:'cors'}).then(function(r){if(!r.ok)throw new Error('Server error');return r.text();}).then(function(t){try{return JSON.parse(t);}catch(e){throw new Error('Invalid response');}});
-}
-function loading(msg){document.getElementById('loadingText').textContent=msg||'Loading...';document.getElementById('loadingOverlay').classList.add('show');}
-function stopLoading(){document.getElementById('loadingOverlay').classList.remove('show');}
-function toast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+(type||'ok');clearTimeout(t._t);t._t=setTimeout(function(){t.className='toast';},3000);}
-
-// =============================================
-// AUTH
-// =============================================
-document.addEventListener('keydown',function(e){if(e.key==='Enter'&&document.getElementById('loginScreen').style.display!=='none')doLogin();});
-
-function doLogin(){
-  var pass=document.getElementById('passInput').value;
-  if(!pass){document.getElementById('loginError').textContent='Enter your password.';return;}
-  loading('Checking password...');
-  api({action:'checkAdmin',pass:pass}).then(function(r){
-    stopLoading();
-    if(r.ok){document.getElementById('loginScreen').style.display='none';document.getElementById('mainHeader').style.display='flex';document.getElementById('app').style.display='block';initEditor();}
-    else document.getElementById('loginError').textContent='Incorrect password.';
-  }).catch(function(){stopLoading();document.getElementById('loginError').textContent='Connection error.';});
-}
-function signOut(){document.getElementById('app').style.display='none';document.getElementById('mainHeader').style.display='none';document.getElementById('loginScreen').style.display='flex';document.getElementById('passInput').value='';document.getElementById('loginError').textContent='';}
-
-// =============================================
-// MENU DATA STORAGE (in-memory, keyed by ISO date)
-// =============================================
-var allMenus={};  // { "2026-04-10": { lunch: { items: [...] }, crawfish: { show: true }, dessert: { items: [...] } } }
-var currentDate='';
-var weekOffset=0;
-
-function isoDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function dayName(iso){return new Date(iso+'T12:00:00').toLocaleDateString('en-US',{weekday:'long'});}
-function shortDay(iso){return new Date(iso+'T12:00:00').toLocaleDateString('en-US',{weekday:'short'});}
-function fmtShort(iso){var d=new Date(iso+'T12:00:00');return(d.getMonth()+1)+'/'+d.getDate();}
-
-function initEditor(){
-  // Load saved menus from the API (Menu sheet)
-  loading('Loading menu data...');
-  api({action:'getMenuData'}).then(function(r){
-    stopLoading();
-    if(r.ok&&r.data){
-      // r.data is an array of { date, json } rows
-      (r.data||[]).forEach(function(row){
-        try{allMenus[row.date]=JSON.parse(row.json);}catch(e){}
-      });
-    }
-    setToday();
-    renderWeek();
-  }).catch(function(){
-    stopLoading();
-    // API might not have the menu actions yet — just proceed with empty
-    toast('Menu sheet not found — save will create it','err');
-    setToday();
-    renderWeek();
-  });
-}
-
-function setToday(){
-  var d=new Date();
-  document.getElementById('editDate').value=isoDate(d);
-  loadDay();
-}
-function setTomorrow(){
-  var d=new Date();d.setDate(d.getDate()+1);
-  document.getElementById('editDate').value=isoDate(d);
-  loadDay();
-}
-
-function loadDay(){
-  currentDate=document.getElementById('editDate').value;
-  if(!currentDate)return;
-  document.getElementById('editDayName').textContent=dayName(currentDate);
-  var menu=allMenus[currentDate]||{};
-  renderLunchItems(menu.lunch?.items||[]);
-  document.getElementById('crawfishToggle').checked=!!(menu.crawfish?.show);
-  renderDessertItems(menu.dessert?.items||[]);
-  renderWeek();
-}
-
-document.getElementById('editDate').addEventListener('change',loadDay);
-
-// =============================================
-// LUNCH ITEMS EDITOR
-// =============================================
-function renderLunchItems(items){
-  var el=document.getElementById('lunchItems');
-  el.innerHTML='';
-  items.forEach(function(item,i){
-    var row=document.createElement('div');row.className='item-row';row.dataset.idx=i;
-    row.innerHTML='<div class="item-num">'+(i+1)+'</div>'+
-      '<div class="item-fields">'+
-      '<input class="item-name-input" placeholder="Item name (e.g. Fried Chicken)" value="'+escAttr(item.name||'')+'">'+
-      '<textarea class="item-desc-input" rows="1" placeholder="Description (optional)">'+(item.desc||'')+'</textarea>'+
-      '</div>'+
-      '<button class="item-del" onclick="removeLunchItem('+i+')" title="Remove">✕</button>';
-    el.appendChild(row);
-  });
-  if(!items.length){
-    el.innerHTML='<div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:.8rem">No lunch items yet. Click "Add Lunch Item" below.</div>';
+defaults: {
+  breakfast: {
+    items: [
+      "Biscuits & Gravy",
+      "Scrambled Eggs",
+      "Bacon",
+      "Sausage",
+      "Hash Browns",
+      "Pancakes",
+      "French Toast",
+      "Breakfast Plate"
+    ]
+  },
+  drinks: {
+    items: [
+      "Sweet Tea",
+      "Unsweet Tea",
+      "Lemonade",
+      "Soft Drinks",
+      "Coffee",
+      "Water"
+    ]
   }
-}
+},
 
-function getLunchItems(){
-  var rows=document.querySelectorAll('#lunchItems .item-row');
-  var items=[];
-  rows.forEach(function(row){
-    var name=row.querySelector('.item-name-input')?.value.trim();
-    var desc=row.querySelector('.item-desc-input')?.value.trim();
-    if(name)items.push({name:name,desc:desc||''});
-  });
-  return items;
-}
+beer: [
+  "Natural Light",
+  "Miller Lite",
+  "Coors Light",
+  "Bud Light",
+  "Budweiser",
+  "Michelob Ultra",
+  "Corona",
+  "Modelo"
+],
 
-function addLunchItem(){
-  var items=getLunchItems();
-  items.push({name:'',desc:''});
-  renderLunchItems(items);
-  // Focus the new name input
-  var inputs=document.querySelectorAll('#lunchItems .item-name-input');
-  if(inputs.length)inputs[inputs.length-1].focus();
-}
+closures: {},
 
-function removeLunchItem(idx){
-  var items=getLunchItems();
-  items.splice(idx,1);
-  renderLunchItems(items);
-}
+menus: {
 
-// =============================================
-// DESSERT ITEMS EDITOR
-// =============================================
-function renderDessertItems(items){
-  var el=document.getElementById('dessertItems');
-  el.innerHTML='';
-  (items||[]).forEach(function(item,i){
-    var row=document.createElement('div');row.className='simple-input-row';
-    row.innerHTML='<input class="simple-input dessert-input" placeholder="e.g. Bread Pudding" value="'+escAttr(item||'')+'">'+ 
-      '<button class="simple-del" onclick="removeDessertItem('+i+')">✕</button>';
-    el.appendChild(row);
-  });
-}
-function getDessertItems(){
-  var inputs=document.querySelectorAll('.dessert-input');
-  var items=[];
-  inputs.forEach(function(inp){var v=inp.value.trim();if(v)items.push(v);});
-  return items;
-}
-function addDessertItem(){
-  var items=getDessertItems();items.push('');renderDessertItems(items);
-  var inputs=document.querySelectorAll('.dessert-input');if(inputs.length)inputs[inputs.length-1].focus();
-}
-function removeDessertItem(idx){var items=getDessertItems();items.splice(idx,1);renderDessertItems(items);}
+  "2026-04-04": {
+    lunch: {
+      show: true,
+      items: [
+        { name: "BBQ Chicken", desc: "Barbecue chicken cooked tender with bold flavor." },
+        { name: "BBQ Beef", desc: "Slow-cooked beef with rich barbecue flavor." },
+        { name: "Baked Beans", desc: "Slow-baked beans in a savory sauce." },
+        { name: "Potato Salad", desc: "Creamy potato salad served chilled." },
+        { name: "Cabbage", desc: "Tender seasoned cabbage." },
+        { name: "Baked Potato Casserole", desc: "Creamy baked potato casserole loaded with flavor." },
+        { name: "Corn", desc: "Sweet seasoned corn." },
+        { name: "Green Beans", desc: "Seasoned green beans cooked until tender." },
+        { name: "Garlic Bread", desc: "Toasted bread with buttery garlic flavor." },
+        { name: "Turkey Clubs", desc: "Classic club sandwiches stacked with turkey, bacon, lettuce, tomato, and mayo." },
+        { name: "Chicken Salad", desc: "Creamy house-made chicken salad served chilled and ready to enjoy." },
+        { name: "Croissants", desc: "Flaky, buttery croissants baked until golden and tender." }
+      ]
+    },
+    crawfish: { show: true },
+    dessert: { items: ["Cake"] }
+  },
 
-// =============================================
-// SAVE / LOAD
-// =============================================
-function collectCurrentDay(){
-  var lunch=getLunchItems();
-  var crawfish=document.getElementById('crawfishToggle').checked;
-  var dessert=getDessertItems();
-  var menu={};
-  if(lunch.length)menu.lunch={show:true,items:lunch};
-  if(crawfish)menu.crawfish={show:true};
-  if(dessert.length)menu.dessert={items:dessert};
-  return menu;
-}
+  "2026-04-05": {
+    lunch: {
+      show: true,
+      items: [
+        { name: "Turkey Clubs", desc: "Classic club sandwiches stacked with turkey, bacon, lettuce, tomato, and mayo." },
+        { name: "Chicken Salad", desc: "Creamy house-made chicken salad served chilled and ready to enjoy." },
+        { name: "Croissants", desc: "Flaky, buttery croissants baked until golden and tender." }
+      ]
+    },
+    crawfish: { show: true },
+    dessert: { items: ["Cake"] }
+  },
 
-function saveMenu(){
-  if(!currentDate){toast('Pick a date first','err');return;}
-  var menu=collectCurrentDay();
-  allMenus[currentDate]=menu;
-  // Save to Google Sheet
-  loading('Saving menu...');
-  api({action:'saveMenuDay',date:currentDate,json:JSON.stringify(menu)}).then(function(r){
-    stopLoading();
-    if(r.ok)toast(dayName(currentDate)+' menu saved');
-    else toast('Saved locally — sheet save failed: '+(r.error||''),'err');
-    renderWeek();
-  }).catch(function(){
-    stopLoading();
-    toast('Saved locally — could not reach server','err');
-    renderWeek();
-  });
-}
+  "2026-04-06": {
+    lunch: {
+      show: true,
+      items: [
+        { name: "Turkey Clubs", desc: "Classic club sandwiches stacked with turkey, bacon, lettuce, tomato, and mayo." },
+        { name: "Chicken Salad", desc: "Creamy house-made chicken salad served chilled and ready to enjoy." },
+        { name: "Croissants", desc: "Flaky, buttery croissants baked until golden and tender." }
+      ]
+    },
+    crawfish: { show: true },
+    dessert: { items: ["Cake"] }
+  },
 
-function clearDay(){
-  if(!currentDate)return;
-  if(!confirm('Clear the menu for '+dayName(currentDate)+'?'))return;
-  delete allMenus[currentDate];
-  loadDay();
-  // Also delete from sheet
-  api({action:'deleteMenuDay',date:currentDate}).catch(function(){});
-  toast('Menu cleared for '+dayName(currentDate));
-}
+  "2026-04-07": {
+    lunch: {
+      show: true,
+      items: [
+        { name: "Country Fried Steak", desc: "Breaded country fried steak served with creamy gravy." },
+        { name: "Smoked Chicken", desc: "Slow-smoked chicken with rich, savory flavor." },
+        { name: "Smoked Sausage with Red Gravy", desc: "Smoked sausage served with a rich red gravy." },
+        { name: "Rice", desc: "Steamed white rice." },
+        { name: "Mashed Potatoes & White Gravy", desc: "Creamy mashed potatoes topped with smooth white gravy." },
+        { name: "Cabbage", desc: "Tender seasoned cabbage." },
+        { name: "Green Beans", desc: "Seasoned green beans cooked until tender." },
+        { name: "Corn", desc: "Sweet seasoned corn." },
+        { name: "Fried Okra", desc: "Crispy golden fried okra." },
+        { name: "Cornbread", desc: "Soft, warm cornbread baked to a golden finish." },
+        { name: "Turkey Clubs", desc: "Classic club sandwiches stacked with turkey, bacon, lettuce, tomato, and mayo." },
+        { name: "Chicken Salad", desc: "Creamy house-made chicken salad served chilled and ready to enjoy." },
+        { name: "Croissants", desc: "Flaky, buttery croissants baked until golden and tender." }
+      ]
+    },
+    crawfish: { show: true },
+    dessert: { items: ["Cake"] }
+  },
 
-// =============================================
-// WEEK OVERVIEW
-// =============================================
-function weekNav(dir){
-  if(dir===0)weekOffset=0;else weekOffset+=dir;
-  renderWeek();
-}
+  "2026-04-08": {
+    lunch: {
+      show: true,
+      items: [
+        { name: "Chicken Enchiladas", desc: "Rolled tortillas filled with chicken and topped with savory sauce." },
+        { name: "Fried Pork Chops", desc: "Crispy fried pork chops cooked until golden." },
+        { name: "Taco Ring", desc: "Seasoned taco filling baked in a flaky ring crust." },
+        { name: "Spanish Rice", desc: "Flavorful seasoned Spanish-style rice." },
+        { name: "Mexican Corn", desc: "Sweet corn with a creamy, seasoned Mexican-style flavor." },
+        { name: "Mashed Potatoes", desc: "Creamy mashed potatoes served hot." },
+        { name: "Gravy", desc: "Rich gravy served over your choice of items." },
+        { name: "Salsa", desc: "Fresh salsa with bold flavor." },
+        { name: "Pinto Beans", desc: "Slow-cooked pinto beans with savory seasoning." },
+        { name: "Turkey Clubs", desc: "Classic club sandwiches stacked with turkey, bacon, lettuce, tomato, and mayo." },
+        { name: "Chicken Salad", desc: "Creamy house-made chicken salad served chilled and ready to enjoy." },
+        { name: "Croissants", desc: "Flaky, buttery croissants baked until golden and tender." }
+      ]
+    },
+    crawfish: { show: true },
+    dessert: { items: ["Cake"] }
+  },
 
-function renderWeek(){
-  var grid=document.getElementById('weekGrid');
-  var label=document.getElementById('weekLabel');
-  var now=new Date();
-  var dayOfWeek=now.getDay();
-  var sun=new Date(now);sun.setDate(now.getDate()-dayOfWeek+weekOffset*7);
-  var sat=new Date(sun);sat.setDate(sun.getDate()+6);
-  label.textContent=fmtShort(isoDate(sun))+' – '+fmtShort(isoDate(sat));
-  
-  grid.innerHTML='';
-  var todayISO=isoDate(now);
-  for(var i=0;i<7;i++){
-    var d=new Date(sun);d.setDate(sun.getDate()+i);
-    var iso=isoDate(d);
-    var menu=allMenus[iso];
-    var hasMenu=!!(menu&&(menu.lunch?.items?.length||menu.crawfish?.show||menu.dessert?.items?.length));
-    var isToday=iso===todayISO;
-    var isSelected=iso===currentDate;
-    var count=menu?.lunch?.items?.length||0;
-    
-    var cell=document.createElement('div');
-    cell.className='week-day'+(isToday?' today':'')+(hasMenu?' has-menu':'')+(isSelected?' selected':'');
-    cell.innerHTML='<div class="wd-name">'+shortDay(iso)+'</div><div class="wd-date">'+fmtShort(iso)+'</div>'+
-      (hasMenu?'<div class="wd-count">'+count+' items</div>':'<div class="wd-empty">empty</div>');
-    cell.dataset.date=iso;
-    cell.addEventListener('click',function(){
-      document.getElementById('editDate').value=this.dataset.date;
-      loadDay();
-    });
-    grid.appendChild(cell);
+  "2026-04-09": {
+    lunch: {
+      show: true,
+      items: [
+
+        { "name": "Hamburger Steak", "desc": "Seasoned hamburger steak cooked and served hot." },
+{ "name": "Smoked Chicken", "desc": "Slow-smoked chicken with rich, savory flavor." },
+{ "name": "Chicken Alfredo", "desc": "Chicken served in a creamy Alfredo sauce over pasta." },
+{ "name": "Mashed Potatoes", "desc": "Creamy mashed potatoes served hot." },
+{ "name": "Gravy", "desc": "Rich gravy served over your choice of items." },
+{ "name": "Cabbage", "desc": "Tender seasoned cabbage." },
+{ "name": "Green Beans", "desc": "Seasoned green beans cooked until tender." },
+{ "name": "Black Eyed Peas", "desc": "Seasoned black eyed peas cooked low and slow." },
+{ "name": "Fried Okra", "desc": "Crispy golden fried okra." },
+{ "name": "Garlic Bread", "desc": "Toasted bread with buttery garlic flavor." },
+        
+        { name: "Turkey Clubs", desc: "Classic club sandwiches stacked with turkey, bacon, lettuce, tomato, and mayo." },
+        { name: "Chicken Salad", desc: "Creamy house-made chicken salad served chilled and ready to enjoy." },
+        { name: "Croissants", desc: "Flaky, buttery croissants baked until golden and tender." }
+      ]
+    },
+    crawfish: { show: true },
+    dessert: { items: ["Cake"] }
+  },
+
+  "2026-04-10": {
+    lunch: {
+      show: true,
+      items: [
+        { name: "Turkey Clubs", desc: "Classic club sandwiches stacked with turkey, bacon, lettuce, tomato, and mayo." },
+        { name: "Chicken Salad", desc: "Creamy house-made chicken salad served chilled and ready to enjoy." },
+        { name: "Croissants", desc: "Flaky, buttery croissants baked until golden and tender." }
+      ]
+    },
+    crawfish: { show: true },
+    dessert: { items: ["Cake"] }
   }
+
 }
 
-// =============================================
-// HELPERS
-// =============================================
-function escAttr(s){return String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-</script>
-</body>
-</html>
+}; // end MENU_DATA
