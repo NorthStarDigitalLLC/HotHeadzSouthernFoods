@@ -119,10 +119,6 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.96);backdrop-
 .ab.green{background:var(--green);color:white}.ab.green:hover{background:var(--green-dark)}
 .ab.ghost{background:var(--dark4);border:1px solid var(--border);color:var(--mid)}.ab.ghost:hover{border-color:var(--border-hot);color:var(--red-hot)}
 
-/* PREVIEW */
-.preview-box{background:var(--dark3);border:1px solid var(--border);padding:1rem;margin-top:1rem;max-height:300px;overflow-y:auto;font-family:'Space Mono',monospace;font-size:.68rem;line-height:1.7;color:var(--mid);white-space:pre-wrap;word-break:break-all;display:none}
-.preview-box.show{display:block}
-
 /* TOAST */
 .toast{position:fixed;bottom:2rem;right:2rem;z-index:9999;color:white;padding:.75rem 1.5rem;font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:.1em;transform:translateY(100px);opacity:0;transition:all .3s;pointer-events:none;max-width:360px}
 .toast.show{transform:translateY(0);opacity:1}
@@ -214,7 +210,7 @@ footer a{color:var(--ember-light);text-decoration:none}
     <div class="welcome">
       <div>
         <div class="welcome-title">Daily <span>Menu Editor</span></div>
-        <div class="welcome-sub" id="welcomeSub">Edit lunch specials, crawfish, and desserts — generates your menu-data.js file</div>
+        <div class="welcome-sub" id="welcomeSub">Edit lunch specials, crawfish, and desserts — updates the live menu instantly</div>
       </div>
       <div style="display:flex;gap:.5rem">
         <a href="staff-portal.html" class="sign-out-btn" style="text-decoration:none">Staff Portal</a>
@@ -284,15 +280,8 @@ footer a{color:var(--ember-light);text-decoration:none}
     <!-- ACTIONS -->
     <div class="actions">
       <button class="ab green" onclick="saveMenu()">💾 Save This Day's Menu</button>
-      <button class="ab ember" onclick="generateFile()">📄 Generate menu-data.js</button>
       <button class="ab ghost" onclick="loadDay()">↺ Reload Day</button>
       <button class="ab ghost" onclick="clearDay()">🗑 Clear Day</button>
-    </div>
-
-    <!-- PREVIEW -->
-    <div style="margin-top:1.5rem">
-      <button class="ab ghost" onclick="togglePreview()" style="width:100%;justify-content:center">👁 Toggle JS Preview</button>
-      <pre class="preview-box" id="previewBox"></pre>
     </div>
 
   </div>
@@ -502,135 +491,6 @@ function clearDay(){
   // Also delete from sheet
   api({action:'deleteMenuDay',date:currentDate}).catch(function(){});
   toast('Menu cleared for '+dayName(currentDate));
-}
-
-// =============================================
-// GENERATE menu-data.js
-// =============================================
-function generateFile(){
-  // First save current day
-  if(currentDate){
-    var menu=collectCurrentDay();
-    if(menu.lunch||menu.crawfish||menu.dessert)allMenus[currentDate]=menu;
-  }
-
-  var js=buildMenuDataJS();
-  // Download as file
-  var blob=new Blob([js],{type:'text/javascript'});
-  var url=URL.createObjectURL(blob);
-  var a=document.createElement('a');
-  a.href=url;a.download='menu-data.js';a.click();
-  URL.revokeObjectURL(url);
-  toast('menu-data.js downloaded');
-}
-
-function buildMenuDataJS(){
-  var lines=[];
-  lines.push('// Hot Headz Southern Foods — Menu Data');
-  lines.push('// Generated '+new Date().toLocaleString());
-  lines.push('');
-  lines.push('var MENU_DATA = {');
-  lines.push('');
-
-  // Settings
-  lines.push('settings: {');
-  lines.push('  advancedWindowDays: 7,');
-  lines.push('  advancedDisclaimer: "Lunch forecast — subject to change. Check Facebook every morning for confirmed specials.",');
-  lines.push('  noDescriptionText: "Ask staff for details."');
-  lines.push('},');
-  lines.push('');
-
-  // Defaults
-  lines.push('defaults: {');
-  lines.push('  breakfast: {');
-  lines.push('    items: [');
-  lines.push('      "Biscuits & Gravy",');
-  lines.push('      "Scrambled Eggs",');
-  lines.push('      "Bacon",');
-  lines.push('      "Sausage",');
-  lines.push('      "Hash Browns",');
-  lines.push('      "Pancakes",');
-  lines.push('      "French Toast",');
-  lines.push('      "Breakfast Plate"');
-  lines.push('    ]');
-  lines.push('  },');
-  lines.push('  drinks: {');
-  lines.push('    items: [');
-  lines.push('      "Sweet Tea",');
-  lines.push('      "Unsweet Tea",');
-  lines.push('      "Lemonade",');
-  lines.push('      "Soft Drinks",');
-  lines.push('      "Coffee",');
-  lines.push('      "Water"');
-  lines.push('    ]');
-  lines.push('  }');
-  lines.push('},');
-  lines.push('');
-
-  // Beer
-  lines.push('beer: [');
-  lines.push('  "Natural Light",');
-  lines.push('  "Miller Lite",');
-  lines.push('  "Coors Light",');
-  lines.push('  "Bud Light",');
-  lines.push('  "Budweiser",');
-  lines.push('  "Michelob Ultra",');
-  lines.push('  "Corona",');
-  lines.push('  "Modelo"');
-  lines.push('],');
-  lines.push('');
-  lines.push('closures: {},');
-  lines.push('');
-
-  // Menus
-  lines.push('menus: {');
-  var dates=Object.keys(allMenus).sort();
-  dates.forEach(function(date,di){
-    var menu=allMenus[date];
-    if(!menu||(!menu.lunch&&!menu.crawfish&&!menu.dessert))return;
-    lines.push('');
-    lines.push('  "'+date+'": {');
-    
-    // Lunch
-    if(menu.lunch&&menu.lunch.items&&menu.lunch.items.length){
-      lines.push('    lunch: {');
-      lines.push('      show: true,');
-      lines.push('      items: [');
-      menu.lunch.items.forEach(function(item,i){
-        var comma=i<menu.lunch.items.length-1?',':'';
-        lines.push('        { name: '+JSON.stringify(item.name)+', desc: '+JSON.stringify(item.desc||'')+' }'+comma);
-      });
-      lines.push('      ]');
-      lines.push('    },');
-    }
-
-    // Crawfish
-    if(menu.crawfish&&menu.crawfish.show){
-      lines.push('    crawfish: { show: true },');
-    }
-
-    // Dessert
-    if(menu.dessert&&menu.dessert.items&&menu.dessert.items.length){
-      lines.push('    dessert: { items: ['+menu.dessert.items.map(function(d){return JSON.stringify(d);}).join(', ')+'] }');
-    }
-
-    lines.push('  }'+(di<dates.length-1?',':''));
-  });
-  lines.push('');
-  lines.push('}');
-  lines.push('');
-  lines.push('}; // end MENU_DATA');
-
-  return lines.join('\n');
-}
-
-function togglePreview(){
-  var el=document.getElementById('previewBox');
-  if(el.classList.contains('show')){el.classList.remove('show');return;}
-  // Save current first
-  if(currentDate){var menu=collectCurrentDay();if(menu.lunch||menu.crawfish||menu.dessert)allMenus[currentDate]=menu;}
-  el.textContent=buildMenuDataJS();
-  el.classList.add('show');
 }
 
 // =============================================
