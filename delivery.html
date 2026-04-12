@@ -1,99 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
   <script defer src="/_vercel/insights/script.js"></script>
-  
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hot Headz &ndash; Delivery Checker</title>
-  <meta name="description" content="Check if we deliver to your address. 10+ plates required within 10 miles of DeRidder, LA.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="icon" type="image/png" href="images/HotHeadzLogo.png">
-  <link rel="apple-touch-icon" href="images/HotHeadzLogo.png">
-  <meta property="og:image" content="images/HotHeadzLogo.png">
-  <meta property="og:image:alt" content="Hot Headz Southern Foods logo">
-  <meta name="twitter:image" content="images/HotHeadzLogo.png">
-  <meta name="twitter:image:alt" content="Hot Headz Southern Foods logo">
-  <style>
+
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <title>Hot Headz Delivery Checker | DeRidder, LA Delivery Area</title>
+
+  <meta
+    name="description"
+    content="Check whether Hot Headz Southern Foods delivers to your address in DeRidder, Louisiana. Delivery available for orders of 10 or more plates within 10 miles."
+  />
+  <meta
+    name="keywords"
+    content="Hot Headz delivery, DeRidder delivery, restaurant delivery DeRidder LA, Southern food delivery DeRidder, Hot Headz Southern Foods delivery area, delivery checker"
+  />
+  <meta name="author" content="Hot Headz Southern Foods" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="theme-color" content="#080407" />
+  <meta name="format-detection" content="telephone=yes" />
+
+  <link rel="canonical" href="https://hotheadzsouthernfoods.com/delivery-checker.html" />
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/HotHeadzLogo.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/images/HotHeadzLogo.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/HotHeadzLogo.png" />
+  <link rel="shortcut icon" href="/images/HotHeadzLogo.png" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Hot Headz Southern Foods" />
+  <meta property="og:title" content="Hot Headz Delivery Checker | DeRidder, LA Delivery Area" />
+  <meta
+    property="og:description"
+    content="Check if your address is within the Hot Headz Southern Foods delivery area. Orders of 10 or more plates within 10 miles of DeRidder, LA."
+  />
+  <meta property="og:image" content="https://hotheadzsouthernfoods.com/images/HotHeadzLogo.png" />
+  <meta property="og:image:alt" content="Hot Headz Southern Foods logo" />
+  <meta property="og:url" content="https://hotheadzsouthernfoods.com/delivery-checker.html" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Hot Headz Delivery Checker | DeRidder, LA" />
+  <meta
+    name="twitter:description"
+    content="See whether your address qualifies for delivery from Hot Headz Southern Foods in DeRidder, Louisiana."
+  />
+  <meta name="twitter:image" content="https://hotheadzsouthernfoods.com/images/HotHeadzLogo.png" />
+  <meta name="twitter:image:alt" content="Hot Headz Southern Foods logo" />
+
+  <!-- Local SEO -->
+  <meta name="geo.region" content="US-LA" />
+  <meta name="geo.placename" content="DeRidder" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Icons / Map Styles -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Hot Headz Delivery Checker",
+    "url": "https://hotheadzsouthernfoods.com/delivery-checker.html",
+    "description": "Check whether your address qualifies for Hot Headz Southern Foods delivery in DeRidder, Louisiana.",
+    "about": {
+      "@type": "Restaurant",
+      "name": "Hot Headz Southern Foods",
+      "url": "https://hotheadzsouthernfoods.com/",
+      "image": "https://hotheadzsouthernfoods.com/images/HotHeadzLogo.png",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "DeRidder",
+        "addressRegion": "LA",
+        "addressCountry": "US"
+      },
+      "areaServed": {
+        "@type": "City",
+        "name": "DeRidder"
+      }
+    }
+  }
+  </script> <style>
     *{margin:0;padding:0;box-sizing:border-box;max-width:100%;}
     html{scroll-behavior:smooth;overflow-x:hidden;}
-    body{background-color:#07060a;color:rgba(255,255,255,0.92);font-family:'Inter',sans-serif;line-height:1.5;padding-bottom:90px;}
-    .hh-delivery{
-      --bg:#07060a;--glass:rgba(10,12,18,.62);--glass2:rgba(10,12,18,.48);
-      --stroke:rgba(255,255,255,.14);--stroke2:rgba(255,255,255,.10);
-      --text:rgba(255,255,255,.92);--muted:rgba(255,255,255,.70);--soft:rgba(255,255,255,.58);
-      --ember:#ff5b3d;--ember2:#ffb04b;
-      --shadow:0 22px 70px rgba(0,0,0,.55);--shadow2:0 14px 40px rgba(0,0,0,.42);
-      --r1:24px;--r2:18px;
-      max-width:980px;margin:2rem auto;font-family:'Inter',sans-serif;color:var(--text);padding:0 1rem;
+    body{
+      background-color:#07060a;
+      color:rgba(255,255,255,0.96);
+      font-family:'Inter',sans-serif;
+      line-height:1.6;
+      padding-bottom:90px;
     }
-    .hh-glass{background:linear-gradient(to bottom,rgba(255,255,255,.06),rgba(255,255,255,.03));background-color:var(--glass);border:1px solid var(--stroke);box-shadow:var(--shadow2);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
-    .hh-headerbox{border-radius:var(--r1);padding:18px 20px;margin-bottom:14px;position:relative;overflow:hidden;}
-    .hh-headerbox::before{content:"";position:absolute;inset:0;background:radial-gradient(900px 260px at 10% 0%,rgba(255,91,61,.14),transparent 62%),radial-gradient(900px 260px at 90% 10%,rgba(255,176,75,.10),transparent 62%);pointer-events:none;}
+
+    .hh-delivery{
+      --bg:#07060a;
+      --glass:rgba(10,12,18,.65);
+      --glass2:rgba(10,12,18,.50);
+      --stroke:rgba(255,255,255,.20);
+      --stroke2:rgba(255,255,255,.16);
+      /* READABILITY: text lifted to .96, muted to .82, soft to .70 */
+      --text:rgba(255,255,255,.96);
+      --muted:rgba(255,255,255,.82);
+      --soft:rgba(255,255,255,.70);
+      --ember:#ff5b3d;
+      --ember2:#ffb04b;
+      --shadow:0 22px 70px rgba(0,0,0,.55);
+      --shadow2:0 14px 40px rgba(0,0,0,.42);
+      --r1:24px;--r2:18px;
+      max-width:980px;margin:2rem auto;
+      font-family:'Inter',sans-serif;
+      color:var(--text);
+      padding:0 1rem;
+    }
+
+    .hh-glass{
+      background:linear-gradient(to bottom,rgba(255,255,255,.07),rgba(255,255,255,.04));
+      background-color:var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow:var(--shadow2);
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    }
+
+    .hh-headerbox{border-radius:var(--r1);padding:20px 22px;margin-bottom:14px;position:relative;overflow:hidden;}
+    .hh-headerbox::before{content:"";position:absolute;inset:0;background:radial-gradient(900px 260px at 10% 0%,rgba(255,91,61,.16),transparent 62%),radial-gradient(900px 260px at 90% 10%,rgba(255,176,75,.12),transparent 62%);pointer-events:none;}
     .hh-headerbox>*{position:relative;z-index:1;}
+
     .hh-headTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
-    .hh-title{margin:0;font-size:clamp(22px,3.2vw,34px);letter-spacing:-0.03em;line-height:1.1;font-weight:950;}
-    .hh-badge{padding:8px 10px;border-radius:999px;font-weight:900;font-size:12px;letter-spacing:.16em;text-transform:uppercase;background:linear-gradient(135deg,rgba(255,91,61,.22),rgba(255,176,75,.18));border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.90);white-space:nowrap;}
-    .hh-sub{margin:8px 0 0;font-weight:700;color:var(--muted);line-height:1.45;}
-    .hh-card{border-radius:var(--r1);padding:18px;margin-bottom:14px;}
+
+    /* READABILITY: title larger, full white */
+    .hh-title{margin:0;font-size:clamp(22px,3.2vw,36px);letter-spacing:-0.03em;line-height:1.1;font-weight:950;color:#fff;}
+
+    /* READABILITY: badge text from .90 → full white */
+    .hh-badge{
+      padding:8px 12px;border-radius:999px;font-weight:900;font-size:13px;
+      letter-spacing:.14em;text-transform:uppercase;
+      background:linear-gradient(135deg,rgba(255,91,61,.28),rgba(255,176,75,.22));
+      border:1px solid rgba(255,255,255,.22);
+      color:#fff;white-space:nowrap;
+    }
+
+    /* READABILITY: sub from --muted .70 → .88 */
+    .hh-sub{margin:10px 0 0;font-weight:600;color:rgba(255,255,255,.88);line-height:1.55;font-size:1rem;}
+    .hh-sub strong{color:#fff;font-weight:800;}
+
+    .hh-card{border-radius:var(--r1);padding:20px;margin-bottom:14px;}
+
     .hh-grid{display:grid;grid-template-columns:1.4fr .6fr;gap:12px;}
     @media(max-width:720px){.hh-grid{grid-template-columns:1fr;}}
-    .hh-label{display:flex;flex-direction:column;gap:8px;font-weight:850;}
-    .hh-labelText{color:rgba(255,255,255,.82);font-size:13px;letter-spacing:.10em;text-transform:uppercase;}
-    .hh-input{padding:14px;border-radius:16px;border:1px solid var(--stroke2);font-size:16px;background:rgba(0,0,0,.22);color:var(--text);outline:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
-    .hh-input::placeholder{color:rgba(255,255,255,.45);}
-    .hh-input:focus{border-color:rgba(255,176,75,.38);box-shadow:0 0 0 4px rgba(255,176,75,.12),inset 0 1px 0 rgba(255,255,255,.06);}
-    .hh-actions{display:flex;gap:10px;margin:12px 0 10px;flex-wrap:wrap;}
+
+    .hh-label{display:flex;flex-direction:column;gap:8px;font-weight:800;}
+
+    /* READABILITY: label text from .82 → full white, size bumped */
+    .hh-labelText{color:#fff;font-size:14px;letter-spacing:.08em;text-transform:uppercase;}
+
+    /* READABILITY: input text full white, placeholder from .45 → .60 */
+    .hh-input{
+      padding:14px;border-radius:16px;
+      border:1px solid rgba(255,255,255,.20);
+      font-size:16px;
+      background:rgba(0,0,0,.28);
+      color:#fff;outline:none;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+      font-family:'Inter',sans-serif;
+    }
+    .hh-input::placeholder{color:rgba(255,255,255,.55);}
+    .hh-input:focus{
+      border-color:rgba(255,176,75,.50);
+      box-shadow:0 0 0 4px rgba(255,176,75,.14),inset 0 1px 0 rgba(255,255,255,.06);
+    }
+
+    .hh-actions{display:flex;gap:10px;margin:14px 0 12px;flex-wrap:wrap;}
     @media(max-width:720px){.hh-actions{flex-direction:column;}}
-    .hh-btn{padding:13px 14px;border-radius:16px;font-weight:950;font-size:15px;cursor:pointer;border:1px solid rgba(255,255,255,.12);text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:10px;user-select:none;transition:transform .14s ease,box-shadow .14s ease,opacity .14s ease,background .14s ease;}
+
+    .hh-btn{
+      padding:14px 16px;border-radius:16px;font-weight:950;font-size:15px;
+      cursor:pointer;border:1px solid rgba(255,255,255,.16);
+      text-decoration:none;display:inline-flex;align-items:center;justify-content:center;
+      gap:10px;user-select:none;
+      transition:transform .14s ease,box-shadow .14s ease,opacity .14s ease,background .14s ease;
+      font-family:'Inter',sans-serif;
+    }
     .hh-btn:active{transform:translateY(1px);}
-    .hh-btn--primary{border-color:transparent;background:linear-gradient(135deg,var(--ember),var(--ember2));color:rgba(12,12,12,.94);box-shadow:0 18px 52px rgba(255,91,61,.18);}
+    .hh-btn--primary{
+      border-color:transparent;
+      background:linear-gradient(135deg,var(--ember),var(--ember2));
+      color:rgba(12,12,12,.96);
+      box-shadow:0 18px 52px rgba(255,91,61,.20);
+      font-weight:900;
+    }
     .hh-btn--primary:hover{opacity:.95;}
-    .hh-btn--ghost{background:rgba(255,255,255,.06);color:var(--text);}
-    .hh-btn--ghost:hover{background:rgba(255,255,255,.09);}
+    /* READABILITY: ghost btn text full white, border more visible */
+    .hh-btn--ghost{
+      background:rgba(255,255,255,.08);
+      color:#fff;
+      border-color:rgba(255,255,255,.20);
+    }
+    .hh-btn--ghost:hover{background:rgba(255,255,255,.12);}
+
     .hh-call{margin-top:12px;width:100%;}
-    .hh-status{padding:14px;border-radius:16px;background:rgba(0,0,0,.20);border:1px solid var(--stroke2);font-weight:850;color:rgba(255,255,255,.86);line-height:1.35;}
-    .hh-status.is-good{border-color:rgba(255,176,75,.35);box-shadow:0 0 0 4px rgba(255,176,75,.10);}
-    .hh-status.is-bad{border-color:rgba(255,91,61,.35);box-shadow:0 0 0 4px rgba(255,91,61,.10);}
-    .hh-hint{margin:10px 0 0;color:rgba(255,255,255,.58);font-weight:700;font-size:13px;}
+
+    /* READABILITY: status text from .86 → .96 */
+    .hh-status{
+      padding:16px;border-radius:16px;
+      background:rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.18);
+      font-weight:700;
+      color:rgba(255,255,255,.96);
+      line-height:1.5;
+      font-size:15px;
+    }
+    .hh-status.is-good{border-color:rgba(255,176,75,.45);box-shadow:0 0 0 4px rgba(255,176,75,.12);}
+    .hh-status.is-bad{border-color:rgba(255,91,61,.45);box-shadow:0 0 0 4px rgba(255,91,61,.12);}
+
+    /* READABILITY: hint from .58 → .75, size bumped */
+    .hh-hint{margin:12px 0 0;color:rgba(255,255,255,.75);font-weight:600;font-size:14px;}
+
     .hh-mapWrap{border-radius:var(--r1);overflow:hidden;padding:10px;}
-    .hh-map{height:420px;border-radius:18px;border:1px solid rgba(255,255,255,.10);overflow:hidden;}
-    .hh-note{margin:10px 0 0;font-size:12px;color:rgba(255,255,255,.62);font-weight:700;}
-    .leaflet-control-zoom a{background:rgba(0,0,0,.55)!important;color:rgba(255,255,255,.90)!important;border:1px solid rgba(255,255,255,.14)!important;}
-    .leaflet-control-attribution{background:rgba(0,0,0,.55)!important;color:rgba(255,255,255,.75)!important;border-radius:10px;border:1px solid rgba(255,255,255,.10);}
+    .hh-map{height:420px;border-radius:18px;border:1px solid rgba(255,255,255,.14);overflow:hidden;}
+
+    /* READABILITY: note from .62 → .72 */
+    .hh-note{margin:10px 0 0;font-size:13px;color:rgba(255,255,255,.72);font-weight:600;}
+
+    .leaflet-control-zoom a{background:rgba(0,0,0,.60)!important;color:rgba(255,255,255,.95)!important;border:1px solid rgba(255,255,255,.18)!important;}
+    .leaflet-control-attribution{background:rgba(0,0,0,.60)!important;color:rgba(255,255,255,.80)!important;border-radius:10px;border:1px solid rgba(255,255,255,.12);}
+
     @media(prefers-reduced-motion:reduce){.hh-btn{transition:none;}}
+
     /* ===== BACK BUTTON ===== */
     .back-btn {
       position: fixed; z-index: 1000; bottom: 24px; left: 50%;
       transform: translateX(-50%);
-      background: rgba(25,20,15,.92);
-      border: 1px solid rgba(255,91,61,.45);
+      background: rgba(25,20,15,.95);
+      border: 1px solid rgba(255,91,61,.52);
       border-radius: 999px;
       display: inline-flex; align-items: center; gap: 10px;
-      cursor: pointer; box-shadow: 0 4px 24px rgba(0,0,0,.4);
+      cursor: pointer; box-shadow: 0 4px 24px rgba(0,0,0,.45);
       transition: all .2s ease; backdrop-filter: blur(8px);
-      padding: 12px 24px; text-decoration: none;
-      color: rgba(255,255,255,.9);
+      padding: 13px 26px; text-decoration: none;
+      /* READABILITY: back btn text full white */
+      color: #fff;
       font-family: 'Inter', sans-serif; font-weight: 800;
-      font-size: .9rem; letter-spacing: .08em; white-space: nowrap;
+      font-size: 1rem; letter-spacing: .06em; white-space: nowrap;
     }
     .back-btn:hover {
       transform: translateX(-50%) translateY(-2px);
-      border-color: rgba(255,91,61,.85);
-      box-shadow: 0 8px 32px rgba(255,91,61,.22);
+      border-color: rgba(255,91,61,.90);
+      box-shadow: 0 8px 32px rgba(255,91,61,.25);
     }
     .back-btn .back-arrow {
       font-size: 1.1rem; color: #ff5b3d;
       transition: transform .2s; display: inline-block;
     }
     .back-btn:hover .back-arrow { transform: translateX(-3px); }
+    /* READABILITY: back-sub from .5 → .70 */
     .back-btn .back-sub {
-      font-size: .65rem; font-weight: 600; opacity: .5;
+      font-size: .72rem; font-weight: 700; opacity: .70;
       text-transform: uppercase; letter-spacing: .1em; margin-left: 2px;
     }
   </style>
@@ -155,10 +335,9 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script>
-    // Wait for Leaflet to be available before initializing the map
     function initMap() {
       if (typeof L === 'undefined') {
-        document.getElementById('map').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,.5);font-family:Inter,sans-serif;font-size:14px;text-align:center;padding:20px;">Map unavailable — check your connection.<br><br><a href="https://maps.google.com/?q=2741+US-190+DeRidder+LA+70634" target="_blank" style="color:#ff5b3d;">Open in Google Maps →</a></div>';
+        document.getElementById('map').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,.75);font-family:Inter,sans-serif;font-size:15px;text-align:center;padding:20px;">Map unavailable — check your connection.<br><br><a href="https://maps.google.com/?q=2741+US-190+DeRidder+LA+70634" target="_blank" style="color:#ffb04b;font-weight:700;">Open in Google Maps →</a></div>';
         return;
       }
       const REST = { lat: 30.8466, lng: -93.2893 };
@@ -212,7 +391,7 @@
         if(userMarker) userMarker.remove();
         if(line) line.remove();
         userMarker = L.marker([loc.lat,loc.lng]).addTo(map);
-        line = L.polyline([[REST.lat,REST.lng],[loc.lat,loc.lng]],{color:"#ffffff",weight:2,opacity:0.75,dashArray:"6 8"}).addTo(map);
+        line = L.polyline([[REST.lat,REST.lng],[loc.lat,loc.lng]],{color:"#ffffff",weight:2,opacity:0.85,dashArray:"6 8"}).addTo(map);
         map.fitBounds(L.latLngBounds([[REST.lat,REST.lng],[loc.lat,loc.lng]]),{padding:[40,40]});
       }
       function evaluate(dist, plates){
@@ -253,7 +432,7 @@
         setStatus("Enter an address (or tap the map) to check delivery availability.",null);
       });
       map.on("click",(e)=>{ const loc={lat:e.latlng.lat,lng:e.latlng.lng}; drawTo(loc); evaluate(toMiles(REST,loc),platesEl.value); });
-    } // end initMap
+    }
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initMap);
