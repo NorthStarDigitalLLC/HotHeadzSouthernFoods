@@ -79,7 +79,18 @@ menus: {
     lunch: {
       show: true,
       items: [
-        
+
+        { "name": "Meatloaf", "desc": "Homestyle baked meatloaf seasoned and cooked to perfection." },
+{ "name": "Fried Chicken Tenders", "desc": "Crispy fried chicken tenders cooked until golden." },
+{ "name": "Pork Chops with Gravy", "desc": "Tender pork chops served with rich gravy." },
+{ "name": "French Fries", "desc": "Hot crispy French fries." },
+{ "name": "Rice", "desc": "Steamed white rice." },
+{ "name": "Mashed Potatoes", "desc": "Creamy mashed potatoes served hot." },
+{ "name": "Fried Okra", "desc": "Crispy golden fried okra." },
+{ "name": "Greens", "desc": "Seasoned greens cooked low and slow for rich flavor." },
+{ "name": "Corn", "desc": "Sweet seasoned corn." },
+{ "name": "Black Eyed Peas", "desc": "Seasoned black eyed peas cooked low and slow." },
+{ "name": "Cornbread", "desc": "Soft, warm cornbread baked to a golden finish." },
 
         { name: "Turkey Clubs", desc: "Classic club sandwiches stacked with turkey, bacon, lettuce, tomato, and mayo." },
         { name: "Chicken Salad", desc: "Creamy house-made chicken salad served chilled and ready to enjoy." },
