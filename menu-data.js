@@ -82,7 +82,7 @@ menus: {
 
         { "name": "Meatloaf", "desc": "Homestyle baked meatloaf seasoned and cooked to perfection." },
 { "name": "Fried Chicken Tenders", "desc": "Crispy fried chicken tenders cooked until golden." },
-{ "name": "Pork Chops with Gravy", "desc": "Tender pork chops served with rich gravy." },
+{ "name": "Pork Roast Gravy", "desc": "Slow-cooked pork roast served with rich, savory gravy." }
 { "name": "French Fries", "desc": "Hot crispy French fries." },
 { "name": "Rice", "desc": "Steamed white rice." },
 { "name": "Mashed Potatoes", "desc": "Creamy mashed potatoes served hot." },
