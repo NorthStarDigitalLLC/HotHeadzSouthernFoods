@@ -522,6 +522,7 @@ function fmtD(d){return d.toISOString().slice(0,10);}
 function fmt12(t){if(!t)return'—';var p=String(t).split(':').map(Number),h=p[0],m=p[1];return(h%12||12)+':'+(m<10?'0':'')+m+(h>=12?'pm':'am');}
 function calcH(s,e){if(!s||!e)return 0;var a=s.split(':').map(Number),b=e.split(':').map(Number),d=(b[0]*60+b[1])-(a[0]*60+a[1]);return d>0?+(d/60).toFixed(1):0;}
 function fmtDate(s){if(!s)return'';var d=new Date(s+'T00:00:00');return MO[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();}
+function fmtMsgDate(s){if(!s)return'';try{var d=new Date(s);if(isNaN(d.getTime()))return s;return MO[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear()+' '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});}catch(e){return s;}}
 function fmtDay(s){if(!s)return'';return FD[new Date(s+'T00:00:00').getDay()];}
 function getMonthDates(off){var n=new Date(),y=n.getFullYear(),m=n.getMonth()+off;while(m<0){y--;m+=12;}while(m>11){y++;m-=12;}var f=new Date(y,m,1),sd=f.getDay(),cs=new Date(f);cs.setDate(1-sd);var cells=[];for(var i=0;i<42;i++){var d=new Date(cs);d.setDate(cs.getDate()+i);cells.push({date:d,iso:fmtD(d),inMonth:d.getMonth()===f.getMonth()&&d.getFullYear()===f.getFullYear()});}return{cells:cells,year:y,month:m,label:FM[m]+' '+y};}
 function buildDowRow(id){var e=document.getElementById(id);if(e)e.innerHTML=DAYS.map(function(d){return'<div class="cal-dow">'+d+'</div>';}).join('');}
@@ -540,7 +541,7 @@ function empRenderMessages(){
     var dir=String(m.direction||'toEmployee');
     var fromLabel=dir==='toManager'?'You → Manager':'From: '+String(m.from||'Manager');
     var msgText=String(m.text||'—');
-    var msgDate=String(m.date||'');
+    var msgDate=fmtMsgDate(m.date||'');
     var i=document.createElement('div');
     i.className='msg-item'+(m.read?'':' unread');
     i.innerHTML='<div class="msg-from">'+fromLabel+'</div><div class="msg-text">'+msgText+'</div><div class="msg-date">'+msgDate+'</div>';
@@ -678,7 +679,7 @@ function renderOwnMessages(){
   sent.slice().reverse().forEach(function(m){
     var toName=String(m.to||'—');
     var msgText=String(m.text||'—');
-    var msgDate=String(m.date||'');
+    var msgDate=fmtMsgDate(m.date||'');
     var msgId=String(m.id||'');
     var i=document.createElement('div');i.className='msg-item';
     var delBtn=msgId?'<button class="msg-del" onclick="deleteMsg(\''+msgId+'\')">🗑</button>':'';
@@ -698,7 +699,7 @@ function renderOwnInbox(){
   _ownInbox.slice().reverse().forEach(function(m){
     var i=document.createElement('div');
     i.className='msg-item'+(m.read?'':' unread');
-    i.innerHTML='<div class="msg-from">From: '+m.from+'</div><div class="msg-text">'+m.text+'</div><div class="msg-date">'+(m.date||'')+'</div><button class="msg-del" onclick="deleteInboxMsg(\''+m.id+'\')">🗑</button>';
+    i.innerHTML='<div class="msg-from">From: '+m.from+'</div><div class="msg-text">'+m.text+'</div><div class="msg-date">'+(fmtMsgDate(m.date||''))+'</div><button class="msg-del" onclick="deleteInboxMsg(\''+m.id+'\')">🗑</button>';
     el.appendChild(i);
     if(!m.read&&m.id)api({action:'markManagerRead',id:m.id}).catch(function(){});
   });
