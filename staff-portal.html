@@ -598,13 +598,44 @@ function renderEmpGrid(){
   g.innerHTML='';
   _ownEmployees.sort(function(a,b){return a.name.localeCompare(b.name);}).forEach(function(e){
     var c=document.createElement('div');c.className='emp-card';
+    var nm=e.name,ph=e.phone||'',pin=e.pin||'',role=e.role||'Staff';
+    var safeNm=nm.replace(/'/g,"\\'");
     var pinId='pin_'+Math.random().toString(36).slice(2,8);
-    c.innerHTML='<div class="emp-name">'+e.name+'</div><div class="emp-role">'+(e.role||'Staff')+'</div>'
-      +(e.pin?'<div style="margin:.4rem 0;display:flex;align-items:center;gap:.5rem"><span style="font-family:Space Mono,monospace;font-size:.6rem;color:#A8A098;letter-spacing:.08em;text-transform:uppercase">PIN:</span><span id="'+pinId+'" style="font-family:Space Mono,monospace;font-size:.78rem;color:var(--ember-light);letter-spacing:.15em;user-select:all">'+e.pin+'</span></div>':'')
-      +(e.phone?'<div style="font-size:.68rem;color:#A8A098;margin-bottom:.3rem">📱 '+e.phone+'</div>':'<div style="font-size:.68rem;color:rgba(231,76,60,.6);margin-bottom:.3rem">⚠ No phone — no SMS</div>')
-      +'<div class="emp-actions"><button class="emp-btn" onclick="resetPin(\''+e.name.replace(/'/g,"\\'")+'\')">🔑 Reset PIN</button><button class="emp-btn" onclick="deleteEmployee(\''+e.name.replace(/'/g,"\\'")+'\')">✕ Remove</button></div>';
+    var phoneId='ph_'+Math.random().toString(36).slice(2,8);
+
+    c.innerHTML=
+      '<div class="emp-name">'+nm+'</div>'
+      +'<div class="emp-role">'+role+'</div>'
+      +(pin?'<div style="margin:.4rem 0;display:flex;align-items:center;gap:.5rem"><span style="font-family:Space Mono,monospace;font-size:.6rem;color:#A8A098;letter-spacing:.08em;text-transform:uppercase">PIN:</span><span style="font-family:Space Mono,monospace;font-size:.78rem;color:var(--ember-light);letter-spacing:.15em;user-select:all">'+pin+'</span></div>':'')
+      // Phone row — always shown, editable inline
+      +'<div style="margin:.35rem 0 .6rem;display:flex;align-items:center;gap:.4rem">'
+        +'<span style="font-family:Space Mono,monospace;font-size:.6rem;color:#A8A098;letter-spacing:.08em;text-transform:uppercase;flex-shrink:0">📱</span>'
+        +'<input id="'+phoneId+'" type="tel" inputmode="numeric" maxlength="10" value="'+ph+'" placeholder="3371234567"'
+          +' style="flex:1;background:var(--dark3);border:1px solid rgba(255,255,255,.12);color:var(--white);padding:.32rem .6rem;font-family:Space Mono,monospace;font-size:.72rem;outline:none;min-width:0;"'
+          +' onfocus="this.style.borderColor=\'var(--ember)\'" onblur="this.style.borderColor=\'rgba(255,255,255,.12)\'">'
+        +'<button class="emp-btn" style="padding:.32rem .7rem;flex-shrink:0" onclick="updatePhone(\''+safeNm+'\',document.getElementById(\''+phoneId+'\').value)">💾</button>'
+      +'</div>'
+      +(ph?'':'<div style="font-size:.62rem;color:rgba(231,76,60,.6);margin-top:-.4rem;margin-bottom:.4rem">No phone — enter above to enable SMS</div>')
+      +'<div class="emp-actions">'
+        +'<button class="emp-btn" onclick="resetPin(\''+safeNm+'\')">🔑 Reset PIN</button>'
+        +'<button class="emp-btn" onclick="deleteEmployee(\''+safeNm+'\')">✕ Remove</button>'
+      +'</div>';
     g.appendChild(c);
   });
+}
+
+function updatePhone(nm,ph){
+  ph=String(ph||'').replace(/\D/g,'').slice(0,10);
+  loading('Saving...','ember');
+  api({action:'updatePhone',name:nm,phone:ph}).then(function(r){
+    stopLoading();
+    if(r.ok){
+      // Update local cache
+      _ownEmployees.forEach(function(e){if(e.name===nm)e.phone=ph;});
+      renderMsgRecipients();
+      toast(ph?nm+' phone saved ✓':nm+' phone cleared');
+    }else toast('Error saving phone','err');
+  }).catch(function(){stopLoading();toast('Connection error','err');});
 }
 
 function renderCurrentPasswords(pw){if(!pw)return;var el=document.getElementById('currentPasswords');if(!el)return;el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:1.5rem"><div><span class="f-label" style="margin-bottom:.4rem;display:block">Current Admin Password</span><span style="font-family:Space Mono,monospace;font-size:.9rem;color:var(--ember-light);letter-spacing:.12em;user-select:all;background:var(--dark3);padding:.5rem .9rem;border:1px solid rgba(255,255,255,.1);display:inline-block">'+(pw.adminPass||'—')+'</span></div><div><span class="f-label" style="margin-bottom:.4rem;display:block">Current Master Password</span><span style="font-family:Space Mono,monospace;font-size:.9rem;color:var(--red-hot);letter-spacing:.12em;user-select:all;background:var(--dark3);padding:.5rem .9rem;border:1px solid rgba(255,255,255,.1);display:inline-block">'+(pw.masterPass||'—')+'</span></div></div>';}
