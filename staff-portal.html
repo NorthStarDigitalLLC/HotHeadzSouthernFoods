@@ -630,8 +630,8 @@ function updatePhone(nm,ph){
   api({action:'updatePhone',name:nm,phone:ph}).then(function(r){
     stopLoading();
     if(r.ok){
-      // Update local cache
       _ownEmployees.forEach(function(e){if(e.name===nm)e.phone=ph;});
+      renderEmpGrid();
       renderMsgRecipients();
       toast(ph?nm+' phone saved ✓':nm+' phone cleared');
     }else toast('Error saving phone','err');
