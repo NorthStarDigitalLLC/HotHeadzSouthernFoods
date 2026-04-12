@@ -169,7 +169,19 @@ const MENU_DATA = {
     lunch: {
       show: true,
       items: [
-        
+
+        { "name": "Beef Tips", "desc": "Tender beef tips cooked in a savory gravy." },
+{ "name": "Red Beans & Rice", "desc": "Slow-cooked red beans served over seasoned rice." },
+{ "name": "BBQ Chicken", "desc": "Barbecue chicken cooked tender with bold flavor." },
+{ "name": "Mashed Potatoes & Gravy", "desc": "Creamy mashed potatoes topped with rich gravy." },
+{ "name": "Cabbage", "desc": "Tender seasoned cabbage." },
+{ "name": "Green Beans", "desc": "Seasoned green beans cooked until tender." },
+{ "name": "Corn", "desc": "Sweet seasoned corn." },
+{ "name": "Rolls", "desc": "Soft rolls served warm." },
+{ "name": "Fried Okra", "desc": "Crispy golden fried okra." },
+{ "name": "Turkey Clubs", "desc": "Classic club sandwiches stacked with turkey, bacon, lettuce, tomato, and mayo." },
+{ "name": "Chicken Salad", "desc": "Creamy house-made chicken salad served chilled and ready to enjoy." },
+{ "name": "Croissants", "desc": "Flaky, buttery croissants baked until golden and tender." },
 
         { name: "Turkey Clubs", desc: "Classic club sandwiches stacked with turkey, bacon, lettuce, tomato, and mayo." },
         { name: "Chicken Salad", desc: "Creamy house-made chicken salad served chilled and ready to enjoy." },
