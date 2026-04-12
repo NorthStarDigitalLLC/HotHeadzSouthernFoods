@@ -408,12 +408,13 @@ footer{padding:1.1rem .9rem;padding-bottom:max(1.1rem,env(safe-area-inset-bottom
     <div style="margin-top:1rem;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap"><span id="shiftCount"></span><button class="ab ghost filter-ab" onclick="if(confirm('Delete ALL shifts?')){clearAllShifts()}">🗑 Clear All</button></div>
   </div>
   <div class="tab-panel" id="tab-employees">
-    <div class="sec-hdr"><div class="sec-title">Manage <span>Employees</span></div><div class="sec-sub">Add employees and set their login PINs. Phone number is used for SMS alerts.</div></div>
+    <div class="sec-hdr"><div class="sec-title">Manage <span>Employees</span></div><div class="sec-sub">Add employees and set their login PINs. Email is used for message alerts. Phone reserved for future SMS.</div></div>
     <div class="card ac-green">
-      <div class="form-grid fg3">
+      <div class="form-grid fg2">
         <div class="form-group"><label class="f-label">Full Name</label><input class="fi" type="text" id="emp-name" placeholder="e.g. Sarah Johnson"></div>
         <div class="form-group"><label class="f-label">PIN (4–6 digits)</label><input class="fi" type="text" id="emp-pin" placeholder="e.g. 1234" maxlength="6" inputmode="numeric"></div>
-        <div class="form-group"><label class="f-label">Phone (for SMS alerts)</label><input class="fi" type="tel" id="emp-phone" placeholder="e.g. 3371234567" inputmode="numeric"></div>
+        <div class="form-group"><label class="f-label">Email (for message alerts)</label><input class="fi" type="email" id="emp-email" placeholder="e.g. sarah@gmail.com"></div>
+        <div class="form-group"><label class="f-label">Phone (optional — future SMS)</label><input class="fi" type="tel" id="emp-phone" placeholder="e.g. 3371234567" inputmode="numeric"></div>
       </div>
       <div style="margin-top:1rem"><label class="f-label">Role(s) — tap to select multiple</label><div class="role-picker" id="emp-roles"></div><div class="custom-toggle"><label><input type="checkbox" onchange="toggleCustom('emp-role-custom',this.checked)"> Custom role</label></div><input class="fi custom-input" id="emp-role-custom" placeholder="Type custom role..."></div>
       <div style="margin-top:1rem"><button class="ab green" onclick="addEmployee()">+ ADD EMPLOYEE</button></div>
@@ -568,6 +569,7 @@ function addEmployee(){
   var nm=document.getElementById('emp-name').value.trim();
   var pn=document.getElementById('emp-pin').value.trim();
   var ph=document.getElementById('emp-phone').value.trim().replace(/\D/g,'');
+  var em=document.getElementById('emp-email').value.trim();
   var rc=document.getElementById('emp-role-custom');
   var rl=(rc&&rc.classList.contains('show')&&rc.value)?rc.value.trim():getSelectedRoles('emp-roles');
   if(!nm){toast('Enter a name','err');return;}
@@ -575,14 +577,15 @@ function addEmployee(){
   if(!/^\d+$/.test(pn)){toast('Numbers only','err');return;}
   if(!rl){toast('Select a role','err');return;}
   loading('Adding...','ember');
-  api({action:'addEmployee',name:nm,pin:pn,role:rl,phone:ph}).then(function(r){
+  api({action:'addEmployee',name:nm,pin:pn,role:rl,phone:ph,email:em}).then(function(r){
     stopLoading();
     if(r.ok){
-      _ownEmployees.push({name:nm,pin:pn,role:rl,phone:ph});
+      _ownEmployees.push({name:nm,pin:pn,role:rl,phone:ph,email:em});
       renderEmpGrid();renderMsgRecipients();
       document.getElementById('emp-name').value='';
       document.getElementById('emp-pin').value='';
       document.getElementById('emp-phone').value='';
+      document.getElementById('emp-email').value='';
       clearRolePicker('emp-roles');
       toast(nm+' added');
     }else toast('Error: '+(r.error||''),'err');
@@ -598,30 +601,52 @@ function renderEmpGrid(){
   g.innerHTML='';
   _ownEmployees.sort(function(a,b){return a.name.localeCompare(b.name);}).forEach(function(e){
     var c=document.createElement('div');c.className='emp-card';
-    var nm=e.name,ph=e.phone||'',pin=e.pin||'',role=e.role||'Staff';
+    var nm=e.name,ph=e.phone||'',em=e.email||'',pin=e.pin||'',role=e.role||'Staff';
     var safeNm=nm.replace(/'/g,"\\'");
-    var pinId='pin_'+Math.random().toString(36).slice(2,8);
     var phoneId='ph_'+Math.random().toString(36).slice(2,8);
+    var emailId='em_'+Math.random().toString(36).slice(2,8);
 
     c.innerHTML=
       '<div class="emp-name">'+nm+'</div>'
       +'<div class="emp-role">'+role+'</div>'
-      +(pin?'<div style="margin:.4rem 0;display:flex;align-items:center;gap:.5rem"><span style="font-family:Space Mono,monospace;font-size:.6rem;color:#A8A098;letter-spacing:.08em;text-transform:uppercase">PIN:</span><span style="font-family:Space Mono,monospace;font-size:.78rem;color:var(--ember-light);letter-spacing:.15em;user-select:all">'+pin+'</span></div>':'')
-      // Phone row — always shown, editable inline
-      +'<div style="margin:.35rem 0 .6rem;display:flex;align-items:center;gap:.4rem">'
+      +(pin?'<div style="margin:.3rem 0;display:flex;align-items:center;gap:.5rem"><span style="font-family:Space Mono,monospace;font-size:.6rem;color:#A8A098;letter-spacing:.08em;text-transform:uppercase">PIN:</span><span style="font-family:Space Mono,monospace;font-size:.78rem;color:var(--ember-light);letter-spacing:.15em;user-select:all">'+pin+'</span></div>':'')
+      // Email row
+      +'<div style="margin:.3rem 0;display:flex;align-items:center;gap:.4rem">'
+        +'<span style="font-family:Space Mono,monospace;font-size:.6rem;color:#A8A098;letter-spacing:.08em;text-transform:uppercase;flex-shrink:0">✉</span>'
+        +'<input id="'+emailId+'" type="email" value="'+em+'" placeholder="email@gmail.com"'
+          +' style="flex:1;background:var(--dark3);border:1px solid rgba(255,255,255,.12);color:var(--white);padding:.32rem .6rem;font-family:DM Sans,sans-serif;font-size:.72rem;outline:none;min-width:0;"'
+          +' onfocus="this.style.borderColor=\'var(--ember)\'" onblur="this.style.borderColor=\'rgba(255,255,255,.12)\'">'
+        +'<button class="emp-btn" style="padding:.32rem .7rem;flex-shrink:0" onclick="updateEmail(\''+safeNm+'\',document.getElementById(\''+emailId+'\').value)">💾</button>'
+      +'</div>'
+      +(em?'':'<div style="font-size:.62rem;color:rgba(231,76,60,.6);margin-top:-.3rem;margin-bottom:.3rem">No email — add above for alerts</div>')
+      // Phone row
+      +'<div style="margin:.3rem 0 .5rem;display:flex;align-items:center;gap:.4rem">'
         +'<span style="font-family:Space Mono,monospace;font-size:.6rem;color:#A8A098;letter-spacing:.08em;text-transform:uppercase;flex-shrink:0">📱</span>'
         +'<input id="'+phoneId+'" type="tel" inputmode="numeric" maxlength="10" value="'+ph+'" placeholder="3371234567"'
           +' style="flex:1;background:var(--dark3);border:1px solid rgba(255,255,255,.12);color:var(--white);padding:.32rem .6rem;font-family:Space Mono,monospace;font-size:.72rem;outline:none;min-width:0;"'
           +' onfocus="this.style.borderColor=\'var(--ember)\'" onblur="this.style.borderColor=\'rgba(255,255,255,.12)\'">'
         +'<button class="emp-btn" style="padding:.32rem .7rem;flex-shrink:0" onclick="updatePhone(\''+safeNm+'\',document.getElementById(\''+phoneId+'\').value)">💾</button>'
       +'</div>'
-      +(ph?'':'<div style="font-size:.62rem;color:rgba(231,76,60,.6);margin-top:-.4rem;margin-bottom:.4rem">No phone — enter above to enable SMS</div>')
       +'<div class="emp-actions">'
         +'<button class="emp-btn" onclick="resetPin(\''+safeNm+'\')">🔑 Reset PIN</button>'
         +'<button class="emp-btn" onclick="deleteEmployee(\''+safeNm+'\')">✕ Remove</button>'
       +'</div>';
     g.appendChild(c);
   });
+}
+
+function updateEmail(nm,em){
+  em=String(em||'').trim();
+  loading('Saving...','ember');
+  api({action:'updateEmail',name:nm,email:em}).then(function(r){
+    stopLoading();
+    if(r.ok){
+      _ownEmployees.forEach(function(e){if(e.name===nm)e.email=em;});
+      renderEmpGrid();
+      renderMsgRecipients();
+      toast(em?nm+' email saved ✓':nm+' email cleared');
+    }else toast('Error saving email','err');
+  }).catch(function(){stopLoading();toast('Connection error','err');});
 }
 
 function updatePhone(nm,ph){
@@ -640,7 +665,7 @@ function updatePhone(nm,ph){
 
 function renderCurrentPasswords(pw){if(!pw)return;var el=document.getElementById('currentPasswords');if(!el)return;el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:1.5rem"><div><span class="f-label" style="margin-bottom:.4rem;display:block">Current Admin Password</span><span style="font-family:Space Mono,monospace;font-size:.9rem;color:var(--ember-light);letter-spacing:.12em;user-select:all;background:var(--dark3);padding:.5rem .9rem;border:1px solid rgba(255,255,255,.1);display:inline-block">'+(pw.adminPass||'—')+'</span></div><div><span class="f-label" style="margin-bottom:.4rem;display:block">Current Master Password</span><span style="font-family:Space Mono,monospace;font-size:.9rem;color:var(--red-hot);letter-spacing:.12em;user-select:all;background:var(--dark3);padding:.5rem .9rem;border:1px solid rgba(255,255,255,.1);display:inline-block">'+(pw.masterPass||'—')+'</span></div></div>';}
 
-function renderMsgRecipients(){var el=document.getElementById('msgRecipients');if(!el)return;el.innerHTML='';_ownEmployees.sort(function(a,b){return a.name.localeCompare(b.name);}).forEach(function(e){var c=document.createElement('span');c.className='emp-check';c.textContent=e.name+(e.phone?'':' ⚠');c.setAttribute('data-name',e.name);c.addEventListener('click',function(){this.classList.toggle('selected');});el.appendChild(c);});}
+function renderMsgRecipients(){var el=document.getElementById('msgRecipients');if(!el)return;el.innerHTML='';_ownEmployees.sort(function(a,b){return a.name.localeCompare(b.name);}).forEach(function(e){var c=document.createElement('span');c.className='emp-check';c.textContent=e.name+(e.email?'':' ⚠');c.setAttribute('data-name',e.name);c.addEventListener('click',function(){this.classList.toggle('selected');});el.appendChild(c);});}
 function selectAllRecipients(){document.querySelectorAll('#msgRecipients .emp-check').forEach(function(c){c.classList.add('selected');});}
 function clearRecipients(){document.querySelectorAll('#msgRecipients .emp-check').forEach(function(c){c.classList.remove('selected');});}
 
