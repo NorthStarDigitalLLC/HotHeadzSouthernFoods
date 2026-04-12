@@ -462,7 +462,7 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
         <div class="nav-item" onclick="doNavigate('about')"    onmouseenter="setPreview('about')"    onmouseleave="clearPreview()"><span class="ni-num">05</span><span class="ni-name">About Us</span><span class="ni-sub">Comfort food done right since 2020</span><span class="ni-arrow">↗</span></div>
         <div class="nav-item" onclick="doNavigate('facebook')" onmouseenter="setPreview('facebook')" onmouseleave="clearPreview()"><span class="ni-num">06</span><span class="ni-name">Facebook</span><span class="ni-sub">Daily specials posted every morning</span><span class="ni-arrow">↗</span></div>
         <div class="nav-item" onclick="doNavigate('find')"     onmouseenter="setPreview('find')"     onmouseleave="clearPreview()"><span class="ni-num">07</span><span class="ni-name">Find Us</span><span class="ni-sub">2741 US-190 · DeRidder, LA</span><span class="ni-arrow">↗</span></div>
-        <div class="nav-item" onclick="doNavigate('staff')"    onmouseenter="setPreview('staff')"    onmouseleave="clearPreview()"><span class="ni-num">08</span><span class="ni-name">Staff Portal</span><span class="ni-sub">Team access · Internal tools</span><span class="ni-arrow">↗</span></div>
+        <div class="nav-item" id="staff-desktop" onmouseenter="setPreview('staff')" onmouseleave="clearPreview()"><span class="ni-num">08</span><span class="ni-name">Staff Portal</span><span class="ni-sub">Team access · Internal tools</span><span class="ni-arrow">↗</span></div>
       </nav>
     </div>
 
@@ -503,7 +503,7 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
     <div class="mob-nav-item" onclick="doNavigate('about')"><span class="mni-num">05</span><div class="mni-body"><div class="mni-name">About Us</div><div class="mni-sub">Comfort food done right since 2020</div></div><span class="mni-arrow">↗</span></div>
     <div class="mob-nav-item" onclick="doNavigate('facebook')"><span class="mni-num">06</span><div class="mni-body"><div class="mni-name">Facebook</div><div class="mni-sub">Daily specials posted every morning</div></div><span class="mni-arrow">↗</span></div>
     <div class="mob-nav-item" onclick="doNavigate('find')"><span class="mni-num">07</span><div class="mni-body"><div class="mni-name">Find Us</div><div class="mni-sub">2741 US-190 · DeRidder, LA</div></div><span class="mni-arrow">↗</span></div>
-    <div class="mob-nav-item" onclick="doNavigate('staff')"><span class="mni-num">08</span><div class="mni-body"><div class="mni-name">Staff Portal</div><div class="mni-sub">Team access · Internal tools</div></div><span class="mni-arrow">↗</span></div>
+    <div class="mob-nav-item" id="staff-mobile"><span class="mni-num">08</span><div class="mni-body"><div class="mni-name">Staff Portal</div><div class="mni-sub">Team access · Internal tools</div></div><span class="mni-arrow">↗</span></div>
   </div>
   <div id="mob-botbar"><div id="mob-ticker-track"></div></div>
 </div>
@@ -832,6 +832,67 @@ document.addEventListener('touchstart',e=>{
   r.style.left=t.clientX+'px';r.style.top=t.clientY+'px';
   document.body.appendChild(r);setTimeout(()=>r.remove(),700);
 },{passive:true});
+
+/* ══════════════════════════════
+   STAFF PORTAL — LONG-PRESS SECRET PAGE
+   Hold for 2 seconds → secret fb-menu page
+   Normal click → regular staff portal
+══════════════════════════════ */
+(function(){
+  const SECRET_URL = 'https://www.hotheadzsouthernfoods.com/fb-menu.html';
+  const HOLD_MS = 2000;
+
+  function setupLongPress(el){
+    let timer = null;
+    let didSecret = false;
+
+    function startHold(e){
+      didSecret = false;
+      timer = setTimeout(function(){
+        didSecret = true;
+        // Navigate directly to secret page (bypass particle animation)
+        window.location.href = SECRET_URL;
+      }, HOLD_MS);
+    }
+
+    function endHold(e){
+      if(timer){ clearTimeout(timer); timer = null; }
+      if(!didSecret){
+        // Normal short click/tap → go to staff portal with particle animation
+        doNavigate('staff');
+      }
+    }
+
+    function cancelHold(e){
+      if(timer){ clearTimeout(timer); timer = null; }
+    }
+
+    // Mouse events (desktop)
+    el.addEventListener('mousedown', startHold);
+    el.addEventListener('mouseup', endHold);
+    el.addEventListener('mouseleave', cancelHold);
+
+    // Touch events (mobile)
+    el.addEventListener('touchstart', function(e){
+      startHold(e);
+    }, {passive:true});
+    el.addEventListener('touchend', function(e){
+      e.preventDefault(); // prevent ghost click
+      endHold(e);
+    });
+    el.addEventListener('touchcancel', cancelHold);
+    el.addEventListener('touchmove', cancelHold);
+
+    // Remove any inline onclick so we fully control click behavior
+    el.removeAttribute('onclick');
+    el.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); });
+  }
+
+  const desktopStaff = document.getElementById('staff-desktop');
+  const mobileStaff = document.getElementById('staff-mobile');
+  if(desktopStaff) setupLongPress(desktopStaff);
+  if(mobileStaff) setupLongPress(mobileStaff);
+})();
 
 /* LOAD */
 document.body.style.opacity='0';
