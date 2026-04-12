@@ -537,11 +537,15 @@ function empRenderMessages(){
   if(!_empMessages.length){el.innerHTML='<div class="no-shifts" style="padding:1.5rem"><span class="ns-icon" style="font-size:1.5rem">💬</span>No messages yet.</div>';return;}
   el.innerHTML='';
   _empMessages.slice().reverse().forEach(function(m){
+    var dir=String(m.direction||'toEmployee');
+    var fromLabel=dir==='toManager'?'You → Manager':'From: '+String(m.from||'Manager');
+    var msgText=String(m.text||'—');
+    var msgDate=String(m.date||'');
     var i=document.createElement('div');
     i.className='msg-item'+(m.read?'':' unread');
-    i.innerHTML='<div class="msg-from">'+(m.direction==='toManager'?'You → Manager':'From: '+(m.from||'Manager'))+'</div><div class="msg-text">'+m.text+'</div><div class="msg-date">'+(m.date||'')+'</div>';
+    i.innerHTML='<div class="msg-from">'+fromLabel+'</div><div class="msg-text">'+msgText+'</div><div class="msg-date">'+msgDate+'</div>';
     el.appendChild(i);
-    if(!m.read&&m.id&&m.direction!=='toManager')api({action:'markRead',id:m.id}).catch(function(){});
+    if(!m.read&&m.id&&dir!=='toManager')api({action:'markRead',id:m.id}).catch(function(){});
   });
 }
 
@@ -668,7 +672,7 @@ function deleteMsg(id){loading('Deleting...','ember');api({action:'deleteMessage
 
 function renderOwnMessages(){
   var el=document.getElementById('ownMsgList');if(!el)return;
-  var sent=(_ownMessages||[]).filter(function(m){return(m.direction||'toEmployee')==='toEmployee';});
+  var sent=(_ownMessages||[]).filter(function(m){var d=String(m.direction||'');return d==='toEmployee'||d==='';});
   if(!sent.length){el.innerHTML='<p style="color:#A8A098;font-size:.82rem">No messages sent yet.</p>';return;}
   el.innerHTML='';
   sent.slice().reverse().forEach(function(m){
@@ -677,7 +681,8 @@ function renderOwnMessages(){
     var msgDate=String(m.date||'');
     var msgId=String(m.id||'');
     var i=document.createElement('div');i.className='msg-item';
-    i.innerHTML='<div class="msg-from">To: '+toName+'</div><div class="msg-text">'+msgText+'</div><div class="msg-date">'+msgDate+'</div>'+(msgId?'<button class="msg-del" onclick="deleteMsg(\'' +msgId+ '\')">\uD83D\uDDD1</button>':'');
+    var delBtn=msgId?'<button class="msg-del" onclick="deleteMsg(\''+msgId+'\')">🗑</button>':'';
+    i.innerHTML='<div class="msg-from">To: '+toName+'</div><div class="msg-text">'+msgText+'</div><div class="msg-date">'+msgDate+'</div>'+delBtn;
     el.appendChild(i);
   });
 }
