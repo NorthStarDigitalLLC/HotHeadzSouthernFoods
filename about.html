@@ -20,87 +20,183 @@
   <meta name="twitter:image:alt" content="Hot Headz Southern Foods logo">
   <style>
     :root {
-      --hhx-bg: #07060a; --hhx-border: rgba(255,255,255,.14);
-      --hhx-text: rgba(255,255,255,.92); --hhx-muted: rgba(255,255,255,.70);
-      --hhx-ember: #ff5b3d; --hhx-ember2: #ffb04b;
-      --hhx-radius: 24px; --hhx-radius2: 18px;
-      --hhx-shadow: 0 22px 70px rgba(0,0,0,.55); --hhx-shadow2: 0 14px 40px rgba(0,0,0,.42);
+      --hhx-bg: #07060a;
+      --hhx-border: rgba(255,255,255,.20);
+      --hhx-text: rgba(255,255,255,.96);
+      /* READABILITY: muted lifted from .70 → .88 */
+      --hhx-muted: rgba(255,255,255,.88);
+      --hhx-ember: #ff5b3d;
+      --hhx-ember2: #ffb04b;
+      --hhx-radius: 24px;
+      --hhx-radius2: 18px;
+      --hhx-shadow: 0 22px 70px rgba(0,0,0,.55);
+      --hhx-shadow2: 0 14px 40px rgba(0,0,0,.42);
     }
+
     *{margin:0;padding:0;box-sizing:border-box;max-width:100%;}
     html{scroll-behavior:smooth;overflow-x:hidden;}
-    body{background-color:#07060a;color:rgba(255,255,255,0.92);font-family:'Inter',sans-serif;line-height:1.5;padding-bottom:90px;}
-    p{color:rgba(255,255,255,0.95);font-size:1.05rem;}
+    body{
+      background-color:#07060a;
+      /* READABILITY: body color full .96 */
+      color:rgba(255,255,255,0.96);
+      font-family:'Inter',sans-serif;
+      line-height:1.6;
+      padding-bottom:90px;
+    }
+
+    /* READABILITY: all p tags full .96, size bumped to 1.1rem */
+    p{color:rgba(255,255,255,0.96);font-size:1.1rem;line-height:1.7;}
+
     h1,h2,h3{font-family:'Inter',sans-serif;font-weight:800;letter-spacing:-0.02em;}
     h1{font-size:clamp(2.2rem,5vw,4rem);line-height:1.1;background:linear-gradient(135deg,#fff,var(--hhx-ember2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-    h2{font-size:clamp(1.8rem,3.5vw,2.8rem);margin-bottom:1.5rem;}
+    h2{font-size:clamp(1.8rem,3.5vw,2.8rem);margin-bottom:1.5rem;color:#fff;}
+    /* READABILITY: h3 explicitly white */
+    h3{color:#fff;font-size:1.15rem;}
+
     .container{max-width:1200px;margin:0 auto;padding:0 1.5rem;}
-    .section{padding:4rem 0;border-bottom:1px solid rgba(255,255,255,0.05);}
-    .btn{display:inline-flex;align-items:center;gap:0.5rem;padding:1rem 2.5rem;border-radius:999px;font-weight:700;text-decoration:none;transition:all 0.2s ease;border:1px solid transparent;}
+    .section{padding:4rem 0;border-bottom:1px solid rgba(255,255,255,0.08);}
+
+    .btn{display:inline-flex;align-items:center;gap:0.5rem;padding:1rem 2.5rem;border-radius:999px;font-weight:700;text-decoration:none;transition:all 0.2s ease;border:1px solid transparent;font-size:1rem;}
     .btn-primary{background:linear-gradient(135deg,var(--hhx-ember),var(--hhx-ember2));color:#1a0d0b;box-shadow:0 14px 30px -14px rgba(255,91,61,0.5);}
     .btn-primary:hover{transform:translateY(-2px);box-shadow:0 28px 45px -18px rgba(255,91,61,0.6);}
-    .btn-outline{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2);color:white;}
-    .btn-outline:hover{border-color:var(--hhx-ember);background:rgba(255,91,61,0.1);}
-    .hero{min-height:60vh;display:flex;align-items:center;background:radial-gradient(circle at 70% 30%,rgba(255,91,61,0.15),transparent 50%),radial-gradient(circle at 30% 70%,rgba(255,176,75,0.1),transparent 50%),var(--hhx-bg);padding:4rem 0;}
+    /* READABILITY: outline btn text full white */
+    .btn-outline{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.28);color:#fff;font-weight:700;}
+    .btn-outline:hover{border-color:var(--hhx-ember);background:rgba(255,91,61,0.12);}
+
+    .hero{
+      min-height:60vh;display:flex;align-items:center;
+      background:radial-gradient(circle at 70% 30%,rgba(255,91,61,0.15),transparent 50%),
+                 radial-gradient(circle at 30% 70%,rgba(255,176,75,0.1),transparent 50%),
+                 var(--hhx-bg);
+      padding:4rem 0;
+    }
     .hero .container{display:grid;gap:2rem;}
     @media(min-width:768px){.hero .container{grid-template-columns:1fr 1fr;align-items:center;}}
     .hero h1{margin-bottom:1rem;}
-    .hero p{font-size:1.2rem;opacity:0.8;}
-    .hero-image{border-radius:var(--hhx-radius);overflow:hidden;border:1px solid rgba(255,255,255,0.1);box-shadow:var(--hhx-shadow);}
+    /* READABILITY: hero p full opacity, larger */
+    .hero p{font-size:1.2rem;color:rgba(255,255,255,0.92);}
+    .hero-image{border-radius:var(--hhx-radius);overflow:hidden;border:1px solid rgba(255,255,255,0.14);box-shadow:var(--hhx-shadow);}
     .hero-image img{width:100%;height:auto;display:block;}
+
+    /* READABILITY: story card text and border boosted */
     .story-grid{display:grid;gap:2rem;}
     @media(min-width:768px){.story-grid{grid-template-columns:1fr 1fr;align-items:center;}}
-    .story-card{background:rgba(30,27,27,0.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);border-radius:var(--hhx-radius);padding:2rem;box-shadow:var(--hhx-shadow2);}
-    .story-card p{margin-bottom:1rem;}
+    .story-card{
+      background:rgba(30,27,27,0.7);
+      backdrop-filter:blur(10px);
+      border:1px solid rgba(255,255,255,0.16);
+      border-radius:var(--hhx-radius);
+      padding:2rem;
+      box-shadow:var(--hhx-shadow2);
+    }
+    .story-card p{margin-bottom:1rem;color:rgba(255,255,255,0.94);}
+    .story-card h2{color:#fff;}
+
+    /* READABILITY: values grid items — text fully readable */
     .values-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem;margin-top:2rem;}
-    .value-item{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:var(--hhx-radius2);padding:2rem 1.5rem;text-align:center;transition:transform 0.2s ease;}
+    .value-item{
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.14);
+      border-radius:var(--hhx-radius2);
+      padding:2rem 1.5rem;
+      text-align:center;
+      transition:transform 0.2s ease, border-color 0.2s ease;
+    }
     .value-item:hover{transform:translateY(-5px);border-color:var(--hhx-ember);}
     .value-item i{font-size:2.5rem;color:var(--hhx-ember);margin-bottom:1rem;}
-    .value-item h3{margin-bottom:0.5rem;}
+    .value-item h3{margin-bottom:0.6rem;color:#fff;font-size:1.15rem;}
+    /* READABILITY: value item p from implicit dim → fully readable */
+    .value-item p{color:rgba(255,255,255,0.88);font-size:1rem;line-height:1.6;}
+
     .team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2rem;margin-top:2rem;}
     .team-member{text-align:center;}
     .team-member img{width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid var(--hhx-ember);margin-bottom:1rem;}
-    .team-member h4{margin-bottom:0.25rem;}
-    .team-member p{opacity:0.7;font-size:0.9rem;}
-    .info-card{background:rgba(30,27,27,0.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);border-radius:var(--hhx-radius);padding:2rem;max-width:500px;margin:2rem auto 0;}
-    .info-row{display:flex;align-items:center;gap:1rem;padding:0.75rem 0;border-bottom:1px solid rgba(255,255,255,0.1);}
+    .team-member h4{margin-bottom:0.25rem;color:#fff;font-size:1.1rem;font-weight:700;}
+    /* READABILITY: team member p from .7 opacity → .82 */
+    .team-member p{color:rgba(255,255,255,0.82);font-size:1rem;}
+
+    /* READABILITY: info card — labels, values, border all boosted */
+    .info-card{
+      background:rgba(30,27,27,0.7);
+      backdrop-filter:blur(10px);
+      border:1px solid rgba(255,255,255,0.16);
+      border-radius:var(--hhx-radius);
+      padding:2rem;
+      max-width:500px;
+      margin:2rem auto 0;
+    }
+    .info-row{
+      display:flex;align-items:center;gap:1rem;
+      padding:0.85rem 0;
+      border-bottom:1px solid rgba(255,255,255,0.12);
+    }
     .info-row:last-child{border-bottom:none;}
     .info-row i{width:30px;color:var(--hhx-ember);font-size:1.2rem;}
-    .info-row .label{font-weight:600;opacity:0.8;}
-    .info-row .value{margin-left:auto;font-weight:700;}
-    .cta-section{background:radial-gradient(ellipse at 50% 50%,rgba(255,91,61,0.2),transparent 70%);border-radius:var(--hhx-radius);padding:4rem 2rem;text-align:center;border:1px solid rgba(255,91,61,0.3);}
+    /* READABILITY: label from .8 opacity → full white, font-size bumped */
+    .info-row .label{font-weight:700;color:rgba(255,255,255,0.88);font-size:1rem;}
+    /* READABILITY: value fully white, size bumped */
+    .info-row .value{margin-left:auto;font-weight:800;color:#fff;font-size:1rem;}
+    .info-row .value a{color:#fff;text-decoration:none;}
+    .info-row .value a:hover{color:var(--hhx-ember2);}
+
+    /* READABILITY: CTA section text boosted */
+    .cta-section{
+      background:radial-gradient(ellipse at 50% 50%,rgba(255,91,61,0.22),transparent 70%);
+      border-radius:var(--hhx-radius);
+      padding:4rem 2rem;
+      text-align:center;
+      border:1px solid rgba(255,91,61,0.35);
+    }
+    .cta-section h2{color:#fff;}
+    /* READABILITY: cta p from .8 opacity → .90 */
+    .cta-section p{font-size:1.2rem;color:rgba(255,255,255,0.90);margin-bottom:2rem;}
+
+    /* HERO "SINCE 2020" tag */
+    .hero-eyebrow{
+      border-left:3px solid var(--hhx-ember);
+      padding-left:10px;
+      color:var(--hhx-ember);
+      font-weight:800;
+      letter-spacing:.12em;
+      font-size:.9rem;
+      text-transform:uppercase;
+      margin-bottom:1rem;
+    }
+
     /* ===== BACK BUTTON ===== */
     .back-btn {
       position: fixed; z-index: 1000; bottom: 24px; left: 50%;
       transform: translateX(-50%);
-      background: rgba(25,20,15,.92);
-      border: 1px solid rgba(255,91,61,.45);
+      background: rgba(25,20,15,.95);
+      border: 1px solid rgba(255,91,61,.50);
       border-radius: 999px;
       display: inline-flex; align-items: center; gap: 10px;
-      cursor: pointer; box-shadow: 0 4px 24px rgba(0,0,0,.4);
+      cursor: pointer; box-shadow: 0 4px 24px rgba(0,0,0,.5);
       transition: all .2s ease; backdrop-filter: blur(8px);
-      padding: 12px 24px; text-decoration: none;
-      color: rgba(255,255,255,.9);
+      padding: 13px 26px; text-decoration: none;
+      /* READABILITY: back btn text full white */
+      color: #fff;
       font-family: 'Inter', sans-serif; font-weight: 800;
-      font-size: .9rem; letter-spacing: .08em; white-space: nowrap;
+      font-size: 1rem; letter-spacing: .06em; white-space: nowrap;
     }
     .back-btn:hover {
       transform: translateX(-50%) translateY(-2px);
-      border-color: rgba(255,91,61,.85);
-      box-shadow: 0 8px 32px rgba(255,91,61,.22);
+      border-color: rgba(255,91,61,.90);
+      box-shadow: 0 8px 32px rgba(255,91,61,.25);
     }
     .back-btn .back-arrow {
       font-size: 1.1rem; color: var(--hhx-ember);
       transition: transform .2s; display: inline-block;
     }
     .back-btn:hover .back-arrow { transform: translateX(-3px); }
+    /* READABILITY: back-sub from .5 opacity → .70 */
     .back-btn .back-sub {
-      font-size: .65rem; font-weight: 600; opacity: .5;
+      font-size: .72rem; font-weight: 700; opacity: .70;
       text-transform: uppercase; letter-spacing: .1em; margin-left: 2px;
     }
   </style>
 </head>
 <body>
-
 
   <!-- ===== BACK BUTTON ===== -->
   <a class="back-btn" href="index.html">
@@ -113,7 +209,7 @@
   <section class="hero">
     <div class="container">
       <div>
-        <div style="border-left:3px solid var(--hhx-ember);padding-left:10px;color:var(--hhx-ember);font-weight:800;letter-spacing:.12em;font-size:.85rem;text-transform:uppercase;margin-bottom:1rem;">SINCE 2020</div>
+        <div class="hero-eyebrow">SINCE 2020</div>
         <h1>Southern hospitality,<br>made from scratch</h1>
         <p>Hot Headz Southern Foods started as a dream to bring real, homestyle cooking to DeRidder. Today, we're proud to serve breakfast and lunch made daily with love.</p>
       </div>
@@ -146,10 +242,26 @@
     <div class="container">
       <h2 style="text-align:center;">What we stand for</h2>
       <div class="values-grid">
-        <div class="value-item"><i class="fas fa-egg"></i><h3>Made from scratch</h3><p>No shortcuts. Every dish is prepared by hand daily.</p></div>
-        <div class="value-item"><i class="fas fa-hand-holding-heart"></i><h3>Family owned</h3><p>We treat every customer like part of the family.</p></div>
-        <div class="value-item"><i class="fas fa-leaf"></i><h3>Quality ingredients</h3><p>We source the best to bring you the best.</p></div>
-        <div class="value-item"><i class="fas fa-smile"></i><h3>Friendly service</h3><p>We believe a smile makes the meal taste better.</p></div>
+        <div class="value-item">
+          <i class="fas fa-egg"></i>
+          <h3>Made from scratch</h3>
+          <p>No shortcuts. Every dish is prepared by hand daily.</p>
+        </div>
+        <div class="value-item">
+          <i class="fas fa-hand-holding-heart"></i>
+          <h3>Family owned</h3>
+          <p>We treat every customer like part of the family.</p>
+        </div>
+        <div class="value-item">
+          <i class="fas fa-leaf"></i>
+          <h3>Quality ingredients</h3>
+          <p>We source the best to bring you the best.</p>
+        </div>
+        <div class="value-item">
+          <i class="fas fa-smile"></i>
+          <h3>Friendly service</h3>
+          <p>We believe a smile makes the meal taste better.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -173,12 +285,36 @@
     <div class="container">
       <div class="info-card">
         <h2 style="text-align:center;margin-bottom:2rem;">Visit us</h2>
-        <div class="info-row"><i class="fas fa-map-pin"></i><span class="label">Address</span><span class="value">2741 US-190, DeRidder, LA</span></div>
-        <div class="info-row"><i class="fas fa-phone"></i><span class="label">Phone</span><span class="value"><a href="tel:3372211035" style="color:inherit;">(337) 221-1035</a></span></div>
-        <div class="info-row"><i class="fas fa-clock"></i><span class="label">Mon&ndash;Fri</span><span class="value">5:30 AM &ndash; 2:00 PM</span></div>
-        <div class="info-row"><i class="fas fa-clock"></i><span class="label">Saturday</span><span class="value">6:00 AM &ndash; 2:00 PM</span></div>
-        <div class="info-row"><i class="fas fa-clock"></i><span class="label">Sunday</span><span class="value">7:00 AM &ndash; 3:00 PM</span></div>
-        <div class="info-row"><i class="fas fa-pepper-hot"></i><span class="label">Crawfish hours</span><span class="value">4 PM &ndash; 8 PM Thu&ndash;Sat</span></div>
+        <div class="info-row">
+          <i class="fas fa-map-pin"></i>
+          <span class="label">Address</span>
+          <span class="value">2741 US-190, DeRidder, LA</span>
+        </div>
+        <div class="info-row">
+          <i class="fas fa-phone"></i>
+          <span class="label">Phone</span>
+          <span class="value"><a href="tel:3372211035">(337) 221-1035</a></span>
+        </div>
+        <div class="info-row">
+          <i class="fas fa-clock"></i>
+          <span class="label">Mon&ndash;Fri</span>
+          <span class="value">5:30 AM &ndash; 2:00 PM</span>
+        </div>
+        <div class="info-row">
+          <i class="fas fa-clock"></i>
+          <span class="label">Saturday</span>
+          <span class="value">6:00 AM &ndash; 2:00 PM</span>
+        </div>
+        <div class="info-row">
+          <i class="fas fa-clock"></i>
+          <span class="label">Sunday</span>
+          <span class="value">7:00 AM &ndash; 3:00 PM</span>
+        </div>
+        <div class="info-row">
+          <i class="fas fa-pepper-hot"></i>
+          <span class="label">Crawfish hours</span>
+          <span class="value">4 PM &ndash; 8 PM Thu&ndash;Sat</span>
+        </div>
       </div>
     </div>
   </section>
@@ -188,7 +324,7 @@
     <div class="container">
       <div class="cta-section">
         <h2 style="margin-bottom:1rem;">Come taste the difference</h2>
-        <p style="font-size:1.2rem;margin-bottom:2rem;opacity:0.8;">Family&#8209;owned, community&#8209;loved. Stop by today!</p>
+        <p>Family&#8209;owned, community&#8209;loved. Stop by today!</p>
         <a href="tel:3372211035" class="btn btn-primary"><i class="fas fa-phone"></i> Call us</a>
         <a href="https://maps.google.com/?q=2741%20US-190%2C%20DeRidder%2C%20LA%2070634" target="_blank" class="btn btn-outline" style="margin-left:1rem;"><i class="fas fa-map-marked-alt"></i> Directions</a>
       </div>
