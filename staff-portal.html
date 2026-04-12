@@ -627,11 +627,16 @@ function updateEmail(nm,em){
   api({action:'updateEmail',name:nm,email:em}).then(function(r){
     stopLoading();
     if(r.ok){
+      // Update local cache immediately
       _ownEmployees.forEach(function(e){if(e.name===nm)e.email=em;});
       renderEmpGrid();
       renderMsgRecipients();
       toast(em?nm+' email saved ✓':nm+' email cleared');
-    }else toast('Error saving email','err');
+      // Re-fetch from sheet to confirm it persisted
+      api({action:'getEmployeesWithPins'}).then(function(r2){
+        if(r2.ok){_ownEmployees=r2.data||[];renderEmpGrid();renderMsgRecipients();}
+      });
+    }else{toast('Error saving email','err');}
   }).catch(function(){stopLoading();toast('Connection error','err');});
 }
 
@@ -663,11 +668,16 @@ function deleteMsg(id){loading('Deleting...','ember');api({action:'deleteMessage
 
 function renderOwnMessages(){
   var el=document.getElementById('ownMsgList');if(!el)return;
-  if(!_ownMessages.length){el.innerHTML='<p style="color:#A8A098;font-size:.82rem">No messages sent yet.</p>';return;}
+  var sent=(_ownMessages||[]).filter(function(m){return(m.direction||'toEmployee')==='toEmployee';});
+  if(!sent.length){el.innerHTML='<p style="color:#A8A098;font-size:.82rem">No messages sent yet.</p>';return;}
   el.innerHTML='';
-  _ownMessages.slice().reverse().forEach(function(m){
+  sent.slice().reverse().forEach(function(m){
+    var toName=String(m.to||'—');
+    var msgText=String(m.text||'—');
+    var msgDate=String(m.date||'');
+    var msgId=String(m.id||'');
     var i=document.createElement('div');i.className='msg-item';
-    i.innerHTML='<div class="msg-from">To: '+m.to+'</div><div class="msg-text">'+m.text+'</div><div class="msg-date">'+(m.date||'')+'</div><button class="msg-del" onclick="deleteMsg(\''+m.id+'\')">🗑</button>';
+    i.innerHTML='<div class="msg-from">To: '+toName+'</div><div class="msg-text">'+msgText+'</div><div class="msg-date">'+msgDate+'</div>'+(msgId?'<button class="msg-del" onclick="deleteMsg(\'' +msgId+ '\')">\uD83D\uDDD1</button>':'');
     el.appendChild(i);
   });
 }
