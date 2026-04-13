@@ -18,20 +18,42 @@
     .toast.info{background:rgba(20,30,60,.9);border:1px solid rgba(100,140,255,.2);}
     @keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
     @keyframes toastOut{to{opacity:0;transform:translateX(40px)}}
-    .admin-gate{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at 30% 20%,#1e1510,#07060a);z-index:10000;}
-    .admin-card{background:rgba(20,18,22,.88);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.12);border-radius:28px;padding:44px 36px;text-align:center;max-width:460px;width:100%;box-shadow:0 40px 80px rgba(0,0,0,.5);animation:fadeUp .7s ease;}
-    .lock-icon{font-size:52px;margin-bottom:14px;animation:floatL 3s ease-in-out infinite;}
-    .admin-card h1{font-family:'Abril Fatface',serif;font-size:30px;margin-bottom:10px;background:linear-gradient(135deg,var(--fire2),var(--fire));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-    .admin-card p{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:18px;}
-    .pin-row{display:flex;gap:10px;justify-content:center;margin:20px 0 12px;}
-    .pin-row input{background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:40px;padding:12px 18px;width:140px;font-size:20px;text-align:center;color:#fff;font-weight:700;letter-spacing:4px;}
-    .pin-row input:focus{outline:none;border-color:var(--fire);}
-    .unlock-btn{background:linear-gradient(135deg,var(--fire),var(--fire2));border:none;border-radius:40px;padding:12px 24px;font-size:16px;font-weight:800;color:#fff;cursor:pointer;}
-    .error-msg{color:var(--danger);font-size:13px;min-height:20px;}
-    .gate-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px;}
-    .gate-links a{padding:10px 20px;border-radius:40px;font-weight:700;font-size:13px;text-decoration:none;}
-    .gl-primary{background:linear-gradient(135deg,var(--fire),var(--fire2));color:#fff;}
-    .gl-ghost{border:1px solid var(--border);color:var(--text2);}
+    .admin-gate{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;z-index:10000;overflow:hidden;}
+    .gate-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,#1e1510,#0a0806 50%,#050404);z-index:0;}
+    .gate-bg::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 70% 80%,rgba(196,24,0,.08),transparent 60%);}
+    .gate-bg::after{content:'';position:absolute;inset:0;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.04'/%3E%3C/svg%3E");}
+    .gate-embers{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;}
+    .gate-ember{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--fire);opacity:0;animation:gEmber linear infinite;}
+    @keyframes gEmber{0%{opacity:0;transform:translateY(0) scale(1)}10%{opacity:.8}60%{opacity:.4}100%{opacity:0;transform:translateY(-100vh) scale(0.3)}}
+    .gate-card{position:relative;z-index:2;width:100%;max-width:440px;animation:fadeUp .8s ease;}
+    .gate-logo{display:flex;justify-content:center;margin-bottom:24px;}
+    .gate-logo img{width:90px;height:90px;border-radius:50%;border:3px solid rgba(255,122,24,.3);box-shadow:0 0 40px rgba(255,122,24,.15);animation:floatL 4s ease-in-out infinite;}
+    .gate-brand{font-family:'Abril Fatface',Georgia,serif;font-size:clamp(28px,7vw,38px);text-align:center;line-height:1.1;margin-bottom:4px;color:var(--text);}
+    .gate-brand em{color:var(--fire);font-style:normal;}
+    .gate-sub{font-family:'DM Serif Display',Georgia,serif;font-style:italic;font-size:14px;color:rgba(212,168,152,.6);text-align:center;letter-spacing:.05em;margin-bottom:28px;}
+    .gate-divider{width:60px;height:2px;margin:0 auto 28px;background:linear-gradient(90deg,transparent,var(--fire),transparent);border-radius:2px;}
+    .gate-form{background:rgba(15,12,10,.6);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:32px 28px;margin-bottom:16px;}
+    .gate-form-title{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(212,168,152,.5);text-align:center;margin-bottom:20px;}
+    .gate-pin-wrap{display:flex;gap:8px;justify-content:center;margin-bottom:16px;}
+    .gate-pin-digit{width:48px;height:56px;border-radius:12px;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#fff;font-size:24px;font-weight:800;text-align:center;font-family:'DM Sans',sans-serif;transition:all .2s;caret-color:var(--fire);}
+    .gate-pin-digit:focus{outline:none;border-color:var(--fire);background:rgba(255,122,24,.06);box-shadow:0 0 20px rgba(255,122,24,.1);}
+    .gate-pin-digit.filled{border-color:rgba(255,122,24,.4);}
+    .gate-pin-digit.error{border-color:var(--danger);animation:gShake .4s ease;}
+    @keyframes gShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+    .gate-unlock{width:100%;padding:14px;border:none;border-radius:14px;font-size:15px;font-weight:800;font-family:'DM Sans',sans-serif;color:#fff;cursor:pointer;transition:all .25s;
+      background:linear-gradient(135deg,var(--fire),#e85520);box-shadow:0 4px 20px rgba(255,122,24,.25);}
+    .gate-unlock:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,122,24,.35);}
+    .gate-unlock:active{transform:translateY(0);}
+    .gate-unlock:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;}
+    .gate-error{color:var(--danger);font-size:12px;font-weight:700;text-align:center;min-height:18px;margin-top:10px;}
+    .gate-lockout{color:var(--danger);font-size:12px;font-weight:700;text-align:center;margin-top:8px;}
+    .gate-footer{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+    .gate-footer a{padding:10px 20px;border-radius:40px;font-weight:700;font-size:12px;text-decoration:none;transition:all .2s;letter-spacing:.03em;}
+    .gf-menu{background:rgba(255,122,24,.1);border:1px solid rgba(255,122,24,.2);color:var(--fire);}
+    .gf-menu:hover{background:rgba(255,122,24,.18);}
+    .gf-home{border:1px solid rgba(255,255,255,.1);color:var(--text3);}
+    .gf-home:hover{background:rgba(255,255,255,.05);color:var(--text2);}
     @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
     @keyframes floatL{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
     .editor{display:none;position:fixed;inset:0;z-index:9999;background:var(--void);flex-direction:column;}
@@ -126,18 +148,27 @@
 <body>
 <div id="toastBox"></div>
 <div class="admin-gate" id="adminGate">
-  <div class="admin-card">
-    <div class="lock-icon">🔒</div>
-    <h1>Menu Editor</h1>
-    <p>Staff-only area for building the daily Facebook menu post.</p>
-    <div class="pin-row">
-      <input type="password" id="pinInput" maxlength="6" placeholder="PIN" inputmode="numeric">
-      <button class="unlock-btn" id="unlockBtn">Unlock</button>
+  <div class="gate-bg"></div>
+  <div class="gate-embers" id="gateEmbers"></div>
+  <div class="gate-card">
+    <div class="gate-logo"><img src="/images/HotHeadzLogo.png" alt="Hot Headz" onerror="this.style.display='none'"></div>
+    <div class="gate-brand">Hot Headz <em>Southern Foods</em></div>
+    <div class="gate-sub">Staff Menu Editor</div>
+    <div class="gate-divider"></div>
+    <div class="gate-form">
+      <div class="gate-form-title">Enter Staff PIN</div>
+      <div class="gate-pin-wrap">
+        <input class="gate-pin-digit" type="password" inputmode="numeric" maxlength="1" data-idx="0" autocomplete="off">
+        <input class="gate-pin-digit" type="password" inputmode="numeric" maxlength="1" data-idx="1" autocomplete="off">
+        <input class="gate-pin-digit" type="password" inputmode="numeric" maxlength="1" data-idx="2" autocomplete="off">
+        <input class="gate-pin-digit" type="password" inputmode="numeric" maxlength="1" data-idx="3" autocomplete="off">
+      </div>
+      <button class="gate-unlock" id="unlockBtn">Unlock Editor</button>
+      <div class="gate-error" id="pinError"></div>
     </div>
-    <div class="error-msg" id="pinError"></div>
-    <div class="gate-links">
-      <a href="/menu" class="gl-primary">View Menu</a>
-      <a href="/" class="gl-ghost">Home</a>
+    <div class="gate-footer">
+      <a href="menu.html" class="gf-menu">View Public Menu</a>
+      <a href="/" class="gf-home">Return Home</a>
     </div>
   </div>
 </div>
@@ -226,10 +257,111 @@ const FONTS=[
 ];
 const BRAND_COLORS=['#ffffff','#f8ede6','#ffa048','#f87038','#f05020','#e83010','#c41800','#000000','#1e0a0c','#130509','#d4a898'];
 
-/* GATE */
-const ADMIN_PIN='2172';
-document.getElementById('unlockBtn').addEventListener('click',()=>{if(document.getElementById('pinInput').value.trim()===ADMIN_PIN){document.getElementById('pinError').textContent='';document.getElementById('adminGate').style.display='none';document.getElementById('editorShell').classList.add('active');setTimeout(()=>draw(),60);}else document.getElementById('pinError').textContent='Incorrect PIN.';});
-document.getElementById('pinInput').addEventListener('keypress',e=>{if(e.key==='Enter')document.getElementById('unlockBtn').click();});
+/* GATE — Hashed PIN, lockout, session, embers */
+// SHA-256 hash of the PIN (not visible in source)
+const PIN_HASH='77334823791bea53e508ba59387c1287c8da962026769657b4686756db4b7bc8';
+async function hashPin(pin){const enc=new TextEncoder().encode(pin);const buf=await crypto.subtle.digest('SHA-256',enc);return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');}
+const SESSION_KEY='hhMenuAuth';
+const LOCKOUT_KEY='hhMenuLockout';
+const MAX_ATTEMPTS=5;
+const LOCKOUT_MINUTES=2;
+let failCount=0;
+
+// Ember particles on gate
+(function(){
+  const container=document.getElementById('gateEmbers');if(!container)return;
+  for(let i=0;i<20;i++){
+    const e=document.createElement('div');e.className='gate-ember';
+    e.style.left=Math.random()*100+'%';e.style.bottom='-10px';
+    e.style.animationDuration=(4+Math.random()*6)+'s';
+    e.style.animationDelay=(Math.random()*5)+'s';
+    e.style.width=(2+Math.random()*2)+'px';e.style.height=e.style.width;
+    container.appendChild(e);
+  }
+})();
+
+// PIN digit inputs
+const digits=document.querySelectorAll('.gate-pin-digit');
+digits.forEach((d,i)=>{
+  d.addEventListener('input',()=>{
+    d.value=d.value.replace(/\D/g,'').slice(0,1);
+    if(d.value&&i<digits.length-1)digits[i+1].focus();
+    d.classList.toggle('filled',!!d.value);
+  });
+  d.addEventListener('keydown',e=>{
+    if(e.key==='Backspace'&&!d.value&&i>0){digits[i-1].focus();digits[i-1].value='';digits[i-1].classList.remove('filled');}
+    if(e.key==='Enter')document.getElementById('unlockBtn').click();
+  });
+  d.addEventListener('paste',e=>{
+    e.preventDefault();
+    const paste=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,4);
+    for(let j=0;j<paste.length&&j<digits.length;j++){digits[j].value=paste[j];digits[j].classList.add('filled');}
+    if(paste.length>=4)document.getElementById('unlockBtn').click();
+  });
+});
+if(digits[0])digits[0].focus();
+
+function getPin(){return Array.from(digits).map(d=>d.value).join('');}
+function shakeDigits(){digits.forEach(d=>{d.classList.add('error');setTimeout(()=>d.classList.remove('error'),500);});}
+function clearDigits(){digits.forEach(d=>{d.value='';d.classList.remove('filled','error');});digits[0]?.focus();}
+
+// Check lockout
+function checkLockout(){
+  const data=safeJSON(localStorage.getItem(LOCKOUT_KEY),null);
+  if(!data)return false;
+  const elapsed=(Date.now()-data.time)/60000;
+  if(elapsed>=LOCKOUT_MINUTES){localStorage.removeItem(LOCKOUT_KEY);failCount=0;return false;}
+  failCount=data.count||0;
+  if(failCount>=MAX_ATTEMPTS){
+    const remaining=Math.ceil(LOCKOUT_MINUTES-elapsed);
+    document.getElementById('pinError').textContent='Too many attempts. Try again in '+remaining+' min.';
+    document.getElementById('unlockBtn').disabled=true;
+    setTimeout(()=>{localStorage.removeItem(LOCKOUT_KEY);failCount=0;document.getElementById('pinError').textContent='';document.getElementById('unlockBtn').disabled=false;},remaining*60000);
+    return true;
+  }
+  return false;
+}
+
+// Check session (stay logged in for 8 hours)
+function checkSession(){
+  const ts=parseInt(localStorage.getItem(SESSION_KEY)||'0',10);
+  if(ts&&(Date.now()-ts)<8*60*60*1000)return true;
+  return false;
+}
+
+function unlockEditor(){
+  localStorage.setItem(SESSION_KEY,String(Date.now()));
+  localStorage.removeItem(LOCKOUT_KEY);
+  document.getElementById('adminGate').style.display='none';
+  document.getElementById('editorShell').classList.add('active');
+  setTimeout(()=>draw(),60);
+}
+
+// Auto-unlock if session is valid
+if(checkSession()){unlockEditor();}
+else{checkLockout();}
+
+document.getElementById('unlockBtn').addEventListener('click',async()=>{
+  if(checkLockout())return;
+  const pin=getPin();
+  if(pin.length!==4){document.getElementById('pinError').textContent='Enter all 4 digits.';shakeDigits();return;}
+  const hash=await hashPin(pin);
+  if(hash===PIN_HASH){
+    document.getElementById('pinError').textContent='';
+    failCount=0;
+    unlockEditor();
+  }else{
+    failCount++;
+    localStorage.setItem(LOCKOUT_KEY,JSON.stringify({count:failCount,time:Date.now()}));
+    if(failCount>=MAX_ATTEMPTS){
+      document.getElementById('pinError').textContent='Too many attempts. Locked for '+LOCKOUT_MINUTES+' minutes.';
+      document.getElementById('unlockBtn').disabled=true;
+    }else{
+      document.getElementById('pinError').textContent='Wrong PIN. '+(MAX_ATTEMPTS-failCount)+' attempts left.';
+    }
+    shakeDigits();clearDigits();
+  }
+});
 
 /* CANVAS STATE */
 const canvas=document.getElementById('hhMEcanvas'),ctx=canvas.getContext('2d',{alpha:false});
