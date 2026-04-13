@@ -71,6 +71,8 @@
     .tb-btn:hover{background:rgba(255,255,255,.1);}
     .tb-btn.undo{font-size:15px;padding:5px 9px;}
     .tb-btn.export-btn{background:linear-gradient(135deg,var(--fire),var(--fire2));border-color:transparent;font-weight:900;padding:7px 16px;}
+    .tb-btn.signout-btn{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.15);color:var(--text2);font-weight:800;padding:7px 14px;margin-left:4px;}
+    .tb-btn.signout-btn:hover{background:rgba(255,77,77,.12);border-color:rgba(255,77,77,.3);color:var(--danger);}
     .main-layout{flex:1;display:flex;min-height:0;overflow:hidden;}
     .canvas-panel{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--void);}
     .canvas-toolbar{display:flex;gap:6px;padding:6px 10px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--surface);}
@@ -128,7 +130,8 @@
     .mpc-title{font-size:14px;font-weight:800;}
     .mpc-btn{padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;}
     .mobile-bar{display:none;flex-shrink:0;padding:8px 12px;gap:6px;border-top:1px solid var(--border);background:var(--surface);align-items:center;justify-content:space-between;}
-    @media(max-width:900px){.mobile-bar{display:flex;}.tb-actions .tb-btn:not(.export-btn):not(.undo){display:none;}}
+    @media(max-width:900px){.mobile-bar{display:flex;}.tb-actions .tb-btn:not(.export-btn):not(.undo):not(.signout-btn){display:none;}}
+    .mob-signout{background:rgba(255,255,255,.06)!important;border-color:rgba(255,255,255,.15)!important;color:var(--text2)!important;}
     .mob-btn{padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;}
     .mob-btn.primary{background:linear-gradient(135deg,var(--fire),var(--fire2));border-color:transparent;color:#fff;}
     .export-modal{display:none;position:fixed;inset:0;z-index:100001;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;}
@@ -186,6 +189,7 @@
       <button class="tb-btn undo" id="undoBtn" title="Undo">↩</button>
       <button class="tb-btn undo" id="redoBtn" title="Redo">↪</button>
       <button class="tb-btn export-btn" id="exportBtn">Export ↓</button>
+      <button class="tb-btn signout-btn" id="signOutBtn">Sign Out ←</button>
     </div>
   </div>
   <div class="main-layout">
@@ -219,6 +223,7 @@
     <button class="mob-btn" id="mobUndoBtn">↩ Undo</button>
     <button class="mob-btn" id="mobSettingsBtn">⚙ Edit</button>
     <button class="mob-btn primary" id="mobExportBtn">Export ↓</button>
+    <button class="mob-btn mob-signout" id="mobSignOutBtn">Sign Out ←</button>
   </div>
 </div>
 <div class="export-modal" id="exportModal">
@@ -781,6 +786,14 @@ function exportJSON(){
 const exportModal=document.getElementById('exportModal');
 document.getElementById('exportBtn').addEventListener('click',()=>exportModal.classList.add('active'));
 document.getElementById('mobExportBtn').addEventListener('click',()=>exportModal.classList.add('active'));
+
+// Sign out — clear session and go to main site
+function signOut(){
+  localStorage.removeItem(SESSION_KEY);
+  window.location.href='/';
+}
+document.getElementById('signOutBtn').addEventListener('click',signOut);
+document.getElementById('mobSignOutBtn').addEventListener('click',signOut);
 document.getElementById('closeExport').addEventListener('click',()=>exportModal.classList.remove('active'));
 exportModal.addEventListener('click',e=>{if(e.target===exportModal)exportModal.classList.remove('active');});
 document.getElementById('dlJpg').addEventListener('click',()=>{exportCropped('image/jpeg','jpg',.92);exportModal.classList.remove('active');});
@@ -1062,7 +1075,7 @@ loadStarterBoxes();rebuildSidePanel();
 (async()=>{
   const s=loadStore();if(s.items.length>0){const a=s.items.find(p=>p.id===s.activeId)||s.items[0];s.activeId=a.id;saveStore(s);if(a.data)await applyPayload(a.data);}else draw();
   // Load template from site's own images folder
-  const DI="/Images/FBMenu.png";
+  const DI="/Images/FBMenu/DailyMenuUpdate.png";
   if(!imgDataURL&&DI){
     img=new Image();
     img.onload=()=>{imgLoaded=true;draw();};
@@ -1071,7 +1084,7 @@ loadStarterBoxes();rebuildSidePanel();
       img=new Image();
       img.onload=()=>{imgLoaded=true;draw();};
       img.onerror=()=>{imgLoaded=false;draw();};
-      img.src="/images/FBMenu.png";
+      img.src="/images/FBMenu/DailyMenuUpdate.png";
     };
     img.src=DI;
   }
