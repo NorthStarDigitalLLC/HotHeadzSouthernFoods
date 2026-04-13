@@ -111,32 +111,49 @@ const MENU_DATA = {
 };
 
 // Fetch ONLY lunch dates from cloud, merge into MENU_DATA.menus
-(async function loadCloudLunch() {
-  try {
-    console.log('[Hot Headz] Fetching lunch dates from cloud...');
-    const response = await fetch(CLOUD_MENU_URL + '?action=menu', { redirect: 'follow' });
-    const text = await response.text();
-    const result = JSON.parse(text);
-
-    if (result.success && result.menuData && result.menuData.menus) {
-      const cloudMenus = result.menuData.menus;
-      const dateCount = Object.keys(cloudMenus).length;
-
-      // Merge cloud lunch dates into MENU_DATA
+// Uses JSONP (script tag) because Google Apps Script redirects cause CORS issues with fetch
+(function loadCloudLunch() {
+  var callbackName = '_hhMenuCallback_' + Date.now();
+  
+  window[callbackName] = function(result) {
+    delete window[callbackName];
+    var scriptEl = document.getElementById(callbackName);
+    if (scriptEl) scriptEl.remove();
+    
+    if (result && result.success && result.menuData && result.menuData.menus) {
+      var cloudMenus = result.menuData.menus;
+      var dateCount = Object.keys(cloudMenus).length;
+      
       Object.keys(cloudMenus).forEach(function(date) {
         MENU_DATA.menus[date] = cloudMenus[date];
       });
-
+      
       console.log('[Hot Headz] Loaded ' + dateCount + ' lunch dates from cloud');
-
-      // Tell menu.html to re-render
       window.dispatchEvent(new CustomEvent('menuDataReady', { detail: MENU_DATA }));
     } else {
-      console.log('[Hot Headz] No lunch dates in cloud yet');
+      console.log('[Hot Headz] No lunch dates in cloud response');
     }
-  } catch (err) {
-    console.warn('[Hot Headz] Cloud lunch fetch failed:', err.message);
-  }
+  };
+  
+  var script = document.createElement('script');
+  script.id = callbackName;
+  script.src = CLOUD_MENU_URL + '?action=menu&callback=' + callbackName;
+  script.onerror = function() {
+    console.warn('[Hot Headz] Cloud lunch script failed to load');
+    delete window[callbackName];
+    script.remove();
+  };
+  document.head.appendChild(script);
+  
+  // Timeout after 15 seconds
+  setTimeout(function() {
+    if (window[callbackName]) {
+      console.warn('[Hot Headz] Cloud lunch timed out');
+      delete window[callbackName];
+      var el = document.getElementById(callbackName);
+      if (el) el.remove();
+    }
+  }, 15000);
 })();
 
 if (typeof module !== "undefined" && module.exports) {
