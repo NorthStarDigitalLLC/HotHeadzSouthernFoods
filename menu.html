@@ -938,20 +938,100 @@
     if(hash==="advanced"||hash==="forecast"){$("tabAdvanced")?.click();return;}
   }
 
+ /* ═══════════════════════════════════════════════════════════
+   MENU.HTML PATCH — Cloud Menu Data Support
+   ═══════════════════════════════════════════════════════════
+   
+   HOW TO APPLY:
+   
+   In your menu.html, find the LAST section of the <script> that looks like:
+   
+     setupDayTabs();
+     const now=new Date();const todayISO=toISO(now);const todayName=wkDay(now);
+     ...
+     initPanel("today",dTI,dTN);initPanel("tomorrow",dToI,dToN);
+     buildAdvanced(dTI);updateStatus(dTN,dTI);
+     setInterval(()=>updateStatus(dTN,dTI),1000);
+     setTimeout(handleHash,150);
+     window.addEventListener("hashchange",handleHash);
+   })();
+   
+   REPLACE that entire block (from setupDayTabs() to the end) with this:
+   ═══════════════════════════════════════════════════════════ */
+
+  // ─── Reusable init function ───
+  function initMenuPage() {
+    // Re-read MENU_DATA (may have been updated by cloud fetch)
+    const freshData = (typeof MENU_DATA !== "undefined") ? MENU_DATA : null;
+    if (!freshData) return;
+    
+    // Update the data reference used by all functions
+    Object.assign(data, freshData);
+    
+    // Re-normalize menus
+    const rawMenus = data.menus || {};
+    const newMenus = {};
+    Object.keys(rawMenus).forEach(k => { const nk = normKey(k); if (nk) newMenus[nk] = rawMenus[k]; });
+    data.menus = newMenus;
+    
+    const now = new Date();
+    const todayISO = toISO(now);
+    const todayName = wkDay(now);
+    const tom = new Date(now); tom.setDate(now.getDate() + 1);
+    const tomorrowISO = toISO(tom);
+    const tomorrowName = wkDay(tom);
+    
+    let dTI = todayISO, dTN = todayName, dToI = tomorrowISO, dToN = tomorrowName;
+    const ct = getClosure(todayName);
+    if (pastClose(todayName) && !ct?.closed) {
+      dTI = tomorrowISO; dTN = tomorrowName;
+      const da = new Date(now); da.setDate(now.getDate() + 2);
+      dToI = toISO(da); dToN = wkDay(da);
+    }
+    
+    $("tabToday").textContent = dTN;
+    $("tabTomorrow").textContent = dToN;
+    
+    panelConfigs = [];
+    initPanel("today", dTI, dTN);
+    initPanel("tomorrow", dToI, dToN);
+    
+    // Clear and rebuild advanced
+    const advTabs = $("advDayTabs");
+    const advCards = $("advCards");
+    if (advTabs) advTabs.innerHTML = '';
+    if (advCards) advCards.innerHTML = '';
+    buildAdvanced(dTI);
+    
+    updateStatus(dTN, dTI);
+    
+    // Store for interval
+    window._hhDTN = dTN;
+    window._hhDTI = dTI;
+  }
+
   setupDayTabs();
-  const now=new Date();const todayISO=toISO(now);const todayName=wkDay(now);
-  const tom=new Date(now);tom.setDate(now.getDate()+1);
-  const tomorrowISO=toISO(tom);const tomorrowName=wkDay(tom);
-  let dTI=todayISO,dTN=todayName,dToI=tomorrowISO,dToN=tomorrowName;
-  const ct=getClosure(todayName);
-  if(pastClose(todayName)&&!ct?.closed){dTI=tomorrowISO;dTN=tomorrowName;const da=new Date(now);da.setDate(now.getDate()+2);dToI=toISO(da);dToN=wkDay(da);}
-  $("tabToday").textContent=dTN;$("tabTomorrow").textContent=dToN;
-  panelConfigs=[];
-  initPanel("today",dTI,dTN);initPanel("tomorrow",dToI,dToN);
-  buildAdvanced(dTI);updateStatus(dTN,dTI);
-  setInterval(()=>updateStatus(dTN,dTI),1000);
-  setTimeout(handleHash,150);
-  window.addEventListener("hashchange",handleHash);
+  initMenuPage();
+  
+  // Update status every second
+  setInterval(() => {
+    if (window._hhDTN && window._hhDTI) updateStatus(window._hhDTN, window._hhDTI);
+  }, 1000);
+  
+  setTimeout(handleHash, 150);
+  window.addEventListener("hashchange", handleHash);
+
+  // ─── CLOUD RE-RENDER ───
+  // When menu-data.js finishes loading from cloud, re-init everything
+  window.addEventListener('menuDataReady', function(e) {
+    console.log('[Hot Headz] Cloud data received, refreshing menu...');
+    if (e.detail) {
+      // Update global MENU_DATA
+      Object.keys(e.detail).forEach(function(k) { MENU_DATA[k] = e.detail[k]; });
+    }
+    initMenuPage();
+  });
+
 })();
 </script>
 </body>
