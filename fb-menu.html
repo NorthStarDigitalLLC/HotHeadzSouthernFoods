@@ -262,7 +262,7 @@ async function loadImg(d){return new Promise(r=>{img=new Image();img.onload=()=>
 
 /* DEFAULT BOXES — positions matched to template */
 function defaultBox(name,text,xPct,yPct,ov={}){
-  return{id:uid(),name,text,xPct:xPct??50,yPct:yPct??50,sizePct:2.0,fontFamily:FONTS[0].value,color:'#ffffff',opacity:1,align:'left',bold:true,italic:false,shadow:true,shadowBlur:10,shadowColor:'rgba(0,0,0,0.7)',bgOn:false,bgColor:'#000000',bgOpacity:.30,bgPadX:14,bgPadY:10,bgRadius:14,lineHeight:1.20,rotationDeg:0,...ov};
+  return{id:uid(),name,text,xPct:xPct??50,yPct:yPct??50,sizePct:2.0,maxWidthPct:0,fontFamily:FONTS[0].value,color:'#ffffff',opacity:1,align:'left',bold:true,italic:false,shadow:true,shadowBlur:10,shadowColor:'rgba(0,0,0,0.7)',bgOn:false,bgColor:'#000000',bgOpacity:.30,bgPadX:14,bgPadY:10,bgRadius:14,lineHeight:1.20,rotationDeg:0,isCustom:false,...ov};
 }
 function loadStarterBoxes(){
   const t=todayDefaults();
@@ -293,7 +293,31 @@ function drawPhoto(){
   ctx.save();ctx.translate(w/2+photoOffsetX,h/2+photoOffsetY);ctx.rotate(photoRot*Math.PI/180);
   ctx.drawImage(img,-bw*fit/2,-bh*fit/2,bw*fit,bh*fit);ctx.restore();
 }
-function measureBox(b){const size=fontPx(b.sizePct),lines=String(b.text??'').split('\n'),lineH=size*(b.lineHeight||1.15);ctx.save();ctx.font=`${b.italic?'italic ':''}${b.bold?'900 ':'700 '}${Math.round(size)}px ${b.fontFamily}`;let maxW=0;for(const l of lines)maxW=Math.max(maxW,ctx.measureText(l).width);ctx.restore();return{lines,size,lineH,maxW,totalH:lines.length*lineH};}
+function measureBox(b){
+  const size=fontPx(b.sizePct);
+  const rawLines=String(b.text??'').split('\n');
+  const lineH=size*(b.lineHeight||1.15);
+  const maxW_limit=b.maxWidthPct>0?pxX(b.maxWidthPct):0;
+  ctx.save();
+  ctx.font=`${b.italic?'italic ':''}${b.bold?'900 ':'700 '}${Math.round(size)}px ${b.fontFamily}`;
+  let lines=[];
+  if(maxW_limit>0){
+    for(const raw of rawLines){
+      const words=raw.split(' ');
+      let cur='';
+      for(const w of words){
+        const test=cur?cur+' '+w:w;
+        if(ctx.measureText(test).width>maxW_limit&&cur){lines.push(cur);cur=w;}
+        else cur=test;
+      }
+      if(cur)lines.push(cur); else lines.push('');
+    }
+  }else{lines=rawLines;}
+  let maxW=0;for(const l of lines)maxW=Math.max(maxW,ctx.measureText(l).width);
+  if(maxW_limit>0)maxW=Math.min(maxW,maxW_limit);
+  ctx.restore();
+  return{lines,size,lineH,maxW,totalH:lines.length*lineH};
+}
 function rotAABB(cx,cy,rw,rh,deg){const rad=(deg||0)*Math.PI/180,hw=rw/2,hh=rh/2;const cs=[{x:-hw,y:-hh},{x:hw,y:-hh},{x:hw,y:hh},{x:-hw,y:hh}];let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;for(const p of cs){const rx=p.x*Math.cos(rad)-p.y*Math.sin(rad)+cx,ry=p.x*Math.sin(rad)+p.y*Math.cos(rad)+cy;minX=Math.min(minX,rx);minY=Math.min(minY,ry);maxX=Math.max(maxX,rx);maxY=Math.max(maxY,ry);}return{left:minX,top:minY,right:maxX,bottom:maxY};}
 function drawTextBox(b){
   const x=pxX(b.xPct),y=pxY(b.yPct),m=measureBox(b),lx=-m.maxW/2,ly=-m.totalH/2,px=b.bgPadX??14,py=b.bgPadY??10;
@@ -307,9 +331,46 @@ function drawTextBox(b){
   if(al==='center'){ctx.textAlign='center';dx=0;}else if(al==='right'){ctx.textAlign='right';dx=lx+m.maxW;}else{ctx.textAlign='left';dx=lx;}
   for(let i=0;i<m.lines.length;i++)ctx.fillText(m.lines[i],dx,ly+(i+.5)*m.lineH);
   ctx.restore();
-  b.__hit=rotAABB(x,y,m.maxW+(b.bgOn?px*2:0),m.totalH+(b.bgOn?py*2:0),b.rotationDeg||0);
+  const rw=m.maxW+(b.bgOn?px*2:0),rh=m.totalH+(b.bgOn?py*2:0);
+  b.__hit=rotAABB(x,y,rw,rh,b.rotationDeg||0);
+  b.__rawW=rw;b.__rawH=rh;b.__cx=x;b.__cy=y;
 }
-function drawOutline(){if(!document.getElementById('outlineOn').checked)return;const b=boxes.find(x=>x.id===activeId);if(!b||!b.__hit)return;const h=b.__hit;ctx.save();ctx.strokeStyle='rgba(255,255,255,0.8)';ctx.lineWidth=2;ctx.setLineDash([6,5]);ctx.strokeRect(h.left,h.top,h.right-h.left,h.bottom-h.top);ctx.restore();}
+const HANDLE_SIZE=8;
+function getHandles(b){
+  if(!b||!b.__hit)return[];
+  const h=b.__hit,hw=HANDLE_SIZE;
+  const mx=(h.left+h.right)/2,my=(h.top+h.bottom)/2;
+  return[
+    {id:'tl',x:h.left,y:h.top,cursor:'nwse-resize'},
+    {id:'tr',x:h.right,y:h.top,cursor:'nesw-resize'},
+    {id:'bl',x:h.left,y:h.bottom,cursor:'nesw-resize'},
+    {id:'br',x:h.right,y:h.bottom,cursor:'nwse-resize'},
+    {id:'ml',x:h.left,y:my,cursor:'ew-resize'},
+    {id:'mr',x:h.right,y:my,cursor:'ew-resize'},
+    {id:'tm',x:mx,y:h.top,cursor:'ns-resize'},
+    {id:'bm',x:mx,y:h.bottom,cursor:'ns-resize'},
+  ];
+}
+function hitHandle(px,py,b){
+  const handles=getHandles(b);
+  const hs=HANDLE_SIZE*1.5;
+  for(const h of handles){if(Math.abs(px-h.x)<hs&&Math.abs(py-h.y)<hs)return h;}
+  return null;
+}
+function drawOutline(){
+  if(!document.getElementById('outlineOn').checked)return;
+  const b=boxes.find(x=>x.id===activeId);if(!b||!b.__hit)return;
+  const h=b.__hit;
+  ctx.save();ctx.strokeStyle='rgba(255,255,255,0.8)';ctx.lineWidth=2;ctx.setLineDash([6,5]);
+  ctx.strokeRect(h.left,h.top,h.right-h.left,h.bottom-h.top);ctx.setLineDash([]);
+  // Draw handles
+  const handles=getHandles(b);
+  for(const handle of handles){
+    ctx.fillStyle='rgba(255,122,24,0.9)';ctx.strokeStyle='#fff';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.arc(handle.x,handle.y,HANDLE_SIZE/2+1,0,Math.PI*2);ctx.fill();ctx.stroke();
+  }
+  ctx.restore();
+}
 function draw(){setCanvasSize();ctx.save();ctx.translate(viewX,viewY);ctx.scale(viewScale,viewScale);drawPhoto();if(document.getElementById('showText').checked){for(const b of boxes)drawTextBox(b);if(activeId)drawOutline();}ctx.restore();}
 function resetAll(){photoScale=1;document.getElementById('photoZoom').value='1';photoRot=0;photoOffsetX=0;photoOffsetY=0;viewX=0;viewY=0;viewScale=1;document.getElementById('viewZoom').value='1';draw();}
 function fitView(){viewX=0;viewY=0;viewScale=1;document.getElementById('viewZoom').value='1';draw();}
@@ -319,12 +380,18 @@ function worldFromClient(cx,cy){const r=rawFromClient(cx,cy);return{x:(r.x-viewX
 function hitTest(px,py){for(let i=boxes.length-1;i>=0;i--){const b=boxes[i],h=b.__hit;if(h&&px>=h.left&&px<=h.right&&py>=h.top&&py<=h.bottom)return b;}return null;}
 
 /* POINTER EVENTS */
+let resizeHandle=null;
 canvas.addEventListener('pointerdown',e=>{
   if(e.pointerType==='touch'){pointers.set(e.pointerId,{clientX:e.clientX,clientY:e.clientY});if(pointers.size===2){pinchActive=true;const p=computePinch();lastMid=p?.mid;lastDist=p?.dist;dragging=false;canvas.setPointerCapture(e.pointerId);return;}}
   if(!isCoarse()&&e.button===2){const p=rawFromClient(e.clientX,e.clientY);dragging=true;dragMode='view';lastX=p.x;lastY=p.y;canvas.setPointerCapture(e.pointerId);return;}
   const p=worldFromClient(e.clientX,e.clientY);lastX=p.x;lastY=p.y;
-  if(document.getElementById('showText').checked){const hit=hitTest(p.x,p.y);if(hit){saveUndo();activeId=hit.id;dragging=true;dragMode='text';rebuildSidePanel();canvas.setPointerCapture(e.pointerId);draw();return;}}
-  activeId=null;rebuildSidePanel();dragging=true;dragMode='image';canvas.setPointerCapture(e.pointerId);draw();
+  // Check resize handles first
+  if(activeId&&document.getElementById('showText').checked){
+    const ab=boxes.find(x=>x.id===activeId);
+    if(ab){const rh=hitHandle(p.x,p.y,ab);if(rh){saveUndo();resizeHandle=rh;dragging=true;dragMode='resize';canvas.setPointerCapture(e.pointerId);return;}}
+  }
+  if(document.getElementById('showText').checked){const hit=hitTest(p.x,p.y);if(hit){saveUndo();activeId=hit.id;dragging=true;dragMode='text';resizeHandle=null;rebuildSidePanel();canvas.setPointerCapture(e.pointerId);draw();return;}}
+  activeId=null;resizeHandle=null;rebuildSidePanel();dragging=true;dragMode='image';canvas.setPointerCapture(e.pointerId);draw();
 });
 function computePinch(){if(pointers.size!==2)return null;const pts=Array.from(pointers.values());const a=rawFromClient(pts[0].clientX,pts[0].clientY),b=rawFromClient(pts[1].clientX,pts[1].clientY);return{mid:{x:(a.x+b.x)/2,y:(a.y+b.y)/2},dist:Math.hypot(a.x-b.x,a.y-b.y)};}
 canvas.addEventListener('pointermove',e=>{
@@ -334,9 +401,32 @@ canvas.addEventListener('pointermove',e=>{
   if(dragMode==='view'){const p=rawFromClient(e.clientX,e.clientY);viewX+=p.x-lastX;viewY+=p.y-lastY;lastX=p.x;lastY=p.y;draw();return;}
   const p=worldFromClient(e.clientX,e.clientY),dx=p.x-lastX,dy=p.y-lastY;lastX=p.x;lastY=p.y;
   if(dragMode==='image'){photoOffsetX+=dx;photoOffsetY+=dy;draw();return;}
+  if(dragMode==='resize'){
+    const b=boxes.find(x=>x.id===activeId);if(!b||!resizeHandle)return;
+    const hid=resizeHandle.id;
+    // Corner handles: scale font size
+    if(hid==='tl'||hid==='tr'||hid==='bl'||hid==='br'){
+      const scaleDir=(hid==='br'||hid==='tr')?1:-1;
+      const delta=(dx*scaleDir+dy*(hid==='bl'||hid==='br'?1:-1))*0.002;
+      b.sizePct=clamp(b.sizePct+delta,0.3,10);
+    }
+    // Side handles: adjust maxWidth
+    if(hid==='ml'||hid==='mr'){
+      const dir=hid==='mr'?1:-1;
+      const curW=b.__rawW||100;
+      const newW=curW+dx*dir*2;
+      b.maxWidthPct=clamp(pctX(newW),2,95);
+    }
+    // Top/bottom handles: adjust line height
+    if(hid==='tm'||hid==='bm'){
+      const dir=hid==='bm'?1:-1;
+      b.lineHeight=clamp((b.lineHeight||1.15)+dy*dir*0.003,0.8,2.5);
+    }
+    draw();triggerAutoSave();return;
+  }
   if(dragMode==='text'){const b=boxes.find(x=>x.id===activeId);if(!b)return;b.xPct=maybeSnap(clamp(pctX(pxX(b.xPct)+dx),0,100));b.yPct=maybeSnap(clamp(pctY(pxY(b.yPct)+dy),0,100));draw();triggerAutoSave();}
 });
-function endPointer(e){dragging=false;if(e?.pointerType==='touch'){pointers.delete(e.pointerId);if(pointers.size<2){pinchActive=false;lastMid=null;lastDist=null;}}triggerAutoSave();}
+function endPointer(e){dragging=false;resizeHandle=null;if(e?.pointerType==='touch'){pointers.delete(e.pointerId);if(pointers.size<2){pinchActive=false;lastMid=null;lastDist=null;}}triggerAutoSave();}
 canvas.addEventListener('pointerup',endPointer);canvas.addEventListener('pointercancel',endPointer);
 canvas.addEventListener('wheel',e=>{e.preventDefault();const d=Math.sign(e.deltaY)*-0.08;if(e.altKey){photoScale=clamp(photoScale+d,.3,4);document.getElementById('photoZoom').value=String(photoScale);draw();return;}viewScale=clamp(viewScale+d,.5,3);document.getElementById('viewZoom').value=String(viewScale);draw();},{passive:false});
 
@@ -391,6 +481,16 @@ function buildQF(){
   h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Type your menu. Canvas updates live.</p>';
   h+='<div class="btn-row"><button class="sm-btn primary" id="qfToday">\ud83d\udcc5 Today\'s Date</button><button class="sm-btn" id="qfYesterday">Copy Previous</button><button class="sm-btn danger" id="qfReset">Reset</button></div>';
   for(const s of sects){const box=boxes.find(b=>b.name===s.name);const val=box?box.text:'';h+='<div class="qf-card"><div class="qf-title">'+s.label+'</div>';if(s.ta)h+='<textarea class="fi fi-ta qf-input" data-name="'+esc(s.name)+'" rows="'+(s.rows||5)+'">'+esc(val)+'</textarea>';else h+='<input class="fi qf-input" data-name="'+esc(s.name)+'" value="'+esc(val)+'">';h+='</div>';}
+  // Custom fields
+  const customBoxes=boxes.filter(b=>b.isCustom);
+  if(customBoxes.length){
+    h+='<div style="margin-top:4px;margin-bottom:8px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Custom Fields</div>';
+    for(const cb of customBoxes){
+      h+='<div class="qf-card"><div class="qf-title" style="justify-content:space-between">'+esc(cb.name)+'<button class="sm-btn danger qf-del-custom" data-id="'+esc(cb.id)+'" style="padding:3px 8px;font-size:10px;">\u00d7</button></div>';
+      h+='<textarea class="fi fi-ta qf-input" data-name="'+esc(cb.name)+'" rows="3">'+esc(cb.text)+'</textarea></div>';
+    }
+  }
+  h+='<div style="margin-top:8px"><button class="sm-btn primary" id="qfAddCustom">+ Add Custom Field</button></div>';
   h+='</div></div>';return h;
 }
 
@@ -408,6 +508,7 @@ function buildTB(){
     h+='<div class="fl">Text</div><textarea class="fi fi-ta" id="bText" rows="5">'+esc(b.text)+'</textarea>';
     h+='<div class="fr"><div><div class="fl">X</div><input class="fi" type="range" id="bX" min="0" max="100" step="0.1" value="'+b.xPct+'" style="accent-color:var(--fire)"></div><div><div class="fl">Y</div><input class="fi" type="range" id="bY" min="0" max="100" step="0.1" value="'+b.yPct+'" style="accent-color:var(--fire)"></div></div>';
     h+='<div class="fr"><div><div class="fl">Size</div><input class="fi" type="range" id="bSize" min="0.3" max="10" step="0.05" value="'+b.sizePct+'" style="accent-color:var(--fire)"></div><div><div class="fl">Size #</div><input class="fi" type="number" id="bSizeN" min="0.3" max="10" step="0.05" value="'+b.sizePct+'"></div></div>';
+    h+='<div class="fr"><div><div class="fl">Max Width %</div><input class="fi" type="range" id="bMaxW" min="0" max="95" step="0.5" value="'+(b.maxWidthPct||0)+'" style="accent-color:var(--fire)"></div><div><div class="fl">Width #</div><input class="fi" type="number" id="bMaxWN" min="0" max="95" step="0.5" value="'+(b.maxWidthPct||0)+'"><div style="font-size:9px;color:var(--text3)">0 = auto width</div></div></div>';
     h+='<div class="fr"><div><div class="fl">Font</div><select class="fs" id="bFont">'+fO+'</select></div><div><div class="fl">Align</div><select class="fs" id="bAlign"><option value="left"'+(b.align==='left'?' selected':'')+'>Left</option><option value="center"'+(b.align==='center'?' selected':'')+'>Center</option><option value="right"'+(b.align==='right'?' selected':'')+'>Right</option></select></div></div>';
     h+='<div class="fl">Text Color</div><div class="swatch-row">';
     BRAND_COLORS.forEach(c=>h+='<div class="swatch bCSw'+(toHex(b.color)===c?' active':'')+'" data-color="'+c+'" style="background:'+c+'"></div>');
@@ -435,6 +536,8 @@ function wirePanel(){
   const qfT=document.getElementById('qfToday');if(qfT)qfT.addEventListener('click',()=>{const t=todayDefaults();const d=boxes.find(b=>b.name==='Day'),dt=boxes.find(b=>b.name==='Date');if(d){saveUndo();d.text=t.weekday;}if(dt)dt.text=t.dateStr;draw();rebuildSidePanel();triggerAutoSave();toast("Today's date filled!",'success');});
   const qfY=document.getElementById('qfYesterday');if(qfY)qfY.addEventListener('click',()=>{const s=loadStore();const prev=s.items.find(p=>p.id!==s.activeId);if(!prev||!prev.data?.boxes){toast('No previous project found','error');return;}saveUndo();for(const pb of prev.data.boxes){const cur=boxes.find(b=>b.name===pb.name);if(cur&&pb.name!=='Day'&&pb.name!=='Date')cur.text=pb.text;}const t=todayDefaults();const d=boxes.find(b=>b.name==='Day'),dt=boxes.find(b=>b.name==='Date');if(d)d.text=t.weekday;if(dt)dt.text=t.dateStr;draw();rebuildSidePanel();triggerAutoSave();toast("Copied previous items!",'success');});
   const qfR=document.getElementById('qfReset');if(qfR)qfR.addEventListener('click',()=>{if(!confirm('Reset all?'))return;saveUndo();loadStarterBoxes();draw();rebuildSidePanel();triggerAutoSave();toast('Reset','info');});
+  const qfAC=document.getElementById('qfAddCustom');if(qfAC)qfAC.addEventListener('click',()=>{const name=prompt('Custom field name:','Special');if(!name)return;saveUndo();const b=defaultBox(name.trim(),name.trim()+'\n\n\u2022 Item 1\n\u2022 Item 2',50,50,{isCustom:true,sizePct:1.4,shadowBlur:8,lineHeight:1.22});boxes.push(b);activeId=b.id;draw();rebuildSidePanel();triggerAutoSave();toast('Custom field "'+name.trim()+'" added! Drag it on canvas to position.','success');});
+  document.querySelectorAll('.qf-del-custom').forEach(btn=>{btn.addEventListener('click',()=>{const id=btn.dataset.id;const box=boxes.find(b=>b.id===id);if(!box||!confirm('Delete custom field "'+box.name+'"?'))return;saveUndo();boxes=boxes.filter(b=>b.id!==id);if(activeId===id)activeId=null;draw();rebuildSidePanel();triggerAutoSave();toast('Removed','info');});});
   const bS=document.getElementById('boxSelect');if(bS)bS.addEventListener('change',()=>{activeId=bS.value||null;rebuildSidePanel();draw();});
   const aB=document.getElementById('addBoxBtn');if(aB)aB.addEventListener('click',()=>{saveUndo();const b=defaultBox('New Box','New text',50,50);boxes.push(b);activeId=b.id;rebuildSidePanel();draw();triggerAutoSave();});
   const dB=document.getElementById('dupBoxBtn');if(dB)dB.addEventListener('click',()=>{const cur=boxes.find(x=>x.id===activeId);if(!cur)return;saveUndo();const c=JSON.parse(JSON.stringify(cur));c.id=uid();c.name+=' (copy)';c.xPct=clamp(cur.xPct+2,0,100);c.yPct=clamp(cur.yPct+2,0,100);boxes.push(c);activeId=c.id;rebuildSidePanel();draw();triggerAutoSave();});
@@ -445,6 +548,8 @@ function wirePanel(){
     w('bX',e=>{b.xPct=parseFloat(e.target.value);draw();triggerAutoSave();});w('bY',e=>{b.yPct=parseFloat(e.target.value);draw();triggerAutoSave();});
     w('bSize',e=>{b.sizePct=parseFloat(e.target.value);const n=document.getElementById('bSizeN');if(n)n.value=b.sizePct;draw();triggerAutoSave();});
     w('bSizeN',e=>{b.sizePct=clamp(parseFloat(e.target.value||'1'),.3,10);const s=document.getElementById('bSize');if(s)s.value=b.sizePct;draw();triggerAutoSave();});
+    w('bMaxW',e=>{b.maxWidthPct=parseFloat(e.target.value);const n=document.getElementById('bMaxWN');if(n)n.value=b.maxWidthPct;draw();triggerAutoSave();});
+    w('bMaxWN',e=>{b.maxWidthPct=clamp(parseFloat(e.target.value||'0'),0,95);const s=document.getElementById('bMaxW');if(s)s.value=b.maxWidthPct;draw();triggerAutoSave();});
     w('bFont',e=>{b.fontFamily=e.target.value;draw();triggerAutoSave();},'change');w('bAlign',e=>{b.align=e.target.value;draw();triggerAutoSave();},'change');
     w('bColor',e=>{b.color=e.target.value;draw();triggerAutoSave();});w('bOp',e=>{b.opacity=parseFloat(e.target.value);draw();triggerAutoSave();});
     w('bRot',e=>{b.rotationDeg=parseFloat(e.target.value||'0');draw();triggerAutoSave();});w('bLH',e=>{b.lineHeight=parseFloat(e.target.value);draw();triggerAutoSave();});
