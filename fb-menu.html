@@ -266,21 +266,43 @@ function setCloudName(n){localStorage.setItem(CLOUD_NAME_KEY,n);}
 
 async function cloudRequest(action,body={}){
   const url=getCloudUrl();
-  if(!url){toast('Set your Google Sheets URL in Projects > Cloud Settings','error');return null;}
+  if(!url){toast('Cloud not configured','error');return null;}
   try{
-    if(action==='list'){
-      const r=await fetch(url+'?action=list');
-      return await r.json();
-    }
-    if(action==='load'){
-      const r=await fetch(url+'?action=load&id='+encodeURIComponent(body.id));
-      return await r.json();
+    if(action==='list'||action==='load'){
+      // GET requests — use fetch with redirect follow
+      let qurl=url+'?action='+action;
+      if(action==='load'&&body.id)qurl+='&id='+encodeURIComponent(body.id);
+      const r=await fetch(qurl,{redirect:'follow'});
+      const text=await r.text();
+      try{return JSON.parse(text);}catch{toast('Cloud returned invalid data','error');return null;}
     }
     if(action==='save'||action==='delete'){
-      const r=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action,...body})});
-      return await r.json();
+      // POST — Apps Script redirects 302, so we need to handle that
+      const r=await fetch(url,{
+        method:'POST',
+        redirect:'follow',
+        headers:{'Content-Type':'text/plain'},
+        body:JSON.stringify({action,...body})
+      });
+      const text=await r.text();
+      try{return JSON.parse(text);}catch{toast('Cloud returned invalid data','error');return null;}
     }
-  }catch(e){toast('Cloud error: '+e.message,'error');return null;}
+  }catch(e){
+    // If CORS blocks fetch, try JSONP fallback for GET
+    if(action==='list'||action==='load'){
+      return new Promise((resolve)=>{
+        const cbName='_hhCloud'+Date.now();
+        let qurl=url+'?action='+action+'&callback='+cbName;
+        if(action==='load'&&body.id)qurl+='&id='+encodeURIComponent(body.id);
+        window[cbName]=function(data){resolve(data);delete window[cbName];document.getElementById(cbName)?.remove();};
+        const sc=document.createElement('script');sc.id=cbName;sc.src=qurl;
+        sc.onerror=()=>{resolve(null);delete window[cbName];sc.remove();toast('Cloud connection failed','error');};
+        document.head.appendChild(sc);
+        setTimeout(()=>{if(window[cbName]){resolve(null);delete window[cbName];sc.remove();toast('Cloud timed out','error');}},15000);
+      });
+    }
+    toast('Cloud error: '+e.message,'error');return null;
+  }
 }
 
 async function cloudSave(name){
@@ -875,27 +897,32 @@ function wirePanel(){
   const csBtn=document.getElementById('cloudSaveNew');
   if(csBtn)csBtn.addEventListener('click',()=>cloudSave());
   const crBtn=document.getElementById('cloudRefresh');
-  if(crBtn)crBtn.addEventListener('click',async()=>{
-    const el=document.getElementById('cloudProjectsList');
-    if(el)el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:6px;">Loading...</div>';
-    const projects=await cloudList();
-    if(!el)return;
-    if(!projects.length){el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:6px;">No cloud projects yet. Save one!</div>';return;}
-    let ph='';
-    projects.forEach(p=>{
-      const d=p.updatedAt?new Date(p.updatedAt).toLocaleString():'';
-      ph+='<div style="display:flex;align-items:center;gap:4px;padding:7px;border-radius:var(--radius-sm);margin-bottom:3px;background:rgba(255,255,255,.03);border:1px solid var(--border);">';
-      ph+='<div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(p.name)+'</div>';
-      ph+='<div style="font-size:9px;color:var(--text3)">'+d+(p.savedBy?' \u2022 by '+esc(p.savedBy):'')+'</div></div>';
-      ph+='<button class="sm-btn cLoad" data-id="'+esc(p.id)+'">Load</button>';
-      ph+='<button class="sm-btn cUpdate" data-id="'+esc(p.id)+'" data-name="'+esc(p.name)+'">\u2601\ufe0f Update</button>';
-      ph+='<button class="sm-btn danger cDel" data-id="'+esc(p.id)+'" data-name="'+esc(p.name)+'">\u00d7</button></div>';
-    });
-    el.innerHTML=ph;
-    el.querySelectorAll('.cLoad').forEach(btn=>{btn.addEventListener('click',()=>cloudLoad(btn.dataset.id));});
-    el.querySelectorAll('.cUpdate').forEach(btn=>{btn.addEventListener('click',()=>cloudUpdate(btn.dataset.id,btn.dataset.name));});
-    el.querySelectorAll('.cDel').forEach(btn=>{btn.addEventListener('click',()=>{cloudDelete(btn.dataset.id,btn.dataset.name).then(()=>{crBtn.click();});});});
+  if(crBtn)crBtn.addEventListener('click',()=>refreshCloudList());
+  // Auto-load cloud projects when panel opens and user has a name set
+  if(getCloudName()&&document.getElementById('cloudProjectsList'))refreshCloudList();
+}
+
+async function refreshCloudList(){
+  const el=document.getElementById('cloudProjectsList');
+  if(!el)return;
+  el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:6px;">Loading from cloud...</div>';
+  const projects=await cloudList();
+  if(!document.getElementById('cloudProjectsList'))return; // panel was switched
+  if(!projects||!projects.length){el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:6px;">No cloud projects yet. Save one!</div>';return;}
+  let ph='';
+  projects.forEach(p=>{
+    const d=p.updatedAt?new Date(p.updatedAt).toLocaleString():'';
+    ph+='<div style="display:flex;align-items:center;gap:4px;padding:7px;border-radius:var(--radius-sm);margin-bottom:3px;background:rgba(255,255,255,.03);border:1px solid var(--border);">';
+    ph+='<div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(p.name)+'</div>';
+    ph+='<div style="font-size:9px;color:var(--text3)">'+d+(p.savedBy?' \u2022 by '+esc(p.savedBy):'')+'</div></div>';
+    ph+='<button class="sm-btn cLoad" data-id="'+esc(p.id)+'">Load</button>';
+    ph+='<button class="sm-btn cUpdate" data-id="'+esc(p.id)+'" data-name="'+esc(p.name)+'">\u2601\ufe0f Update</button>';
+    ph+='<button class="sm-btn danger cDel" data-id="'+esc(p.id)+'" data-name="'+esc(p.name)+'">\u00d7</button></div>';
   });
+  el.innerHTML=ph;
+  el.querySelectorAll('.cLoad').forEach(btn=>{btn.addEventListener('click',()=>cloudLoad(btn.dataset.id));});
+  el.querySelectorAll('.cUpdate').forEach(btn=>{btn.addEventListener('click',()=>cloudUpdate(btn.dataset.id,btn.dataset.name));});
+  el.querySelectorAll('.cDel').forEach(btn=>{btn.addEventListener('click',()=>{cloudDelete(btn.dataset.id,btn.dataset.name).then(()=>refreshCloudList());});});
 }
 
 /* INIT */
