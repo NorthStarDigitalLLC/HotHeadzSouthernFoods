@@ -71,10 +71,69 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:10000;
 </div>
 <a class="back-btn" href="index.html"><span class="arrow">&#8592;</span> Back to Home</a>
 <div class="flash-overlay" id="flashModal"><div class="flash-card"><div class="flash-countdown" id="flashCount">5</div><div class="flash-title" id="flashTitle">Closed</div><div class="flash-text" id="flashText"></div><div class="flash-sub">Closing automatically</div></div></div>
-<script src="menu-data.js"></script>
 <script>
 (function(){
 "use strict";
+
+// ═══ CLOUD URL — fetches lunch data directly from Apps Script ═══
+var CLOUD_URL = 'https://script.google.com/macros/s/AKfycbz7Zw5EAbw2TbXlhUxhZErQQjel7FcngRp_bCV-qT61PehYXnZ5jkUL_c4GFxcBv02LaA/exec';
+
+// ═══ STATIC DEFAULTS (no more menu-data.js) ═══
+var MENU_DATA = {
+  settings: {
+    showAdvancedTab: true,
+    advancedDisclaimer: "Lunch posted 1\u20132 days early is subject to change.",
+    advancedWindowDays: 7,
+    noDescriptionText: "No description for this item."
+  },
+  hours: {
+    note: "",
+    weekly: [
+      { day: "Monday",    open: "5:30 AM", close: "2:00 PM", breakfast: "5:30 AM \u2013 10:30 AM", lunch: "11:00 AM \u2013 2:00 PM" },
+      { day: "Tuesday",   open: "5:30 AM", close: "2:00 PM", breakfast: "5:30 AM \u2013 10:30 AM", lunch: "11:00 AM \u2013 2:00 PM" },
+      { day: "Wednesday", open: "5:30 AM", close: "2:00 PM", breakfast: "5:30 AM \u2013 10:30 AM", lunch: "11:00 AM \u2013 2:00 PM" },
+      { day: "Thursday",  open: "5:30 AM", close: "2:00 PM", breakfast: "5:30 AM \u2013 10:30 AM", lunch: "11:00 AM \u2013 2:00 PM" },
+      { day: "Friday",    open: "5:30 AM", close: "2:00 PM", breakfast: "5:30 AM \u2013 10:30 AM", lunch: "11:00 AM \u2013 2:00 PM" },
+      { day: "Saturday",  open: "6:00 AM", close: "2:00 PM", breakfast: "6:00 AM \u2013 10:30 AM", lunch: "11:00 AM \u2013 2:00 PM" },
+      { day: "Sunday",    open: "7:00 AM", close: "3:00 PM", breakfast: "7:00 AM \u2013 10:30 AM", lunch: "11:00 AM \u2013 3:00 PM" }
+    ]
+  },
+  closures: {},
+  phoneTel: "tel:3372211035",
+  deliveryNote: "Delivery available for 10+ orders within a 10-mile radius.",
+  beer: ["Natural Light","Miller Lite","Coors Light","Bud Light","Budweiser","Michelob Ultra","Corona","Modelo"],
+  defaults: {
+    breakfast: {
+      subtitle: "(Same Daily \u2013 Served at opening)",
+      plates: ["Breakfast Plate \u2013 $9.99 (1 Meat)","Breakfast Plate \u2013 $11.99 (2 Meats)","Child Breakfast (10 & under) \u2013 $4.99"],
+      items: ["Scrambled Eggs","Bacon","Sausage","Hot Links","Pancakes","French Toast Sticks","Biscuits","Hashbrowns","Cheesy Grits","Sausage Gravy","Oatmeal","BLT","Bacon, Egg and Cheese","Sausage, Egg and Cheese","Breakfast Burritos"]
+    },
+    lunch: {
+      subtitle: "(Changes Daily)",
+      plates: ["Lunch Plate \u2013 $12.99 (1 Meat, 2 Sides)","Lunch Plate \u2013 $15.99 (2 Meats, 2 Sides)","Lunch Plate \u2013 $19.99 (3 Meats, 2 Sides)","Child Lunch (10 & under) \u2013 $6.99","Extra Side \u2013 $2.99"]
+    },
+    salad: {
+      subtitle: "(Available Daily)",
+      items: ["With Meal \u2013 $4.99","Only \u2013 $8.99"],
+      saladBar: {
+        lettuce: ["Romaine","Iceberg"],
+        toppings: ["Diced tomatoes","Cucumbers","Onions","Broccoli","Carrots","Cauliflower","Peppers","Cheese","Croutons","Bacon bits","Eggs","Crackers"],
+        dressing: ["Ranch","Thousand Island","Italian","Blue Cheese","Caesar"]
+      }
+    },
+    drinks: { items: ["Coke","Diet Coke","Sprite","Dr Pepper","Sweet Tea","Unsweet Tea","Lemonade","Coffee","Milk","Orange Juice"] },
+    dessert: { subtitle: "(Changes Daily)" },
+    crawfish: {
+      subtitle: "(Pricing is subject to change)",
+      items: ["Cooking starts at 4:00 PM and ends at 8:00 PM.","Only available Thursday \u2013 Sunday.","$5.99 per pound (subject to change).","Call to ask about crawfish availability."]
+    }
+  },
+  menus: {}
+};
+
+var data = MENU_DATA;
+
+// ═══ Particles ═══
 var cv=document.getElementById("particles"),cx=cv.getContext("2d"),W,H,pts=[];
 function rsz(){W=cv.width=innerWidth;H=cv.height=innerHeight}rsz();addEventListener("resize",rsz);
 function P(){this.r=1}P.prototype.reset=function(i){this.x=Math.random()*W;this.y=i?Math.random()*H:H+20;this.sz=Math.random()*2.5+.5;this.sy=-(Math.random()*.4+.1);this.sx=(Math.random()-.5)*.3;this.op=Math.random()*.25+.05;this.fs=Math.random()*.0008+.0002;var r=Math.random();this.cr=r<.3?255:r<.5?255:180;this.cg=r<.3?120+Math.random()*60:r<.5?180:165;this.cb=r<.3?40:r<.5?100:150;if(r<.3)this.op*=1.5};P.prototype.upd=function(){this.y+=this.sy;this.x+=this.sx+Math.sin(this.y*.008)*.15;this.op-=this.fs;if(this.op<=0||this.y<-20)this.reset(0)};P.prototype.drw=function(){cx.beginPath();cx.arc(this.x,this.y,this.sz,0,6.28);cx.fillStyle="rgba("+this.cr+","+this.cg+","+this.cb+","+this.op+")";cx.fill()};
@@ -84,6 +143,7 @@ var N=innerWidth<640?40:80;for(var i=0;i<N;i++){var p=new P;p.reset(1);pts.push(
 var ro=new IntersectionObserver(function(e){e.forEach(function(en){if(en.isIntersecting){en.target.classList.add("revealed");ro.unobserve(en.target)}})},{threshold:.1,rootMargin:"0px 0px -40px 0px"});
 function obs(c){c.querySelectorAll(".menu-item").forEach(function(el,i){el.style.transition="opacity .55s cubic-bezier(.16,1,.3,1) "+i*.04+"s,transform .55s cubic-bezier(.16,1,.3,1) "+i*.04+"s";ro.observe(el)})}
 
+// ═══ Helpers ═══
 var $=function(id){return document.getElementById(id)},esc=function(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")};
 function toISO(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function fmtD(d){return d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})}
@@ -94,11 +154,7 @@ function biz(day){var l=String(day||"").toLowerCase(),o=l==="sunday"?"7:00 AM":l
 function t12(s){if(!s)return null;var m=String(s).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);if(!m)return null;var h=+m[1],mn=+m[2],ap=m[3].toUpperCase();if(ap==="PM"&&h!==12)h+=12;if(ap==="AM"&&h===12)h=0;return h*60+mn}
 function pastCl(day){var h=biz(day),cl=t12(h.close);if(cl==null)return false;var n=new Date();return(n.getHours()*60+n.getMinutes())>=cl}
 
-var data=(typeof MENU_DATA!=="undefined")?MENU_DATA:null;
-if(!data){$("loadError").classList.remove("hide");return}
-var menus={};
-var rm=data.menus||{};Object.keys(rm).forEach(function(k){var nk=nKey(k);if(nk)menus[nk]=rm[k]});data.menus=menus;
-
+var menus=data.menus;
 function gM(iso){return menus[iso]||null}
 function gCl(dn){var c=data.closures||{},ks=Object.keys(c);for(var i=0;i<ks.length;i++)if(ks[i].toLowerCase()===String(dn||"").toLowerCase())return c[ks[i]];return null}
 function nI(a){if(!Array.isArray(a))return[];return a.map(function(x){return String(x||"").trim()}).filter(Boolean)}
@@ -108,6 +164,7 @@ function bCats(iso){var menu=gM(iso)||{},def=data.defaults||{},cats=[];var bkP=n
 
 function rCat(c){var h='<div class="cat-header"><div><div class="cat-name">'+c.icon+' '+esc(c.name)+'</div><div class="cat-subtitle">'+esc(c.sub)+'</div></div></div>';if(c.plates&&c.plates.length)h+='<div class="section-label">Plates &amp; Pricing</div><div class="plates-row">'+c.plates.map(function(p){return'<div class="plate-card">'+esc(p)+'</div>'}).join("")+'</div>';if(c.hasLunch&&c.items&&c.items.length){h+='<div class="section-label">Today\'s Specials</div><ul class="item-list">';c.items.forEach(function(it){h+='<li class="menu-item" onclick="this.classList.toggle(\'expanded\')"><div class="item-name">'+esc(it.name)+'</div><div class="item-desc">'+esc(it.desc||data.settings.noDescriptionText||"")+'</div><div class="item-hint">tap for details</div></li>'});h+='</ul>'}if(!c.hasLunch&&c.items&&c.items.length){h+='<div class="section-label">'+(c.isBeer?"Available":c.isCF?"Details":"Items")+'</div><ul class="item-list">';c.items.forEach(function(it){var nm=typeof it==="string"?it:it.name;h+='<li class="menu-item'+(c.isBeer?" beer-item":"")+'"><div class="item-name">'+(c.isBeer?"\ud83c\udf7a ":"")+esc(nm)+'</div></li>'});h+='</ul>'}if(c.id==="salad"){if(c.pricing&&c.pricing.length)h+='<div class="section-label">Pricing</div><ul class="item-list">'+c.pricing.map(function(p){return'<li class="menu-item"><div class="item-name">'+esc(p)+'</div></li>'}).join("")+'</ul>';var sb=c.saladBar||{};h+='<div class="section-label">Build Your Salad</div><div class="salad-grid">';if(sb.lettuce&&sb.lettuce.length)h+='<div><div class="salad-col-title">Lettuce</div><ul class="item-list">'+sb.lettuce.map(function(x){return'<li class="menu-item"><div class="item-name">'+esc(x)+'</div></li>'}).join("")+'</ul></div>';if(sb.toppings&&sb.toppings.length)h+='<div><div class="salad-col-title">Toppings</div><ul class="item-list">'+sb.toppings.map(function(x){return'<li class="menu-item"><div class="item-name">'+esc(x)+'</div></li>'}).join("")+'</ul></div>';if(sb.dressing&&sb.dressing.length)h+='<div><div class="salad-col-title">Dressing</div><ul class="item-list">'+sb.dressing.map(function(x){return'<li class="menu-item"><div class="item-name">'+esc(x)+'</div></li>'}).join("")+'</ul></div>';h+='</div>'}if(c.isCF)h='<div class="crawfish-wrap">'+h+'</div>';return h}
 
+// ═══ Panel Init & Status ═══
 var panelConfigs=[];
 function initP(pfx,iso,dn){panelConfigs.push({pfx:pfx,iso:iso,dn:dn});var h=biz(dn),cl=gCl(dn),he=$(pfx+"Hours");if(cl&&cl.closed){$(pfx+"Closed").classList.remove("hide");var msg=$(pfx+"ClosedMsg");if(msg)msg.textContent=cl.message||"See you next time!";if(he)he.textContent=dn+": Closed";return}if(he)he.innerHTML="<strong>"+dn+"</strong> &nbsp;"+h.open+" \u2013 "+h.close+" &nbsp;\xb7&nbsp; Breakfast "+h.breakfast+" &nbsp;\xb7&nbsp; Lunch "+h.lunch+(h.crawfish?" &nbsp;\xb7&nbsp; Crawfish "+h.crawfish:"");bPC(pfx,iso)}
 function bPC(pfx,iso){var cn=$(pfx+"CatNav"),cs=$(pfx+"CatSections");if(!cn||!cs)return;var ab=cn.querySelector(".cat-btn.active"),ai=ab?ab.dataset.idx:"0",cats=bCats(iso);cn.innerHTML=cats.map(function(c,i){return'<button class="cat-btn'+(c.isBeer?" beer-btn":"")+(String(i)===ai?" active":"")+'" data-idx="'+i+'">'+c.icon+" "+esc(c.name)+"</button>"}).join("");cs.innerHTML=cats.map(function(c,i){return'<div class="cat-section'+(String(i)===ai?" visible":"")+'" data-idx="'+i+'">'+rCat(c)+"</div>"}).join("");var btns=cn.querySelectorAll(".cat-btn"),secs=cs.querySelectorAll(".cat-section");btns.forEach(function(b){b.addEventListener("click",function(){var idx=b.dataset.idx;btns.forEach(function(x){x.classList.toggle("active",x.dataset.idx===idx)});secs.forEach(function(s){s.classList.toggle("visible",s.dataset.idx===idx);if(s.dataset.idx===idx)obs(s)})})});secs.forEach(function(s){if(s.classList.contains("visible"))obs(s)})}
@@ -121,14 +178,8 @@ function setupTabs(){var tabs=[$("tabToday"),$("tabTomorrow"),$("tabAdvanced")],
 var fT=null,fI=null;function sFlash(t,x){var m=$("flashModal"),c=$("flashCount");if(!m)return;$("flashTitle").textContent=t;$("flashText").textContent=x;if(fT)clearTimeout(fT);if(fI)clearInterval(fI);var r=5;c.textContent=r;m.classList.add("show");fI=setInterval(function(){r--;if(r>0)c.textContent=r;else clearInterval(fI)},1000);fT=setTimeout(hFlash,5000)}function hFlash(){if(fT){clearTimeout(fT);fT=null}if(fI){clearInterval(fI);fI=null}$("flashModal").classList.remove("show")}$("flashModal").addEventListener("click",hFlash);$("flashModal").querySelector(".flash-card").addEventListener("click",function(e){e.stopPropagation()});addEventListener("keydown",function(e){if(e.key==="Escape")hFlash()});
 function hHash(){var h=(location.hash||"").replace("#","").toLowerCase();if(h==="tomorrow")$("tabTomorrow").click();else if(h==="advanced"||h==="forecast")$("tabAdvanced").click()}
 
-// ═══ INIT with cloud re-render ═══
+// ═══ INIT — render with defaults, then fetch cloud data and re-render ═══
 function initPage(){
-  var fd=(typeof MENU_DATA!=="undefined")?MENU_DATA:null;if(!fd)return;
-  Object.assign(data,fd);
-  // FIX: update menus closure IN PLACE
-  var rm2=data.menus||{};var ok=Object.keys(menus);for(var i=0;i<ok.length;i++)delete menus[ok[i]];
-  var nk2=Object.keys(rm2);for(var j=0;j<nk2.length;j++){var k=nKey(nk2[j]);if(k)menus[k]=rm2[nk2[j]]}
-  data.menus=menus;
   var now=new Date(),tI=toISO(now),tN=wkD(now),tom=new Date(now);tom.setDate(now.getDate()+1);var toI=toISO(tom),toN=wkD(tom);
   var dTI=tI,dTN=tN,dToI=toI,dToN=toN,ct=gCl(tN);
   if(pastCl(tN)&&!(ct&&ct.closed)){dTI=toI;dTN=toN;var da=new Date(now);da.setDate(now.getDate()+2);dToI=toISO(da);dToN=wkD(da)}
@@ -137,15 +188,31 @@ function initPage(){
   var at=$("advDayTabs"),ac=$("advCards");if(at)at.innerHTML="";if(ac)ac.innerHTML="";
   bAdv(dTI);uSt(dTN,dTI);window._dTN=dTN;window._dTI=dTI;
 }
-setupTabs();initPage();
+
+setupTabs();
+initPage(); // Render immediately with defaults
+
+// Fetch lunch from Apps Script and re-render
+fetch(CLOUD_URL + '?action=lunch', { redirect: 'follow' })
+  .then(function(r) { return r.text(); })
+  .then(function(text) {
+    try {
+      var result = JSON.parse(text);
+      if (result && result.success && result.dates) {
+        var keys = Object.keys(result.dates);
+        for (var i = 0; i < keys.length; i++) {
+          var nk = nKey(keys[i]);
+          if (nk) menus[nk] = result.dates[keys[i]];
+        }
+        console.log('[HH] Loaded ' + keys.length + ' lunch dates from cloud');
+        initPage(); // Re-render with cloud data
+      }
+    } catch(e) { console.warn('[HH] Parse error:', e.message); }
+  })
+  .catch(function(err) { console.warn('[HH] Lunch fetch failed:', err.message); });
+
 setInterval(function(){if(window._dTN&&window._dTI)uSt(window._dTN,window._dTI)},1000);
 setTimeout(hHash,150);addEventListener("hashchange",hHash);
-addEventListener("menuDataReady",function(e){
-  console.log("[HH] Cloud lunch arrived, re-rendering...");
-  if(e.detail){var ks=Object.keys(e.detail);for(var i=0;i<ks.length;i++)MENU_DATA[ks[i]]=e.detail[ks[i]]}
-  initPage();
-});
 })();
 </script>
-</body>
 </html>
