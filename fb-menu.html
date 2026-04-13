@@ -194,9 +194,9 @@
   <div class="export-card">
     <h2>Export Menu</h2>
     <p>Download your finished menu image.</p>
-    <button class="export-big main" id="dlJpg"><span class="icon">📸</span><span class="meta">Download JPG<small>Best for Facebook</small></span></button>
-    <button class="export-big" id="dlPng"><span class="icon">🖼</span><span class="meta">Download PNG<small>Lossless quality</small></span></button>
-    <button class="export-big" id="dlJson"><span class="icon">💾</span><span class="meta">Export Project JSON<small>Save for later</small></span></button>
+    <button class="export-big main" id="dlJpg"><span class="icon">📸</span><span class="meta">Download JPG<small>Best for Facebook — post this one</small></span></button>
+    <button class="export-big" id="dlPng"><span class="icon">🖼</span><span class="meta">Download PNG<small>Lossless quality — larger file</small></span></button>
+    <button class="export-big" id="dlJson"><span class="icon">📤</span><span class="meta">Export Project File<small>Share with team — they import it and pick up where you left off</small></span></button>
     <button class="export-close" id="closeExport">Cancel</button>
   </div>
 </div>
@@ -445,14 +445,62 @@ document.getElementById('hhMEfile').addEventListener('change',async()=>{const f=
 function currentPayload(){return{outW,outH,imgDataURL:imgDataURL||'',photoTransform:{photoScale,photoRot,photoOffsetX,photoOffsetY},boxes};}
 async function applyPayload(p){if(!p)return;if(p.imgDataURL){imgDataURL=p.imgDataURL;await loadImg(imgDataURL);}const t=p.photoTransform||{};photoScale=t.photoScale??photoScale;photoRot=t.photoRot??photoRot;photoOffsetX=t.photoOffsetX??photoOffsetX;photoOffsetY=t.photoOffsetY??photoOffsetY;document.getElementById('photoZoom').value=String(photoScale);if(Array.isArray(p.boxes))boxes=p.boxes;activeId=null;fitView();rebuildSidePanel();draw();}
 function createProject(name){const s=loadStore();const p={id:uid(),name:name||`Menu ${new Date().toLocaleDateString()}`,createdAt:Date.now(),updatedAt:Date.now(),data:currentPayload()};s.items.unshift(p);s.activeId=p.id;const r=saveStore(s);if(!r.ok){toast('Save failed: '+r.error,'error');return false;}toast('Project created!','success');rebuildSidePanel();return true;}
-function saveProject(){const s=loadStore();const a=s.items.find(p=>p.id===s.activeId);if(!a){createProject();return;}a.updatedAt=Date.now();a.data=currentPayload();const r=saveStore(s);if(!r.ok){toast('Save failed: '+r.error,'error');return;}toast('Project saved!','success');rebuildSidePanel();}
+function saveProject(askName){
+  const s=loadStore();const a=s.items.find(p=>p.id===s.activeId);
+  if(!a){
+    const name=prompt('Name this project:','Menu '+new Date().toLocaleDateString());
+    if(name===null)return;
+    createProject(name.trim()||'Menu '+new Date().toLocaleDateString());
+    return;
+  }
+  if(askName){
+    const name=prompt('Rename project:',a.name);
+    if(name===null)return;
+    a.name=name.trim()||a.name;
+  }
+  a.updatedAt=Date.now();a.data=currentPayload();
+  const r=saveStore(s);if(!r.ok){toast('Save failed: '+r.error,'error');return;}
+  toast('Saved "'+a.name+'"!','success');rebuildSidePanel();
+}
+function renameProject(id){
+  const s=loadStore();const p=s.items.find(x=>x.id===id);if(!p)return;
+  const name=prompt('Rename project:',p.name);if(name===null||!name.trim())return;
+  p.name=name.trim();p.updatedAt=Date.now();saveStore(s);
+  toast('Renamed to "'+p.name+'"','success');rebuildSidePanel();
+}
+function exportProjectFile(id){
+  const s=loadStore();const p=s.items.find(x=>x.id===id);
+  if(!p){toast('No project to export','error');return;}
+  // Always include the current image data so the recipient can pick up where you left off
+  const exportData={...p};
+  if(!exportData.data.imgDataURL&&imgDataURL){exportData.data.imgDataURL=imgDataURL;}
+  const blob=new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
+  const el=document.createElement('a');
+  const safeName=(p.name||'menu').replace(/[^a-zA-Z0-9-_ ]/g,'').replace(/\s+/g,'-').toLowerCase();
+  el.download=`hotheadz-${safeName}-${new Date().toISOString().slice(0,10)}.json`;
+  el.href=URL.createObjectURL(blob);document.body.appendChild(el);el.click();el.remove();
+  setTimeout(()=>URL.revokeObjectURL(el.href),1500);
+  toast('Project file exported! Share this file so someone else can import it.','success');
+}
 async function loadProject(id){const s=loadStore();const p=s.items.find(x=>x.id===id);if(!p)return;s.activeId=id;saveStore(s);if(p.data)await applyPayload(p.data);rebuildSidePanel();}
 function deleteProject(id){const s=loadStore();const p=s.items.find(x=>x.id===id);if(!p||!confirm(`Delete "${p.name}"?`))return;s.items=s.items.filter(x=>x.id!==id);if(s.activeId===id)s.activeId=s.items[0]?.id??null;saveStore(s);const n=s.items.find(x=>x.id===s.activeId);if(n?.data)applyPayload(n.data);else{loadStarterBoxes();imgLoaded=false;imgDataURL='';resetAll();}toast('Deleted','info');rebuildSidePanel();}
 
 /* EXPORT */
 function getPhotoAABB(){if(!imgLoaded)return null;const w=canvas.width,h=canvas.height,iw=img.naturalWidth,ih=img.naturalHeight;const rot=(photoRot%180)!==0,bw=rot?ih:iw,bh=rot?iw:ih;const fit=Math.min(w/bw,h/bh)*photoScale;const cx=w/2+photoOffsetX,cy=h/2+photoOffsetY,dw=bw*fit,dh=bh*fit;const rad=photoRot*Math.PI/180;const corners=[{x:-dw/2,y:-dh/2},{x:dw/2,y:-dh/2},{x:dw/2,y:dh/2},{x:-dw/2,y:dh/2}];let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;for(const p of corners){const rx=p.x*Math.cos(rad)-p.y*Math.sin(rad)+cx,ry=p.x*Math.sin(rad)+p.y*Math.cos(rad)+cy;minX=Math.min(minX,rx);minY=Math.min(minY,ry);maxX=Math.max(maxX,rx);maxY=Math.max(maxY,ry);}return{sx:Math.max(0,Math.floor(minX)),sy:Math.max(0,Math.floor(minY)),sw:Math.max(1,Math.min(w,Math.ceil(maxX))-Math.max(0,Math.floor(minX))),sh:Math.max(1,Math.min(h,Math.ceil(maxY))-Math.max(0,Math.floor(minY)))};}
 function exportCropped(mime,ext,q){if(!imgLoaded){toast('Upload template first','error');return;}const ov={viewX,viewY,viewScale};viewX=0;viewY=0;viewScale=1;draw();const a=getPhotoAABB();viewX=ov.viewX;viewY=ov.viewY;viewScale=ov.viewScale;if(!a){toast('No photo bounds','error');return;}const out=document.createElement('canvas');out.width=a.sw;out.height=a.sh;out.getContext('2d').drawImage(canvas,a.sx,a.sy,a.sw,a.sh,0,0,a.sw,a.sh);out.toBlob(blob=>{if(!blob)return;const el=document.createElement('a');el.download=`hotheadz-menu-${new Date().toISOString().slice(0,10)}.${ext}`;el.href=URL.createObjectURL(blob);document.body.appendChild(el);el.click();el.remove();setTimeout(()=>URL.revokeObjectURL(el.href),1500);toast(`${ext.toUpperCase()} downloaded!`,'success');},mime,q);draw();}
-function exportJSON(){const s=loadStore();const a=s.items.find(p=>p.id===s.activeId);const proj={id:a?.id||uid(),name:a?.name||'Menu Export',createdAt:a?.createdAt||Date.now(),updatedAt:Date.now(),data:currentPayload()};const blob=new Blob([JSON.stringify(proj,null,2)],{type:'application/json'});const el=document.createElement('a');el.download=`hotheadz-menu-${new Date().toISOString().slice(0,10)}.json`;el.href=URL.createObjectURL(blob);document.body.appendChild(el);el.click();el.remove();toast('JSON exported!','success');}
+function exportJSON(){
+  const s=loadStore();const a=s.items.find(p=>p.id===s.activeId);
+  const payload=currentPayload();
+  // Always include image so recipient can pick up where you left off
+  if(!payload.imgDataURL&&imgDataURL)payload.imgDataURL=imgDataURL;
+  const proj={id:a?.id||uid(),name:a?.name||'Menu Export',createdAt:a?.createdAt||Date.now(),updatedAt:Date.now(),data:payload};
+  const blob=new Blob([JSON.stringify(proj,null,2)],{type:'application/json'});
+  const el=document.createElement('a');
+  const safeName=(proj.name||'menu').replace(/[^a-zA-Z0-9-_ ]/g,'').replace(/\s+/g,'-').toLowerCase();
+  el.download=`hotheadz-${safeName}-${new Date().toISOString().slice(0,10)}.json`;
+  el.href=URL.createObjectURL(blob);document.body.appendChild(el);el.click();el.remove();
+  toast('Project exported with template image! Anyone can import this file.','success');
+}
 const exportModal=document.getElementById('exportModal');
 document.getElementById('exportBtn').addEventListener('click',()=>exportModal.classList.add('active'));
 document.getElementById('mobExportBtn').addEventListener('click',()=>exportModal.classList.add('active'));
@@ -568,10 +616,52 @@ function buildTB(){
 }
 function buildPH(){return '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">Photo Settings</span></div><div class="acc-body"><div class="fl">Photo Zoom</div><input class="fi" type="range" id="pZoom2" min="0.3" max="4" step="0.01" value="'+photoScale+'" style="accent-color:var(--fire)"><div class="btn-row"><button class="sm-btn" id="pRot2">Rotate 90\u00b0</button><button class="sm-btn" id="pReset2">Reset Photo</button></div><p style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5;">Drag canvas = move photo. Right-drag = pan view.</p></div></div>';}
 function buildPR(){
-  const s=loadStore();let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">Projects</span><span class="acc-badge">'+s.items.length+'</span></div><div class="acc-body">';
-  h+='<div class="btn-row"><button class="sm-btn primary" id="pNew">New</button><button class="sm-btn" id="pSave">Save</button><button class="sm-btn" id="pImport">Import JSON</button></div>';
-  if(!s.items.length)h+='<p style="font-size:12px;color:var(--text3)">No projects yet.</p>';
-  else s.items.forEach(p=>{const ac=p.id===s.activeId;const d=new Date(p.updatedAt||p.createdAt||Date.now()).toLocaleString();h+='<div style="display:flex;align-items:center;gap:6px;padding:8px;border-radius:var(--radius-sm);margin-bottom:4px;background:'+(ac?'var(--ember)':'rgba(255,255,255,.03)')+';border:1px solid '+(ac?'rgba(255,122,24,.15)':'var(--border)')+'"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:'+(ac?'var(--fire)':'var(--text)')+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(p.name)+'</div><div style="font-size:10px;color:var(--text3)">'+d+'</div></div>';if(!ac)h+='<button class="sm-btn pLoad" data-id="'+esc(p.id)+'">Load</button>';h+='<button class="sm-btn danger pDel" data-id="'+esc(p.id)+'">\u00d7</button></div>';});
+  const s=loadStore();const activeProj=s.items.find(p=>p.id===s.activeId);
+  let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">Projects</span><span class="acc-badge">'+s.items.length+'</span></div><div class="acc-body">';
+
+  // Active project info
+  if(activeProj){
+    h+='<div style="background:var(--ember);border:1px solid rgba(255,122,24,.2);border-radius:var(--radius);padding:10px;margin-bottom:10px;">';
+    h+='<div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Current Project</div>';
+    h+='<div style="font-size:14px;font-weight:800;color:var(--fire);margin-bottom:6px;">'+esc(activeProj.name)+'</div>';
+    h+='<div style="font-size:10px;color:var(--text3);margin-bottom:8px;">Last saved: '+new Date(activeProj.updatedAt||activeProj.createdAt||Date.now()).toLocaleString()+'</div>';
+    h+='<div class="btn-row">';
+    h+='<button class="sm-btn primary" id="pSave">\ud83d\udcbe Save</button>';
+    h+='<button class="sm-btn" id="pSaveAs">\ud83d\udcdd Save As...</button>';
+    h+='<button class="sm-btn" id="pRename">\u270f\ufe0f Rename</button>';
+    h+='<button class="sm-btn" id="pExportActive">\ud83d\udce4 Export File</button>';
+    h+='</div></div>';
+  }
+
+  // New / Import
+  h+='<div class="btn-row" style="margin-bottom:10px;">';
+  h+='<button class="sm-btn primary" id="pNew">\u2795 New Project</button>';
+  h+='<button class="sm-btn" id="pImport">\ud83d\udce5 Import File</button>';
+  h+='</div>';
+
+  // All projects list
+  if(!s.items.length)h+='<p style="font-size:12px;color:var(--text3)">No projects yet. Save your current work to create one.</p>';
+  else{
+    h+='<div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:6px;">All Projects</div>';
+    s.items.forEach(p=>{
+      const ac=p.id===s.activeId;
+      const d=new Date(p.updatedAt||p.createdAt||Date.now()).toLocaleString();
+      h+='<div style="display:flex;align-items:center;gap:5px;padding:8px;border-radius:var(--radius-sm);margin-bottom:4px;background:'+(ac?'var(--ember)':'rgba(255,255,255,.03)')+';border:1px solid '+(ac?'rgba(255,122,24,.15)':'var(--border)')+'">';
+      h+='<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:'+(ac?'var(--fire)':'var(--text)')+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(p.name)+'</div><div style="font-size:10px;color:var(--text3)">'+d+'</div></div>';
+      if(!ac)h+='<button class="sm-btn pLoad" data-id="'+esc(p.id)+'" title="Load">Load</button>';
+      h+='<button class="sm-btn pExport" data-id="'+esc(p.id)+'" title="Export file">\ud83d\udce4</button>';
+      h+='<button class="sm-btn pRenameBtn" data-id="'+esc(p.id)+'" title="Rename">\u270f\ufe0f</button>';
+      h+='<button class="sm-btn danger pDel" data-id="'+esc(p.id)+'" title="Delete">\u00d7</button>';
+      h+='</div>';
+    });
+  }
+
+  // Import help
+  h+='<div style="margin-top:12px;padding:10px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--radius-sm);">';
+  h+='<div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:4px;">\ud83d\udca1 Sharing Projects</div>';
+  h+='<div style="font-size:10px;color:var(--text3);line-height:1.5;">Export a project file to share with another team member. They can import it on their device and pick up exactly where you left off \u2014 template image, text, positions, everything.</div>';
+  h+='</div>';
+
   h+='</div></div>';return h;
 }
 
@@ -617,11 +707,16 @@ function wirePanel(){
   const pZ=document.getElementById('pZoom2');if(pZ)pZ.addEventListener('input',()=>{photoScale=parseFloat(pZ.value);document.getElementById('photoZoom').value=pZ.value;draw();});
   const pR=document.getElementById('pRot2');if(pR)pR.addEventListener('click',()=>{saveUndo();photoRot=(photoRot+90)%360;draw();triggerAutoSave();});
   const pRs=document.getElementById('pReset2');if(pRs)pRs.addEventListener('click',()=>{saveUndo();photoScale=1;photoRot=0;photoOffsetX=0;photoOffsetY=0;document.getElementById('photoZoom').value='1';draw();triggerAutoSave();});
-  const pN=document.getElementById('pNew');if(pN)pN.addEventListener('click',()=>{const n=prompt('Project name:','Menu '+new Date().toLocaleDateString());if(n===null)return;createProject(n.trim());rebuildSidePanel();});
-  const pSv=document.getElementById('pSave');if(pSv)pSv.addEventListener('click',saveProject);
-  const pI=document.getElementById('pImport');if(pI)pI.addEventListener('click',()=>{const inp=document.createElement('input');inp.type='file';inp.accept='application/json';inp.onchange=async()=>{const f=inp.files?.[0];if(!f)return;const obj=safeJSON(await f.text(),null);if(!obj||!obj.data){toast('Invalid JSON','error');return;}const s=loadStore();s.items.unshift({id:uid(),name:obj.name||'Imported',createdAt:Date.now(),updatedAt:Date.now(),data:obj.data});s.activeId=s.items[0].id;saveStore(s);if(s.items[0]?.data)await applyPayload(s.items[0].data);toast('Imported!','success');rebuildSidePanel();};inp.click();});
+  const pN=document.getElementById('pNew');if(pN)pN.addEventListener('click',()=>{const n=prompt('Project name:','Menu '+new Date().toLocaleDateString());if(n===null)return;createProject(n.trim()||'Menu '+new Date().toLocaleDateString());rebuildSidePanel();});
+  const pSv=document.getElementById('pSave');if(pSv)pSv.addEventListener('click',()=>saveProject(false));
+  const pSA=document.getElementById('pSaveAs');if(pSA)pSA.addEventListener('click',()=>saveProject(true));
+  const pRn=document.getElementById('pRename');if(pRn)pRn.addEventListener('click',()=>{const s=loadStore();if(s.activeId)renameProject(s.activeId);});
+  const pEA=document.getElementById('pExportActive');if(pEA)pEA.addEventListener('click',()=>{const s=loadStore();if(s.activeId)exportProjectFile(s.activeId);});
+  const pI=document.getElementById('pImport');if(pI)pI.addEventListener('click',()=>{const inp=document.createElement('input');inp.type='file';inp.accept='application/json';inp.onchange=async()=>{const f=inp.files?.[0];if(!f)return;const obj=safeJSON(await f.text(),null);if(!obj||!obj.data){toast('Invalid project file','error');return;}const s=loadStore();s.items.unshift({id:uid(),name:obj.name||'Imported',createdAt:Date.now(),updatedAt:Date.now(),data:obj.data});s.activeId=s.items[0].id;saveStore(s);if(s.items[0]?.data)await applyPayload(s.items[0].data);toast('Imported "'+( obj.name||'project')+'"! Template and all settings loaded.','success');rebuildSidePanel();};inp.click();});
   document.querySelectorAll('.pLoad').forEach(btn=>{btn.addEventListener('click',()=>loadProject(btn.dataset.id));});
   document.querySelectorAll('.pDel').forEach(btn=>{btn.addEventListener('click',()=>deleteProject(btn.dataset.id));});
+  document.querySelectorAll('.pExport').forEach(btn=>{btn.addEventListener('click',()=>exportProjectFile(btn.dataset.id));});
+  document.querySelectorAll('.pRenameBtn').forEach(btn=>{btn.addEventListener('click',()=>renameProject(btn.dataset.id));});
 }
 
 /* INIT */
