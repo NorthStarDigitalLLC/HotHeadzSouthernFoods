@@ -257,6 +257,78 @@ function triggerAutoSave(){clearTimeout(ast);ast=setTimeout(()=>{const s=loadSto
 function loadStore(){const s=safeJSON(localStorage.getItem(PK),null);if(s&&Array.isArray(s.items))return s;return{activeId:null,items:[]};}
 function saveStore(s){try{localStorage.setItem(PK,JSON.stringify(s));return{ok:true}}catch(e){return{ok:false,error:String(e?.message||e)}}}
 
+/* CLOUD STORAGE (Google Sheets) */
+const CLOUD_URL_KEY='hhMenuCloud_url';
+const CLOUD_NAME_KEY='hhMenuCloud_name';
+function getCloudUrl(){return localStorage.getItem(CLOUD_URL_KEY)||'';}
+function setCloudUrl(u){localStorage.setItem(CLOUD_URL_KEY,u);}
+function getCloudName(){return localStorage.getItem(CLOUD_NAME_KEY)||'Staff';}
+function setCloudName(n){localStorage.setItem(CLOUD_NAME_KEY,n);}
+
+async function cloudRequest(action,body={}){
+  const url=getCloudUrl();
+  if(!url){toast('Set your Google Sheets URL in Projects > Cloud Settings','error');return null;}
+  try{
+    if(action==='list'){
+      const r=await fetch(url+'?action=list');
+      return await r.json();
+    }
+    if(action==='load'){
+      const r=await fetch(url+'?action=load&id='+encodeURIComponent(body.id));
+      return await r.json();
+    }
+    if(action==='save'||action==='delete'){
+      const r=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action,...body})});
+      return await r.json();
+    }
+  }catch(e){toast('Cloud error: '+e.message,'error');return null;}
+}
+
+async function cloudSave(name){
+  const projName=name||prompt('Project name for cloud:','Menu '+new Date().toLocaleDateString());
+  if(!projName)return;
+  toast('Saving to cloud...','info');
+  const payload=currentPayload();
+  // Strip image data to keep sheet size manageable — staff will have the template loaded locally
+  const lightPayload={...payload,imgDataURL:''};
+  const result=await cloudRequest('save',{project:{id:uid(),name:projName.trim(),savedBy:getCloudName(),data:lightPayload}});
+  if(result?.success){toast('Saved "'+projName.trim()+'" to cloud!','success');rebuildSidePanel();}
+  else toast('Cloud save failed: '+(result?.error||'unknown'),'error');
+}
+
+async function cloudUpdate(id,name){
+  toast('Updating cloud...','info');
+  const payload=currentPayload();
+  const lightPayload={...payload,imgDataURL:''};
+  const result=await cloudRequest('save',{project:{id,name,savedBy:getCloudName(),data:lightPayload}});
+  if(result?.success)toast('Updated "'+name+'" on cloud!','success');
+  else toast('Cloud update failed: '+(result?.error||'unknown'),'error');
+}
+
+async function cloudList(){
+  const result=await cloudRequest('list');
+  if(result?.success)return result.projects||[];
+  toast('Could not load cloud projects: '+(result?.error||'unknown'),'error');
+  return[];
+}
+
+async function cloudLoad(id){
+  toast('Loading from cloud...','info');
+  const result=await cloudRequest('load',{id});
+  if(result?.success&&result.project?.data){
+    await applyPayload(result.project.data);
+    toast('Loaded "'+result.project.name+'" from cloud!','success');
+    rebuildSidePanel();
+  }else toast('Cloud load failed: '+(result?.error||'unknown'),'error');
+}
+
+async function cloudDelete(id,name){
+  if(!confirm('Delete "'+name+'" from cloud? This affects everyone.'))return;
+  const result=await cloudRequest('delete',{id});
+  if(result?.success){toast('Deleted from cloud','info');rebuildSidePanel();}
+  else toast('Cloud delete failed: '+(result?.error||'unknown'),'error');
+}
+
 /* IMAGE */
 function fileToDataURL(f){return new Promise((r,j)=>{const x=new FileReader();x.onload=()=>r(String(x.result||''));x.onerror=j;x.readAsDataURL(f);})}
 async function compressImage(d){const i=new Image();i.src=d;await new Promise(r=>{i.onload=()=>r(1);i.onerror=()=>r(0)});if(!i.naturalWidth)return d;const s=Math.min(1,2200/Math.max(i.naturalWidth,i.naturalHeight));const w=Math.round(i.naturalWidth*s),h=Math.round(i.naturalHeight*s);const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(i,0,0,w,h);return c.toDataURL('image/jpeg',0.9);}
@@ -268,22 +340,19 @@ function defaultBox(name,text,xPct,yPct,ov={}){
 }
 function loadStarterBoxes(){
   const t=todayDefaults();
-  // Common overrides for readability on busy background
-  const readable={shadow:true,shadowBlur:16,shadowColor:'rgba(0,0,0,0.85)',strokeOn:true,strokeColor:'#000000',strokeWidth:3};
-  // For sections on LIGHT backgrounds (wood) — add dark semi-transparent bg
-  const onLight={...readable,bgOn:true,bgColor:'#1a1008',bgOpacity:0.55,bgPadX:12,bgPadY:8,bgRadius:8};
-  // For sections on DARK backgrounds (slate/chalkboard) — just stroke+shadow is enough
-  const onDark={...readable};
+  const C='#d4a898'; // brand sand color
+  const SF='system-ui,-apple-system,Segoe UI,Roboto,Arial';
+  const base={color:C,shadow:true,shadowBlur:8,shadowColor:'rgba(0,0,0,0.7)'};
   boxes=[
-    defaultBox('Day',t.weekday||'Monday',50,5.5,{align:'center',sizePct:5.8,shadowBlur:18,shadowColor:'rgba(0,0,0,0.9)',fontFamily:'"Abril Fatface",Georgia,serif',lineHeight:1.0,strokeOn:true,strokeColor:'#000000',strokeWidth:4}),
-    defaultBox('Date',t.dateStr||'April 13, 2026',50,10.8,{align:'center',sizePct:2.6,shadowBlur:14,shadowColor:'rgba(0,0,0,0.85)',fontFamily:'"DM Serif Display",Georgia,serif',italic:true,lineHeight:1.0,strokeOn:true,strokeColor:'#000000',strokeWidth:2}),
-    defaultBox('Breakfast','BREAKFAST\n5:30 AM - 10:30 AM\n\n\u2022 Scrambled Eggs\n\u2022 Bacon\n\u2022 Sausage, Hotlinks\n\u2022 Pancakes\n\u2022 French Toast Sticks\n\u2022 Biscuits\n\u2022 Hashbrowns\n\u2022 Cheesy Grits\n\u2022 Grits\n\u2022 Sausage Gravy\n\u2022 Oatmeal\n\n- Breakfast Sandwiches\n\u2022 BLT\n\u2022 Bacon, Egg and Cheese\n\u2022 Sausage, Egg and cheese\n\u2022 Breakfast Burritos',15,44,{...onLight,sizePct:1.6,lineHeight:1.22,maxWidthPct:28}),
-    defaultBox('Salad Bar','SALAD BAR\n\nLettuce:\n\u2022 Romaine\n\u2022 Iceburg\nToppings:\n\u2022 Diced Tomatoes\n\u2022 Cucumbers\n\u2022 Onions\n\u2022 Broccoli\n\u2022 Carrots\n\u2022 Cauliflower\n\u2022 Peppers\n\u2022 Cheese\n\u2022 Croutons\n\u2022 Bacon Bits\n\u2022 Eggs\n\u2022 Diced Ham\n\u2022 Crackers\n\u2022 Sunflower Seeds\n\u2022 Pickled Okra\n\u2022 Jalapenos\n\u2022 Pickled beets\n\u2022 Green Olives\n\u2022 Banana Peppers\n\u2022 Pickled Green Tomatoes',63,46,{...onDark,sizePct:1.38,lineHeight:1.18}),
-    defaultBox('Dressings','Dressings:\n\u2022 Ranch\n\u2022 Italian\n\u2022 Blue Cheese\n\u2022 Caesar\n\u2022 Thousand Island',88,30,{...onDark,sizePct:1.38,lineHeight:1.18}),
-    defaultBox('Lunch','LUNCH\n11:00 AM - 2:00 PM\n\n\u2022 Beef Tips\n\u2022 Red Beans & Rice\n\u2022 BBQ Chicken\n\u2022 Mashed Potatoes\n& Gravy\n\u2022 Cabbage\n\u2022 Green Beans\n\u2022 Corn\n\u2022 Rolls\n\u2022 Fried Okra\n\nSame Daily\n\u2022 Turkey Clubs\n\u2022 Chicken Salad\nCroissants',13,77,{...onLight,sizePct:1.5,lineHeight:1.22,maxWidthPct:22}),
-    defaultBox('Drinks','DRINKS\n\n\u2022 Sweet Tea\n\u2022 Unsweet Tea\n\u2022 Dr. Pepper\n\u2022 Rootbeer\n\u2022 Sprite\n\u2022 Fruit Punch\n\u2022 Blue Powerade\n\u2022 Diet Coke\n\u2022 Coke Zero\n\u2022 Coke\n\u2022 Coffee\n\u2022 Orange Juice\n\u2022 Milk\n\u2022 Chocolate Milk',37,77,{...onDark,sizePct:1.5,lineHeight:1.22,maxWidthPct:22}),
-    defaultBox('Dessert','DESSERT\n\nCake',80,80,{align:'center',sizePct:1.9,...onDark,lineHeight:1.25,fontFamily:'"DM Serif Display",Georgia,serif',italic:true}),
-    defaultBox('Bottom Note','For pricing and hours please visit\nHotHeadzSouthernFoods.com',50,97,{align:'center',sizePct:1.55,...onLight,lineHeight:1.25,fontFamily:'"DM Serif Display",Georgia,serif',italic:true,bgOpacity:0.45}),
+    defaultBox('Day',t.weekday||'Monday',51.06,6.83,{...base,align:'center',sizePct:5.8,shadowBlur:14,fontFamily:'"Abril Fatface",Georgia,serif',lineHeight:1.0}),
+    defaultBox('Date',t.dateStr||'April 13, 2026',50.61,12.26,{...base,align:'center',sizePct:2.6,shadowBlur:10,fontFamily:'"DM Serif Display",Georgia,serif',italic:true,lineHeight:1.0}),
+    defaultBox('Breakfast','BREAKFAST\n5:30 AM - 10:30 AM\n\n\u2022 Scrambled Eggs\n\u2022 Bacon\n\u2022 Sausage, Hotlinks\n\u2022 Pancakes\n\u2022 French Toast Sticks\n\u2022 Biscuits\n\u2022 Hashbrowns\n\u2022 Cheesy Grits\n\u2022 Grits\n\u2022 Sausage Gravy\n\u2022 Oatmeal',19.80,48.21,{...base,fontFamily:SF,sizePct:1.31,lineHeight:1.22,maxWidthPct:24.6}),
+    defaultBox('Salad Bar','SALAD BAR\n\nLettuce:\n\u2022 Romaine\n\u2022 Iceburg\nToppings:\n\u2022 Diced Tomatoes\n\u2022 Cucumbers\n\u2022 Onions\n\u2022 Broccoli\n\u2022 Carrots\n\u2022 Cauliflower\n\u2022 Peppers\n\u2022 Cheese\n\u2022 Croutons\n\u2022 Bacon Bits\n\u2022 Eggs\n\u2022 Diced Ham\n\u2022 Crackers\n\u2022 Sunflower Seeds\n\u2022 Pickled Okra\n\u2022 Jalapenos\n\u2022 Pickled beets\n\u2022 Green Olives\n\u2022 Banana Peppers\n\u2022 Pickled Green Tomatoes',69.07,53.09,{...base,fontFamily:SF,sizePct:1.28,lineHeight:1.18}),
+    defaultBox('Dressings','Dressings:\n\u2022 Ranch\n\u2022 Italian\n\u2022 Blue Cheese\n\u2022 Caesar\n\u2022 Thousand Island',81.33,38.21,{...base,fontFamily:SF,sizePct:1.28,lineHeight:1.18}),
+    defaultBox('Lunch','LUNCH\n11:00 AM - 2:00 PM\n\n\u2022 Beef Tips\n\u2022 Red Beans & Rice\n\u2022 BBQ Chicken\n\u2022 Mashed Potatoes\n& Gravy\n\u2022 Cabbage\n\u2022 Green Beans\n\u2022 Corn\n\u2022 Rolls\n\u2022 Fried Okra\n\nSame Daily\n\u2022 Turkey Clubs\n\u2022 Chicken Salad\nCroissants',18.75,78.79,{...base,fontFamily:SF,sizePct:1.31,lineHeight:1.22}),
+    defaultBox('Drinks','DRINKS\n\n\u2022 Sweet Tea\n\u2022 Unsweet Tea\n\u2022 Dr. Pepper\n\u2022 Rootbeer\n\u2022 Sprite\n\u2022 Fruit Punch\n\u2022 Blue Powerade\n\u2022 Diet Coke\n\u2022 Coke Zero\n\u2022 Coke\n\u2022 Coffee\n\u2022 Orange Juice\n\u2022 Milk\n\u2022 Chocolate Milk',40.43,78.79,{...base,fontFamily:SF,sizePct:1.38,lineHeight:1.22}),
+    defaultBox('Bottom Note','For pricing and hours please visit\nHotHeadzSouthernFoods.com',42.11,57.53,{...base,align:'center',sizePct:1.40,shadowBlur:10,fontFamily:'"DM Serif Display",Georgia,serif',italic:true,lineHeight:1.25}),
+    defaultBox('Breakfast Sandwiches','BREAKFAST SANDWICHES\n- Same Daily\n\n\u2022 BLT\n\u2022 Bacon, Egg and Cheese\n\u2022 Sausage, Egg and cheese\n\u2022 Breakfast Burritos',43.02,43.08,{...base,fontFamily:SF,sizePct:1.41,lineHeight:1.27,isCustom:true}),
   ];
   activeId=null;
 }
@@ -581,7 +650,7 @@ function rebuildSidePanel(){
 }
 
 function buildQF(){
-  const sects=[{name:'Day',label:'Day of Week',ta:false},{name:'Date',label:'Date',ta:false},{name:'Breakfast',label:'\ud83c\udf73 Breakfast',ta:true,rows:12},{name:'Lunch',label:'\ud83c\udf57 Lunch',ta:true,rows:10},{name:'Salad Bar',label:'\ud83e\udd57 Salad Bar (Left)',ta:true,rows:14},{name:'Dressings',label:'\ud83e\udd57 Dressings (Right)',ta:true,rows:5},{name:'Drinks',label:'\ud83e\udd64 Drinks',ta:true,rows:10},{name:'Dessert',label:'\ud83c\udf70 Dessert',ta:true,rows:3},{name:'Bottom Note',label:'\ud83d\udccc Footer',ta:true,rows:2}];
+  const sects=[{name:'Day',label:'Day of Week',ta:false},{name:'Date',label:'Date',ta:false},{name:'Breakfast',label:'\ud83c\udf73 Breakfast',ta:true,rows:10},{name:'Breakfast Sandwiches',label:'\ud83c\udf73 Breakfast Sandwiches',ta:true,rows:6},{name:'Lunch',label:'\ud83c\udf57 Lunch',ta:true,rows:10},{name:'Salad Bar',label:'\ud83e\udd57 Salad Bar (Left)',ta:true,rows:14},{name:'Dressings',label:'\ud83e\udd57 Dressings (Right)',ta:true,rows:5},{name:'Drinks',label:'\ud83e\udd64 Drinks',ta:true,rows:10},{name:'Bottom Note',label:'\ud83d\udccc Footer',ta:true,rows:2}];
   let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u26a1 Quick Fill</span></div><div class="acc-body">';
   h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Type your menu. Canvas updates live. Expand each card for styling.</p>';
   h+='<div class="btn-row"><button class="sm-btn primary" id="qfToday">\ud83d\udcc5 Today\'s Date</button><button class="sm-btn" id="qfYesterday">Copy Previous</button><button class="sm-btn danger" id="qfReset">Reset</button></div>';
@@ -679,52 +748,64 @@ function buildTB(){
 function buildPH(){return '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">Photo Settings</span></div><div class="acc-body"><div class="fl">Photo Zoom</div><input class="fi" type="range" id="pZoom2" min="0.3" max="4" step="0.01" value="'+photoScale+'" style="accent-color:var(--fire)"><div class="btn-row"><button class="sm-btn" id="pRot2">Rotate 90\u00b0</button><button class="sm-btn" id="pReset2">Reset Photo</button></div><p style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5;">Drag canvas = move photo. Right-drag = pan view.</p></div></div>';}
 function buildPR(){
   const s=loadStore();const activeProj=s.items.find(p=>p.id===s.activeId);
-  let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">Projects</span><span class="acc-badge">'+s.items.length+'</span></div><div class="acc-body">';
+  const cloudUrl=getCloudUrl();const cloudName=getCloudName();
+  let h='';
 
-  // Active project info
+  // CLOUD
+  h+='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u2601\ufe0f Cloud (Shared)</span></div><div class="acc-body">';
+  if(!cloudUrl){
+    h+='<div style="background:rgba(255,122,24,.06);border:1px solid rgba(255,122,24,.12);border-radius:var(--radius);padding:12px;margin-bottom:8px;">';
+    h+='<div style="font-size:12px;font-weight:800;color:var(--fire);margin-bottom:6px;">\ud83d\udd17 Connect Google Sheets</div>';
+    h+='<div style="font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:8px;">Save projects to a shared Google Sheet so all staff can load them from any device.</div>';
+    h+='<div class="fl">Google Apps Script URL</div>';
+    h+='<input class="fi" id="cloudUrlInput" placeholder="https://script.google.com/macros/s/.../exec">';
+    h+='<div class="fl">Your Name</div>';
+    h+='<input class="fi" id="cloudNameInput" placeholder="Your name" value="'+esc(cloudName)+'">';
+    h+='<button class="sm-btn primary" id="cloudConnect">\u2601\ufe0f Connect</button>';
+    h+='</div>';
+  }else{
+    h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">';
+    h+='<div style="width:8px;height:8px;border-radius:50%;background:#4dff88;flex-shrink:0;"></div>';
+    h+='<span style="font-size:11px;color:var(--success);font-weight:700;">Connected</span>';
+    h+='<span style="font-size:10px;color:var(--text3);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">as '+esc(cloudName)+'</span>';
+    h+='<button class="sm-btn" id="cloudChangeName" style="font-size:10px;">Name</button>';
+    h+='<button class="sm-btn" id="cloudDisconnect" style="font-size:10px;">Disconnect</button>';
+    h+='</div>';
+    h+='<div class="btn-row" style="margin-bottom:8px;">';
+    h+='<button class="sm-btn primary" id="cloudSaveNew">\u2601\ufe0f Save to Cloud</button>';
+    h+='<button class="sm-btn" id="cloudRefresh">\ud83d\udd04 Load Cloud Projects</button>';
+    h+='</div>';
+    h+='<div id="cloudProjectsList" style="min-height:30px;"><div style="font-size:11px;color:var(--text3);padding:6px;">Click "Load Cloud Projects" to see shared saves.</div></div>';
+  }
+  h+='</div></div>';
+
+  // LOCAL
+  h+='<div class="acc'+(cloudUrl?'':' open')+'"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83d\udcbe Local (This Device)</span><span class="acc-badge">'+s.items.length+'</span></div><div class="acc-body">';
   if(activeProj){
     h+='<div style="background:var(--ember);border:1px solid rgba(255,122,24,.2);border-radius:var(--radius);padding:10px;margin-bottom:10px;">';
-    h+='<div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Current Project</div>';
-    h+='<div style="font-size:14px;font-weight:800;color:var(--fire);margin-bottom:6px;">'+esc(activeProj.name)+'</div>';
-    h+='<div style="font-size:10px;color:var(--text3);margin-bottom:8px;">Last saved: '+new Date(activeProj.updatedAt||activeProj.createdAt||Date.now()).toLocaleString()+'</div>';
+    h+='<div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Current Local Project</div>';
+    h+='<div style="font-size:14px;font-weight:800;color:var(--fire);margin-bottom:4px;">'+esc(activeProj.name)+'</div>';
+    h+='<div style="font-size:10px;color:var(--text3);margin-bottom:8px;">'+new Date(activeProj.updatedAt||Date.now()).toLocaleString()+'</div>';
     h+='<div class="btn-row">';
     h+='<button class="sm-btn primary" id="pSave">\ud83d\udcbe Save</button>';
-    h+='<button class="sm-btn" id="pSaveAs">\ud83d\udcdd Save As...</button>';
-    h+='<button class="sm-btn" id="pRename">\u270f\ufe0f Rename</button>';
-    h+='<button class="sm-btn" id="pExportActive">\ud83d\udce4 Export File</button>';
+    h+='<button class="sm-btn" id="pSaveAs">Save As</button>';
+    h+='<button class="sm-btn" id="pRename">Rename</button>';
+    h+='<button class="sm-btn" id="pExportActive">\ud83d\udce4 Export</button>';
     h+='</div></div>';
   }
-
-  // New / Import
-  h+='<div class="btn-row" style="margin-bottom:10px;">';
-  h+='<button class="sm-btn primary" id="pNew">\u2795 New Project</button>';
-  h+='<button class="sm-btn" id="pImport">\ud83d\udce5 Import File</button>';
-  h+='</div>';
-
-  // All projects list
-  if(!s.items.length)h+='<p style="font-size:12px;color:var(--text3)">No projects yet. Save your current work to create one.</p>';
-  else{
-    h+='<div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:6px;">All Projects</div>';
-    s.items.forEach(p=>{
-      const ac=p.id===s.activeId;
-      const d=new Date(p.updatedAt||p.createdAt||Date.now()).toLocaleString();
-      h+='<div style="display:flex;align-items:center;gap:5px;padding:8px;border-radius:var(--radius-sm);margin-bottom:4px;background:'+(ac?'var(--ember)':'rgba(255,255,255,.03)')+';border:1px solid '+(ac?'rgba(255,122,24,.15)':'var(--border)')+'">';
-      h+='<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:'+(ac?'var(--fire)':'var(--text)')+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(p.name)+'</div><div style="font-size:10px;color:var(--text3)">'+d+'</div></div>';
-      if(!ac)h+='<button class="sm-btn pLoad" data-id="'+esc(p.id)+'" title="Load">Load</button>';
-      h+='<button class="sm-btn pExport" data-id="'+esc(p.id)+'" title="Export file">\ud83d\udce4</button>';
-      h+='<button class="sm-btn pRenameBtn" data-id="'+esc(p.id)+'" title="Rename">\u270f\ufe0f</button>';
-      h+='<button class="sm-btn danger pDel" data-id="'+esc(p.id)+'" title="Delete">\u00d7</button>';
-      h+='</div>';
-    });
-  }
-
-  // Import help
-  h+='<div style="margin-top:12px;padding:10px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--radius-sm);">';
-  h+='<div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:4px;">\ud83d\udca1 Sharing Projects</div>';
-  h+='<div style="font-size:10px;color:var(--text3);line-height:1.5;">Export a project file to share with another team member. They can import it on their device and pick up exactly where you left off \u2014 template image, text, positions, everything.</div>';
-  h+='</div>';
-
-  h+='</div></div>';return h;
+  h+='<div class="btn-row" style="margin-bottom:8px;"><button class="sm-btn primary" id="pNew">\u2795 New</button><button class="sm-btn" id="pImport">\ud83d\udce5 Import File</button></div>';
+  if(!s.items.length)h+='<p style="font-size:12px;color:var(--text3)">No local projects.</p>';
+  else s.items.forEach(p=>{
+    const ac=p.id===s.activeId;const d=new Date(p.updatedAt||p.createdAt||Date.now()).toLocaleString();
+    h+='<div style="display:flex;align-items:center;gap:4px;padding:7px;border-radius:var(--radius-sm);margin-bottom:3px;background:'+(ac?'var(--ember)':'rgba(255,255,255,.03)')+';border:1px solid '+(ac?'rgba(255,122,24,.15)':'var(--border)')+'">';
+    h+='<div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:700;color:'+(ac?'var(--fire)':'var(--text)')+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(p.name)+'</div><div style="font-size:9px;color:var(--text3)">'+d+'</div></div>';
+    if(!ac)h+='<button class="sm-btn pLoad" data-id="'+esc(p.id)+'">Load</button>';
+    h+='<button class="sm-btn pExport" data-id="'+esc(p.id)+'">\ud83d\udce4</button>';
+    h+='<button class="sm-btn pRenameBtn" data-id="'+esc(p.id)+'">\u270f\ufe0f</button>';
+    h+='<button class="sm-btn danger pDel" data-id="'+esc(p.id)+'">\u00d7</button></div>';
+  });
+  h+='</div></div>';
+  return h;
 }
 
 function wirePanel(){
@@ -786,6 +867,43 @@ function wirePanel(){
   document.querySelectorAll('.pDel').forEach(btn=>{btn.addEventListener('click',()=>deleteProject(btn.dataset.id));});
   document.querySelectorAll('.pExport').forEach(btn=>{btn.addEventListener('click',()=>exportProjectFile(btn.dataset.id));});
   document.querySelectorAll('.pRenameBtn').forEach(btn=>{btn.addEventListener('click',()=>renameProject(btn.dataset.id));});
+
+  // Cloud wiring
+  const ccBtn=document.getElementById('cloudConnect');
+  if(ccBtn)ccBtn.addEventListener('click',()=>{
+    const url=(document.getElementById('cloudUrlInput').value||'').trim();
+    const name=(document.getElementById('cloudNameInput').value||'').trim()||'Staff';
+    if(!url||!url.startsWith('https://')){toast('Paste a valid Google Apps Script URL','error');return;}
+    setCloudUrl(url);setCloudName(name);toast('Connected to cloud!','success');rebuildSidePanel();
+  });
+  const cdBtn=document.getElementById('cloudDisconnect');
+  if(cdBtn)cdBtn.addEventListener('click',()=>{if(!confirm('Disconnect from cloud?'))return;localStorage.removeItem(CLOUD_URL_KEY);toast('Disconnected','info');rebuildSidePanel();});
+  const cnBtn=document.getElementById('cloudChangeName');
+  if(cnBtn)cnBtn.addEventListener('click',()=>{const n=prompt('Your name:',getCloudName());if(n)setCloudName(n.trim());rebuildSidePanel();});
+  const csBtn=document.getElementById('cloudSaveNew');
+  if(csBtn)csBtn.addEventListener('click',()=>cloudSave());
+  const crBtn=document.getElementById('cloudRefresh');
+  if(crBtn)crBtn.addEventListener('click',async()=>{
+    const el=document.getElementById('cloudProjectsList');
+    if(el)el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:6px;">Loading...</div>';
+    const projects=await cloudList();
+    if(!el)return;
+    if(!projects.length){el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:6px;">No cloud projects yet. Save one!</div>';return;}
+    let ph='';
+    projects.forEach(p=>{
+      const d=p.updatedAt?new Date(p.updatedAt).toLocaleString():'';
+      ph+='<div style="display:flex;align-items:center;gap:4px;padding:7px;border-radius:var(--radius-sm);margin-bottom:3px;background:rgba(255,255,255,.03);border:1px solid var(--border);">';
+      ph+='<div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(p.name)+'</div>';
+      ph+='<div style="font-size:9px;color:var(--text3)">'+d+(p.savedBy?' \u2022 by '+esc(p.savedBy):'')+'</div></div>';
+      ph+='<button class="sm-btn cLoad" data-id="'+esc(p.id)+'">Load</button>';
+      ph+='<button class="sm-btn cUpdate" data-id="'+esc(p.id)+'" data-name="'+esc(p.name)+'">\u2601\ufe0f Update</button>';
+      ph+='<button class="sm-btn danger cDel" data-id="'+esc(p.id)+'" data-name="'+esc(p.name)+'">\u00d7</button></div>';
+    });
+    el.innerHTML=ph;
+    el.querySelectorAll('.cLoad').forEach(btn=>{btn.addEventListener('click',()=>cloudLoad(btn.dataset.id));});
+    el.querySelectorAll('.cUpdate').forEach(btn=>{btn.addEventListener('click',()=>cloudUpdate(btn.dataset.id,btn.dataset.name));});
+    el.querySelectorAll('.cDel').forEach(btn=>{btn.addEventListener('click',()=>{cloudDelete(btn.dataset.id,btn.dataset.name).then(()=>{crBtn.click();});});});
+  });
 }
 
 /* INIT */
@@ -793,7 +911,7 @@ loadStarterBoxes();rebuildSidePanel();
 (async()=>{
   const s=loadStore();if(s.items.length>0){const a=s.items.find(p=>p.id===s.activeId)||s.items[0];s.activeId=a.id;saveStore(s);if(a.data)await applyPayload(a.data);}else draw();
   // Load template from site's own images folder
-  const DI="/images/FBMenu.png";
+  const DI="/Images/FBMenu.png";
   if(!imgDataURL&&DI){
     img=new Image();
     img.onload=()=>{imgLoaded=true;draw();};
