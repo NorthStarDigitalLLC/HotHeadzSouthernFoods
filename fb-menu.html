@@ -270,16 +270,20 @@ function loadStarterBoxes(){
   const t=todayDefaults();
   // Common overrides for readability on busy background
   const readable={shadow:true,shadowBlur:16,shadowColor:'rgba(0,0,0,0.85)',strokeOn:true,strokeColor:'#000000',strokeWidth:3};
+  // For sections on LIGHT backgrounds (wood) — add dark semi-transparent bg
+  const onLight={...readable,bgOn:true,bgColor:'#1a1008',bgOpacity:0.55,bgPadX:12,bgPadY:8,bgRadius:8};
+  // For sections on DARK backgrounds (slate/chalkboard) — just stroke+shadow is enough
+  const onDark={...readable};
   boxes=[
     defaultBox('Day',t.weekday||'Monday',50,5.5,{align:'center',sizePct:5.8,shadowBlur:18,shadowColor:'rgba(0,0,0,0.9)',fontFamily:'"Abril Fatface",Georgia,serif',lineHeight:1.0,strokeOn:true,strokeColor:'#000000',strokeWidth:4}),
     defaultBox('Date',t.dateStr||'April 13, 2026',50,10.8,{align:'center',sizePct:2.6,shadowBlur:14,shadowColor:'rgba(0,0,0,0.85)',fontFamily:'"DM Serif Display",Georgia,serif',italic:true,lineHeight:1.0,strokeOn:true,strokeColor:'#000000',strokeWidth:2}),
-    defaultBox('Breakfast','BREAKFAST\n5:30 AM - 10:30 AM\n\n\u2022 Scrambled Eggs\n\u2022 Bacon\n\u2022 Sausage, Hotlinks\n\u2022 Pancakes\n\u2022 French Toast Sticks\n\u2022 Biscuits\n\u2022 Hashbrowns\n\u2022 Cheesy Grits\n\u2022 Grits\n\u2022 Sausage Gravy\n\u2022 Oatmeal\n\n- Breakfast Sandwiches\n\u2022 BLT\n\u2022 Bacon, Egg and Cheese\n\u2022 Sausage, Egg and cheese\n\u2022 Breakfast Burritos',15,44,{...readable,sizePct:1.55,lineHeight:1.22,maxWidthPct:28}),
-    defaultBox('Salad Bar','SALAD BAR\n\nLettuce:\n\u2022 Romaine\n\u2022 Iceburg\nToppings:\n\u2022 Diced Tomatoes\n\u2022 Cucumbers\n\u2022 Onions\n\u2022 Broccoli\n\u2022 Carrots\n\u2022 Cauliflower\n\u2022 Peppers\n\u2022 Cheese\n\u2022 Croutons\n\u2022 Bacon Bits\n\u2022 Eggs\n\u2022 Diced Ham\n\u2022 Crackers\n\u2022 Sunflower Seeds\n\u2022 Pickled Okra\n\u2022 Jalapenos\n\u2022 Pickled beets\n\u2022 Green Olives\n\u2022 Banana Peppers\n\u2022 Pickled Green Tomatoes',63,46,{...readable,sizePct:1.35,lineHeight:1.18}),
-    defaultBox('Dressings','Dressings:\n\u2022 Ranch\n\u2022 Italian\n\u2022 Blue Cheese\n\u2022 Caesar\n\u2022 Thousand Island',88,30,{...readable,sizePct:1.35,lineHeight:1.18}),
-    defaultBox('Lunch','LUNCH\n11:00 AM - 2:00 PM\n\n\u2022 Beef Tips\n\u2022 Red Beans & Rice\n\u2022 BBQ Chicken\n\u2022 Mashed Potatoes\n& Gravy\n\u2022 Cabbage\n\u2022 Green Beans\n\u2022 Corn\n\u2022 Rolls\n\u2022 Fried Okra\n\nSame Daily\n\u2022 Turkey Clubs\n\u2022 Chicken Salad\nCroissants',13,77,{...readable,sizePct:1.45,lineHeight:1.22,maxWidthPct:22}),
-    defaultBox('Drinks','DRINKS\n\n\u2022 Sweet Tea\n\u2022 Unsweet Tea\n\u2022 Dr. Pepper\n\u2022 Rootbeer\n\u2022 Sprite\n\u2022 Fruit Punch\n\u2022 Blue Powerade\n\u2022 Diet Coke\n\u2022 Coke Zero\n\u2022 Coke\n\u2022 Coffee\n\u2022 Orange Juice\n\u2022 Milk\n\u2022 Chocolate Milk',37,77,{...readable,sizePct:1.45,lineHeight:1.22,maxWidthPct:22}),
-    defaultBox('Dessert','DESSERT\n\nCake',80,80,{align:'center',sizePct:1.9,...readable,lineHeight:1.25,fontFamily:'"DM Serif Display",Georgia,serif',italic:true}),
-    defaultBox('Bottom Note','For pricing and hours please visit\nHotHeadzSouthernFoods.com',50,97,{align:'center',sizePct:1.55,...readable,lineHeight:1.25,fontFamily:'"DM Serif Display",Georgia,serif',italic:true}),
+    defaultBox('Breakfast','BREAKFAST\n5:30 AM - 10:30 AM\n\n\u2022 Scrambled Eggs\n\u2022 Bacon\n\u2022 Sausage, Hotlinks\n\u2022 Pancakes\n\u2022 French Toast Sticks\n\u2022 Biscuits\n\u2022 Hashbrowns\n\u2022 Cheesy Grits\n\u2022 Grits\n\u2022 Sausage Gravy\n\u2022 Oatmeal\n\n- Breakfast Sandwiches\n\u2022 BLT\n\u2022 Bacon, Egg and Cheese\n\u2022 Sausage, Egg and cheese\n\u2022 Breakfast Burritos',15,44,{...onLight,sizePct:1.6,lineHeight:1.22,maxWidthPct:28}),
+    defaultBox('Salad Bar','SALAD BAR\n\nLettuce:\n\u2022 Romaine\n\u2022 Iceburg\nToppings:\n\u2022 Diced Tomatoes\n\u2022 Cucumbers\n\u2022 Onions\n\u2022 Broccoli\n\u2022 Carrots\n\u2022 Cauliflower\n\u2022 Peppers\n\u2022 Cheese\n\u2022 Croutons\n\u2022 Bacon Bits\n\u2022 Eggs\n\u2022 Diced Ham\n\u2022 Crackers\n\u2022 Sunflower Seeds\n\u2022 Pickled Okra\n\u2022 Jalapenos\n\u2022 Pickled beets\n\u2022 Green Olives\n\u2022 Banana Peppers\n\u2022 Pickled Green Tomatoes',63,46,{...onDark,sizePct:1.38,lineHeight:1.18}),
+    defaultBox('Dressings','Dressings:\n\u2022 Ranch\n\u2022 Italian\n\u2022 Blue Cheese\n\u2022 Caesar\n\u2022 Thousand Island',88,30,{...onDark,sizePct:1.38,lineHeight:1.18}),
+    defaultBox('Lunch','LUNCH\n11:00 AM - 2:00 PM\n\n\u2022 Beef Tips\n\u2022 Red Beans & Rice\n\u2022 BBQ Chicken\n\u2022 Mashed Potatoes\n& Gravy\n\u2022 Cabbage\n\u2022 Green Beans\n\u2022 Corn\n\u2022 Rolls\n\u2022 Fried Okra\n\nSame Daily\n\u2022 Turkey Clubs\n\u2022 Chicken Salad\nCroissants',13,77,{...onLight,sizePct:1.5,lineHeight:1.22,maxWidthPct:22}),
+    defaultBox('Drinks','DRINKS\n\n\u2022 Sweet Tea\n\u2022 Unsweet Tea\n\u2022 Dr. Pepper\n\u2022 Rootbeer\n\u2022 Sprite\n\u2022 Fruit Punch\n\u2022 Blue Powerade\n\u2022 Diet Coke\n\u2022 Coke Zero\n\u2022 Coke\n\u2022 Coffee\n\u2022 Orange Juice\n\u2022 Milk\n\u2022 Chocolate Milk',37,77,{...onDark,sizePct:1.5,lineHeight:1.22,maxWidthPct:22}),
+    defaultBox('Dessert','DESSERT\n\nCake',80,80,{align:'center',sizePct:1.9,...onDark,lineHeight:1.25,fontFamily:'"DM Serif Display",Georgia,serif',italic:true}),
+    defaultBox('Bottom Note','For pricing and hours please visit\nHotHeadzSouthernFoods.com',50,97,{align:'center',sizePct:1.55,...onLight,lineHeight:1.25,fontFamily:'"DM Serif Display",Georgia,serif',italic:true,bgOpacity:0.45}),
   ];
   activeId=null;
 }
@@ -628,6 +632,9 @@ function buildQF(){
     h+='<label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">Outline W <input type="range" class="qf-strokew" data-id="'+esc(b.id)+'" min="0" max="8" step="0.5" value="'+(b.strokeWidth||2)+'" style="width:50px;accent-color:var(--fire);"></label>';
     // Max Width
     h+='<label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">Width <input type="range" class="qf-maxw" data-id="'+esc(b.id)+'" min="0" max="95" step="0.5" value="'+(b.maxWidthPct||0)+'" style="width:60px;accent-color:var(--fire);"></label>';
+    // Background
+    h+='<label class="cf-toggle" style="font-size:9px;gap:3px;"><input type="checkbox" class="qf-bg" data-id="'+esc(b.id)+'"'+(b.bgOn?' checked':'')+'> BG Box</label>';
+    h+='<label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">BG% <input type="range" class="qf-bgop" data-id="'+esc(b.id)+'" min="0" max="1" step="0.05" value="'+(b.bgOpacity??.3)+'" style="width:50px;accent-color:var(--fire);"></label>';
     h+='</div>';
     // Quick color swatches
     h+='<div style="display:flex;gap:3px;margin-top:5px;flex-wrap:wrap;">';
@@ -735,6 +742,8 @@ function wirePanel(){
   document.querySelectorAll('.qf-stroke').forEach(el=>{el.addEventListener('change',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.strokeOn=!!el.checked;draw();triggerAutoSave();}});});
   document.querySelectorAll('.qf-strokew').forEach(el=>{el.addEventListener('input',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.strokeWidth=parseFloat(el.value);draw();triggerAutoSave();}});});
   document.querySelectorAll('.qf-maxw').forEach(el=>{el.addEventListener('input',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.maxWidthPct=parseFloat(el.value);draw();triggerAutoSave();}});});
+  document.querySelectorAll('.qf-bg').forEach(el=>{el.addEventListener('change',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.bgOn=!!el.checked;draw();triggerAutoSave();}});});
+  document.querySelectorAll('.qf-bgop').forEach(el=>{el.addEventListener('input',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.bgOpacity=parseFloat(el.value);draw();triggerAutoSave();}});});
   document.querySelectorAll('.qf-vis').forEach(el=>{el.addEventListener('change',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){saveUndo();b.opacity=el.checked?1:0;draw();triggerAutoSave();}});});
   document.querySelectorAll('.qf-csw').forEach(el=>{el.addEventListener('click',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.color=el.dataset.color;draw();rebuildSidePanel();triggerAutoSave();}});});
   document.querySelectorAll('.qf-del').forEach(el=>{el.addEventListener('click',()=>{const id=el.dataset.id;const name=el.dataset.name;if(!confirm('Delete "'+name+'" from the menu?'))return;saveUndo();boxes=boxes.filter(b=>b.id!==id);if(activeId===id)activeId=null;draw();rebuildSidePanel();triggerAutoSave();toast('Removed "'+name+'"','info');});});
@@ -783,8 +792,20 @@ function wirePanel(){
 loadStarterBoxes();rebuildSidePanel();
 (async()=>{
   const s=loadStore();if(s.items.length>0){const a=s.items.find(p=>p.id===s.activeId)||s.items[0];s.activeId=a.id;saveStore(s);if(a.data)await applyPayload(a.data);}else draw();
-  const DI="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/38f723d4-604b-4459-b945-c1edaed19159/DailyMenuUpdate.png?format=750w";
-  if(!imgDataURL&&DI){img=new Image();img.crossOrigin='anonymous';img.onload=()=>{imgLoaded=true;draw();};img.onerror=()=>{imgLoaded=false;draw();};img.src=DI;}
+  // Load template from site's own images folder
+  const DI="/Images/FBMenu.png";
+  if(!imgDataURL&&DI){
+    img=new Image();
+    img.onload=()=>{imgLoaded=true;draw();};
+    img.onerror=()=>{
+      // Fallback: try lowercase path
+      img=new Image();
+      img.onload=()=>{imgLoaded=true;draw();};
+      img.onerror=()=>{imgLoaded=false;draw();};
+      img.src="/Images/FBMenu.png";
+    };
+    img.src=DI;
+  }
 })();
 })();
 </script>
