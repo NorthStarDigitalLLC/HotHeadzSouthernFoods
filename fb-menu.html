@@ -348,10 +348,10 @@ function drawTextBox(b){
   b.__hit=rotAABB(x,y,rw,rh,b.rotationDeg||0);
   b.__rawW=rw;b.__rawH=rh;b.__cx=x;b.__cy=y;
 }
-const HANDLE_SIZE=8;
+const HANDLE_SIZE=10;
 function getHandles(b){
   if(!b||!b.__hit)return[];
-  const h=b.__hit,hw=HANDLE_SIZE;
+  const h=b.__hit;
   const mx=(h.left+h.right)/2,my=(h.top+h.bottom)/2;
   return[
     {id:'tl',x:h.left,y:h.top,cursor:'nwse-resize'},
@@ -366,7 +366,7 @@ function getHandles(b){
 }
 function hitHandle(px,py,b){
   const handles=getHandles(b);
-  const hs=HANDLE_SIZE*1.5;
+  const hs=HANDLE_SIZE*2.5; // bigger hit area for easier grabbing
   for(const h of handles){if(Math.abs(px-h.x)<hs&&Math.abs(py-h.y)<hs)return h;}
   return null;
 }
@@ -379,8 +379,26 @@ function drawOutline(){
   // Draw handles
   const handles=getHandles(b);
   for(const handle of handles){
-    ctx.fillStyle='rgba(255,122,24,0.9)';ctx.strokeStyle='#fff';ctx.lineWidth=1.5;
-    ctx.beginPath();ctx.arc(handle.x,handle.y,HANDLE_SIZE/2+1,0,Math.PI*2);ctx.fill();ctx.stroke();
+    const isSide=handle.id==='ml'||handle.id==='mr';
+    const isTopBot=handle.id==='tm'||handle.id==='bm';
+    const isCorner=!isSide&&!isTopBot;
+    const sz=isCorner?6:5;
+    ctx.fillStyle=isSide?'rgba(100,180,255,0.95)':isTopBot?'rgba(100,255,150,0.95)':'rgba(255,122,24,0.95)';
+    ctx.strokeStyle='#fff';ctx.lineWidth=2;
+    if(isSide){
+      // Draw wider horizontal bar for side handles
+      ctx.beginPath();
+      ctx.roundRect?ctx.roundRect(handle.x-4,handle.y-10,8,20,3):ctx.rect(handle.x-4,handle.y-10,8,20);
+      ctx.fill();ctx.stroke();
+    }else if(isTopBot){
+      // Draw wider vertical bar for top/bottom
+      ctx.beginPath();
+      ctx.roundRect?ctx.roundRect(handle.x-10,handle.y-4,20,8,3):ctx.rect(handle.x-10,handle.y-4,20,8);
+      ctx.fill();ctx.stroke();
+    }else{
+      // Corner circles
+      ctx.beginPath();ctx.arc(handle.x,handle.y,sz,0,Math.PI*2);ctx.fill();ctx.stroke();
+    }
   }
   ctx.restore();
 }
@@ -417,18 +435,36 @@ canvas.addEventListener('pointermove',e=>{
   if(dragMode==='resize'){
     const b=boxes.find(x=>x.id===activeId);if(!b||!resizeHandle)return;
     const hid=resizeHandle.id;
-    // Corner handles: scale font size
+    const hit=b.__hit;
+    // Corner handles: scale font size proportionally
     if(hid==='tl'||hid==='tr'||hid==='bl'||hid==='br'){
-      const scaleDir=(hid==='br'||hid==='tr')?1:-1;
-      const delta=(dx*scaleDir+dy*(hid==='bl'||hid==='br'?1:-1))*0.002;
-      b.sizePct=clamp(b.sizePct+delta,0.3,10);
+      // Drag outward = bigger, inward = smaller
+      const cx=(hit.left+hit.right)/2, cy=(hit.top+hit.bottom)/2;
+      const px=lastX, py=lastY; // current pointer pos (already updated)
+      const prevDist=Math.hypot((px-dx)-cx,(py-dy)-cy);
+      const newDist=Math.hypot(px-cx,py-cy);
+      if(prevDist>0){
+        const ratio=newDist/prevDist;
+        b.sizePct=clamp(b.sizePct*ratio,0.3,10);
+        // Also scale maxWidthPct if set
+        if(b.maxWidthPct>0)b.maxWidthPct=clamp(b.maxWidthPct*ratio,2,95);
+      }
     }
-    // Side handles: adjust maxWidth
+    // Side handles: adjust maxWidth by dragging left/right edge
     if(hid==='ml'||hid==='mr'){
+      // Get current box width in pixels from hit box
+      const curHitW=hit.right-hit.left;
+      // If maxWidthPct is 0 (auto), initialize it from the current rendered width
+      if(!b.maxWidthPct||b.maxWidthPct===0){
+        b.maxWidthPct=pctX(curHitW);
+      }
+      // Dragging right edge right = wider, left edge left = wider
       const dir=hid==='mr'?1:-1;
-      const curW=b.__rawW||100;
-      const newW=curW+dx*dir*2;
-      b.maxWidthPct=clamp(pctX(newW),2,95);
+      const deltaW=dx*dir;
+      const newWPx=pxX(b.maxWidthPct)+deltaW*2; // *2 because box is centered
+      b.maxWidthPct=clamp(pctX(newWPx),3,95);
+      // Also shift position slightly to keep the opposite edge anchored
+      b.xPct=clamp(b.xPct+pctX(dx)/2,0,100);
     }
     // Top/bottom handles: adjust line height
     if(hid==='tm'||hid==='bm'){
