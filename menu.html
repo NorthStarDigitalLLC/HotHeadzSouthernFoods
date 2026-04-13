@@ -192,13 +192,8 @@ function initPage(){
 setupTabs();
 initPage(); // Render immediately with defaults
 
-// Fetch lunch from Apps Script via POST (avoids CORS preflight)
-fetch(CLOUD_URL, {
-  method: 'POST',
-  redirect: 'follow',
-  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-  body: JSON.stringify({ action: 'lunch' })
-})
+// Fetch lunch from Apps Script via GET (same pattern as working staff portal)
+fetch(CLOUD_URL + '?action=lunch', { method: 'GET', mode: 'cors' })
   .then(function(r) { return r.text(); })
   .then(function(text) {
     try {
