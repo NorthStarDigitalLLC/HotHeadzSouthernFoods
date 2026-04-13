@@ -258,11 +258,10 @@ function loadStore(){const s=safeJSON(localStorage.getItem(PK),null);if(s&&Array
 function saveStore(s){try{localStorage.setItem(PK,JSON.stringify(s));return{ok:true}}catch(e){return{ok:false,error:String(e?.message||e)}}}
 
 /* CLOUD STORAGE (Google Sheets) */
-const CLOUD_URL_KEY='hhMenuCloud_url';
+const CLOUD_URL='https://script.google.com/macros/s/AKfycbxHd4heBpNJzAsgodKJMlgq8dVa_qlpHjIUHHRFYL6AIJys-d4x5Mxm1P_egFfvQiNtnQ/exec';
 const CLOUD_NAME_KEY='hhMenuCloud_name';
-function getCloudUrl(){return localStorage.getItem(CLOUD_URL_KEY)||'';}
-function setCloudUrl(u){localStorage.setItem(CLOUD_URL_KEY,u);}
-function getCloudName(){return localStorage.getItem(CLOUD_NAME_KEY)||'Staff';}
+function getCloudUrl(){return CLOUD_URL;}
+function getCloudName(){return localStorage.getItem(CLOUD_NAME_KEY)||'';}
 function setCloudName(n){localStorage.setItem(CLOUD_NAME_KEY,n);}
 
 async function cloudRequest(action,body={}){
@@ -748,28 +747,24 @@ function buildTB(){
 function buildPH(){return '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">Photo Settings</span></div><div class="acc-body"><div class="fl">Photo Zoom</div><input class="fi" type="range" id="pZoom2" min="0.3" max="4" step="0.01" value="'+photoScale+'" style="accent-color:var(--fire)"><div class="btn-row"><button class="sm-btn" id="pRot2">Rotate 90\u00b0</button><button class="sm-btn" id="pReset2">Reset Photo</button></div><p style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5;">Drag canvas = move photo. Right-drag = pan view.</p></div></div>';}
 function buildPR(){
   const s=loadStore();const activeProj=s.items.find(p=>p.id===s.activeId);
-  const cloudUrl=getCloudUrl();const cloudName=getCloudName();
+  const cloudName=getCloudName();
   let h='';
 
   // CLOUD
   h+='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u2601\ufe0f Cloud (Shared)</span></div><div class="acc-body">';
-  if(!cloudUrl){
+  if(!cloudName){
     h+='<div style="background:rgba(255,122,24,.06);border:1px solid rgba(255,122,24,.12);border-radius:var(--radius);padding:12px;margin-bottom:8px;">';
-    h+='<div style="font-size:12px;font-weight:800;color:var(--fire);margin-bottom:6px;">\ud83d\udd17 Connect Google Sheets</div>';
-    h+='<div style="font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:8px;">Save projects to a shared Google Sheet so all staff can load them from any device.</div>';
-    h+='<div class="fl">Google Apps Script URL</div>';
-    h+='<input class="fi" id="cloudUrlInput" placeholder="https://script.google.com/macros/s/.../exec">';
-    h+='<div class="fl">Your Name</div>';
-    h+='<input class="fi" id="cloudNameInput" placeholder="Your name" value="'+esc(cloudName)+'">';
-    h+='<button class="sm-btn primary" id="cloudConnect">\u2601\ufe0f Connect</button>';
+    h+='<div style="font-size:12px;font-weight:800;color:var(--fire);margin-bottom:6px;">Enter Your Name</div>';
+    h+='<div style="font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:8px;">So the team knows who saved each project.</div>';
+    h+='<input class="fi" id="cloudNameInput" placeholder="Your name">';
+    h+='<button class="sm-btn primary" id="cloudSetName">\u2601\ufe0f Set Name & Connect</button>';
     h+='</div>';
   }else{
     h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">';
     h+='<div style="width:8px;height:8px;border-radius:50%;background:#4dff88;flex-shrink:0;"></div>';
     h+='<span style="font-size:11px;color:var(--success);font-weight:700;">Connected</span>';
     h+='<span style="font-size:10px;color:var(--text3);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">as '+esc(cloudName)+'</span>';
-    h+='<button class="sm-btn" id="cloudChangeName" style="font-size:10px;">Name</button>';
-    h+='<button class="sm-btn" id="cloudDisconnect" style="font-size:10px;">Disconnect</button>';
+    h+='<button class="sm-btn" id="cloudChangeName" style="font-size:10px;">Change Name</button>';
     h+='</div>';
     h+='<div class="btn-row" style="margin-bottom:8px;">';
     h+='<button class="sm-btn primary" id="cloudSaveNew">\u2601\ufe0f Save to Cloud</button>';
@@ -780,7 +775,7 @@ function buildPR(){
   h+='</div></div>';
 
   // LOCAL
-  h+='<div class="acc'+(cloudUrl?'':' open')+'"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83d\udcbe Local (This Device)</span><span class="acc-badge">'+s.items.length+'</span></div><div class="acc-body">';
+  h+='<div class="acc"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83d\udcbe Local (This Device)</span><span class="acc-badge">'+s.items.length+'</span></div><div class="acc-body">';
   if(activeProj){
     h+='<div style="background:var(--ember);border:1px solid rgba(255,122,24,.2);border-radius:var(--radius);padding:10px;margin-bottom:10px;">';
     h+='<div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Current Local Project</div>';
@@ -869,17 +864,14 @@ function wirePanel(){
   document.querySelectorAll('.pRenameBtn').forEach(btn=>{btn.addEventListener('click',()=>renameProject(btn.dataset.id));});
 
   // Cloud wiring
-  const ccBtn=document.getElementById('cloudConnect');
-  if(ccBtn)ccBtn.addEventListener('click',()=>{
-    const url=(document.getElementById('cloudUrlInput').value||'').trim();
-    const name=(document.getElementById('cloudNameInput').value||'').trim()||'Staff';
-    if(!url||!url.startsWith('https://')){toast('Paste a valid Google Apps Script URL','error');return;}
-    setCloudUrl(url);setCloudName(name);toast('Connected to cloud!','success');rebuildSidePanel();
+  const csn=document.getElementById('cloudSetName');
+  if(csn)csn.addEventListener('click',()=>{
+    const name=(document.getElementById('cloudNameInput').value||'').trim();
+    if(!name){toast('Enter your name','error');return;}
+    setCloudName(name);toast('Connected as '+name+'!','success');rebuildSidePanel();
   });
-  const cdBtn=document.getElementById('cloudDisconnect');
-  if(cdBtn)cdBtn.addEventListener('click',()=>{if(!confirm('Disconnect from cloud?'))return;localStorage.removeItem(CLOUD_URL_KEY);toast('Disconnected','info');rebuildSidePanel();});
   const cnBtn=document.getElementById('cloudChangeName');
-  if(cnBtn)cnBtn.addEventListener('click',()=>{const n=prompt('Your name:',getCloudName());if(n)setCloudName(n.trim());rebuildSidePanel();});
+  if(cnBtn)cnBtn.addEventListener('click',()=>{const n=prompt('Your name:',getCloudName());if(n&&n.trim()){setCloudName(n.trim());rebuildSidePanel();}});
   const csBtn=document.getElementById('cloudSaveNew');
   if(csBtn)csBtn.addEventListener('click',()=>cloudSave());
   const crBtn=document.getElementById('cloudRefresh');
