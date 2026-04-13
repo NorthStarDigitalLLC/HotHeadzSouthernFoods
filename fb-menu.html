@@ -66,6 +66,8 @@
     .tab-btn{padding:6px 13px;border-radius:8px;border:none;background:transparent;color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;}
     .tab-btn:hover{background:rgba(255,255,255,.06);color:var(--text);}
     .tab-btn.active{background:var(--ember);color:var(--fire);}
+    .tab-btn.menu-tab{border:1px solid rgba(255,255,255,.06);}
+    .tab-btn.menu-tab.active{background:rgba(100,180,255,.12);color:#7ac4ff;border-color:rgba(100,180,255,.2);}
     .tb-actions{display:flex;gap:5px;flex-shrink:0;}
     .tb-btn{padding:7px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;}
     .tb-btn:hover{background:rgba(255,255,255,.1);}
@@ -180,10 +182,19 @@
     <div class="topbar-brand">Hot Headz</div>
     <div class="topbar-sep"></div>
     <div class="topbar-tabs">
-      <button class="tab-btn active" data-tab="quickfill">⚡ Quick Fill</button>
+      <button class="tab-btn active" data-tab="quickfill">⚡ FB Menu</button>
       <button class="tab-btn" data-tab="textboxes">Text Boxes</button>
       <button class="tab-btn" data-tab="photo">Photo</button>
       <button class="tab-btn" data-tab="projects">Projects</button>
+      <div class="topbar-sep" style="margin:0 4px;"></div>
+      <button class="tab-btn menu-tab" data-tab="menu-lunch">🍽 Lunch</button>
+      <button class="tab-btn menu-tab" data-tab="menu-breakfast">🍳 Breakfast</button>
+      <button class="tab-btn menu-tab" data-tab="menu-drinks">🥤 Drinks</button>
+      <button class="tab-btn menu-tab" data-tab="menu-salad">🥗 Salad</button>
+      <button class="tab-btn menu-tab" data-tab="menu-dessert">🍰 Dessert</button>
+      <button class="tab-btn menu-tab" data-tab="menu-crawfish">🦞 Crawfish</button>
+      <button class="tab-btn menu-tab" data-tab="menu-hours">⏰ Hours</button>
+      <button class="tab-btn menu-tab" data-tab="menu-beer">🍺 Beer</button>
     </div>
     <div class="tb-actions">
       <button class="tb-btn undo" id="undoBtn" title="Undo">↩</button>
@@ -232,7 +243,8 @@
     <p>Download your finished menu image.</p>
     <button class="export-big main" id="dlJpg"><span class="icon">📸</span><span class="meta">Download JPG<small>Best for Facebook — post this one</small></span></button>
     <button class="export-big" id="dlPng"><span class="icon">🖼</span><span class="meta">Download PNG<small>Lossless quality — larger file</small></span></button>
-    <button class="export-big" id="dlJson"><span class="icon">📤</span><span class="meta">Export Project File<small>Share with team — they import it and pick up where you left off</small></span></button>
+    <button class="export-big" id="publishLunch" style="background:linear-gradient(135deg,#4dff88,#2a9d5c);border-color:transparent;"><span class="icon">🌐</span><span class="meta">Publish Lunch to Website<small>Push today's lunch items to the live public menu</small></span></button>
+    <button class="export-big" id="dlJson"><span class="icon">📤</span><span class="meta">Export Project File<small>Share with team</small></span></button>
     <button class="export-close" id="closeExport">Cancel</button>
   </div>
 </div>
@@ -800,6 +812,57 @@ document.getElementById('dlJpg').addEventListener('click',()=>{exportCropped('im
 document.getElementById('dlPng').addEventListener('click',()=>{exportCropped('image/png','png',1);exportModal.classList.remove('active');});
 document.getElementById('dlJson').addEventListener('click',()=>{exportJSON();exportModal.classList.remove('active');});
 
+// Publish lunch items to live website menu
+async function publishLunch(){
+  // Find the Lunch text box
+  const lunchBox=boxes.find(b=>b.name==='Lunch');
+  if(!lunchBox||!lunchBox.text.trim()){toast('No Lunch text box found or it is empty','error');return;}
+  
+  // Parse lunch text into items array
+  // Format: lines starting with • or - are items, skip headers/times
+  const lines=lunchBox.text.split('\n').map(l=>l.trim()).filter(Boolean);
+  const items=[];
+  for(const line of lines){
+    // Skip header lines like "LUNCH" and time lines
+    if(line.toUpperCase()==='LUNCH')continue;
+    if(/^\d{1,2}:\d{2}\s*(AM|PM)/i.test(line))continue;
+    if(/^(Same Daily|Same daily)/i.test(line)){items.push({name:line,desc:''});continue;}
+    // Clean bullet points
+    let clean=line.replace(/^[\u2022\u2023\u25E6\u2043\u2219•\-\*]\s*/,'').trim();
+    if(clean)items.push({name:clean,desc:''});
+  }
+  
+  if(!items.length){toast('Could not parse any lunch items from the Lunch text box','error');return;}
+  
+  // Get today's date in ISO format
+  const now=new Date();
+  const dateISO=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  
+  // Confirm
+  const itemNames=items.map(i=>i.name).join(', ');
+  if(!confirm('Publish '+items.length+' lunch items to the live website for '+dateISO+'?\n\n'+itemNames))return;
+  
+  toast('Publishing to live menu...','info');
+  
+  try{
+    const url=getCloudUrl();
+    const r=await fetch(url,{
+      method:'POST',redirect:'follow',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'publish',date:dateISO,items:items,publishedBy:getCloudName()})
+    });
+    const text=await r.text();
+    const result=safeJSON(text,null);
+    if(result?.success){
+      toast('Published! '+items.length+' lunch items are now live on the website.','success');
+    }else{
+      toast('Publish failed: '+(result?.error||'unknown error'),'error');
+    }
+  }catch(e){toast('Publish error: '+e.message,'error');}
+}
+
+document.getElementById('publishLunch').addEventListener('click',()=>{publishLunch();exportModal.classList.remove('active');});
+
 /* SIDE PANEL */
 let currentTab='quickfill';
 document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{currentTab=btn.dataset.tab;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');rebuildSidePanel();if(window.innerWidth<=900)document.getElementById('sidePanel').classList.add('mobile-open');});});
@@ -812,6 +875,32 @@ function rebuildSidePanel(){
   else if(currentTab==='textboxes')c.innerHTML=buildTB();
   else if(currentTab==='photo')c.innerHTML=buildPH();
   else if(currentTab==='projects')c.innerHTML=buildPR();
+  else if(currentTab.startsWith('menu-')){
+    // Load menu data on demand if cache is empty
+    if(!menuCache._loaded){
+      c.innerHTML='<div style="padding:20px;text-align:center;"><div style="font-size:13px;color:var(--text2);margin-bottom:8px;">Loading menu data from cloud...</div></div>';
+      loadFullMenu().then(fullMenu=>{
+        if(fullMenu){
+          menuCache['hours']=fullMenu.hours||{};
+          menuCache['closures']=fullMenu.closures||{};
+          menuCache['breakfast']=fullMenu.defaults?.breakfast||{};
+          menuCache['drinks']=fullMenu.defaults?.drinks||{};
+          menuCache['salad']=fullMenu.defaults?.salad||{};
+          menuCache['dessert']=fullMenu.defaults?.dessert||{};
+          menuCache['crawfish']=fullMenu.defaults?.crawfish||{};
+          menuCache['beer']=fullMenu.beer||[];
+          menuCache['lunch-defaults']=fullMenu.defaults?.lunch||{};
+          menuCache._loaded=true;
+        }else{
+          menuCache._loaded=true; // Don't keep retrying
+          toast('Could not load from cloud — you can still edit and save. Make sure you deploy the new Apps Script.','info');
+        }
+        c.innerHTML=buildMenuTab(currentTab);wirePanel();
+      });
+      return;
+    }
+    c.innerHTML=buildMenuTab(currentTab);
+  }
   wirePanel();
 }
 
@@ -972,6 +1061,7 @@ function buildPR(){
 
 function wirePanel(){
   document.querySelectorAll('.acc-head').forEach(h=>{h.addEventListener('click',()=>h.parentElement.classList.toggle('open'));});
+  if(currentTab.startsWith('menu-')){wireMenuPanel();return;}
   document.querySelectorAll('.qf-input').forEach(el=>{el.addEventListener('input',()=>{const box=boxes.find(b=>b.name===el.dataset.name);if(box){saveUndo();box.text=el.value;draw();triggerAutoSave();}});});
 
   // QF inline styling controls
@@ -1070,24 +1160,327 @@ async function refreshCloudList(){
   el.querySelectorAll('.cDel').forEach(btn=>{btn.addEventListener('click',()=>{cloudDelete(btn.dataset.id,btn.dataset.name).then(()=>refreshCloudList());});});
 }
 
+/* ═══════════════════════════════════════════════
+   PUBLIC MENU DATA MANAGEMENT
+   All data lives in Google Sheets via the Apps Script
+═══════════════════════════════════════════════ */
+let menuCache={};
+
+async function loadMenuKey(key){
+  const url=getCloudUrl();if(!url)return null;
+  try{
+    const r=await fetch(url+'?action=menu-key&key='+encodeURIComponent(key),{redirect:'follow'});
+    const j=JSON.parse(await r.text());
+    if(j.success){menuCache[key]=j.value;return j.value;}
+  }catch(e){console.warn('loadMenuKey error:',e);}
+  return menuCache[key]||null;
+}
+
+async function saveMenuKey(key,value){
+  const url=getCloudUrl();if(!url){toast('No cloud connection','error');return false;}
+  try{
+    const r=await fetch(url,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'save-menu',key:key,value:value})});
+    const j=JSON.parse(await r.text());
+    if(j.success){menuCache[key]=value;toast('Saved '+key+'!','success');return true;}
+    else{toast('Save failed: '+(j.error||''),'error');return false;}
+  }catch(e){toast('Save error: '+e.message,'error');return false;}
+}
+
+async function saveLunchForDate(date,data){
+  const url=getCloudUrl();if(!url)return false;
+  try{
+    const r=await fetch(url,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'save-lunch',date:date,data:data})});
+    const j=JSON.parse(await r.text());
+    if(j.success){toast('Lunch saved for '+date+'!','success');return true;}
+    else{toast('Save failed: '+(j.error||''),'error');return false;}
+  }catch(e){toast('Save error: '+e.message,'error');return false;}
+}
+
+async function deleteLunchForDate(date){
+  const url=getCloudUrl();if(!url)return false;
+  try{
+    const r=await fetch(url,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'delete-lunch',date:date})});
+    const j=JSON.parse(await r.text());
+    if(j.success){toast('Lunch removed for '+date,'info');return true;}
+  }catch(e){}
+  return false;
+}
+
+async function loadFullMenu(){
+  const url=getCloudUrl();if(!url)return null;
+  try{
+    const r=await fetch(url+'?action=menu',{redirect:'follow',mode:'cors'});
+    const text=await r.text();
+    const j=JSON.parse(text);
+    if(j.success)return j.menuData;
+  }catch(e){
+    // CORS might block — try no-cors won't help, just log silently
+    console.log('[HH] Cloud menu fetch unavailable:',e.message);
+  }
+  return null;
+}
+
+function todayISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function dateOffset(n){const d=new Date();d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function isoToDay(iso){const[y,m,d]=iso.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:'long'});}
+function isoToLabel(iso){const[y,m,d]=iso.split('-').map(Number);const dt=new Date(y,m-1,d);return dt.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});}
+
+/* ── Menu Tab Builders ── */
+function buildMenuTab(tab){
+  const t=tab.replace('menu-','');
+  if(t==='lunch')return buildMenuLunch();
+  if(t==='breakfast')return buildMenuList('breakfast','Breakfast Items','Same daily — served at opening','Add items that are served every day for breakfast.',12);
+  if(t==='drinks')return buildMenuList('drinks','Drinks','Available daily','All drink options.',8);
+  if(t==='dessert')return buildMenuList('dessert','Dessert','Changes daily','Default dessert items. Override per-date in Lunch tab.',4);
+  if(t==='crawfish')return buildMenuCrawfish();
+  if(t==='salad')return buildMenuSalad();
+  if(t==='hours')return buildMenuHours();
+  if(t==='beer')return buildMenuList('beer','Beer','Ice cold','Beer options available.',6);
+  return '<div style="padding:14px;color:var(--text3);">Unknown tab</div>';
+}
+
+function buildMenuLunch(){
+  let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83c\udf7d Lunch Forecast</span></div><div class="acc-body">';
+  h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Set lunch items for each date. These show on the public menu and weekly forecast.</p>';
+  // Date picker - show 7 days
+  h+='<div class="btn-row" style="margin-bottom:10px;">';
+  for(let i=0;i<7;i++){
+    const iso=dateOffset(i);const lbl=i===0?'Today':i===1?'Tomorrow':isoToLabel(iso);
+    h+='<button class="sm-btn lunchDateBtn'+(i===0?' primary':'')+'" data-date="'+iso+'">'+lbl+'</button>';
+  }
+  h+='</div>';
+  h+='<div id="lunchDateEditor"><div style="font-size:11px;color:var(--text3);padding:8px;">Select a date above...</div></div>';
+  // Lunch defaults (plates/pricing)
+  h+='<div style="margin-top:16px;"><div class="fl">Default Lunch Plates & Pricing (one per line)</div>';
+  h+='<textarea class="fi fi-ta" id="lunchDefaultPlates" rows="5" placeholder="Lunch Plate – $12.99 (1 Meat, 2 Sides)"></textarea>';
+  h+='<button class="sm-btn primary" id="saveLunchDefaults">\ud83d\udcbe Save Lunch Defaults</button></div>';
+  h+='</div></div>';
+  return h;
+}
+
+function buildMenuList(key,title,subtitle,hint,rows){
+  const cached=menuCache[key];
+  const val=cached?( Array.isArray(cached)?cached.join('\n'):(cached.items||[]).join('\n') ):'';
+  const plates=cached?.plates?cached.plates.join('\n'):'';
+  let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">'+title+'</span></div><div class="acc-body">';
+  h+='<p style="font-size:12px;color:var(--text2);margin-bottom:8px;">'+hint+'</p>';
+  if(key==='breakfast'){
+    h+='<div class="fl">Plates & Pricing (one per line)</div>';
+    h+='<textarea class="fi fi-ta menuPlates" data-key="'+key+'" rows="4" placeholder="Breakfast Plate – $9.99">'+esc(plates)+'</textarea>';
+    h+='<div class="fl">Subtitle</div>';
+    h+='<input class="fi menuSub" data-key="'+key+'" value="'+esc(cached?.subtitle||subtitle)+'">';
+  }
+  h+='<div class="fl">Items (one per line)</div>';
+  h+='<textarea class="fi fi-ta menuItems" data-key="'+key+'" rows="'+rows+'" placeholder="One item per line">'+esc(val)+'</textarea>';
+  h+='<button class="sm-btn primary menuSaveBtn" data-key="'+key+'">\ud83d\udcbe Save '+title+' to Cloud</button>';
+  h+='<button class="sm-btn menuLoadBtn" data-key="'+key+'" style="margin-left:4px;">\ud83d\udd04 Load from Cloud</button>';
+  h+='</div></div>';
+  return h;
+}
+
+function buildMenuSalad(){
+  const cached=menuCache['salad']||{};
+  const sb=cached.saladBar||{};
+  let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83e\udd57 Salad Bar</span></div><div class="acc-body">';
+  h+='<div class="fl">Pricing (one per line)</div>';
+  h+='<textarea class="fi fi-ta" id="saladPricing" rows="3">'+esc((cached.items||[]).join('\n'))+'</textarea>';
+  h+='<div class="fl">Lettuce (one per line)</div>';
+  h+='<textarea class="fi fi-ta" id="saladLettuce" rows="2">'+esc((sb.lettuce||[]).join('\n'))+'</textarea>';
+  h+='<div class="fl">Toppings (one per line)</div>';
+  h+='<textarea class="fi fi-ta" id="saladToppings" rows="8">'+esc((sb.toppings||[]).join('\n'))+'</textarea>';
+  h+='<div class="fl">Dressings (one per line)</div>';
+  h+='<textarea class="fi fi-ta" id="saladDressings" rows="4">'+esc((sb.dressing||[]).join('\n'))+'</textarea>';
+  h+='<button class="sm-btn primary" id="saladSave">\ud83d\udcbe Save Salad Bar</button>';
+  h+='<button class="sm-btn" id="saladLoad" style="margin-left:4px;">\ud83d\udd04 Load from Cloud</button>';
+  h+='</div></div>';
+  return h;
+}
+
+function buildMenuCrawfish(){
+  const cached=menuCache['crawfish']||{};
+  let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83e\udd9e Crawfish</span></div><div class="acc-body">';
+  h+='<div class="fl">Subtitle</div><input class="fi" id="cfSub" value="'+esc(cached.subtitle||'(Pricing is subject to change)')+'">';
+  h+='<div class="fl">Info/Details (one per line)</div>';
+  h+='<textarea class="fi fi-ta" id="cfItems" rows="5">'+esc((cached.items||[]).join('\n'))+'</textarea>';
+  h+='<button class="sm-btn primary" id="cfSave">\ud83d\udcbe Save Crawfish</button>';
+  h+='<button class="sm-btn" id="cfLoad" style="margin-left:4px;">\ud83d\udd04 Load from Cloud</button>';
+  h+='</div></div>';
+  return h;
+}
+
+function buildMenuHours(){
+  const cached=menuCache['hours']||{};
+  const weekly=cached.weekly||[];
+  const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u23f0 Hours & Settings</span></div><div class="acc-body">';
+  h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;">Set opening hours for each day.</p>';
+  for(const day of days){
+    const existing=weekly.find(w=>w.day===day)||{};
+    h+='<div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap;">';
+    h+='<span style="font-size:12px;font-weight:700;color:var(--text);min-width:80px;">'+day+'</span>';
+    h+='<input class="fi hoursOpen" data-day="'+day+'" placeholder="Open" value="'+esc(existing.open||'')+'" style="width:90px;margin-bottom:0;">';
+    h+='<span style="font-size:11px;color:var(--text3);">to</span>';
+    h+='<input class="fi hoursClose" data-day="'+day+'" placeholder="Close" value="'+esc(existing.close||'')+'" style="width:90px;margin-bottom:0;">';
+    h+='</div>';
+  }
+  h+='<div style="margin-top:10px;"><div class="fl">Note (optional)</div><input class="fi" id="hoursNote" value="'+esc(cached.note||'')+'" placeholder="e.g. Holiday hours may vary"></div>';
+  // Closures
+  h+='<div style="margin-top:12px;"><div class="fl">Closures (day = message, one per line)</div>';
+  const closures=menuCache['closures']||{};
+  const closureLines=Object.keys(closures).map(k=>k+' = '+(closures[k].message||'Closed')).join('\n');
+  h+='<textarea class="fi fi-ta" id="closuresTA" rows="3" placeholder="Sunday = Closed for the holiday!">'+esc(closureLines)+'</textarea></div>';
+  h+='<button class="sm-btn primary" id="hoursSave" style="margin-top:8px;">\ud83d\udcbe Save Hours & Closures</button>';
+  h+='<button class="sm-btn" id="hoursLoad" style="margin-left:4px;">\ud83d\udd04 Load from Cloud</button>';
+  h+='</div></div>';
+  return h;
+}
+
+function linesTo(text){return String(text||'').split('\n').map(s=>s.trim()).filter(Boolean);}
+
+/* Wire menu tab events */
+function wireMenuPanel(){
+  // Generic list save/load (breakfast, drinks, dessert, beer)
+  document.querySelectorAll('.menuSaveBtn').forEach(btn=>{btn.addEventListener('click',async()=>{
+    const key=btn.dataset.key;
+    const itemsEl=document.querySelector('.menuItems[data-key="'+key+'"]');
+    const platesEl=document.querySelector('.menuPlates[data-key="'+key+'"]');
+    const subEl=document.querySelector('.menuSub[data-key="'+key+'"]');
+    const items=linesTo(itemsEl?.value);
+    if(key==='beer'){await saveMenuKey(key,items);}
+    else{
+      const obj={items:items};
+      if(platesEl)obj.plates=linesTo(platesEl.value);
+      if(subEl)obj.subtitle=subEl.value.trim();
+      await saveMenuKey(key,obj);
+    }
+  });});
+  document.querySelectorAll('.menuLoadBtn').forEach(btn=>{btn.addEventListener('click',async()=>{
+    const key=btn.dataset.key;await loadMenuKey(key);rebuildSidePanel();toast('Loaded '+key+' from cloud','success');
+  });});
+
+  // Salad
+  const saladSave=document.getElementById('saladSave');
+  if(saladSave)saladSave.addEventListener('click',async()=>{
+    await saveMenuKey('salad',{
+      items:linesTo(document.getElementById('saladPricing')?.value),
+      saladBar:{
+        lettuce:linesTo(document.getElementById('saladLettuce')?.value),
+        toppings:linesTo(document.getElementById('saladToppings')?.value),
+        dressing:linesTo(document.getElementById('saladDressings')?.value)
+      }
+    });
+  });
+  const saladLoad=document.getElementById('saladLoad');
+  if(saladLoad)saladLoad.addEventListener('click',async()=>{await loadMenuKey('salad');rebuildSidePanel();toast('Loaded salad from cloud','success');});
+
+  // Crawfish
+  const cfSave=document.getElementById('cfSave');
+  if(cfSave)cfSave.addEventListener('click',async()=>{
+    await saveMenuKey('crawfish',{subtitle:document.getElementById('cfSub')?.value||'',items:linesTo(document.getElementById('cfItems')?.value)});
+  });
+  const cfLoad=document.getElementById('cfLoad');
+  if(cfLoad)cfLoad.addEventListener('click',async()=>{await loadMenuKey('crawfish');rebuildSidePanel();toast('Loaded crawfish from cloud','success');});
+
+  // Hours
+  const hoursSave=document.getElementById('hoursSave');
+  if(hoursSave)hoursSave.addEventListener('click',async()=>{
+    const weekly=[];
+    ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].forEach(day=>{
+      const open=document.querySelector('.hoursOpen[data-day="'+day+'"]')?.value||'';
+      const close=document.querySelector('.hoursClose[data-day="'+day+'"]')?.value||'';
+      if(open||close)weekly.push({day,open,close,breakfast:open+' \u2013 10:30 AM',lunch:'11:00 AM \u2013 '+close});
+    });
+    await saveMenuKey('hours',{note:document.getElementById('hoursNote')?.value||'',weekly});
+    // Closures
+    const closureLines=linesTo(document.getElementById('closuresTA')?.value);
+    const closures={};
+    closureLines.forEach(line=>{const[k,...rest]=line.split('=');if(k)closures[k.trim()]={closed:true,message:rest.join('=').trim()||'Closed'};});
+    await saveMenuKey('closures',closures);
+  });
+  const hoursLoad=document.getElementById('hoursLoad');
+  if(hoursLoad)hoursLoad.addEventListener('click',async()=>{await loadMenuKey('hours');await loadMenuKey('closures');rebuildSidePanel();toast('Loaded hours from cloud','success');});
+
+  // Lunch forecast
+  document.querySelectorAll('.lunchDateBtn').forEach(btn=>{btn.addEventListener('click',async()=>{
+    document.querySelectorAll('.lunchDateBtn').forEach(b=>b.classList.remove('primary'));
+    btn.classList.add('primary');
+    const date=btn.dataset.date;
+    const el=document.getElementById('lunchDateEditor');
+    if(!el)return;
+    el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:8px;">Loading...</div>';
+    // Try to load this date from cloud
+    const url=getCloudUrl();let lunchData=null;
+    try{
+      const r=await fetch(url+'?action=menu',{redirect:'follow'});
+      const j=JSON.parse(await r.text());
+      if(j.success&&j.menuData?.menus?.[date])lunchData=j.menuData.menus[date];
+    }catch(e){}
+    const items=lunchData?.lunch?.items||[];
+    const itemsText=items.map(i=>typeof i==='object'?(i.name+(i.desc?' | '+i.desc:'')):(i||'')).join('\n');
+    const dessertItems=lunchData?.dessert?.items||[];
+    const showCrawfish=lunchData?.crawfish?.show!==false;
+    let lh='<div style="font-size:12px;font-weight:700;color:var(--fire);margin-bottom:8px;">'+isoToDay(date)+' \u2022 '+date+'</div>';
+    lh+='<div class="fl">Lunch Items (one per line, use Name | Description)</div>';
+    lh+='<textarea class="fi fi-ta" id="lunchItemsTA" rows="12" placeholder="Beef Tips | Tender beef tips in savory gravy\nRed Beans & Rice | Slow-cooked red beans over rice">'+esc(itemsText)+'</textarea>';
+    lh+='<div class="fr"><div><div class="fl">Dessert</div><input class="fi" id="lunchDessert" value="'+esc(dessertItems.join(', '))+'" placeholder="Cake"></div>';
+    lh+='<div><div class="fl">Crawfish</div><label class="cf-toggle" style="margin-top:8px;"><input type="checkbox" id="lunchCrawfish"'+(showCrawfish?' checked':'')+'> Available</label></div></div>';
+    lh+='<div class="btn-row" style="margin-top:8px;"><button class="sm-btn primary" id="saveLunchDate">\ud83d\udcbe Save Lunch for '+isoToLabel(date)+'</button>';
+    lh+='<button class="sm-btn danger" id="deleteLunchDate">\u00d7 Clear This Date</button></div>';
+    el.innerHTML=lh;
+    // Wire save
+    document.getElementById('saveLunchDate')?.addEventListener('click',async()=>{
+      const lines=linesTo(document.getElementById('lunchItemsTA')?.value);
+      const lunchItems=lines.map(line=>{const[name,...rest]=line.split('|');return{name:(name||'').trim(),desc:rest.join('|').trim()};}).filter(i=>i.name);
+      const dessert=linesTo(document.getElementById('lunchDessert')?.value.replace(/,/g,'\n'));
+      const crawfish=document.getElementById('lunchCrawfish')?.checked;
+      const dateData={lunch:{show:true,items:lunchItems},dessert:{items:dessert},crawfish:{show:crawfish}};
+      await saveLunchForDate(date,dateData);
+    });
+    document.getElementById('deleteLunchDate')?.addEventListener('click',async()=>{
+      if(!confirm('Clear lunch for '+date+'?'))return;
+      await deleteLunchForDate(date);
+      btn.click(); // reload
+    });
+  });});
+  // Auto-click today
+  const todayBtn=document.querySelector('.lunchDateBtn');
+  if(todayBtn&&currentTab==='menu-lunch')todayBtn.click();
+
+  // Lunch defaults save
+  const sld=document.getElementById('saveLunchDefaults');
+  if(sld)sld.addEventListener('click',async()=>{
+    const plates=linesTo(document.getElementById('lunchDefaultPlates')?.value);
+    await saveMenuKey('lunch-defaults',{subtitle:'(Changes Daily)',plates});
+  });
+}
+
 /* INIT */
 loadStarterBoxes();rebuildSidePanel();
 (async()=>{
   const s=loadStore();if(s.items.length>0){const a=s.items.find(p=>p.id===s.activeId)||s.items[0];s.activeId=a.id;saveStore(s);if(a.data)await applyPayload(a.data);}else draw();
-  // Load template from site's own images folder
-  const DI="/Images/FBMenu.png";
-  if(!imgDataURL&&DI){
-    img=new Image();
-    img.onload=()=>{imgLoaded=true;draw();};
-    img.onerror=()=>{
-      // Fallback: try lowercase path
-      img=new Image();
-      img.onload=()=>{imgLoaded=true;draw();};
-      img.onerror=()=>{imgLoaded=false;draw();};
-      img.src="/images/FBMenu.png";
-    };
-    img.src=DI;
-  }
+  // Load template image
+  const DI="/images/FBMenu.png";
+  if(!imgDataURL&&DI){img=new Image();img.onload=()=>{imgLoaded=true;draw();};img.onerror=()=>{imgLoaded=false;draw();};img.src=DI;}
+  // Pre-load menu data from cloud for the menu tabs (silent — no error toast)
+  try{
+    const fullMenu=await loadFullMenu();
+    if(fullMenu){
+      menuCache['hours']=fullMenu.hours||{};
+      menuCache['closures']=fullMenu.closures||{};
+      menuCache['breakfast']=fullMenu.defaults?.breakfast||{};
+      menuCache['drinks']=fullMenu.defaults?.drinks||{};
+      menuCache['salad']=fullMenu.defaults?.salad||{};
+      menuCache['dessert']=fullMenu.defaults?.dessert||{};
+      menuCache['crawfish']=fullMenu.defaults?.crawfish||{};
+      menuCache['beer']=fullMenu.beer||[];
+      menuCache['lunch-defaults']=fullMenu.defaults?.lunch||{};
+      menuCache._loaded=true;
+      console.log('[HH] Menu data preloaded');
+    }
+  }catch(e){console.log('[HH] Menu preload skipped (will load on demand)');}
 })();
 })();
 </script>
