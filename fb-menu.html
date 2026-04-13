@@ -2,1841 +2,1140 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hot Headz – Admin Menu Editor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Hot Headz – Menu Editor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Serif+Display:ital@0;1&family=Playfair+Display:wght@700;900&family=Bebas+Neue&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* ---------- GLOBAL RESET ---------- */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    *{margin:0;padding:0;box-sizing:border-box;}
+    :root{
+      --void:#0a0a0e;--surface:#131318;--card:#1a1a22;--border:rgba(255,255,255,.1);
+      --text:#f0ece6;--text2:rgba(240,236,230,.7);--text3:rgba(240,236,230,.45);
+      --fire:#ff7a18;--fire2:#ffb347;--ember:rgba(255,122,24,.15);
+      --danger:#ff4d4d;--danger-bg:rgba(255,77,77,.12);
+      --success:#4dff88;--success-bg:rgba(77,255,136,.12);
+      --radius:14px;--radius-sm:10px;
     }
-    body {
-      background: #0b0a0e;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:var(--text);
+      font-family:'DM Sans',system-ui,sans-serif;-webkit-tap-highlight-color:transparent;}
+
+    /* ── TOAST ── */
+    #toastBox{position:fixed;top:16px;right:16px;z-index:100000;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+    .toast{pointer-events:auto;padding:12px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;
+      color:#fff;backdrop-filter:blur(12px);animation:toastIn .35s ease,toastOut .4s 2.8s ease forwards;
+      box-shadow:0 8px 30px rgba(0,0,0,.4);max-width:340px;}
+    .toast.success{background:rgba(30,60,40,.88);border:1px solid rgba(77,255,136,.25);}
+    .toast.error{background:rgba(60,20,20,.88);border:1px solid rgba(255,77,77,.3);}
+    .toast.info{background:rgba(20,30,60,.88);border:1px solid rgba(100,140,255,.25);}
+    @keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+    @keyframes toastOut{to{opacity:0;transform:translateX(40px)}}
+
+    /* ── ADMIN GATE ── */
+    .admin-gate{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;
+      background:radial-gradient(ellipse at 30% 20%,#1e1510,#07060a);z-index:10000;}
+    .admin-card{background:rgba(20,18,22,.88);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.12);
+      border-radius:28px;padding:44px 36px;text-align:center;max-width:480px;width:100%;
+      box-shadow:0 40px 80px rgba(0,0,0,.5);animation:fadeUp .7s ease;}
+    .lock-icon{font-size:56px;margin-bottom:16px;animation:floatLock 3s ease-in-out infinite;}
+    .admin-card h1{font-family:'Abril Fatface',serif;font-size:32px;margin-bottom:12px;
+      background:linear-gradient(135deg,var(--fire2),var(--fire));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .admin-card p{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px;}
+    .pin-row{display:flex;gap:10px;justify-content:center;margin:24px 0 14px;}
+    .pin-row input{background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:40px;padding:13px 18px;
+      width:150px;font-size:20px;text-align:center;color:#fff;font-weight:700;letter-spacing:4px;}
+    .pin-row input:focus{outline:none;border-color:var(--fire);}
+    .unlock-btn{background:linear-gradient(135deg,var(--fire),var(--fire2));border:none;border-radius:40px;padding:13px 26px;
+      font-size:16px;font-weight:800;color:#fff;cursor:pointer;transition:transform .2s,box-shadow .2s;}
+    .unlock-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,122,24,.35);}
+    .error-msg{color:var(--danger);font-size:13px;min-height:22px;margin-bottom:8px;}
+    .gate-links{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px;}
+    .gate-links a{padding:11px 22px;border-radius:40px;font-weight:700;font-size:13px;text-decoration:none;transition:all .2s;}
+    .gate-link-primary{background:linear-gradient(135deg,var(--fire),var(--fire2));color:#fff;}
+    .gate-link-ghost{border:1px solid var(--border);color:var(--text2);}
+    .gate-link-ghost:hover{background:rgba(255,255,255,.06);}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes floatLock{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+    /* ── EDITOR SHELL ── */
+    .editor{display:none;position:fixed;inset:0;z-index:9999;background:var(--void);flex-direction:column;}
+    .editor.active{display:flex;}
+
+    /* ── TOP BAR ── */
+    .topbar{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--border);
+      background:var(--surface);flex-shrink:0;min-height:52px;}
+    .topbar-brand{font-family:'Abril Fatface',serif;font-size:16px;white-space:nowrap;
+      background:linear-gradient(135deg,var(--fire2),var(--fire));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .topbar-sep{width:1px;height:24px;background:var(--border);flex-shrink:0;}
+    .topbar-tabs{display:flex;gap:4px;flex:1;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    .topbar-tabs::-webkit-scrollbar{display:none;}
+    .tab-btn{padding:7px 14px;border-radius:8px;border:none;background:transparent;color:var(--text2);
+      font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s;letter-spacing:.02em;}
+    .tab-btn:hover{background:rgba(255,255,255,.06);color:var(--text);}
+    .tab-btn.active{background:var(--ember);color:var(--fire);}
+    .topbar-actions{display:flex;gap:6px;flex-shrink:0;}
+    .tb-btn{padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:rgba(255,255,255,.05);
+      color:var(--text);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;}
+    .tb-btn:hover{background:rgba(255,255,255,.1);}
+    .tb-btn.undo{font-size:15px;padding:6px 10px;}
+    .tb-btn.export-btn{background:linear-gradient(135deg,var(--fire),var(--fire2));border-color:transparent;
+      font-size:13px;font-weight:900;padding:8px 18px;}
+    .tb-btn.export-btn:hover{box-shadow:0 4px 16px rgba(255,122,24,.3);}
+
+    /* ── MAIN LAYOUT ── */
+    .main-layout{flex:1;display:flex;min-height:0;overflow:hidden;}
+
+    /* ── CANVAS PANEL ── */
+    .canvas-panel{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--void);}
+    .canvas-toolbar{display:flex;gap:8px;padding:8px 12px;align-items:center;flex-wrap:wrap;
+      border-bottom:1px solid var(--border);background:var(--surface);}
+    .ct-btn{padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.05);
+      color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;}
+    .ct-btn:hover{background:rgba(255,255,255,.1);color:var(--text);}
+    .ct-sep{flex:1;}
+    .ct-label{font-size:11px;color:var(--text3);font-weight:600;white-space:nowrap;}
+    .ct-range{width:100px;accent-color:var(--fire);}
+    .canvas-area{flex:1;display:flex;align-items:center;justify-content:center;padding:8px;min-height:0;}
+    #hhMEcanvas{width:100%;height:100%;border-radius:var(--radius-sm);touch-action:none;background:#0e0e12;
+      box-shadow:0 0 0 1px var(--border);}
+    .canvas-foot{display:flex;gap:8px;padding:8px 12px;align-items:center;flex-wrap:wrap;
+      border-top:1px solid var(--border);background:var(--surface);}
+    .cf-toggle{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--text2);cursor:pointer;}
+    .cf-toggle input{accent-color:var(--fire);}
+
+    /* ── SIDE PANEL ── */
+    .side-panel{width:380px;flex-shrink:0;border-left:1px solid var(--border);background:var(--surface);
+      display:flex;flex-direction:column;overflow:hidden;}
+    .side-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:0;}
+    .side-scroll::-webkit-scrollbar{width:5px;}
+    .side-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px;}
+
+    /* Accordion sections */
+    .acc{border-bottom:1px solid var(--border);}
+    .acc-head{display:flex;align-items:center;gap:8px;padding:12px 14px;cursor:pointer;user-select:none;transition:background .15s;}
+    .acc-head:hover{background:rgba(255,255,255,.03);}
+    .acc-arrow{font-size:10px;color:var(--text3);transition:transform .25s;flex-shrink:0;}
+    .acc.open .acc-arrow{transform:rotate(90deg);}
+    .acc-title{font-size:13px;font-weight:800;color:var(--text);flex:1;letter-spacing:-.01em;}
+    .acc-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--ember);color:var(--fire);}
+    .acc-body{display:none;padding:0 14px 14px;}
+    .acc.open .acc-body{display:block;}
+
+    /* Form elements */
+    .field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px;}
+    .field:last-child{margin-bottom:0;}
+    .field-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;}
+    .field-input{padding:9px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);
+      background:rgba(0,0,0,.3);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;width:100%;}
+    .field-input:focus{outline:none;border-color:var(--fire);}
+    .field-ta{resize:vertical;min-height:90px;line-height:1.5;}
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+    .field-range{width:100%;accent-color:var(--fire);}
+    .field-select{padding:9px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);
+      background:rgba(0,0,0,.3);color:var(--text);font-size:13px;font-weight:600;}
+    .field-color{height:40px;padding:4px 8px;cursor:pointer;}
+
+    .btn-row{display:flex;gap:6px;flex-wrap:wrap;}
+    .sm-btn{padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.06);
+      color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;}
+    .sm-btn:hover{background:rgba(255,255,255,.12);color:var(--text);}
+    .sm-btn.danger{border-color:rgba(255,77,77,.2);background:var(--danger-bg);color:var(--danger);}
+    .sm-btn.danger:hover{background:rgba(255,77,77,.2);}
+    .sm-btn.primary{background:var(--ember);border-color:rgba(255,122,24,.2);color:var(--fire);}
+
+    /* Quick-fill */
+    .qf-section{background:rgba(255,122,24,.04);border:1px solid rgba(255,122,24,.12);border-radius:var(--radius);
+      padding:12px;margin-bottom:10px;}
+    .qf-section-title{font-size:12px;font-weight:800;color:var(--fire);margin-bottom:8px;
+      display:flex;align-items:center;gap:6px;}
+    .qf-section-title::before{content:'';width:3px;height:12px;border-radius:2px;background:var(--fire);}
+
+    /* Color swatches */
+    .swatch-row{display:flex;gap:6px;flex-wrap:wrap;}
+    .swatch{width:28px;height:28px;border-radius:6px;border:2px solid transparent;cursor:pointer;transition:all .15s;}
+    .swatch:hover{transform:scale(1.15);}
+    .swatch.active{border-color:#fff;box-shadow:0 0 8px rgba(255,255,255,.3);}
+
+    /* ── MOBILE ── */
+    @media(max-width:900px){
+      .side-panel{display:none;position:fixed;inset:0;width:100%;z-index:10001;border-left:none;}
+      .side-panel.mobile-open{display:flex;}
+      .mobile-panel-close{display:flex!important;}
+    }
+    @media(min-width:901px){
+      .mobile-panel-close{display:none!important;}
+    }
+    .mobile-panel-close{display:none;position:sticky;top:0;z-index:2;padding:10px 14px;
+      background:var(--surface);border-bottom:1px solid var(--border);align-items:center;justify-content:space-between;}
+    .mpc-title{font-size:14px;font-weight:800;color:var(--text);}
+    .mpc-btn{padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);
+      background:rgba(255,255,255,.06);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;}
+
+    /* Mobile bottom bar */
+    .mobile-bar{display:none;flex-shrink:0;padding:8px 12px;gap:6px;border-top:1px solid var(--border);
+      background:var(--surface);align-items:center;justify-content:space-between;}
+    @media(max-width:900px){.mobile-bar{display:flex;}}
+    .mob-btn{padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);
+      background:rgba(255,255,255,.06);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;}
+    .mob-btn.primary{background:linear-gradient(135deg,var(--fire),var(--fire2));border-color:transparent;color:#fff;}
+
+    /* Hide desktop-only on mobile */
+    @media(max-width:900px){
+      .topbar-actions .tb-btn:not(.export-btn):not(.undo){display:none;}
     }
 
-    /* ---------- ADMIN GATE STYLES ---------- */
-    .admin-gate {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      background: radial-gradient(circle at 20% 20%, #2a1e14, #07060a);
-      z-index: 10000;
-    }
-    .admin-card {
-      background: rgba(20, 18, 22, 0.85);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 32px;
-      padding: 50px 40px;
-      text-align: center;
-      max-width: 520px;
-      width: 100%;
-      color: #fff;
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
-      animation: fadeUp 0.8s ease;
-    }
-    .lock-icon {
-      font-size: 64px;
-      margin-bottom: 20px;
-      animation: floatLock 3s ease-in-out infinite;
-    }
-    .admin-card h1 {
-      font-size: 36px;
-      margin-bottom: 16px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #ffb347, #ff7a18);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .admin-card p {
-      font-size: 16px;
-      opacity: 0.85;
-      line-height: 1.6;
-      margin-bottom: 24px;
-    }
-    .pin-input {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      margin: 30px 0 20px;
-    }
-    .pin-input input {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 40px;
-      padding: 14px 20px;
-      width: 160px;
-      font-size: 20px;
-      text-align: center;
-      color: white;
-      font-weight: 600;
-      letter-spacing: 4px;
-    }
-    .pin-input input:focus {
-      outline: none;
-      border-color: #ff7a18;
-    }
-    .unlock-btn {
-      background: linear-gradient(45deg, #ff7a18, #ffb347);
-      border: none;
-      border-radius: 40px;
-      padding: 14px 30px;
-      font-size: 18px;
-      font-weight: 700;
-      color: white;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .unlock-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(255, 122, 24, 0.4);
-    }
-    .error-msg {
-      color: #ff6b6b;
-      font-size: 14px;
-      min-height: 24px;
-    }
-    .admin-buttons {
-      margin-top: 20px;
-      display: flex;
-      gap: 15px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .menu-btn {
-      background: linear-gradient(45deg, #ff7a18, #ffb347);
-      padding: 14px 26px;
-      border-radius: 60px;
-      font-weight: 600;
-      text-decoration: none;
-      color: white;
-      transition: all 0.25s ease;
-    }
-    .menu-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-    }
-    .home-btn {
-      padding: 14px 26px;
-      border-radius: 60px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      text-decoration: none;
-      color: inherit;
-      transition: all 0.25s ease;
-    }
-    .home-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes floatLock {
-      0%,100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-
-    /* ---------- EDITOR STYLES (merged from the original script) ---------- */
-    .hhME-root {
-      display: none;  /* hidden by default, shown after unlock */
-      position: fixed;
-      inset: 0;
-      z-index: 999999;
-      background: rgba(0,0,0,.72);
-      backdrop-filter: blur(10px);
-    }
-    .hhME-wrap {
-      position: absolute;
-      inset: 14px;
-      max-width: 1400px;
-      margin: 0 auto;
-      border-radius: 18px;
-      background: rgba(15,15,18,.92);
-      border: 1px solid rgba(255,255,255,.14);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      height: calc(100dvh - 28px);
-    }
-    .hhME-head {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 14px;
-      border-bottom: 1px solid rgba(255,255,255,.10);
-    }
-    .hhME-title { font-weight: 900; color: rgba(255,255,255,.92); letter-spacing:-.2px; }
-    .hhME-sub { font-size:12px; color: rgba(255,255,255,.70); }
-    .hhME-xbtn {
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(255,255,255,.08);
-      color: #fff;
-      cursor: pointer;
-    }
-    .hhME-grid {
-      flex: 1;
-      min-height: 0;
-      display: grid;
-      grid-template-columns: 1.05fr .95fr;
-      gap: 12px;
-      padding: 12px;
-    }
-    .hhME-card {
-      min-height: 0;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.28);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-    .hhME-toolbar {
-      padding: 10px 10px 0;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .hhME-toolbar small { margin-left: auto; color: rgba(255,255,255,.74); font-size:12px; }
-    .hhME-canvasWrap {
-      flex: 1;
-      min-height: 320px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 10px;
-    }
-    #hhMEcanvas {
-      width: 100%;
-      height: 100%;
-      min-height: 320px;
-      border-radius: 14px;
-      touch-action: none;
-      background: #101115;
-    }
-    .hhME-foot {
-      padding: 10px;
-      border-top: 1px solid rgba(255,255,255,.10);
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .hhME-toggle { display: flex; gap:8px; align-items:center; color:rgba(255,255,255,.86); font-weight:800; }
-    .hhME-dl {
-      padding:12px 14px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.18);
-      color:#fff;
-      font-weight:900;
-      cursor:pointer;
-      background:rgba(255,255,255,.08);
-    }
-    .hhME-dl.primary { background:linear-gradient(135deg, rgba(255,115,0,.75), rgba(255,0,90,.55)); }
-    .hhME-right { overflow:auto; padding:12px; background:rgba(0,0,0,.32); }
-    .hhME-row { display:flex; align-items:center; justify-content:space-between; gap:10px; }
-    .hhME-label { font-weight:900; color:rgba(255,255,255,.92); font-size:14px; }
-    .hhME-miniBtn {
-      padding:10px 12px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.22);
-      background:rgba(255,255,255,.10);
-      color:#fff;
-      cursor:pointer;
-      font-weight:900;
-      font-size:12px;
-    }
-    .hhME-danger { background:rgba(255,60,60,.18); border-color:rgba(255,90,90,.28); }
-    .hhME-input {
-      padding:10px 12px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.22);
-      background:rgba(0,0,0,.45);
-      color:#fff;
-    }
-    .hhME-select {
-      padding:10px 12px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.22);
-      background:rgba(0,0,0,.45);
-      color:#fff;
-    }
-    .hhME-ta {
-      width:100%;
-      resize:vertical;
-      padding:10px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.22);
-      background:rgba(0,0,0,.45);
-      color:#fff;
-      font-weight:700;
-      line-height:1.35;
-      font-size:14px;
-    }
-    .hhME-section {
-      border:1px solid rgba(255,255,255,.18);
-      background:rgba(255,255,255,.06);
-      border-radius:14px;
-      padding:10px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-    .hhME-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    .hhME-rangeLbl { display:flex; flex-direction:column; gap:6px; color:rgba(255,255,255,.88); font-size:13px; }
-
-    @media (max-width: 980px){
-      .hhME-grid { grid-template-columns:1fr; }
-    }
-    @media (max-width: 600px){
-      .hhME-wrap { inset:8px; height:calc(100dvh - 16px); border-radius:16px; }
-      .hhME-canvasWrap { height:50vh; min-height:360px; }
-      #hhMEcanvas { min-height:360px; }
-      .hhME-toolbar small { width:100%; margin-left:0; }
-    }
+    /* Export modal */
+    .export-modal{display:none;position:fixed;inset:0;z-index:100001;background:rgba(0,0,0,.7);
+      backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;}
+    .export-modal.active{display:flex;}
+    .export-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+      padding:28px;max-width:420px;width:100%;text-align:center;animation:fadeUp .3s ease;}
+    .export-card h2{font-family:'Abril Fatface',serif;font-size:24px;margin-bottom:8px;
+      background:linear-gradient(135deg,var(--fire2),var(--fire));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .export-card p{font-size:13px;color:var(--text2);margin-bottom:20px;}
+    .export-btns{display:flex;flex-direction:column;gap:10px;}
+    .export-big-btn{padding:16px;border-radius:var(--radius);border:1px solid var(--border);
+      background:rgba(255,255,255,.05);color:var(--text);font-size:14px;font-weight:800;cursor:pointer;
+      transition:all .2s;display:flex;align-items:center;gap:12px;}
+    .export-big-btn:hover{background:rgba(255,255,255,.1);transform:translateY(-1px);}
+    .export-big-btn.main{background:linear-gradient(135deg,var(--fire),var(--fire2));border-color:transparent;}
+    .export-big-btn .icon{font-size:22px;}
+    .export-big-btn .meta{text-align:left;flex:1;}
+    .export-big-btn .meta small{display:block;font-size:11px;font-weight:600;opacity:.7;margin-top:2px;}
+    .export-close{margin-top:14px;padding:10px;border:none;background:transparent;color:var(--text3);
+      font-size:13px;font-weight:700;cursor:pointer;}
+    .export-close:hover{color:var(--text);}
   </style>
 </head>
 <body>
-  <!-- ADMIN GATE (visible by default) -->
-  <div class="admin-gate" id="adminGate">
-    <div class="admin-card">
-      <div class="lock-icon">🔒</div>
-      <h1>Admins Only</h1>
-      <p>
-        This area is reserved for administrators.
-        <br><br>
-        If you're just exploring, feel free to check out our public menu.
-      </p>
 
-      <div class="pin-input">
-        <input type="password" id="pinInput" maxlength="6" placeholder="PIN" inputmode="numeric">
-        <button class="unlock-btn" id="unlockBtn">Unlock</button>
+<div id="toastBox"></div>
+
+<!-- ADMIN GATE -->
+<div class="admin-gate" id="adminGate">
+  <div class="admin-card">
+    <div class="lock-icon">🔒</div>
+    <h1>Menu Editor</h1>
+    <p>Staff-only area for building the daily Facebook menu post.</p>
+    <div class="pin-row">
+      <input type="password" id="pinInput" maxlength="6" placeholder="PIN" inputmode="numeric">
+      <button class="unlock-btn" id="unlockBtn">Unlock</button>
+    </div>
+    <div class="error-msg" id="pinError"></div>
+    <div class="gate-links">
+      <a href="/menu" class="gate-link-primary">View Menu</a>
+      <a href="/" class="gate-link-ghost">Home</a>
+    </div>
+  </div>
+</div>
+
+<!-- EDITOR -->
+<div class="editor" id="editorShell">
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-brand">Hot Headz</div>
+    <div class="topbar-sep"></div>
+    <div class="topbar-tabs">
+      <button class="tab-btn active" data-tab="quickfill">Quick Fill</button>
+      <button class="tab-btn" data-tab="textboxes">Text Boxes</button>
+      <button class="tab-btn" data-tab="photo">Photo</button>
+      <button class="tab-btn" data-tab="canvas">Canvas</button>
+      <button class="tab-btn" data-tab="projects">Projects</button>
+    </div>
+    <div class="topbar-actions">
+      <button class="tb-btn undo" id="undoBtn" title="Undo">↩</button>
+      <button class="tb-btn undo" id="redoBtn" title="Redo">↪</button>
+      <button class="tb-btn export-btn" id="exportBtn">Export ↓</button>
+    </div>
+  </div>
+
+  <div class="main-layout">
+    <!-- CANVAS -->
+    <div class="canvas-panel">
+      <div class="canvas-toolbar">
+        <input id="hhMEfile" type="file" accept="image/*" style="font-size:11px;color:var(--text2);max-width:160px;">
+        <button class="ct-btn" id="resetViewBtn">Reset</button>
+        <button class="ct-btn" id="fitViewBtn">Fit</button>
+        <button class="ct-btn" id="rotateBtn">Rotate 90°</button>
+        <div class="ct-sep"></div>
+        <span class="ct-label">Photo</span>
+        <input class="ct-range" id="photoZoom" type="range" min="0.3" max="4" step="0.01" value="1">
+        <span class="ct-label">View</span>
+        <input class="ct-range" id="viewZoom" type="range" min="0.5" max="3" step="0.01" value="1">
       </div>
-      <div class="error-msg" id="pinError"></div>
+      <div class="canvas-area">
+        <canvas id="hhMEcanvas"></canvas>
+      </div>
+      <div class="canvas-foot">
+        <label class="cf-toggle"><input id="showText" type="checkbox" checked> Text</label>
+        <label class="cf-toggle"><input id="snapOn" type="checkbox" checked> Snap</label>
+        <label class="cf-toggle"><input id="outlineOn" type="checkbox" checked> Outline</label>
+        <div style="flex:1;"></div>
+        <span style="font-size:10px;color:var(--text3);">Tap canvas to deselect • Right-drag=pan • Wheel=zoom • Alt+Wheel=photo zoom</span>
+      </div>
+    </div>
 
-      <div class="admin-buttons">
-        <a href="/menu" class="menu-btn">View Lunch Menu</a>
-        <a href="/" class="home-btn">Return Home</a>
+    <!-- SIDE PANEL -->
+    <div class="side-panel" id="sidePanel">
+      <div class="mobile-panel-close">
+        <span class="mpc-title">Settings</span>
+        <button class="mpc-btn" id="closeSidePanel">Done</button>
+      </div>
+      <div class="side-scroll" id="sideScroll">
+        <!-- Populated by JS -->
       </div>
     </div>
   </div>
 
-  <!-- EDITOR (hidden initially) -->
-  <div class="hhME-root" id="hhMEditorRoot_v36">
-    <div class="hhME-wrap" role="dialog" aria-modal="true" aria-label="Daily Menu Editor">
-      <div class="hhME-head">
-        <div>
-          <div class="hhME-title">Daily Menu Editor</div>
-          <div class="hhME-sub">
-            Desktop: Wheel=view zoom • Alt+Wheel=photo zoom • Right-drag=pan view<br>
-            Mobile: 2-finger drag=pan view • pinch=view zoom
-          </div>
-        </div>
-        <div style="display:flex; gap:10px; align-items:center;">
-          <button class="hhME-xbtn" id="hhMEhelpBtn" type="button">Tips</button>
-          <button class="hhME-xbtn" id="hhMEcloseBtn" type="button">Close ✕</button>
-        </div>
-      </div>
-
-      <div class="hhME-grid">
-        <!-- LEFT: Canvas -->
-        <div class="hhME-card">
-          <div class="hhME-toolbar">
-            <input id="hhMEfile" type="file" accept="image/*" style="color:#fff;">
-            <button class="hhME-miniBtn" id="hhMEresetView" type="button">Reset</button>
-            <button class="hhME-miniBtn" id="hhMEfitView" type="button">Fit View</button>
-            <button class="hhME-miniBtn" id="hhMErotate" type="button">Rotate Photo 90°</button>
-
-            <label class="hhME-rangeLbl" style="min-width:240px;">
-              PHOTO Zoom (export)
-              <input id="hhMEzoom" type="range" min="0.3" max="4" step="0.01" value="1" style="width:100%;">
-            </label>
-
-            <label class="hhME-rangeLbl" style="min-width:240px;">
-              VIEW Zoom (edit only)
-              <input id="hhMEviewzoom" type="range" min="0.5" max="3" step="0.01" value="1" style="width:100%;">
-            </label>
-
-            <small>Tap empty canvas to deselect • Esc deselect/close</small>
-          </div>
-
-          <div class="hhME-canvasWrap">
-            <canvas id="hhMEcanvas"></canvas>
-          </div>
-
-          <div class="hhME-foot">
-            <div style="display:flex; gap:14px; flex-wrap:wrap; align-items:center;">
-              <label class="hhME-toggle"><input id="hhMEoverlay" type="checkbox" checked> Show text</label>
-              <label class="hhME-toggle"><input id="hhMEsnap" type="checkbox" checked> Snap</label>
-              <label class="hhME-toggle"><input id="hhMEoutline" type="checkbox" checked> Outline</label>
-            </div>
-            <div style="display:flex; gap:10px;">
-              <button class="hhME-dl primary" id="hhMEjpg" type="button">Download JPG (Cropped)</button>
-              <button class="hhME-dl" id="hhMEpng" type="button">Download PNG (Cropped)</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- RIGHT: Controls & Projects -->
-        <div class="hhME-card hhME-right">
-          <div class="hhME-section">
-            <div class="hhME-row">
-              <div class="hhME-label">Projects</div>
-              <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <button class="hhME-miniBtn" id="hhMEprojNew" type="button">New</button>
-                <button class="hhME-miniBtn" id="hhMEprojSave" type="button">Save</button>
-                <button class="hhME-miniBtn" id="hhMEprojDup" type="button">Duplicate</button>
-                <button class="hhME-miniBtn hhME-danger" id="hhMEprojDel" type="button">Delete</button>
-              </div>
-            </div>
-
-            <div class="hhME-grid2">
-              <label class="hhME-rangeLbl">Active project
-                <select id="hhMEprojSelect" class="hhME-select"></select>
-              </label>
-
-              <label class="hhME-rangeLbl">Rename
-                <div style="display:flex; gap:8px;">
-                  <input id="hhMEprojName" class="hhME-input" type="text" placeholder="Project name">
-                  <button class="hhME-miniBtn" id="hhMEprojRename" type="button">Rename</button>
-                </div>
-              </label>
-            </div>
-
-            <div class="hhME-row" style="align-items:flex-start;">
-              <label class="hhME-toggle" style="font-weight:900;">
-                <input id="hhMEsaveNoImg" type="checkbox">
-                Save without image (layout only)
-              </label>
-              <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <button class="hhME-miniBtn" id="hhMEexportJSON" type="button">Export JSON (Live)</button>
-                <button class="hhME-miniBtn" id="hhMEimportJSONFile" type="button">Import File</button>
-                <button class="hhME-miniBtn" id="hhMEimportJSONPaste" type="button">Paste JSON</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="hhME-section">
-            <div class="hhME-row">
-              <div class="hhME-label">Canvas size</div>
-              <div style="display:flex; gap:8px;">
-                <button class="hhME-miniBtn" id="hhMEig" type="button">IG 1080×1350</button>
-                <button class="hhME-miniBtn" id="hhMEsq" type="button">Square 1080×1080</button>
-              </div>
-            </div>
-
-            <div class="hhME-grid2">
-              <label class="hhME-rangeLbl">W
-                <input class="hhME-input" id="hhMEoutW" type="number" value="1080" min="600" max="3000">
-              </label>
-              <label class="hhME-rangeLbl">H
-                <input class="hhME-input" id="hhMEoutH" type="number" value="1350" min="600" max="4000">
-              </label>
-            </div>
-          </div>
-
-          <div class="hhME-section">
-            <div class="hhME-row">
-              <div class="hhME-label">Text boxes</div>
-              <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <button class="hhME-miniBtn" id="hhMEaddBox" type="button">+ Add</button>
-                <button class="hhME-miniBtn" id="hhMEdupBox" type="button">Duplicate</button>
-                <button class="hhME-miniBtn hhME-danger" id="hhMEdelBox" type="button">Delete</button>
-              </div>
-            </div>
-
-            <div class="hhME-row">
-              <div style="font-size:12px; color:rgba(255,255,255,.70);">Tap a box on canvas or pick one.</div>
-              <select id="hhMEboxSelect" class="hhME-select" style="min-width:260px;"></select>
-            </div>
-
-            <div id="hhMEboxEditor" class="hhME-section" style="margin-top:10px;"></div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <!-- Mobile bottom bar -->
+  <div class="mobile-bar">
+    <button class="mob-btn" id="mobUndoBtn">↩ Undo</button>
+    <button class="mob-btn" id="mobSettingsBtn">⚙ Settings</button>
+    <button class="mob-btn primary" id="mobExportBtn">Export ↓</button>
   </div>
+</div>
 
-  <script>
-    (function() {
-      // ---------- GATE LOGIC ----------
-      const ADMIN_PIN = "2172";
-      const gate = document.getElementById('adminGate');
-      const editorRoot = document.getElementById('hhMEditorRoot_v36');
-      const pinInput = document.getElementById('pinInput');
-      const unlockBtn = document.getElementById('unlockBtn');
-      const pinError = document.getElementById('pinError');
+<!-- Export Modal -->
+<div class="export-modal" id="exportModal">
+  <div class="export-card">
+    <h2>Export Menu</h2>
+    <p>Download your finished menu image, cropped to the photo bounds.</p>
+    <div class="export-btns">
+      <button class="export-big-btn main" id="dlJpg">
+        <span class="icon">📸</span>
+        <span class="meta">Download JPG<small>Best for Facebook — smaller file size</small></span>
+      </button>
+      <button class="export-big-btn" id="dlPng">
+        <span class="icon">🖼</span>
+        <span class="meta">Download PNG<small>Lossless quality — larger file</small></span>
+      </button>
+      <button class="export-big-btn" id="dlJsonExport">
+        <span class="icon">💾</span>
+        <span class="meta">Export Project JSON<small>Save layout for later or share with team</small></span>
+      </button>
+    </div>
+    <button class="export-close" id="closeExport">Cancel</button>
+  </div>
+</div>
 
-      function unlockEditor() {
-        gate.style.display = 'none';
-        editorRoot.style.display = 'block';
-        // Ensure canvas redraws after becoming visible
-        setTimeout(() => {
-          if (typeof drawEditor === 'function') drawEditor();
-          else if (window.editorDraw) window.editorDraw();
-        }, 50);
-      }
+<script>
+(function(){
+// ═══════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+const uid=()=>Math.random().toString(16).slice(2)+'-'+Date.now().toString(16);
+const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-      unlockBtn.addEventListener('click', () => {
-        const entered = pinInput.value.trim();
-        if (entered === ADMIN_PIN) {
-          pinError.textContent = '';
-          unlockEditor();
-        } else {
-          pinError.textContent = 'Incorrect PIN.';
-        }
+function toast(msg,type='info'){
+  const el=document.createElement('div');el.className='toast '+type;el.textContent=msg;
+  document.getElementById('toastBox').appendChild(el);
+  setTimeout(()=>el.remove(),3500);
+}
+
+function safeJSON(raw,fb){try{return JSON.parse(raw)}catch{return fb}}
+function toHex(c){
+  if(/^#([0-9a-f]{3}){1,2}$/i.test(String(c)))return c;
+  const m=String(c).match(/rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+  if(m)return'#'+[m[1],m[2],m[3]].map(x=>clamp(+x,0,255).toString(16).padStart(2,'0')).join('');
+  return'#ffffff';
+}
+function hexRgba(hex,a){
+  const h=String(hex||'#000').replace('#','');
+  const f=h.length===3?h.split('').map(x=>x+x).join(''):h.padEnd(6,'0').slice(0,6);
+  return`rgba(${parseInt(f.slice(0,2),16)},${parseInt(f.slice(2,4),16)},${parseInt(f.slice(4,6),16)},${clamp(a,0,1)})`;
+}
+function todayDefaults(){
+  const n=new Date();
+  return{weekday:n.toLocaleDateString(undefined,{weekday:'long'}),dateStr:n.toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'})};
+}
+const isCoarse=()=>{try{return matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>0}catch{return false}};
+
+// ═══════════════════════════════════════
+//  FONT & COLOR PRESETS
+// ═══════════════════════════════════════
+const FONTS=[
+  {label:"System (Clean)",value:'system-ui,-apple-system,Segoe UI,Roboto,Arial'},
+  {label:"DM Sans (Brand)",value:'"DM Sans",system-ui,sans-serif'},
+  {label:"Abril Fatface (Display)",value:'"Abril Fatface",Georgia,serif'},
+  {label:"DM Serif Display",value:'"DM Serif Display",Georgia,serif'},
+  {label:"Playfair Display",value:'"Playfair Display",Georgia,serif'},
+  {label:"Bebas Neue (Bold)",value:'"Bebas Neue",Impact,sans-serif'},
+  {label:"Oswald (Modern)",value:'"Oswald",Arial,sans-serif'},
+  {label:"Georgia (Classic)",value:'Georgia,"Times New Roman",serif'},
+  {label:"Trebuchet (Friendly)",value:'"Trebuchet MS",Arial,sans-serif'},
+  {label:"Verdana (Readable)",value:'Verdana,Geneva,sans-serif'},
+  {label:"Courier (Mono)",value:'"Courier New",Courier,monospace'},
+];
+
+const BRAND_COLORS=[
+  '#ffffff','#f8ede6','#ffa048','#f87038','#f05020','#e83010','#c41800',
+  '#000000','#1e0a0c','#130509','#080407','#d4a898','#efd8cc',
+];
+
+// ═══════════════════════════════════════
+//  GATE
+// ═══════════════════════════════════════
+const ADMIN_PIN='2172';
+const gate=document.getElementById('adminGate');
+const editorShell=document.getElementById('editorShell');
+
+function unlockEditor(){
+  gate.style.display='none';
+  editorShell.classList.add('active');
+  setTimeout(()=>draw(),60);
+}
+
+document.getElementById('unlockBtn').addEventListener('click',()=>{
+  if(document.getElementById('pinInput').value.trim()===ADMIN_PIN){
+    document.getElementById('pinError').textContent='';unlockEditor();
+  }else{document.getElementById('pinError').textContent='Incorrect PIN.';}
+});
+document.getElementById('pinInput').addEventListener('keypress',e=>{if(e.key==='Enter')document.getElementById('unlockBtn').click();});
+
+// ═══════════════════════════════════════
+//  CANVAS STATE
+// ═══════════════════════════════════════
+const canvas=document.getElementById('hhMEcanvas');
+const ctx=canvas.getContext('2d',{alpha:false});
+
+let img=new Image(),imgLoaded=false,imgDataURL='';
+let photoScale=1,photoRot=0,photoOffsetX=0,photoOffsetY=0;
+let viewX=0,viewY=0,viewScale=1;
+let outW=1080,outH=1350;
+let boxes=[];
+let activeId=null;
+let dragging=false,dragMode='image',lastX=0,lastY=0;
+const pointers=new Map();let pinchActive=false,lastMid=null,lastDist=null;
+canvas.addEventListener('contextmenu',e=>e.preventDefault());
+
+// ═══════════════════════════════════════
+//  UNDO / REDO
+// ═══════════════════════════════════════
+let undoStack=[],redoStack=[];
+const MAX_UNDO=40;
+
+function saveUndo(){
+  undoStack.push(JSON.stringify({boxes,photoScale,photoRot,photoOffsetX,photoOffsetY}));
+  if(undoStack.length>MAX_UNDO)undoStack.shift();
+  redoStack=[];
+}
+function doUndo(){
+  if(!undoStack.length)return;
+  redoStack.push(JSON.stringify({boxes,photoScale,photoRot,photoOffsetX,photoOffsetY}));
+  const s=JSON.parse(undoStack.pop());
+  boxes=s.boxes;photoScale=s.photoScale;photoRot=s.photoRot;
+  photoOffsetX=s.photoOffsetX;photoOffsetY=s.photoOffsetY;
+  document.getElementById('photoZoom').value=String(photoScale);
+  activeId=null;rebuildSidePanel();draw();
+  toast('Undo','info');
+}
+function doRedo(){
+  if(!redoStack.length)return;
+  undoStack.push(JSON.stringify({boxes,photoScale,photoRot,photoOffsetX,photoOffsetY}));
+  const s=JSON.parse(redoStack.pop());
+  boxes=s.boxes;photoScale=s.photoScale;photoRot=s.photoRot;
+  photoOffsetX=s.photoOffsetX;photoOffsetY=s.photoOffsetY;
+  document.getElementById('photoZoom').value=String(photoScale);
+  activeId=null;rebuildSidePanel();draw();
+  toast('Redo','info');
+}
+document.getElementById('undoBtn').addEventListener('click',doUndo);
+document.getElementById('redoBtn').addEventListener('click',doRedo);
+document.getElementById('mobUndoBtn').addEventListener('click',doUndo);
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();if(e.shiftKey)doRedo();else doUndo();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='y'){e.preventDefault();doRedo();}
+  if(e.key==='Escape'){activeId=null;rebuildSidePanel();draw();}
+});
+
+// ═══════════════════════════════════════
+//  AUTO-SAVE
+// ═══════════════════════════════════════
+const PROJECTS_KEY='hhMenuEditorProjects_v37';
+let autoSaveTimer=null;
+
+function triggerAutoSave(){
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer=setTimeout(()=>{
+    const store=loadStore();
+    const active=store.items.find(p=>p.id===store.activeId);
+    if(active){
+      active.updatedAt=Date.now();
+      active.data=currentPayload();
+      const r=saveStore(store);
+      if(!r.ok)console.warn('Auto-save failed:',r.error);
+    }
+  },2000);
+}
+
+function loadStore(){
+  const s=safeJSON(localStorage.getItem(PROJECTS_KEY),null);
+  if(s&&Array.isArray(s.items))return s;
+  return{activeId:null,items:[]};
+}
+function saveStore(store){
+  try{localStorage.setItem(PROJECTS_KEY,JSON.stringify(store));return{ok:true};}
+  catch(e){return{ok:false,error:String(e?.message||e)};}
+}
+
+// ═══════════════════════════════════════
+//  IMAGE IO
+// ═══════════════════════════════════════
+function fileToDataURL(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result||''));r.onerror=rej;r.readAsDataURL(file);})}
+
+async function compressImage(dataUrl,opts={}){
+  const{maxDim=2200,quality=0.9}=opts;
+  const im=new Image();im.src=dataUrl;
+  await new Promise(r=>{im.onload=()=>r(1);im.onerror=()=>r(0);});
+  if(!im.naturalWidth)return dataUrl;
+  const sc=Math.min(1,maxDim/Math.max(im.naturalWidth,im.naturalHeight));
+  const w=Math.round(im.naturalWidth*sc),h=Math.round(im.naturalHeight*sc);
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  c.getContext('2d').drawImage(im,0,0,w,h);
+  return c.toDataURL('image/jpeg',quality);
+}
+
+async function loadImg(dataUrl){
+  return new Promise(r=>{
+    img=new Image();
+    img.onload=()=>{imgLoaded=true;r(true);};
+    img.onerror=()=>{imgLoaded=false;r(false);};
+    img.src=dataUrl;
+  });
+}
+
+// ═══════════════════════════════════════
+//  DEFAULT BOXES
+// ═══════════════════════════════════════
+function defaultBox(name,text,xPct,yPct,overrides={}){
+  return{id:uid(),name,text,xPct:xPct??50,yPct:yPct??50,sizePct:2.6,
+    fontFamily:FONTS[0].value,color:'#ffffff',opacity:.95,align:'left',
+    bold:true,italic:false,underline:false,shadow:true,shadowBlur:16,
+    shadowColor:'rgba(0,0,0,0.45)',bgOn:true,bgColor:'#000000',bgOpacity:.30,
+    bgPadX:14,bgPadY:10,bgRadius:14,lineHeight:1.15,rotationDeg:0,...overrides};
+}
+
+function loadStarterBoxes(){
+  const t=todayDefaults();
+  boxes=[
+    defaultBox('Day',t.weekday||'Wednesday',50,8,{align:'center',sizePct:6.6,bgOn:false}),
+    defaultBox('Date',t.dateStr||'March 4th 2026',50,14,{align:'center',sizePct:2.7,bgOn:false}),
+    defaultBox('Breakfast','BREAKFAST\n5:30 AM - 10:30 AM\n\n• Item 1\n• Item 2\n• Item 3',18,44),
+    defaultBox('Lunch','LUNCH\n11:00 AM - 2:00 PM\n\n• Item 1\n• Item 2\n• Item 3',16,80),
+    defaultBox('Drinks','DRINKS\n\n• Sweet Tea\n• Coke\n• Coffee',50,80),
+    defaultBox('Salad Bar','SALAD BAR\n\n• Lettuce\n• Toppings\n• Dressings',72,46),
+    defaultBox('Dessert','DESSERT\n\nCake',74,85),
+    defaultBox('Bottom Note','For pricing and hours please visit\nHotHeadzSouthernFoods.com',50,96),
+  ];
+  activeId=null;
+}
+
+// ═══════════════════════════════════════
+//  CANVAS DRAWING
+// ═══════════════════════════════════════
+function setCanvasSize(){canvas.width=outW;canvas.height=outH;}
+const pxX=p=>(p/100)*canvas.width,pxY=p=>(p/100)*canvas.height;
+const pctX=px=>(px/canvas.width)*100,pctY=px=>(px/canvas.height)*100;
+const fontPx=p=>Math.max(6,(p/100)*canvas.height);
+
+function roundRect(x,y,w,h,r){
+  const rr=Math.min(r,w/2,h/2);ctx.beginPath();
+  ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);
+  ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();
+}
+
+function drawPhoto(){
+  ctx.fillStyle='#111216';ctx.fillRect(0,0,canvas.width,canvas.height);
+  if(!imgLoaded){
+    ctx.save();ctx.fillStyle='rgba(255,255,255,0.6)';
+    ctx.font='700 20px system-ui';ctx.textAlign='center';
+    ctx.fillText('Upload a menu template image to start',canvas.width/2,canvas.height/2);
+    ctx.restore();return;
+  }
+  const w=canvas.width,h=canvas.height,iw=img.naturalWidth,ih=img.naturalHeight;
+  const rot=(photoRot%180)!==0,bw=rot?ih:iw,bh=rot?iw:ih;
+  const fit=Math.min(w/bw,h/bh)*photoScale;
+  const cx=w/2+photoOffsetX,cy=h/2+photoOffsetY;
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(photoRot*Math.PI/180);
+  ctx.drawImage(img,-bw*fit/2,-bh*fit/2,bw*fit,bh*fit);ctx.restore();
+}
+
+function measureBox(b){
+  const size=fontPx(b.sizePct),lines=String(b.text??'').split('\n'),lineH=size*(b.lineHeight||1.15);
+  ctx.save();ctx.font=`${b.italic?'italic ':''}${b.bold?'900 ':'700 '}${Math.round(size)}px ${b.fontFamily}`;
+  let maxW=0;for(const l of lines)maxW=Math.max(maxW,ctx.measureText(l).width);
+  ctx.restore();
+  return{lines,size,lineH,maxW,totalH:lines.length*lineH};
+}
+
+function rotatedAABB(cx,cy,rw,rh,deg){
+  const rad=(deg||0)*Math.PI/180,hw=rw/2,hh=rh/2;
+  const corners=[{x:-hw,y:-hh},{x:hw,y:-hh},{x:hw,y:hh},{x:-hw,y:hh}];
+  let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
+  for(const p of corners){
+    const rx=p.x*Math.cos(rad)-p.y*Math.sin(rad)+cx;
+    const ry=p.x*Math.sin(rad)+p.y*Math.cos(rad)+cy;
+    minX=Math.min(minX,rx);minY=Math.min(minY,ry);maxX=Math.max(maxX,rx);maxY=Math.max(maxY,ry);
+  }
+  return{left:minX,top:minY,right:maxX,bottom:maxY};
+}
+
+function drawTextBox(b){
+  const x=pxX(b.xPct),y=pxY(b.yPct);
+  const{lines,size,lineH,maxW,totalH}=measureBox(b);
+  const lx=-maxW/2,ly=-totalH/2,px=b.bgPadX??14,py=b.bgPadY??10;
+  const rw=maxW+(b.bgOn?px*2:0),rh=totalH+(b.bgOn?py*2:0);
+  ctx.save();ctx.translate(x,y);ctx.rotate((b.rotationDeg||0)*Math.PI/180);
+  if(b.bgOn){
+    ctx.save();ctx.shadowBlur=0;
+    ctx.fillStyle=hexRgba(b.bgColor||'#000',clamp(b.bgOpacity??.3,0,1));
+    roundRect(lx-px,ly-py,maxW+px*2,totalH+py*2,b.bgRadius??14);ctx.fill();ctx.restore();
+  }
+  if(b.shadow){ctx.shadowColor=b.shadowColor||'rgba(0,0,0,0.45)';ctx.shadowBlur=b.shadowBlur??16;}
+  else{ctx.shadowColor='rgba(0,0,0,0)';ctx.shadowBlur=0;}
+  ctx.fillStyle=hexRgba(b.color||'#fff',clamp(b.opacity??.95,0,1));
+  ctx.font=`${b.italic?'italic ':''}${b.bold?'900 ':'700 '}${Math.round(size)}px ${b.fontFamily}`;
+  ctx.textBaseline='middle';
+  const al=(b.align||'left').toLowerCase();
+  let dx=0;
+  if(al==='center'){ctx.textAlign='center';dx=0;}
+  else if(al==='right'){ctx.textAlign='right';dx=lx+maxW;}
+  else{ctx.textAlign='left';dx=lx;}
+  for(let i=0;i<lines.length;i++)ctx.fillText(lines[i],dx,ly+(i+.5)*lineH);
+  ctx.restore();
+  b.__hit=rotatedAABB(x,y,rw,rh,b.rotationDeg||0);
+}
+
+function drawOutline(){
+  if(!document.getElementById('outlineOn').checked)return;
+  const b=boxes.find(x=>x.id===activeId);
+  if(!b||!b.__hit)return;
+  const h=b.__hit;
+  ctx.save();ctx.strokeStyle='rgba(255,255,255,0.8)';ctx.lineWidth=2;ctx.setLineDash([6,5]);
+  ctx.strokeRect(h.left,h.top,h.right-h.left,h.bottom-h.top);ctx.restore();
+}
+
+function draw(){
+  setCanvasSize();
+  ctx.save();ctx.translate(viewX,viewY);ctx.scale(viewScale,viewScale);
+  drawPhoto();
+  if(document.getElementById('showText').checked){
+    for(const b of boxes)drawTextBox(b);
+    if(activeId)drawOutline();
+  }
+  ctx.restore();
+}
+
+function resetAll(){photoScale=1;document.getElementById('photoZoom').value='1';photoRot=0;photoOffsetX=0;photoOffsetY=0;viewX=0;viewY=0;viewScale=1;document.getElementById('viewZoom').value='1';draw();}
+function fitView(){viewX=0;viewY=0;viewScale=1;document.getElementById('viewZoom').value='1';draw();}
+function maybeSnap(v){return document.getElementById('snapOn').checked?Math.round(v*2)/2:v;}
+
+function rawFromClient(cx,cy){const r=canvas.getBoundingClientRect();return{x:(cx-r.left)*(canvas.width/r.width),y:(cy-r.top)*(canvas.height/r.height)};}
+function worldFromClient(cx,cy){const r=rawFromClient(cx,cy);return{x:(r.x-viewX)/viewScale,y:(r.y-viewY)/viewScale};}
+function hitTest(px,py){for(let i=boxes.length-1;i>=0;i--){const b=boxes[i],h=b.__hit;if(h&&px>=h.left&&px<=h.right&&py>=h.top&&py<=h.bottom)return b;}return null;}
+
+// ── Pointer events ──
+canvas.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='touch'){
+    pointers.set(e.pointerId,{clientX:e.clientX,clientY:e.clientY});
+    if(pointers.size===2){pinchActive=true;const p=computePinch();lastMid=p?.mid;lastDist=p?.dist;dragging=false;canvas.setPointerCapture(e.pointerId);return;}
+  }
+  if(!isCoarse()&&e.button===2){const p=rawFromClient(e.clientX,e.clientY);dragging=true;dragMode='view';lastX=p.x;lastY=p.y;canvas.setPointerCapture(e.pointerId);return;}
+  const p=worldFromClient(e.clientX,e.clientY);lastX=p.x;lastY=p.y;
+  if(document.getElementById('showText').checked){
+    const hit=hitTest(p.x,p.y);
+    if(hit){saveUndo();activeId=hit.id;dragging=true;dragMode='text';rebuildSidePanel();canvas.setPointerCapture(e.pointerId);draw();return;}
+  }
+  saveUndo();activeId=null;rebuildSidePanel();dragging=true;dragMode='image';canvas.setPointerCapture(e.pointerId);draw();
+});
+
+function computePinch(){
+  if(pointers.size!==2)return null;
+  const pts=Array.from(pointers.values());
+  const a=rawFromClient(pts[0].clientX,pts[0].clientY),b=rawFromClient(pts[1].clientX,pts[1].clientY);
+  return{mid:{x:(a.x+b.x)/2,y:(a.y+b.y)/2},dist:Math.hypot(a.x-b.x,a.y-b.y)};
+}
+
+canvas.addEventListener('pointermove',e=>{
+  if(e.pointerType==='touch'&&pointers.has(e.pointerId))pointers.set(e.pointerId,{clientX:e.clientX,clientY:e.clientY});
+  if(pinchActive&&pointers.size===2){
+    const p=computePinch();if(!p)return;
+    if(lastMid){viewX+=p.mid.x-lastMid.x;viewY+=p.mid.y-lastMid.y;}
+    if(lastDist&&p.dist){viewScale=clamp(viewScale*(p.dist/lastDist),.5,3);document.getElementById('viewZoom').value=String(viewScale);}
+    lastMid=p.mid;lastDist=p.dist;draw();return;
+  }
+  if(!dragging)return;
+  if(dragMode==='view'){const p=rawFromClient(e.clientX,e.clientY);viewX+=p.x-lastX;viewY+=p.y-lastY;lastX=p.x;lastY=p.y;draw();return;}
+  const p=worldFromClient(e.clientX,e.clientY);const dx=p.x-lastX,dy=p.y-lastY;lastX=p.x;lastY=p.y;
+  if(dragMode==='image'){photoOffsetX+=dx;photoOffsetY+=dy;draw();return;}
+  if(dragMode==='text'){
+    const b=boxes.find(x=>x.id===activeId);if(!b)return;
+    b.xPct=maybeSnap(clamp(pctX(pxX(b.xPct)+dx),0,100));
+    b.yPct=maybeSnap(clamp(pctY(pxY(b.yPct)+dy),0,100));
+    draw();triggerAutoSave();
+  }
+});
+
+function endPointer(e){
+  dragging=false;if(e?.pointerType==='touch'){pointers.delete(e.pointerId);if(pointers.size<2){pinchActive=false;lastMid=null;lastDist=null;}}
+  triggerAutoSave();
+}
+canvas.addEventListener('pointerup',endPointer);
+canvas.addEventListener('pointercancel',endPointer);
+
+canvas.addEventListener('wheel',e=>{
+  e.preventDefault();const d=Math.sign(e.deltaY)*-0.08;
+  if(e.altKey){photoScale=clamp(photoScale+d,.3,4);document.getElementById('photoZoom').value=String(photoScale);draw();return;}
+  viewScale=clamp(viewScale+d,.5,3);document.getElementById('viewZoom').value=String(viewScale);draw();
+},{passive:false});
+
+// ═══════════════════════════════════════
+//  TOOLBAR BINDINGS
+// ═══════════════════════════════════════
+document.getElementById('resetViewBtn').addEventListener('click',resetAll);
+document.getElementById('fitViewBtn').addEventListener('click',fitView);
+document.getElementById('rotateBtn').addEventListener('click',()=>{saveUndo();photoRot=(photoRot+90)%360;draw();triggerAutoSave();});
+document.getElementById('photoZoom').addEventListener('input',()=>{photoScale=parseFloat(document.getElementById('photoZoom').value);draw();});
+document.getElementById('viewZoom').addEventListener('input',()=>{viewScale=parseFloat(document.getElementById('viewZoom').value);draw();});
+['showText','snapOn','outlineOn'].forEach(id=>document.getElementById(id).addEventListener('input',draw));
+
+document.getElementById('hhMEfile').addEventListener('change',async()=>{
+  const file=document.getElementById('hhMEfile').files?.[0];if(!file)return;
+  const orig=await fileToDataURL(file);
+  imgDataURL=await compressImage(orig);
+  await loadImg(imgDataURL);
+  fitView();draw();
+  document.getElementById('hhMEfile').value='';
+  toast('Template uploaded!','success');
+  triggerAutoSave();
+});
+
+// ═══════════════════════════════════════
+//  PAYLOADS & PROJECTS
+// ═══════════════════════════════════════
+function currentPayload(){
+  return{outW,outH,imgDataURL:imgDataURL||'',photoTransform:{photoScale,photoRot,photoOffsetX,photoOffsetY},boxes};
+}
+async function applyPayload(p){
+  if(!p)return;
+  outW=p.outW||1080;outH=p.outH||1350;
+  if(p.imgDataURL){imgDataURL=p.imgDataURL;await loadImg(imgDataURL);}
+  else if(!imgLoaded){}
+  const t=p.photoTransform||{};
+  photoScale=t.photoScale??photoScale;photoRot=t.photoRot??photoRot;
+  photoOffsetX=t.photoOffsetX??photoOffsetX;photoOffsetY=t.photoOffsetY??photoOffsetY;
+  document.getElementById('photoZoom').value=String(photoScale);
+  if(Array.isArray(p.boxes))boxes=p.boxes;
+  activeId=null;fitView();rebuildSidePanel();draw();
+}
+
+function createProject(name){
+  const store=loadStore();
+  const p={id:uid(),name:name||`Menu ${new Date().toLocaleDateString()}`,createdAt:Date.now(),updatedAt:Date.now(),data:currentPayload()};
+  store.items.unshift(p);store.activeId=p.id;
+  const r=saveStore(store);
+  if(!r.ok){toast('Save failed: '+r.error,'error');return false;}
+  toast('Project created!','success');rebuildSidePanel();return true;
+}
+
+function saveProject(){
+  const store=loadStore();const active=store.items.find(p=>p.id===store.activeId);
+  if(!active){createProject();return;}
+  active.updatedAt=Date.now();active.data=currentPayload();
+  const r=saveStore(store);
+  if(!r.ok){toast('Save failed: '+r.error,'error');return;}
+  toast('Project saved!','success');rebuildSidePanel();
+}
+
+async function loadProject(id){
+  const store=loadStore();const p=store.items.find(x=>x.id===id);if(!p)return;
+  store.activeId=id;saveStore(store);
+  if(p.data)await applyPayload(p.data);
+  rebuildSidePanel();
+}
+
+function deleteProject(id){
+  const store=loadStore();const p=store.items.find(x=>x.id===id);
+  if(!p||!confirm(`Delete "${p.name}"?`))return;
+  store.items=store.items.filter(x=>x.id!==id);
+  if(store.activeId===id)store.activeId=store.items[0]?.id??null;
+  saveStore(store);
+  const next=store.items.find(x=>x.id===store.activeId);
+  if(next?.data)applyPayload(next.data);
+  else{loadStarterBoxes();imgLoaded=false;imgDataURL='';resetAll();}
+  toast('Project deleted','info');rebuildSidePanel();
+}
+
+// ═══════════════════════════════════════
+//  EXPORT
+// ═══════════════════════════════════════
+function getPhotoAABB(){
+  if(!imgLoaded)return null;
+  const w=canvas.width,h=canvas.height,iw=img.naturalWidth,ih=img.naturalHeight;
+  const rot=(photoRot%180)!==0,bw=rot?ih:iw,bh=rot?iw:ih;
+  const fit=Math.min(w/bw,h/bh)*photoScale;
+  const cx=w/2+photoOffsetX,cy=h/2+photoOffsetY,dw=bw*fit,dh=bh*fit;
+  const rad=photoRot*Math.PI/180;
+  const corners=[{x:-dw/2,y:-dh/2},{x:dw/2,y:-dh/2},{x:dw/2,y:dh/2},{x:-dw/2,y:dh/2}];
+  let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
+  for(const p of corners){
+    const rx=p.x*Math.cos(rad)-p.y*Math.sin(rad)+cx;
+    const ry=p.x*Math.sin(rad)+p.y*Math.cos(rad)+cy;
+    minX=Math.min(minX,rx);minY=Math.min(minY,ry);maxX=Math.max(maxX,rx);maxY=Math.max(maxY,ry);
+  }
+  return{sx:Math.max(0,Math.floor(minX)),sy:Math.max(0,Math.floor(minY)),
+    sw:Math.max(1,Math.min(w,Math.ceil(maxX))-Math.max(0,Math.floor(minX))),
+    sh:Math.max(1,Math.min(h,Math.ceil(maxY))-Math.max(0,Math.floor(minY)))};
+}
+
+function exportCropped(mime,ext,quality){
+  if(!imgLoaded){toast('Upload a template image first','error');return;}
+  const ov={viewX,viewY,viewScale};viewX=0;viewY=0;viewScale=1;draw();
+  const aabb=getPhotoAABB();viewX=ov.viewX;viewY=ov.viewY;viewScale=ov.viewScale;
+  if(!aabb){toast('No photo bounds found','error');return;}
+  const out=document.createElement('canvas');out.width=aabb.sw;out.height=aabb.sh;
+  out.getContext('2d').drawImage(canvas,aabb.sx,aabb.sy,aabb.sw,aabb.sh,0,0,aabb.sw,aabb.sh);
+  out.toBlob(blob=>{
+    if(!blob)return;
+    const a=document.createElement('a');
+    a.download=`hotheadz-menu-${new Date().toISOString().slice(0,10)}.${ext}`;
+    a.href=URL.createObjectURL(blob);document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+    toast(`${ext.toUpperCase()} downloaded!`,'success');
+  },mime,quality);
+}
+
+function exportJSON(){
+  const store=loadStore();const active=store.items.find(p=>p.id===store.activeId);
+  const project={id:active?.id||uid(),name:active?.name||'Menu Export',createdAt:active?.createdAt||Date.now(),updatedAt:Date.now(),data:currentPayload()};
+  const blob=new Blob([JSON.stringify(project,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.download=`hotheadz-menu-${new Date().toISOString().slice(0,10)}.json`;
+  a.href=URL.createObjectURL(blob);document.body.appendChild(a);a.click();a.remove();
+  toast('JSON exported!','success');
+}
+
+// Export modal
+const exportModal=document.getElementById('exportModal');
+function openExport(){exportModal.classList.add('active');}
+function closeExport(){exportModal.classList.remove('active');}
+document.getElementById('exportBtn').addEventListener('click',openExport);
+document.getElementById('mobExportBtn').addEventListener('click',openExport);
+document.getElementById('closeExport').addEventListener('click',closeExport);
+exportModal.addEventListener('click',e=>{if(e.target===exportModal)closeExport();});
+document.getElementById('dlJpg').addEventListener('click',()=>{exportCropped('image/jpeg','jpg',.92);closeExport();});
+document.getElementById('dlPng').addEventListener('click',()=>{exportCropped('image/png','png',1);closeExport();});
+document.getElementById('dlJsonExport').addEventListener('click',()=>{exportJSON();closeExport();});
+
+// ═══════════════════════════════════════
+//  SIDE PANEL — TABS & ACCORDION
+// ═══════════════════════════════════════
+let currentTab='quickfill';
+
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    currentTab=btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    rebuildSidePanel();
+    // On mobile, open the panel
+    if(window.innerWidth<=900)document.getElementById('sidePanel').classList.add('mobile-open');
+  });
+});
+
+document.getElementById('mobSettingsBtn').addEventListener('click',()=>{
+  document.getElementById('sidePanel').classList.add('mobile-open');
+});
+document.getElementById('closeSidePanel').addEventListener('click',()=>{
+  document.getElementById('sidePanel').classList.remove('mobile-open');
+});
+
+function rebuildSidePanel(){
+  const container=document.getElementById('sideScroll');
+  let html='';
+
+  if(currentTab==='quickfill') html=buildQuickFillPanel();
+  else if(currentTab==='textboxes') html=buildTextBoxesPanel();
+  else if(currentTab==='photo') html=buildPhotoPanel();
+  else if(currentTab==='canvas') html=buildCanvasPanel();
+  else if(currentTab==='projects') html=buildProjectsPanel();
+
+  container.innerHTML=html;
+  wirePanel();
+}
+
+// ── QUICK FILL ──
+function buildQuickFillPanel(){
+  const sections=[
+    {name:'Day',label:'Day of Week',placeholder:'Wednesday'},
+    {name:'Date',label:'Date',placeholder:'March 4th 2026'},
+    {name:'Breakfast',label:'Breakfast Items',placeholder:'BREAKFAST\n5:30 AM - 10:30 AM\n\n• Eggs & Bacon\n• Pancakes',ta:true},
+    {name:'Lunch',label:'Lunch Items',placeholder:'LUNCH\n11:00 AM - 2:00 PM\n\n• Fried Chicken\n• Red Beans & Rice',ta:true},
+    {name:'Drinks',label:'Drinks',placeholder:'DRINKS\n\n• Sweet Tea\n• Coke',ta:true},
+    {name:'Salad Bar',label:'Salad Bar',placeholder:'SALAD BAR\n\n• Lettuce\n• Toppings',ta:true},
+    {name:'Dessert',label:'Dessert',placeholder:'DESSERT\n\nBread Pudding',ta:true},
+    {name:'Bottom Note',label:'Bottom Note',placeholder:'For pricing and hours...',ta:true},
+  ];
+
+  let html=`<div class="acc open"><div class="acc-head"><span class="acc-arrow">▶</span><span class="acc-title">Quick Fill — Today's Menu</span></div><div class="acc-body">`;
+  html+=`<p style="font-size:12px;color:var(--text3);margin-bottom:12px;">Type your menu items below. Changes update the canvas live.</p>`;
+  html+=`<div class="btn-row" style="margin-bottom:12px;"><button class="sm-btn primary" id="qfToday">Fill Today's Date</button><button class="sm-btn" id="qfReset">Reset All Text</button></div>`;
+
+  for(const s of sections){
+    const box=boxes.find(b=>b.name===s.name);
+    const val=box?box.text:'';
+    html+=`<div class="qf-section"><div class="qf-section-title">${esc(s.label)}</div>`;
+    if(s.ta){
+      html+=`<textarea class="field-input field-ta qf-input" data-name="${esc(s.name)}" placeholder="${esc(s.placeholder)}" rows="4">${esc(val)}</textarea>`;
+    }else{
+      html+=`<input class="field-input qf-input" data-name="${esc(s.name)}" placeholder="${esc(s.placeholder)}" value="${esc(val)}">`;
+    }
+    html+=`</div>`;
+  }
+  html+=`</div></div>`;
+  return html;
+}
+
+// ── TEXT BOXES ──
+function buildTextBoxesPanel(){
+  let html=`<div class="acc open"><div class="acc-head"><span class="acc-arrow">▶</span><span class="acc-title">Text Boxes</span><span class="acc-badge">${boxes.length}</span></div><div class="acc-body">`;
+  html+=`<div class="btn-row" style="margin-bottom:10px;"><button class="sm-btn primary" id="addBoxBtn">+ Add Box</button><button class="sm-btn" id="dupBoxBtn">Duplicate</button><button class="sm-btn danger" id="delBoxBtn">Delete</button></div>`;
+  html+=`<div class="field"><div class="field-label">Select box</div><select class="field-select" id="boxSelect">`;
+  html+=`<option value=""${!activeId?' selected':''}>(none)</option>`;
+  boxes.forEach((b,i)=>html+=`<option value="${esc(b.id)}"${b.id===activeId?' selected':''}>${i+1}. ${esc(b.name)}</option>`);
+  html+=`</select></div>`;
+  html+=`</div></div>`;
+
+  // Active box editor
+  const b=boxes.find(x=>x.id===activeId);
+  if(b){
+    const fontOpts=FONTS.map(f=>`<option value="${esc(f.value)}"${f.value===b.fontFamily?' selected':''}>${esc(f.label)}</option>`).join('');
+
+    html+=`<div class="acc open"><div class="acc-head"><span class="acc-arrow">▶</span><span class="acc-title">Edit: ${esc(b.name)}</span></div><div class="acc-body">`;
+    html+=`<div class="field"><div class="field-label">Name</div><input class="field-input" id="bName" value="${esc(b.name)}"></div>`;
+    html+=`<div class="field"><div class="field-label">Text</div><textarea class="field-input field-ta" id="bText" rows="5">${esc(b.text)}</textarea></div>`;
+    html+=`<div class="field-row"><div class="field"><div class="field-label">X</div><input class="field-range" type="range" id="bX" min="0" max="100" step="0.1" value="${b.xPct}"></div>`;
+    html+=`<div class="field"><div class="field-label">Y</div><input class="field-range" type="range" id="bY" min="0" max="100" step="0.1" value="${b.yPct}"></div></div>`;
+    html+=`<div class="field-row"><div class="field"><div class="field-label">Size</div><input class="field-range" type="range" id="bSize" min="0.3" max="10" step="0.05" value="${b.sizePct}"></div>`;
+    html+=`<div class="field"><div class="field-label">Size #</div><input class="field-input" type="number" id="bSizeN" min="0.3" max="10" step="0.05" value="${b.sizePct}"></div></div>`;
+    html+=`<div class="field-row"><div class="field"><div class="field-label">Font</div><select class="field-select" id="bFont">${fontOpts}</select></div>`;
+    html+=`<div class="field"><div class="field-label">Align</div><select class="field-select" id="bAlign"><option value="left"${b.align==='left'?' selected':''}>Left</option><option value="center"${b.align==='center'?' selected':''}>Center</option><option value="right"${b.align==='right'?' selected':''}>Right</option></select></div></div>`;
+
+    // Color swatches
+    html+=`<div class="field"><div class="field-label">Text Color</div><div class="swatch-row">`;
+    BRAND_COLORS.forEach(c=>html+=`<div class="swatch bColorSwatch${toHex(b.color)===c?' active':''}" data-color="${c}" style="background:${c};"></div>`);
+    html+=`<input class="field-input field-color" type="color" id="bColor" value="${toHex(b.color)}" style="width:28px;height:28px;padding:2px;border-radius:6px;">`;
+    html+=`</div></div>`;
+
+    html+=`<div class="field-row"><div class="field"><div class="field-label">Opacity</div><input class="field-range" type="range" id="bOp" min="0" max="1" step="0.01" value="${b.opacity}"></div>`;
+    html+=`<div class="field"><div class="field-label">Rotation</div><input class="field-input" type="number" id="bRot" value="${b.rotationDeg||0}" step="1"></div></div>`;
+    html+=`<div class="field-row"><div class="field"><div class="field-label">Line Height</div><input class="field-range" type="range" id="bLH" min="0.8" max="2.2" step="0.01" value="${b.lineHeight||1.15}"></div>`;
+    html+=`<div class="field"><div class="field-label">Shadow</div><label class="cf-toggle" style="margin-top:6px;"><input type="checkbox" id="bShadow"${b.shadow?' checked':''}> On</label></div></div>`;
+
+    // BG section
+    html+=`<div class="field" style="margin-top:6px;"><div class="field-label">Background</div>`;
+    html+=`<label class="cf-toggle"><input type="checkbox" id="bBgOn"${b.bgOn?' checked':''}> Enable</label></div>`;
+    html+=`<div class="field-row"><div class="field"><div class="field-label">BG Color</div><input class="field-input field-color" type="color" id="bBgColor" value="${toHex(b.bgColor)}" style="height:36px;"></div>`;
+    html+=`<div class="field"><div class="field-label">BG Opacity</div><input class="field-range" type="range" id="bBgOp" min="0" max="1" step="0.01" value="${b.bgOpacity??.3}"></div></div>`;
+
+    html+=`</div></div>`;
+  }
+
+  return html;
+}
+
+// ── PHOTO ──
+function buildPhotoPanel(){
+  let html=`<div class="acc open"><div class="acc-head"><span class="acc-arrow">▶</span><span class="acc-title">Photo Settings</span></div><div class="acc-body">`;
+  html+=`<div class="field"><div class="field-label">Photo Zoom (export)</div><input class="field-range" type="range" id="pZoom2" min="0.3" max="4" step="0.01" value="${photoScale}"></div>`;
+  html+=`<div class="field"><div class="field-label">Rotation</div><div class="btn-row"><button class="sm-btn" id="pRot2">Rotate 90°</button><button class="sm-btn" id="pReset2">Reset Photo</button></div></div>`;
+  html+=`<p style="font-size:11px;color:var(--text3);margin-top:8px;">Drag on canvas to move photo. Right-drag to pan view. Wheel to zoom view, Alt+Wheel to zoom photo.</p>`;
+  html+=`</div></div>`;
+  return html;
+}
+
+// ── CANVAS ──
+function buildCanvasPanel(){
+  let html=`<div class="acc open"><div class="acc-head"><span class="acc-arrow">▶</span><span class="acc-title">Canvas Size</span></div><div class="acc-body">`;
+  html+=`<div class="btn-row" style="margin-bottom:10px;"><button class="sm-btn" id="csIG">IG 1080×1350</button><button class="sm-btn" id="csSQ">Square 1080×1080</button></div>`;
+  html+=`<div class="field-row"><div class="field"><div class="field-label">Width</div><input class="field-input" type="number" id="csW" value="${outW}" min="600" max="3000"></div>`;
+  html+=`<div class="field"><div class="field-label">Height</div><input class="field-input" type="number" id="csH" value="${outH}" min="600" max="4000"></div></div>`;
+  html+=`</div></div>`;
+  return html;
+}
+
+// ── PROJECTS ──
+function buildProjectsPanel(){
+  const store=loadStore();
+  let html=`<div class="acc open"><div class="acc-head"><span class="acc-arrow">▶</span><span class="acc-title">Projects</span><span class="acc-badge">${store.items.length}</span></div><div class="acc-body">`;
+  html+=`<div class="btn-row" style="margin-bottom:10px;"><button class="sm-btn primary" id="pNew">New Project</button><button class="sm-btn" id="pSave">Save</button><button class="sm-btn" id="pImportFile">Import File</button></div>`;
+
+  if(store.items.length===0){
+    html+=`<p style="font-size:12px;color:var(--text3);">No projects yet. Create one to save your work.</p>`;
+  }else{
+    store.items.forEach(p=>{
+      const isActive=p.id===store.activeId;
+      const date=new Date(p.updatedAt||p.createdAt||Date.now()).toLocaleString();
+      html+=`<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--radius-sm);margin-bottom:4px;background:${isActive?'var(--ember)':'rgba(255,255,255,.03)'};border:1px solid ${isActive?'rgba(255,122,24,.2)':'var(--border)'};">`;
+      html+=`<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:${isActive?'var(--fire)':'var(--text)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(p.name)}</div>`;
+      html+=`<div style="font-size:10px;color:var(--text3);">${date}</div></div>`;
+      if(!isActive)html+=`<button class="sm-btn pLoad" data-id="${esc(p.id)}">Load</button>`;
+      html+=`<button class="sm-btn danger pDel" data-id="${esc(p.id)}">×</button>`;
+      html+=`</div>`;
+    });
+  }
+  html+=`</div></div>`;
+  return html;
+}
+
+// ── Wire panel events ──
+function wirePanel(){
+  // Accordion toggles
+  document.querySelectorAll('.acc-head').forEach(h=>{
+    h.addEventListener('click',()=>h.parentElement.classList.toggle('open'));
+  });
+
+  // Quick fill
+  document.querySelectorAll('.qf-input').forEach(el=>{
+    el.addEventListener('input',()=>{
+      const name=el.dataset.name;const box=boxes.find(b=>b.name===name);
+      if(box){saveUndo();box.text=el.value;draw();triggerAutoSave();}
+    });
+  });
+  const qfToday=document.getElementById('qfToday');
+  if(qfToday)qfToday.addEventListener('click',()=>{
+    const t=todayDefaults();
+    const dayBox=boxes.find(b=>b.name==='Day');
+    const dateBox=boxes.find(b=>b.name==='Date');
+    if(dayBox){saveUndo();dayBox.text=t.weekday;}
+    if(dateBox)dateBox.text=t.dateStr;
+    draw();rebuildSidePanel();triggerAutoSave();
+    toast("Today's date filled!",'success');
+  });
+  const qfReset=document.getElementById('qfReset');
+  if(qfReset)qfReset.addEventListener('click',()=>{
+    if(!confirm('Reset all text to defaults?'))return;
+    saveUndo();loadStarterBoxes();draw();rebuildSidePanel();triggerAutoSave();
+    toast('Text reset to defaults','info');
+  });
+
+  // Text boxes
+  const boxSelect=document.getElementById('boxSelect');
+  if(boxSelect)boxSelect.addEventListener('change',()=>{activeId=boxSelect.value||null;rebuildSidePanel();draw();});
+  const addBoxBtn=document.getElementById('addBoxBtn');
+  if(addBoxBtn)addBoxBtn.addEventListener('click',()=>{saveUndo();const b=defaultBox('New Box','New text',50,50);boxes.push(b);activeId=b.id;rebuildSidePanel();draw();triggerAutoSave();});
+  const dupBoxBtn=document.getElementById('dupBoxBtn');
+  if(dupBoxBtn)dupBoxBtn.addEventListener('click',()=>{const cur=boxes.find(x=>x.id===activeId);if(!cur)return;saveUndo();const c=JSON.parse(JSON.stringify(cur));c.id=uid();c.name+=' (copy)';c.xPct=clamp(cur.xPct+2,0,100);c.yPct=clamp(cur.yPct+2,0,100);boxes.push(c);activeId=c.id;rebuildSidePanel();draw();triggerAutoSave();});
+  const delBoxBtn=document.getElementById('delBoxBtn');
+  if(delBoxBtn)delBoxBtn.addEventListener('click',()=>{const cur=boxes.find(x=>x.id===activeId);if(!cur||!confirm(`Delete "${cur.name}"?`))return;saveUndo();boxes=boxes.filter(b=>b.id!==cur.id);activeId=null;rebuildSidePanel();draw();triggerAutoSave();});
+
+  // Box editor fields
+  const b=boxes.find(x=>x.id===activeId);
+  if(b){
+    const wire=(id,fn,evt='input')=>{const el=document.getElementById(id);if(el)el.addEventListener(evt,fn);};
+    wire('bName',e=>{b.name=e.target.value;draw();triggerAutoSave();});
+    wire('bText',e=>{b.text=e.target.value;draw();triggerAutoSave();});
+    wire('bX',e=>{b.xPct=parseFloat(e.target.value);draw();triggerAutoSave();});
+    wire('bY',e=>{b.yPct=parseFloat(e.target.value);draw();triggerAutoSave();});
+    wire('bSize',e=>{b.sizePct=parseFloat(e.target.value);const n=document.getElementById('bSizeN');if(n)n.value=b.sizePct;draw();triggerAutoSave();});
+    wire('bSizeN',e=>{b.sizePct=clamp(parseFloat(e.target.value||'1'),.3,10);const s=document.getElementById('bSize');if(s)s.value=b.sizePct;draw();triggerAutoSave();});
+    wire('bFont',e=>{b.fontFamily=e.target.value;draw();triggerAutoSave();},'change');
+    wire('bAlign',e=>{b.align=e.target.value;draw();triggerAutoSave();},'change');
+    wire('bColor',e=>{b.color=e.target.value;draw();triggerAutoSave();});
+    wire('bOp',e=>{b.opacity=parseFloat(e.target.value);draw();triggerAutoSave();});
+    wire('bRot',e=>{b.rotationDeg=parseFloat(e.target.value||'0');draw();triggerAutoSave();});
+    wire('bLH',e=>{b.lineHeight=parseFloat(e.target.value);draw();triggerAutoSave();});
+    wire('bShadow',e=>{b.shadow=!!e.target.checked;draw();triggerAutoSave();},'change');
+    wire('bBgOn',e=>{b.bgOn=!!e.target.checked;draw();triggerAutoSave();},'change');
+    wire('bBgColor',e=>{b.bgColor=e.target.value;draw();triggerAutoSave();});
+    wire('bBgOp',e=>{b.bgOpacity=parseFloat(e.target.value);draw();triggerAutoSave();});
+
+    // Color swatches
+    document.querySelectorAll('.bColorSwatch').forEach(sw=>{
+      sw.addEventListener('click',()=>{
+        b.color=sw.dataset.color;draw();triggerAutoSave();rebuildSidePanel();
       });
+    });
+  }
 
-      pinInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') unlockBtn.click();
-      });
+  // Photo panel
+  const pZoom2=document.getElementById('pZoom2');
+  if(pZoom2)pZoom2.addEventListener('input',()=>{photoScale=parseFloat(pZoom2.value);document.getElementById('photoZoom').value=pZoom2.value;draw();});
+  const pRot2=document.getElementById('pRot2');
+  if(pRot2)pRot2.addEventListener('click',()=>{saveUndo();photoRot=(photoRot+90)%360;draw();triggerAutoSave();});
+  const pReset2=document.getElementById('pReset2');
+  if(pReset2)pReset2.addEventListener('click',()=>{saveUndo();photoScale=1;photoRot=0;photoOffsetX=0;photoOffsetY=0;document.getElementById('photoZoom').value='1';draw();triggerAutoSave();});
 
-      // Close editor button (returns to gate)
-      document.getElementById('hhMEcloseBtn').addEventListener('click', () => {
-        editorRoot.style.display = 'none';
-        gate.style.display = 'flex';
-      });
+  // Canvas panel
+  const csIG=document.getElementById('csIG');
+  if(csIG)csIG.addEventListener('click',()=>{outW=1080;outH=1350;draw();rebuildSidePanel();triggerAutoSave();});
+  const csSQ=document.getElementById('csSQ');
+  if(csSQ)csSQ.addEventListener('click',()=>{outW=1080;outH=1080;draw();rebuildSidePanel();triggerAutoSave();});
+  const csW=document.getElementById('csW');
+  if(csW)csW.addEventListener('change',()=>{outW=clamp(parseInt(csW.value)||1080,600,3000);draw();triggerAutoSave();});
+  const csH=document.getElementById('csH');
+  if(csH)csH.addEventListener('change',()=>{outH=clamp(parseInt(csH.value)||1350,600,4000);draw();triggerAutoSave();});
 
-      // ---------- EDITOR SCRIPT (adapted from original, minus floating openers & PIN) ----------
-      const DEFAULT_IMAGE_URL =
-        "https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/38f723d4-604b-4459-b945-c1edaed19159/DailyMenuUpdate.png?format=750w";
-
-      const EDIT_PIN = "2172";        // not used here (handled by gate)
-      const OPEN_QUERY_KEY = "menuedit";
-
-      const PROJECTS_KEY = "hhMenuEditorProjects_v36";
-
-      const FONT_OPTIONS = [
-        { label: "System (Clean)", value: 'system-ui, -apple-system, Segoe UI, Roboto, Arial' },
-        { label: "Georgia (Classic)", value: 'Georgia, "Times New Roman", Times, serif' },
-        { label: "Times (Formal)", value: '"Times New Roman", Times, serif' },
-        { label: "Trebuchet (Friendly)", value: '"Trebuchet MS", Trebuchet, Arial, sans-serif' },
-        { label: "Verdana (Readable)", value: "Verdana, Geneva, sans-serif" },
-        { label: "Courier (Mono)", value: '"Courier New", Courier, monospace' }
-      ];
-
-      const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
-      const uid = () => Math.random().toString(16).slice(2) + "-" + Date.now().toString(16);
-      const esc = (s) => String(s ?? "")
-        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;").replaceAll("'","&#039;");
-
-      const isCoarsePointer = () => {
-        try {
-          return (
-            (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) ||
-            (navigator.maxTouchPoints && navigator.maxTouchPoints > 0)
-          );
-        } catch { return false; }
-      };
-
-      function safeJsonParse(raw, fallback){
-        try { return JSON.parse(raw); } catch { return fallback; }
+  // Projects panel
+  const pNew=document.getElementById('pNew');
+  if(pNew)pNew.addEventListener('click',()=>{const name=prompt('Project name:',`Menu ${new Date().toLocaleDateString()}`);if(name===null)return;createProject(name.trim());rebuildSidePanel();});
+  const pSave=document.getElementById('pSave');
+  if(pSave)pSave.addEventListener('click',saveProject);
+  const pImportFile=document.getElementById('pImportFile');
+  if(pImportFile)pImportFile.addEventListener('click',()=>{
+    const inp=document.createElement('input');inp.type='file';inp.accept='application/json';
+    inp.onchange=async()=>{
+      const file=inp.files?.[0];if(!file)return;
+      const obj=safeJSON(await file.text(),null);if(!obj){toast('Invalid JSON file','error');return;}
+      const store=loadStore();
+      if(obj.data){
+        store.items.unshift({id:uid(),name:obj.name||'Imported',createdAt:Date.now(),updatedAt:Date.now(),data:obj.data});
+        store.activeId=store.items[0].id;
       }
-
-      function toHex(color){
-        if (/^#([0-9a-f]{3}){1,2}$/i.test(String(color))) return color;
-        const m = String(color).match(/rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
-        if (m){
-          const r = clamp(parseInt(m[1],10),0,255).toString(16).padStart(2,"0");
-          const g = clamp(parseInt(m[2],10),0,255).toString(16).padStart(2,"0");
-          const b = clamp(parseInt(m[3],10),0,255).toString(16).padStart(2,"0");
-          return `#${r}${g}${b}`;
-        }
-        return "#ffffff";
-      }
-
-      function hexToRgba(hex, a){
-        const h = String(hex || "#000000").replace("#","");
-        const full = h.length === 3 ? h.split("").map(x=>x+x).join("") : h.padEnd(6,"0").slice(0,6);
-        const r = parseInt(full.slice(0,2), 16);
-        const g = parseInt(full.slice(2,4), 16);
-        const b = parseInt(full.slice(4,6), 16);
-        return `rgba(${r},${g},${b},${clamp(a,0,1)})`;
-      }
-
-      function todayDefaults(){
-        try{
-          const now = new Date();
-          return {
-            weekday: now.toLocaleDateString(undefined, { weekday:"long" }),
-            dateStr: now.toLocaleDateString(undefined, { month:"long", day:"numeric", year:"numeric" })
-          };
-        } catch { return { weekday:"", dateStr:"" }; }
-      }
-
-      // -------- STATE --------
-      const canvas = document.getElementById("hhMEcanvas");
-      const ctx = canvas.getContext("2d", { alpha:false });
-      let img = new Image();
-      let imgLoaded = false;
-      let imgDataURL = "";
-
-      let photoScale = 1, photoRot = 0, photoOffsetX = 0, photoOffsetY = 0;
-      let viewX = 0, viewY = 0, viewScale = 1;
-      let boxes = [];
-      let activeId = null;
-      let dragging = false;
-      let dragMode = "image"; // "image" | "text" | "view"
-      let lastX = 0, lastY = 0;
-
-      const pointers = new Map(); // pointerId -> {clientX, clientY}
-      let pinchActive = false;
-      let lastMid = null;
-      let lastDist = null;
-
-      canvas.addEventListener("contextmenu", (e) => e.preventDefault());
-
-      // -------- localStorage wrapper --------
-      function saveProjectsStore(store){
-        try{
-          localStorage.setItem(PROJECTS_KEY, JSON.stringify(store));
-          return { ok:true };
-        } catch (e){
-          const msg = String(e && e.message ? e.message : e);
-          return { ok:false, error: msg };
-        }
-      }
-      function loadProjectsStore(){
-        const store = safeJsonParse(localStorage.getItem(PROJECTS_KEY), null);
-        if (store && Array.isArray(store.items)) return store;
-        return { activeId: null, items: [] };
-      }
-      function getActiveProject(store){
-        if (!store.activeId) return null;
-        return store.items.find(p => p.id === store.activeId) || null;
-      }
-
-      // -------- IMAGE IO / COMPRESSION --------
-      function fileToDataURL(file){
-        return new Promise((resolve, reject) => {
-          const r = new FileReader();
-          r.onload = () => resolve(String(r.result || ""));
-          r.onerror = reject;
-          r.readAsDataURL(file);
-        });
-      }
-
-      async function compressImageDataURL(dataUrl, opts){
-        const { maxDim=2200, quality=0.9 } = (opts || {});
-        const im = new Image();
-        im.src = dataUrl;
-
-        await new Promise(res => {
-          im.onload = () => res(true);
-          im.onerror = () => res(false);
-        });
-
-        if (!im.naturalWidth) return dataUrl;
-
-        const iw = im.naturalWidth, ih = im.naturalHeight;
-        const sc = Math.min(1, maxDim / Math.max(iw, ih));
-        const w = Math.round(iw * sc);
-        const h = Math.round(ih * sc);
-
-        const c = document.createElement("canvas");
-        c.width = w; c.height = h;
-        const cctx = c.getContext("2d");
-        cctx.drawImage(im, 0, 0, w, h);
-
-        return c.toDataURL("image/jpeg", quality);
-      }
-
-      async function loadImageFromDataURL(dataUrl){
-        return new Promise((resolve) => {
-          img = new Image();
-          img.onload = () => { imgLoaded = true; resolve(true); };
-          img.onerror = () => { imgLoaded = false; resolve(false); };
-          img.src = dataUrl;
-        });
-      }
-
-      // -------- DEFAULT BOXES --------
-      function defaultBox(name, text, xPct, yPct){
-        return {
-          id: uid(),
-          name: name || "Text",
-          text: text || "New text",
-          xPct: xPct ?? 50,
-          yPct: yPct ?? 50,
-          sizePct: 2.6,
-          fontFamily: FONT_OPTIONS[0].value,
-          color: "#ffffff",
-          opacity: 0.95,
-          align: "left",
-          bold: true,
-          italic: false,
-          underline: false,
-          shadow: true,
-          shadowBlur: 16,
-          shadowColor: "rgba(0,0,0,0.45)",
-          bgOn: true,
-          bgColor: "#000000",
-          bgOpacity: 0.30,
-          bgPadX: 14,
-          bgPadY: 10,
-          bgRadius: 14,
-          lineHeight: 1.15,
-          rotationDeg: 0
-        };
-      }
-
-      function loadStarterBoxes(){
-        const t = todayDefaults();
-        boxes = [
-          defaultBox("Day", t.weekday || "Wednesday", 50, 8),
-          defaultBox("Date", t.dateStr || "March 4th 2026", 50, 14),
-          defaultBox("Breakfast", "BREAKFAST\n5:30 AM - 10:30 AM\n\n• Item 1\n• Item 2\n• Item 3", 18, 44),
-          defaultBox("Lunch", "LUNCH\n11:00 AM - 2:00 PM\n\n• Item 1\n• Item 2\n• Item 3", 16, 80),
-          defaultBox("Drinks", "DRINKS\n\n• Sweet Tea\n• Coke\n• Coffee", 50, 80),
-          defaultBox("Salad Bar", "SALAD BAR\n\n• Lettuce\n• Toppings\n• Dressings", 72, 46),
-          defaultBox("Dessert", "DESSERT\n\nCake", 74, 85),
-          defaultBox("Bottom Note", "For pricing and hours please visit\nHotHeadzSouthernFoods.com", 50, 96),
-        ];
-        const day = boxes.find(b => b.name === "Day");
-        const date = boxes.find(b => b.name === "Date");
-        if (day){ day.align="center"; day.sizePct=6.6; day.bgOn=false; day.bold=true; }
-        if (date){ date.align="center"; date.sizePct=2.7; date.bgOn=false; date.bold=true; }
-        activeId = null;
-      }
-
-      // -------- CANVAS helpers --------
-      function setCanvasSize(){
-        const w = clamp(parseInt(document.getElementById("hhMEoutW").value || "1080", 10), 600, 4000);
-        const h = clamp(parseInt(document.getElementById("hhMEoutH").value || "1350", 10), 600, 5000);
-        canvas.width = w;
-        canvas.height = h;
-      }
-
-      const pxX = (pct) => (pct/100) * canvas.width;
-      const pxY = (pct) => (pct/100) * canvas.height;
-      const pctX = (px) => (px / canvas.width) * 100;
-      const pctY = (px) => (px / canvas.height) * 100;
-      const fontPx = (pct) => Math.max(6, (pct/100) * canvas.height);
-
-      function roundRectPath(x, y, w, h, r){
-        const rr = Math.min(r, w/2, h/2);
-        ctx.beginPath();
-        ctx.moveTo(x+rr, y);
-        ctx.arcTo(x+w, y, x+w, y+h, rr);
-        ctx.arcTo(x+w, y+h, x, y+h, rr);
-        ctx.arcTo(x, y+h, x, y, rr);
-        ctx.arcTo(x, y, x+w, y, rr);
-        ctx.closePath();
-      }
-
-      function drawPhotoContain(){
-        ctx.fillStyle = "#111216";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        if (!imgLoaded){
-          ctx.save();
-          ctx.fillStyle = "rgba(255,255,255,0.85)";
-          ctx.font = "800 22px system-ui, -apple-system, Segoe UI, Roboto, Arial";
-          ctx.textAlign = "center";
-          ctx.fillText("Upload your menu template image to start", canvas.width/2, canvas.height/2);
-          ctx.restore();
-          return;
-        }
-
-        const w = canvas.width, h = canvas.height;
-        const iw = img.naturalWidth, ih = img.naturalHeight;
-
-        const rotated = (photoRot % 180) !== 0;
-        const baseW = rotated ? ih : iw;
-        const baseH = rotated ? iw : ih;
-
-        const fit = Math.min(w/baseW, h/baseH) * photoScale;
-
-        const cx = w/2 + photoOffsetX;
-        const cy = h/2 + photoOffsetY;
-
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate((photoRot * Math.PI)/180);
-
-        const drawW = baseW * fit;
-        const drawH = baseH * fit;
-
-        ctx.drawImage(img, -drawW/2, -drawH/2, drawW, drawH);
-        ctx.restore();
-      }
-
-      function measureBoxText(b){
-        const size = fontPx(b.sizePct);
-        const lines = String(b.text ?? "").split("\n");
-        const lineH = size * (b.lineHeight || 1.15);
-
-        ctx.save();
-        ctx.font = `${b.italic ? "italic " : ""}${b.bold ? "900 " : "700 "}${Math.round(size)}px ${b.fontFamily}`;
-        let maxW = 0;
-        for (const line of lines) maxW = Math.max(maxW, ctx.measureText(line).width);
-        ctx.restore();
-
-        return { lines, size, lineH, maxW, totalH: lines.length * lineH };
-      }
-
-      function computeRotatedAABB(centerX, centerY, rectW, rectH, rotationDeg){
-        const rad = (rotationDeg || 0) * Math.PI / 180;
-        const hw = rectW / 2;
-        const hh = rectH / 2;
-
-        const corners = [
-          { x: -hw, y: -hh },
-          { x:  hw, y: -hh },
-          { x:  hw, y:  hh },
-          { x: -hw, y:  hh },
-        ];
-
-        const pts = corners.map(p => {
-          const rx = p.x * Math.cos(rad) - p.y * Math.sin(rad);
-          const ry = p.x * Math.sin(rad) + p.y * Math.cos(rad);
-          return { x: rx + centerX, y: ry + centerY };
-        });
-
-        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-        for (const p of pts){
-          minX = Math.min(minX, p.x);
-          minY = Math.min(minY, p.y);
-          maxX = Math.max(maxX, p.x);
-          maxY = Math.max(maxY, p.y);
-        }
-        return { left:minX, top:minY, right:maxX, bottom:maxY };
-      }
-
-      function drawTextBox(b){
-        const x = pxX(b.xPct);
-        const y = pxY(b.yPct);
-        const { lines, size, lineH, maxW, totalH } = measureBoxText(b);
-
-        const localLeft = -maxW/2;
-        const localTop = -totalH/2;
-
-        const padX = b.bgPadX ?? 14;
-        const padY = b.bgPadY ?? 10;
-
-        const rectW = maxW + (b.bgOn ? padX*2 : 0);
-        const rectH = totalH + (b.bgOn ? padY*2 : 0);
-
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate((b.rotationDeg || 0) * Math.PI / 180);
-
-        if (b.bgOn){
-          ctx.save();
-          ctx.shadowBlur = 0;
-          const r = b.bgRadius ?? 14;
-          ctx.fillStyle = hexToRgba(b.bgColor || "#000000", clamp(b.bgOpacity ?? 0.30, 0, 1));
-          roundRectPath(localLeft - padX, localTop - padY, maxW + padX*2, totalH + padY*2, r);
-          ctx.fill();
-          ctx.restore();
-        }
-
-        if (b.shadow){
-          ctx.shadowColor = b.shadowColor || "rgba(0,0,0,0.45)";
-          ctx.shadowBlur = b.shadowBlur ?? 16;
-        } else {
-          ctx.shadowColor = "rgba(0,0,0,0)";
-          ctx.shadowBlur = 0;
-        }
-
-        ctx.fillStyle = hexToRgba(b.color || "#ffffff", clamp(b.opacity ?? 0.95, 0, 1));
-        ctx.font = `${b.italic ? "italic " : ""}${b.bold ? "900 " : "700 "}${Math.round(size)}px ${b.fontFamily}`;
-        ctx.textBaseline = "middle";
-
-        const align = (b.align || "left").toLowerCase();
-        let drawX = 0;
-        if (align === "center"){
-          ctx.textAlign = "center";
-          drawX = 0;
-        } else if (align === "right"){
-          ctx.textAlign = "right";
-          drawX = localLeft + maxW;
-        } else {
-          ctx.textAlign = "left";
-          drawX = localLeft;
-        }
-
-        for (let i=0; i<lines.length; i++){
-          const yy = localTop + (i + 0.5) * lineH;
-          ctx.fillText(lines[i], drawX, yy);
-        }
-
-        ctx.restore();
-        b.__hit = computeRotatedAABB(x, y, rectW, rectH, b.rotationDeg || 0);
-      }
-
-      function drawSelectionOutline(){
-        if (!document.getElementById("hhMEoutline").checked) return;
-        const b = getActive();
-        if (!b || !b.__hit) return;
-        const hit = b.__hit;
-        ctx.save();
-        ctx.strokeStyle = "rgba(255,255,255,0.80)";
-        ctx.lineWidth = 2;
-        ctx.setLineDash([6, 5]);
-        ctx.strokeRect(hit.left, hit.top, hit.right - hit.left, hit.bottom - hit.top);
-        ctx.restore();
-      }
-
-      function draw(){
-        setCanvasSize();
-
-        ctx.save();
-        ctx.translate(viewX, viewY);
-        ctx.scale(viewScale, viewScale);
-
-        drawPhotoContain();
-
-        if (document.getElementById("hhMEoverlay").checked){
-          for (const b of boxes) drawTextBox(b);
-          if (activeId) drawSelectionOutline();
-        }
-
-        ctx.restore();
-      }
-
-      function resetAll(){
-        photoScale = 1; document.getElementById("hhMEzoom").value = "1";
-        photoRot = 0; photoOffsetX = 0; photoOffsetY = 0;
-        viewX = 0; viewY = 0; viewScale = 1; document.getElementById("hhMEviewzoom").value = "1";
-        draw();
-      }
-
-      function fitView(){
-        viewX = 0; viewY = 0; viewScale = 1;
-        document.getElementById("hhMEviewzoom").value = "1";
-        draw();
-      }
-
-      function getActive(){
-        return boxes.find(b => b.id === activeId) || null;
-      }
-
-      function deselectText(){
-        activeId = null;
-        rebuildSelect();
-        rebuildEditor();
-        draw();
-      }
-
-      function maybeSnap(vPct){
-        if (!document.getElementById("hhMEsnap").checked) return vPct;
-        return Math.round(vPct * 2) / 2;
-      }
-
-      function canvasPosRawFromClient(clientX, clientY){
-        const r = canvas.getBoundingClientRect();
-        return {
-          x: (clientX - r.left) * (canvas.width / r.width),
-          y: (clientY - r.top)  * (canvas.height / r.height)
-        };
-      }
-
-      function canvasPosWorldFromClient(clientX, clientY){
-        const raw = canvasPosRawFromClient(clientX, clientY);
-        return { x: (raw.x - viewX) / viewScale, y: (raw.y - viewY) / viewScale };
-      }
-
-      function hitTestText(px, py){
-        for (let i = boxes.length - 1; i >= 0; i--){
-          const b = boxes[i];
-          const hit = b.__hit;
-          if (!hit) continue;
-          if (px >= hit.left && px <= hit.right && py >= hit.top && py <= hit.bottom) return b;
-        }
-        return null;
-      }
-
-      function computePinch(){
-        if (pointers.size !== 2) return null;
-        const pts = Array.from(pointers.values());
-        const a = canvasPosRawFromClient(pts[0].clientX, pts[0].clientY);
-        const b = canvasPosRawFromClient(pts[1].clientX, pts[1].clientY);
-        const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
-        const dx = a.x - b.x, dy = a.y - b.y;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        return { mid, dist };
-      }
-
-      // ----- Pointer interactions -----
-      canvas.addEventListener("pointerdown", (e) => {
-        if (e.pointerType === "touch"){
-          pointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
-          if (pointers.size === 2){
-            pinchActive = true;
-            const p = computePinch();
-            lastMid = p?.mid || null;
-            lastDist = p?.dist || null;
-            dragging = false;
-            canvas.setPointerCapture(e.pointerId);
-            return;
-          }
-        }
-
-        const isRightClick = (e.button === 2);
-        if (!isCoarsePointer() && isRightClick){
-          const pRaw = canvasPosRawFromClient(e.clientX, e.clientY);
-          dragging = true;
-          dragMode = "view";
-          lastX = pRaw.x;
-          lastY = pRaw.y;
-          canvas.setPointerCapture(e.pointerId);
-          return;
-        }
-
-        const p = canvasPosWorldFromClient(e.clientX, e.clientY);
-        lastX = p.x; lastY = p.y;
-
-        if (document.getElementById("hhMEoverlay").checked){
-          const hit = hitTestText(p.x, p.y);
-          if (hit){
-            activeId = hit.id;
-            dragging = true;
-            dragMode = "text";
-            rebuildSelect();
-            rebuildEditor();
-            canvas.setPointerCapture(e.pointerId);
-            draw();
-            return;
-          }
-        }
-
-        deselectText();
-        dragging = true;
-        dragMode = "image";
-        canvas.setPointerCapture(e.pointerId);
-      });
-
-      canvas.addEventListener("pointermove", (e) => {
-        if (e.pointerType === "touch" && pointers.has(e.pointerId)){
-          pointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
-        }
-
-        if (pinchActive && pointers.size === 2){
-          const p = computePinch();
-          if (!p) return;
-
-          if (lastMid){
-            const dx = p.mid.x - lastMid.x;
-            const dy = p.mid.y - lastMid.y;
-            viewX += dx;
-            viewY += dy;
-          }
-
-          if (lastDist && p.dist){
-            const ratio = p.dist / lastDist;
-            viewScale = clamp(viewScale * ratio, 0.5, 3);
-            document.getElementById("hhMEviewzoom").value = String(viewScale);
-          }
-
-          lastMid = p.mid;
-          lastDist = p.dist;
-          draw();
-          return;
-        }
-
-        if (!dragging) return;
-
-        if (dragMode === "view"){
-          const pRaw = canvasPosRawFromClient(e.clientX, e.clientY);
-          const dx = pRaw.x - lastX;
-          const dy = pRaw.y - lastY;
-          lastX = pRaw.x; lastY = pRaw.y;
-          viewX += dx;
-          viewY += dy;
-          draw();
-          return;
-        }
-
-        const p = canvasPosWorldFromClient(e.clientX, e.clientY);
-        const dx = p.x - lastX;
-        const dy = p.y - lastY;
-        lastX = p.x; lastY = p.y;
-
-        if (dragMode === "image"){
-          photoOffsetX += dx;
-          photoOffsetY += dy;
-          draw();
-          return;
-        }
-
-        if (dragMode === "text"){
-          const b = getActive();
-          if (!b) return;
-          b.xPct = maybeSnap(clamp(pctX(pxX(b.xPct) + dx), 0, 100));
-          b.yPct = maybeSnap(clamp(pctY(pxY(b.yPct) + dy), 0, 100));
-          const xEl = document.getElementById("hhME_x");
-          const yEl = document.getElementById("hhME_y");
-          if (xEl) xEl.value = String(b.xPct);
-          if (yEl) yEl.value = String(b.yPct);
-          draw();
-        }
-      });
-
-      function endPointer(e){
-        dragging = false;
-        if (e && e.pointerType === "touch"){
-          pointers.delete(e.pointerId);
-          if (pointers.size < 2){
-            pinchActive = false;
-            lastMid = null;
-            lastDist = null;
-          }
-        }
-      }
-      canvas.addEventListener("pointerup", endPointer);
-      canvas.addEventListener("pointercancel", endPointer);
-
-      canvas.addEventListener("wheel", (e) => {
-        e.preventDefault();
-        const delta = Math.sign(e.deltaY) * -0.08;
-
-        if (e.altKey){
-          photoScale = clamp(photoScale + delta, 0.3, 4);
-          document.getElementById("hhMEzoom").value = String(photoScale);
-          draw();
-          return;
-        }
-
-        viewScale = clamp(viewScale + delta, 0.5, 3);
-        document.getElementById("hhMEviewzoom").value = String(viewScale);
-        draw();
-      }, { passive:false });
-
-      // ----- Box CRUD -----
-      function addTextBox(){
-        const b = defaultBox("New Box", "New text", 50, 50);
-        boxes.push(b);
-        activeId = b.id;
-        rebuildSelect();
-        rebuildEditor();
-        draw();
-      }
-
-      function duplicateTextBox(){
-        const cur = getActive();
-        if (!cur) return;
-        const copy = JSON.parse(JSON.stringify(cur));
-        copy.id = uid();
-        copy.name = (cur.name || "Text") + " (copy)";
-        copy.xPct = clamp(cur.xPct + 2, 0, 100);
-        copy.yPct = clamp(cur.yPct + 2, 0, 100);
-        boxes.push(copy);
-        activeId = copy.id;
-        rebuildSelect();
-        rebuildEditor();
-        draw();
-      }
-
-      function deleteTextBox(){
-        const cur = getActive();
-        if (!cur) return;
-        if (!confirm(`Delete "${cur.name || "Text"}"?`)) return;
-        boxes = boxes.filter(b => b.id !== cur.id);
-        activeId = null;
-        rebuildSelect();
-        rebuildEditor();
-        draw();
-      }
-
-      // ----- Editor UI -----
-      function rebuildSelect(){
-        const selectEl = document.getElementById("hhMEboxSelect");
-        const opts = [];
-        opts.push(`<option value=""${activeId ? "" : " selected"}>(none)</option>`);
-        for (let i=0; i<boxes.length; i++){
-          const b = boxes[i];
-          const label = `${i+1}. ${b.name || "Text"}`;
-          opts.push(`<option value="${esc(b.id)}"${b.id === activeId ? " selected" : ""}>${esc(label)}</option>`);
-        }
-        selectEl.innerHTML = opts.join("");
-      }
-
-      function rebuildEditor(){
-        const b = getActive();
-        const editorEl = document.getElementById("hhMEboxEditor");
-        if (!b){
-          editorEl.innerHTML = `<div style="color:rgba(255,255,255,.78);">No selection. Tap a text box on the canvas or pick one above.</div>`;
-          return;
-        }
-
-        const fontOptionsHtml = FONT_OPTIONS.map(f =>
-          `<option value="${esc(f.value)}"${f.value === b.fontFamily ? " selected" : ""}>${esc(f.label)}</option>`
-        ).join("");
-
-        editorEl.innerHTML = `
-          <div class="hhME-row">
-            <div class="hhME-label">Name</div>
-            <input id="hhME_name" class="hhME-input" type="text" value="${esc(b.name)}" style="width:60%;">
-          </div>
-
-          <textarea id="hhME_text" class="hhME-ta" rows="6">${esc(b.text)}</textarea>
-
-          <div class="hhME-grid2">
-            <label class="hhME-rangeLbl">X
-              <input id="hhME_x" type="range" min="0" max="100" step="0.1" value="${b.xPct}">
-            </label>
-            <label class="hhME-rangeLbl">Y
-              <input id="hhME_y" type="range" min="0" max="100" step="0.1" value="${b.yPct}">
-            </label>
-          </div>
-
-          <div class="hhME-grid2">
-            <label class="hhME-rangeLbl">Size
-              <input id="hhME_size" type="range" min="0.3" max="10" step="0.05" value="${b.sizePct}">
-            </label>
-            <label class="hhME-rangeLbl">Size (exact)
-              <input id="hhME_sizeNum" class="hhME-input" type="number" min="0.3" max="10" step="0.05" value="${b.sizePct}">
-            </label>
-          </div>
-
-          <div class="hhME-grid2">
-            <label class="hhME-rangeLbl">Opacity
-              <input id="hhME_op" type="range" min="0" max="1" step="0.01" value="${b.opacity}">
-            </label>
-            <label class="hhME-rangeLbl">Rotate (deg)
-              <input id="hhME_rot" class="hhME-input" type="number" value="${Number(b.rotationDeg||0)}" step="1">
-            </label>
-          </div>
-
-          <div class="hhME-grid2">
-            <label class="hhME-rangeLbl">Font
-              <select id="hhME_font" class="hhME-select">${fontOptionsHtml}</select>
-            </label>
-            <label class="hhME-rangeLbl">Color
-              <input id="hhME_color" class="hhME-input" type="color" value="${toHex(b.color)}" style="height:44px; padding:6px 10px;">
-            </label>
-          </div>
-
-          <div class="hhME-grid2">
-            <label class="hhME-rangeLbl">Align
-              <select id="hhME_align" class="hhME-select">
-                <option value="left"${b.align==="left"?" selected":""}>Left</option>
-                <option value="center"${b.align==="center"?" selected":""}>Center</option>
-                <option value="right"${b.align==="right"?" selected":""}>Right</option>
-              </select>
-            </label>
-            <label class="hhME-toggle" style="justify-content:flex-start;">
-              <input id="hhME_shadowOn" type="checkbox"${b.shadow ? " checked" : ""}> Shadow
-            </label>
-          </div>
-
-          <div class="hhME-grid2">
-            <label class="hhME-toggle" style="justify-content:flex-start;">
-              <input id="hhME_bgOn" type="checkbox"${b.bgOn ? " checked" : ""}> Background
-            </label>
-            <label class="hhME-rangeLbl">BG Opacity
-              <input id="hhME_bgOp" type="range" min="0" max="1" step="0.01" value="${Number(b.bgOpacity ?? 0.3)}">
-            </label>
-          </div>
-
-          <div class="hhME-grid2">
-            <label class="hhME-rangeLbl">BG Color
-              <input id="hhME_bgColor" class="hhME-input" type="color" value="${toHex(b.bgColor)}" style="height:44px; padding:6px 10px;">
-            </label>
-            <label class="hhME-rangeLbl">Line Height
-              <input id="hhME_lh" type="range" min="0.8" max="2.2" step="0.01" value="${Number(b.lineHeight ?? 1.15)}">
-            </label>
-          </div>
-        `;
-
-        const wire = (id, fn, evt="input") => {
-          const el = document.getElementById(id);
-          if (el) el.addEventListener(evt, fn);
-        };
-
-        wire("hhME_name", (e) => { b.name = e.target.value; rebuildSelect(); draw(); });
-        wire("hhME_text", (e) => { b.text = e.target.value; draw(); });
-
-        wire("hhME_x", (e) => { b.xPct = parseFloat(e.target.value); draw(); });
-        wire("hhME_y", (e) => { b.yPct = parseFloat(e.target.value); draw(); });
-
-        wire("hhME_size", (e) => {
-          b.sizePct = parseFloat(e.target.value);
-          const n = document.getElementById("hhME_sizeNum");
-          if (n) n.value = String(b.sizePct);
-          draw();
-        });
-
-        wire("hhME_sizeNum", (e) => {
-          b.sizePct = clamp(parseFloat(e.target.value || "1"), 0.3, 10);
-          const s = document.getElementById("hhME_size");
-          if (s) s.value = String(b.sizePct);
-          draw();
-        });
-
-        wire("hhME_op", (e) => { b.opacity = parseFloat(e.target.value); draw(); });
-        wire("hhME_rot", (e) => { b.rotationDeg = parseFloat(e.target.value || "0"); draw(); });
-
-        wire("hhME_font", (e) => { b.fontFamily = e.target.value; draw(); }, "change");
-        wire("hhME_color", (e) => { b.color = e.target.value; draw(); });
-
-        wire("hhME_align", (e) => { b.align = e.target.value; draw(); }, "change");
-
-        wire("hhME_shadowOn", (e) => { b.shadow = !!e.target.checked; draw(); }, "change");
-        wire("hhME_bgOn", (e) => { b.bgOn = !!e.target.checked; draw(); }, "change");
-        wire("hhME_bgColor", (e) => { b.bgColor = e.target.value; draw(); });
-        wire("hhME_bgOp", (e) => { b.bgOpacity = parseFloat(e.target.value); draw(); });
-        wire("hhME_lh", (e) => { b.lineHeight = parseFloat(e.target.value); draw(); });
-      }
-
-      // ----- Payload -----
-      function currentPayload(){
-        const saveWithoutImage = !!document.getElementById("hhMEsaveNoImg").checked;
-        return {
-          outW: parseInt(document.getElementById("hhMEoutW").value || "1080", 10),
-          outH: parseInt(document.getElementById("hhMEoutH").value || "1350", 10),
-          imgDataURL: saveWithoutImage ? "" : (imgDataURL || ""),
-          photoTransform: { photoScale, photoRot, photoOffsetX, photoOffsetY },
-          boxes
-        };
-      }
-
-      async function applyPayload(payload){
-        if (!payload) return;
-
-        if (payload.outW) document.getElementById("hhMEoutW").value = String(payload.outW);
-        if (payload.outH) document.getElementById("hhMEoutH").value = String(payload.outH);
-
-        const nextImg = payload.imgDataURL || "";
-        if (nextImg){
-          imgDataURL = nextImg;
-          await loadImageFromDataURL(imgDataURL);
-        } else {
-          if (!imgLoaded) alert("This project was saved without an image. Upload the template image to preview/export.");
-        }
-
-        const t = payload.photoTransform || {};
-        photoScale = typeof t.photoScale === "number" ? t.photoScale : photoScale;
-        photoRot = typeof t.photoRot === "number" ? t.photoRot : photoRot;
-        photoOffsetX = typeof t.photoOffsetX === "number" ? t.photoOffsetX : photoOffsetX;
-        photoOffsetY = typeof t.photoOffsetY === "number" ? t.photoOffsetY : photoOffsetY;
-
-        document.getElementById("hhMEzoom").value = String(photoScale);
-
-        if (Array.isArray(payload.boxes)) boxes = payload.boxes;
-
-        fitView();
-
-        activeId = null;
-        rebuildSelect();
-        rebuildEditor();
-        draw();
-      }
-
-      function rebuildProjectsUI(){
-        const store = loadProjectsStore();
-        const projSelect = document.getElementById("hhMEprojSelect");
-        projSelect.innerHTML = store.items.map(p => {
-          const label = `${p.name || "Project"} • ${new Date(p.updatedAt || p.createdAt || Date.now()).toLocaleString()}`;
-          return `<option value="${esc(p.id)}"${p.id === store.activeId ? " selected" : ""}>${esc(label)}</option>`;
-        }).join("");
-
-        const active = getActiveProject(store);
-        document.getElementById("hhMEprojName").value = active?.name || "";
-      }
-
-      async function setActiveProject(id){
-        const store = loadProjectsStore();
-        if (!store.items.some(p => p.id === id)) return;
-        store.activeId = id;
-        const res = saveProjectsStore(store);
-        if (!res.ok){ alert("Could not set active project: " + res.error); return; }
-        rebuildProjectsUI();
-        const active = getActiveProject(store);
-        if (active?.data) await applyPayload(active.data);
-      }
-
-      function createProject(name){
-        const store = loadProjectsStore();
-        const p = {
-          id: uid(),
-          name: name || `Menu ${new Date().toLocaleDateString()}`,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-          data: currentPayload()
-        };
-        store.items.unshift(p);
-        store.activeId = p.id;
-
-        const res = saveProjectsStore(store);
-        if (!res.ok){
-          alert(
-            "Save failed (browser storage limit). Try:\n" +
-            "• Upload again (auto-compress)\n" +
-            "• Toggle 'Save without image'\n\n" +
-            "Error: " + res.error
-          );
-          return false;
-        }
-        rebuildProjectsUI();
-        return true;
-      }
-
-      function saveProject(){
-        const store = loadProjectsStore();
-        const active = getActiveProject(store);
-
-        if (!active){
-          createProject(`Menu ${new Date().toLocaleDateString()}`);
-          return;
-        }
-
-        active.updatedAt = Date.now();
-        active.data = currentPayload();
-
-        const res = saveProjectsStore(store);
-        if (!res.ok){
-          alert(
-            "Save failed (browser storage limit).\n\n" +
-            "Fix options:\n" +
-            "1) Turn ON 'Save without image'\n" +
-            "2) Re-upload the template (auto-compress)\n" +
-            "3) Delete older projects\n\n" +
-            "Error: " + res.error
-          );
-          return;
-        }
-
-        rebuildProjectsUI();
-        alert("Project saved.");
-      }
-
-      function duplicateProject(){
-        const store = loadProjectsStore();
-        const active = getActiveProject(store);
-        if (!active){ alert("No active project to duplicate."); return; }
-        const copy = {
-          id: uid(),
-          name: (active.name || "Project") + " (copy)",
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-          data: JSON.parse(JSON.stringify(active.data))
-        };
-        store.items.unshift(copy);
-        store.activeId = copy.id;
-
-        const res = saveProjectsStore(store);
-        if (!res.ok){
-          alert("Duplicate failed (storage limit). Delete older projects or save without image.\n\nError: " + res.error);
-          return;
-        }
-        rebuildProjectsUI();
-        alert("Duplicated project.");
-      }
-
-      async function deleteProject(){
-        const store = loadProjectsStore();
-        const active = getActiveProject(store);
-        if (!active){ alert("No project to delete."); return; }
-        if (!confirm(`Delete project "${active.name}"?`)) return;
-        store.items = store.items.filter(p => p.id !== active.id);
-        store.activeId = store.items[0]?.id ?? null;
-
-        const res = saveProjectsStore(store);
-        if (!res.ok){ alert("Delete failed: " + res.error); return; }
-
-        rebuildProjectsUI();
-        const next = getActiveProject(store);
-        if (next?.data) await applyPayload(next.data);
-        else {
-          loadStarterBoxes();
-          imgLoaded = false; imgDataURL = "";
-          resetAll();
-          deselectText();
-        }
-      }
-
-      function renameProject(){
-        const newName = (document.getElementById("hhMEprojName").value || "").trim();
-        if (!newName) { alert("Enter a name."); return; }
-        const store = loadProjectsStore();
-        const active = getActiveProject(store);
-        if (!active){ alert("No active project."); return; }
-        active.name = newName;
-        active.updatedAt = Date.now();
-        const res = saveProjectsStore(store);
-        if (!res.ok){ alert("Rename failed: " + res.error); return; }
-        rebuildProjectsUI();
-      }
-
-      function exportJSON(){
-        const store = loadProjectsStore();
-        const active = getActiveProject(store);
-
-        const project = {
-          id: active?.id || uid(),
-          name: (active?.name || document.getElementById("hhMEprojName").value || "Menu Export").trim(),
-          createdAt: active?.createdAt || Date.now(),
-          updatedAt: Date.now(),
-          data: currentPayload()
-        };
-
-        const blob = new Blob([JSON.stringify(project, null, 2)], { type:"application/json" });
-        const a = document.createElement("a");
-        a.download = `hotheadz-menu-project-${new Date().toISOString().slice(0,10)}.json`;
-        a.href = URL.createObjectURL(blob);
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(() => URL.revokeObjectURL(a.href), 1500);
-      }
-
-      async function sanitizeImportedData(data){
-        if (!data) return data;
-
-        if (document.getElementById("hhMEsaveNoImg").checked){
-          data.imgDataURL = "";
-          return data;
-        }
-
-        if (data.imgDataURL && typeof data.imgDataURL === "string" && data.imgDataURL.length > 350000){
-          data.imgDataURL = await compressImageDataURL(data.imgDataURL, { maxDim: 2200, quality: 0.9 });
-        }
-        return data;
-      }
-
-      async function importProjectObject(obj){
-        const store = loadProjectsStore();
-
-        if (obj && Array.isArray(obj.items)){
-          const incoming = obj.items.filter(x => x && x.data);
-          for (const p of incoming){
-            const data = await sanitizeImportedData(p.data);
-            store.items.unshift({
-              id: uid(),
-              name: p.name || "Imported",
-              createdAt: Date.now(),
-              updatedAt: Date.now(),
-              data
-            });
-          }
-          store.activeId = store.items[0]?.id ?? store.activeId;
-        } else if (obj && obj.data){
-          const data = await sanitizeImportedData(obj.data);
-          store.items.unshift({
-            id: uid(),
-            name: obj.name || "Imported Project",
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-            data
-          });
-          store.activeId = store.items[0].id;
-        } else {
-          alert("Invalid JSON. It must be a project export (with .data) or a bundle (with .items).");
-          return;
-        }
-
-        const res = saveProjectsStore(store);
-        if (!res.ok){
-          alert(
-            "Import failed (storage limit).\n\nTry:\n" +
-            "• Turn ON 'Save without image' then import\n" +
-            "• Delete old projects\n\n" +
-            "Error: " + res.error
-          );
-          return;
-        }
-
-        rebuildProjectsUI();
-        const active = getActiveProject(store);
-        if (active?.data) await applyPayload(active.data);
-        alert("Imported successfully.");
-      }
-
-      function importFromFile(){
-        const inp = document.createElement("input");
-        inp.type = "file";
-        inp.accept = "application/json";
-        inp.onchange = async () => {
-          const file = inp.files?.[0];
-          if (!file) return;
-          const text = await file.text();
-          const obj = safeJsonParse(text, null);
-          if (!obj) { alert("Invalid JSON file."); return; }
-          await importProjectObject(obj);
-        };
-        inp.click();
-      }
-
-      function importFromPaste(){
-        const overlay = document.createElement("div");
-        overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000000;display:flex;align-items:center;justify-content:center;padding:18px;";
-        overlay.innerHTML = `
-          <div style="max-width:980px;width:100%;background:#111;border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:12px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;">
-              <div style="color:#fff;font-weight:900;">Paste JSON to Import</div>
-              <button id="hhMEpasteClose" style="padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;cursor:pointer;">Close</button>
-            </div>
-            <div style="color:rgba(255,255,255,.70);font-size:12px;margin-bottom:8px;">
-              Tip: If import fails due to storage, enable “Save without image” before importing.
-            </div>
-            <textarea id="hhMEpasteTA" style="width:100%;height:55vh;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.45);color:#fff;padding:10px;font-weight:700;"></textarea>
-            <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:10px;">
-              <button id="hhMEpasteImport" style="padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:linear-gradient(135deg, rgba(255,115,0,.75), rgba(255,0,90,.55));color:#fff;font-weight:900;cursor:pointer;">Import</button>
-            </div>
-          </div>
-        `;
-        document.body.appendChild(overlay);
-
-        overlay.querySelector("#hhMEpasteClose").onclick = () => overlay.remove();
-        overlay.querySelector("#hhMEpasteImport").onclick = async () => {
-          const raw = overlay.querySelector("#hhMEpasteTA").value;
-          const obj = safeJsonParse(raw, null);
-          if (!obj) { alert("Invalid JSON pasted."); return; }
-          await importProjectObject(obj);
-          overlay.remove();
-        };
-      }
-
-      async function handleUpload(file){
-        if (!file) return;
-
-        const original = await fileToDataURL(file);
-        const compressed = await compressImageDataURL(original, { maxDim: 2200, quality: 0.9 });
-
-        imgDataURL = compressed;
-        await loadImageFromDataURL(imgDataURL);
-
-        activeId = null;
-        dragging = false;
-
-        fitView();
-
-        document.getElementById("hhMEfile").value = "";
-        alert("Template uploaded (auto-compressed). Click Save to store as a project.");
-
-        draw();
-        setTimeout(draw, 80);
-      }
-
-      function getPhotoDrawAABB(){
-        if (!imgLoaded) return null;
-
-        const w = canvas.width, h = canvas.height;
-        const iw = img.naturalWidth, ih = img.naturalHeight;
-
-        const rotated = (photoRot % 180) !== 0;
-        const baseW = rotated ? ih : iw;
-        const baseH = rotated ? iw : ih;
-
-        const fit = Math.min(w / baseW, h / baseH) * photoScale;
-
-        const cx = w/2 + photoOffsetX;
-        const cy = h/2 + photoOffsetY;
-
-        const drawW = baseW * fit;
-        const drawH = baseH * fit;
-
-        const rad = (photoRot * Math.PI) / 180;
-
-        const corners = [
-          { x: -drawW/2, y: -drawH/2 },
-          { x:  drawW/2, y: -drawH/2 },
-          { x:  drawW/2, y:  drawH/2 },
-          { x: -drawW/2, y:  drawH/2 },
-        ];
-
-        const pts = corners.map(p => {
-          const rx = p.x * Math.cos(rad) - p.y * Math.sin(rad);
-          const ry = p.x * Math.sin(rad) + p.y * Math.cos(rad);
-          return { x: rx + cx, y: ry + cy };
-        });
-
-        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-        for (const p of pts){
-          minX = Math.min(minX, p.x);
-          minY = Math.min(minY, p.y);
-          maxX = Math.max(maxX, p.x);
-          maxY = Math.max(maxY, p.y);
-        }
-
-        minX = Math.max(0, Math.floor(minX));
-        minY = Math.max(0, Math.floor(minY));
-        maxX = Math.min(w, Math.ceil(maxX));
-        maxY = Math.min(h, Math.ceil(maxY));
-
-        const sw = Math.max(1, maxX - minX);
-        const sh = Math.max(1, maxY - minY);
-
-        return { sx: minX, sy: minY, sw, sh };
-      }
-
-      function exportCropped(mime, ext, quality){
-        if (!imgLoaded) { alert("Upload your menu template image first."); return; }
-
-        const oldVX = viewX, oldVY = viewY, oldVS = viewScale;
-        viewX = 0; viewY = 0; viewScale = 1;
-
-        draw();
-
-        const aabb = getPhotoDrawAABB();
-
-        viewX = oldVX; viewY = oldVY; viewScale = oldVS;
-
-        if (!aabb) { alert("No photo bounds found."); return; }
-
-        const { sx, sy, sw, sh } = aabb;
-
-        const out = document.createElement("canvas");
-        out.width = sw;
-        out.height = sh;
-        const octx = out.getContext("2d");
-        octx.drawImage(canvas, sx, sy, sw, sh, 0, 0, sw, sh);
-
-        out.toBlob((blob) => {
-          if (!blob) return;
-          const a = document.createElement("a");
-          const stamp = new Date().toISOString().slice(0,10);
-          a.download = `hotheadz-menu-${stamp}.${ext}`;
-          a.href = URL.createObjectURL(blob);
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          setTimeout(() => URL.revokeObjectURL(a.href), 1500);
-        }, mime, quality);
-      }
-
-      // ----- Bind UI elements (editor controls) -----
-      document.getElementById("hhMEhelpBtn").addEventListener("click", () => {
-        alert(
-`Controls:
-Desktop:
-• Wheel = VIEW zoom (edit only)
-• Alt + Wheel = PHOTO zoom (affects export)
-• Left-drag empty canvas = move PHOTO
-• Right-drag = pan VIEW
-
-Mobile/Tablet:
-• 1 finger: drag TEXT (selected) or drag PHOTO (empty)
-• 2 fingers: drag = pan VIEW
-• Pinch (2 fingers): VIEW zoom
-
-Downloads are CROPPED to the PHOTO bounds.
-Photo is CONTAIN-fit (won't cut off).
-
-If Save/Import fails:
-• Storage limit: use “Save without image” or delete older projects.`
-        );
-      });
-
-      document.getElementById("hhMEresetView").addEventListener("click", resetAll);
-      document.getElementById("hhMEfitView").addEventListener("click", fitView);
-      document.getElementById("hhMErotate").addEventListener("click", () => { photoRot = (photoRot + 90) % 360; draw(); });
-
-      document.getElementById("hhMEzoom").addEventListener("input", () => {
-        photoScale = parseFloat(document.getElementById("hhMEzoom").value || "1");
-        draw();
-      });
-      document.getElementById("hhMEviewzoom").addEventListener("input", () => {
-        viewScale = parseFloat(document.getElementById("hhMEviewzoom").value || "1");
-        draw();
-      });
-
-      ["hhMEoverlay", "hhMEsnap", "hhMEoutline", "hhMEoutW", "hhMEoutH"].forEach(id => {
-        document.getElementById(id).addEventListener("input", draw);
-      });
-
-      document.getElementById("hhMEjpg").addEventListener("click", () => exportCropped("image/jpeg", "jpg", 0.92));
-      document.getElementById("hhMEpng").addEventListener("click", () => exportCropped("image/png", "png", 1));
-
-      document.getElementById("hhMEig").addEventListener("click", () => {
-        document.getElementById("hhMEoutW").value = "1080";
-        document.getElementById("hhMEoutH").value = "1350";
-        draw();
-      });
-      document.getElementById("hhMEsq").addEventListener("click", () => {
-        document.getElementById("hhMEoutW").value = "1080";
-        document.getElementById("hhMEoutH").value = "1080";
-        draw();
-      });
-
-      document.getElementById("hhMEaddBox").addEventListener("click", addTextBox);
-      document.getElementById("hhMEdupBox").addEventListener("click", duplicateTextBox);
-      document.getElementById("hhMEdelBox").addEventListener("click", deleteTextBox);
-
-      document.getElementById("hhMEboxSelect").addEventListener("change", () => {
-        const v = document.getElementById("hhMEboxSelect").value || "";
-        activeId = v || null;
-        rebuildEditor();
-        draw();
-      });
-
-      document.getElementById("hhMEfile").addEventListener("change", async () => {
-        await handleUpload(document.getElementById("hhMEfile").files?.[0]);
-      });
-
-      // Projects
-      document.getElementById("hhMEprojNew").addEventListener("click", () => {
-        const name = prompt("New project name:", `Menu ${new Date().toLocaleDateString()}`);
-        if (name === null) return;
-        createProject(name.trim() || `Menu ${new Date().toLocaleDateString()}`);
-        rebuildProjectsUI();
-      });
-      document.getElementById("hhMEprojSave").addEventListener("click", saveProject);
-      document.getElementById("hhMEprojDup").addEventListener("click", duplicateProject);
-      document.getElementById("hhMEprojDel").addEventListener("click", async () => { await deleteProject(); });
-      document.getElementById("hhMEprojRename").addEventListener("click", renameProject);
-      document.getElementById("hhMEprojSelect").addEventListener("change", async () => {
-        await setActiveProject(document.getElementById("hhMEprojSelect").value);
-      });
-
-      document.getElementById("hhMEexportJSON").addEventListener("click", exportJSON);
-      document.getElementById("hhMEimportJSONFile").addEventListener("click", importFromFile);
-      document.getElementById("hhMEimportJSONPaste").addEventListener("click", importFromPaste);
-
-      // Initialize editor
-      loadStarterBoxes();
-      rebuildSelect();
-      rebuildEditor();
-
-      (async () => {
-        const store = loadProjectsStore();
-        if (store.items.length > 0){
-          rebuildProjectsUI();
-          const active = getActiveProject(store) || store.items[0];
-          store.activeId = active.id;
-          const res = saveProjectsStore(store);
-          if (res.ok){
-            document.getElementById("hhMEprojSelect").value = active.id;
-            await applyPayload(active.data);
-          } else {
-            alert("Could not read saved projects (storage blocked): " + res.error);
-          }
-        } else {
-          rebuildProjectsUI();
-          draw();
-        }
-
-        // Default image (preview only)
-        if (DEFAULT_IMAGE_URL && !imgDataURL){
-          img = new Image();
-          img.crossOrigin = "anonymous";
-          img.onload = () => { imgLoaded = true; draw(); };
-          img.onerror = () => { imgLoaded = false; draw(); };
-          img.src = DEFAULT_IMAGE_URL;
-        }
-      })();
-
-      // Expose draw function for gate unlock
-      window.editorDraw = draw;
-    })();
-  </script>
+      const r=saveStore(store);
+      if(!r.ok){toast('Import failed: '+r.error,'error');return;}
+      const active=store.items.find(x=>x.id===store.activeId);
+      if(active?.data)await applyPayload(active.data);
+      toast('Project imported!','success');rebuildSidePanel();
+    };inp.click();
+  });
+
+  document.querySelectorAll('.pLoad').forEach(btn=>{
+    btn.addEventListener('click',()=>loadProject(btn.dataset.id));
+  });
+  document.querySelectorAll('.pDel').forEach(btn=>{
+    btn.addEventListener('click',()=>deleteProject(btn.dataset.id));
+  });
+}
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+loadStarterBoxes();
+rebuildSidePanel();
+
+(async()=>{
+  const store=loadStore();
+  if(store.items.length>0){
+    const active=store.items.find(p=>p.id===store.activeId)||store.items[0];
+    store.activeId=active.id;saveStore(store);
+    if(active.data)await applyPayload(active.data);
+  }else{
+    draw();
+  }
+
+  // Default image preview
+  const DEFAULT_IMG="https://images.squarespace-cdn.com/content/v1/696710c636aacc1859901840/38f723d4-604b-4459-b945-c1edaed19159/DailyMenuUpdate.png?format=750w";
+  if(!imgDataURL&&DEFAULT_IMG){
+    img=new Image();img.crossOrigin='anonymous';
+    img.onload=()=>{imgLoaded=true;draw();};
+    img.onerror=()=>{imgLoaded=false;draw();};
+    img.src=DEFAULT_IMG;
+  }
+})();
+
+})();
+</script>
 </body>
 </html>
