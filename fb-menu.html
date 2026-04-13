@@ -90,6 +90,8 @@
     .qf-title{font-size:12px;font-weight:800;color:var(--fire);margin-bottom:6px;display:flex;align-items:center;gap:5px;}
     .qf-title::before{content:'';width:3px;height:11px;border-radius:2px;background:var(--fire);}
     .qf-hint{font-size:10px;color:var(--text3);margin-bottom:6px;line-height:1.4;}
+    .qf-details summary{list-style:none;}.qf-details summary::-webkit-details-marker{display:none;}
+    .qf-details[open] summary{color:var(--fire)!important;}
     .swatch-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
     .swatch{width:26px;height:26px;border-radius:5px;border:2px solid transparent;cursor:pointer;transition:all .12s;}
     .swatch:hover{transform:scale(1.12);}
@@ -478,19 +480,62 @@ function rebuildSidePanel(){
 function buildQF(){
   const sects=[{name:'Day',label:'Day of Week',ta:false},{name:'Date',label:'Date',ta:false},{name:'Breakfast',label:'\ud83c\udf73 Breakfast',ta:true,rows:12},{name:'Lunch',label:'\ud83c\udf57 Lunch',ta:true,rows:10},{name:'Salad Bar',label:'\ud83e\udd57 Salad Bar (Left)',ta:true,rows:14},{name:'Dressings',label:'\ud83e\udd57 Dressings (Right)',ta:true,rows:5},{name:'Drinks',label:'\ud83e\udd64 Drinks',ta:true,rows:10},{name:'Dessert',label:'\ud83c\udf70 Dessert',ta:true,rows:3},{name:'Bottom Note',label:'\ud83d\udccc Footer',ta:true,rows:2}];
   let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u26a1 Quick Fill</span></div><div class="acc-body">';
-  h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Type your menu. Canvas updates live.</p>';
+  h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Type your menu. Canvas updates live. Expand each card for styling.</p>';
   h+='<div class="btn-row"><button class="sm-btn primary" id="qfToday">\ud83d\udcc5 Today\'s Date</button><button class="sm-btn" id="qfYesterday">Copy Previous</button><button class="sm-btn danger" id="qfReset">Reset</button></div>';
-  for(const s of sects){const box=boxes.find(b=>b.name===s.name);const val=box?box.text:'';h+='<div class="qf-card"><div class="qf-title">'+s.label+'</div>';if(s.ta)h+='<textarea class="fi fi-ta qf-input" data-name="'+esc(s.name)+'" rows="'+(s.rows||5)+'">'+esc(val)+'</textarea>';else h+='<input class="fi qf-input" data-name="'+esc(s.name)+'" value="'+esc(val)+'">';h+='</div>';}
-  // Custom fields
+
+  // Render ALL boxes (built-in sections + custom) in order
+  const allSections=[];
+  for(const s of sects){const box=boxes.find(b=>b.name===s.name);if(box)allSections.push({box,label:s.label,ta:s.ta,rows:s.rows||5,builtin:true});}
   const customBoxes=boxes.filter(b=>b.isCustom);
-  if(customBoxes.length){
-    h+='<div style="margin-top:4px;margin-bottom:8px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Custom Fields</div>';
-    for(const cb of customBoxes){
-      h+='<div class="qf-card"><div class="qf-title" style="justify-content:space-between">'+esc(cb.name)+'<button class="sm-btn danger qf-del-custom" data-id="'+esc(cb.id)+'" style="padding:3px 8px;font-size:10px;">\u00d7</button></div>';
-      h+='<textarea class="fi fi-ta qf-input" data-name="'+esc(cb.name)+'" rows="3">'+esc(cb.text)+'</textarea></div>';
-    }
+  for(const cb of customBoxes)allSections.push({box:cb,label:cb.name,ta:true,rows:4,builtin:false});
+
+  for(const s of allSections){
+    const b=s.box;
+    h+='<div class="qf-card">';
+    // Header row with label, visibility toggle, delete
+    h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">';
+    h+='<div class="qf-title" style="flex:1;margin-bottom:0;">'+esc(s.label)+'</div>';
+    h+='<label class="cf-toggle" style="font-size:9px;gap:3px;" title="Show/hide on canvas"><input type="checkbox" class="qf-vis" data-id="'+esc(b.id)+'"'+(b.opacity>0?' checked':'')+'> Visible</label>';
+    h+='<button class="sm-btn danger qf-del" data-id="'+esc(b.id)+'" data-name="'+esc(b.name)+'" style="padding:2px 7px;font-size:10px;" title="Delete field">\u00d7</button>';
+    h+='</div>';
+
+    // Text input
+    if(s.ta)h+='<textarea class="fi fi-ta qf-input" data-name="'+esc(b.name)+'" rows="'+s.rows+'">'+esc(b.text)+'</textarea>';
+    else h+='<input class="fi qf-input" data-name="'+esc(b.name)+'" value="'+esc(b.text)+'">';
+
+    // Expandable styling row
+    h+='<details class="qf-details"><summary style="font-size:10px;font-weight:700;color:var(--text3);cursor:pointer;margin-top:4px;user-select:none;">Style \u25be</summary>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;">';
+    // Color
+    h+='<label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">Color <input type="color" class="qf-color" data-id="'+esc(b.id)+'" value="'+toHex(b.color)+'" style="width:26px;height:26px;padding:1px;border:1px solid var(--border);border-radius:4px;cursor:pointer;background:transparent;"></label>';
+    // Size
+    h+='<label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">Size <input type="range" class="qf-size" data-id="'+esc(b.id)+'" min="0.3" max="10" step="0.05" value="'+b.sizePct+'" style="width:70px;accent-color:var(--fire);"><span class="qf-size-val" style="min-width:24px;">'+b.sizePct.toFixed(1)+'</span></label>';
+    // Bold
+    h+='<button class="sm-btn qf-bold" data-id="'+esc(b.id)+'" style="padding:3px 8px;font-weight:900;'+(b.bold?'background:var(--ember);color:var(--fire);border-color:rgba(255,122,24,.3);':'')+'">B</button>';
+    // Italic
+    h+='<button class="sm-btn qf-italic" data-id="'+esc(b.id)+'" style="padding:3px 8px;font-style:italic;'+(b.italic?'background:var(--ember);color:var(--fire);border-color:rgba(255,122,24,.3);':'')+'">I</button>';
+    // Font
+    h+='<select class="fs qf-font" data-id="'+esc(b.id)+'" style="font-size:10px;padding:4px 6px;max-width:120px;margin-bottom:0;">';
+    FONTS.forEach(f=>h+='<option value="'+esc(f.value)+'"'+(f.value===b.fontFamily?' selected':'')+'>'+esc(f.label)+'</option>');
+    h+='</select>';
+    // Align
+    h+='<select class="fs qf-align" data-id="'+esc(b.id)+'" style="font-size:10px;padding:4px 6px;max-width:80px;margin-bottom:0;">';
+    h+='<option value="left"'+(b.align==='left'?' selected':'')+'>Left</option><option value="center"'+(b.align==='center'?' selected':'')+'>Center</option><option value="right"'+(b.align==='right'?' selected':'')+'>Right</option>';
+    h+='</select>';
+    // Shadow
+    h+='<label class="cf-toggle" style="font-size:9px;gap:3px;"><input type="checkbox" class="qf-shadow" data-id="'+esc(b.id)+'"'+(b.shadow?' checked':'')+'> Shadow</label>';
+    // Max Width
+    h+='<label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">Width <input type="range" class="qf-maxw" data-id="'+esc(b.id)+'" min="0" max="95" step="0.5" value="'+(b.maxWidthPct||0)+'" style="width:60px;accent-color:var(--fire);"></label>';
+    h+='</div>';
+    // Quick color swatches
+    h+='<div style="display:flex;gap:3px;margin-top:5px;flex-wrap:wrap;">';
+    BRAND_COLORS.forEach(c=>h+='<div class="swatch qf-csw" data-id="'+esc(b.id)+'" data-color="'+c+'" style="width:18px;height:18px;border-radius:3px;background:'+c+';'+(toHex(b.color)===c?'border-color:#fff;':'')+'"></div>');
+    h+='</div>';
+    h+='</details>';
+    h+='</div>';
   }
-  h+='<div style="margin-top:8px"><button class="sm-btn primary" id="qfAddCustom">+ Add Custom Field</button></div>';
+
+  h+='<div style="margin-top:10px"><button class="sm-btn primary" id="qfAddCustom">+ Add Custom Field</button></div>';
   h+='</div></div>';return h;
 }
 
@@ -533,11 +578,23 @@ function buildPR(){
 function wirePanel(){
   document.querySelectorAll('.acc-head').forEach(h=>{h.addEventListener('click',()=>h.parentElement.classList.toggle('open'));});
   document.querySelectorAll('.qf-input').forEach(el=>{el.addEventListener('input',()=>{const box=boxes.find(b=>b.name===el.dataset.name);if(box){saveUndo();box.text=el.value;draw();triggerAutoSave();}});});
+
+  // QF inline styling controls
+  document.querySelectorAll('.qf-color').forEach(el=>{el.addEventListener('input',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.color=el.value;draw();triggerAutoSave();}});});
+  document.querySelectorAll('.qf-size').forEach(el=>{el.addEventListener('input',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.sizePct=parseFloat(el.value);const lbl=el.parentElement.querySelector('.qf-size-val');if(lbl)lbl.textContent=b.sizePct.toFixed(1);draw();triggerAutoSave();}});});
+  document.querySelectorAll('.qf-bold').forEach(el=>{el.addEventListener('click',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){saveUndo();b.bold=!b.bold;draw();rebuildSidePanel();triggerAutoSave();}});});
+  document.querySelectorAll('.qf-italic').forEach(el=>{el.addEventListener('click',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){saveUndo();b.italic=!b.italic;draw();rebuildSidePanel();triggerAutoSave();}});});
+  document.querySelectorAll('.qf-font').forEach(el=>{el.addEventListener('change',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.fontFamily=el.value;draw();triggerAutoSave();}});});
+  document.querySelectorAll('.qf-align').forEach(el=>{el.addEventListener('change',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.align=el.value;draw();triggerAutoSave();}});});
+  document.querySelectorAll('.qf-shadow').forEach(el=>{el.addEventListener('change',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.shadow=!!el.checked;draw();triggerAutoSave();}});});
+  document.querySelectorAll('.qf-maxw').forEach(el=>{el.addEventListener('input',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.maxWidthPct=parseFloat(el.value);draw();triggerAutoSave();}});});
+  document.querySelectorAll('.qf-vis').forEach(el=>{el.addEventListener('change',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){saveUndo();b.opacity=el.checked?1:0;draw();triggerAutoSave();}});});
+  document.querySelectorAll('.qf-csw').forEach(el=>{el.addEventListener('click',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.color=el.dataset.color;draw();rebuildSidePanel();triggerAutoSave();}});});
+  document.querySelectorAll('.qf-del').forEach(el=>{el.addEventListener('click',()=>{const id=el.dataset.id;const name=el.dataset.name;if(!confirm('Delete "'+name+'" from the menu?'))return;saveUndo();boxes=boxes.filter(b=>b.id!==id);if(activeId===id)activeId=null;draw();rebuildSidePanel();triggerAutoSave();toast('Removed "'+name+'"','info');});});
   const qfT=document.getElementById('qfToday');if(qfT)qfT.addEventListener('click',()=>{const t=todayDefaults();const d=boxes.find(b=>b.name==='Day'),dt=boxes.find(b=>b.name==='Date');if(d){saveUndo();d.text=t.weekday;}if(dt)dt.text=t.dateStr;draw();rebuildSidePanel();triggerAutoSave();toast("Today's date filled!",'success');});
   const qfY=document.getElementById('qfYesterday');if(qfY)qfY.addEventListener('click',()=>{const s=loadStore();const prev=s.items.find(p=>p.id!==s.activeId);if(!prev||!prev.data?.boxes){toast('No previous project found','error');return;}saveUndo();for(const pb of prev.data.boxes){const cur=boxes.find(b=>b.name===pb.name);if(cur&&pb.name!=='Day'&&pb.name!=='Date')cur.text=pb.text;}const t=todayDefaults();const d=boxes.find(b=>b.name==='Day'),dt=boxes.find(b=>b.name==='Date');if(d)d.text=t.weekday;if(dt)dt.text=t.dateStr;draw();rebuildSidePanel();triggerAutoSave();toast("Copied previous items!",'success');});
   const qfR=document.getElementById('qfReset');if(qfR)qfR.addEventListener('click',()=>{if(!confirm('Reset all?'))return;saveUndo();loadStarterBoxes();draw();rebuildSidePanel();triggerAutoSave();toast('Reset','info');});
   const qfAC=document.getElementById('qfAddCustom');if(qfAC)qfAC.addEventListener('click',()=>{const name=prompt('Custom field name:','Special');if(!name)return;saveUndo();const b=defaultBox(name.trim(),name.trim()+'\n\n\u2022 Item 1\n\u2022 Item 2',50,50,{isCustom:true,sizePct:1.4,shadowBlur:8,lineHeight:1.22});boxes.push(b);activeId=b.id;draw();rebuildSidePanel();triggerAutoSave();toast('Custom field "'+name.trim()+'" added! Drag it on canvas to position.','success');});
-  document.querySelectorAll('.qf-del-custom').forEach(btn=>{btn.addEventListener('click',()=>{const id=btn.dataset.id;const box=boxes.find(b=>b.id===id);if(!box||!confirm('Delete custom field "'+box.name+'"?'))return;saveUndo();boxes=boxes.filter(b=>b.id!==id);if(activeId===id)activeId=null;draw();rebuildSidePanel();triggerAutoSave();toast('Removed','info');});});
   const bS=document.getElementById('boxSelect');if(bS)bS.addEventListener('change',()=>{activeId=bS.value||null;rebuildSidePanel();draw();});
   const aB=document.getElementById('addBoxBtn');if(aB)aB.addEventListener('click',()=>{saveUndo();const b=defaultBox('New Box','New text',50,50);boxes.push(b);activeId=b.id;rebuildSidePanel();draw();triggerAutoSave();});
   const dB=document.getElementById('dupBoxBtn');if(dB)dB.addEventListener('click',()=>{const cur=boxes.find(x=>x.id===activeId);if(!cur)return;saveUndo();const c=JSON.parse(JSON.stringify(cur));c.id=uid();c.name+=' (copy)';c.xPct=clamp(cur.xPct+2,0,100);c.yPct=clamp(cur.yPct+2,0,100);boxes.push(c);activeId=c.id;rebuildSidePanel();draw();triggerAutoSave();});
