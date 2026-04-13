@@ -344,9 +344,13 @@ function drawTextBox(b){
   }
   for(let i=0;i<m.lines.length;i++)ctx.fillText(m.lines[i],dx,ly+(i+.5)*m.lineH);
   ctx.restore();
-  const rw=m.maxW+(b.bgOn?px*2:0),rh=m.totalH+(b.bgOn?py*2:0);
-  b.__hit=rotAABB(x,y,rw,rh,b.rotationDeg||0);
-  b.__rawW=rw;b.__rawH=rh;b.__cx=x;b.__cy=y;
+  // Hit box width: use maxWidthPct constraint if set (so handles stay at the edges you set, not where text ends)
+  const constraintW=b.maxWidthPct>0?pxX(b.maxWidthPct):0;
+  const textW=m.maxW;
+  const boxW=Math.max(textW,constraintW)+(b.bgOn?px*2:0);
+  const rh=m.totalH+(b.bgOn?py*2:0);
+  b.__hit=rotAABB(x,y,boxW,rh,b.rotationDeg||0);
+  b.__rawW=boxW;b.__rawH=rh;b.__cx=x;b.__cy=y;
 }
 const HANDLE_SIZE=10;
 function getHandles(b){
