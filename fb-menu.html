@@ -264,20 +264,22 @@ async function loadImg(d){return new Promise(r=>{img=new Image();img.onload=()=>
 
 /* DEFAULT BOXES — positions matched to template */
 function defaultBox(name,text,xPct,yPct,ov={}){
-  return{id:uid(),name,text,xPct:xPct??50,yPct:yPct??50,sizePct:2.0,maxWidthPct:0,fontFamily:FONTS[0].value,color:'#ffffff',opacity:1,align:'left',bold:true,italic:false,shadow:true,shadowBlur:10,shadowColor:'rgba(0,0,0,0.7)',bgOn:false,bgColor:'#000000',bgOpacity:.30,bgPadX:14,bgPadY:10,bgRadius:14,lineHeight:1.20,rotationDeg:0,isCustom:false,...ov};
+  return{id:uid(),name,text,xPct:xPct??50,yPct:yPct??50,sizePct:2.0,maxWidthPct:0,fontFamily:FONTS[0].value,color:'#ffffff',opacity:1,align:'left',bold:true,italic:false,shadow:true,shadowBlur:10,shadowColor:'rgba(0,0,0,0.7)',strokeOn:false,strokeColor:'#000000',strokeWidth:2,bgOn:false,bgColor:'#000000',bgOpacity:.30,bgPadX:14,bgPadY:10,bgRadius:14,lineHeight:1.20,rotationDeg:0,isCustom:false,...ov};
 }
 function loadStarterBoxes(){
   const t=todayDefaults();
+  // Common overrides for readability on busy background
+  const readable={shadow:true,shadowBlur:16,shadowColor:'rgba(0,0,0,0.85)',strokeOn:true,strokeColor:'#000000',strokeWidth:3};
   boxes=[
-    defaultBox('Day',t.weekday||'Monday',50,5.5,{align:'center',sizePct:5.8,shadow:true,shadowBlur:14,fontFamily:'"Abril Fatface",Georgia,serif',lineHeight:1.0}),
-    defaultBox('Date',t.dateStr||'April 13, 2026',50,10.8,{align:'center',sizePct:2.6,shadow:true,shadowBlur:10,fontFamily:'"DM Serif Display",Georgia,serif',italic:true,lineHeight:1.0}),
-    defaultBox('Breakfast','BREAKFAST\n5:30 AM - 10:30 AM\n\n\u2022 Scrambled Eggs\n\u2022 Bacon\n\u2022 Sausage, Hotlinks\n\u2022 Pancakes\n\u2022 French Toast Sticks\n\u2022 Biscuits\n\u2022 Hashbrowns\n\u2022 Cheesy Grits\n\u2022 Grits\n\u2022 Sausage Gravy\n\u2022 Oatmeal\n\n- Breakfast Sandwiches\n\u2022 BLT\n\u2022 Bacon, Egg and Cheese\n\u2022 Sausage, Egg and cheese\n\u2022 Breakfast Burritos',22,41,{sizePct:1.48,shadowBlur:8,lineHeight:1.22}),
-    defaultBox('Salad Bar','SALAD BAR\n\nLettuce:\n\u2022 Romaine\n\u2022 Iceburg\nToppings:\n\u2022 Diced Tomatoes\n\u2022 Cucumbers\n\u2022 Onions\n\u2022 Broccoli\n\u2022 Carrots\n\u2022 Cauliflower\n\u2022 Peppers\n\u2022 Cheese\n\u2022 Croutons\n\u2022 Bacon Bits\n\u2022 Eggs\n\u2022 Diced Ham\n\u2022 Crackers\n\u2022 Sunflower Seeds\n\u2022 Pickled Okra\n\u2022 Jalapenos\n\u2022 Pickled beets\n\u2022 Green Olives\n\u2022 Banana Peppers\n\u2022 Pickled Green Tomatoes',63,43.5,{sizePct:1.28,shadowBlur:8,lineHeight:1.18}),
-    defaultBox('Dressings','Dressings:\n\u2022 Ranch\n\u2022 Italian\n\u2022 Blue Cheese\n\u2022 Caesar\n\u2022 Thousand Island',88,28.5,{sizePct:1.28,shadowBlur:8,lineHeight:1.18}),
-    defaultBox('Lunch','LUNCH\n11:00 AM - 2:00 PM\n\n\u2022 Beef Tips\n\u2022 Red Beans & Rice\n\u2022 BBQ Chicken\n\u2022 Mashed Potatoes\n& Gravy\n\u2022 Cabbage\n\u2022 Green Beans\n\u2022 Corn\n\u2022 Rolls\n\u2022 Fried Okra\n\nSame Daily\n\u2022 Turkey Clubs\n\u2022 Chicken Salad\nCroissants',14.5,76,{sizePct:1.38,shadowBlur:8,lineHeight:1.22}),
-    defaultBox('Drinks','DRINKS\n\n\u2022 Sweet Tea\n\u2022 Unsweet Tea\n\u2022 Dr. Pepper\n\u2022 Rootbeer\n\u2022 Sprite\n\u2022 Fruit Punch\n\u2022 Blue Powerade\n\u2022 Diet Coke\n\u2022 Coke Zero\n\u2022 Coke\n\u2022 Coffee\n\u2022 Orange Juice\n\u2022 Milk\n\u2022 Chocolate Milk',38,76,{sizePct:1.38,shadowBlur:8,lineHeight:1.22}),
-    defaultBox('Dessert','DESSERT\n\nCake',80,78,{align:'center',sizePct:1.8,shadowBlur:8,lineHeight:1.25,fontFamily:'"DM Serif Display",Georgia,serif',italic:true}),
-    defaultBox('Bottom Note','For pricing and hours please visit\nHotHeadzSouthernFoods.com',50,96,{align:'center',sizePct:1.55,shadowBlur:10,lineHeight:1.25,fontFamily:'"DM Serif Display",Georgia,serif',italic:true}),
+    defaultBox('Day',t.weekday||'Monday',50,5.5,{align:'center',sizePct:5.8,shadowBlur:18,shadowColor:'rgba(0,0,0,0.9)',fontFamily:'"Abril Fatface",Georgia,serif',lineHeight:1.0,strokeOn:true,strokeColor:'#000000',strokeWidth:4}),
+    defaultBox('Date',t.dateStr||'April 13, 2026',50,10.8,{align:'center',sizePct:2.6,shadowBlur:14,shadowColor:'rgba(0,0,0,0.85)',fontFamily:'"DM Serif Display",Georgia,serif',italic:true,lineHeight:1.0,strokeOn:true,strokeColor:'#000000',strokeWidth:2}),
+    defaultBox('Breakfast','BREAKFAST\n5:30 AM - 10:30 AM\n\n\u2022 Scrambled Eggs\n\u2022 Bacon\n\u2022 Sausage, Hotlinks\n\u2022 Pancakes\n\u2022 French Toast Sticks\n\u2022 Biscuits\n\u2022 Hashbrowns\n\u2022 Cheesy Grits\n\u2022 Grits\n\u2022 Sausage Gravy\n\u2022 Oatmeal\n\n- Breakfast Sandwiches\n\u2022 BLT\n\u2022 Bacon, Egg and Cheese\n\u2022 Sausage, Egg and cheese\n\u2022 Breakfast Burritos',15,44,{...readable,sizePct:1.55,lineHeight:1.22,maxWidthPct:28}),
+    defaultBox('Salad Bar','SALAD BAR\n\nLettuce:\n\u2022 Romaine\n\u2022 Iceburg\nToppings:\n\u2022 Diced Tomatoes\n\u2022 Cucumbers\n\u2022 Onions\n\u2022 Broccoli\n\u2022 Carrots\n\u2022 Cauliflower\n\u2022 Peppers\n\u2022 Cheese\n\u2022 Croutons\n\u2022 Bacon Bits\n\u2022 Eggs\n\u2022 Diced Ham\n\u2022 Crackers\n\u2022 Sunflower Seeds\n\u2022 Pickled Okra\n\u2022 Jalapenos\n\u2022 Pickled beets\n\u2022 Green Olives\n\u2022 Banana Peppers\n\u2022 Pickled Green Tomatoes',63,46,{...readable,sizePct:1.35,lineHeight:1.18}),
+    defaultBox('Dressings','Dressings:\n\u2022 Ranch\n\u2022 Italian\n\u2022 Blue Cheese\n\u2022 Caesar\n\u2022 Thousand Island',88,30,{...readable,sizePct:1.35,lineHeight:1.18}),
+    defaultBox('Lunch','LUNCH\n11:00 AM - 2:00 PM\n\n\u2022 Beef Tips\n\u2022 Red Beans & Rice\n\u2022 BBQ Chicken\n\u2022 Mashed Potatoes\n& Gravy\n\u2022 Cabbage\n\u2022 Green Beans\n\u2022 Corn\n\u2022 Rolls\n\u2022 Fried Okra\n\nSame Daily\n\u2022 Turkey Clubs\n\u2022 Chicken Salad\nCroissants',13,77,{...readable,sizePct:1.45,lineHeight:1.22,maxWidthPct:22}),
+    defaultBox('Drinks','DRINKS\n\n\u2022 Sweet Tea\n\u2022 Unsweet Tea\n\u2022 Dr. Pepper\n\u2022 Rootbeer\n\u2022 Sprite\n\u2022 Fruit Punch\n\u2022 Blue Powerade\n\u2022 Diet Coke\n\u2022 Coke Zero\n\u2022 Coke\n\u2022 Coffee\n\u2022 Orange Juice\n\u2022 Milk\n\u2022 Chocolate Milk',37,77,{...readable,sizePct:1.45,lineHeight:1.22,maxWidthPct:22}),
+    defaultBox('Dessert','DESSERT\n\nCake',80,80,{align:'center',sizePct:1.9,...readable,lineHeight:1.25,fontFamily:'"DM Serif Display",Georgia,serif',italic:true}),
+    defaultBox('Bottom Note','For pricing and hours please visit\nHotHeadzSouthernFoods.com',50,97,{align:'center',sizePct:1.55,...readable,lineHeight:1.25,fontFamily:'"DM Serif Display",Georgia,serif',italic:true}),
   ];
   activeId=null;
 }
@@ -331,6 +333,15 @@ function drawTextBox(b){
   ctx.textBaseline='middle';
   const al=(b.align||'left').toLowerCase();let dx=0;
   if(al==='center'){ctx.textAlign='center';dx=0;}else if(al==='right'){ctx.textAlign='right';dx=lx+m.maxW;}else{ctx.textAlign='left';dx=lx;}
+  // Draw text stroke first (outline behind fill for readability)
+  if(b.strokeOn&&b.strokeWidth>0){
+    ctx.save();ctx.shadowBlur=0;ctx.shadowColor='transparent';
+    ctx.strokeStyle=b.strokeColor||'#000000';ctx.lineWidth=b.strokeWidth||2;ctx.lineJoin='round';
+    for(let i=0;i<m.lines.length;i++)ctx.strokeText(m.lines[i],dx,ly+(i+.5)*m.lineH);
+    ctx.restore();
+    // Reapply shadow for fill pass
+    if(b.shadow){ctx.shadowColor=b.shadowColor||'rgba(0,0,0,0.7)';ctx.shadowBlur=b.shadowBlur??10;}
+  }
   for(let i=0;i<m.lines.length;i++)ctx.fillText(m.lines[i],dx,ly+(i+.5)*m.lineH);
   ctx.restore();
   const rw=m.maxW+(b.bgOn?px*2:0),rh=m.totalH+(b.bgOn?py*2:0);
@@ -572,6 +583,9 @@ function buildQF(){
     h+='</select>';
     // Shadow
     h+='<label class="cf-toggle" style="font-size:9px;gap:3px;"><input type="checkbox" class="qf-shadow" data-id="'+esc(b.id)+'"'+(b.shadow?' checked':'')+'> Shadow</label>';
+    // Stroke
+    h+='<label class="cf-toggle" style="font-size:9px;gap:3px;"><input type="checkbox" class="qf-stroke" data-id="'+esc(b.id)+'"'+(b.strokeOn?' checked':'')+'> Outline</label>';
+    h+='<label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">Outline W <input type="range" class="qf-strokew" data-id="'+esc(b.id)+'" min="0" max="8" step="0.5" value="'+(b.strokeWidth||2)+'" style="width:50px;accent-color:var(--fire);"></label>';
     // Max Width
     h+='<label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">Width <input type="range" class="qf-maxw" data-id="'+esc(b.id)+'" min="0" max="95" step="0.5" value="'+(b.maxWidthPct||0)+'" style="width:60px;accent-color:var(--fire);"></label>';
     h+='</div>';
@@ -608,6 +622,7 @@ function buildTB(){
     h+='<input class="fi" type="color" id="bColor" value="'+toHex(b.color)+'" style="width:28px;height:28px;padding:2px;border-radius:5px;margin-bottom:0"></div>';
     h+='<div class="fr"><div><div class="fl">Opacity</div><input class="fi" type="range" id="bOp" min="0" max="1" step="0.01" value="'+b.opacity+'" style="accent-color:var(--fire)"></div><div><div class="fl">Rotation</div><input class="fi" type="number" id="bRot" value="'+(b.rotationDeg||0)+'" step="1"></div></div>';
     h+='<div class="fr"><div><div class="fl">Line Height</div><input class="fi" type="range" id="bLH" min="0.8" max="2.2" step="0.01" value="'+(b.lineHeight||1.15)+'" style="accent-color:var(--fire)"></div><div><div class="fl">Shadow</div><label class="cf-toggle" style="margin-top:6px"><input type="checkbox" id="bShadow"'+(b.shadow?' checked':'')+'> On</label></div></div>';
+    h+='<div class="fr"><div><div class="fl">Text Outline</div><label class="cf-toggle" style="margin-top:6px"><input type="checkbox" id="bStroke"'+(b.strokeOn?' checked':'')+'> On</label></div><div><div class="fl">Outline Width</div><input class="fi" type="range" id="bStrokeW" min="0" max="8" step="0.5" value="'+(b.strokeWidth||2)+'" style="accent-color:var(--fire)"></div></div>';
     h+='<div class="fl">Background</div><label class="cf-toggle"><input type="checkbox" id="bBgOn"'+(b.bgOn?' checked':'')+'> Enable</label>';
     h+='<div class="fr"><div><div class="fl">BG Color</div><input class="fi" type="color" id="bBgColor" value="'+toHex(b.bgColor)+'" style="height:36px;padding:3px 6px"></div><div><div class="fl">BG Opacity</div><input class="fi" type="range" id="bBgOp" min="0" max="1" step="0.01" value="'+(b.bgOpacity??.3)+'" style="accent-color:var(--fire)"></div></div>';
     h+='</div></div>';
@@ -677,6 +692,8 @@ function wirePanel(){
   document.querySelectorAll('.qf-font').forEach(el=>{el.addEventListener('change',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.fontFamily=el.value;draw();triggerAutoSave();}});});
   document.querySelectorAll('.qf-align').forEach(el=>{el.addEventListener('change',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.align=el.value;draw();triggerAutoSave();}});});
   document.querySelectorAll('.qf-shadow').forEach(el=>{el.addEventListener('change',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.shadow=!!el.checked;draw();triggerAutoSave();}});});
+  document.querySelectorAll('.qf-stroke').forEach(el=>{el.addEventListener('change',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.strokeOn=!!el.checked;draw();triggerAutoSave();}});});
+  document.querySelectorAll('.qf-strokew').forEach(el=>{el.addEventListener('input',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.strokeWidth=parseFloat(el.value);draw();triggerAutoSave();}});});
   document.querySelectorAll('.qf-maxw').forEach(el=>{el.addEventListener('input',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.maxWidthPct=parseFloat(el.value);draw();triggerAutoSave();}});});
   document.querySelectorAll('.qf-vis').forEach(el=>{el.addEventListener('change',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){saveUndo();b.opacity=el.checked?1:0;draw();triggerAutoSave();}});});
   document.querySelectorAll('.qf-csw').forEach(el=>{el.addEventListener('click',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.color=el.dataset.color;draw();rebuildSidePanel();triggerAutoSave();}});});
@@ -700,7 +717,10 @@ function wirePanel(){
     w('bFont',e=>{b.fontFamily=e.target.value;draw();triggerAutoSave();},'change');w('bAlign',e=>{b.align=e.target.value;draw();triggerAutoSave();},'change');
     w('bColor',e=>{b.color=e.target.value;draw();triggerAutoSave();});w('bOp',e=>{b.opacity=parseFloat(e.target.value);draw();triggerAutoSave();});
     w('bRot',e=>{b.rotationDeg=parseFloat(e.target.value||'0');draw();triggerAutoSave();});w('bLH',e=>{b.lineHeight=parseFloat(e.target.value);draw();triggerAutoSave();});
-    w('bShadow',e=>{b.shadow=!!e.target.checked;draw();triggerAutoSave();},'change');w('bBgOn',e=>{b.bgOn=!!e.target.checked;draw();triggerAutoSave();},'change');
+    w('bShadow',e=>{b.shadow=!!e.target.checked;draw();triggerAutoSave();},'change');
+    w('bStroke',e=>{b.strokeOn=!!e.target.checked;draw();triggerAutoSave();},'change');
+    w('bStrokeW',e=>{b.strokeWidth=parseFloat(e.target.value);draw();triggerAutoSave();});
+    w('bBgOn',e=>{b.bgOn=!!e.target.checked;draw();triggerAutoSave();},'change');
     w('bBgColor',e=>{b.bgColor=e.target.value;draw();triggerAutoSave();});w('bBgOp',e=>{b.bgOpacity=parseFloat(e.target.value);draw();triggerAutoSave();});
     document.querySelectorAll('.bCSw').forEach(sw=>{sw.addEventListener('click',()=>{b.color=sw.dataset.color;draw();triggerAutoSave();rebuildSidePanel();});});
   }
