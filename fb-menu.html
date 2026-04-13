@@ -400,31 +400,21 @@ function getCloudUrl(){return CLOUD_URL;}
 function getCloudName(){return localStorage.getItem(CLOUD_NAME_KEY)||'';}
 function setCloudName(n){localStorage.setItem(CLOUD_NAME_KEY,n);}
 
-// *** FIX 1: cloudRequest now uses fetch() for ALL actions instead of JSONP for reads ***
+// All requests use POST with text/plain to avoid CORS preflight issues
 async function cloudRequest(action,body={}){
   const url=getCloudUrl();
   if(!url){toast('Cloud not configured','error');return null;}
   try{
-    if(action==='list'||action==='load'){
-      // FIX: Use fetch instead of JSONP
-      let qurl=url+'?action='+action;
-      if(action==='load'&&body.id)qurl+='&id='+encodeURIComponent(body.id);
-      const r=await fetch(qurl,{redirect:'follow'});
-      const text=await r.text();
-      try{return JSON.parse(text);}catch(e){toast('Cloud returned invalid data','error');return null;}
-    }
-    if(action==='save'||action==='delete'||action==='save-lunch'||action==='delete-lunch'){
-      const r=await fetch(url,{
-        method:'POST',
-        redirect:'follow',
-        headers:{'Content-Type':'text/plain'},
-        body:JSON.stringify({action,...body})
-      });
-      const text=await r.text();
-      try{return JSON.parse(text);}catch{
-        if(text.includes('success'))return{success:true};
-        toast('Cloud returned unexpected response','error');return null;
-      }
+    const r=await fetch(url,{
+      method:'POST',
+      redirect:'follow',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({action,...body})
+    });
+    const text=await r.text();
+    try{return JSON.parse(text);}catch{
+      if(text.includes('success'))return{success:true};
+      toast('Cloud returned unexpected response','error');return null;
     }
   }catch(e){toast('Cloud error: '+e.message,'error');return null;}
 }
@@ -756,11 +746,11 @@ async function publishLunch(){
 }
 document.getElementById('publishLunch').addEventListener('click',()=>{publishLunch();exportModal.classList.remove('active');});
 
-// *** FIX 2: loadFullMenu uses fetch instead of JSONP ***
+// loadFullMenu uses POST to avoid CORS
 async function loadFullMenu(){
   const url=getCloudUrl();if(!url)return null;
   try{
-    const r=await fetch(url+'?action=lunch',{redirect:'follow'});
+    const r=await fetch(url,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'lunch'})});
     const text=await r.text();
     const result=JSON.parse(text);
     if(result?.success)return result.dates||null;
@@ -956,10 +946,10 @@ function wireMenuPanel(){
     const el=document.getElementById('lunchDateEditor');
     if(!el)return;
     el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:8px;">Loading...</div>';
-    // FIX: Use fetch instead of JSONP
+    // Use POST to avoid CORS issues
     const url=getCloudUrl();let lunchData=null;
     try{
-      const r=await fetch(url+'?action=lunch',{redirect:'follow'});
+      const r=await fetch(url,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'lunch'})});
       const text=await r.text();
       const result=JSON.parse(text);
       if(result?.success&&result?.dates?.[date])lunchData=result.dates[date];
