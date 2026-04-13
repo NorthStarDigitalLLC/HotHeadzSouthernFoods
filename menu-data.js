@@ -2,7 +2,7 @@
  * HOT HEADZ SOUTHERN FOODS — Menu Data
  * Static data here. Lunch fetched from Google Sheets.
  */
-var CLOUD_MENU_URL = 'https://script.google.com/macros/s/AKfycbxHd4heBpNJzAsgodKJMlgq8dVa_qlpHjIUHHRFYL6AIJys-d4x5Mxm1P_egFfvQiNtnQ/exec';
+var CLOUD_URL = 'https://script.google.com/macros/s/AKfycbxHd4heBpNJzAsgodKJMlgq8dVa_qlpHjIUHHRFYL6AIJys-d4x5Mxm1P_egFfvQiNtnQ/exec';
 
 var MENU_DATA = {
   settings: {
@@ -56,28 +56,97 @@ var MENU_DATA = {
   menus: {}
 };
 
-// Fetch lunch dates from Google Sheets via JSONP
+// ─── Load lunch from cloud ───
+// Try 3 methods in sequence: JSONP, fetch, iframe
 (function() {
-  var cb = '_hhLunch' + Date.now();
-  window[cb] = function(result) {
-    delete window[cb];
-    var el = document.getElementById(cb); if (el) el.remove();
-    if (result && result.success && result.dates) {
-      var dates = result.dates;
-      var keys = Object.keys(dates);
-      for (var i = 0; i < keys.length; i++) {
-        MENU_DATA.menus[keys[i]] = dates[keys[i]];
+  var loaded = false;
+
+  function applyLunch(dates) {
+    if (loaded) return;
+    loaded = true;
+    var keys = Object.keys(dates);
+    for (var i = 0; i < keys.length; i++) MENU_DATA.menus[keys[i]] = dates[keys[i]];
+    console.log('[HH] Loaded ' + keys.length + ' lunch dates');
+    window.dispatchEvent(new CustomEvent('menuDataReady', { detail: MENU_DATA }));
+  }
+
+  // Method 1: JSONP
+  function tryJSONP() {
+    var cb = '_hhLunch' + Date.now();
+    window[cb] = function(result) {
+      delete window[cb];
+      var el = document.getElementById(cb); if (el) el.remove();
+      if (result && result.success && result.dates) applyLunch(result.dates);
+      else tryFetch(); // JSONP returned but no data, try fetch
+    };
+    var s = document.createElement('script');
+    s.id = cb;
+    s.src = CLOUD_URL + '?action=lunch&callback=' + cb;
+    s.onerror = function() {
+      delete window[cb]; s.remove();
+      console.log('[HH] JSONP failed, trying fetch...');
+      tryFetch();
+    };
+    document.head.appendChild(s);
+    // Timeout → try fetch
+    setTimeout(function() {
+      if (window[cb]) {
+        delete window[cb];
+        var el = document.getElementById(cb); if (el) el.remove();
+        console.log('[HH] JSONP timed out, trying fetch...');
+        tryFetch();
       }
-      console.log('[HH] Loaded ' + keys.length + ' lunch dates from cloud');
-      window.dispatchEvent(new CustomEvent('menuDataReady', { detail: MENU_DATA }));
-    } else {
-      console.log('[HH] No lunch dates from cloud');
-    }
-  };
-  var s = document.createElement('script');
-  s.id = cb;
-  s.src = CLOUD_MENU_URL + '?action=lunch&callback=' + cb;
-  s.onerror = function() { delete window[cb]; s.remove(); console.warn('[HH] Cloud lunch fetch failed'); };
-  document.head.appendChild(s);
-  setTimeout(function() { if (window[cb]) { delete window[cb]; var el = document.getElementById(cb); if (el) el.remove(); console.warn('[HH] Cloud lunch timed out'); } }, 15000);
+    }, 8000);
+  }
+
+  // Method 2: Fetch with redirect follow
+  function tryFetch() {
+    if (loaded) return;
+    fetch(CLOUD_URL + '?action=lunch', { redirect: 'follow' })
+      .then(function(r) { return r.text(); })
+      .then(function(text) {
+        try {
+          var result = JSON.parse(text);
+          if (result && result.success && result.dates) applyLunch(result.dates);
+          else console.log('[HH] Fetch returned no dates');
+        } catch(e) {
+          console.log('[HH] Fetch response not JSON, trying iframe...');
+          tryIframe();
+        }
+      })
+      .catch(function(err) {
+        console.log('[HH] Fetch failed (' + err.message + '), trying iframe...');
+        tryIframe();
+      });
+  }
+
+  // Method 3: Hidden iframe that loads the URL and reads the content
+  function tryIframe() {
+    if (loaded) return;
+    var iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = CLOUD_URL + '?action=lunch';
+    var timer = setTimeout(function() {
+      try {
+        var text = iframe.contentDocument.body.innerText || iframe.contentDocument.body.textContent;
+        var result = JSON.parse(text);
+        if (result && result.success && result.dates) applyLunch(result.dates);
+      } catch(e) { console.warn('[HH] All methods failed to load lunch'); }
+      iframe.remove();
+    }, 5000);
+    iframe.onload = function() {
+      clearTimeout(timer);
+      try {
+        var text = iframe.contentDocument.body.innerText || iframe.contentDocument.body.textContent;
+        var result = JSON.parse(text);
+        if (result && result.success && result.dates) applyLunch(result.dates);
+        else console.log('[HH] Iframe loaded but no dates');
+      } catch(e) { console.warn('[HH] Iframe cross-origin blocked'); }
+      iframe.remove();
+    };
+    document.body.appendChild(iframe);
+  }
+
+  // Start with JSONP
+  tryJSONP();
 })();
