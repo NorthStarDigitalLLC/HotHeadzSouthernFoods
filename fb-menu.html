@@ -267,8 +267,7 @@ const FONTS=[
 ];
 const BRAND_COLORS=['#ffffff','#f8ede6','#ffa048','#f87038','#f05020','#e83010','#c41800','#000000','#1e0a0c','#130509','#d4a898'];
 
-/* GATE — Hashed PIN, lockout, session, embers */
-// SHA-256 hash of the PIN (not visible in source)
+/* GATE */
 const PIN_HASH='77334823791bea53e508ba59387c1287c8da962026769657b4686756db4b7bc8';
 async function hashPin(pin){const enc=new TextEncoder().encode(pin);const buf=await crypto.subtle.digest('SHA-256',enc);return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');}
 const SESSION_KEY='hhMenuAuth';
@@ -277,7 +276,6 @@ const MAX_ATTEMPTS=5;
 const LOCKOUT_MINUTES=2;
 let failCount=0;
 
-// Ember particles on gate
 (function(){
   const container=document.getElementById('gateEmbers');if(!container)return;
   for(let i=0;i<20;i++){
@@ -290,7 +288,6 @@ let failCount=0;
   }
 })();
 
-// PIN digit inputs
 const digits=document.querySelectorAll('.gate-pin-digit');
 digits.forEach((d,i)=>{
   d.addEventListener('input',()=>{
@@ -315,7 +312,6 @@ function getPin(){return Array.from(digits).map(d=>d.value).join('');}
 function shakeDigits(){digits.forEach(d=>{d.classList.add('error');setTimeout(()=>d.classList.remove('error'),500);});}
 function clearDigits(){digits.forEach(d=>{d.value='';d.classList.remove('filled','error');});digits[0]?.focus();}
 
-// Check lockout
 function checkLockout(){
   const data=safeJSON(localStorage.getItem(LOCKOUT_KEY),null);
   if(!data)return false;
@@ -332,7 +328,6 @@ function checkLockout(){
   return false;
 }
 
-// Check session (stay logged in for 8 hours)
 function checkSession(){
   const ts=parseInt(localStorage.getItem(SESSION_KEY)||'0',10);
   if(ts&&(Date.now()-ts)<8*60*60*1000)return true;
@@ -347,7 +342,6 @@ function unlockEditor(){
   setTimeout(()=>draw(),60);
 }
 
-// Auto-unlock if session is valid
 if(checkSession()){unlockEditor();}
 else{checkLockout();}
 
@@ -399,29 +393,25 @@ function triggerAutoSave(){clearTimeout(ast);ast=setTimeout(()=>{const s=loadSto
 function loadStore(){const s=safeJSON(localStorage.getItem(PK),null);if(s&&Array.isArray(s.items))return s;return{activeId:null,items:[]};}
 function saveStore(s){try{localStorage.setItem(PK,JSON.stringify(s));return{ok:true}}catch(e){return{ok:false,error:String(e?.message||e)}}}
 
-/* CLOUD STORAGE (Google Sheets) */
+/* CLOUD STORAGE */
 const CLOUD_URL='https://script.google.com/macros/s/AKfycbxHd4heBpNJzAsgodKJMlgq8dVa_qlpHjIUHHRFYL6AIJys-d4x5Mxm1P_egFfvQiNtnQ';
 const CLOUD_NAME_KEY='hhMenuCloud_name';
 function getCloudUrl(){return CLOUD_URL;}
 function getCloudName(){return localStorage.getItem(CLOUD_NAME_KEY)||'';}
 function setCloudName(n){localStorage.setItem(CLOUD_NAME_KEY,n);}
 
+// *** FIX 1: cloudRequest now uses fetch() for ALL actions instead of JSONP for reads ***
 async function cloudRequest(action,body={}){
   const url=getCloudUrl();
   if(!url){toast('Cloud not configured','error');return null;}
   try{
     if(action==='list'||action==='load'){
-      // GET requests — use JSONP (always works with Apps Script, no CORS issues)
-      return new Promise((resolve)=>{
-        const cbName='_hhCloud'+Date.now()+Math.random().toString(36).slice(2);
-        let qurl=url+'?action='+action+'&callback='+cbName;
-        if(action==='load'&&body.id)qurl+='&id='+encodeURIComponent(body.id);
-        window[cbName]=function(data){resolve(data);delete window[cbName];document.getElementById(cbName)?.remove();};
-        const sc=document.createElement('script');sc.id=cbName;sc.src=qurl;
-        sc.onerror=()=>{resolve(null);delete window[cbName];sc.remove();toast('Cloud connection failed','error');};
-        document.head.appendChild(sc);
-        setTimeout(()=>{if(window[cbName]){resolve(null);delete window[cbName];document.getElementById(cbName)?.remove();toast('Cloud timed out','error');}},15000);
-      });
+      // FIX: Use fetch instead of JSONP
+      let qurl=url+'?action='+action;
+      if(action==='load'&&body.id)qurl+='&id='+encodeURIComponent(body.id);
+      const r=await fetch(qurl,{redirect:'follow'});
+      const text=await r.text();
+      try{return JSON.parse(text);}catch(e){toast('Cloud returned invalid data','error');return null;}
     }
     if(action==='save'||action==='delete'||action==='save-lunch'||action==='delete-lunch'){
       const r=await fetch(url,{
@@ -432,7 +422,6 @@ async function cloudRequest(action,body={}){
       });
       const text=await r.text();
       try{return JSON.parse(text);}catch{
-        // POST might also redirect — if text looks like HTML, it might have worked anyway
         if(text.includes('success'))return{success:true};
         toast('Cloud returned unexpected response','error');return null;
       }
@@ -445,7 +434,6 @@ async function cloudSave(name){
   if(!projName)return;
   toast('Saving to cloud...','info');
   const payload=currentPayload();
-  // Strip image data to keep sheet size manageable — staff will have the template loaded locally
   const lightPayload={...payload,imgDataURL:''};
   const result=await cloudRequest('save',{project:{id:uid(),name:projName.trim(),savedBy:getCloudName(),data:lightPayload}});
   if(result?.success){toast('Saved "'+projName.trim()+'" to cloud!','success');rebuildSidePanel();}
@@ -490,13 +478,13 @@ function fileToDataURL(f){return new Promise((r,j)=>{const x=new FileReader();x.
 async function compressImage(d){const i=new Image();i.src=d;await new Promise(r=>{i.onload=()=>r(1);i.onerror=()=>r(0)});if(!i.naturalWidth)return d;const s=Math.min(1,2200/Math.max(i.naturalWidth,i.naturalHeight));const w=Math.round(i.naturalWidth*s),h=Math.round(i.naturalHeight*s);const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(i,0,0,w,h);return c.toDataURL('image/jpeg',0.9);}
 async function loadImg(d){return new Promise(r=>{img=new Image();img.onload=()=>{imgLoaded=true;r(true)};img.onerror=()=>{imgLoaded=false;r(false)};img.src=d;})}
 
-/* DEFAULT BOXES — positions matched to template */
+/* DEFAULT BOXES */
 function defaultBox(name,text,xPct,yPct,ov={}){
   return{id:uid(),name,text,xPct:xPct??50,yPct:yPct??50,sizePct:2.0,maxWidthPct:0,fontFamily:FONTS[0].value,color:'#ffffff',opacity:1,align:'left',bold:true,italic:false,shadow:true,shadowBlur:10,shadowColor:'rgba(0,0,0,0.7)',strokeOn:false,strokeColor:'#000000',strokeWidth:2,bgOn:false,bgColor:'#000000',bgOpacity:.30,bgPadX:14,bgPadY:10,bgRadius:14,lineHeight:1.20,rotationDeg:0,isCustom:false,...ov};
 }
 function loadStarterBoxes(){
   const t=todayDefaults();
-  const C='#d4a898'; // brand sand color
+  const C='#d4a898';
   const SF='system-ui,-apple-system,Segoe UI,Roboto,Arial';
   const base={color:C,shadow:true,shadowBlur:8,shadowColor:'rgba(0,0,0,0.7)'};
   boxes=[
@@ -562,18 +550,15 @@ function drawTextBox(b){
   ctx.textBaseline='middle';
   const al=(b.align||'left').toLowerCase();let dx=0;
   if(al==='center'){ctx.textAlign='center';dx=0;}else if(al==='right'){ctx.textAlign='right';dx=lx+m.maxW;}else{ctx.textAlign='left';dx=lx;}
-  // Draw text stroke first (outline behind fill for readability)
   if(b.strokeOn&&b.strokeWidth>0){
     ctx.save();ctx.shadowBlur=0;ctx.shadowColor='transparent';
     ctx.strokeStyle=b.strokeColor||'#000000';ctx.lineWidth=b.strokeWidth||2;ctx.lineJoin='round';
     for(let i=0;i<m.lines.length;i++)ctx.strokeText(m.lines[i],dx,ly+(i+.5)*m.lineH);
     ctx.restore();
-    // Reapply shadow for fill pass
     if(b.shadow){ctx.shadowColor=b.shadowColor||'rgba(0,0,0,0.7)';ctx.shadowBlur=b.shadowBlur??10;}
   }
   for(let i=0;i<m.lines.length;i++)ctx.fillText(m.lines[i],dx,ly+(i+.5)*m.lineH);
   ctx.restore();
-  // Hit box width: use maxWidthPct constraint if set (so handles stay at the edges you set, not where text ends)
   const constraintW=b.maxWidthPct>0?pxX(b.maxWidthPct):0;
   const textW=m.maxW;
   const boxW=Math.max(textW,constraintW)+(b.bgOn?px*2:0);
@@ -599,7 +584,7 @@ function getHandles(b){
 }
 function hitHandle(px,py,b){
   const handles=getHandles(b);
-  const hs=HANDLE_SIZE*2.5; // bigger hit area for easier grabbing
+  const hs=HANDLE_SIZE*2.5;
   for(const h of handles){if(Math.abs(px-h.x)<hs&&Math.abs(py-h.y)<hs)return h;}
   return null;
 }
@@ -609,29 +594,16 @@ function drawOutline(){
   const h=b.__hit;
   ctx.save();ctx.strokeStyle='rgba(255,255,255,0.8)';ctx.lineWidth=2;ctx.setLineDash([6,5]);
   ctx.strokeRect(h.left,h.top,h.right-h.left,h.bottom-h.top);ctx.setLineDash([]);
-  // Draw handles
   const handles=getHandles(b);
   for(const handle of handles){
     const isSide=handle.id==='ml'||handle.id==='mr';
     const isTopBot=handle.id==='tm'||handle.id==='bm';
-    const isCorner=!isSide&&!isTopBot;
-    const sz=isCorner?6:5;
+    const sz=(!isSide&&!isTopBot)?6:5;
     ctx.fillStyle=isSide?'rgba(100,180,255,0.95)':isTopBot?'rgba(100,255,150,0.95)':'rgba(255,122,24,0.95)';
     ctx.strokeStyle='#fff';ctx.lineWidth=2;
-    if(isSide){
-      // Draw wider horizontal bar for side handles
-      ctx.beginPath();
-      ctx.roundRect?ctx.roundRect(handle.x-4,handle.y-10,8,20,3):ctx.rect(handle.x-4,handle.y-10,8,20);
-      ctx.fill();ctx.stroke();
-    }else if(isTopBot){
-      // Draw wider vertical bar for top/bottom
-      ctx.beginPath();
-      ctx.roundRect?ctx.roundRect(handle.x-10,handle.y-4,20,8,3):ctx.rect(handle.x-10,handle.y-4,20,8);
-      ctx.fill();ctx.stroke();
-    }else{
-      // Corner circles
-      ctx.beginPath();ctx.arc(handle.x,handle.y,sz,0,Math.PI*2);ctx.fill();ctx.stroke();
-    }
+    if(isSide){ctx.beginPath();ctx.roundRect?ctx.roundRect(handle.x-4,handle.y-10,8,20,3):ctx.rect(handle.x-4,handle.y-10,8,20);ctx.fill();ctx.stroke();}
+    else if(isTopBot){ctx.beginPath();ctx.roundRect?ctx.roundRect(handle.x-10,handle.y-4,20,8,3):ctx.rect(handle.x-10,handle.y-4,20,8);ctx.fill();ctx.stroke();}
+    else{ctx.beginPath();ctx.arc(handle.x,handle.y,sz,0,Math.PI*2);ctx.fill();ctx.stroke();}
   }
   ctx.restore();
 }
@@ -649,7 +621,6 @@ canvas.addEventListener('pointerdown',e=>{
   if(e.pointerType==='touch'){pointers.set(e.pointerId,{clientX:e.clientX,clientY:e.clientY});if(pointers.size===2){pinchActive=true;const p=computePinch();lastMid=p?.mid;lastDist=p?.dist;dragging=false;canvas.setPointerCapture(e.pointerId);return;}}
   if(!isCoarse()&&e.button===2){const p=rawFromClient(e.clientX,e.clientY);dragging=true;dragMode='view';lastX=p.x;lastY=p.y;canvas.setPointerCapture(e.pointerId);return;}
   const p=worldFromClient(e.clientX,e.clientY);lastX=p.x;lastY=p.y;
-  // Check resize handles first
   if(activeId&&document.getElementById('showText').checked){
     const ab=boxes.find(x=>x.id===activeId);
     if(ab){const rh=hitHandle(p.x,p.y,ab);if(rh){saveUndo();resizeHandle=rh;dragging=true;dragMode='resize';canvas.setPointerCapture(e.pointerId);return;}}
@@ -669,41 +640,19 @@ canvas.addEventListener('pointermove',e=>{
     const b=boxes.find(x=>x.id===activeId);if(!b||!resizeHandle)return;
     const hid=resizeHandle.id;
     const hit=b.__hit;
-    // Corner handles: scale font size proportionally
     if(hid==='tl'||hid==='tr'||hid==='bl'||hid==='br'){
-      // Drag outward = bigger, inward = smaller
-      const cx=(hit.left+hit.right)/2, cy=(hit.top+hit.bottom)/2;
-      const px=lastX, py=lastY; // current pointer pos (already updated)
+      const cx=(hit.left+hit.right)/2,cy=(hit.top+hit.bottom)/2;
+      const px=lastX,py=lastY;
       const prevDist=Math.hypot((px-dx)-cx,(py-dy)-cy);
       const newDist=Math.hypot(px-cx,py-cy);
-      if(prevDist>0){
-        const ratio=newDist/prevDist;
-        b.sizePct=clamp(b.sizePct*ratio,0.3,10);
-        // Also scale maxWidthPct if set
-        if(b.maxWidthPct>0)b.maxWidthPct=clamp(b.maxWidthPct*ratio,2,95);
-      }
+      if(prevDist>0){const ratio=newDist/prevDist;b.sizePct=clamp(b.sizePct*ratio,0.3,10);if(b.maxWidthPct>0)b.maxWidthPct=clamp(b.maxWidthPct*ratio,2,95);}
     }
-    // Side handles: adjust maxWidth by dragging left/right edge
     if(hid==='ml'||hid==='mr'){
-      // Get current box width in pixels from hit box
-      const curHitW=hit.right-hit.left;
-      // If maxWidthPct is 0 (auto), initialize it from the current rendered width
-      if(!b.maxWidthPct||b.maxWidthPct===0){
-        b.maxWidthPct=pctX(curHitW);
-      }
-      // Dragging right edge right = wider, left edge left = wider
-      const dir=hid==='mr'?1:-1;
-      const deltaW=dx*dir;
-      const newWPx=pxX(b.maxWidthPct)+deltaW*2; // *2 because box is centered
-      b.maxWidthPct=clamp(pctX(newWPx),3,95);
-      // Also shift position slightly to keep the opposite edge anchored
-      b.xPct=clamp(b.xPct+pctX(dx)/2,0,100);
+      if(!b.maxWidthPct||b.maxWidthPct===0)b.maxWidthPct=pctX(hit.right-hit.left);
+      const dir=hid==='mr'?1:-1;const deltaW=dx*dir;const newWPx=pxX(b.maxWidthPct)+deltaW*2;
+      b.maxWidthPct=clamp(pctX(newWPx),3,95);b.xPct=clamp(b.xPct+pctX(dx)/2,0,100);
     }
-    // Top/bottom handles: adjust line height
-    if(hid==='tm'||hid==='bm'){
-      const dir=hid==='bm'?1:-1;
-      b.lineHeight=clamp((b.lineHeight||1.15)+dy*dir*0.003,0.8,2.5);
-    }
+    if(hid==='tm'||hid==='bm'){const dir=hid==='bm'?1:-1;b.lineHeight=clamp((b.lineHeight||1.15)+dy*dir*0.003,0.8,2.5);}
     draw();triggerAutoSave();return;
   }
   if(dragMode==='text'){const b=boxes.find(x=>x.id===activeId);if(!b)return;b.xPct=maybeSnap(clamp(pctX(pxX(b.xPct)+dx),0,100));b.yPct=maybeSnap(clamp(pctY(pxY(b.yPct)+dy),0,100));draw();triggerAutoSave();}
@@ -727,31 +676,16 @@ async function applyPayload(p){if(!p)return;if(p.imgDataURL){imgDataURL=p.imgDat
 function createProject(name){const s=loadStore();const p={id:uid(),name:name||`Menu ${new Date().toLocaleDateString()}`,createdAt:Date.now(),updatedAt:Date.now(),data:currentPayload()};s.items.unshift(p);s.activeId=p.id;const r=saveStore(s);if(!r.ok){toast('Save failed: '+r.error,'error');return false;}toast('Project created!','success');rebuildSidePanel();return true;}
 function saveProject(askName){
   const s=loadStore();const a=s.items.find(p=>p.id===s.activeId);
-  if(!a){
-    const name=prompt('Name this project:','Menu '+new Date().toLocaleDateString());
-    if(name===null)return;
-    createProject(name.trim()||'Menu '+new Date().toLocaleDateString());
-    return;
-  }
-  if(askName){
-    const name=prompt('Rename project:',a.name);
-    if(name===null)return;
-    a.name=name.trim()||a.name;
-  }
+  if(!a){const name=prompt('Name this project:','Menu '+new Date().toLocaleDateString());if(name===null)return;createProject(name.trim()||'Menu '+new Date().toLocaleDateString());return;}
+  if(askName){const name=prompt('Rename project:',a.name);if(name===null)return;a.name=name.trim()||a.name;}
   a.updatedAt=Date.now();a.data=currentPayload();
   const r=saveStore(s);if(!r.ok){toast('Save failed: '+r.error,'error');return;}
   toast('Saved "'+a.name+'"!','success');rebuildSidePanel();
 }
-function renameProject(id){
-  const s=loadStore();const p=s.items.find(x=>x.id===id);if(!p)return;
-  const name=prompt('Rename project:',p.name);if(name===null||!name.trim())return;
-  p.name=name.trim();p.updatedAt=Date.now();saveStore(s);
-  toast('Renamed to "'+p.name+'"','success');rebuildSidePanel();
-}
+function renameProject(id){const s=loadStore();const p=s.items.find(x=>x.id===id);if(!p)return;const name=prompt('Rename project:',p.name);if(name===null||!name.trim())return;p.name=name.trim();p.updatedAt=Date.now();saveStore(s);toast('Renamed to "'+p.name+'"','success');rebuildSidePanel();}
 function exportProjectFile(id){
   const s=loadStore();const p=s.items.find(x=>x.id===id);
   if(!p){toast('No project to export','error');return;}
-  // Always include the current image data so the recipient can pick up where you left off
   const exportData={...p};
   if(!exportData.data.imgDataURL&&imgDataURL){exportData.data.imgDataURL=imgDataURL;}
   const blob=new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
@@ -760,7 +694,7 @@ function exportProjectFile(id){
   el.download=`hotheadz-${safeName}-${new Date().toISOString().slice(0,10)}.json`;
   el.href=URL.createObjectURL(blob);document.body.appendChild(el);el.click();el.remove();
   setTimeout(()=>URL.revokeObjectURL(el.href),1500);
-  toast('Project file exported! Share this file so someone else can import it.','success');
+  toast('Project file exported!','success');
 }
 async function loadProject(id){const s=loadStore();const p=s.items.find(x=>x.id===id);if(!p)return;s.activeId=id;saveStore(s);if(p.data)await applyPayload(p.data);rebuildSidePanel();}
 function deleteProject(id){const s=loadStore();const p=s.items.find(x=>x.id===id);if(!p||!confirm(`Delete "${p.name}"?`))return;s.items=s.items.filter(x=>x.id!==id);if(s.activeId===id)s.activeId=s.items[0]?.id??null;saveStore(s);const n=s.items.find(x=>x.id===s.activeId);if(n?.data)applyPayload(n.data);else{loadStarterBoxes();imgLoaded=false;imgDataURL='';resetAll();}toast('Deleted','info');rebuildSidePanel();}
@@ -771,7 +705,6 @@ function exportCropped(mime,ext,q){if(!imgLoaded){toast('Upload template first',
 function exportJSON(){
   const s=loadStore();const a=s.items.find(p=>p.id===s.activeId);
   const payload=currentPayload();
-  // Always include image so recipient can pick up where you left off
   if(!payload.imgDataURL&&imgDataURL)payload.imgDataURL=imgDataURL;
   const proj={id:a?.id||uid(),name:a?.name||'Menu Export',createdAt:a?.createdAt||Date.now(),updatedAt:Date.now(),data:payload};
   const blob=new Blob([JSON.stringify(proj,null,2)],{type:'application/json'});
@@ -779,17 +712,13 @@ function exportJSON(){
   const safeName=(proj.name||'menu').replace(/[^a-zA-Z0-9-_ ]/g,'').replace(/\s+/g,'-').toLowerCase();
   el.download=`hotheadz-${safeName}-${new Date().toISOString().slice(0,10)}.json`;
   el.href=URL.createObjectURL(blob);document.body.appendChild(el);el.click();el.remove();
-  toast('Project exported with template image! Anyone can import this file.','success');
+  toast('Project exported with template image!','success');
 }
 const exportModal=document.getElementById('exportModal');
 document.getElementById('exportBtn').addEventListener('click',()=>exportModal.classList.add('active'));
 document.getElementById('mobExportBtn').addEventListener('click',()=>exportModal.classList.add('active'));
 
-// Sign out — clear session and go to main site
-function signOut(){
-  localStorage.removeItem(SESSION_KEY);
-  window.location.href='/';
-}
+function signOut(){localStorage.removeItem(SESSION_KEY);window.location.href='/';}
 document.getElementById('signOutBtn').addEventListener('click',signOut);
 document.getElementById('mobSignOutBtn').addEventListener('click',signOut);
 document.getElementById('closeExport').addEventListener('click',()=>exportModal.classList.remove('active'));
@@ -798,56 +727,46 @@ document.getElementById('dlJpg').addEventListener('click',()=>{exportCropped('im
 document.getElementById('dlPng').addEventListener('click',()=>{exportCropped('image/png','png',1);exportModal.classList.remove('active');});
 document.getElementById('dlJson').addEventListener('click',()=>{exportJSON();exportModal.classList.remove('active');});
 
-// Publish lunch items to live website menu
 async function publishLunch(){
-  // Find the Lunch text box
   const lunchBox=boxes.find(b=>b.name==='Lunch');
   if(!lunchBox||!lunchBox.text.trim()){toast('No Lunch text box found or it is empty','error');return;}
-  
-  // Parse lunch text into items array
-  // Format: lines starting with • or - are items, skip headers/times
   const lines=lunchBox.text.split('\n').map(l=>l.trim()).filter(Boolean);
   const items=[];
   for(const line of lines){
-    // Skip header lines like "LUNCH" and time lines
     if(line.toUpperCase()==='LUNCH')continue;
     if(/^\d{1,2}:\d{2}\s*(AM|PM)/i.test(line))continue;
     if(/^(Same Daily|Same daily)/i.test(line)){items.push({name:line,desc:''});continue;}
-    // Clean bullet points
     let clean=line.replace(/^[\u2022\u2023\u25E6\u2043\u2219•\-\*]\s*/,'').trim();
     if(clean)items.push({name:clean,desc:''});
   }
-  
-  if(!items.length){toast('Could not parse any lunch items from the Lunch text box','error');return;}
-  
-  // Get today's date in ISO format
+  if(!items.length){toast('Could not parse any lunch items','error');return;}
   const now=new Date();
   const dateISO=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
-  
-  // Confirm
   const itemNames=items.map(i=>i.name).join(', ');
   if(!confirm('Publish '+items.length+' lunch items to the live website for '+dateISO+'?\n\n'+itemNames))return;
-  
   toast('Publishing to live menu...','info');
-  
   try{
     const url=getCloudUrl();
-    const r=await fetch(url,{
-      method:'POST',redirect:'follow',
-      headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({action:'publish',date:dateISO,items:items,publishedBy:getCloudName()})
-    });
+    const r=await fetch(url,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'save-lunch',date:dateISO,data:{lunch:{show:true,items:items},dessert:{items:[]},crawfish:{show:false}},publishedBy:getCloudName()})});
     const text=await r.text();
     const result=safeJSON(text,null);
-    if(result?.success){
-      toast('Published! '+items.length+' lunch items are now live on the website.','success');
-    }else{
-      toast('Publish failed: '+(result?.error||'unknown error'),'error');
-    }
+    if(result?.success){toast('Published! '+items.length+' lunch items are now live.','success');}
+    else{toast('Publish failed: '+(result?.error||'unknown error'),'error');}
   }catch(e){toast('Publish error: '+e.message,'error');}
 }
-
 document.getElementById('publishLunch').addEventListener('click',()=>{publishLunch();exportModal.classList.remove('active');});
+
+// *** FIX 2: loadFullMenu uses fetch instead of JSONP ***
+async function loadFullMenu(){
+  const url=getCloudUrl();if(!url)return null;
+  try{
+    const r=await fetch(url+'?action=lunch',{redirect:'follow'});
+    const text=await r.text();
+    const result=JSON.parse(text);
+    if(result?.success)return result.dates||null;
+    return null;
+  }catch(e){console.warn('loadFullMenu error:',e);return null;}
+}
 
 /* SIDE PANEL */
 let currentTab='quickfill';
@@ -870,65 +789,45 @@ function buildQF(){
   let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u26a1 Quick Fill</span></div><div class="acc-body">';
   h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Type your menu. Canvas updates live. Expand each card for styling.</p>';
   h+='<div class="btn-row"><button class="sm-btn primary" id="qfToday">\ud83d\udcc5 Today\'s Date</button><button class="sm-btn" id="qfYesterday">Copy Previous</button><button class="sm-btn danger" id="qfReset">Reset</button></div>';
-
-  // Render ALL boxes (built-in sections + custom) in order
   const allSections=[];
   for(const s of sects){const box=boxes.find(b=>b.name===s.name);if(box)allSections.push({box,label:s.label,ta:s.ta,rows:s.rows||5,builtin:true});}
   const customBoxes=boxes.filter(b=>b.isCustom);
   for(const cb of customBoxes)allSections.push({box:cb,label:cb.name,ta:true,rows:4,builtin:false});
-
   for(const s of allSections){
     const b=s.box;
     h+='<div class="qf-card">';
-    // Header row with label, visibility toggle, delete
     h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">';
     h+='<div class="qf-title" style="flex:1;margin-bottom:0;">'+esc(s.label)+'</div>';
     h+='<label class="cf-toggle" style="font-size:9px;gap:3px;" title="Show/hide on canvas"><input type="checkbox" class="qf-vis" data-id="'+esc(b.id)+'"'+(b.opacity>0?' checked':'')+'> Visible</label>';
     h+='<button class="sm-btn danger qf-del" data-id="'+esc(b.id)+'" data-name="'+esc(b.name)+'" style="padding:2px 7px;font-size:10px;" title="Delete field">\u00d7</button>';
     h+='</div>';
-
-    // Text input
     if(s.ta)h+='<textarea class="fi fi-ta qf-input" data-name="'+esc(b.name)+'" rows="'+s.rows+'">'+esc(b.text)+'</textarea>';
     else h+='<input class="fi qf-input" data-name="'+esc(b.name)+'" value="'+esc(b.text)+'">';
-
-    // Expandable styling row
     h+='<details class="qf-details"><summary style="font-size:10px;font-weight:700;color:var(--text3);cursor:pointer;margin-top:4px;user-select:none;">Style \u25be</summary>';
     h+='<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;">';
-    // Color
     h+='<label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">Color <input type="color" class="qf-color" data-id="'+esc(b.id)+'" value="'+toHex(b.color)+'" style="width:26px;height:26px;padding:1px;border:1px solid var(--border);border-radius:4px;cursor:pointer;background:transparent;"></label>';
-    // Size
     h+='<label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">Size <input type="range" class="qf-size" data-id="'+esc(b.id)+'" min="0.3" max="10" step="0.05" value="'+b.sizePct+'" style="width:70px;accent-color:var(--fire);"><span class="qf-size-val" style="min-width:24px;">'+b.sizePct.toFixed(1)+'</span></label>';
-    // Bold
     h+='<button class="sm-btn qf-bold" data-id="'+esc(b.id)+'" style="padding:3px 8px;font-weight:900;'+(b.bold?'background:var(--ember);color:var(--fire);border-color:rgba(255,122,24,.3);':'')+'">B</button>';
-    // Italic
     h+='<button class="sm-btn qf-italic" data-id="'+esc(b.id)+'" style="padding:3px 8px;font-style:italic;'+(b.italic?'background:var(--ember);color:var(--fire);border-color:rgba(255,122,24,.3);':'')+'">I</button>';
-    // Font
     h+='<select class="fs qf-font" data-id="'+esc(b.id)+'" style="font-size:10px;padding:4px 6px;max-width:120px;margin-bottom:0;">';
     FONTS.forEach(f=>h+='<option value="'+esc(f.value)+'"'+(f.value===b.fontFamily?' selected':'')+'>'+esc(f.label)+'</option>');
     h+='</select>';
-    // Align
     h+='<select class="fs qf-align" data-id="'+esc(b.id)+'" style="font-size:10px;padding:4px 6px;max-width:80px;margin-bottom:0;">';
     h+='<option value="left"'+(b.align==='left'?' selected':'')+'>Left</option><option value="center"'+(b.align==='center'?' selected':'')+'>Center</option><option value="right"'+(b.align==='right'?' selected':'')+'>Right</option>';
     h+='</select>';
-    // Shadow
     h+='<label class="cf-toggle" style="font-size:9px;gap:3px;"><input type="checkbox" class="qf-shadow" data-id="'+esc(b.id)+'"'+(b.shadow?' checked':'')+'> Shadow</label>';
-    // Stroke
     h+='<label class="cf-toggle" style="font-size:9px;gap:3px;"><input type="checkbox" class="qf-stroke" data-id="'+esc(b.id)+'"'+(b.strokeOn?' checked':'')+'> Outline</label>';
     h+='<label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">Outline W <input type="range" class="qf-strokew" data-id="'+esc(b.id)+'" min="0" max="8" step="0.5" value="'+(b.strokeWidth||2)+'" style="width:50px;accent-color:var(--fire);"></label>';
-    // Max Width
     h+='<label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">Width <input type="range" class="qf-maxw" data-id="'+esc(b.id)+'" min="0" max="95" step="0.5" value="'+(b.maxWidthPct||0)+'" style="width:60px;accent-color:var(--fire);"></label>';
-    // Background
     h+='<label class="cf-toggle" style="font-size:9px;gap:3px;"><input type="checkbox" class="qf-bg" data-id="'+esc(b.id)+'"'+(b.bgOn?' checked':'')+'> BG Box</label>';
     h+='<label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">BG% <input type="range" class="qf-bgop" data-id="'+esc(b.id)+'" min="0" max="1" step="0.05" value="'+(b.bgOpacity??.3)+'" style="width:50px;accent-color:var(--fire);"></label>';
     h+='</div>';
-    // Quick color swatches
     h+='<div style="display:flex;gap:3px;margin-top:5px;flex-wrap:wrap;">';
     BRAND_COLORS.forEach(c=>h+='<div class="swatch qf-csw" data-id="'+esc(b.id)+'" data-color="'+c+'" style="width:18px;height:18px;border-radius:3px;background:'+c+';'+(toHex(b.color)===c?'border-color:#fff;':'')+'"></div>');
     h+='</div>';
     h+='</details>';
     h+='</div>';
   }
-
   h+='<div style="margin-top:10px"><button class="sm-btn primary" id="qfAddCustom">+ Add Custom Field</button></div>';
   h+='</div></div>';return h;
 }
@@ -966,8 +865,6 @@ function buildPR(){
   const s=loadStore();const activeProj=s.items.find(p=>p.id===s.activeId);
   const cloudName=getCloudName();
   let h='';
-
-  // CLOUD
   h+='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u2601\ufe0f Cloud (Shared)</span></div><div class="acc-body">';
   if(!cloudName){
     h+='<div style="background:rgba(255,122,24,.06);border:1px solid rgba(255,122,24,.12);border-radius:var(--radius);padding:12px;margin-bottom:8px;">';
@@ -990,8 +887,6 @@ function buildPR(){
     h+='<div id="cloudProjectsList" style="min-height:30px;"><div style="font-size:11px;color:var(--text3);padding:6px;">Click "Load Cloud Projects" to see shared saves.</div></div>';
   }
   h+='</div></div>';
-
-  // LOCAL
   h+='<div class="acc"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83d\udcbe Local (This Device)</span><span class="acc-badge">'+s.items.length+'</span></div><div class="acc-body">';
   if(activeProj){
     h+='<div style="background:var(--ember);border:1px solid rgba(255,122,24,.2);border-radius:var(--radius);padding:10px;margin-bottom:10px;">';
@@ -1020,12 +915,109 @@ function buildPR(){
   return h;
 }
 
+/* MENU DEFAULTS */
+const MENU_DEFAULTS={breakfast:{subtitle:'(Same Daily – Served at opening)',plates:['Breakfast Plate – $9.99 (1 Meat)','Breakfast Plate – $11.99 (2 Meats)','Child Breakfast (10 & under) – $4.99'],items:['Scrambled Eggs','Bacon','Sausage','Hot Links','Pancakes','French Toast Sticks','Biscuits','Hashbrowns','Cheesy Grits','Sausage Gravy','Oatmeal','BLT','Bacon, Egg and Cheese','Sausage, Egg and Cheese','Breakfast Burritos']},'lunch-defaults':{subtitle:'(Changes Daily)',plates:['Lunch Plate – $12.99 (1 Meat, 2 Sides)','Lunch Plate – $15.99 (2 Meats, 2 Sides)','Lunch Plate – $19.99 (3 Meats, 2 Sides)','Child Lunch (10 & under) – $6.99','Extra Side – $2.99']},drinks:{items:['Coke','Diet Coke','Sprite','Dr Pepper','Sweet Tea','Unsweet Tea','Lemonade','Coffee','Milk','Orange Juice']},dessert:{subtitle:'(Changes Daily)',items:[]},beer:['Natural Light','Miller Lite','Coors Light','Bud Light','Budweiser','Michelob Ultra','Corona','Modelo'],salad:{items:['With Meal – $4.99','Only – $8.99'],saladBar:{lettuce:['Romaine','Iceberg'],toppings:['Diced tomatoes','Cucumbers','Onions','Broccoli','Carrots','Cauliflower','Peppers','Cheese','Croutons','Bacon bits','Eggs','Crackers'],dressing:['Ranch','Thousand Island','Italian','Blue Cheese','Caesar']}},crawfish:{subtitle:'(Pricing is subject to change)',items:['Cooking starts at 4:00 PM and ends at 8:00 PM.','Only available Thursday – Sunday.','$5.99 per pound (subject to change).','Call to ask about crawfish availability.']},hours:{note:'',weekly:[{day:'Monday',open:'5:30 AM',close:'2:00 PM'},{day:'Tuesday',open:'5:30 AM',close:'2:00 PM'},{day:'Wednesday',open:'5:30 AM',close:'2:00 PM'},{day:'Thursday',open:'5:30 AM',close:'2:00 PM'},{day:'Friday',open:'5:30 AM',close:'2:00 PM'},{day:'Saturday',open:'6:00 AM',close:'2:00 PM'},{day:'Sunday',open:'7:00 AM',close:'3:00 PM'}]},closures:{}};
+let menuCache={};
+function menuVal(key){return menuCache[key]&&(Array.isArray(menuCache[key])?menuCache[key].length:Object.keys(menuCache[key]).length)?menuCache[key]:MENU_DEFAULTS[key]||null;}
+
+function todayISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function dateOffset(n){const d=new Date();d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function isoToDay(iso){const[y,m,d]=iso.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:'long'});}
+function isoToLabel(iso){const[y,m,d]=iso.split('-').map(Number);const dt=new Date(y,m-1,d);return dt.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});}
+
+function buildMenuLunch(){
+  let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83c\udf7d Lunch Forecast</span></div><div class="acc-body">';
+  h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Set lunch items for each date. These show on the public menu and weekly forecast.</p>';
+  h+='<div class="btn-row" style="margin-bottom:10px;">';
+  for(let i=0;i<7;i++){
+    const iso=dateOffset(i);const lbl=i===0?'Today':i===1?'Tomorrow':isoToLabel(iso);
+    h+='<button class="sm-btn lunchDateBtn'+(i===0?' primary':'')+'" data-date="'+iso+'">'+lbl+'</button>';
+  }
+  h+='</div>';
+  h+='<div id="lunchDateEditor"><div style="font-size:11px;color:var(--text3);padding:8px;">Select a date above...</div></div>';
+  h+='<div style="margin-top:16px;"><div class="fl">Default Lunch Plates & Pricing (one per line)</div>';
+  const lunchDef=menuVal('lunch-defaults')||{};
+  const lunchPlatesVal=(lunchDef.plates||[]).join('\n');
+  h+='<textarea class="fi fi-ta" id="lunchDefaultPlates" rows="5" placeholder="Lunch Plate – $12.99 (1 Meat, 2 Sides)">'+esc(lunchPlatesVal)+'</textarea>';
+  h+='<button class="sm-btn primary" id="saveLunchDefaults">\ud83d\udcbe Save Lunch Defaults</button></div>';
+  h+='</div></div>';
+  return h;
+}
+
+function linesTo(text){return String(text||'').split('\n').map(s=>s.trim()).filter(Boolean);}
+
+/* Wire menu tab events */
+function wireMenuPanel(){
+  // *** FIX 3: Lunch date buttons use fetch instead of JSONP ***
+  document.querySelectorAll('.lunchDateBtn').forEach(btn=>{btn.addEventListener('click',async()=>{
+    document.querySelectorAll('.lunchDateBtn').forEach(b=>b.classList.remove('primary'));
+    btn.classList.add('primary');
+    const date=btn.dataset.date;
+    const el=document.getElementById('lunchDateEditor');
+    if(!el)return;
+    el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:8px;">Loading...</div>';
+    // FIX: Use fetch instead of JSONP
+    const url=getCloudUrl();let lunchData=null;
+    try{
+      const r=await fetch(url+'?action=lunch',{redirect:'follow'});
+      const text=await r.text();
+      const result=JSON.parse(text);
+      if(result?.success&&result?.dates?.[date])lunchData=result.dates[date];
+    }catch(e){toast('Could not load from cloud','error');}
+    const items=lunchData?.lunch?.items||[];
+    const itemsText=items.map(i=>typeof i==='object'?(i.name+(i.desc?' | '+i.desc:'')):(i||'')).join('\n');
+    const dessertItems=lunchData?.dessert?.items||[];
+    const showCrawfish=lunchData?.crawfish?.show!==false;
+    let lh='<div style="font-size:12px;font-weight:700;color:var(--fire);margin-bottom:8px;">'+isoToDay(date)+' \u2022 '+date+'</div>';
+    lh+='<div class="fl">Lunch Items (one per line — use Name | Description)</div>';
+    lh+='<textarea class="fi fi-ta" id="lunchItemsTA" rows="12" placeholder="Beef Tips | Tender beef tips in savory gravy\nRed Beans & Rice | Slow-cooked red beans over rice">'+esc(itemsText)+'</textarea>';
+    lh+='<div class="fr"><div><div class="fl">Dessert</div><input class="fi" id="lunchDessert" value="'+esc(dessertItems.join(', '))+'" placeholder="Cake"></div>';
+    lh+='<div><div class="fl">Crawfish</div><label class="cf-toggle" style="margin-top:8px;"><input type="checkbox" id="lunchCrawfish"'+(showCrawfish?' checked':'')+'> Available</label></div></div>';
+    lh+='<div class="btn-row" style="margin-top:8px;"><button class="sm-btn primary" id="saveLunchDate">\ud83d\udcbe Save Lunch for '+isoToLabel(date)+'</button>';
+    lh+='<button class="sm-btn danger" id="deleteLunchDate">\u00d7 Clear This Date</button></div>';
+    el.innerHTML=lh;
+    document.getElementById('saveLunchDate')?.addEventListener('click',async()=>{
+      const lines=linesTo(document.getElementById('lunchItemsTA')?.value);
+      const lunchItems=lines.map(line=>{const[name,...rest]=line.split('|');return{name:(name||'').trim(),desc:rest.join('|').trim()};}).filter(i=>i.name);
+      const dessert=linesTo(document.getElementById('lunchDessert')?.value.replace(/,/g,'\n'));
+      const crawfish=document.getElementById('lunchCrawfish')?.checked;
+      const dateData={lunch:{show:true,items:lunchItems},dessert:{items:dessert},crawfish:{show:crawfish}};
+      await saveLunchForDate(date,dateData);
+    });
+    document.getElementById('deleteLunchDate')?.addEventListener('click',async()=>{
+      if(!confirm('Clear lunch for '+date+'?'))return;
+      await deleteLunchForDate(date);
+      btn.click();
+    });
+  });});
+  const todayBtn=document.querySelector('.lunchDateBtn');
+  if(todayBtn&&currentTab==='menu-lunch')todayBtn.click();
+}
+
+async function saveLunchForDate(date,data){
+  const url=getCloudUrl();if(!url)return false;
+  try{
+    const r=await fetch(url,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'save-lunch',date:date,data:data})});
+    const j=JSON.parse(await r.text());
+    if(j.success){toast('Lunch saved for '+date+'!','success');return true;}
+    else{toast('Save failed: '+(j.error||''),'error');return false;}
+  }catch(e){toast('Save error: '+e.message,'error');return false;}
+}
+
+async function deleteLunchForDate(date){
+  const url=getCloudUrl();if(!url)return false;
+  try{
+    const r=await fetch(url,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'delete-lunch',date:date})});
+    const j=JSON.parse(await r.text());
+    if(j.success){toast('Lunch removed for '+date,'info');return true;}
+  }catch(e){}
+  return false;
+}
+
 function wirePanel(){
   document.querySelectorAll('.acc-head').forEach(h=>{h.addEventListener('click',()=>h.parentElement.classList.toggle('open'));});
   if(currentTab.startsWith('menu-')){wireMenuPanel();return;}
   document.querySelectorAll('.qf-input').forEach(el=>{el.addEventListener('input',()=>{const box=boxes.find(b=>b.name===el.dataset.name);if(box){saveUndo();box.text=el.value;draw();triggerAutoSave();}});});
-
-  // QF inline styling controls
   document.querySelectorAll('.qf-color').forEach(el=>{el.addEventListener('input',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.color=el.value;draw();triggerAutoSave();}});});
   document.querySelectorAll('.qf-size').forEach(el=>{el.addEventListener('input',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.sizePct=parseFloat(el.value);const lbl=el.parentElement.querySelector('.qf-size-val');if(lbl)lbl.textContent=b.sizePct.toFixed(1);draw();triggerAutoSave();}});});
   document.querySelectorAll('.qf-bold').forEach(el=>{el.addEventListener('click',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){saveUndo();b.bold=!b.bold;draw();rebuildSidePanel();triggerAutoSave();}});});
@@ -1044,7 +1036,7 @@ function wirePanel(){
   const qfT=document.getElementById('qfToday');if(qfT)qfT.addEventListener('click',()=>{const t=todayDefaults();const d=boxes.find(b=>b.name==='Day'),dt=boxes.find(b=>b.name==='Date');if(d){saveUndo();d.text=t.weekday;}if(dt)dt.text=t.dateStr;draw();rebuildSidePanel();triggerAutoSave();toast("Today's date filled!",'success');});
   const qfY=document.getElementById('qfYesterday');if(qfY)qfY.addEventListener('click',()=>{const s=loadStore();const prev=s.items.find(p=>p.id!==s.activeId);if(!prev||!prev.data?.boxes){toast('No previous project found','error');return;}saveUndo();for(const pb of prev.data.boxes){const cur=boxes.find(b=>b.name===pb.name);if(cur&&pb.name!=='Day'&&pb.name!=='Date')cur.text=pb.text;}const t=todayDefaults();const d=boxes.find(b=>b.name==='Day'),dt=boxes.find(b=>b.name==='Date');if(d)d.text=t.weekday;if(dt)dt.text=t.dateStr;draw();rebuildSidePanel();triggerAutoSave();toast("Copied previous items!",'success');});
   const qfR=document.getElementById('qfReset');if(qfR)qfR.addEventListener('click',()=>{if(!confirm('Reset all?'))return;saveUndo();loadStarterBoxes();draw();rebuildSidePanel();triggerAutoSave();toast('Reset','info');});
-  const qfAC=document.getElementById('qfAddCustom');if(qfAC)qfAC.addEventListener('click',()=>{const name=prompt('Custom field name:','Special');if(!name)return;saveUndo();const b=defaultBox(name.trim(),name.trim()+'\n\n\u2022 Item 1\n\u2022 Item 2',50,50,{isCustom:true,sizePct:1.4,shadowBlur:8,lineHeight:1.22});boxes.push(b);activeId=b.id;draw();rebuildSidePanel();triggerAutoSave();toast('Custom field "'+name.trim()+'" added! Drag it on canvas to position.','success');});
+  const qfAC=document.getElementById('qfAddCustom');if(qfAC)qfAC.addEventListener('click',()=>{const name=prompt('Custom field name:','Special');if(!name)return;saveUndo();const b=defaultBox(name.trim(),name.trim()+'\n\n\u2022 Item 1\n\u2022 Item 2',50,50,{isCustom:true,sizePct:1.4,shadowBlur:8,lineHeight:1.22});boxes.push(b);activeId=b.id;draw();rebuildSidePanel();triggerAutoSave();toast('Custom field "'+name.trim()+'" added!','success');});
   const bS=document.getElementById('boxSelect');if(bS)bS.addEventListener('change',()=>{activeId=bS.value||null;rebuildSidePanel();draw();});
   const aB=document.getElementById('addBoxBtn');if(aB)aB.addEventListener('click',()=>{saveUndo();const b=defaultBox('New Box','New text',50,50);boxes.push(b);activeId=b.id;rebuildSidePanel();draw();triggerAutoSave();});
   const dB=document.getElementById('dupBoxBtn');if(dB)dB.addEventListener('click',()=>{const cur=boxes.find(x=>x.id===activeId);if(!cur)return;saveUndo();const c=JSON.parse(JSON.stringify(cur));c.id=uid();c.name+=' (copy)';c.xPct=clamp(cur.xPct+2,0,100);c.yPct=clamp(cur.yPct+2,0,100);boxes.push(c);activeId=c.id;rebuildSidePanel();draw();triggerAutoSave();});
@@ -1075,13 +1067,12 @@ function wirePanel(){
   const pSA=document.getElementById('pSaveAs');if(pSA)pSA.addEventListener('click',()=>saveProject(true));
   const pRn=document.getElementById('pRename');if(pRn)pRn.addEventListener('click',()=>{const s=loadStore();if(s.activeId)renameProject(s.activeId);});
   const pEA=document.getElementById('pExportActive');if(pEA)pEA.addEventListener('click',()=>{const s=loadStore();if(s.activeId)exportProjectFile(s.activeId);});
-  const pI=document.getElementById('pImport');if(pI)pI.addEventListener('click',()=>{const inp=document.createElement('input');inp.type='file';inp.accept='application/json';inp.onchange=async()=>{const f=inp.files?.[0];if(!f)return;const obj=safeJSON(await f.text(),null);if(!obj||!obj.data){toast('Invalid project file','error');return;}const s=loadStore();s.items.unshift({id:uid(),name:obj.name||'Imported',createdAt:Date.now(),updatedAt:Date.now(),data:obj.data});s.activeId=s.items[0].id;saveStore(s);if(s.items[0]?.data)await applyPayload(s.items[0].data);toast('Imported "'+( obj.name||'project')+'"! Template and all settings loaded.','success');rebuildSidePanel();};inp.click();});
+  const pI=document.getElementById('pImport');if(pI)pI.addEventListener('click',()=>{const inp=document.createElement('input');inp.type='file';inp.accept='application/json';inp.onchange=async()=>{const f=inp.files?.[0];if(!f)return;const obj=safeJSON(await f.text(),null);if(!obj||!obj.data){toast('Invalid project file','error');return;}const s=loadStore();s.items.unshift({id:uid(),name:obj.name||'Imported',createdAt:Date.now(),updatedAt:Date.now(),data:obj.data});s.activeId=s.items[0].id;saveStore(s);if(s.items[0]?.data)await applyPayload(s.items[0].data);toast('Imported "'+( obj.name||'project')+'"!','success');rebuildSidePanel();};inp.click();});
   document.querySelectorAll('.pLoad').forEach(btn=>{btn.addEventListener('click',()=>loadProject(btn.dataset.id));});
   document.querySelectorAll('.pDel').forEach(btn=>{btn.addEventListener('click',()=>deleteProject(btn.dataset.id));});
   document.querySelectorAll('.pExport').forEach(btn=>{btn.addEventListener('click',()=>exportProjectFile(btn.dataset.id));});
   document.querySelectorAll('.pRenameBtn').forEach(btn=>{btn.addEventListener('click',()=>renameProject(btn.dataset.id));});
 
-  // Cloud wiring
   const csn=document.getElementById('cloudSetName');
   if(csn)csn.addEventListener('click',()=>{
     const name=(document.getElementById('cloudNameInput').value||'').trim();
@@ -1094,7 +1085,6 @@ function wirePanel(){
   if(csBtn)csBtn.addEventListener('click',()=>cloudSave());
   const crBtn=document.getElementById('cloudRefresh');
   if(crBtn)crBtn.addEventListener('click',()=>refreshCloudList());
-  // Auto-load cloud projects when panel opens and user has a name set
   if(getCloudName()&&document.getElementById('cloudProjectsList'))refreshCloudList();
 }
 
@@ -1103,7 +1093,7 @@ async function refreshCloudList(){
   if(!el)return;
   el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:6px;">Loading from cloud...</div>';
   const projects=await cloudList();
-  if(!document.getElementById('cloudProjectsList'))return; // panel was switched
+  if(!document.getElementById('cloudProjectsList'))return;
   if(!projects||!projects.length){el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:6px;">No cloud projects yet. Save one!</div>';return;}
   let ph='';
   projects.forEach(p=>{
@@ -1121,278 +1111,10 @@ async function refreshCloudList(){
   el.querySelectorAll('.cDel').forEach(btn=>{btn.addEventListener('click',()=>{cloudDelete(btn.dataset.id,btn.dataset.name).then(()=>refreshCloudList());});});
 }
 
-/* ═══════════════════════════════════════════════
-   PUBLIC MENU DATA MANAGEMENT
-   All data lives in Google Sheets via the Apps Script
-═══════════════════════════════════════════════ */
-let menuCache={};
-
-async function loadMenuKey(key){
-  const url=getCloudUrl();if(!url)return null;
-  try{
-    const r=await fetch(url+'?action=menu-key&key='+encodeURIComponent(key),{redirect:'follow'});
-    const j=JSON.parse(await r.text());
-    if(j.success){menuCache[key]=j.value;return j.value;}
-  }catch(e){console.warn('loadMenuKey error:',e);}
-  return menuCache[key]||null;
-}
-
-async function saveMenuKey(key,value){
-  const url=getCloudUrl();if(!url){toast('No cloud connection','error');return false;}
-  try{
-    const r=await fetch(url,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({action:'save-menu',key:key,value:value})});
-    const j=JSON.parse(await r.text());
-    if(j.success){menuCache[key]=value;toast('Saved '+key+'!','success');return true;}
-    else{toast('Save failed: '+(j.error||''),'error');return false;}
-  }catch(e){toast('Save error: '+e.message,'error');return false;}
-}
-
-async function saveLunchForDate(date,data){
-  const url=getCloudUrl();if(!url)return false;
-  try{
-    const r=await fetch(url,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({action:'save-lunch',date:date,data:data})});
-    const j=JSON.parse(await r.text());
-    if(j.success){toast('Lunch saved for '+date+'!','success');return true;}
-    else{toast('Save failed: '+(j.error||''),'error');return false;}
-  }catch(e){toast('Save error: '+e.message,'error');return false;}
-}
-
-async function deleteLunchForDate(date){
-  const url=getCloudUrl();if(!url)return false;
-  try{
-    const r=await fetch(url,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({action:'delete-lunch',date:date})});
-    const j=JSON.parse(await r.text());
-    if(j.success){toast('Lunch removed for '+date,'info');return true;}
-  }catch(e){}
-  return false;
-}
-
-async function loadFullMenu(){
-  const url=getCloudUrl();if(!url)return null;
-  // Use JSONP for reliable cross-origin loading
-  return new Promise((resolve)=>{
-    const cb='_hhMenu'+Date.now();
-    window[cb]=function(result){delete window[cb];document.getElementById(cb)?.remove();
-      if(result?.success)resolve(result.menuData);else resolve(null);
-    };
-    const sc=document.createElement('script');sc.id=cb;
-    sc.src=url+'?action=lunch&callback='+cb;
-    sc.onerror=()=>{delete window[cb];sc.remove();resolve(null);};
-    document.head.appendChild(sc);
-    setTimeout(()=>{if(window[cb]){delete window[cb];document.getElementById(cb)?.remove();resolve(null);}},10000);
-  });
-}
-
-function todayISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function dateOffset(n){const d=new Date();d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function isoToDay(iso){const[y,m,d]=iso.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:'long'});}
-function isoToLabel(iso){const[y,m,d]=iso.split('-').map(Number);const dt=new Date(y,m-1,d);return dt.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});}
-
-/* ── Menu Tab Builders ── */
-// Hardcoded defaults matching your menu-data.js — used if cloud hasn't loaded yet
-const MENU_DEFAULTS={
-  breakfast:{
-    subtitle:'(Same Daily – Served at opening)',
-    plates:['Breakfast Plate – $9.99 (1 Meat)','Breakfast Plate – $11.99 (2 Meats)','Child Breakfast (10 & under) – $4.99'],
-    items:['Scrambled Eggs','Bacon','Sausage','Hot Links','Pancakes','French Toast Sticks','Biscuits','Hashbrowns','Cheesy Grits','Sausage Gravy','Oatmeal','BLT','Bacon, Egg and Cheese','Sausage, Egg and Cheese','Breakfast Burritos']
-  },
-  'lunch-defaults':{
-    subtitle:'(Changes Daily)',
-    plates:['Lunch Plate – $12.99 (1 Meat, 2 Sides)','Lunch Plate – $15.99 (2 Meats, 2 Sides)','Lunch Plate – $19.99 (3 Meats, 2 Sides)','Child Lunch (10 & under) – $6.99','Extra Side – $2.99']
-  },
-  drinks:{items:['Coke','Diet Coke','Sprite','Dr Pepper','Sweet Tea','Unsweet Tea','Lemonade','Coffee','Milk','Orange Juice']},
-  dessert:{subtitle:'(Changes Daily)',items:[]},
-  beer:['Natural Light','Miller Lite','Coors Light','Bud Light','Budweiser','Michelob Ultra','Corona','Modelo'],
-  salad:{
-    items:['With Meal – $4.99','Only – $8.99'],
-    saladBar:{lettuce:['Romaine','Iceberg'],toppings:['Diced tomatoes','Cucumbers','Onions','Broccoli','Carrots','Cauliflower','Peppers','Cheese','Croutons','Bacon bits','Eggs','Crackers'],dressing:['Ranch','Thousand Island','Italian','Blue Cheese','Caesar']}
-  },
-  crawfish:{
-    subtitle:'(Pricing is subject to change)',
-    items:['Cooking starts at 4:00 PM and ends at 8:00 PM.','Only available Thursday – Sunday.','$5.99 per pound (subject to change).','Call to ask about crawfish availability.']
-  },
-  hours:{note:'',weekly:[
-    {day:'Monday',open:'5:30 AM',close:'2:00 PM'},{day:'Tuesday',open:'5:30 AM',close:'2:00 PM'},
-    {day:'Wednesday',open:'5:30 AM',close:'2:00 PM'},{day:'Thursday',open:'5:30 AM',close:'2:00 PM'},
-    {day:'Friday',open:'5:30 AM',close:'2:00 PM'},{day:'Saturday',open:'6:00 AM',close:'2:00 PM'},
-    {day:'Sunday',open:'7:00 AM',close:'3:00 PM'}
-  ]},
-  closures:{}
-};
-// Helper: get cached value or fall back to default
-function menuVal(key){return menuCache[key]&&(Array.isArray(menuCache[key])?menuCache[key].length:Object.keys(menuCache[key]).length)?menuCache[key]:MENU_DEFAULTS[key]||null;}
-
-function buildMenuTab(tab){
-  if(tab==='menu-lunch')return buildMenuLunch();
-  return '<div style="padding:14px;color:var(--text3);">Unknown tab</div>';
-}
-
-function buildMenuLunch(){
-  let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83c\udf7d Lunch Forecast</span></div><div class="acc-body">';
-  h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Set lunch items for each date. These show on the public menu and weekly forecast.</p>';
-  // Date picker - show 7 days
-  h+='<div class="btn-row" style="margin-bottom:10px;">';
-  for(let i=0;i<7;i++){
-    const iso=dateOffset(i);const lbl=i===0?'Today':i===1?'Tomorrow':isoToLabel(iso);
-    h+='<button class="sm-btn lunchDateBtn'+(i===0?' primary':'')+'" data-date="'+iso+'">'+lbl+'</button>';
-  }
-  h+='</div>';
-  h+='<div id="lunchDateEditor"><div style="font-size:11px;color:var(--text3);padding:8px;">Select a date above...</div></div>';
-  // Lunch defaults (plates/pricing)
-  h+='<div style="margin-top:16px;"><div class="fl">Default Lunch Plates & Pricing (one per line)</div>';
-  const lunchDef=menuVal('lunch-defaults')||{};
-  const lunchPlatesVal=(lunchDef.plates||[]).join('\n');
-  h+='<textarea class="fi fi-ta" id="lunchDefaultPlates" rows="5" placeholder="Lunch Plate – $12.99 (1 Meat, 2 Sides)">'+esc(lunchPlatesVal)+'</textarea>';
-  h+='<button class="sm-btn primary" id="saveLunchDefaults">\ud83d\udcbe Save Lunch Defaults</button></div>';
-  h+='</div></div>';
-  return h;
-}
-
-function buildMenuList(key,title,subtitle,hint,rows){
-  const cached=menuVal(key);
-  const val=cached?( Array.isArray(cached)?cached.join('\n'):(cached.items||[]).join('\n') ):'';
-  const plates=cached?.plates?cached.plates.join('\n'):'';
-  let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">'+title+'</span></div><div class="acc-body">';
-  h+='<p style="font-size:12px;color:var(--text2);margin-bottom:8px;">'+hint+'</p>';
-  if(key==='breakfast'){
-    h+='<div class="fl">Plates & Pricing (one per line)</div>';
-    h+='<textarea class="fi fi-ta menuPlates" data-key="'+key+'" rows="4" placeholder="Breakfast Plate – $9.99">'+esc(plates)+'</textarea>';
-    h+='<div class="fl">Subtitle</div>';
-    h+='<input class="fi menuSub" data-key="'+key+'" value="'+esc(cached?.subtitle||subtitle)+'">';
-  }
-  h+='<div class="fl">Items (one per line)</div>';
-  h+='<textarea class="fi fi-ta menuItems" data-key="'+key+'" rows="'+rows+'" placeholder="One item per line">'+esc(val)+'</textarea>';
-  h+='<button class="sm-btn primary menuSaveBtn" data-key="'+key+'">\ud83d\udcbe Save '+title+' to Cloud</button>';
-  h+='<button class="sm-btn menuLoadBtn" data-key="'+key+'" style="margin-left:4px;">\ud83d\udd04 Load from Cloud</button>';
-  h+='</div></div>';
-  return h;
-}
-
-function buildMenuSalad(){
-  const cached=menuVal('salad')||{};
-  const sb=cached.saladBar||{};
-  let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83e\udd57 Salad Bar</span></div><div class="acc-body">';
-  h+='<div class="fl">Pricing (one per line)</div>';
-  h+='<textarea class="fi fi-ta" id="saladPricing" rows="3">'+esc((cached.items||[]).join('\n'))+'</textarea>';
-  h+='<div class="fl">Lettuce (one per line)</div>';
-  h+='<textarea class="fi fi-ta" id="saladLettuce" rows="2">'+esc((sb.lettuce||[]).join('\n'))+'</textarea>';
-  h+='<div class="fl">Toppings (one per line)</div>';
-  h+='<textarea class="fi fi-ta" id="saladToppings" rows="8">'+esc((sb.toppings||[]).join('\n'))+'</textarea>';
-  h+='<div class="fl">Dressings (one per line)</div>';
-  h+='<textarea class="fi fi-ta" id="saladDressings" rows="4">'+esc((sb.dressing||[]).join('\n'))+'</textarea>';
-  h+='<button class="sm-btn primary" id="saladSave">\ud83d\udcbe Save Salad Bar</button>';
-  h+='<button class="sm-btn" id="saladLoad" style="margin-left:4px;">\ud83d\udd04 Load from Cloud</button>';
-  h+='</div></div>';
-  return h;
-}
-
-function buildMenuCrawfish(){
-  const cached=menuVal('crawfish')||{};
-  let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83e\udd9e Crawfish</span></div><div class="acc-body">';
-  h+='<div class="fl">Subtitle</div><input class="fi" id="cfSub" value="'+esc(cached.subtitle||'(Pricing is subject to change)')+'">';
-  h+='<div class="fl">Info/Details (one per line)</div>';
-  h+='<textarea class="fi fi-ta" id="cfItems" rows="5">'+esc((cached.items||[]).join('\n'))+'</textarea>';
-  h+='<button class="sm-btn primary" id="cfSave">\ud83d\udcbe Save Crawfish</button>';
-  h+='<button class="sm-btn" id="cfLoad" style="margin-left:4px;">\ud83d\udd04 Load from Cloud</button>';
-  h+='</div></div>';
-  return h;
-}
-
-function buildMenuHours(){
-  const cached=menuVal('hours')||{};
-  const weekly=cached.weekly||[];
-  const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-  let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u23f0 Hours & Settings</span></div><div class="acc-body">';
-  h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;">Set opening hours for each day.</p>';
-  for(const day of days){
-    const existing=weekly.find(w=>w.day===day)||{};
-    h+='<div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap;">';
-    h+='<span style="font-size:12px;font-weight:700;color:var(--text);min-width:80px;">'+day+'</span>';
-    h+='<input class="fi hoursOpen" data-day="'+day+'" placeholder="Open" value="'+esc(existing.open||'')+'" style="width:90px;margin-bottom:0;">';
-    h+='<span style="font-size:11px;color:var(--text3);">to</span>';
-    h+='<input class="fi hoursClose" data-day="'+day+'" placeholder="Close" value="'+esc(existing.close||'')+'" style="width:90px;margin-bottom:0;">';
-    h+='</div>';
-  }
-  h+='<div style="margin-top:10px;"><div class="fl">Note (optional)</div><input class="fi" id="hoursNote" value="'+esc(cached.note||'')+'" placeholder="e.g. Holiday hours may vary"></div>';
-  // Closures
-  h+='<div style="margin-top:12px;"><div class="fl">Closures (day = message, one per line)</div>';
-  const closures=menuVal('closures')||{};
-  const closureLines=Object.keys(closures).map(k=>k+' = '+(closures[k].message||'Closed')).join('\n');
-  h+='<textarea class="fi fi-ta" id="closuresTA" rows="3" placeholder="Sunday = Closed for the holiday!">'+esc(closureLines)+'</textarea></div>';
-  h+='<button class="sm-btn primary" id="hoursSave" style="margin-top:8px;">\ud83d\udcbe Save Hours & Closures</button>';
-  h+='<button class="sm-btn" id="hoursLoad" style="margin-left:4px;">\ud83d\udd04 Load from Cloud</button>';
-  h+='</div></div>';
-  return h;
-}
-
-function linesTo(text){return String(text||'').split('\n').map(s=>s.trim()).filter(Boolean);}
-
-/* Wire menu tab events */
-function wireMenuPanel(){
-  // Lunch forecast date buttons
-  document.querySelectorAll('.lunchDateBtn').forEach(btn=>{btn.addEventListener('click',async()=>{
-    document.querySelectorAll('.lunchDateBtn').forEach(b=>b.classList.remove('primary'));
-    btn.classList.add('primary');
-    const date=btn.dataset.date;
-    const el=document.getElementById('lunchDateEditor');
-    if(!el)return;
-    el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:8px;">Loading...</div>';
-    // Load this date from cloud using JSONP (avoids CORS redirect issues)
-    const url=getCloudUrl();let lunchData=null;
-    try{
-      lunchData=await new Promise((resolve)=>{
-        const cb='_hhLunch'+Date.now();
-        window[cb]=function(result){
-          delete window[cb];document.getElementById(cb)?.remove();
-          if(result?.success&&result?.dates?.[date])resolve(result.dates[date]);
-          else resolve(null);
-        };
-        const sc=document.createElement('script');sc.id=cb;
-        sc.src=url+'?action=lunch&callback='+cb;
-        sc.onerror=()=>{delete window[cb];sc.remove();resolve(null);};
-        document.head.appendChild(sc);
-        setTimeout(()=>{if(window[cb]){delete window[cb];document.getElementById(cb)?.remove();resolve(null);}},10000);
-      });
-    }catch(e){toast('Could not load from cloud','error');}
-    const items=lunchData?.lunch?.items||[];
-    const itemsText=items.map(i=>typeof i==='object'?(i.name+(i.desc?' | '+i.desc:'')):(i||'')).join('\n');
-    const dessertItems=lunchData?.dessert?.items||[];
-    const showCrawfish=lunchData?.crawfish?.show!==false;
-    let lh='<div style="font-size:12px;font-weight:700;color:var(--fire);margin-bottom:8px;">'+isoToDay(date)+' \u2022 '+date+'</div>';
-    lh+='<div class="fl">Lunch Items (one per line — use Name | Description)</div>';
-    lh+='<textarea class="fi fi-ta" id="lunchItemsTA" rows="12" placeholder="Beef Tips | Tender beef tips in savory gravy\nRed Beans & Rice | Slow-cooked red beans over rice">'+esc(itemsText)+'</textarea>';
-    lh+='<div class="fr"><div><div class="fl">Dessert</div><input class="fi" id="lunchDessert" value="'+esc(dessertItems.join(', '))+'" placeholder="Cake"></div>';
-    lh+='<div><div class="fl">Crawfish</div><label class="cf-toggle" style="margin-top:8px;"><input type="checkbox" id="lunchCrawfish"'+(showCrawfish?' checked':'')+'> Available</label></div></div>';
-    lh+='<div class="btn-row" style="margin-top:8px;"><button class="sm-btn primary" id="saveLunchDate">\ud83d\udcbe Save Lunch for '+isoToLabel(date)+'</button>';
-    lh+='<button class="sm-btn danger" id="deleteLunchDate">\u00d7 Clear This Date</button></div>';
-    el.innerHTML=lh;
-    document.getElementById('saveLunchDate')?.addEventListener('click',async()=>{
-      const lines=linesTo(document.getElementById('lunchItemsTA')?.value);
-      const lunchItems=lines.map(line=>{const[name,...rest]=line.split('|');return{name:(name||'').trim(),desc:rest.join('|').trim()};}).filter(i=>i.name);
-      const dessert=linesTo(document.getElementById('lunchDessert')?.value.replace(/,/g,'\n'));
-      const crawfish=document.getElementById('lunchCrawfish')?.checked;
-      const dateData={lunch:{show:true,items:lunchItems},dessert:{items:dessert},crawfish:{show:crawfish}};
-      await saveLunchForDate(date,dateData);
-    });
-    document.getElementById('deleteLunchDate')?.addEventListener('click',async()=>{
-      if(!confirm('Clear lunch for '+date+'?'))return;
-      await deleteLunchForDate(date);
-      btn.click();
-    });
-  });});
-  // Auto-click today
-  const todayBtn=document.querySelector('.lunchDateBtn');
-  if(todayBtn&&currentTab==='menu-lunch')todayBtn.click();
-}
-
 /* INIT */
 loadStarterBoxes();rebuildSidePanel();
 (async()=>{
   const s=loadStore();if(s.items.length>0){const a=s.items.find(p=>p.id===s.activeId)||s.items[0];s.activeId=a.id;saveStore(s);if(a.data)await applyPayload(a.data);}else draw();
-  // Load template image
   const DI="/images/FBMenu.png";
   if(!imgDataURL&&DI){img=new Image();img.onload=()=>{imgLoaded=true;draw();};img.onerror=()=>{imgLoaded=false;draw();};img.src=DI;}
 })();
