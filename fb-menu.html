@@ -226,6 +226,7 @@
   <div class="mobile-bar">
     <button class="mob-btn" id="mobUndoBtn">↩ Undo</button>
     <button class="mob-btn" id="mobSettingsBtn">⚙ Edit</button>
+    <button class="mob-btn" id="mobLunchBtn" style="background:rgba(100,180,255,.15);border-color:rgba(100,180,255,.25);color:#7ac4ff;">🍽 Lunch</button>
     <button class="mob-btn primary" id="mobExportBtn">Export ↓</button>
     <button class="mob-btn mob-signout" id="mobSignOutBtn">Sign Out ←</button>
   </div>
@@ -759,6 +760,7 @@ async function loadFullMenu(){
 let currentTab='quickfill';
 document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{currentTab=btn.dataset.tab;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');rebuildSidePanel();if(window.innerWidth<=900)document.getElementById('sidePanel').classList.add('mobile-open');});});
 document.getElementById('mobSettingsBtn').addEventListener('click',()=>{document.getElementById('sidePanel').classList.add('mobile-open');});
+document.getElementById('mobLunchBtn').addEventListener('click',()=>{currentTab='menu-lunch';document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));const mt=document.querySelector('.tab-btn[data-tab="menu-lunch"]');if(mt)mt.classList.add('active');rebuildSidePanel();document.getElementById('sidePanel').classList.add('mobile-open');});
 document.getElementById('closeSidePanel').addEventListener('click',()=>{document.getElementById('sidePanel').classList.remove('mobile-open');});
 
 function rebuildSidePanel(){
