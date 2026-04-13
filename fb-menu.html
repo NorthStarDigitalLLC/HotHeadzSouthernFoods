@@ -1229,6 +1229,39 @@ function isoToDay(iso){const[y,m,d]=iso.split('-').map(Number);return new Date(y
 function isoToLabel(iso){const[y,m,d]=iso.split('-').map(Number);const dt=new Date(y,m-1,d);return dt.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});}
 
 /* ── Menu Tab Builders ── */
+// Hardcoded defaults matching your menu-data.js — used if cloud hasn't loaded yet
+const MENU_DEFAULTS={
+  breakfast:{
+    subtitle:'(Same Daily – Served at opening)',
+    plates:['Breakfast Plate – $9.99 (1 Meat)','Breakfast Plate – $11.99 (2 Meats)','Child Breakfast (10 & under) – $4.99'],
+    items:['Scrambled Eggs','Bacon','Sausage','Hot Links','Pancakes','French Toast Sticks','Biscuits','Hashbrowns','Cheesy Grits','Sausage Gravy','Oatmeal','BLT','Bacon, Egg and Cheese','Sausage, Egg and Cheese','Breakfast Burritos']
+  },
+  'lunch-defaults':{
+    subtitle:'(Changes Daily)',
+    plates:['Lunch Plate – $12.99 (1 Meat, 2 Sides)','Lunch Plate – $15.99 (2 Meats, 2 Sides)','Lunch Plate – $19.99 (3 Meats, 2 Sides)','Child Lunch (10 & under) – $6.99','Extra Side – $2.99']
+  },
+  drinks:{items:['Coke','Diet Coke','Sprite','Dr Pepper','Sweet Tea','Unsweet Tea','Lemonade','Coffee','Milk','Orange Juice']},
+  dessert:{subtitle:'(Changes Daily)',items:[]},
+  beer:['Natural Light','Miller Lite','Coors Light','Bud Light','Budweiser','Michelob Ultra','Corona','Modelo'],
+  salad:{
+    items:['With Meal – $4.99','Only – $8.99'],
+    saladBar:{lettuce:['Romaine','Iceberg'],toppings:['Diced tomatoes','Cucumbers','Onions','Broccoli','Carrots','Cauliflower','Peppers','Cheese','Croutons','Bacon bits','Eggs','Crackers'],dressing:['Ranch','Thousand Island','Italian','Blue Cheese','Caesar']}
+  },
+  crawfish:{
+    subtitle:'(Pricing is subject to change)',
+    items:['Cooking starts at 4:00 PM and ends at 8:00 PM.','Only available Thursday – Sunday.','$5.99 per pound (subject to change).','Call to ask about crawfish availability.']
+  },
+  hours:{note:'',weekly:[
+    {day:'Monday',open:'5:30 AM',close:'2:00 PM'},{day:'Tuesday',open:'5:30 AM',close:'2:00 PM'},
+    {day:'Wednesday',open:'5:30 AM',close:'2:00 PM'},{day:'Thursday',open:'5:30 AM',close:'2:00 PM'},
+    {day:'Friday',open:'5:30 AM',close:'2:00 PM'},{day:'Saturday',open:'6:00 AM',close:'2:00 PM'},
+    {day:'Sunday',open:'7:00 AM',close:'3:00 PM'}
+  ]},
+  closures:{}
+};
+// Helper: get cached value or fall back to default
+function menuVal(key){return menuCache[key]&&(Array.isArray(menuCache[key])?menuCache[key].length:Object.keys(menuCache[key]).length)?menuCache[key]:MENU_DEFAULTS[key]||null;}
+
 function buildMenuTab(tab){
   const t=tab.replace('menu-','');
   if(t==='lunch')return buildMenuLunch();
@@ -1255,14 +1288,16 @@ function buildMenuLunch(){
   h+='<div id="lunchDateEditor"><div style="font-size:11px;color:var(--text3);padding:8px;">Select a date above...</div></div>';
   // Lunch defaults (plates/pricing)
   h+='<div style="margin-top:16px;"><div class="fl">Default Lunch Plates & Pricing (one per line)</div>';
-  h+='<textarea class="fi fi-ta" id="lunchDefaultPlates" rows="5" placeholder="Lunch Plate – $12.99 (1 Meat, 2 Sides)"></textarea>';
+  const lunchDef=menuVal('lunch-defaults')||{};
+  const lunchPlatesVal=(lunchDef.plates||[]).join('\n');
+  h+='<textarea class="fi fi-ta" id="lunchDefaultPlates" rows="5" placeholder="Lunch Plate – $12.99 (1 Meat, 2 Sides)">'+esc(lunchPlatesVal)+'</textarea>';
   h+='<button class="sm-btn primary" id="saveLunchDefaults">\ud83d\udcbe Save Lunch Defaults</button></div>';
   h+='</div></div>';
   return h;
 }
 
 function buildMenuList(key,title,subtitle,hint,rows){
-  const cached=menuCache[key];
+  const cached=menuVal(key);
   const val=cached?( Array.isArray(cached)?cached.join('\n'):(cached.items||[]).join('\n') ):'';
   const plates=cached?.plates?cached.plates.join('\n'):'';
   let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">'+title+'</span></div><div class="acc-body">';
@@ -1282,7 +1317,7 @@ function buildMenuList(key,title,subtitle,hint,rows){
 }
 
 function buildMenuSalad(){
-  const cached=menuCache['salad']||{};
+  const cached=menuVal('salad')||{};
   const sb=cached.saladBar||{};
   let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83e\udd57 Salad Bar</span></div><div class="acc-body">';
   h+='<div class="fl">Pricing (one per line)</div>';
@@ -1300,7 +1335,7 @@ function buildMenuSalad(){
 }
 
 function buildMenuCrawfish(){
-  const cached=menuCache['crawfish']||{};
+  const cached=menuVal('crawfish')||{};
   let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83e\udd9e Crawfish</span></div><div class="acc-body">';
   h+='<div class="fl">Subtitle</div><input class="fi" id="cfSub" value="'+esc(cached.subtitle||'(Pricing is subject to change)')+'">';
   h+='<div class="fl">Info/Details (one per line)</div>';
@@ -1312,7 +1347,7 @@ function buildMenuCrawfish(){
 }
 
 function buildMenuHours(){
-  const cached=menuCache['hours']||{};
+  const cached=menuVal('hours')||{};
   const weekly=cached.weekly||[];
   const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
   let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u23f0 Hours & Settings</span></div><div class="acc-body">';
@@ -1329,7 +1364,7 @@ function buildMenuHours(){
   h+='<div style="margin-top:10px;"><div class="fl">Note (optional)</div><input class="fi" id="hoursNote" value="'+esc(cached.note||'')+'" placeholder="e.g. Holiday hours may vary"></div>';
   // Closures
   h+='<div style="margin-top:12px;"><div class="fl">Closures (day = message, one per line)</div>';
-  const closures=menuCache['closures']||{};
+  const closures=menuVal('closures')||{};
   const closureLines=Object.keys(closures).map(k=>k+' = '+(closures[k].message||'Closed')).join('\n');
   h+='<textarea class="fi fi-ta" id="closuresTA" rows="3" placeholder="Sunday = Closed for the holiday!">'+esc(closureLines)+'</textarea></div>';
   h+='<button class="sm-btn primary" id="hoursSave" style="margin-top:8px;">\ud83d\udcbe Save Hours & Closures</button>';
