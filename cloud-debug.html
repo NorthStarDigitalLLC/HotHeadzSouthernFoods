@@ -1,270 +1,104 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hot Headz – Lunch Debug Tool</title>
-<style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:'Courier New',monospace;background:#0a0a0e;color:#f0ece6;padding:24px;min-height:100vh}
-  h1{font-size:20px;color:#ff7a18;margin-bottom:4px}
-  .sub{font-size:13px;color:rgba(240,236,230,.5);margin-bottom:24px}
-  .card{background:#1a1a22;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:20px;margin-bottom:16px}
-  .card h2{font-size:14px;color:#ffb347;margin-bottom:8px;text-transform:uppercase;letter-spacing:.1em}
-  .status{display:inline-block;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700;margin-bottom:8px}
-  .status.ok{background:rgba(77,255,136,.15);color:#4dff88;border:1px solid rgba(77,255,136,.2)}
-  .status.fail{background:rgba(255,77,77,.15);color:#ff4d4d;border:1px solid rgba(255,77,77,.2)}
-  .status.wait{background:rgba(255,187,71,.15);color:#ffbb47;border:1px solid rgba(255,187,71,.2)}
-  pre{background:#111;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:14px;font-size:12px;overflow-x:auto;max-height:400px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;margin-top:8px;line-height:1.5}
-  .key{color:#ff7a18}.str{color:#4dff88}.num{color:#7ac4ff}.null{color:#ff4d4d}
-  button{padding:10px 20px;border-radius:8px;border:1px solid rgba(255,122,24,.3);background:rgba(255,122,24,.15);color:#ff7a18;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-right:8px;margin-bottom:8px}
-  button:hover{background:rgba(255,122,24,.25)}
-  .fix{background:rgba(77,255,136,.08);border-color:rgba(77,255,136,.2);color:#4dff88;padding:16px;border-radius:10px;margin-top:12px;font-size:12px;line-height:1.6}
-  .fix code{background:rgba(255,255,255,.08);padding:2px 6px;border-radius:4px;font-size:11px}
-</style>
+<html>
+<head><meta charset="UTF-8"><title>HH Connection Test</title>
+<style>body{background:#111;color:#eee;font-family:monospace;padding:20px}button{padding:12px 24px;font-size:16px;margin:8px;cursor:pointer;background:#e07828;color:#fff;border:none;border-radius:4px}pre{background:#1a1a1a;padding:16px;margin:12px 0;border-radius:4px;white-space:pre-wrap;word-break:break-all;max-height:300px;overflow-y:auto}.ok{color:#4dff88}.err{color:#ff4d4d}.warn{color:#ffbb47}</style>
 </head>
 <body>
-<h1>🔥 Hot Headz – Lunch Debug Tool</h1>
-<div class="sub">Open this file on the same domain as your site (or locally) to diagnose why lunch items aren't loading.</div>
+<h2>🔥 Hot Headz — Connection Test</h2>
+<p>Click each button. We need to find which method works on your domain.</p>
 
-<div class="card">
-  <h2>Test 1: Direct Fetch (what menu-data.js does)</h2>
-  <button onclick="testFetch()">Run Fetch Test</button>
-  <div id="fetchStatus"><span class="status wait">Not run yet</span></div>
-  <pre id="fetchResult">Click the button above...</pre>
-</div>
-
-<div class="card">
-  <h2>Test 2: JSONP (what the editor does for reads)</h2>
-  <button onclick="testJSONP()">Run JSONP Test</button>
-  <div id="jsonpStatus"><span class="status wait">Not run yet</span></div>
-  <pre id="jsonpResult">Click the button above...</pre>
-</div>
-
-<div class="card">
-  <h2>Test 3: Date Format Check</h2>
-  <p style="font-size:12px;color:rgba(240,236,230,.6);margin-bottom:8px;">If Tests 1 or 2 succeed, this checks whether the dates in the response match what the frontend expects.</p>
-  <div id="dateCheckResult"><span class="status wait">Run Test 1 or 2 first</span></div>
-  <pre id="dateDetail">Waiting for data...</pre>
-</div>
-
-<div class="card">
-  <h2>Diagnosis & Fix</h2>
-  <div id="diagnosis">Run the tests above to see what's wrong.</div>
-</div>
+<button onclick="test1()">Test 1: GET (like staff portal)</button>
+<button onclick="test2()">Test 2: POST text/plain</button>
+<button onclick="test3()">Test 3: POST no headers</button>
+<button onclick="test4()">Test 4: No-cors GET</button>
+<pre id="log">Click a button to start testing...</pre>
 
 <script>
-var CLOUD_URL = 'https://script.google.com/macros/s/AKfycbxHd4heBpNJzAsgodKJMlgq8dVa_qlpHjIUHHRFYL6AIJys-d4x5Mxm1P_egFfvQiNtnQ/exec';
-var lastData = null;
+var URL = 'https://script.google.com/macros/s/AKfycbz7Zw5EAbw2TbXlhUxhZErQQjel7FcngRp_bCV-qT61PehYXnZ5jkUL_c4GFxcBv02LaA/exec';
+var log = document.getElementById('log');
 
-function syntaxHL(json) {
-  return json.replace(/("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(m) {
-    var cls = 'num';
-    if (/^"/.test(m)) { cls = /:$/.test(m) ? 'key' : 'str'; }
-    else if (/true|false/.test(m)) cls = 'num';
-    else if (/null/.test(m)) cls = 'null';
-    return '<span class="' + cls + '">' + m + '</span>';
-  });
+function addLog(msg, cls) {
+  var span = document.createElement('span');
+  span.className = cls || '';
+  span.textContent = msg + '\n';
+  log.appendChild(span);
+  log.scrollTop = log.scrollHeight;
 }
 
-async function testFetch() {
-  var statusEl = document.getElementById('fetchStatus');
-  var resultEl = document.getElementById('fetchResult');
-  statusEl.innerHTML = '<span class="status wait">Fetching...</span>';
-  resultEl.textContent = 'Loading...';
-  
+async function test1() {
+  log.innerHTML = '';
+  addLog('TEST 1: GET with mode:cors (staff portal pattern)');
+  addLog('URL: ' + URL + '?action=lunch');
   try {
-    var startTime = Date.now();
-    var r = await fetch(CLOUD_URL + '?action=lunch', { redirect: 'follow' });
-    var elapsed = Date.now() - startTime;
-    
+    var r = await fetch(URL + '?action=lunch', { method: 'GET', mode: 'cors' });
+    addLog('Status: ' + r.status, 'ok');
     var text = await r.text();
-    statusEl.innerHTML = '<span class="status ok">Response received (' + elapsed + 'ms, status ' + r.status + ')</span>';
-    
-    // Try to parse
+    addLog('Response length: ' + text.length, 'ok');
+    addLog('First 500 chars: ' + text.slice(0, 500), 'ok');
+  } catch(e) {
+    addLog('FAILED: ' + e.message, 'err');
+    addLog('This means GET with cors is blocked.', 'warn');
+  }
+}
+
+async function test2() {
+  log.innerHTML = '';
+  addLog('TEST 2: POST with Content-Type: text/plain');
+  try {
+    var r = await fetch(URL, {
+      method: 'POST',
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'lunch' })
+    });
+    addLog('Status: ' + r.status, 'ok');
+    var text = await r.text();
+    addLog('Response length: ' + text.length, 'ok');
+    addLog('First 500 chars: ' + text.slice(0, 500), 'ok');
+  } catch(e) {
+    addLog('FAILED: ' + e.message, 'err');
+  }
+}
+
+async function test3() {
+  log.innerHTML = '';
+  addLog('TEST 3: POST with no Content-Type header at all');
+  try {
+    var r = await fetch(URL, {
+      method: 'POST',
+      redirect: 'follow',
+      body: JSON.stringify({ action: 'lunch' })
+    });
+    addLog('Status: ' + r.status, 'ok');
+    var text = await r.text();
+    addLog('Response length: ' + text.length, 'ok');
+    addLog('First 500 chars: ' + text.slice(0, 500), 'ok');
+  } catch(e) {
+    addLog('FAILED: ' + e.message, 'err');
+  }
+}
+
+async function test4() {
+  log.innerHTML = '';
+  addLog('TEST 4: GET with mode:no-cors (opaque response)');
+  try {
+    var r = await fetch(URL + '?action=lunch', { method: 'GET', mode: 'no-cors' });
+    addLog('Status: ' + r.status + ' (0 = opaque, expected with no-cors)', 'warn');
+    addLog('Type: ' + r.type, 'warn');
     try {
-      var parsed = JSON.parse(text);
-      lastData = parsed;
-      resultEl.innerHTML = syntaxHL(JSON.stringify(parsed, null, 2));
-      
-      if (parsed.success && parsed.dates) {
-        var keys = Object.keys(parsed.dates);
-        statusEl.innerHTML += '<br><span class="status ok">✓ Valid JSON with ' + keys.length + ' dates</span>';
-        checkDates(parsed);
-      } else if (parsed.success && (!parsed.dates || Object.keys(parsed.dates).length === 0)) {
-        statusEl.innerHTML += '<br><span class="status fail">⚠ success:true but dates is empty — no lunch data in the sheet?</span>';
-      } else {
-        statusEl.innerHTML += '<br><span class="status fail">✗ success:false — error: ' + (parsed.error || 'unknown') + '</span>';
-      }
-    } catch(pe) {
-      statusEl.innerHTML += '<br><span class="status fail">✗ Response is not valid JSON!</span>';
-      resultEl.textContent = 'RAW RESPONSE (first 2000 chars):\n\n' + text.slice(0, 2000);
-      // Check if it's an HTML redirect page
-      if (text.includes('<!DOCTYPE') || text.includes('<html')) {
-        statusEl.innerHTML += '<br><span class="status fail">✗ Got HTML instead of JSON — this is the CORS redirect issue</span>';
-      }
+      var text = await r.text();
+      addLog('Response: ' + (text || '(empty - opaque responses hide content)'), text ? 'ok' : 'warn');
+    } catch(e2) {
+      addLog('Cannot read body (expected with no-cors): ' + e2.message, 'warn');
     }
   } catch(e) {
-    statusEl.innerHTML = '<span class="status fail">Fetch failed: ' + e.message + '</span>';
-    resultEl.textContent = 'Error: ' + e.message + '\n\nThis usually means:\n1. CORS is blocking the request\n2. The Apps Script URL is wrong\n3. Network issue';
+    addLog('FAILED: ' + e.message, 'err');
   }
 }
 
-function testJSONP() {
-  var statusEl = document.getElementById('jsonpStatus');
-  var resultEl = document.getElementById('jsonpResult');
-  statusEl.innerHTML = '<span class="status wait">Loading via JSONP...</span>';
-  resultEl.textContent = 'Loading...';
-  
-  var cbName = '_hhDebug' + Date.now();
-  var startTime = Date.now();
-  var timedOut = false;
-  
-  window[cbName] = function(data) {
-    if (timedOut) return;
-    var elapsed = Date.now() - startTime;
-    delete window[cbName];
-    document.getElementById(cbName)?.remove();
-    
-    statusEl.innerHTML = '<span class="status ok">JSONP response received (' + elapsed + 'ms)</span>';
-    
-    if (data && data.success && data.dates) {
-      var keys = Object.keys(data.dates);
-      lastData = data;
-      statusEl.innerHTML += '<br><span class="status ok">✓ ' + keys.length + ' dates loaded</span>';
-      resultEl.innerHTML = syntaxHL(JSON.stringify(data, null, 2));
-      checkDates(data);
-    } else if (data && data.success) {
-      statusEl.innerHTML += '<br><span class="status fail">⚠ success:true but no dates — sheet might be empty</span>';
-      resultEl.innerHTML = syntaxHL(JSON.stringify(data, null, 2));
-    } else {
-      statusEl.innerHTML += '<br><span class="status fail">✗ Error: ' + (data?.error || 'Unknown') + '</span>';
-      resultEl.innerHTML = syntaxHL(JSON.stringify(data, null, 2));
-    }
-  };
-  
-  var sc = document.createElement('script');
-  sc.id = cbName;
-  sc.src = CLOUD_URL + '?action=lunch&callback=' + cbName;
-  sc.onerror = function() {
-    if (timedOut) return;
-    delete window[cbName];
-    sc.remove();
-    statusEl.innerHTML = '<span class="status fail">JSONP script failed to load</span>';
-    resultEl.textContent = 'The script tag failed. This could mean:\n1. Apps Script URL is wrong\n2. Apps Script is not deployed as "Anyone"\n3. Network blocked';
-  };
-  document.head.appendChild(sc);
-  
-  setTimeout(function() {
-    if (window[cbName]) {
-      timedOut = true;
-      delete window[cbName];
-      document.getElementById(cbName)?.remove();
-      statusEl.innerHTML = '<span class="status fail">JSONP timed out after 15 seconds</span>';
-      resultEl.textContent = 'No response received. The Apps Script may be:\n1. Very slow\n2. Throwing an error\n3. Not deployed correctly';
-    }
-  }, 15000);
-}
-
-function checkDates(data) {
-  var el = document.getElementById('dateCheckResult');
-  var detail = document.getElementById('dateDetail');
-  if (!data || !data.dates) { el.innerHTML = '<span class="status fail">No dates to check</span>'; return; }
-  
-  var keys = Object.keys(data.dates);
-  if (keys.length === 0) {
-    el.innerHTML = '<span class="status fail">No lunch dates in the response</span>';
-    detail.textContent = 'The LunchDates sheet appears to be empty.\nTry publishing a lunch from the editor first.';
-    return;
-  }
-  
-  var isoPattern = /^\d{4}-\d{2}-\d{2}$/;
-  var good = [], bad = [];
-  for (var i = 0; i < keys.length; i++) {
-    if (isoPattern.test(keys[i])) good.push(keys[i]);
-    else bad.push(keys[i]);
-  }
-  
-  var today = new Date();
-  var todayISO = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
-  var hasToday = keys.indexOf(todayISO) >= 0;
-  
-  var lines = 'Date keys found: ' + keys.join(', ') + '\n';
-  lines += 'Today is: ' + todayISO + '\n';
-  lines += 'Has today\'s lunch: ' + (hasToday ? 'YES ✓' : 'NO ✗') + '\n\n';
-  
-  if (bad.length) {
-    el.innerHTML = '<span class="status fail">⚠ ' + bad.length + ' dates have wrong format!</span>';
-    lines += 'BAD FORMAT DATES:\n';
-    bad.forEach(function(b) { lines += '  "' + b + '" — should be YYYY-MM-DD\n'; });
-    lines += '\nThis is the problem! Google Sheets is converting your date strings.\n';
-    lines += 'FIX: In Google Sheets, select the date column → Format → Number → Plain text\n';
-    lines += 'Then re-save the lunch items from the editor.';
-  } else {
-    el.innerHTML = '<span class="status ok">✓ All ' + good.length + ' dates are valid ISO format</span>';
-    lines += 'All dates look correct.\n\n';
-    
-    // Check if the lunch items have actual content
-    for (var j = 0; j < keys.length; j++) {
-      var entry = data.dates[keys[j]];
-      var lunchItems = entry?.lunch?.items || [];
-      lines += keys[j] + ': ' + lunchItems.length + ' lunch items';
-      if (lunchItems.length > 0) {
-        lines += ' — ' + lunchItems.map(function(it) { return typeof it === 'object' ? it.name : it; }).join(', ');
-      }
-      lines += '\n';
-    }
-  }
-  
-  detail.textContent = lines;
-  buildDiagnosis(data, bad.length > 0, hasToday);
-}
-
-function buildDiagnosis(data, hasBadDates, hasToday) {
-  var el = document.getElementById('diagnosis');
-  var html = '';
-  
-  if (!data || !data.success) {
-    html = '<div class="fix">❌ <strong>Apps Script is not responding correctly.</strong><br><br>' +
-      'Check that:<br>' +
-      '1. The script is deployed as <code>Execute as: Me</code> and <code>Who has access: Anyone</code><br>' +
-      '2. You redeployed after the last code change (use "New deployment" or update the existing one)<br>' +
-      '3. The LunchDates sheet exists in the spreadsheet</div>';
-  } else if (Object.keys(data.dates).length === 0) {
-    html = '<div class="fix">⚠️ <strong>The cloud responds fine, but there are no lunch dates saved.</strong><br><br>' +
-      'Go to the editor → Lunch Forecast tab → pick a date → add items → click Save.<br>' +
-      'Then come back here and re-run the tests.</div>';
-  } else if (hasBadDates) {
-    html = '<div class="fix">🔧 <strong>Date format issue in Google Sheets!</strong><br><br>' +
-      'Google Sheets is converting your date strings (like <code>2026-04-12</code>) into Date objects, ' +
-      'which then serialize differently.<br><br>' +
-      '<strong>Fix in Google Sheets:</strong><br>' +
-      '1. Open your spreadsheet<br>' +
-      '2. Go to the <code>LunchDates</code> sheet<br>' +
-      '3. Select the entire <strong>date column (Column A)</strong><br>' +
-      '4. Go to <strong>Format → Number → Plain text</strong><br>' +
-      '5. Delete existing rows and re-publish from the editor<br><br>' +
-      'The Apps Script code already has <code>setNumberFormat(\'@\')</code> to prevent this, ' +
-      'but existing rows may have been saved before this fix was added.<br><br>' +
-      '<strong>Alternative:</strong> Update your <code>dateToISO()</code> function in Apps Script to handle more date formats ' +
-      '(it may be getting <code>Sun Apr 12 2026 00:00:00</code> instead of <code>2026-04-12</code>).</div>';
-  } else if (!hasToday) {
-    html = '<div class="fix">⚠️ <strong>Data loads fine, but there\'s no entry for today.</strong><br><br>' +
-      'The menu page looks for today\'s date. You have lunch data for other dates but not today.<br>' +
-      'Go to the editor → Lunch Forecast → select Today → add items → Save.</div>';
-  } else {
-    html = '<div class="fix">✅ <strong>Everything looks correct!</strong><br><br>' +
-      'The cloud is returning valid data with today\'s lunch. If the menu page still isn\'t showing it, ' +
-      'the issue might be:<br>' +
-      '1. <strong>Caching:</strong> Hard-refresh the menu page (Ctrl+Shift+R)<br>' +
-      '2. <strong>menu-data.js timing:</strong> The fetch in menu-data.js might complete before menu.html is ready. ' +
-      'Check the browser console for errors.<br>' +
-      '3. <strong>CORS on your domain:</strong> fetch() from your Vercel domain to Apps Script might be blocked. ' +
-      'Check browser console for CORS errors.</div>';
-  }
-  
-  el.innerHTML = html;
-}
+addLog('Page loaded. Your current origin: ' + window.location.origin);
+addLog('Target URL: ' + URL);
+addLog('');
 </script>
 </body>
 </html>
