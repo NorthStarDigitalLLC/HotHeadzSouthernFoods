@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head><title>Cloud Debug</title></head>
+<body style="background:#111;color:#eee;font-family:monospace;padding:20px;line-height:1.8;">
+<h2>Hot Headz Cloud Debug v2</h2>
+<div id="output" style="white-space:pre-wrap;"></div>
+<script>
+var URL = 'https://script.google.com/macros/s/AKfycbxHd4heBpNJzAsgodKJMlgq8dVa_qlpHjIUHHRFYL6AIJys-d4x5Mxm1P_egFfvQiNtnQ/exec';
+var out = document.getElementById('output');
+function log(m) { out.textContent += m + '\n'; }
+
+async function run() {
+  log('URL: ' + URL);
+  log('');
+
+  // Test 1: JSONP with ?action=lunch
+  log('═══ Test 1: JSONP (?action=lunch) ═══');
+  var jsonpResult = await new Promise(function(resolve) {
+    var cb = '_test1_' + Date.now();
+    window[cb] = function(data) { delete window[cb]; document.getElementById(cb).remove(); resolve(data); };
+    var s = document.createElement('script');
+    s.id = cb; s.src = URL + '?action=lunch&callback=' + cb;
+    s.onerror = function() { delete window[cb]; s.remove(); resolve('SCRIPT_ERROR'); };
+    document.head.appendChild(s);
+    setTimeout(function() { if (window[cb]) { delete window[cb]; document.getElementById(cb).remove(); resolve('TIMEOUT'); } }, 8000);
+  });
+  if (jsonpResult === 'SCRIPT_ERROR') log('❌ JSONP: script tag failed to load');
+  else if (jsonpResult === 'TIMEOUT') log('⏰ JSONP: timed out after 8s');
+  else { log('✅ JSONP: ' + JSON.stringify(jsonpResult).slice(0, 300)); }
+
+  // Test 2: Fetch with ?action=lunch
+  log('\n═══ Test 2: Fetch (?action=lunch) ═══');
+  try {
+    var r = await fetch(URL + '?action=lunch', { redirect: 'follow' });
+    var text = await r.text();
+    log('✅ Fetch status: ' + r.status + ' length: ' + text.length);
+    log('   Response: ' + text.slice(0, 300));
+  } catch(e) { log('❌ Fetch error: ' + e.message); }
+
+  // Test 3: JSONP with ?action=list (this one works in the editor)
+  log('\n═══ Test 3: JSONP (?action=list — editor uses this) ═══');
+  var listResult = await new Promise(function(resolve) {
+    var cb = '_test3_' + Date.now();
+    window[cb] = function(data) { delete window[cb]; document.getElementById(cb).remove(); resolve(data); };
+    var s = document.createElement('script');
+    s.id = cb; s.src = URL + '?action=list&callback=' + cb;
+    s.onerror = function() { delete window[cb]; s.remove(); resolve('SCRIPT_ERROR'); };
+    document.head.appendChild(s);
+    setTimeout(function() { if (window[cb]) { delete window[cb]; document.getElementById(cb).remove(); resolve('TIMEOUT'); } }, 8000);
+  });
+  if (listResult === 'SCRIPT_ERROR') log('❌ JSONP list: script tag failed');
+  else if (listResult === 'TIMEOUT') log('⏰ JSONP list: timed out');
+  else { log('✅ JSONP list: ' + JSON.stringify(listResult).slice(0, 300)); }
+
+  log('\n═══ DONE ═══');
+  log('If Test 3 (list) works but Test 1 (lunch) fails:');
+  log('  → The new Apps Script code is NOT deployed. Deploy a new version.');
+  log('If all tests fail:');
+  log('  → The URL is wrong or deployment needs re-authorization.');
+  log('If Test 1 or 2 works:');
+  log('  → The cloud is fine. Problem is in menu.html or menu-data.js.');
+}
+run();
+</script>
+</body>
+</html>
