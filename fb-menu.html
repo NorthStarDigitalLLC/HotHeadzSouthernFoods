@@ -759,7 +759,7 @@ async function loadFullMenu(){
 /* SIDE PANEL */
 let currentTab='quickfill';
 document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{currentTab=btn.dataset.tab;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');rebuildSidePanel();if(window.innerWidth<=900)document.getElementById('sidePanel').classList.add('mobile-open');});});
-document.getElementById('mobSettingsBtn').addEventListener('click',()=>{document.getElementById('sidePanel').classList.add('mobile-open');});
+document.getElementById('mobSettingsBtn').addEventListener('click',()=>{currentTab='quickfill';document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));const qt=document.querySelector('.tab-btn[data-tab="quickfill"]');if(qt)qt.classList.add('active');rebuildSidePanel();document.getElementById('sidePanel').classList.add('mobile-open');});
 document.getElementById('mobLunchBtn').addEventListener('click',()=>{currentTab='menu-lunch';document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));const mt=document.querySelector('.tab-btn[data-tab="menu-lunch"]');if(mt)mt.classList.add('active');rebuildSidePanel();document.getElementById('sidePanel').classList.add('mobile-open');});
 document.getElementById('closeSidePanel').addEventListener('click',()=>{document.getElementById('sidePanel').classList.remove('mobile-open');});
 
