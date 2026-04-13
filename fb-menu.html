@@ -400,22 +400,26 @@ function getCloudUrl(){return CLOUD_URL;}
 function getCloudName(){return localStorage.getItem(CLOUD_NAME_KEY)||'';}
 function setCloudName(n){localStorage.setItem(CLOUD_NAME_KEY,n);}
 
-// All requests use POST with text/plain to avoid CORS preflight issues
+// Same pattern as the working staff portal — GET with query params for reads, POST for writes with data
+function apiGet(params){
+  var q=Object.keys(params).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(params[k]);}).join('&');
+  return fetch(getCloudUrl()+'?'+q,{method:'GET',mode:'cors'}).then(function(r){return r.text();}).then(function(t){return JSON.parse(t);});
+}
+function apiPost(params){
+  return fetch(getCloudUrl(),{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(params)}).then(function(r){return r.text();}).then(function(t){return JSON.parse(t);});
+}
 async function cloudRequest(action,body={}){
   const url=getCloudUrl();
   if(!url){toast('Cloud not configured','error');return null;}
   try{
-    const r=await fetch(url,{
-      method:'POST',
-      redirect:'follow',
-      headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body:JSON.stringify({action,...body})
-    });
-    const text=await r.text();
-    try{return JSON.parse(text);}catch{
-      if(text.includes('success'))return{success:true};
-      toast('Cloud returned unexpected response','error');return null;
+    // Reads use GET (works reliably like the staff portal)
+    if(action==='list'||action==='load'||action==='lunch'){
+      var params={action:action};
+      if(action==='load'&&body.id)params.id=body.id;
+      return await apiGet(params);
     }
+    // Writes use POST with text/plain to avoid preflight
+    return await apiPost({action,...body});
   }catch(e){toast('Cloud error: '+e.message,'error');return null;}
 }
 
@@ -736,25 +740,18 @@ async function publishLunch(){
   if(!confirm('Publish '+items.length+' lunch items to the live website for '+dateISO+'?\n\n'+itemNames))return;
   toast('Publishing to live menu...','info');
   try{
-    const url=getCloudUrl();
-    const r=await fetch(url,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'save-lunch',date:dateISO,data:{lunch:{show:true,items:items},dessert:{items:[]},crawfish:{show:false}},publishedBy:getCloudName()})});
-    const text=await r.text();
-    const result=safeJSON(text,null);
+    const result=await apiPost({action:'save-lunch',date:dateISO,data:{lunch:{show:true,items:items},dessert:{items:[]},crawfish:{show:false}},publishedBy:getCloudName()});
     if(result?.success){toast('Published! '+items.length+' lunch items are now live.','success');}
     else{toast('Publish failed: '+(result?.error||'unknown error'),'error');}
   }catch(e){toast('Publish error: '+e.message,'error');}
 }
 document.getElementById('publishLunch').addEventListener('click',()=>{publishLunch();exportModal.classList.remove('active');});
 
-// loadFullMenu uses POST to avoid CORS
+// loadFullMenu uses GET like the working portal
 async function loadFullMenu(){
   const url=getCloudUrl();if(!url)return null;
   try{
-    const r=await fetch(url,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'lunch'})});
-    const text=await r.text();
-    const result=JSON.parse(text);
-    if(result?.success)return result.dates||null;
-    return null;
+    return await apiGet({action:'lunch'});
   }catch(e){console.warn('loadFullMenu error:',e);return null;}
 }
 
@@ -946,12 +943,10 @@ function wireMenuPanel(){
     const el=document.getElementById('lunchDateEditor');
     if(!el)return;
     el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:8px;">Loading...</div>';
-    // Use POST to avoid CORS issues
+    // Use GET like the working staff portal
     const url=getCloudUrl();let lunchData=null;
     try{
-      const r=await fetch(url,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'lunch'})});
-      const text=await r.text();
-      const result=JSON.parse(text);
+      const result=await apiGet({action:'lunch'});
       if(result?.success&&result?.dates?.[date])lunchData=result.dates[date];
     }catch(e){toast('Could not load from cloud','error');}
     const items=lunchData?.lunch?.items||[];
@@ -985,20 +980,16 @@ function wireMenuPanel(){
 }
 
 async function saveLunchForDate(date,data){
-  const url=getCloudUrl();if(!url)return false;
   try{
-    const r=await fetch(url,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'save-lunch',date:date,data:data})});
-    const j=JSON.parse(await r.text());
+    const j=await apiPost({action:'save-lunch',date:date,data:data});
     if(j.success){toast('Lunch saved for '+date+'!','success');return true;}
     else{toast('Save failed: '+(j.error||''),'error');return false;}
   }catch(e){toast('Save error: '+e.message,'error');return false;}
 }
 
 async function deleteLunchForDate(date){
-  const url=getCloudUrl();if(!url)return false;
   try{
-    const r=await fetch(url,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'delete-lunch',date:date})});
-    const j=JSON.parse(await r.text());
+    const j=await apiPost({action:'delete-lunch',date:date});
     if(j.success){toast('Lunch removed for '+date,'info');return true;}
   }catch(e){}
   return false;
