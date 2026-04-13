@@ -1179,7 +1179,7 @@ async function loadFullMenu(){
       if(result?.success)resolve(result.menuData);else resolve(null);
     };
     const sc=document.createElement('script');sc.id=cb;
-    sc.src=url+'?action=menu&callback='+cb;
+    sc.src=url+'?action=lunch&callback='+cb;
     sc.onerror=()=>{delete window[cb];sc.remove();resolve(null);};
     document.head.appendChild(sc);
     setTimeout(()=>{if(window[cb]){delete window[cb];document.getElementById(cb)?.remove();resolve(null);}},10000);
@@ -1347,11 +1347,11 @@ function wireMenuPanel(){
         const cb='_hhLunch'+Date.now();
         window[cb]=function(result){
           delete window[cb];document.getElementById(cb)?.remove();
-          if(result?.success&&result?.menuData?.menus?.[date])resolve(result.menuData.menus[date]);
+          if(result?.success&&result?.dates?.[date])resolve(result.dates[date]);
           else resolve(null);
         };
         const sc=document.createElement('script');sc.id=cb;
-        sc.src=url+'?action=menu&callback='+cb;
+        sc.src=url+'?action=lunch&callback='+cb;
         sc.onerror=()=>{delete window[cb];sc.remove();resolve(null);};
         document.head.appendChild(sc);
         setTimeout(()=>{if(window[cb]){delete window[cb];document.getElementById(cb)?.remove();resolve(null);}},10000);
