@@ -56,8 +56,9 @@ var MENU_DATA = {
   menus: {}
 };
 
-// Fetch lunch from cloud using fetch (confirmed working on this domain)
+// Fetch lunch from cloud
 (function() {
+  console.log('[HH] Fetching lunch data from cloud...');
   fetch(CLOUD_URL + '?action=lunch', { redirect: 'follow' })
     .then(function(r) { return r.text(); })
     .then(function(text) {
@@ -68,8 +69,10 @@ var MENU_DATA = {
           for (var i = 0; i < keys.length; i++) {
             MENU_DATA.menus[keys[i]] = result.dates[keys[i]];
           }
-          console.log('[HH] Loaded ' + keys.length + ' lunch dates');
+          console.log('[HH] Loaded ' + keys.length + ' lunch dates:', keys.join(', '));
           window.dispatchEvent(new CustomEvent('menuDataReady', { detail: MENU_DATA }));
+        } else {
+          console.warn('[HH] Cloud returned no dates:', result);
         }
       } catch(e) { console.warn('[HH] Parse error:', e.message); }
     })
