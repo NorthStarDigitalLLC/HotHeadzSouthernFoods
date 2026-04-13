@@ -192,8 +192,13 @@ function initPage(){
 setupTabs();
 initPage(); // Render immediately with defaults
 
-// Fetch lunch from Apps Script and re-render
-fetch(CLOUD_URL + '?action=lunch', { redirect: 'follow' })
+// Fetch lunch from Apps Script via POST (avoids CORS preflight)
+fetch(CLOUD_URL, {
+  method: 'POST',
+  redirect: 'follow',
+  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+  body: JSON.stringify({ action: 'lunch' })
+})
   .then(function(r) { return r.text(); })
   .then(function(text) {
     try {
