@@ -57,8 +57,8 @@
     .ct-sep{flex:1;}
     .ct-label{font-size:10px;color:var(--text3);font-weight:600;white-space:nowrap;}
     .ct-range{width:80px;accent-color:var(--fire);}
-    .canvas-area{flex:1;display:flex;align-items:center;justify-content:center;padding:6px;min-height:0;}
-    #hhMEcanvas{width:100%;height:100%;border-radius:8px;touch-action:none;background:#0e0e12;}
+    .canvas-area{flex:1;display:flex;align-items:center;justify-content:center;padding:6px;min-height:0;overflow:hidden;}
+    #hhMEcanvas{max-width:100%;max-height:100%;border-radius:8px;touch-action:none;background:#0e0e12;object-fit:contain;}
     .canvas-foot{display:flex;gap:6px;padding:6px 10px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--border);background:var(--surface);}
     .cf-toggle{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text2);cursor:pointer;}
     .cf-toggle input{accent-color:var(--fire);}
@@ -289,7 +289,7 @@ function drawPhoto(){
   if(!imgLoaded){ctx.save();ctx.fillStyle='rgba(255,255,255,0.6)';ctx.font='700 20px system-ui';ctx.textAlign='center';ctx.fillText('Upload your menu template image to start',canvas.width/2,canvas.height/2);ctx.restore();return;}
   const w=canvas.width,h=canvas.height,iw=img.naturalWidth,ih=img.naturalHeight;
   const rot=(photoRot%180)!==0,bw=rot?ih:iw,bh=rot?iw:ih;
-  const fit=Math.max(w/bw,h/bh)*photoScale;
+  const fit=Math.min(w/bw,h/bh)*photoScale;
   ctx.save();ctx.translate(w/2+photoOffsetX,h/2+photoOffsetY);ctx.rotate(photoRot*Math.PI/180);
   ctx.drawImage(img,-bw*fit/2,-bh*fit/2,bw*fit,bh*fit);ctx.restore();
 }
@@ -358,7 +358,7 @@ async function loadProject(id){const s=loadStore();const p=s.items.find(x=>x.id=
 function deleteProject(id){const s=loadStore();const p=s.items.find(x=>x.id===id);if(!p||!confirm(`Delete "${p.name}"?`))return;s.items=s.items.filter(x=>x.id!==id);if(s.activeId===id)s.activeId=s.items[0]?.id??null;saveStore(s);const n=s.items.find(x=>x.id===s.activeId);if(n?.data)applyPayload(n.data);else{loadStarterBoxes();imgLoaded=false;imgDataURL='';resetAll();}toast('Deleted','info');rebuildSidePanel();}
 
 /* EXPORT */
-function getPhotoAABB(){if(!imgLoaded)return null;const w=canvas.width,h=canvas.height,iw=img.naturalWidth,ih=img.naturalHeight;const rot=(photoRot%180)!==0,bw=rot?ih:iw,bh=rot?iw:ih;const fit=Math.max(w/bw,h/bh)*photoScale;const cx=w/2+photoOffsetX,cy=h/2+photoOffsetY,dw=bw*fit,dh=bh*fit;const rad=photoRot*Math.PI/180;const corners=[{x:-dw/2,y:-dh/2},{x:dw/2,y:-dh/2},{x:dw/2,y:dh/2},{x:-dw/2,y:dh/2}];let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;for(const p of corners){const rx=p.x*Math.cos(rad)-p.y*Math.sin(rad)+cx,ry=p.x*Math.sin(rad)+p.y*Math.cos(rad)+cy;minX=Math.min(minX,rx);minY=Math.min(minY,ry);maxX=Math.max(maxX,rx);maxY=Math.max(maxY,ry);}return{sx:Math.max(0,Math.floor(minX)),sy:Math.max(0,Math.floor(minY)),sw:Math.max(1,Math.min(w,Math.ceil(maxX))-Math.max(0,Math.floor(minX))),sh:Math.max(1,Math.min(h,Math.ceil(maxY))-Math.max(0,Math.floor(minY)))};}
+function getPhotoAABB(){if(!imgLoaded)return null;const w=canvas.width,h=canvas.height,iw=img.naturalWidth,ih=img.naturalHeight;const rot=(photoRot%180)!==0,bw=rot?ih:iw,bh=rot?iw:ih;const fit=Math.min(w/bw,h/bh)*photoScale;const cx=w/2+photoOffsetX,cy=h/2+photoOffsetY,dw=bw*fit,dh=bh*fit;const rad=photoRot*Math.PI/180;const corners=[{x:-dw/2,y:-dh/2},{x:dw/2,y:-dh/2},{x:dw/2,y:dh/2},{x:-dw/2,y:dh/2}];let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;for(const p of corners){const rx=p.x*Math.cos(rad)-p.y*Math.sin(rad)+cx,ry=p.x*Math.sin(rad)+p.y*Math.cos(rad)+cy;minX=Math.min(minX,rx);minY=Math.min(minY,ry);maxX=Math.max(maxX,rx);maxY=Math.max(maxY,ry);}return{sx:Math.max(0,Math.floor(minX)),sy:Math.max(0,Math.floor(minY)),sw:Math.max(1,Math.min(w,Math.ceil(maxX))-Math.max(0,Math.floor(minX))),sh:Math.max(1,Math.min(h,Math.ceil(maxY))-Math.max(0,Math.floor(minY)))};}
 function exportCropped(mime,ext,q){if(!imgLoaded){toast('Upload template first','error');return;}const ov={viewX,viewY,viewScale};viewX=0;viewY=0;viewScale=1;draw();const a=getPhotoAABB();viewX=ov.viewX;viewY=ov.viewY;viewScale=ov.viewScale;if(!a){toast('No photo bounds','error');return;}const out=document.createElement('canvas');out.width=a.sw;out.height=a.sh;out.getContext('2d').drawImage(canvas,a.sx,a.sy,a.sw,a.sh,0,0,a.sw,a.sh);out.toBlob(blob=>{if(!blob)return;const el=document.createElement('a');el.download=`hotheadz-menu-${new Date().toISOString().slice(0,10)}.${ext}`;el.href=URL.createObjectURL(blob);document.body.appendChild(el);el.click();el.remove();setTimeout(()=>URL.revokeObjectURL(el.href),1500);toast(`${ext.toUpperCase()} downloaded!`,'success');},mime,q);draw();}
 function exportJSON(){const s=loadStore();const a=s.items.find(p=>p.id===s.activeId);const proj={id:a?.id||uid(),name:a?.name||'Menu Export',createdAt:a?.createdAt||Date.now(),updatedAt:Date.now(),data:currentPayload()};const blob=new Blob([JSON.stringify(proj,null,2)],{type:'application/json'});const el=document.createElement('a');el.download=`hotheadz-menu-${new Date().toISOString().slice(0,10)}.json`;el.href=URL.createObjectURL(blob);document.body.appendChild(el);el.click();el.remove();toast('JSON exported!','success');}
 const exportModal=document.getElementById('exportModal');
