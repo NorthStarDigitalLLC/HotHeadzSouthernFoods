@@ -941,6 +941,64 @@ window.addEventListener('load',()=>{
     },200);
   }));
 });
+
+/* ══════════════════════════════
+   BACK-BUTTON / BFCACHE RESET
+   When the browser restores this page from cache (e.g. user hit Back),
+   the nav transition was mid-animation when we left — everything is faded
+   to 0 and the particle overlay is still on. Reset it all here.
+══════════════════════════════ */
+function resetPageState(){
+  // Kill the nav transition flags
+  navActive = false;
+  navPhase = 0;
+  navParticles = [];
+  navRipples.length = 0;
+  // Hide the overlay canvas
+  navCv.style.display = 'none';
+  nx.clearRect(0,0,W,H);
+  // Restore every element we faded during doNavigate()
+  const topbar  = document.getElementById('topbar');
+  const botbar  = document.getElementById('botbar');
+  const mobHdr  = document.getElementById('mob-header');
+  const mobNav  = document.getElementById('mob-nav');
+  const mobBot  = document.getElementById('mob-botbar');
+  const shell   = document.getElementById('shell');
+  const mobShl  = document.getElementById('mobile-shell');
+  if(topbar) topbar.style.opacity = '';
+  if(botbar) botbar.style.opacity = '';
+  if(mobHdr) mobHdr.style.opacity = '';
+  if(mobNav) mobNav.style.opacity = '';
+  if(mobBot) mobBot.style.opacity = '';
+  if(shell){ shell.style.transition = ''; shell.style.opacity = ''; }
+  if(mobShl){ mobShl.style.transition = ''; mobShl.style.opacity = ''; }
+  // Make sure body is visible
+  document.body.style.opacity = '1';
+  // Re-trigger the nice fade-in
+  const isMobile = window.innerWidth < 768;
+  if(isMobile){
+    if(mobShl) mobShl.classList.add('on');
+  } else {
+    if(shell) shell.classList.add('on');
+  }
+}
+
+window.addEventListener('pageshow', function(e){
+  // e.persisted === true means the page was restored from bfcache (back/forward)
+  if(e.persisted){
+    resetPageState();
+  }
+});
+
+// Safari / iOS sometimes fire pagehide when navigating away. If we get shown
+// again without a full load (bfcache), pageshow above catches it. But as a
+// belt-and-suspenders fallback, also reset when the tab regains visibility
+// if nav state got left on.
+document.addEventListener('visibilitychange', function(){
+  if(document.visibilityState === 'visible' && navActive){
+    resetPageState();
+  }
+});
 </script>
 </body>
 </html>
