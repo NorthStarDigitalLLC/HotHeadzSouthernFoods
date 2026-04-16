@@ -141,6 +141,8 @@
   --void:#080407;--deep:#130509;--coal:#1e0a0c;
   --pepper:#c41800;--fire:#e83010;--chili:#f05020;--heat:#f87038;--burn:#ffa048;
   --cream:#f8ede6;--parch:#efd8cc;--sand:#d4a898;
+  /* DoorDash brand red — distinct from the orange chili/fire palette */
+  --dd-red:#EB1700;--dd-red-hot:#FF2D0E;--dd-red-deep:#B31100;
   --serif:'DM Serif Display',Georgia,serif;
   --display:'Abril Fatface',Georgia,serif;
   --body:'DM Sans',sans-serif;
@@ -169,7 +171,7 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
 #shell.on{opacity:1;}
 
 #topbar{flex-shrink:0;display:flex;align-items:stretch;
-  height:clamp(52px,7vh,68px);
+  height:clamp(50px,6.2vh,62px);
   border-bottom:1px solid rgba(232,180,160,.18);
   background:linear-gradient(to bottom,rgba(8,4,7,.97),rgba(8,4,7,.6));
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
@@ -184,11 +186,11 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
 .tb-val{font-family:var(--body);font-weight:500;font-size:clamp(11px,1.3vw,14px);
   letter-spacing:.04em;color:rgba(245,220,210,.92);}
 
-#brand-name{font-family:var(--display);font-weight:400;font-size:clamp(15px,2.1vw,24px);
+#brand-name{font-family:var(--display);font-weight:400;font-size:clamp(14px,1.9vw,22px);
   letter-spacing:.01em;color:var(--cream);text-align:center;line-height:1;
   text-shadow:0 0 40px rgba(240,80,32,.3);}
 #brand-name em{font-style:italic;color:var(--heat);}
-#brand-tagline{font-family:var(--body);font-weight:400;font-size:10px;letter-spacing:.2em;
+#brand-tagline{font-family:var(--body);font-weight:400;font-size:9px;letter-spacing:.2em;
   text-transform:uppercase;color:rgba(232,180,160,.52);margin-top:3px;text-align:center;}
 
 .tb-status{display:flex;align-items:center;gap:7px;font-family:var(--body);font-weight:700;
@@ -200,21 +202,22 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
 #main>*+*{border-left:1px solid rgba(232,180,160,.1);}
 
 #sidebar-l,#sidebar-r{display:flex;flex-direction:column;justify-content:space-between;
-  padding:clamp(14px,2.2vh,24px) clamp(12px,1.6vw,22px);}
+  padding:clamp(12px,1.8vh,20px) clamp(12px,1.6vw,22px);overflow-y:auto;overflow-x:hidden;}
+#sidebar-l::-webkit-scrollbar,#sidebar-r::-webkit-scrollbar{display:none;}
 #sidebar-l{animation:fadeSlideR .8s .5s ease both;}
 #sidebar-r{animation:fadeSlideL .8s .5s ease both;}
-.sb-group{display:flex;flex-direction:column;gap:clamp(12px,1.8vh,20px);}
+.sb-group{display:flex;flex-direction:column;gap:clamp(10px,1.5vh,18px);}
 .sb-block{display:flex;flex-direction:column;gap:4px;}
 .sb-label{font-family:var(--body);font-weight:700;font-size:9px;letter-spacing:.28em;
   text-transform:uppercase;color:rgba(232,180,160,.60);}
 .sb-text{font-family:var(--serif);font-style:italic;font-weight:400;
-  font-size:clamp(11px,1.1vw,14px);color:rgba(245,220,210,.85);line-height:1.6;}
+  font-size:clamp(11px,1.05vw,13px);color:rgba(245,220,210,.85);line-height:1.55;}
 .sb-hot{font-family:var(--body);font-weight:700;font-size:11px;letter-spacing:.1em;
   text-transform:uppercase;color:var(--burn);display:flex;align-items:center;gap:5px;}
 .sb-hot::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--burn);
   box-shadow:0 0 7px var(--burn);animation:dp 1.8s ease-in-out infinite;flex-shrink:0;}
 @keyframes dp{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
-.sb-links{display:flex;flex-direction:column;gap:7px;}
+.sb-links{display:flex;flex-direction:column;gap:6px;}
 .sb-link{font-family:var(--body);font-weight:600;font-size:10px;letter-spacing:.15em;
   text-transform:uppercase;color:rgba(232,180,160,.65);text-decoration:none;
   transition:color .25s;cursor:none;display:flex;align-items:center;gap:6px;}
@@ -222,14 +225,15 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
 .sb-link:hover{color:var(--heat);}
 
 #nav-center{display:flex;flex-direction:column;justify-content:center;
-  padding:clamp(8px,1.5vh,14px) clamp(18px,2.8vw,44px);position:relative;}
+  padding:clamp(6px,1vh,12px) clamp(18px,2.8vw,44px);position:relative;min-height:0;overflow:hidden;}
 #nav-center::before{content:'';position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(ellipse at 50% 85%,rgba(196,24,0,.07),transparent 65%);}
+#nav-center nav{display:flex;flex-direction:column;min-height:0;}
 
 .nav-item{position:relative;display:flex;align-items:center;
-  padding:clamp(9px,1.5vh,16px) 0;
+  padding:clamp(5px,.95vh,11px) 0;
   border-bottom:1px solid rgba(232,180,160,.09);
-  cursor:none;overflow:hidden;transition:border-color .4s;-webkit-tap-highlight-color:transparent;}
+  cursor:none;overflow:hidden;transition:border-color .4s;-webkit-tap-highlight-color:transparent;flex-shrink:0;}
 .nav-item:first-child{border-top:1px solid rgba(232,180,160,.09);}
 .nav-item:hover{border-bottom-color:rgba(240,80,32,.2);}
 .nav-item:first-child:hover{border-top-color:rgba(240,80,32,.2);}
@@ -248,27 +252,80 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
   padding-left:12px;transition:color .4s;}
 .nav-item:hover .ni-num{color:rgba(240,80,32,.75);}
 .ni-name{position:relative;z-index:1;font-family:var(--display);font-weight:400;
-  font-size:clamp(22px,3.5vw,50px);letter-spacing:.01em;line-height:1;flex:1;
-  color:rgba(245,220,210,.92);transition:color .35s,letter-spacing .55s cubic-bezier(.16,1,.3,1),text-shadow .4s;}
+  font-size:clamp(18px,2.8vw,38px);letter-spacing:.01em;line-height:1;flex:1;
+  color:rgba(245,220,210,.92);transition:color .35s,letter-spacing .55s cubic-bezier(.16,1,.3,1),text-shadow .4s;
+  display:flex;align-items:center;}
 .nav-item:hover .ni-name{color:#fff;letter-spacing:.02em;text-shadow:0 0 60px rgba(240,80,32,.3);}
 .ni-sub{position:relative;z-index:1;font-family:var(--serif);font-style:italic;font-weight:400;
-  font-size:clamp(11px,1vw,14px);color:rgba(232,180,160,.52);
+  font-size:clamp(10px,.9vw,13px);color:rgba(232,180,160,.52);
   padding:0 clamp(8px,1.4vw,18px);transition:color .35s;display:none;}
 @media(min-width:900px){.ni-sub{display:block;}}
 .nav-item:hover .ni-sub{color:rgba(248,112,56,.75);}
-.ni-arrow{position:relative;z-index:1;width:clamp(26px,2.8vw,38px);height:clamp(26px,2.8vw,38px);
+.ni-arrow{position:relative;z-index:1;width:clamp(24px,2.4vw,32px);height:clamp(24px,2.4vw,32px);
   border:1px solid rgba(232,180,160,.22);border-radius:50%;display:flex;align-items:center;
-  justify-content:center;color:rgba(232,180,160,.50);font-size:13px;
+  justify-content:center;color:rgba(232,180,160,.50);font-size:12px;flex-shrink:0;
   transition:transform .45s cubic-bezier(.34,1.56,.64,1),border-color .35s,color .35s,background .35s,box-shadow .35s;}
 .nav-item:hover .ni-arrow{transform:rotate(-45deg) scale(1.1);border-color:rgba(240,80,32,.65);
   color:var(--heat);background:rgba(240,80,32,.1);box-shadow:0 0 16px rgba(240,80,32,.2);}
 
-.nav-item:nth-child(1){animation:fadeSlideU .6s .4s ease both}
-.nav-item:nth-child(2){animation:fadeSlideU .6s .5s ease both}
-.nav-item:nth-child(3){animation:fadeSlideU .6s .6s ease both}
-.nav-item:nth-child(4){animation:fadeSlideU .6s .7s ease both}
-.nav-item:nth-child(5){animation:fadeSlideU .6s .8s ease both}
-.nav-item:nth-child(6){animation:fadeSlideU .6s .9s ease both}
+/* Sub-items (Lunch, Beer) — indented, smaller */
+.nav-item.sub{padding-left:clamp(18px,2.8vw,44px);opacity:.92;}
+.nav-item.sub .ni-num{font-size:8px;opacity:.7;}
+.nav-item.sub .ni-name{font-size:clamp(13px,1.8vw,24px);color:rgba(248,112,56,.85);}
+.nav-item.sub .ni-arrow{width:clamp(20px,1.8vw,26px);height:clamp(20px,1.8vw,26px);font-size:10px;}
+
+/* ═══ DOORDASH — distinct red branding, glowing, "NEW" badge ═══ */
+.nav-item.doordash{
+  border-top:1px solid rgba(235,23,0,.35)!important;
+  border-bottom:1px solid rgba(235,23,0,.35)!important;
+  background:linear-gradient(90deg,rgba(235,23,0,.08),rgba(235,23,0,.02) 60%,transparent);
+  box-shadow:inset 0 0 40px rgba(235,23,0,.08);
+  animation:fadeSlideU .6s .75s ease both, ddGlow 3s ease-in-out 1.6s infinite;
+}
+.nav-item.doordash::before{
+  background:linear-gradient(90deg,rgba(235,23,0,.0) 0%,rgba(235,23,0,.12) 25%,rgba(255,45,14,.18) 50%,rgba(235,23,0,.1) 75%,transparent 100%);
+}
+.nav-item.doordash::after{
+  background:linear-gradient(to bottom,transparent,var(--dd-red-hot),var(--dd-red),transparent);
+  box-shadow:0 0 10px var(--dd-red-hot);
+  transform:scaleY(1);
+  left:0;
+  width:3px;
+}
+.nav-item.doordash .ni-num{color:rgba(235,23,0,.85);font-weight:700;}
+.nav-item.doordash .ni-name{color:#fff;}
+.nav-item.doordash:hover .ni-name{text-shadow:0 0 60px rgba(235,23,0,.5);}
+.nav-item.doordash .ni-sub{color:rgba(255,120,90,.78);}
+.nav-item.doordash:hover .ni-sub{color:#ff9570;}
+.nav-item.doordash .ni-arrow{
+  border-color:rgba(235,23,0,.6);color:var(--dd-red-hot);
+  background:rgba(235,23,0,.08);box-shadow:0 0 12px rgba(235,23,0,.3);}
+.nav-item.doordash:hover .ni-arrow{
+  border-color:var(--dd-red-hot);color:#fff;background:var(--dd-red);
+  box-shadow:0 0 20px var(--dd-red-hot);transform:rotate(-45deg) scale(1.15);}
+.dd-tag{display:inline-flex;align-items:center;gap:5px;
+  padding:3px 9px;margin-left:10px;border-radius:3px;
+  background:linear-gradient(135deg,var(--dd-red-hot),var(--dd-red));
+  color:#fff;font-family:var(--body);font-weight:800;font-size:8px;
+  letter-spacing:.22em;text-transform:uppercase;
+  box-shadow:0 0 14px rgba(235,23,0,.55),inset 0 1px 0 rgba(255,255,255,.15);
+  white-space:nowrap;flex-shrink:0;vertical-align:middle;}
+.dd-tag::before{content:'';width:5px;height:5px;border-radius:50%;background:#fff;
+  box-shadow:0 0 6px #fff;animation:ddPulse 1.5s ease-in-out infinite;}
+@keyframes ddPulse{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+@keyframes ddGlow{0%,100%{box-shadow:inset 0 0 40px rgba(235,23,0,.08),0 0 0 rgba(235,23,0,0)}
+  50%{box-shadow:inset 0 0 50px rgba(235,23,0,.14),0 0 20px rgba(235,23,0,.15)}}
+
+.nav-item:nth-child(1){animation:fadeSlideU .6s .40s ease both}
+.nav-item:nth-child(2){animation:fadeSlideU .6s .47s ease both}
+.nav-item:nth-child(3){animation:fadeSlideU .6s .54s ease both}
+.nav-item:nth-child(4){animation:fadeSlideU .6s .61s ease both}
+.nav-item:nth-child(5){animation:fadeSlideU .6s .68s ease both}
+.nav-item:nth-child(7){animation:fadeSlideU .6s .82s ease both}
+.nav-item:nth-child(8){animation:fadeSlideU .6s .89s ease both}
+.nav-item:nth-child(9){animation:fadeSlideU .6s .96s ease both}
+.nav-item:nth-child(10){animation:fadeSlideU .6s 1.03s ease both}
+.nav-item:nth-child(11){animation:fadeSlideU .6s 1.10s ease both}
 
 .pv-label{font-family:var(--body);font-weight:700;font-size:10px;letter-spacing:.25em;
   text-transform:uppercase;color:rgba(232,180,160,.78);margin-bottom:7px;}
@@ -281,12 +338,14 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
   text-transform:uppercase;padding:4px 10px;border-radius:2px;
   border:1px solid rgba(232,180,160,.35);color:rgba(239,216,204,.82);transition:all .35s;}
 .pv-chip.on{border-color:rgba(240,80,32,.65);color:var(--burn);background:rgba(240,80,32,.12);}
+.pv-chip.dd{border-color:rgba(235,23,0,.7);color:#ff8060;background:rgba(235,23,0,.15);}
 #pv-num{font-family:var(--display);font-weight:400;font-size:clamp(58px,10vw,110px);
   line-height:1;letter-spacing:.02em;color:rgba(196,24,0,.09);text-align:right;
   margin-top:auto;transition:color .5s;}
 #pv-num.lit{color:rgba(240,80,32,.22);}
+#pv-num.dd-lit{color:rgba(235,23,0,.3);}
 
-#botbar{flex-shrink:0;height:36px;display:flex;align-items:center;justify-content:space-between;
+#botbar{flex-shrink:0;height:32px;display:flex;align-items:center;justify-content:space-between;
   padding:0 clamp(14px,2.5vw,28px);border-top:1px solid rgba(232,180,160,.1);
   background:linear-gradient(to top,rgba(8,4,7,.9),transparent);overflow:hidden;
   transition:opacity .5s;}
@@ -342,7 +401,7 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
 #mob-nav::-webkit-scrollbar{display:none;}
 
 .mob-nav-item{position:relative;display:flex;align-items:center;
-  padding:0 20px;height:clamp(72px,11.5vh,90px);
+  padding:0 20px;height:clamp(68px,10.5vh,84px);
   border-bottom:1px solid rgba(232,180,160,.1);overflow:hidden;
   -webkit-tap-highlight-color:transparent;cursor:pointer;transition:background .3s;}
 .mob-nav-item:first-child{border-top:1px solid rgba(232,180,160,.1);}
@@ -359,9 +418,10 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
 
 .mni-num{font-family:var(--body);font-weight:500;font-size:10px;letter-spacing:.18em;
   color:rgba(232,180,160,.50);width:36px;flex-shrink:0;padding-left:10px;}
-.mni-body{flex:1;display:flex;flex-direction:column;gap:4px;padding:0 12px 0 8px;}
+.mni-body{flex:1;display:flex;flex-direction:column;gap:4px;padding:0 12px 0 8px;min-width:0;}
 .mni-name{font-family:var(--display);font-weight:400;font-size:clamp(20px,5.5vw,27px);
-  letter-spacing:.01em;line-height:1;color:rgba(245,220,210,.95);transition:color .3s;}
+  letter-spacing:.01em;line-height:1;color:rgba(245,220,210,.95);transition:color .3s;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .mob-nav-item:active .mni-name,.mob-nav-item.touched .mni-name{color:#fff;}
 .mni-sub{font-family:var(--serif);font-style:italic;font-weight:400;font-size:13px;
   color:rgba(232,180,160,.65);transition:color .3s;line-height:1;}
@@ -372,12 +432,52 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
 .mob-nav-item:active .mni-arrow,.mob-nav-item.touched .mni-arrow{
   border-color:rgba(240,80,32,.5);color:var(--heat);background:rgba(240,80,32,.09);}
 
+/* DoorDash — Mobile */
+.mob-nav-item.doordash{
+  border-top:1px solid rgba(235,23,0,.35)!important;
+  border-bottom:1px solid rgba(235,23,0,.35)!important;
+  background:linear-gradient(90deg,rgba(235,23,0,.08),rgba(235,23,0,.02) 60%,transparent);
+  box-shadow:inset 0 0 40px rgba(235,23,0,.08);
+  animation:fadeSlideU .5s .65s ease both, ddGlow 3s ease-in-out 1.4s infinite;
+}
+.mob-nav-item.doordash::before{
+  background:linear-gradient(to bottom,transparent,var(--dd-red-hot),var(--dd-red),transparent);
+  box-shadow:0 0 10px var(--dd-red-hot);
+  transform:scaleY(1);
+  width:3px;
+}
+.mob-nav-item.doordash::after{
+  background:linear-gradient(90deg,rgba(235,23,0,.14),rgba(235,23,0,.04),transparent);
+  opacity:1;
+}
+.mob-nav-item.doordash .mni-num{color:rgba(235,23,0,.85);font-weight:700;}
+.mob-nav-item.doordash .mni-name{color:#fff;}
+.mob-nav-item.doordash .mni-sub{color:rgba(255,120,90,.78);}
+.mob-nav-item.doordash .mni-arrow{
+  border-color:rgba(235,23,0,.6);color:var(--dd-red-hot);
+  background:rgba(235,23,0,.08);box-shadow:0 0 10px rgba(235,23,0,.3);}
+.mob-nav-item.doordash:active .mni-arrow{
+  border-color:var(--dd-red-hot);color:#fff;background:var(--dd-red);}
+.dd-tag-m{display:inline-flex;align-items:center;gap:4px;
+  padding:3px 8px;border-radius:3px;
+  background:linear-gradient(135deg,var(--dd-red-hot),var(--dd-red));
+  color:#fff;font-family:var(--body);font-weight:800;font-size:8px;
+  letter-spacing:.2em;text-transform:uppercase;
+  box-shadow:0 0 12px rgba(235,23,0,.55),inset 0 1px 0 rgba(255,255,255,.15);
+  white-space:nowrap;}
+.dd-tag-m::before{content:'';width:4px;height:4px;border-radius:50%;background:#fff;
+  box-shadow:0 0 5px #fff;animation:ddPulse 1.5s ease-in-out infinite;}
+
 .mob-nav-item:nth-child(1){animation:fadeSlideU .5s .35s ease both}
-.mob-nav-item:nth-child(2){animation:fadeSlideU .5s .43s ease both}
-.mob-nav-item:nth-child(3){animation:fadeSlideU .5s .51s ease both}
-.mob-nav-item:nth-child(4){animation:fadeSlideU .5s .59s ease both}
-.mob-nav-item:nth-child(5){animation:fadeSlideU .5s .67s ease both}
-.mob-nav-item:nth-child(6){animation:fadeSlideU .5s .75s ease both}
+.mob-nav-item:nth-child(2){animation:fadeSlideU .5s .41s ease both}
+.mob-nav-item:nth-child(3){animation:fadeSlideU .5s .47s ease both}
+.mob-nav-item:nth-child(4){animation:fadeSlideU .5s .53s ease both}
+.mob-nav-item:nth-child(5){animation:fadeSlideU .5s .59s ease both}
+.mob-nav-item:nth-child(7){animation:fadeSlideU .5s .71s ease both}
+.mob-nav-item:nth-child(8){animation:fadeSlideU .5s .77s ease both}
+.mob-nav-item:nth-child(9){animation:fadeSlideU .5s .83s ease both}
+.mob-nav-item:nth-child(10){animation:fadeSlideU .5s .89s ease both}
+.mob-nav-item:nth-child(11){animation:fadeSlideU .5s .95s ease both}
 
 #mob-botbar{flex-shrink:0;height:38px;display:flex;align-items:center;justify-content:center;
   border-top:1px solid rgba(232,180,160,.1);
@@ -397,6 +497,12 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
 @keyframes fadeSlideR{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:translateX(0)}}
 @keyframes fadeSlideL{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)}}
 @keyframes fadeSlideU{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* Safety: on shorter desktops, allow nav to scroll internally so nothing gets cut off */
+@media(min-width:768px) and (max-height:720px){
+  #nav-center{overflow-y:auto;}
+  #nav-center::-webkit-scrollbar{display:none;}
+}
 </style>
 </head>
 <body>
@@ -425,7 +531,7 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
       <div class="sb-group">
         <div class="sb-block"><span class="sb-label">The Kitchen</span><span class="sb-text">Made from scratch every morning. Breakfast & lunch done right.</span></div>
         <div class="sb-block"><span class="sb-label">Specialty</span><span class="sb-text">Southern plates, Cajun classics, crawfish, po-boys & homemade desserts</span></div>
-        <div class="sb-block"><span class="sb-label">Service</span><span class="sb-text">Dine-in · Carry-out · Delivery (10+ plates within 10 miles)</span></div>
+        <div class="sb-block"><span class="sb-label">Service</span><span class="sb-text">Dine-in · Carry-out · Delivery · DoorDash</span></div>
         <div class="sb-block"><span class="sb-label">Tonight</span><span class="sb-hot">Crawfish available Thu–Sat 4–8pm</span></div>
       </div>
       <div>
@@ -443,14 +549,15 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
       <nav>
         <div class="nav-item" onclick="doNavigate('home')"     onmouseenter="setPreview('home')"     onmouseleave="clearPreview()"><span class="ni-num">01</span><span class="ni-name">Home</span><span class="ni-sub">Back to the landing page</span><span class="ni-arrow">↗</span></div>
         <div class="nav-item" onclick="doNavigate('menu')"     onmouseenter="setPreview('menu')"     onmouseleave="clearPreview()"><span class="ni-num">02</span><span class="ni-name">The Menu</span><span class="ni-sub">Breakfast, lunch, daily specials</span><span class="ni-arrow">↗</span></div>
-        <div class="nav-item" onclick="doNavigate('lunch')" onmouseenter="setPreview('lunch')" onmouseleave="clearPreview()" style="padding-left:clamp(18px,2.8vw,44px);opacity:.9;"><span class="ni-num" style="font-size:8px;opacity:.7;">✦</span><span class="ni-name" style="font-size:clamp(14px,2.2vw,32px);color:rgba(248,112,56,.85);">Lunch</span><span class="ni-sub">Daily plates · Southern classics</span><span class="ni-arrow" style="width:clamp(20px,2vw,28px);height:clamp(20px,2vw,28px);">↗</span></div>
-        <div class="nav-item" onclick="doNavigate('beer')"  onmouseenter="setPreview('beer')"  onmouseleave="clearPreview()" style="padding-left:clamp(18px,2.8vw,44px);opacity:.9;"><span class="ni-num" style="font-size:8px;opacity:.7;">✦</span><span class="ni-name" style="font-size:clamp(14px,2.2vw,32px);color:rgba(248,112,56,.85);">Beer</span><span class="ni-sub">Cold drinks · What's on tap</span><span class="ni-arrow" style="width:clamp(20px,2vw,28px);height:clamp(20px,2vw,28px);">↗</span></div>
+        <div class="nav-item sub" onclick="doNavigate('lunch')" onmouseenter="setPreview('lunch')" onmouseleave="clearPreview()"><span class="ni-num">✦</span><span class="ni-name">Lunch</span><span class="ni-sub">Daily plates · Southern classics</span><span class="ni-arrow">↗</span></div>
+        <div class="nav-item sub" onclick="doNavigate('beer')"  onmouseenter="setPreview('beer')"  onmouseleave="clearPreview()"><span class="ni-num">✦</span><span class="ni-name">Beer</span><span class="ni-sub">Cold drinks · What's on tap</span><span class="ni-arrow">↗</span></div>
         <div class="nav-item" onclick="doNavigate('delivery')" onmouseenter="setPreview('delivery')" onmouseleave="clearPreview()"><span class="ni-num">03</span><span class="ni-name">Delivery</span><span class="ni-sub">10+ plates · within 10 miles</span><span class="ni-arrow">↗</span></div>
-        <div class="nav-item" onclick="doNavigate('order')"    onmouseenter="setPreview('order')"    onmouseleave="clearPreview()"><span class="ni-num">04</span><span class="ni-name">Order Now</span><span class="ni-sub">Call ahead for faster pickup</span><span class="ni-arrow">↗</span></div>
-        <div class="nav-item" onclick="doNavigate('about')"    onmouseenter="setPreview('about')"    onmouseleave="clearPreview()"><span class="ni-num">05</span><span class="ni-name">About Us</span><span class="ni-sub">Comfort food done right since 2020</span><span class="ni-arrow">↗</span></div>
-        <div class="nav-item" onclick="doNavigate('facebook')" onmouseenter="setPreview('facebook')" onmouseleave="clearPreview()"><span class="ni-num">06</span><span class="ni-name">Facebook</span><span class="ni-sub">Daily specials posted every morning</span><span class="ni-arrow">↗</span></div>
-        <div class="nav-item" onclick="doNavigate('find')"     onmouseenter="setPreview('find')"     onmouseleave="clearPreview()"><span class="ni-num">07</span><span class="ni-name">Find Us</span><span class="ni-sub">2741 US-190 · DeRidder, LA</span><span class="ni-arrow">↗</span></div>
-        <div class="nav-item" id="staff-desktop" data-nav="staff" onmouseenter="setPreview('staff')" onmouseleave="clearPreview()"><span class="ni-num">08</span><span class="ni-name">Staff Portal</span><span class="ni-sub">Team access · Internal tools</span><span class="ni-arrow">↗</span></div>
+        <div class="nav-item doordash" onclick="doNavigate('doordash')" onmouseenter="setPreview('doordash')" onmouseleave="clearPreview()"><span class="ni-num">04</span><span class="ni-name">DoorDash<span class="dd-tag">New</span></span><span class="ni-sub">Order delivery through DoorDash</span><span class="ni-arrow">↗</span></div>
+        <div class="nav-item" onclick="doNavigate('order')"    onmouseenter="setPreview('order')"    onmouseleave="clearPreview()"><span class="ni-num">05</span><span class="ni-name">Order Now</span><span class="ni-sub">Call ahead for faster pickup</span><span class="ni-arrow">↗</span></div>
+        <div class="nav-item" onclick="doNavigate('about')"    onmouseenter="setPreview('about')"    onmouseleave="clearPreview()"><span class="ni-num">06</span><span class="ni-name">About Us</span><span class="ni-sub">Comfort food done right since 2020</span><span class="ni-arrow">↗</span></div>
+        <div class="nav-item" onclick="doNavigate('facebook')" onmouseenter="setPreview('facebook')" onmouseleave="clearPreview()"><span class="ni-num">07</span><span class="ni-name">Facebook</span><span class="ni-sub">Daily specials posted every morning</span><span class="ni-arrow">↗</span></div>
+        <div class="nav-item" onclick="doNavigate('find')"     onmouseenter="setPreview('find')"     onmouseleave="clearPreview()"><span class="ni-num">08</span><span class="ni-name">Find Us</span><span class="ni-sub">2741 US-190 · DeRidder, LA</span><span class="ni-arrow">↗</span></div>
+        <div class="nav-item" id="staff-desktop" data-nav="staff" onmouseenter="setPreview('staff')" onmouseleave="clearPreview()"><span class="ni-num">09</span><span class="ni-name">Staff Portal</span><span class="ni-sub">Team access · Internal tools</span><span class="ni-arrow">↗</span></div>
       </nav>
     </div>
 
@@ -486,11 +593,12 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
     <div class="mob-nav-item" onclick="doNavigate('lunch')" style="padding-left:36px;"><span class="mni-num" style="font-size:9px;opacity:.6;">✦</span><div class="mni-body"><div class="mni-name" style="font-size:clamp(18px,4.5vw,23px);color:rgba(248,112,56,.88);">Lunch</div><div class="mni-sub">Daily plates · Southern classics</div></div><span class="mni-arrow">↗</span></div>
     <div class="mob-nav-item" onclick="doNavigate('beer')" style="padding-left:36px;"><span class="mni-num" style="font-size:9px;opacity:.6;">✦</span><div class="mni-body"><div class="mni-name" style="font-size:clamp(18px,4.5vw,23px);color:rgba(248,112,56,.88);">Beer</div><div class="mni-sub">Cold drinks · What's on tap</div></div><span class="mni-arrow">↗</span></div>
     <div class="mob-nav-item" onclick="doNavigate('delivery')"><span class="mni-num">03</span><div class="mni-body"><div class="mni-name">Delivery</div><div class="mni-sub">10+ plates · within 10 miles</div></div><span class="mni-arrow">↗</span></div>
-    <div class="mob-nav-item" onclick="doNavigate('order')"><span class="mni-num">04</span><div class="mni-body"><div class="mni-name">Order Now</div><div class="mni-sub">Call ahead for faster pickup</div></div><span class="mni-arrow">↗</span></div>
-    <div class="mob-nav-item" onclick="doNavigate('about')"><span class="mni-num">05</span><div class="mni-body"><div class="mni-name">About Us</div><div class="mni-sub">Comfort food done right since 2020</div></div><span class="mni-arrow">↗</span></div>
-    <div class="mob-nav-item" onclick="doNavigate('facebook')"><span class="mni-num">06</span><div class="mni-body"><div class="mni-name">Facebook</div><div class="mni-sub">Daily specials posted every morning</div></div><span class="mni-arrow">↗</span></div>
-    <div class="mob-nav-item" onclick="doNavigate('find')"><span class="mni-num">07</span><div class="mni-body"><div class="mni-name">Find Us</div><div class="mni-sub">2741 US-190 · DeRidder, LA</div></div><span class="mni-arrow">↗</span></div>
-    <div class="mob-nav-item" id="staff-mobile" data-nav="staff"><span class="mni-num">08</span><div class="mni-body"><div class="mni-name">Staff Portal</div><div class="mni-sub">Team access · Internal tools</div></div><span class="mni-arrow">↗</span></div>
+    <div class="mob-nav-item doordash" onclick="doNavigate('doordash')"><span class="mni-num">04</span><div class="mni-body"><div class="mni-name">DoorDash <span class="dd-tag-m">New</span></div><div class="mni-sub">Order delivery through DoorDash</div></div><span class="mni-arrow">↗</span></div>
+    <div class="mob-nav-item" onclick="doNavigate('order')"><span class="mni-num">05</span><div class="mni-body"><div class="mni-name">Order Now</div><div class="mni-sub">Call ahead for faster pickup</div></div><span class="mni-arrow">↗</span></div>
+    <div class="mob-nav-item" onclick="doNavigate('about')"><span class="mni-num">06</span><div class="mni-body"><div class="mni-name">About Us</div><div class="mni-sub">Comfort food done right since 2020</div></div><span class="mni-arrow">↗</span></div>
+    <div class="mob-nav-item" onclick="doNavigate('facebook')"><span class="mni-num">07</span><div class="mni-body"><div class="mni-name">Facebook</div><div class="mni-sub">Daily specials posted every morning</div></div><span class="mni-arrow">↗</span></div>
+    <div class="mob-nav-item" onclick="doNavigate('find')"><span class="mni-num">08</span><div class="mni-body"><div class="mni-name">Find Us</div><div class="mni-sub">2741 US-190 · DeRidder, LA</div></div><span class="mni-arrow">↗</span></div>
+    <div class="mob-nav-item" id="staff-mobile" data-nav="staff"><span class="mni-num">09</span><div class="mni-body"><div class="mni-name">Staff Portal</div><div class="mni-sub">Team access · Internal tools</div></div><span class="mni-arrow">↗</span></div>
   </div>
   <div id="mob-botbar"><div id="mob-ticker-track"></div></div>
 </div>
@@ -548,7 +656,7 @@ let mx=W/2,my=H/2;
 document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;curEl.style.left=e.clientX+'px';curEl.style.top=e.clientY+'px';});
 
 /* TICKERS */
-const tkItems=['Red Beans & Rice','Fried Chicken Plate','Catfish Plate','Meatloaf','Smothered Pork Chops','Chicken & Sausage Gumbo','Shrimp Po\' Boy','Crawfish Étouffée','Jambalaya','Mac & Cheese','Cornbread','Breakfast Plate','Biscuits & Gravy','Cajun Boudin','Sweet Tea','Bread Pudding'];
+const tkItems=['Red Beans & Rice','Fried Chicken Plate','Catfish Plate','Meatloaf','Smothered Pork Chops','Chicken & Sausage Gumbo','Shrimp Po\' Boy','Crawfish Étouffée','Jambalaya','Mac & Cheese','Cornbread','Breakfast Plate','Biscuits & Gravy','Cajun Boudin','Sweet Tea','Bread Pudding','Now on DoorDash'];
 const d4=[...tkItems,...tkItems,...tkItems,...tkItems];
 document.getElementById('ticker-track').innerHTML=d4.map(t=>`<span class="t-item">${t}</span>`).join('');
 document.getElementById('mob-ticker-track').innerHTML=d4.map(t=>`<span class="mt-item">${t}</span>`).join('');
@@ -560,10 +668,12 @@ const mobHoursStr=dow===0?'7am – 3pm':dow===6?'6am – 2pm':'5:30am – 2pm';
 document.getElementById('hours-today').textContent=hoursStr;
 document.getElementById('mob-hours').textContent=mobHoursStr;
 
-/* PAGE DATA */
+/* PAGE DATA — doordash opens the DoorDash store page in a new tab */
 const PAGES={
   home:{dest:'home.html'},menu:{dest:'menu.html'},lunch:{dest:'menu.html#lunch'},
-  beer:{dest:'menu.html#beer'},delivery:{dest:'delivery.html'},order:{dest:'tel:3372211035'},
+  beer:{dest:'menu.html#beer'},delivery:{dest:'delivery.html'},
+  doordash:{dest:'https://www.doordash.com/store/hot-headz-southern-foods'},
+  order:{dest:'tel:3372211035'},
   about:{dest:'about.html'},facebook:{dest:'https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/'},
   find:{dest:'https://maps.google.com/?q=2741+US-190+DeRidder+LA+70634'},staff:{dest:'staff-portal.html'},
 };
@@ -573,26 +683,31 @@ const pvData={
   lunch:{num:'✦',title:'Lunch. Done Right.',italic:'Daily Southern plates · Changes every day',chips:['Changes Daily','Southern Plates','Includes Sides','Check Facebook']},
   beer:{num:'✦',title:'Cold. Cold Beer.',italic:'Ice cold · Natural Light · Modelo · Budweiser',chips:['Natural Light','Miller Lite','Coors Light','Modelo']},
   delivery:{num:'03',title:'We Bring The Food.',italic:'10+ plate orders · within 10 miles',chips:['10+ Plates','Within 10 Miles','Call Ahead','(337) 221-1035']},
-  order:{num:'04',title:'Call Ahead.',italic:'Skip the line · Ready when you arrive',chips:['(337) 221-1035','Mon–Fri from 5:30am','Sat from 6am','Sun from 7am']},
-  about:{num:'05',title:'Comfort Food Done Right.',italic:'Family-owned · DeRidder proud · Since 2020',chips:['Est. 2020','Family Owned','Made From Scratch','DeRidder Proud']},
-  facebook:{num:'06',title:'Follow The Feed.',italic:'Daily specials posted every morning',chips:['Daily Specials','Morning Posts','Photos','Announcements']},
-  find:{num:'07',title:"We're on US-190.",italic:'2741 US-190 · DeRidder, LA 70634',chips:['2741 US-190','(337) 221-1035','Mon–Fri 5:30–2','Sat 6–2']},
-  staff:{num:'08',title:'Staff Portal.',italic:'Team access · Scheduling · Internal tools',chips:['Staff Only','Schedule','Internal','Portal']},
+  doordash:{num:'04',title:'Now On DoorDash.',italic:'Order delivery · Tap to open DoorDash',chips:['DoorDash','Delivery','Order Online','Tap To Open'],dd:true},
+  order:{num:'05',title:'Call Ahead.',italic:'Skip the line · Ready when you arrive',chips:['(337) 221-1035','Mon–Fri from 5:30am','Sat from 6am','Sun from 7am']},
+  about:{num:'06',title:'Comfort Food Done Right.',italic:'Family-owned · DeRidder proud · Since 2020',chips:['Est. 2020','Family Owned','Made From Scratch','DeRidder Proud']},
+  facebook:{num:'07',title:'Follow The Feed.',italic:'Daily specials posted every morning',chips:['Daily Specials','Morning Posts','Photos','Announcements']},
+  find:{num:'08',title:"We're on US-190.",italic:'2741 US-190 · DeRidder, LA 70634',chips:['2741 US-190','(337) 221-1035','Mon–Fri 5:30–2','Sat 6–2']},
+  staff:{num:'09',title:'Staff Portal.',italic:'Team access · Scheduling · Internal tools',chips:['Staff Only','Schedule','Internal','Portal']},
 };
 
 function setPreview(id){
   const p=pvData[id];
   document.getElementById('pv-title').textContent=p.title;
   document.getElementById('pv-desc').textContent=p.italic;
-  document.getElementById('pv-num').textContent=p.num;
-  document.getElementById('pv-num').classList.add('lit');
-  document.getElementById('pv-chips').innerHTML=p.chips.slice(0,4).map((c,i)=>`<span class="pv-chip${i<2?' on':''}">${c}</span>`).join('');
+  const num=document.getElementById('pv-num');
+  num.textContent=p.num;
+  num.classList.remove('lit','dd-lit');
+  num.classList.add(p.dd?'dd-lit':'lit');
+  const chipClass=p.dd?' dd':' on';
+  document.getElementById('pv-chips').innerHTML=p.chips.slice(0,4).map((c,i)=>`<span class="pv-chip${i<2?chipClass:''}">${c}</span>`).join('');
 }
 function clearPreview(){
   document.getElementById('pv-title').textContent='Hover any item to explore';
   document.getElementById('pv-desc').textContent='Each destination has its own story. Take your time.';
-  document.getElementById('pv-num').classList.remove('lit');
-  document.getElementById('pv-num').textContent='—';
+  const num=document.getElementById('pv-num');
+  num.classList.remove('lit','dd-lit');
+  num.textContent='—';
   document.getElementById('pv-chips').innerHTML='';
 }
 
@@ -658,7 +773,9 @@ function spawnNavParticles(hotDots,col){
 function doNavigate(id){
   if(navActive)return;
   const page=PAGES[id];if(!page)return;
-  navActive=true;navDest=page.dest;navColor=[255,140,60];
+  navActive=true;navDest=page.dest;
+  // DoorDash gets its own brand red particle color
+  navColor = id==='doordash' ? [255,45,14] : [255,140,60];
   navPhase=1;navPhaseTs=performance.now();
   navCv.style.display='block';
   document.getElementById('topbar').style.opacity='0';
@@ -778,22 +895,20 @@ document.addEventListener('touchstart',e=>{
     });
     el.addEventListener('mouseleave', cancelHold);
 
-    // TOUCH (mobile) — this is the key fix
+    // TOUCH (mobile)
     el.addEventListener('touchstart', function(e){
-      // Don't call preventDefault here — allow scroll detection
       var touch = e.touches[0];
       startHold(touch.clientX, touch.clientY);
     }, {passive: true});
 
     el.addEventListener('touchend', function(e){
-      e.preventDefault(); // prevent ghost click / double-fire
+      e.preventDefault();
       endHold();
     });
 
     el.addEventListener('touchcancel', cancelHold);
 
     el.addEventListener('touchmove', function(e){
-      // Cancel if finger moved more than 10px (user is scrolling)
       if(e.touches.length > 0){
         var dx = e.touches[0].clientX - startX;
         var dy = e.touches[0].clientY - startY;
@@ -803,7 +918,6 @@ document.addEventListener('touchstart',e=>{
       }
     }, {passive: true});
 
-    // Block any click events — we handle everything via touch/mouse down/up
     el.addEventListener('click', function(e){
       e.preventDefault();
       e.stopPropagation();
