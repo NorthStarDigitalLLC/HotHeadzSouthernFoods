@@ -1358,7 +1358,160 @@ function buildMenuLunch(){
   h+='</div>';
   h+='<div id="lunchDateEditor"><div style="font-size:11px;color:var(--text3);padding:8px;">Select a date above...</div></div>';
   h+='</div></div>';
+
+  // ═══ SAVED DATES MANAGER ═══
+  h+='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83d\uddd1\ufe0f Manage Saved Dates</span></div><div class="acc-body">';
+  h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">All lunch dates currently saved in the cloud. Past dates that have already happened still take up sheet rows and clutter the forecast \u2014 clean them out here.</p>';
+  h+='<div class="btn-row" style="margin-bottom:10px;">';
+  h+='<button class="sm-btn primary" id="loadSavedDates">\ud83d\udd04 Load Saved Dates</button>';
+  h+='<button class="sm-btn danger" id="deleteAllPastDates">\ud83d\uddd1\ufe0f Delete All Past Dates</button>';
+  h+='</div>';
+  h+='<div id="savedDatesList"><div style="font-size:11px;color:var(--text3);padding:6px;">Click "Load Saved Dates" to see what\'s in the spreadsheet.</div></div>';
+  h+='</div></div>';
   return h;
+}
+
+// Helper to render the saved-dates list
+async function refreshSavedDatesList(){
+  const el = document.getElementById('savedDatesList');
+  if (!el) return;
+  el.innerHTML = '<div style="font-size:11px;color:var(--text3);padding:6px;">Loading from cloud...</div>';
+  try {
+    const result = await apiPost({ action: 'lunch' });
+    if (!result || !result.success) {
+      el.innerHTML = '<div style="font-size:11px;color:var(--danger);padding:6px;">Could not load: ' + (result && result.error ? result.error : 'unknown error') + '</div>';
+      return;
+    }
+    const dates = result.dates || {};
+    const keys = Object.keys(dates).sort();
+    if (!keys.length) {
+      el.innerHTML = '<div style="font-size:11px;color:var(--text3);padding:6px;">No dates saved yet.</div>';
+      return;
+    }
+    const todayStr = todayISO();
+    let html = '';
+    let pastCount = 0;
+    keys.forEach(date => {
+      const isPast = date < todayStr;
+      const isToday = date === todayStr;
+      if (isPast) pastCount++;
+      const data = dates[date] || {};
+      const lunch = data.lunch || {};
+      const items = lunch.items || [];
+      const itemCount = items.length;
+      const day = isoToDay(date);
+      const label = isoToLabel(date);
+      const ageBadge = isPast ? '<span style="background:rgba(255,77,77,.15);color:#ff7a7a;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;">PAST</span>' :
+                       isToday ? '<span style="background:rgba(255,200,80,.15);color:#ffc850;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;">TODAY</span>' :
+                       '<span style="background:rgba(100,180,255,.15);color:#7ac4ff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;">UPCOMING</span>';
+      html += '<div style="display:flex;align-items:center;gap:6px;padding:8px;border-radius:var(--radius-sm);margin-bottom:4px;background:'+(isPast?'rgba(255,77,77,.04)':'rgba(255,255,255,.03)')+';border:1px solid '+(isPast?'rgba(255,77,77,.12)':'var(--border)')+';">';
+      html += '<div style="flex:1;min-width:0">';
+      html += '<div style="font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;">'+esc(day)+' '+ageBadge+'</div>';
+      html += '<div style="font-size:10px;color:var(--text3);">'+esc(label)+' \u2022 '+itemCount+' item'+(itemCount===1?'':'s')+'</div>';
+      html += '</div>';
+      html += '<button class="sm-btn savedDateLoad" data-date="'+esc(date)+'" style="font-size:10px;">Load</button>';
+      html += '<button class="sm-btn danger savedDateDel" data-date="'+esc(date)+'" data-day="'+esc(day)+'" style="font-size:10px;padding:4px 8px;">\u00d7</button>';
+      html += '</div>';
+    });
+    if (pastCount > 0) {
+      html = '<div style="font-size:11px;color:var(--text2);padding:6px 0;margin-bottom:6px;">Total: '+keys.length+' dates saved \u2022 <span style="color:#ff7a7a;font-weight:700;">'+pastCount+' past</span></div>' + html;
+    } else {
+      html = '<div style="font-size:11px;color:var(--text2);padding:6px 0;margin-bottom:6px;">Total: '+keys.length+' dates saved</div>' + html;
+    }
+    el.innerHTML = html;
+
+    // Wire individual delete and load buttons
+    el.querySelectorAll('.savedDateDel').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const date = btn.dataset.date;
+        const day = btn.dataset.day;
+        if (!confirm('Delete lunch for '+day+' ('+date+')? This removes the row from the spreadsheet.')) return;
+        const ok = await deleteLunchForDate(date);
+        if (ok) refreshSavedDatesList();
+      });
+    });
+    el.querySelectorAll('.savedDateLoad').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Switch to a date button if it's in the visible 7-day range, otherwise just info-toast
+        const date = btn.dataset.date;
+        const dayBtn = document.querySelector('.lunchDateBtn[data-date="'+date+'"]');
+        if (dayBtn) {
+          dayBtn.click();
+          dayBtn.scrollIntoView({behavior:'smooth',block:'nearest'});
+        } else {
+          toast('Date '+date+' is outside the 7-day editor range. Showing details only:', 'info');
+          // Render in the editor area as read-only-ish
+          const dayName = isoToDay(date);
+          const data = (window._lastSavedDates && window._lastSavedDates[date]) || {};
+          const items = (data.lunch && data.lunch.items) || [];
+          const dessert = (data.dessert && data.dessert.items) || [];
+          const showCrawfish = !data.crawfish || data.crawfish.show !== false;
+          let lh = '<div style="font-size:12px;font-weight:700;color:var(--fire);margin-bottom:8px;">'+dayName+' \u2022 '+date+' (read-only \u2014 outside editor range)</div>';
+          lh += '<div class="fl">Lunch Items</div>';
+          const itemsText = items.map(i => typeof i==='object' ? (i.name+(i.desc?' | '+i.desc:'')) : (i||'')).join('\n');
+          lh += '<textarea class="fi fi-ta" id="lunchItemsTA" rows="10">'+esc(itemsText)+'</textarea>';
+          lh += '<div class="fr"><div><div class="fl">Dessert</div><input class="fi" id="lunchDessert" value="'+esc(dessert.join(', '))+'"></div>';
+          lh += '<div><div class="fl">Crawfish</div><label class="cf-toggle" style="margin-top:8px;"><input type="checkbox" id="lunchCrawfish"'+(showCrawfish?' checked':'')+'> Available</label></div></div>';
+          lh += '<div class="btn-row" style="margin-top:8px;">';
+          lh += '<button class="sm-btn primary" id="saveLunchDate">\ud83d\udcbe Save '+date+'</button>';
+          lh += '<button class="sm-btn danger" id="deleteLunchDate">\u00d7 Clear This Date</button></div>';
+          const ed = document.getElementById('lunchDateEditor');
+          if (ed) {
+            ed.innerHTML = lh;
+            // Wire up these buttons too
+            document.getElementById('saveLunchDate')?.addEventListener('click', async () => {
+              const lines = linesTo(document.getElementById('lunchItemsTA')?.value);
+              const lunchItems = lines.map(line => { const [name, ...rest] = line.split('|'); return { name: (name||'').trim(), desc: rest.join('|').trim() }; }).filter(i => i.name);
+              const dess = linesTo(document.getElementById('lunchDessert')?.value.replace(/,/g,'\n'));
+              const crawfish = document.getElementById('lunchCrawfish')?.checked;
+              await saveLunchForDate(date, { lunch: { show:true, items: lunchItems }, dessert: { items: dess }, crawfish: { show: crawfish } });
+            });
+            document.getElementById('deleteLunchDate')?.addEventListener('click', async () => {
+              if (!confirm('Clear lunch for '+date+'?')) return;
+              await deleteLunchForDate(date);
+              refreshSavedDatesList();
+            });
+          }
+        }
+      });
+    });
+    // Stash the dates so the load handler can read them
+    window._lastSavedDates = dates;
+  } catch (e) {
+    el.innerHTML = '<div style="font-size:11px;color:var(--danger);padding:6px;">Error: '+e.message+'</div>';
+  }
+}
+
+// Bulk delete all past dates
+async function deleteAllPastDates(){
+  try {
+    const result = await apiPost({ action: 'lunch' });
+    if (!result || !result.success) {
+      toast('Could not load dates: '+(result?.error||'unknown'), 'error');
+      return;
+    }
+    const dates = result.dates || {};
+    const todayStr = todayISO();
+    const pastKeys = Object.keys(dates).filter(d => d < todayStr).sort();
+    if (!pastKeys.length) {
+      toast('No past dates to delete', 'info');
+      return;
+    }
+    if (!confirm('Delete '+pastKeys.length+' past lunch date'+(pastKeys.length===1?'':'s')+'?\n\nDates to delete:\n'+pastKeys.join('\n')+'\n\nThis cannot be undone.')) return;
+    toast('Deleting '+pastKeys.length+' dates...', 'info');
+    let deleted = 0, failed = 0;
+    for (const date of pastKeys) {
+      try {
+        const r = await apiPost({ action: 'delete-lunch', date: date });
+        if (r && r.success) deleted++; else failed++;
+      } catch (e) { failed++; }
+    }
+    if (failed === 0) toast('Deleted '+deleted+' past date'+(deleted===1?'':'s')+'!', 'success');
+    else toast('Deleted '+deleted+', failed '+failed, 'error');
+    refreshSavedDatesList();
+  } catch (e) {
+    toast('Error: '+e.message, 'error');
+  }
 }
 
 /* ═══ MENU LUNCH (forecast) wire handlers ═══ */
@@ -1399,16 +1552,28 @@ function wireMenuPanel(){
       if(!confirm('Clear lunch for '+date+'?'))return;
       await deleteLunchForDate(date);
       btn.click();
+      refreshSavedDatesList();
     });
   });});
   const todayBtn=document.querySelector('.lunchDateBtn');
   if(todayBtn&&currentTab==='menu-lunch')todayBtn.click();
+
+  // Wire the saved dates manager buttons
+  const lsd = document.getElementById('loadSavedDates');
+  if (lsd) lsd.addEventListener('click', refreshSavedDatesList);
+  const dap = document.getElementById('deleteAllPastDates');
+  if (dap) dap.addEventListener('click', deleteAllPastDates);
+
+  // Auto-load saved dates list when the tab opens
+  if (currentTab === 'menu-lunch') {
+    setTimeout(refreshSavedDatesList, 100);
+  }
 }
 
 async function saveLunchForDate(date,data){
   try{
     const j=await apiPost({action:'save-lunch',date:date,data:data});
-    if(j.success){toast('Lunch saved for '+date+'!','success');return true;}
+    if(j.success){toast('Lunch saved for '+date+'!','success');if(typeof refreshSavedDatesList==='function')setTimeout(refreshSavedDatesList,300);return true;}
     else{toast('Save failed: '+(j.error||''),'error');return false;}
   }catch(e){toast('Save error: '+e.message,'error');return false;}
 }
