@@ -766,7 +766,7 @@ async function loadMenuDefaults(force){
   menuDefaultsStatus = 'loading';
   try {
     const res = await cloudRequest('getMenuDefaults');
-    if (res && res.ok && res.data) {
+    if (res && res.success && res.data) {
       menuDefaultsCache = res.data;
       menuDefaultsStatus = 'loaded';
       return menuDefaultsCache;
@@ -783,7 +783,7 @@ async function saveMenuDefaultKey(key, value){
   toast('Saving ' + key + '...', 'info');
   try {
     const res = await apiPost({ action: 'saveMenuDefault', key: key, json: JSON.stringify(value) });
-    if (res && res.ok) {
+    if (res && res.success) {
       if (menuDefaultsCache) menuDefaultsCache[key] = value;
       toast('Saved ' + key + '!', 'success');
       return true;
@@ -801,7 +801,7 @@ async function resetMenuDefaultKey(key){
   toast('Resetting ' + key + '...', 'info');
   try {
     const res = await apiPost({ action: 'resetMenuDefault', key: key });
-    if (res && res.ok) {
+    if (res && res.success) {
       await loadMenuDefaults(true);
       toast('Reset ' + key + ' to defaults', 'success');
       return true;
