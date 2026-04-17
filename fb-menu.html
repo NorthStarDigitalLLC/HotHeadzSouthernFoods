@@ -417,8 +417,10 @@ function getCloudName(){return localStorage.getItem(CLOUD_NAME_KEY)||'';}
 function setCloudName(n){localStorage.setItem(CLOUD_NAME_KEY,n);}
 
 function apiGet(params){
-  var q=Object.keys(params).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(params[k]);}).join('&');
-  return fetch(getCloudUrl()+'?'+q).then(function(r){return r.text();}).then(function(t){return JSON.parse(t);});
+  // Use POST with text/plain body (a "simple" CORS request) — same trick as apiPost.
+  // Apps Script doesn't reliably send CORS headers on GET responses, but it does
+  // accept and respond to POST since the request is treated as a simple cross-origin request.
+  return apiPost(params);
 }
 function apiPost(params){
   return fetch(getCloudUrl(),{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(params)}).then(function(r){return r.text();}).then(function(t){return JSON.parse(t);});
