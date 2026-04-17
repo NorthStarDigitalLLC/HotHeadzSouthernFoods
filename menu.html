@@ -338,12 +338,17 @@ function applyFullMenu(d){
 var MIN_LOAD_MS = 1600;
 var loadStart = Date.now();
 
-fetch(CLOUD_URL + '?action=getFullMenu&_ts=' + Date.now(), { method:'GET', mode:'cors' })
+fetch(CLOUD_URL, {
+    method: 'POST',
+    redirect: 'follow',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: 'getFullMenu', _ts: Date.now() })
+  })
   .then(function(r){ return r.text(); })
   .then(function(txt){
     try {
       var j = JSON.parse(txt);
-      if (j && j.ok && j.data) applyFullMenu(j.data);
+      if (j && j.success && j.data) applyFullMenu(j.data);
       else console.warn('[HH] Unexpected cloud payload:', j);
     } catch(e) { console.warn('[HH] Parse error:', e.message); }
     finish();
