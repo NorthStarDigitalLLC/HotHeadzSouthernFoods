@@ -418,7 +418,7 @@ function setCloudName(n){localStorage.setItem(CLOUD_NAME_KEY,n);}
 
 function apiGet(params){
   var q=Object.keys(params).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(params[k]);}).join('&');
-  return fetch(getCloudUrl()+'?'+q,{method:'GET',mode:'cors'}).then(function(r){return r.text();}).then(function(t){return JSON.parse(t);});
+  return fetch(getCloudUrl()+'?'+q).then(function(r){return r.text();}).then(function(t){return JSON.parse(t);});
 }
 function apiPost(params){
   return fetch(getCloudUrl(),{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(params)}).then(function(r){return r.text();}).then(function(t){return JSON.parse(t);});
