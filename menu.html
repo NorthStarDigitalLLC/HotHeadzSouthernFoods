@@ -105,6 +105,91 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:10000;
 .adv-day-tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:18px}.adv-day-tab{font-size:13px;font-weight:600;padding:9px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.10);background:var(--surface);color:rgba(245,237,228,.70);cursor:pointer;transition:all .3s}.adv-day-tab.active{background:var(--surface-raised);border-color:var(--border-warm);color:var(--accent-light)}.adv-card{display:none;border-radius:24px;border:1px solid rgba(255,255,255,.10);background:var(--surface-solid);padding:28px;animation:sIn .5s var(--ease-out-expo)}.adv-card.visible{display:block}.adv-card-title{font-family:var(--font-display);font-size:30px;font-weight:700;margin-bottom:4px}.adv-card-sub{font-size:14px;color:rgba(245,237,228,.72);margin-bottom:18px}
 .closed-state{text-align:center;padding:60px 20px;border-radius:24px;border:1px solid rgba(255,255,255,.10);background:var(--surface-solid)}.closed-state h2{font-family:var(--font-display);font-size:32px;font-weight:700;margin-bottom:8px}.closed-state p{color:rgba(245,237,228,.82);font-size:15px}
 .back-btn{position:fixed;z-index:90;bottom:26px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border-warm);border-radius:999px;padding:14px 32px;display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-weight:700;font-size:15px;box-shadow:0 8px 32px rgba(0,0,0,.6);transition:all .3s;backdrop-filter:blur(16px)}.back-btn:hover{transform:translateX(-50%) translateY(-3px);border-color:var(--accent)}.back-btn .arrow{color:var(--accent-hot);font-size:20px}
+
+/* ═══ ACTION BAR (Call / Directions / Share / Print) ═══ */
+.action-bar{position:fixed;z-index:89;bottom:26px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--border-warm);border-radius:999px;padding:6px;box-shadow:0 8px 32px rgba(0,0,0,.6);backdrop-filter:blur(16px);max-width:calc(100vw - 24px)}
+.action-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:999px;border:none;background:transparent;color:var(--text);font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;text-decoration:none;transition:all .25s var(--ease-out-expo);white-space:nowrap}
+.action-btn svg{width:16px;height:16px;flex-shrink:0}
+.action-btn:hover{background:var(--surface-raised);transform:translateY(-1px)}
+.action-btn.primary{background:linear-gradient(135deg,var(--accent),var(--ember));color:#fff;box-shadow:0 4px 16px var(--accent-glow)}
+.action-btn.primary:hover{box-shadow:0 6px 24px var(--accent-glow)}
+.action-btn.home{opacity:.72}
+.action-btn.home:hover{opacity:1}
+.action-label{display:inline}
+@media(max-width:640px){.action-bar{gap:4px;padding:5px;bottom:16px}.action-btn{padding:10px 12px;font-size:12px;gap:4px}.action-label{display:none}.action-btn.primary .action-label{display:inline}}
+
+/* ═══ TODAY'S SPECIALS BADGE ═══ */
+.specials-banner{display:none;justify-content:center;margin:16px auto 8px;max-width:calc(100% - 36px);opacity:0;animation:fadeUp .8s var(--ease-out-expo) 1.4s forwards}
+.specials-banner.visible{display:flex}
+.specials-badge{display:inline-flex;align-items:center;gap:10px;padding:10px 22px;border-radius:999px;background:linear-gradient(135deg,rgba(255,106,26,.15),rgba(196,58,24,.10));border:1px solid rgba(255,120,40,.35);color:var(--accent-light);font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;position:relative;overflow:hidden;cursor:pointer;transition:all .3s var(--ease-out-expo)}
+.specials-badge:hover{transform:translateY(-2px);border-color:var(--accent-hot);color:#fff}
+.specials-badge::before{content:"";position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,200,120,.2),transparent);animation:bannerShine 3s ease-in-out infinite}
+@keyframes bannerShine{0%{left:-100%}60%{left:100%}100%{left:100%}}
+.specials-flame{font-size:14px;animation:flameFloat 1.6s ease-in-out infinite}
+.specials-count{background:rgba(255,106,26,.25);color:var(--accent-light);padding:2px 8px;border-radius:999px;font-size:11px;letter-spacing:.06em}
+
+/* ═══ WHATS NEW TICKER ═══ */
+.ticker-wrap{display:none;margin:0 auto 12px;max-width:calc(100% - 36px);background:linear-gradient(90deg,rgba(255,106,26,.08),rgba(255,200,120,.04));border:1px solid rgba(255,120,40,.18);border-radius:14px;overflow:hidden;opacity:0;animation:fadeUp .8s var(--ease-out-expo) 1.5s forwards}
+.ticker-wrap.visible{display:flex;align-items:center;gap:0}
+.ticker-label{flex-shrink:0;padding:10px 14px;background:rgba(255,106,26,.18);color:var(--accent-light);font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.ticker-track{flex:1;overflow:hidden;white-space:nowrap;position:relative;mask-image:linear-gradient(90deg,transparent 0,#000 20px,#000 calc(100% - 20px),transparent 100%)}
+.ticker-inner{display:inline-flex;animation:tickerScroll 28s linear infinite;padding-left:100%}
+.ticker-wrap:hover .ticker-inner{animation-play-state:paused}
+@keyframes tickerScroll{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+.ticker-item{padding:10px 0;color:var(--text-mid);font-size:13px;font-weight:600}
+.ticker-item strong{color:var(--accent-light);font-weight:700}
+.ticker-sep{color:var(--accent);padding:0 20px;font-weight:900}
+
+/* ═══ BETTER CLOSED STATE with countdown ═══ */
+.closed-enhanced{text-align:center;padding:50px 24px;border-radius:24px;border:1px solid var(--border-warm);background:linear-gradient(145deg,var(--surface-solid),rgba(40,28,18,.5));position:relative;overflow:hidden}
+.closed-enhanced::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.closed-icon{font-size:44px;margin-bottom:12px;display:inline-block;animation:flameFloat 2s ease-in-out infinite}
+.closed-title{font-family:var(--font-display);font-size:36px;font-weight:700;line-height:1.1;margin-bottom:6px}
+.closed-sub{font-size:15px;color:var(--text-mid);margin-bottom:26px}
+.closed-cd{display:inline-flex;flex-direction:column;align-items:center;gap:10px;padding:20px 28px;border-radius:20px;background:rgba(255,255,255,.03);border:1px solid var(--border);margin-bottom:18px}
+.closed-cd-label{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-light)}
+.closed-cd-value{font-size:32px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums;line-height:1}
+.closed-cd-detail{font-size:12px;color:var(--text-dim);font-weight:600}
+.closed-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.closed-action-btn{padding:11px 20px;border-radius:999px;border:1px solid var(--border-warm);background:var(--surface);color:var(--text);font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .25s}
+.closed-action-btn:hover{background:var(--surface-raised);transform:translateY(-2px)}
+.closed-action-btn svg{width:14px;height:14px}
+
+/* ═══ SHARE TOAST ═══ */
+.share-toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface-solid);border:1px solid var(--accent);color:var(--text);padding:12px 22px;border-radius:999px;font-size:13px;font-weight:700;z-index:201;box-shadow:0 8px 32px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:all .4s var(--ease-spring)}
+.share-toast.visible{opacity:1;transform:translateX(-50%) translateY(0)}
+.share-toast::before{content:"\2713";color:var(--accent-hot);margin-right:6px;font-weight:900}
+
+/* ═══ PRINT STYLES ═══ */
+@media print{
+  body{background:#fff!important;color:#000!important;font-family:Georgia,serif}
+  #particles,.bg-glow,.back-btn,.action-bar,.ticker-wrap,.specials-banner,.day-tabs-wrap,#loadScreen,.flash-overlay,body::after,.countdown-wrap,.status-wrap,.hero-flame{display:none!important}
+  .app{max-width:100%;padding:0 20px;background:#fff}
+  .panel{display:block!important;page-break-after:always}
+  .hero{padding:24px 0 16px}
+  .hero-title{color:#000!important;text-shadow:none}.hero-title em{color:#c43a18!important;text-shadow:none}
+  .hero-eyebrow,.hero-sub{color:#444!important}
+  .cat-section{display:block!important;page-break-inside:avoid;margin-bottom:30px}
+  .cat-nav{display:none!important}
+  .cat-header{border-bottom:2px solid #000;margin-bottom:14px;padding-bottom:8px}
+  .cat-name{color:#000!important}.cat-subtitle{color:#666!important}
+  .section-label{color:#c43a18!important}.section-label::after{display:none}
+  .hours-line{color:#222!important}.hours-line strong{color:#000!important}
+  .plate-card{background:#f9f5ed!important;color:#000!important;border:1px solid #c7a880!important;box-shadow:none!important}
+  .menu-item{color:#000!important;border:none!important;padding:4px 0!important;background:transparent!important;opacity:1!important;transform:none!important}
+  .menu-item .item-name{color:#000!important}
+  .menu-item .item-desc{max-height:none!important;opacity:1!important;color:#333!important;margin-top:2px;font-size:12px}
+  .menu-item .item-hint{display:none!important}
+  .crawfish-wrap{background:#fff!important;border:2px solid #c43a18!important;color:#000!important}
+  .closed-state,.closed-enhanced{background:#f5f5f5!important;color:#000!important}
+  .closed-title,.closed-state h2{color:#000!important}
+  .adv-card{background:#fff!important;border:1px solid #ccc!important;page-break-inside:avoid;margin-bottom:20px}
+  .adv-card-title{color:#000!important}.adv-card-sub{color:#555!important}
+  .adv-day-tabs{display:none!important}
+  .adv-card{display:block!important}
+  .print-footer{display:block!important;text-align:center;padding:20px 0;border-top:1px solid #ccc;margin-top:30px;font-size:11px;color:#666}
+}
+.print-footer{display:none}
 .section-divider{width:100%;height:1px;border:none;background:linear-gradient(90deg,transparent,var(--border-warm),transparent);margin:10px 0 4px}
 .flash-overlay{position:fixed;inset:0;display:none;place-items:center;z-index:200;background:rgba(0,0,0,.78);backdrop-filter:blur(16px);padding:18px}.flash-overlay.show{display:grid}.flash-card{width:min(460px,calc(100vw - 32px));border-radius:28px;border:1px solid var(--border-warm);background:var(--surface-solid);padding:36px;text-align:center;animation:fp .4s var(--ease-spring)}@keyframes fp{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}.flash-title{font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--accent-light);margin-bottom:10px}.flash-text{color:rgba(245,237,228,.90);font-size:15px;line-height:1.6;margin-bottom:16px}.flash-countdown{display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent-hot),var(--ember));color:#fff;font-weight:900;font-size:22px;margin-bottom:12px}.flash-sub{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(245,237,228,.70)}
 .hide{display:none!important}
@@ -144,13 +229,40 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:10000;
 <canvas id="particles"></canvas><div class="bg-glow"></div>
 <div class="app">
   <header class="hero"><div class="hero-flame">🔥</div><div class="hero-eyebrow">DeRidder, Louisiana</div><h1 class="hero-title">Hot Headz<br><em>Southern Foods</em></h1><p class="hero-sub" id="heroSub">Loading menu&hellip;</p><div class="status-wrap"><div class="status-badge"><span class="status-dot closed" id="statusDot"></span><span id="statusText">Checking&hellip;</span></div></div><div class="countdown-wrap" id="countdownWrap" style="display:none"><div class="countdown-label" id="countdownLabel"></div><div class="countdown-timer"><div class="countdown-block"><span class="countdown-num" id="cdHours">00</span><span class="countdown-unit">HR</span></div><div class="countdown-sep">:</div><div class="countdown-block"><span class="countdown-num" id="cdMins">00</span><span class="countdown-unit">MIN</span></div><div class="countdown-sep">:</div><div class="countdown-block"><span class="countdown-num" id="cdSecs">00</span><span class="countdown-unit">SEC</span></div></div></div></header>
+  <div class="specials-banner" id="specialsBanner"></div>
+  <div class="ticker-wrap" id="tickerWrap">
+    <div class="ticker-label">🔥 This week</div>
+    <div class="ticker-track"><div class="ticker-inner" id="tickerInner"></div></div>
+  </div>
   <nav class="day-tabs-wrap"><div class="day-tabs"><button class="day-tab active" id="tabToday">Today</button><button class="day-tab" id="tabTomorrow">Tomorrow</button><button class="day-tab" id="tabAdvanced">Weekly Forecast</button></div></nav>
   <div class="panel visible" id="panelToday"><div class="hours-line" id="todayHours"></div><hr class="section-divider"/><nav class="cat-nav" id="todayCatNav"></nav><div id="todayCatSections"></div><div class="closed-state hide" id="todayClosed"><h2>Closed Today</h2><p id="todayClosedMsg">See you next time!</p></div></div>
   <div class="panel" id="panelTomorrow"><div class="hours-line" id="tomorrowHours"></div><hr class="section-divider"/><nav class="cat-nav" id="tomorrowCatNav"></nav><div id="tomorrowCatSections"></div><div class="closed-state hide" id="tomorrowClosed"><h2>Closed</h2><p id="tomorrowClosedMsg">See you next time!</p></div></div>
   <div class="panel" id="panelAdvanced"><div class="hours-line" id="advDisclaimer"></div><div class="adv-day-tabs" id="advDayTabs"></div><div id="advCards"></div></div>
   <div class="closed-state hide" id="loadError"><h2>Menu couldn't load</h2><p id="loadErrorMsg">Try again in a moment.</p></div>
 </div>
-<a class="back-btn" href="index.html"><span class="arrow">&#8592;</span> Back to Home</a>
+<div class="print-footer">Hot Headz Southern Foods &bull; 2741 US-190, DeRidder, LA 70634 &bull; (337) 221-1035 &bull; hotheadzsouthernfoods.com</div>
+<div class="action-bar" id="actionBar">
+  <a class="action-btn primary" id="btnCall" href="tel:3372211035" aria-label="Call restaurant">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    <span class="action-label">Call</span>
+  </a>
+  <a class="action-btn" id="btnDirections" href="https://maps.google.com/?q=Hot+Headz+Southern+Foods+2741+US-190+DeRidder+LA+70634" target="_blank" rel="noopener" aria-label="Get directions">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    <span class="action-label">Directions</span>
+  </a>
+  <button class="action-btn" id="btnShare" aria-label="Share menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    <span class="action-label">Share</span>
+  </button>
+  <button class="action-btn" id="btnPrint" aria-label="Print menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    <span class="action-label">Print</span>
+  </button>
+  <a class="action-btn home" href="index.html" aria-label="Back to home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+  </a>
+</div>
+<div class="share-toast" id="shareToast">Link copied to clipboard</div>
 <div class="flash-overlay" id="flashModal"><div class="flash-card"><div class="flash-countdown" id="flashCount">5</div><div class="flash-title" id="flashTitle">Closed</div><div class="flash-text" id="flashText"></div><div class="flash-sub">Closing automatically</div></div></div>
 
 <script>
@@ -392,7 +504,94 @@ function bCats(iso){var menu=gM(iso)||{},def=data.defaults||{},cats=[];var bkP=n
 function rCat(c){var h='<div class="cat-header"><div><div class="cat-name">'+c.icon+' '+esc(c.name)+'</div><div class="cat-subtitle">'+esc(c.sub)+'</div></div></div>';if(c.plates&&c.plates.length)h+='<div class="section-label">Plates &amp; Pricing</div><div class="plates-row">'+c.plates.map(function(p){return'<div class="plate-card">'+esc(p)+'</div>'}).join("")+'</div>';if(c.hasLunch&&c.items&&c.items.length){h+='<div class="section-label">Today\'s Specials</div><ul class="item-list">';c.items.forEach(function(it){h+='<li class="menu-item" onclick="this.classList.toggle(\'expanded\')"><div class="item-name">'+esc(it.name)+'</div><div class="item-desc">'+esc(it.desc||data.settings.noDescriptionText||"")+'</div><div class="item-hint">tap for details</div></li>'});h+='</ul>'}if(!c.hasLunch&&c.items&&c.items.length){h+='<div class="section-label">'+(c.isBeer?"Available":c.isCF?"Details":"Items")+'</div><ul class="item-list">';c.items.forEach(function(it){var nm=typeof it==="string"?it:it.name;h+='<li class="menu-item'+(c.isBeer?" beer-item":"")+'"><div class="item-name">'+(c.isBeer?"\ud83c\udf7a ":"")+esc(nm)+'</div></li>'});h+='</ul>'}if(c.id==="salad"){if(c.pricing&&c.pricing.length)h+='<div class="section-label">Pricing</div><ul class="item-list">'+c.pricing.map(function(p){return'<li class="menu-item"><div class="item-name">'+esc(p)+'</div></li>'}).join("")+'</ul>';var sb=c.saladBar||{};h+='<div class="section-label">Build Your Salad</div><div class="salad-grid">';if(sb.lettuce&&sb.lettuce.length)h+='<div><div class="salad-col-title">Lettuce</div><ul class="item-list">'+sb.lettuce.map(function(x){return'<li class="menu-item"><div class="item-name">'+esc(x)+'</div></li>'}).join("")+'</ul></div>';if(sb.toppings&&sb.toppings.length)h+='<div><div class="salad-col-title">Toppings</div><ul class="item-list">'+sb.toppings.map(function(x){return'<li class="menu-item"><div class="item-name">'+esc(x)+'</div></li>'}).join("")+'</ul></div>';if(sb.dressing&&sb.dressing.length)h+='<div><div class="salad-col-title">Dressing</div><ul class="item-list">'+sb.dressing.map(function(x){return'<li class="menu-item"><div class="item-name">'+esc(x)+'</div></li>'}).join("")+'</ul></div>';h+='</div>'}if(c.isCF)h='<div class="crawfish-wrap">'+h+'</div>';return h}
 
 var panelConfigs=[];
-function initP(pfx,iso,dn){panelConfigs.push({pfx:pfx,iso:iso,dn:dn});var h=bizFromHours(dn),cl=gCl(dn),he=$(pfx+"Hours");if(cl&&cl.closed){$(pfx+"Closed").classList.remove("hide");var msg=$(pfx+"ClosedMsg");if(msg)msg.textContent=cl.message||"See you next time!";if(he)he.textContent=dn+": Closed";return}if(he)he.innerHTML="<strong>"+dn+"</strong> &nbsp;"+h.open+" \u2013 "+h.close+" &nbsp;\xb7&nbsp; Breakfast "+h.breakfast+" &nbsp;\xb7&nbsp; Lunch "+h.lunch+(h.crawfish?" &nbsp;\xb7&nbsp; Crawfish "+h.crawfish:"");bPC(pfx,iso)}
+
+// ═══ Enhanced closed state with countdown ═══
+function renderClosedState(pfx, iso, dn, closureMsg){
+  var panel = $('panel' + pfx.charAt(0).toUpperCase() + pfx.slice(1));
+  if (!panel) return;
+  var closedEl = $(pfx+'Closed');
+  var catNav = $(pfx+'CatNav');
+  var catSec = $(pfx+'CatSections');
+  if (catNav) catNav.innerHTML = '';
+  if (catSec) catSec.innerHTML = '';
+  if (closedEl) {
+    closedEl.classList.remove('hide');
+    closedEl.className = 'closed-enhanced';
+    // Find next open day
+    var nextOpen = findNextOpen(iso);
+    var icon = '🌙';
+    var title = 'Closed ' + dn;
+    var sub = closureMsg || 'See you next time!';
+    var cdLabel = nextOpen ? 'Opens in' : 'Back soon';
+    var cdValue = '';
+    var cdDetail = '';
+    if (nextOpen) {
+      cdValue = fmtCountdown(nextOpen.date - new Date());
+      cdDetail = 'on ' + nextOpen.dayName + ' at ' + nextOpen.openTime;
+    }
+    closedEl.innerHTML =
+      '<div class="closed-icon">'+icon+'</div>' +
+      '<div class="closed-title">'+esc(title)+'</div>' +
+      '<div class="closed-sub">'+esc(sub)+'</div>' +
+      (nextOpen ? '<div class="closed-cd" data-next-open="'+nextOpen.date.getTime()+'">' +
+        '<div class="closed-cd-label">'+cdLabel+'</div>' +
+        '<div class="closed-cd-value">'+cdValue+'</div>' +
+        '<div class="closed-cd-detail">'+esc(cdDetail)+'</div>' +
+      '</div>' : '') +
+      '<div class="closed-actions">' +
+        '<a class="closed-action-btn" href="tel:3372211035"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Call</a>' +
+        '<a class="closed-action-btn" href="https://maps.google.com/?q=Hot+Headz+Southern+Foods+2741+US-190+DeRidder+LA+70634" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Directions</a>' +
+      '</div>';
+  }
+}
+
+function fmtCountdown(ms){
+  if (ms <= 0) return '00:00:00';
+  var t = Math.floor(ms/1000);
+  var days = Math.floor(t/86400);
+  var h = Math.floor((t%86400)/3600);
+  var m = Math.floor((t%3600)/60);
+  var s = t%60;
+  if (days > 0) return days + 'd ' + h + 'h ' + m + 'm';
+  return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+function findNextOpen(fromISO){
+  var start = pISO(fromISO);
+  for (var i = 0; i < 7; i++) {
+    var check = new Date(start);
+    check.setDate(start.getDate() + i);
+    var dn = wkD(check);
+    var iso = toISO(check);
+    var cl = gCl(dn);
+    if (cl && cl.closed) continue;
+    var h = bizFromHours(dn);
+    var openMin = t12(h.open);
+    if (openMin == null) continue;
+    var target = new Date(check);
+    target.setHours(Math.floor(openMin/60), openMin%60, 0, 0);
+    // If today, only count if open time hasn't passed yet
+    if (i === 0) {
+      var now = new Date();
+      if (now >= target) continue;
+    }
+    return { date: target, dayName: dn, openTime: h.open, iso: iso };
+  }
+  return null;
+}
+
+// Refresh countdown in closed state every second
+setInterval(function(){
+  var els = document.querySelectorAll('.closed-cd[data-next-open]');
+  els.forEach(function(el){
+    var ts = parseInt(el.getAttribute('data-next-open'), 10);
+    if (!ts) return;
+    var remaining = ts - Date.now();
+    var val = el.querySelector('.closed-cd-value');
+    if (val) val.textContent = fmtCountdown(remaining);
+  });
+}, 1000);
+function initP(pfx,iso,dn){panelConfigs.push({pfx:pfx,iso:iso,dn:dn});var h=bizFromHours(dn),cl=gCl(dn),he=$(pfx+"Hours");if(cl&&cl.closed){renderClosedState(pfx,iso,dn,cl.message||"See you next time!");if(he)he.textContent=dn+": Closed";return}if(he)he.innerHTML="<strong>"+dn+"</strong> &nbsp;"+h.open+" \u2013 "+h.close+" &nbsp;\xb7&nbsp; Breakfast "+h.breakfast+" &nbsp;\xb7&nbsp; Lunch "+h.lunch+(h.crawfish?" &nbsp;\xb7&nbsp; Crawfish "+h.crawfish:"");bPC(pfx,iso)}
 function bPC(pfx,iso){var cn=$(pfx+"CatNav"),cs=$(pfx+"CatSections");if(!cn||!cs)return;var ab=cn.querySelector(".cat-btn.active"),ai=ab?ab.dataset.idx:"0",cats=bCats(iso);cn.innerHTML=cats.map(function(c,i){return'<button class="cat-btn'+(c.isBeer?" beer-btn":"")+(String(i)===ai?" active":"")+'" data-idx="'+i+'">'+c.icon+" "+esc(c.name)+"</button>"}).join("");cs.innerHTML=cats.map(function(c,i){return'<div class="cat-section'+(String(i)===ai?" visible":"")+'" data-idx="'+i+'">'+rCat(c)+"</div>"}).join("");var btns=cn.querySelectorAll(".cat-btn"),secs=cs.querySelectorAll(".cat-section");btns.forEach(function(b){b.addEventListener("click",function(){var idx=b.dataset.idx;btns.forEach(function(x){x.classList.toggle("active",x.dataset.idx===idx)});secs.forEach(function(s){s.classList.toggle("visible",s.dataset.idx===idx);if(s.dataset.idx===idx)obs(s)})})});secs.forEach(function(s){if(s.classList.contains("visible"))obs(s)})}
 function tAt(ts){var m=t12(ts);if(m==null)return null;var d=new Date();d.setHours(Math.floor(m/60),m%60,0,0);return d}
 function fCD(ms){if(ms<=0)return{h:"00",m:"00",s:"00"};var t=Math.floor(ms/1000);return{h:String(Math.floor(t/3600)).padStart(2,"0"),m:String(Math.floor(t%3600/60)).padStart(2,"0"),s:String(t%60).padStart(2,"0")}}
@@ -411,6 +610,8 @@ function initPage(){
   $("tabToday").textContent=dTN;$("tabTomorrow").textContent=dToN;
   panelConfigs=[];initP("today",dTI,dTN);initP("tomorrow",dToI,dToN);
   bAdv(dTI);uSt(dTN,dTI);window._dTN=dTN;window._dTI=dTI;
+  updateSpecialsBanner(dTI);
+  updateTicker();
 }
 
 setupTabs();
@@ -478,6 +679,136 @@ function finish(){
 
 setInterval(function(){if(window._dTN&&window._dTI)uSt(window._dTN,window._dTI)},1000);
 addEventListener("hashchange",hHash);
+
+// ═══ Today's Specials Badge ═══
+function updateSpecialsBanner(iso){
+  var banner = $('specialsBanner');
+  if (!banner) return;
+  var menu = gM(iso);
+  var lunchItems = (menu && menu.lunch && Array.isArray(menu.lunch.items)) ? menu.lunch.items : [];
+  if (lunchItems.length > 0) {
+    banner.innerHTML = '<div class="specials-badge" id="specialsBadge"><span class="specials-flame">\ud83d\udd25</span>Today\'s Specials Posted<span class="specials-count">'+lunchItems.length+' item'+(lunchItems.length===1?'':'s')+'</span></div>';
+    banner.classList.add('visible');
+    var badge = $('specialsBadge');
+    if (badge) badge.addEventListener('click', function(){
+      // Scroll to lunch section and click it
+      var lunchBtn = document.querySelector('#todayCatNav .cat-btn');
+      var nav = $('todayCatNav');
+      if (nav) {
+        var btns = nav.querySelectorAll('.cat-btn');
+        for (var i = 0; i < btns.length; i++) {
+          if (btns[i].textContent.toLowerCase().indexOf('lunch') >= 0) {
+            btns[i].click();
+            btns[i].scrollIntoView({behavior:'smooth',block:'start'});
+            return;
+          }
+        }
+      }
+    });
+  } else {
+    banner.classList.remove('visible');
+    banner.innerHTML = '';
+  }
+}
+
+// ═══ What's New Ticker ═══
+function updateTicker(){
+  var wrap = $('tickerWrap');
+  var inner = $('tickerInner');
+  if (!wrap || !inner) return;
+  var now = new Date();
+  var items = [];
+  // Scan the next 7 days for lunch items
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(now);
+    d.setDate(now.getDate() + i);
+    var iso = toISO(d);
+    var dn = wkD(d);
+    var menu = gM(iso);
+    if (!menu || !menu.lunch || !Array.isArray(menu.lunch.items) || menu.lunch.items.length === 0) continue;
+    var itemNames = menu.lunch.items.map(function(it){ return typeof it === 'string' ? it : (it && it.name) || ''; }).filter(Boolean);
+    if (!itemNames.length) continue;
+    var label = i === 0 ? 'Today' : (i === 1 ? 'Tomorrow' : dn);
+    items.push('<span class="ticker-item"><strong>'+esc(label)+':</strong> '+esc(itemNames.slice(0, 4).join(' \u2022 '))+(itemNames.length > 4 ? ' \u2022 +'+(itemNames.length-4)+' more' : '')+'</span>');
+  }
+  if (!items.length) {
+    wrap.classList.remove('visible');
+    return;
+  }
+  // Duplicate for seamless scroll
+  var content = items.join('<span class="ticker-sep">\u2726</span>') + '<span class="ticker-sep">\u2726</span>' + items.join('<span class="ticker-sep">\u2726</span>') + '<span class="ticker-sep">\u2726</span>';
+  inner.innerHTML = content;
+  wrap.classList.add('visible');
+}
+
+// ═══ Share Menu ═══
+function buildShareText(){
+  var now = new Date();
+  var todayISO = toISO(now);
+  var todayName = wkD(now);
+  var menu = gM(todayISO);
+  var lines = [];
+  lines.push('\ud83d\udd25 Hot Headz Southern Foods \u2014 '+todayName+' '+fmtD(now));
+  lines.push('');
+  var h = bizFromHours(todayName);
+  lines.push('\ud83d\udd52 '+h.open+' \u2013 '+h.close);
+  lines.push('');
+  if (menu && menu.lunch && Array.isArray(menu.lunch.items) && menu.lunch.items.length) {
+    lines.push('TODAY\'S LUNCH:');
+    menu.lunch.items.forEach(function(it){
+      var name = typeof it === 'string' ? it : (it && it.name) || '';
+      if (name) lines.push('\u2022 ' + name);
+    });
+    lines.push('');
+  }
+  lines.push('\ud83d\udcde (337) 221-1035');
+  lines.push('\ud83d\udccd 2741 US-190, DeRidder, LA');
+  lines.push('');
+  lines.push(location.origin || 'hotheadzsouthernfoods.com');
+  return lines.join('\n');
+}
+
+function showShareToast(msg){
+  var toast = $('shareToast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.classList.add('visible');
+  setTimeout(function(){ toast.classList.remove('visible'); }, 2400);
+}
+
+var btnShare = $('btnShare');
+if (btnShare) btnShare.addEventListener('click', async function(){
+  var text = buildShareText();
+  var shareData = {
+    title: 'Hot Headz Southern Foods',
+    text: text,
+    url: (location.origin || 'https://hotheadzsouthernfoods.com') + '/menu.html'
+  };
+  if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+    try { await navigator.share(shareData); return; }
+    catch(e) { /* user canceled or failed, fall through to clipboard */ }
+  }
+  // Clipboard fallback
+  try {
+    await navigator.clipboard.writeText(text);
+    showShareToast('Menu copied to clipboard');
+  } catch(e) {
+    // Old browser fallback
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showShareToast('Menu copied to clipboard'); }
+    catch(e) { showShareToast('Could not copy \u2014 try browser Share menu'); }
+    document.body.removeChild(ta);
+  }
+});
+
+// ═══ Print ═══
+var btnPrint = $('btnPrint');
+if (btnPrint) btnPrint.addEventListener('click', function(){ window.print(); });
 })();
 </script>
 </html>
