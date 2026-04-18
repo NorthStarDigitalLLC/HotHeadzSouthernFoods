@@ -71,21 +71,21 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:10000;
 #loadScreen{position:fixed;inset:0;z-index:99999;background:radial-gradient(ellipse at center,#1a0f08 0%,#0a0604 70%,#050302 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:28px;transition:opacity .7s var(--ease-out-expo),visibility .7s}
 #loadScreen.done{opacity:0;visibility:hidden;pointer-events:none}
 #nanoCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1}
-.load-core{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:24px}
-.load-ring-wrap{position:relative;width:140px;height:140px;display:grid;place-items:center}
-.load-ring{position:absolute;inset:0;border-radius:50%;border:1px solid transparent;animation:ringSpin 3s linear infinite}
-.load-ring.r1{border-top-color:rgba(255,120,40,.7);border-right-color:rgba(255,120,40,.3);animation-duration:2s}
-.load-ring.r2{inset:10px;border-bottom-color:rgba(255,200,120,.5);border-left-color:rgba(255,200,120,.2);animation-duration:3s;animation-direction:reverse}
-.load-ring.r3{inset:22px;border-top-color:rgba(196,58,24,.6);animation-duration:4s}
-@keyframes ringSpin{to{transform:rotate(360deg)}}
-.load-center{position:relative;width:72px;height:72px;border-radius:50%;background:radial-gradient(circle,#ff8a3a 0%,#e07828 45%,#c43a18 100%);box-shadow:0 0 40px rgba(255,120,40,.6),0 0 80px rgba(255,120,40,.3),inset 0 0 20px rgba(255,200,120,.4);animation:corePulse 1.6s ease-in-out infinite;display:grid;place-items:center;font-size:32px}
-@keyframes corePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-.load-brand{font-family:var(--font-display);font-size:28px;font-weight:700;line-height:1;text-align:center;color:#fff;text-shadow:0 0 30px rgba(255,120,40,.5)}
+.load-core{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:24px;padding:0 20px}
+.load-ring-wrap{position:relative;width:180px;height:180px;display:grid;place-items:center}
+.load-ring-svg{position:absolute;inset:0}
+.load-center{position:relative;width:88px;height:88px;border-radius:50%;background:radial-gradient(circle,#ffb060 0%,#ff7028 40%,#c43a18 80%,#6a1a08 100%);box-shadow:0 0 50px rgba(255,120,40,.75),0 0 100px rgba(255,120,40,.45),inset 0 0 28px rgba(255,220,150,.55);animation:corePulse 1.6s ease-in-out infinite;display:grid;place-items:center;font-size:40px}
+@keyframes corePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.load-brand{font-family:var(--font-display);font-size:30px;font-weight:700;line-height:1;text-align:center;color:#fff;text-shadow:0 0 28px rgba(255,120,40,.55);letter-spacing:-.01em}
 .load-brand em{font-style:italic;color:var(--accent-hot)}
-.load-status{font-size:11px;font-weight:800;letter-spacing:.26em;text-transform:uppercase;color:rgba(255,200,140,.85);font-family:var(--font-body);min-height:16px;transition:opacity .3s}
-.load-progress{width:200px;height:3px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;position:relative}
-.load-progress-bar{position:absolute;left:-30%;top:0;bottom:0;width:30%;background:linear-gradient(90deg,transparent,var(--accent-hot),var(--accent-light),var(--accent-hot),transparent);border-radius:3px;animation:progScan 1.6s ease-in-out infinite}
-@keyframes progScan{0%{left:-30%}100%{left:100%}}
+.load-stage{display:flex;flex-direction:column;align-items:center;gap:14px}
+.load-status{font-size:11px;font-weight:800;letter-spacing:.26em;text-transform:uppercase;color:#ffc078;min-height:16px;transition:opacity .3s;font-family:var(--font-body);text-align:center}
+.load-steps{display:flex;gap:6px}
+.load-step{width:22px;height:3px;border-radius:2px;background:rgba(255,255,255,.12);transition:background .4s,box-shadow .4s}
+.load-step.active{background:var(--accent-hot);box-shadow:0 0 10px rgba(255,106,26,.55)}
+.load-pct-row{display:flex;align-items:center;gap:10px;font-size:10px;font-weight:700;letter-spacing:.08em;color:rgba(255,200,140,.75);text-transform:uppercase;font-family:var(--font-body);font-variant-numeric:tabular-nums}
+.load-progress{width:140px;height:2px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.load-progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent-hot),var(--accent-light));border-radius:2px;transition:width .4s cubic-bezier(.16,1,.3,1)}
 
 #particles{position:fixed;inset:0;z-index:0;pointer-events:none}.bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 700px 500px at 8% 5%,rgba(255,120,40,.1),transparent),radial-gradient(ellipse 500px 500px at 92% 90%,rgba(196,58,24,.06),transparent),radial-gradient(ellipse 600px 300px at 50% 40%,rgba(255,200,120,.03),transparent);animation:glowPulse 8s ease-in-out infinite alternate}@keyframes glowPulse{0%{opacity:1}100%{opacity:.6}}
 .app{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:0 18px 140px}.hero{text-align:center;padding:56px 0 32px;opacity:0;animation:heroIn 1.4s var(--ease-out-expo) .2s forwards}@keyframes heroIn{from{opacity:0;transform:translateY(30px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}.hero-flame{display:inline-block;font-size:36px;animation:flameFloat 2s ease-in-out infinite;margin-bottom:12px}@keyframes flameFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.08)}}.hero-eyebrow{font-size:12px;font-weight:800;letter-spacing:.26em;text-transform:uppercase;color:var(--accent-light);margin-bottom:14px;opacity:0;animation:fadeUp .8s var(--ease-out-expo) .5s forwards}.hero-title{font-family:var(--font-display);font-size:clamp(38px,7vw,64px);font-weight:700;line-height:1;letter-spacing:-.03em;margin-bottom:6px;opacity:0;animation:fadeUp 1s var(--ease-out-expo) .7s forwards}.hero-title em{font-style:italic;color:var(--accent-hot);text-shadow:0 0 40px var(--accent-glow)}.hero-sub{font-size:16px;color:rgba(245,237,228,.88);font-weight:400;line-height:1.6;margin-top:4px;opacity:0;animation:fadeUp .8s var(--ease-out-expo) .9s forwards}@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
@@ -108,7 +108,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:10000;
 .section-divider{width:100%;height:1px;border:none;background:linear-gradient(90deg,transparent,var(--border-warm),transparent);margin:10px 0 4px}
 .flash-overlay{position:fixed;inset:0;display:none;place-items:center;z-index:200;background:rgba(0,0,0,.78);backdrop-filter:blur(16px);padding:18px}.flash-overlay.show{display:grid}.flash-card{width:min(460px,calc(100vw - 32px));border-radius:28px;border:1px solid var(--border-warm);background:var(--surface-solid);padding:36px;text-align:center;animation:fp .4s var(--ease-spring)}@keyframes fp{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}.flash-title{font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--accent-light);margin-bottom:10px}.flash-text{color:rgba(245,237,228,.90);font-size:15px;line-height:1.6;margin-bottom:16px}.flash-countdown{display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent-hot),var(--ember));color:#fff;font-weight:900;font-size:22px;margin-bottom:12px}.flash-sub{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(245,237,228,.70)}
 .hide{display:none!important}
-@media(max-width:640px){.plates-row{grid-template-columns:1fr}.salad-grid{grid-template-columns:1fr}.app{padding:0 12px 140px}.hero{padding:40px 0 24px}.load-ring-wrap{width:120px;height:120px}.load-brand{font-size:24px}}
+@media(max-width:640px){.plates-row{grid-template-columns:1fr}.salad-grid{grid-template-columns:1fr}.app{padding:0 12px 140px}.hero{padding:40px 0 24px}.load-ring-wrap{width:150px;height:150px}.load-center{width:72px;height:72px;font-size:32px}.load-brand{font-size:24px}}
 </style>
 </head>
 <body>
@@ -117,14 +117,27 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:10000;
   <canvas id="nanoCanvas"></canvas>
   <div class="load-core">
     <div class="load-ring-wrap">
-      <div class="load-ring r1"></div>
-      <div class="load-ring r2"></div>
-      <div class="load-ring r3"></div>
+      <svg class="load-ring-svg" width="180" height="180" viewBox="0 0 180 180">
+        <circle id="ring1" cx="90" cy="90" r="82" fill="none" stroke="rgba(255,120,40,0.75)" stroke-width="1" stroke-dasharray="120 400" stroke-linecap="round"/>
+        <circle id="ring2" cx="90" cy="90" r="68" fill="none" stroke="rgba(255,200,120,0.55)" stroke-width="1" stroke-dasharray="90 300" stroke-linecap="round"/>
+        <circle id="ring3" cx="90" cy="90" r="54" fill="none" stroke="rgba(196,58,24,0.6)" stroke-width="1" stroke-dasharray="60 250" stroke-linecap="round"/>
+      </svg>
       <div class="load-center">🔥</div>
     </div>
     <div class="load-brand">Hot Headz <em>Southern Foods</em></div>
-    <div class="load-status" id="loadStatus">Initializing nano swarm…</div>
-    <div class="load-progress"><div class="load-progress-bar"></div></div>
+    <div class="load-stage">
+      <div class="load-status" id="loadStatus">Fetching menu data</div>
+      <div class="load-steps">
+        <div class="load-step active" data-step="0"></div>
+        <div class="load-step" data-step="1"></div>
+        <div class="load-step" data-step="2"></div>
+        <div class="load-step" data-step="3"></div>
+      </div>
+      <div class="load-pct-row">
+        <span id="loadPct">0%</span>
+        <div class="load-progress"><div class="load-progress-bar" id="loadProgBar"></div></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -145,80 +158,168 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:10000;
 "use strict";
 
 // ═══ NANO-BOT LOADING SCREEN ═══
+var _nanoStopped = false, _ringAngles = [0, 0, 0], _nanoT = 0;
 (function nanoBots(){
   var c = document.getElementById('nanoCanvas'); if (!c) return;
-  var ctx = c.getContext('2d'), W, H, cx, cy;
-  function rs(){ W = c.width = innerWidth; H = c.height = innerHeight; cx = W/2; cy = H/2; }
+  var ctx = c.getContext('2d'), dpr = window.devicePixelRatio || 1, W, H, cx, cy;
+  function rs(){
+    W = innerWidth; H = innerHeight;
+    c.width = W * dpr; c.height = H * dpr;
+    c.style.width = W + 'px'; c.style.height = H + 'px';
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+    cx = W/2; cy = H/2;
+  }
   rs(); addEventListener('resize', rs);
-  var N = innerWidth < 640 ? 60 : 120;
+
+  var N = innerWidth < 640 ? 50 : 90;
   var bots = [];
   for (var i = 0; i < N; i++) {
-    var ang = Math.random() * Math.PI * 2;
-    var r = 100 + Math.random() * Math.max(W, H) * 0.4;
-    bots.push({ x: cx + Math.cos(ang) * r, y: cy + Math.sin(ang) * r, vx: 0, vy: 0, size: 1 + Math.random() * 2, hue: 18 + Math.random() * 20, phase: Math.random() * Math.PI * 2, speed: 0.02 + Math.random() * 0.04, ox: (Math.random()-0.5) * 60, oy: (Math.random()-0.5) * 60, trail: [] });
+    bots.push({
+      angle: Math.random() * Math.PI * 2,
+      radius: 120 + Math.random() * 180,
+      speed: 0.003 + Math.random() * 0.008,
+      size: 1.2 + Math.random() * 1.8,
+      hue: 18 + Math.random() * 22,
+      phase: Math.random() * Math.PI * 2,
+      pulseSpeed: 0.02 + Math.random() * 0.03,
+      trail: []
+    });
   }
-  var t = 0, stopped = false;
+
   function frame() {
-    if (stopped) return;
-    t += 1;
-    ctx.fillStyle = 'rgba(10,6,4,0.22)';
+    if (_nanoStopped) return;
+    _nanoT += 1;
+
+    ctx.fillStyle = 'rgba(10,6,4,0.18)';
     ctx.fillRect(0, 0, W, H);
+
+    // Bots with trails
     for (var i = 0; i < bots.length; i++) {
       var b = bots[i];
-      var orbitR = 80 + Math.sin(t*0.008 + b.phase) * 40;
-      var orbitA = t * b.speed + b.phase;
-      var tx = cx + Math.cos(orbitA) * orbitR + b.ox * Math.sin(t*0.01);
-      var ty = cy + Math.sin(orbitA) * orbitR + b.oy * Math.cos(t*0.01);
-      b.vx += (tx - b.x) * 0.035; b.vy += (ty - b.y) * 0.035;
-      b.vx *= 0.88; b.vy *= 0.88;
-      b.x += b.vx; b.y += b.vy;
-      b.trail.push({x:b.x, y:b.y});
-      if (b.trail.length > 8) b.trail.shift();
+      b.angle += b.speed;
+      var rOsc = b.radius + Math.sin(_nanoT * 0.012 + b.phase) * 22;
+      var x = cx + Math.cos(b.angle) * rOsc;
+      var y = cy + Math.sin(b.angle) * rOsc;
+
+      b.trail.push({x: x, y: y});
+      if (b.trail.length > 10) b.trail.shift();
+
       for (var j = 0; j < b.trail.length; j++) {
         var p = b.trail[j];
-        var alpha = (j / b.trail.length) * 0.4;
-        ctx.fillStyle = 'hsla(' + b.hue + ',85%,60%,' + alpha + ')';
-        ctx.beginPath(); ctx.arc(p.x, p.y, b.size * (j / b.trail.length), 0, Math.PI*2); ctx.fill();
+        var alpha = (j / b.trail.length) * 0.45;
+        ctx.fillStyle = 'hsla(' + b.hue + ',90%,60%,' + alpha + ')';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, b.size * (j / b.trail.length), 0, Math.PI * 2);
+        ctx.fill();
       }
-      ctx.fillStyle = 'hsla(' + b.hue + ',90%,65%,0.9)';
-      ctx.shadowColor = 'hsla(' + b.hue + ',90%,60%,1)';
-      ctx.shadowBlur = 8;
-      ctx.beginPath(); ctx.arc(b.x, b.y, b.size, 0, Math.PI*2); ctx.fill();
+
+      var pulse = 0.8 + Math.sin(_nanoT * b.pulseSpeed + b.phase) * 0.2;
+      ctx.fillStyle = 'hsla(' + b.hue + ',95%,65%,0.95)';
+      ctx.shadowColor = 'hsla(' + b.hue + ',95%,60%,1)';
+      ctx.shadowBlur = 10 * pulse;
+      ctx.beginPath();
+      ctx.arc(x, y, b.size * pulse, 0, Math.PI * 2);
+      ctx.fill();
       ctx.shadowBlur = 0;
     }
-    ctx.strokeStyle = 'rgba(255,140,50,0.08)'; ctx.lineWidth = 1;
-    for (var i = 0; i < bots.length; i++) {
-      for (var j = i+1; j < bots.length; j++) {
-        var dx = bots[i].x - bots[j].x, dy = bots[i].y - bots[j].y;
-        var d2 = dx*dx + dy*dy;
-        if (d2 < 3600) {
-          ctx.globalAlpha = 1 - d2/3600;
-          ctx.beginPath(); ctx.moveTo(bots[i].x, bots[i].y); ctx.lineTo(bots[j].x, bots[j].y); ctx.stroke();
+
+    // Connection lines (sparse)
+    ctx.strokeStyle = 'rgba(255,140,50,0.06)';
+    ctx.lineWidth = 0.5;
+    for (var i = 0; i < bots.length; i += 2) {
+      for (var j = i + 2; j < bots.length; j += 2) {
+        var b1 = bots[i], b2 = bots[j];
+        var r1 = b1.radius + Math.sin(_nanoT * 0.012 + b1.phase) * 22;
+        var r2 = b2.radius + Math.sin(_nanoT * 0.012 + b2.phase) * 22;
+        var x1 = cx + Math.cos(b1.angle) * r1;
+        var y1 = cy + Math.sin(b1.angle) * r1;
+        var x2 = cx + Math.cos(b2.angle) * r2;
+        var y2 = cy + Math.sin(b2.angle) * r2;
+        var dx = x1 - x2, dy = y1 - y2;
+        var d2 = dx * dx + dy * dy;
+        if (d2 < 6400) {
+          ctx.globalAlpha = 1 - d2 / 6400;
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
         }
       }
     }
     ctx.globalAlpha = 1;
+
+    // Rotate the SVG rings
+    var r1el = document.getElementById('ring1');
+    var r2el = document.getElementById('ring2');
+    var r3el = document.getElementById('ring3');
+    if (r1el) { _ringAngles[0] += 1.4; r1el.setAttribute('transform','rotate(' + _ringAngles[0] + ' 90 90)'); }
+    if (r2el) { _ringAngles[1] -= 0.9; r2el.setAttribute('transform','rotate(' + _ringAngles[1] + ' 90 90)'); }
+    if (r3el) { _ringAngles[2] += 0.6; r3el.setAttribute('transform','rotate(' + _ringAngles[2] + ' 90 90)'); }
+
     requestAnimationFrame(frame);
   }
   frame();
-  window._stopNano = function(){ stopped = true; };
 })();
+window._stopNano = function(){ _nanoStopped = true; };
 
-var statusMsgs = ['Initializing nano swarm…','Scanning the kitchen…','Tasting the grits…','Counting biscuits…','Warming the griddle…','Plating today\'s menu…','Almost ready…'];
-var _msgIdx = 0;
-var _msgTimer = setInterval(function(){
-  var el = document.getElementById('loadStatus'); if (!el) return;
-  _msgIdx = (_msgIdx + 1) % statusMsgs.length;
-  el.style.opacity = '0';
-  setTimeout(function(){ el.textContent = statusMsgs[_msgIdx]; el.style.opacity = '1'; }, 200);
-}, 900);
+// ═══ Stage progression (tied to real data fetch) ═══
+var STAGES = [
+  'Fetching menu data',
+  'Loading today\'s specials',
+  'Warming the griddle',
+  'Almost ready'
+];
+var _currentStage = 0;
+
+function setLoadStage(i){
+  if (i < 0 || i >= STAGES.length) return;
+  _currentStage = i;
+  var el = document.getElementById('loadStatus');
+  if (el) {
+    el.style.opacity = '0';
+    setTimeout(function(){ el.textContent = STAGES[i]; el.style.opacity = '1'; }, 180);
+  }
+  var dots = document.querySelectorAll('.load-step');
+  for (var d = 0; d < dots.length; d++) {
+    dots[d].classList.toggle('active', d <= i);
+  }
+  var pct = Math.round(((i + 1) / STAGES.length) * 100);
+  var bar = document.getElementById('loadProgBar');
+  var pctEl = document.getElementById('loadPct');
+  if (bar) bar.style.width = pct + '%';
+  if (pctEl) pctEl.textContent = pct + '%';
+}
+
+// Keep cycling the "almost ready" dot animation if data takes long
+var _stageIdleTimer = null;
+function startStageCycling(){
+  if (_stageIdleTimer) return;
+  _stageIdleTimer = setInterval(function(){
+    if (_currentStage < STAGES.length - 1) {
+      setLoadStage(_currentStage + 1);
+    }
+  }, 900);
+}
+function stopStageCycling(){
+  if (_stageIdleTimer) { clearInterval(_stageIdleTimer); _stageIdleTimer = null; }
+}
+
+setLoadStage(0);
+startStageCycling();
 
 function hideLoader() {
-  clearInterval(_msgTimer);
+  stopStageCycling();
+  setLoadStage(3); // ensure we show "almost ready" + 100% before fading
   var ls = document.getElementById('loadScreen');
   if (ls) {
-    ls.classList.add('done');
-    setTimeout(function(){ if (window._stopNano) window._stopNano(); if (ls.parentNode) ls.parentNode.removeChild(ls); }, 800);
+    setTimeout(function(){
+      ls.classList.add('done');
+      setTimeout(function(){
+        if (window._stopNano) window._stopNano();
+        if (ls.parentNode) ls.parentNode.removeChild(ls);
+      }, 800);
+    }, 200);
   }
 }
 
@@ -336,8 +437,12 @@ function applyFullMenu(d){
   });
 }
 
-var MIN_LOAD_MS = 1600;
+var MIN_LOAD_MS = 1800;
 var loadStart = Date.now();
+
+// Stage 1: started — already shown
+// Move to stage 2 after a brief moment (shows progress even on fast networks)
+setTimeout(function(){ if (_currentStage < 1) setLoadStage(1); }, 400);
 
 fetch(CLOUD_URL, {
     method: 'POST',
@@ -345,7 +450,10 @@ fetch(CLOUD_URL, {
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify({ action: 'getFullMenu', _ts: Date.now() })
   })
-  .then(function(r){ return r.text(); })
+  .then(function(r){
+    setLoadStage(2); // got response headers
+    return r.text();
+  })
   .then(function(txt){
     console.log('[HH] Cloud response:', txt.substring(0, 300));
     try {
