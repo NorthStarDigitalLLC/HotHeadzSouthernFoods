@@ -55,84 +55,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
 
-<!-- Website structured data -->
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "url": "https://hotheadzsouthernfoods.com/",
-  "name": "Hot Headz Southern Foods",
-  "alternateName": "Hot Headz"
-}
+{"@context":"https://schema.org","@type":"WebSite","url":"https://hotheadzsouthernfoods.com/","name":"Hot Headz Southern Foods","alternateName":"Hot Headz"}
 </script>
-
-<!-- Restaurant structured data -->
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Restaurant",
-  "@id": "https://hotheadzsouthernfoods.com/#restaurant",
-  "name": "Hot Headz Southern Foods",
-  "url": "https://hotheadzsouthernfoods.com/",
-  "image": "https://hotheadzsouthernfoods.com/images/Hotheadzshare.png",
-  "logo": "https://hotheadzsouthernfoods.com/images/HotHeadzLogo.png",
-  "description": "Fresh, made-from-scratch Southern breakfast and lunch restaurant in DeRidder, Louisiana.",
-  "telephone": "+1-337-221-1035",
-  "priceRange": "$$",
-  "servesCuisine": [
-    "Southern",
-    "American",
-    "Breakfast",
-    "Lunch",
-    "Comfort Food"
-  ],
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "2741 US-190",
-    "addressLocality": "DeRidder",
-    "addressRegion": "LA",
-    "postalCode": "70634",
-    "addressCountry": "US"
-  },
-  "openingHoursSpecification": [
-    {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday"
-      ],
-      "opens": "05:30",
-      "closes": "14:00"
-    },
-    {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": "Saturday",
-      "opens": "06:00",
-      "closes": "14:00"
-    },
-    {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": "Sunday",
-      "opens": "07:00",
-      "closes": "15:00"
-    }
-  ],
-  "areaServed": [
-    "DeRidder, LA",
-    "Beauregard Parish, LA"
-  ],
-  "sameAs": [
-    "https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/"
-  ],
-  "hasMenu": "https://hotheadzsouthernfoods.com/menu.html",
-  "potentialAction": {
-    "@type": "OrderAction",
-    "target": "https://hotheadzsouthernfoods.com/"
-  }
-}
+{"@context":"https://schema.org","@type":"Restaurant","@id":"https://hotheadzsouthernfoods.com/#restaurant","name":"Hot Headz Southern Foods","url":"https://hotheadzsouthernfoods.com/","image":"https://hotheadzsouthernfoods.com/images/Hotheadzshare.png","logo":"https://hotheadzsouthernfoods.com/images/HotHeadzLogo.png","description":"Fresh, made-from-scratch Southern breakfast and lunch restaurant in DeRidder, Louisiana.","telephone":"+1-337-221-1035","priceRange":"$$","servesCuisine":["Southern","American","Breakfast","Lunch","Comfort Food"],"address":{"@type":"PostalAddress","streetAddress":"2741 US-190","addressLocality":"DeRidder","addressRegion":"LA","postalCode":"70634","addressCountry":"US"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"05:30","closes":"14:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"06:00","closes":"14:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Sunday","opens":"07:00","closes":"15:00"}],"areaServed":["DeRidder, LA","Beauregard Parish, LA"],"sameAs":["https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/"],"hasMenu":"https://hotheadzsouthernfoods.com/menu.html","potentialAction":{"@type":"OrderAction","target":"https://hotheadzsouthernfoods.com/"}}
 </script>
 </head>
 <style>
@@ -609,7 +536,10 @@ function hideLoader() {
 }
 
 // ═══ CLOUD URL ═══
-var CLOUD_URL = 'https://script.google.com/macros/s/AKfycbz7Zw5EAbw2TbXlhUxhZErQQjel7FcngRp_bCV-qT61PehYXnZ5jkUL_c4GFxcBv02LaA/exec';
+// ═══ SUPABASE CONFIG ═══
+var SUPABASE_URL = 'https://zgqjzgonwvkxfbdseieg.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpncWp6Z29ud3ZreGZiZHNlaWVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1Njk4NTksImV4cCI6MjA5MjE0NTg1OX0.1mGtFUKumyQUgU0pO2CxIYSKLEuYEzspCGk9ncYYavk';
+function supabaseHeaders(){return{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Accept':'application/json'}}
 
 // ═══ Data shell — filled from cloud. Minimal fallback so nothing breaks if cloud fails. ═══
 var MENU_DATA = {
@@ -954,33 +884,47 @@ var MIN_LOAD_MS = 1800;
 var loadStart = Date.now();
 
 // Stage 1: started — already shown
-// Move to stage 2 after a brief moment (shows progress even on fast networks)
 setTimeout(function(){ if (_currentStage < 1) setLoadStage(1); }, 400);
 
-fetch(CLOUD_URL, {
-    method: 'POST',
-    redirect: 'follow',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ action: 'getFullMenu', _ts: Date.now() })
-  })
-  .then(function(r){
-    setLoadStage(2); // got response headers
-    return r.text();
-  })
-  .then(function(txt){
-    console.log('[HH] Cloud response:', txt.substring(0, 300));
-    try {
-      var j = JSON.parse(txt);
-      console.log('[HH] Parsed:', j);
-      if (j && j.success && j.data) {
-        applyFullMenu(j.data);
-        console.log('[HH] Applied. Defaults keys:', Object.keys(data.defaults), 'Beer count:', data.beer.length);
-      }
-      else console.warn('[HH] Unexpected cloud payload:', j);
-    } catch(e) { console.warn('[HH] Parse error:', e.message, 'Raw:', txt); }
-    finish();
-  })
-  .catch(function(err){ console.warn('[HH] Cloud fetch failed:', err.message); finish(); });
+// Fetch menu_defaults and lunch_dates in parallel from Supabase
+Promise.all([
+  fetch(SUPABASE_URL + '/rest/v1/menu_defaults?select=key,value', { headers: supabaseHeaders() }).then(function(r){ return r.json(); }),
+  fetch(SUPABASE_URL + '/rest/v1/lunch_dates?select=lunch_date,data', { headers: supabaseHeaders() }).then(function(r){ return r.json(); })
+])
+.then(function(results){
+  setLoadStage(2);
+  var defaultsRows = results[0];
+  var datesRows = results[1];
+  console.log('[HH] Supabase defaults rows:', defaultsRows && defaultsRows.length);
+  console.log('[HH] Supabase lunch_dates rows:', datesRows && datesRows.length);
+
+  // Reshape: turn rows into the { defaults: {...}, dates: {...} } shape applyFullMenu expects
+  var defaults = {};
+  if (Array.isArray(defaultsRows)) {
+    defaultsRows.forEach(function(row){ defaults[row.key] = row.value; });
+  } else if (defaultsRows && defaultsRows.message) {
+    console.warn('[HH] Supabase defaults error:', defaultsRows.message);
+  }
+
+  var dates = {};
+  if (Array.isArray(datesRows)) {
+    datesRows.forEach(function(row){
+      // Supabase returns DATE as "YYYY-MM-DD" string
+      dates[row.lunch_date] = row.data;
+    });
+  } else if (datesRows && datesRows.message) {
+    console.warn('[HH] Supabase dates error:', datesRows.message);
+  }
+
+  applyFullMenu({ defaults: defaults, dates: dates });
+  console.log('[HH] Applied. Defaults keys:', Object.keys(data.defaults), 'Beer count:', data.beer.length, 'Dates:', Object.keys(dates).length);
+  setLoadStage(3);
+  finish();
+})
+.catch(function(err){
+  console.warn('[HH] Supabase fetch failed:', err.message);
+  finish();
+});
 
 function finish(){
   initPage();
