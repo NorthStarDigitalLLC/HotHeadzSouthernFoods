@@ -413,48 +413,43 @@ function saveStore(s){try{localStorage.setItem(PK,JSON.stringify(s));return{ok:t
 // ═══════════════════════════════════════════════════════════════════
 // SUPABASE BACKEND
 // ═══════════════════════════════════════════════════════════════════
-// Public anon key — safe to ship in client-side code. Writes are still
-// gated by the RLS policies + the PIN lock on this editor.
+// Anon key only — Supabase blocks secret keys from browsers.
+// Writes are allowed because our RLS policies permit anon to INSERT/UPDATE/DELETE.
+// Real security comes from: (1) the PIN gate on this editor, (2) this file
+// living at a non-public URL.
 // ═══════════════════════════════════════════════════════════════════
 const SUPABASE_URL = 'https://zgqjzgonwvkxfbdseieg.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpncWp6Z29ud3ZreGZiZHNlaWVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1Njk4NTksImV4cCI6MjA5MjE0NTg1OX0.1mGtFUKumyQUgU0pO2CxIYSKLEuYEzspCGk9ncYYavk';
-
-// ⚠️  PASTE YOUR SERVICE_ROLE KEY HERE  ⚠️
-// Required for writes (save, delete). Only this editor file sees it, behind the PIN.
-// Get it from: Supabase → Settings → API → "service_role secret" → Reveal → Copy
-// If left blank, writes will fail with 401/403 but reads will still work.
-const SUPABASE_SERVICE_ROLE_KEY = 'sb_secret_TbtskLI1X3JCw_CqzLJa-Q_7mw6CxAG';
 
 const CLOUD_NAME_KEY='hhMenuCloud_name';
 function getCloudName(){return localStorage.getItem(CLOUD_NAME_KEY)||'';}
 function setCloudName(n){localStorage.setItem(CLOUD_NAME_KEY,n);}
 
-// Use service_role for writes when available, anon for reads
-function sbHeaders(forWrite){
-  var key = (forWrite && SUPABASE_SERVICE_ROLE_KEY) ? SUPABASE_SERVICE_ROLE_KEY : SUPABASE_ANON_KEY;
+// All requests use the anon key
+function sbHeaders(){
   return {
-    'apikey': key,
-    'Authorization': 'Bearer ' + key,
+    'apikey': SUPABASE_ANON_KEY,
+    'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   };
 }
 
-function sbJsonHeaders(forWrite){
-  var h = sbHeaders(forWrite);
+function sbJsonHeaders(){
+  var h = sbHeaders();
   h['Prefer'] = 'return=representation';
   return h;
 }
 
 // Low-level Supabase fetch helpers
 function sbGet(path){
-  return fetch(SUPABASE_URL + '/rest/v1/' + path, { headers: sbHeaders(false) })
+  return fetch(SUPABASE_URL + '/rest/v1/' + path, { headers: sbHeaders() })
     .then(function(r){ return r.text(); })
     .then(function(t){ try { return JSON.parse(t); } catch(e) { return { _raw: t }; } });
 }
 
 function sbWrite(method, path, body){
-  var init = { method: method, headers: sbJsonHeaders(true) };
+  var init = { method: method, headers: sbJsonHeaders() };
   if (body !== undefined) init.body = JSON.stringify(body);
   return fetch(SUPABASE_URL + '/rest/v1/' + path, init)
     .then(function(r){ return r.text().then(function(t){ return { status: r.status, ok: r.ok, text: t }; }); })
@@ -492,7 +487,7 @@ async function apiPost(params) {
         // UPSERT via Prefer: resolution=merge-duplicates
         await fetch(SUPABASE_URL + '/rest/v1/menu_defaults', {
           method: 'POST',
-          headers: Object.assign({}, sbJsonHeaders(true), { 'Prefer': 'resolution=merge-duplicates,return=representation' }),
+          headers: Object.assign({}, sbJsonHeaders(), { 'Prefer': 'resolution=merge-duplicates,return=representation' }),
           body: JSON.stringify(payload)
         }).then(function(r){
           if (!r.ok) return r.text().then(function(t){ throw new Error(t || ('HTTP ' + r.status)); });
@@ -531,7 +526,7 @@ async function apiPost(params) {
         var payload = { lunch_date: params.date, data: params.data, saved_by: params.publishedBy || getCloudName() || null };
         await fetch(SUPABASE_URL + '/rest/v1/lunch_dates', {
           method: 'POST',
-          headers: Object.assign({}, sbJsonHeaders(true), { 'Prefer': 'resolution=merge-duplicates,return=representation' }),
+          headers: Object.assign({}, sbJsonHeaders(), { 'Prefer': 'resolution=merge-duplicates,return=representation' }),
           body: JSON.stringify(payload)
         }).then(function(r){
           if (!r.ok) return r.text().then(function(t){ throw new Error(t || ('HTTP ' + r.status)); });
@@ -569,7 +564,7 @@ async function apiPost(params) {
         };
         await fetch(SUPABASE_URL + '/rest/v1/drawing_projects', {
           method: 'POST',
-          headers: Object.assign({}, sbJsonHeaders(true), { 'Prefer': 'resolution=merge-duplicates,return=representation' }),
+          headers: Object.assign({}, sbJsonHeaders(), { 'Prefer': 'resolution=merge-duplicates,return=representation' }),
           body: JSON.stringify(payload)
         }).then(function(r){
           if (!r.ok) return r.text().then(function(t){ throw new Error(t || ('HTTP ' + r.status)); });
