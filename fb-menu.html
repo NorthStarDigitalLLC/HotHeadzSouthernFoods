@@ -929,15 +929,17 @@ async function loadMenuDefaults(force){
   menuDefaultsStatus = 'loading';
   try {
     const res = await cloudRequest('getMenuDefaults');
-    if (res && res.success && res.data) {
-      menuDefaultsCache = res.data;
+    if (res && res.success && res.defaults) {
+      menuDefaultsCache = res.defaults;
       menuDefaultsStatus = 'loaded';
       return menuDefaultsCache;
     }
     menuDefaultsStatus = 'error';
+    console.warn('[HH editor] loadMenuDefaults unexpected response:', res);
     return null;
   } catch(e) {
     menuDefaultsStatus = 'error';
+    console.warn('[HH editor] loadMenuDefaults error:', e.message);
     return null;
   }
 }
@@ -1205,10 +1207,15 @@ function buildStaticSettings(){
 /* ═══ STATIC TAB WIRE HANDLERS ═══ */
 async function wireStaticPanel(){
   // Load fresh data if we don't have any
-  if (!menuDefaultsCache && menuDefaultsStatus !== 'loading') {
+  if (!menuDefaultsCache && menuDefaultsStatus !== 'loading' && menuDefaultsStatus !== 'error') {
     await loadMenuDefaults();
     rebuildSidePanel();
     return;
+  }
+  // If we tried and failed, show the panel anyway with empty data so user can retry
+  if (menuDefaultsStatus === 'error' && !menuDefaultsCache) {
+    menuDefaultsCache = {}; // empty cache to avoid retriggering loads
+    console.warn('[HH editor] Proceeding with empty menu defaults cache after load error');
   }
 
   // BREAKFAST
