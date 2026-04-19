@@ -481,6 +481,31 @@ document.addEventListener('DOMContentLoaded',function(){buildRolePicker('emp-rol
 var SUPABASE_URL = 'https://zgqjzgonwvkxfbdseieg.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpncWp6Z29ud3ZreGZiZHNlaWVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1Njk4NTksImV4cCI6MjA5MjE0NTg1OX0.1mGtFUKumyQUgU0pO2CxIYSKLEuYEzspCGk9ncYYavk';
 
+// ═══ EMAIL RELAY ═══
+// Separate Google Apps Script whose ONLY job is to send emails via Gmail.
+// Supabase can't send email on its own — this bridges that gap.
+// If left empty or the relay fails, messages still save to Supabase;
+// only the email alert is skipped. Set to your Apps Script /exec URL.
+var EMAIL_RELAY_URL = '';
+
+// Fire an email via the relay. Never throws — if it fails, we log and move on
+// so a broken relay doesn't break the portal itself.
+function sendEmailAlert(payload){
+  if (!EMAIL_RELAY_URL) return Promise.resolve({ok:false,skipped:true});
+  return fetch(EMAIL_RELAY_URL, {
+    method: 'POST',
+    mode: 'no-cors',  // Apps Script webhooks don't send CORS headers; we fire-and-forget
+    headers: {'Content-Type':'text/plain;charset=utf-8'},  // avoids CORS preflight
+    body: JSON.stringify(payload)
+  }).then(function(){
+    // With no-cors mode we can't read the response, but the email did fire.
+    return {ok:true};
+  }).catch(function(err){
+    console.warn('[HH staff] email relay failed:', err.message);
+    return {ok:false,error:err.message};
+  });
+}
+
 function sbHeaders(){return{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json','Accept':'application/json'};}
 function sbJsonHeaders(){var h=sbHeaders();h['Prefer']='return=representation';return h;}
 
@@ -625,13 +650,36 @@ async function api(p){
         var id=uid();
         var body={id:id,direction:'toEmployee',from_name:p.from||'Manager',to_names:p.to||'',text:p.text||'',read:false};
         await sbWrite('POST','portal_messages',body);
-        return{ok:true,emailSent:0};  // TODO: Edge Function for real email alerts
+
+        // Fire email alert in background — look up recipient emails from employees table
+        var sent = 0;
+        try {
+          var names = String(p.to||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
+          if (names.length) {
+            // Fetch current employee email addresses
+            var filter = names.map(function(n){return '"'+n.replace(/"/g,'\\"')+'"';}).join(',');
+            var emps = await sbGet('employees?select=name,email&name=in.('+encodeURIComponent(filter)+')');
+            if (Array.isArray(emps)) {
+              var emails = emps.map(function(e){return e.email;}).filter(function(e){return e && e.indexOf('@')>=0;});
+              if (emails.length) {
+                sendEmailAlert({type:'toEmployee', from:p.from||'Manager', to:emails, text:p.text||''});
+                sent = emails.length;
+              }
+            }
+          }
+        } catch(e) { console.warn('[HH staff] email lookup failed:', e.message); }
+
+        return {ok:true, emailSent:sent};
       }
       case 'sendMessageToManager': {
         var id=uid();
         var body={id:id,direction:'toManager',from_name:p.from,to_names:'Manager',text:p.text||'',read:false};
         await sbWrite('POST','portal_messages',body);
-        return{ok:true};
+
+        // Fire manager alert email in background (fire-and-forget)
+        sendEmailAlert({type:'toManager', from:p.from||'Employee', text:p.text||''});
+
+        return {ok:true};
       }
       case 'markRead': {
         await sbWrite('PATCH','portal_messages?id=eq.'+encodeURIComponent(p.id),{read:true});
