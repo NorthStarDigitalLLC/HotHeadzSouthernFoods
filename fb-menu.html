@@ -410,32 +410,198 @@ function loadStore(){const s=safeJSON(localStorage.getItem(PK),null);if(s&&Array
 function saveStore(s){try{localStorage.setItem(PK,JSON.stringify(s));return{ok:true}}catch(e){return{ok:false,error:String(e?.message||e)}}}
 
 /* CLOUD API */
-const CLOUD_URL='https://script.google.com/macros/s/AKfycbz7Zw5EAbw2TbXlhUxhZErQQjel7FcngRp_bCV-qT61PehYXnZ5jkUL_c4GFxcBv02LaA/exec';
+// ═══════════════════════════════════════════════════════════════════
+// SUPABASE BACKEND
+// ═══════════════════════════════════════════════════════════════════
+// Public anon key — safe to ship in client-side code. Writes are still
+// gated by the RLS policies + the PIN lock on this editor.
+// ═══════════════════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://zgqjzgonwvkxfbdseieg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpncWp6Z29ud3ZreGZiZHNlaWVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1Njk4NTksImV4cCI6MjA5MjE0NTg1OX0.1mGtFUKumyQUgU0pO2CxIYSKLEuYEzspCGk9ncYYavk';
+
+// ⚠️  PASTE YOUR SERVICE_ROLE KEY HERE  ⚠️
+// Required for writes (save, delete). Only this editor file sees it, behind the PIN.
+// Get it from: Supabase → Settings → API → "service_role secret" → Reveal → Copy
+// If left blank, writes will fail with 401/403 but reads will still work.
+const SUPABASE_SERVICE_ROLE_KEY = '';
+
 const CLOUD_NAME_KEY='hhMenuCloud_name';
-function getCloudUrl(){return CLOUD_URL;}
 function getCloudName(){return localStorage.getItem(CLOUD_NAME_KEY)||'';}
 function setCloudName(n){localStorage.setItem(CLOUD_NAME_KEY,n);}
 
-function apiGet(params){
-  // Use POST with text/plain body (a "simple" CORS request) — same trick as apiPost.
-  // Apps Script doesn't reliably send CORS headers on GET responses, but it does
-  // accept and respond to POST since the request is treated as a simple cross-origin request.
-  return apiPost(params);
+// Use service_role for writes when available, anon for reads
+function sbHeaders(forWrite){
+  var key = (forWrite && SUPABASE_SERVICE_ROLE_KEY) ? SUPABASE_SERVICE_ROLE_KEY : SUPABASE_ANON_KEY;
+  return {
+    'apikey': key,
+    'Authorization': 'Bearer ' + key,
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  };
 }
-function apiPost(params){
-  return fetch(getCloudUrl(),{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(params)}).then(function(r){return r.text();}).then(function(t){return JSON.parse(t);});
+
+function sbJsonHeaders(forWrite){
+  var h = sbHeaders(forWrite);
+  h['Prefer'] = 'return=representation';
+  return h;
 }
-async function cloudRequest(action,body={}){
-  const url=getCloudUrl();
-  if(!url){toast('Cloud not configured','error');return null;}
-  try{
-    if(action==='list'||action==='load'||action==='lunch'||action==='getMenuDefaults'||action==='getFullMenu'){
-      var params={action:action};
-      if(action==='load'&&body.id)params.id=body.id;
-      return await apiGet(params);
+
+// Low-level Supabase fetch helpers
+function sbGet(path){
+  return fetch(SUPABASE_URL + '/rest/v1/' + path, { headers: sbHeaders(false) })
+    .then(function(r){ return r.text(); })
+    .then(function(t){ try { return JSON.parse(t); } catch(e) { return { _raw: t }; } });
+}
+
+function sbWrite(method, path, body){
+  var init = { method: method, headers: sbJsonHeaders(true) };
+  if (body !== undefined) init.body = JSON.stringify(body);
+  return fetch(SUPABASE_URL + '/rest/v1/' + path, init)
+    .then(function(r){ return r.text().then(function(t){ return { status: r.status, ok: r.ok, text: t }; }); })
+    .then(function(resp){
+      var parsed = null;
+      try { parsed = resp.text ? JSON.parse(resp.text) : null; } catch(e) {}
+      if (!resp.ok) {
+        var msg = (parsed && (parsed.message || parsed.error || parsed.hint)) || resp.text || ('HTTP ' + resp.status);
+        throw new Error(msg);
+      }
+      return parsed;
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Action dispatcher — translates old Apps-Script-style {action:...} calls
+// into Supabase REST calls. Keeps the rest of the editor unchanged.
+// ═══════════════════════════════════════════════════════════════════
+async function apiPost(params) {
+  var action = params.action;
+  try {
+    switch(action) {
+
+      // ── Menu defaults (breakfast/lunch/beer/hours/settings/etc) ──
+      case 'getMenuDefaults': {
+        var rows = await sbGet('menu_defaults?select=key,value,updated_at');
+        if (!Array.isArray(rows)) return { success: false, error: rows && rows.message || 'fetch failed' };
+        var defaults = {};
+        rows.forEach(function(r){ defaults[r.key] = r.value; });
+        return { success: true, defaults: defaults };
+      }
+
+      case 'saveMenuDefault': {
+        var payload = { key: params.key, value: typeof params.json === 'string' ? JSON.parse(params.json) : params.json };
+        // UPSERT via Prefer: resolution=merge-duplicates
+        await fetch(SUPABASE_URL + '/rest/v1/menu_defaults', {
+          method: 'POST',
+          headers: Object.assign({}, sbJsonHeaders(true), { 'Prefer': 'resolution=merge-duplicates,return=representation' }),
+          body: JSON.stringify(payload)
+        }).then(function(r){
+          if (!r.ok) return r.text().then(function(t){ throw new Error(t || ('HTTP ' + r.status)); });
+        });
+        return { success: true };
+      }
+
+      case 'resetMenuDefault': {
+        await sbWrite('DELETE', 'menu_defaults?key=eq.' + encodeURIComponent(params.key));
+        return { success: true };
+      }
+
+      // ── Full combined menu (defaults + dates) ──
+      case 'getFullMenu': {
+        var res = await Promise.all([
+          sbGet('menu_defaults?select=key,value'),
+          sbGet('lunch_dates?select=lunch_date,data')
+        ]);
+        var defaults = {};
+        if (Array.isArray(res[0])) res[0].forEach(function(r){ defaults[r.key] = r.value; });
+        var dates = {};
+        if (Array.isArray(res[1])) res[1].forEach(function(r){ dates[r.lunch_date] = r.data; });
+        return { success: true, data: { defaults: defaults, dates: dates } };
+      }
+
+      // ── Lunch forecast (per-date rows) ──
+      case 'lunch': {
+        var rows = await sbGet('lunch_dates?select=lunch_date,data,updated_at&order=lunch_date.asc');
+        if (!Array.isArray(rows)) return { success: false, error: rows && rows.message || 'fetch failed' };
+        var dates = {};
+        rows.forEach(function(r){ dates[r.lunch_date] = r.data; });
+        return { success: true, dates: dates };
+      }
+
+      case 'save-lunch': {
+        var payload = { lunch_date: params.date, data: params.data, saved_by: params.publishedBy || getCloudName() || null };
+        await fetch(SUPABASE_URL + '/rest/v1/lunch_dates', {
+          method: 'POST',
+          headers: Object.assign({}, sbJsonHeaders(true), { 'Prefer': 'resolution=merge-duplicates,return=representation' }),
+          body: JSON.stringify(payload)
+        }).then(function(r){
+          if (!r.ok) return r.text().then(function(t){ throw new Error(t || ('HTTP ' + r.status)); });
+        });
+        return { success: true };
+      }
+
+      case 'delete-lunch': {
+        await sbWrite('DELETE', 'lunch_dates?lunch_date=eq.' + encodeURIComponent(params.date));
+        return { success: true };
+      }
+
+      // ── Drawing projects (canvas work) ──
+      case 'list': {
+        var rows = await sbGet('drawing_projects?select=id,name,updated_at,created_at&order=updated_at.desc');
+        if (!Array.isArray(rows)) return { success: false, error: rows && rows.message || 'fetch failed' };
+        return { success: true, projects: rows };
+      }
+
+      case 'load': {
+        var rows = await sbGet('drawing_projects?select=*&id=eq.' + encodeURIComponent(params.id));
+        if (!Array.isArray(rows) || !rows.length) return { success: false, error: 'Project not found' };
+        var p = rows[0];
+        return { success: true, project: { id: p.id, name: p.name, data: p.data, updatedAt: p.updated_at, createdAt: p.created_at } };
+      }
+
+      case 'save': {
+        // Handle both shapes: {name, data, id} and {project: {name, data, id, savedBy}}
+        var proj = params.project || params;
+        var payload = {
+          id: proj.id,
+          name: proj.name,
+          data: proj.data,
+          saved_by: proj.savedBy || params.savedBy || getCloudName() || null
+        };
+        await fetch(SUPABASE_URL + '/rest/v1/drawing_projects', {
+          method: 'POST',
+          headers: Object.assign({}, sbJsonHeaders(true), { 'Prefer': 'resolution=merge-duplicates,return=representation' }),
+          body: JSON.stringify(payload)
+        }).then(function(r){
+          if (!r.ok) return r.text().then(function(t){ throw new Error(t || ('HTTP ' + r.status)); });
+        });
+        return { success: true, id: proj.id };
+      }
+
+      case 'delete': {
+        await sbWrite('DELETE', 'drawing_projects?id=eq.' + encodeURIComponent(params.id));
+        return { success: true };
+      }
+
+      default:
+        console.warn('[HH editor] Unknown action:', action);
+        return { success: false, error: 'Unknown action: ' + action };
     }
-    return await apiPost(Object.assign({action},body));
-  }catch(e){toast('Cloud error: '+e.message,'error');return null;}
+  } catch(err) {
+    console.warn('[HH editor] apiPost error for', action, ':', err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+function apiGet(params){ return apiPost(params); }
+
+async function cloudRequest(action, body) {
+  body = body || {};
+  try {
+    return await apiPost(Object.assign({ action: action }, body));
+  } catch(e) {
+    toast('Cloud error: ' + e.message, 'error');
+    return null;
+  }
 }
 
 async function cloudSave(name){
