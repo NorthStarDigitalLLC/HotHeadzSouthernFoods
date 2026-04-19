@@ -129,7 +129,6 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.97);backdrop-
 .time-preset:hover{border-color:rgba(255,255,255,.2);color:var(--white)}
 .time-preset.selected{background:rgba(230,126,34,.15);border-color:rgba(230,126,34,.45);color:var(--ember-light)}
 
-/* ═══ MESSAGES — employee send to manager ═══ */
 .emp-msg-compose{background:var(--dark2);border:1px solid rgba(255,255,255,.10);padding:1.25rem;margin-bottom:0}
 .emp-msg-compose .f-label{margin-bottom:.5rem}
 .emp-msg-row{display:flex;gap:.75rem;margin-top:.75rem;flex-wrap:wrap}
@@ -149,8 +148,6 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.97);backdrop-
 .msg-text{font-size:.85rem;color:var(--white);line-height:1.6}
 .msg-date{font-size:.6rem;color:#A8A098;margin-top:.3rem}
 .msg-del{position:absolute;top:.75rem;right:.75rem;background:none;border:none;color:#909090;cursor:pointer;font-size:.75rem;transition:color .2s}.msg-del:hover{color:var(--red-hot)}
-/* SMS badge shown next to sent message count */
-.sms-badge{display:inline-flex;align-items:center;gap:.35rem;font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.08em;color:var(--green);background:rgba(39,174,96,.1);border:1px solid rgba(39,174,96,.3);padding:.2rem .6rem;border-radius:2px;margin-left:.5rem}
 
 .panel-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.1em;margin-bottom:1rem;display:flex;align-items:center;gap:.75rem;color:var(--white)}
 .panel-title::before{content:'';width:3px;height:1.2rem;background:var(--red-hot);display:inline-block;flex-shrink:0}
@@ -226,7 +223,6 @@ footer{border-top:1px solid rgba(255,255,255,.10);padding:1.5rem;text-align:cent
 .master-emp-grid{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem}
 .master-emp-btn{font-family:'Space Mono',monospace;font-size:.6rem;padding:.4rem .75rem;background:var(--dark3);border:1px solid rgba(255,255,255,.1);color:#B0A898;cursor:pointer;transition:all .2s;border-radius:2px}
 .master-emp-btn:hover{border-color:var(--ember);color:var(--ember-light);background:rgba(230,126,34,.06)}
-/* Inbox badge on manager messages tab */
 .tab-badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;background:var(--red-hot);color:white;font-size:.55rem;font-weight:700;border-radius:999px;padding:0 4px;margin-left:5px;vertical-align:middle}
 
 @media(max-width:900px){header{padding:0 1.25rem}.wrap{padding:1.25rem}.btm-grid{grid-template-columns:1fr}.fg5,.fg4{grid-template-columns:1fr 1fr}.fg3,.fg2{grid-template-columns:1fr 1fr}.card{padding:1.25rem}.notes-group{min-width:100%}}
@@ -368,7 +364,6 @@ footer{padding:1.1rem .9rem;padding-bottom:max(1.1rem,env(safe-area-inset-bottom
   <div class="schedule-grid" id="empScheduleGrid"></div>
   <div class="panel-title">My Upcoming Shifts</div><div class="panel-box" id="empMyShifts"></div>
 
-  <!-- EMPLOYEE MESSAGES — receive + send to manager -->
   <div class="panel-title">💬 Messages</div>
   <div class="panel-box" style="padding:0;overflow:hidden">
     <div class="emp-msg-compose">
@@ -408,12 +403,12 @@ footer{padding:1.1rem .9rem;padding-bottom:max(1.1rem,env(safe-area-inset-bottom
     <div style="margin-top:1rem;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap"><span id="shiftCount"></span><button class="ab ghost filter-ab" onclick="if(confirm('Delete ALL shifts?')){clearAllShifts()}">🗑 Clear All</button></div>
   </div>
   <div class="tab-panel" id="tab-employees">
-    <div class="sec-hdr"><div class="sec-title">Manage <span>Employees</span></div><div class="sec-sub">Add employees and set their login PINs. Email is used for message alerts.</div></div>
+    <div class="sec-hdr"><div class="sec-title">Manage <span>Employees</span></div><div class="sec-sub">Add employees and set their login PINs. Email is stored for future alert features.</div></div>
     <div class="card ac-green">
       <div class="form-grid fg3">
         <div class="form-group"><label class="f-label">Full Name</label><input class="fi" type="text" id="emp-name" placeholder="e.g. Sarah Johnson"></div>
         <div class="form-group"><label class="f-label">PIN (4–6 digits)</label><input class="fi" type="text" id="emp-pin" placeholder="e.g. 1234" maxlength="6" inputmode="numeric"></div>
-        <div class="form-group"><label class="f-label">Email (for message alerts)</label><input class="fi" type="email" id="emp-email" placeholder="e.g. sarah@gmail.com"></div>
+        <div class="form-group"><label class="f-label">Email (for alerts)</label><input class="fi" type="email" id="emp-email" placeholder="e.g. sarah@gmail.com"></div>
       </div>
       <div style="margin-top:1rem"><label class="f-label">Role(s) — tap to select multiple</label><div class="role-picker" id="emp-roles"></div><div class="custom-toggle"><label><input type="checkbox" onchange="toggleCustom('emp-role-custom',this.checked)"> Custom role</label></div><input class="fi custom-input" id="emp-role-custom" placeholder="Type custom role..."></div>
       <div style="margin-top:1rem"><button class="ab green" onclick="addEmployee()">+ ADD EMPLOYEE</button></div>
@@ -421,18 +416,16 @@ footer{padding:1.1rem .9rem;padding-bottom:max(1.1rem,env(safe-area-inset-bottom
     <div class="emp-grid" id="empGrid"></div>
   </div>
   <div class="tab-panel" id="tab-messages">
-    <div class="sec-hdr"><div class="sec-title">💬 Messages</div><div class="sec-sub">Send to employees — they get an SMS alert. Employee messages to you appear below.</div></div>
-    <!-- SEND TO EMPLOYEES -->
+    <div class="sec-hdr"><div class="sec-title">💬 Messages</div><div class="sec-sub">Send messages to staff. They'll see them on their portal dashboard.</div></div>
     <div class="card ac-ember msg-compose">
-      <div class="sec-title" style="font-size:1rem;margin-bottom:.75rem">Send to Employees <span style="font-size:.75rem;color:#A8A098;font-family:'DM Sans',sans-serif;font-weight:400">— email alert fires to their inbox</span></div>
+      <div class="sec-title" style="font-size:1rem;margin-bottom:.75rem">Send to Employees</div>
       <div class="form-group"><label class="f-label">Select recipients</label>
         <div class="emp-check-list" id="msgRecipients"></div>
         <div style="margin-top:.3rem"><button class="ab ghost" style="font-size:.7rem;padding:.3rem .7rem" onclick="selectAllRecipients()">Select All</button> <button class="ab ghost" style="font-size:.7rem;padding:.3rem .7rem" onclick="clearRecipients()">Clear</button></div>
       </div>
       <div class="form-group" style="margin-top:1rem"><label class="f-label">Message</label><input class="fi" type="text" id="msgText" placeholder="Type your message..."></div>
-      <div style="margin-top:1rem"><button class="ab ember" onclick="sendMsg()">📨 SEND + EMAIL ALERT</button></div>
+      <div style="margin-top:1rem"><button class="ab ember" onclick="sendMsg()">📨 SEND MESSAGE</button></div>
     </div>
-    <!-- INBOX — messages from employees -->
     <div class="sec-title" style="font-size:1rem;margin-bottom:.75rem">📥 Inbox — From Employees</div>
     <div id="ownInboxList"></div>
     <div class="sec-title" style="font-size:1rem;margin:.75rem 0">📤 Sent Messages</div>
@@ -479,8 +472,245 @@ function buildTimePresets(cid,times){var el=document.getElementById(cid);if(!el)
 function getSelectedTime(cid,cusId){var c=document.getElementById(cusId);if(c&&c.classList.contains('show')&&c.value)return c.value;var s=document.querySelector('#'+cid+' .time-preset.selected');return s?s.getAttribute('data-time'):'';}
 document.addEventListener('DOMContentLoaded',function(){buildRolePicker('emp-roles');buildRolePicker('modal-roles');buildTimePresets('modal-start-presets',START_TIMES);buildTimePresets('modal-end-presets',END_TIMES);var ds=document.querySelector('#modal-start-presets .time-preset[data-time="5:30"]');var de=document.querySelector('#modal-end-presets .time-preset[data-time="14:00"]');if(ds)ds.classList.add('selected');if(de)de.classList.add('selected');var dr=document.querySelector('#modal-roles .role-chip[data-role="Cook"]');if(dr)dr.classList.add('selected');});
 
-var API_URL='https://script.google.com/macros/s/AKfycbxnCSfbRk15e66t3rhDCMYzVmc6fpwptTxh611NIqPn8KV3mybvqxoFe97wpXM1YqtMrQ/exec';
-function api(p){var q=Object.keys(p).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(p[k]);}).join('&');return fetch(API_URL+'?'+q,{method:'GET',mode:'cors'}).then(function(r){return r.text();}).then(function(t){return JSON.parse(t);});}
+// ═══════════════════════════════════════════════════════════════════
+// SUPABASE BACKEND
+// Drop-in replacement for the old Google Apps Script api() function.
+// Same caller signature, same response shapes. The rest of the portal
+// code below doesn't need to know anything changed.
+// ═══════════════════════════════════════════════════════════════════
+var SUPABASE_URL = 'https://zgqjzgonwvkxfbdseieg.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpncWp6Z29ud3ZreGZiZHNlaWVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1Njk4NTksImV4cCI6MjA5MjE0NTg1OX0.1mGtFUKumyQUgU0pO2CxIYSKLEuYEzspCGk9ncYYavk';
+
+function sbHeaders(){return{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json','Accept':'application/json'};}
+function sbJsonHeaders(){var h=sbHeaders();h['Prefer']='return=representation';return h;}
+
+function sbGet(path){
+  return fetch(SUPABASE_URL+'/rest/v1/'+path,{headers:sbHeaders()})
+    .then(function(r){return r.text();})
+    .then(function(t){try{return JSON.parse(t);}catch(e){return{_raw:t};}});
+}
+function sbWrite(method,path,body){
+  var init={method:method,headers:sbJsonHeaders()};
+  if(body!==undefined)init.body=JSON.stringify(body);
+  return fetch(SUPABASE_URL+'/rest/v1/'+path,init)
+    .then(function(r){return r.text().then(function(t){return{status:r.status,ok:r.ok,text:t};});})
+    .then(function(resp){
+      var parsed=null;try{parsed=resp.text?JSON.parse(resp.text):null;}catch(e){}
+      if(!resp.ok){
+        var msg=(parsed&&(parsed.message||parsed.error||parsed.hint))||resp.text||('HTTP '+resp.status);
+        throw new Error(msg);
+      }
+      return parsed;
+    });
+}
+function sbUpsert(path,body){
+  return fetch(SUPABASE_URL+'/rest/v1/'+path,{
+    method:'POST',
+    headers:Object.assign({},sbJsonHeaders(),{'Prefer':'resolution=merge-duplicates,return=representation'}),
+    body:JSON.stringify(body)
+  }).then(function(r){return r.text().then(function(t){return{status:r.status,ok:r.ok,text:t};});})
+    .then(function(resp){
+      if(!resp.ok){
+        var parsed=null;try{parsed=JSON.parse(resp.text);}catch(e){}
+        var msg=(parsed&&(parsed.message||parsed.error||parsed.hint))||resp.text||('HTTP '+resp.status);
+        throw new Error(msg);
+      }
+      try{return JSON.parse(resp.text);}catch(e){return null;}
+    });
+}
+
+function uid(){return Math.random().toString(36).slice(2,10)+Date.now().toString(36);}
+
+async function api(p){
+  var action=p.action;
+  try{
+    switch(action){
+
+      // ── EMPLOYEES ──
+      case 'getEmployees': {
+        var rows=await sbGet('employees?select=name,role,email&order=name.asc');
+        if(!Array.isArray(rows))return{ok:false,error:(rows&&rows.message)||'load failed'};
+        return{ok:true,data:rows};
+      }
+      case 'getEmployeesWithPins': {
+        var rows=await sbGet('employees?select=name,pin,role,email&order=name.asc');
+        if(!Array.isArray(rows))return{ok:false,error:(rows&&rows.message)||'load failed'};
+        return{ok:true,data:rows};
+      }
+      case 'checkPin': {
+        var rows=await sbGet('employees?select=name,pin&name=eq.'+encodeURIComponent(p.name));
+        if(!Array.isArray(rows)||!rows.length)return{ok:false,error:'Employee not found'};
+        if(String(rows[0].pin)===String(p.pin))return{ok:true};
+        return{ok:false,error:'Incorrect PIN'};
+      }
+      case 'addEmployee': {
+        var body={name:p.name,pin:p.pin,role:p.role||'',email:p.email||''};
+        await sbWrite('POST','employees',body);
+        return{ok:true};
+      }
+      case 'deleteEmployee': {
+        await sbWrite('DELETE','employees?name=eq.'+encodeURIComponent(p.name));
+        return{ok:true};
+      }
+      case 'updatePin': {
+        await sbWrite('PATCH','employees?name=eq.'+encodeURIComponent(p.name),{pin:p.pin});
+        return{ok:true};
+      }
+      case 'updateEmail': {
+        await sbWrite('PATCH','employees?name=eq.'+encodeURIComponent(p.name),{email:p.email||''});
+        return{ok:true};
+      }
+
+      // ── SHIFTS ──
+      case 'getSchedule': {
+        var rows=await sbGet('shifts?select=*&order=shift_date.asc,start_time.asc');
+        if(!Array.isArray(rows))return{ok:false,error:(rows&&rows.message)||'load failed'};
+        // Normalize to old shape: {id, name, date, startTime, endTime, role, notes}
+        var out=rows.map(function(r){return{
+          id:r.id,name:r.name,date:r.shift_date,
+          startTime:r.start_time||'',endTime:r.end_time||'',
+          role:r.role||'',notes:r.notes||''
+        };});
+        return{ok:true,data:out};
+      }
+      case 'addShift': {
+        var id=uid();
+        var body={id:id,name:p.name,shift_date:p.date,start_time:p.startTime||null,end_time:p.endTime||null,role:p.role||'',notes:p.notes||''};
+        await sbWrite('POST','shifts',body);
+        return{ok:true,id:id};
+      }
+      case 'deleteShift': {
+        await sbWrite('DELETE','shifts?id=eq.'+encodeURIComponent(p.id));
+        return{ok:true};
+      }
+      case 'clearShifts': {
+        // DELETE all rows — use `id=neq.__never__` so it matches all rows
+        await sbWrite('DELETE','shifts?id=neq.__never__');
+        return{ok:true};
+      }
+
+      // ── MESSAGES ──
+      case 'getMessages': {
+        // Employee calling: p.name set → return messages where recipients include them OR they sent
+        // Manager calling: no p.name → return all messages (both directions)
+        var rows=await sbGet('portal_messages?select=*&order=created_at.asc');
+        if(!Array.isArray(rows))return{ok:false,error:(rows&&rows.message)||'load failed'};
+        var out=rows.map(function(r){return{
+          id:r.id,direction:r.direction,from:r.from_name,to:r.to_names||'',
+          text:r.text,read:!!r.read,date:r.created_at
+        };});
+        if(p.name){
+          var me=String(p.name).toLowerCase();
+          out=out.filter(function(m){
+            if(m.direction==='toManager'&&String(m.from).toLowerCase()===me)return true;
+            if(m.direction==='toEmployee'){
+              var list=String(m.to||'').split(',').map(function(x){return x.trim().toLowerCase();});
+              return list.indexOf(me)>=0;
+            }
+            return false;
+          });
+        }
+        return{ok:true,data:out};
+      }
+      case 'getManagerInbox': {
+        var rows=await sbGet('portal_messages?select=*&direction=eq.toManager&order=created_at.asc');
+        if(!Array.isArray(rows))return{ok:false,error:(rows&&rows.message)||'load failed'};
+        var out=rows.map(function(r){return{
+          id:r.id,from:r.from_name,text:r.text,read:!!r.read,date:r.created_at
+        };});
+        return{ok:true,data:out};
+      }
+      case 'sendMessage': {
+        // Manager → employees (p.from='Manager', p.to='Alice,Bob', p.text=...)
+        var id=uid();
+        var body={id:id,direction:'toEmployee',from_name:p.from||'Manager',to_names:p.to||'',text:p.text||'',read:false};
+        await sbWrite('POST','portal_messages',body);
+        return{ok:true,emailSent:0};  // TODO: Edge Function for real email alerts
+      }
+      case 'sendMessageToManager': {
+        var id=uid();
+        var body={id:id,direction:'toManager',from_name:p.from,to_names:'Manager',text:p.text||'',read:false};
+        await sbWrite('POST','portal_messages',body);
+        return{ok:true};
+      }
+      case 'markRead': {
+        await sbWrite('PATCH','portal_messages?id=eq.'+encodeURIComponent(p.id),{read:true});
+        return{ok:true};
+      }
+      case 'markManagerRead': {
+        await sbWrite('PATCH','portal_messages?id=eq.'+encodeURIComponent(p.id),{read:true});
+        return{ok:true};
+      }
+      case 'deleteMessage': {
+        await sbWrite('DELETE','portal_messages?id=eq.'+encodeURIComponent(p.id));
+        return{ok:true};
+      }
+      case 'deleteManagerInbox': {
+        await sbWrite('DELETE','portal_messages?id=eq.'+encodeURIComponent(p.id));
+        return{ok:true};
+      }
+
+      // ── NOTICES ──
+      case 'getNotices': {
+        var rows=await sbGet('portal_notices?select=*&order=created_at.asc');
+        if(!Array.isArray(rows))return{ok:false,error:(rows&&rows.message)||'load failed'};
+        var out=rows.map(function(r){return{id:r.id,text:r.text,type:r.type||'',date:r.created_at};});
+        return{ok:true,data:out};
+      }
+      case 'addNotice': {
+        var id=uid();
+        await sbWrite('POST','portal_notices',{id:id,text:p.text,type:p.type||''});
+        return{ok:true,id:id};
+      }
+      case 'deleteNotice': {
+        await sbWrite('DELETE','portal_notices?id=eq.'+encodeURIComponent(p.id));
+        return{ok:true};
+      }
+
+      // ── SETTINGS / PASSWORDS ──
+      case 'getPasswords': {
+        var rows=await sbGet('portal_settings?select=key,value&key=in.(admin_pass,master_pass)');
+        var adminPass='hotheadz2025',masterPass='masterkey2025';
+        if(Array.isArray(rows))rows.forEach(function(r){
+          if(r.key==='admin_pass')adminPass=r.value;
+          if(r.key==='master_pass')masterPass=r.value;
+        });
+        return{ok:true,data:{adminPass:adminPass,masterPass:masterPass}};
+      }
+      case 'checkAdmin': {
+        var rows=await sbGet('portal_settings?select=value&key=eq.admin_pass');
+        var stored=(Array.isArray(rows)&&rows[0])?rows[0].value:'hotheadz2025';
+        return{ok:String(p.pass)===String(stored)};
+      }
+      case 'checkMaster': {
+        var rows=await sbGet('portal_settings?select=value&key=eq.master_pass');
+        var stored=(Array.isArray(rows)&&rows[0])?rows[0].value:'masterkey2025';
+        return{ok:String(p.pass)===String(stored)};
+      }
+      case 'setAdmin': {
+        await sbUpsert('portal_settings',{key:'admin_pass',value:p.pass});
+        return{ok:true};
+      }
+      case 'setMaster': {
+        await sbUpsert('portal_settings',{key:'master_pass',value:p.pass});
+        return{ok:true};
+      }
+
+      default:
+        console.warn('[HH staff] Unknown action:',action);
+        return{ok:false,error:'Unknown action: '+action};
+    }
+  }catch(err){
+    console.warn('[HH staff] api error for',action,':',err.message);
+    return{ok:false,error:err.message};
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// REST OF PORTAL CODE — unchanged from the Apps Script version.
+// All the functions below call api({action:...}) just like before.
+// ═══════════════════════════════════════════════════════════════════
+
 function loading(m,c){document.getElementById('loadingText').textContent=m||'Loading...';document.getElementById('spinner').className='spinner '+(c||'red');document.getElementById('loadingOverlay').classList.add('show');}
 function stopLoading(){document.getElementById('loadingOverlay').classList.remove('show');}
 function toast(m,t){var e=document.getElementById('toast');e.textContent=m;e.className='toast show '+(t||'ok');clearTimeout(e._t);e._t=setTimeout(function(){e.className='toast';},2800);}
@@ -501,7 +731,6 @@ function loadEmployeeNames(){loading('Loading...','red');api({action:'getEmploye
 function empLogin(){var n=document.getElementById('empName').value.trim(),p=document.getElementById('empPin').value.trim(),e=document.getElementById('empError');if(!n){e.textContent='Select your name.';return;}if(!p){e.textContent='Enter your PIN.';return;}loading('Checking...','red');api({action:'checkPin',name:n,pin:p}).then(function(r){stopLoading();if(r.ok){_currentUser=n;showEmpApp();}else e.textContent=r.error||'Incorrect PIN.';}).catch(function(){stopLoading();e.textContent='Connection error.';});}
 function showEmpApp(){document.getElementById('loginScreen').style.display='none';document.getElementById('empApp').style.display='block';showHeader('employee');document.getElementById('empWelcomeName').textContent=_currentUser;document.getElementById('empWelcomeMeta').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});loading('Loading...','red');Promise.all([api({action:'getSchedule'}),api({action:'getNotices'}),api({action:'getMessages',name:_currentUser})]).then(function(r){stopLoading();if(r[0].ok)_schedule=(r[0].data||[]).map(function(s){if(s.date&&s.date.length>10)s.date=s.date.slice(0,10);return s;});if(r[1].ok)_notices=r[1].data||[];if(r[2].ok)_empMessages=r[2].data||[];empRenderMonth();empRenderMyShifts();empRenderNotices();empRenderMessages();}).catch(function(){stopLoading();});}
 
-// ── EMPLOYEE SEND MESSAGE TO MANAGER ──
 function empSendMsg(){
   var tx=document.getElementById('empMsgText').value.trim();
   if(!tx){toast('Enter a message','err');return;}
@@ -511,7 +740,6 @@ function empSendMsg(){
     if(r.ok){
       document.getElementById('empMsgText').value='';
       toast('Message sent to manager ✓');
-      // Refresh messages
       api({action:'getMessages',name:_currentUser}).then(function(r2){if(r2.ok){_empMessages=r2.data||[];empRenderMessages();}});
     }else toast('Error sending','err');
   }).catch(function(){stopLoading();toast('Connection error','err');});
@@ -532,7 +760,7 @@ function empGoToday(){_empMonthOffset=0;empRenderMonth();}
 function empRenderMonth(){renderCalendarGrid('empScheduleGrid','empMonthRange','empDowRow',_empMonthOffset,_schedule,_currentUser,false);empRenderStats();}
 function empRenderMyShifts(){var td=new Date();td.setHours(0,0,0,0);var me=_currentUser.trim().toLowerCase();var up=_schedule.filter(function(s){return s.name.trim().toLowerCase()===me&&new Date(s.date+'T00:00:00')>=td;}).sort(function(a,b){return a.date.localeCompare(b.date);}).slice(0,10);var el=document.getElementById('empMyShifts');if(!up.length){el.innerHTML='<div class="no-shifts"><span class="ns-icon">📅</span>No upcoming shifts.</div>';return;}el.innerHTML='';up.forEach(function(s,i){var d=new Date(s.date+'T00:00:00'),h=calcH(s.startTime,s.endTime);var r=document.createElement('div');r.className='panel-row';r.innerHTML='<div class="sdb '+(i===0?'next':'')+'"><div class="sdb-day">'+DAYS[d.getDay()]+'</div><div class="sdb-num">'+d.getDate()+'</div></div><div class="pi"><div class="pi-title">'+MO[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear()+'</div><div class="pi-meta">'+fmt12(s.startTime)+(s.endTime?' – '+fmt12(s.endTime):'')+'</div><div class="pi-role">'+(s.role||'Staff')+(s.notes?' · '+s.notes:'')+'</div></div><div class="hrs-badge">'+(h>0?h+'h':'–')+'<span>hours</span></div>';el.appendChild(r);});}
 function empRenderStats(){var md=getMonthDates(_empMonthOffset),mm=[];md.cells.forEach(function(c){if(!c.inMonth)return;_schedule.filter(function(s){return s.date===c.iso&&s.name.trim().toLowerCase()===_currentUser.trim().toLowerCase();}).forEach(function(s){mm.push(s);});});var th=mm.reduce(function(a,s){return a+calcH(s.startTime,s.endTime);},0);var td=[...new Set(mm.map(function(s){return s.date;}))].length;var so=mm.sort(function(a,b){return a.date.localeCompare(b.date);});document.getElementById('empStatHours').innerHTML=th+'<span>h</span>';document.getElementById('empStatDays').textContent=td;document.getElementById('empStatIn').textContent=so.length?fmt12(so[0].startTime):'–';document.getElementById('empStatOut').textContent=so.length?fmt12(so[so.length-1].endTime):'–';}
-function empRenderNotices(){var el=document.getElementById('empNoticeBoard');var all=_notices.slice().reverse().slice(0,8);if(!all.length){el.innerHTML='<div class="no-shifts"><span class="ns-icon">📋</span>No notices posted yet.</div>';return;}el.innerHTML='';all.forEach(function(n){var i=document.createElement('div');i.className='notice-item';i.innerHTML='<div class="ndot '+(n.type||'')+'"></div><div><div class="n-text">'+n.text+'</div><div class="n-date">'+(n.date||'')+'</div></div>';el.appendChild(i);});}
+function empRenderNotices(){var el=document.getElementById('empNoticeBoard');var all=_notices.slice().reverse().slice(0,8);if(!all.length){el.innerHTML='<div class="no-shifts"><span class="ns-icon">📋</span>No notices posted yet.</div>';return;}el.innerHTML='';all.forEach(function(n){var i=document.createElement('div');i.className='notice-item';i.innerHTML='<div class="ndot '+(n.type||'')+'"></div><div><div class="n-text">'+n.text+'</div><div class="n-date">'+fmtMsgDate(n.date||'')+'</div></div>';el.appendChild(i);});}
 function empRenderMessages(){
   var el=document.getElementById('empMessages');
   if(!_empMessages.length){el.innerHTML='<div class="no-shifts" style="padding:1.5rem"><span class="ns-icon" style="font-size:1.5rem">💬</span>No messages yet.</div>';return;}
@@ -553,7 +781,7 @@ function empRenderMessages(){
 var _modalDate='';
 function openShiftModal(iso){_modalDate=iso;var d=new Date(iso+'T12:00:00');document.getElementById('modalDate').textContent=FD[d.getDay()]+', '+MO[d.getMonth()]+' '+d.getDate();var s=document.getElementById('modal-emp');s.innerHTML='<option value="">— Select Employee —</option>';_ownEmployees.sort(function(a,b){return a.name.localeCompare(b.name);}).forEach(function(e){var o=document.createElement('option');o.value=e.name;o.textContent=e.name;s.appendChild(o);});document.getElementById('modal-notes').value='';document.getElementById('shiftModal').classList.add('show');}
 function closeShiftModal(){document.getElementById('shiftModal').classList.remove('show');}
-function submitShiftModal(){var ec=document.getElementById('modal-emp-custom');var nm=(ec&&ec.classList.contains('show')&&ec.value)?ec.value.trim():document.getElementById('modal-emp').value;if(!nm){toast('Select an employee','err');return;}var st=getSelectedTime('modal-start-presets','modal-start-custom');var en=getSelectedTime('modal-end-presets','modal-end-custom');var rc=document.getElementById('modal-role-custom');var rl=(rc&&rc.classList.contains('show')&&rc.value)?rc.value.trim():getSelectedRoles('modal-roles');if(!rl){toast('Select a role','err');return;}var nt=document.getElementById('modal-notes').value.trim();loading('Adding...','ember');api({action:'addShift',name:nm,date:_modalDate,startTime:st,endTime:en,role:rl,notes:nt}).then(function(r){stopLoading();if(r.ok){_ownSchedule.push({id:r.id,name:nm,date:_modalDate,startTime:st,endTime:en,role:rl,notes:nt});renderCalendarGrid('ownScheduleGrid','ownMonthRange','ownDowRow',_ownMonthOffset,_ownSchedule,null,true);renderShiftTable();closeShiftModal();toast(nm+' assigned');}else toast('Error','err');}).catch(function(){stopLoading();toast('Error','err');});}
+function submitShiftModal(){var ec=document.getElementById('modal-emp-custom');var nm=(ec&&ec.classList.contains('show')&&ec.value)?ec.value.trim():document.getElementById('modal-emp').value;if(!nm){toast('Select an employee','err');return;}var st=getSelectedTime('modal-start-presets','modal-start-custom');var en=getSelectedTime('modal-end-presets','modal-end-custom');var rc=document.getElementById('modal-role-custom');var rl=(rc&&rc.classList.contains('show')&&rc.value)?rc.value.trim():getSelectedRoles('modal-roles');if(!rl){toast('Select a role','err');return;}var nt=document.getElementById('modal-notes').value.trim();loading('Adding...','ember');api({action:'addShift',name:nm,date:_modalDate,startTime:st,endTime:en,role:rl,notes:nt}).then(function(r){stopLoading();if(r.ok){_ownSchedule.push({id:r.id,name:nm,date:_modalDate,startTime:st,endTime:en,role:rl,notes:nt});renderCalendarGrid('ownScheduleGrid','ownMonthRange','ownDowRow',_ownMonthOffset,_ownSchedule,null,true);renderShiftTable();closeShiftModal();toast(nm+' assigned');}else toast('Error: '+(r.error||''),'err');}).catch(function(){stopLoading();toast('Error','err');});}
 document.addEventListener('click',function(e){if(e.target.id==='shiftModal')closeShiftModal();});
 
 var _ownMonthOffset=0,_ownSchedule=[],_ownEmployees=[],_ownMessages=[],_ownInbox=[],_filterFrom='',_filterTo='';
@@ -617,7 +845,6 @@ function renderEmpGrid(){
           +' onfocus="this.style.borderColor=\'var(--ember)\'" onblur="this.style.borderColor=\'rgba(255,255,255,.12)\'">'
         +'<button class="emp-btn" style="padding:.32rem .7rem;flex-shrink:0" onclick="updateEmail(\''+safeNm+'\',document.getElementById(\''+emailId+'\').value)">💾</button>'
       +'</div>'
-      +(em?'':'<div style="font-size:.62rem;color:rgba(231,76,60,.6);margin-top:-.3rem;margin-bottom:.3rem">No email — add above for alerts</div>')
       +'<div class="emp-actions">'
         +'<button class="emp-btn" onclick="resetPin(\''+safeNm+'\')">🔑 Reset PIN</button>'
         +'<button class="emp-btn" onclick="deleteEmployee(\''+safeNm+'\')">✕ Remove</button>'
@@ -632,26 +859,20 @@ function updateEmail(nm,em){
   api({action:'updateEmail',name:nm,email:em}).then(function(r){
     stopLoading();
     if(r.ok){
-      // Update local cache immediately
       _ownEmployees.forEach(function(e){if(e.name===nm)e.email=em;});
       renderEmpGrid();
       renderMsgRecipients();
       toast(em?nm+' email saved ✓':nm+' email cleared');
-      // Re-fetch from sheet to confirm it persisted
-      api({action:'getEmployeesWithPins'}).then(function(r2){
-        if(r2.ok){_ownEmployees=r2.data||[];renderEmpGrid();renderMsgRecipients();}
-      });
     }else{toast('Error saving email','err');}
   }).catch(function(){stopLoading();toast('Connection error','err');});
 }
 
 function renderCurrentPasswords(pw){if(!pw)return;var el=document.getElementById('currentPasswords');if(!el)return;el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:1.5rem"><div><span class="f-label" style="margin-bottom:.4rem;display:block">Current Admin Password</span><span style="font-family:Space Mono,monospace;font-size:.9rem;color:var(--ember-light);letter-spacing:.12em;user-select:all;background:var(--dark3);padding:.5rem .9rem;border:1px solid rgba(255,255,255,.1);display:inline-block">'+(pw.adminPass||'—')+'</span></div><div><span class="f-label" style="margin-bottom:.4rem;display:block">Current Master Password</span><span style="font-family:Space Mono,monospace;font-size:.9rem;color:var(--red-hot);letter-spacing:.12em;user-select:all;background:var(--dark3);padding:.5rem .9rem;border:1px solid rgba(255,255,255,.1);display:inline-block">'+(pw.masterPass||'—')+'</span></div></div>';}
 
-function renderMsgRecipients(){var el=document.getElementById('msgRecipients');if(!el)return;el.innerHTML='';_ownEmployees.sort(function(a,b){return a.name.localeCompare(b.name);}).forEach(function(e){var c=document.createElement('span');c.className='emp-check';c.textContent=e.name+(e.email?'':' ⚠');c.setAttribute('data-name',e.name);c.addEventListener('click',function(){this.classList.toggle('selected');});el.appendChild(c);});}
+function renderMsgRecipients(){var el=document.getElementById('msgRecipients');if(!el)return;el.innerHTML='';_ownEmployees.sort(function(a,b){return a.name.localeCompare(b.name);}).forEach(function(e){var c=document.createElement('span');c.className='emp-check';c.textContent=e.name;c.setAttribute('data-name',e.name);c.addEventListener('click',function(){this.classList.toggle('selected');});el.appendChild(c);});}
 function selectAllRecipients(){document.querySelectorAll('#msgRecipients .emp-check').forEach(function(c){c.classList.add('selected');});}
 function clearRecipients(){document.querySelectorAll('#msgRecipients .emp-check').forEach(function(c){c.classList.remove('selected');});}
 
-// ── MANAGER SEND MESSAGE + SMS ALERT ──
 function sendMsg(){
   var sel=[];document.querySelectorAll('#msgRecipients .emp-check.selected').forEach(function(c){sel.push(c.getAttribute('data-name'));});
   if(!sel.length){toast('Select employees','err');return;}
@@ -662,8 +883,7 @@ function sendMsg(){
     stopLoading();
     if(r.ok){
       document.getElementById('msgText').value='';clearRecipients();
-      var emailCount=r.emailSent||0;
-      toast('Sent to '+sel.length+(emailCount?' · '+emailCount+' email'+(emailCount>1?'s':'')+' sent':''));
+      toast('Sent to '+sel.length+' recipient'+(sel.length!==1?'s':''));
       api({action:'getMessages'}).then(function(r2){if(r2.ok){_ownMessages=r2.data||[];renderOwnMessages();}});
     }else toast('Error','err');
   }).catch(function(){stopLoading();toast('Error','err');});
@@ -688,7 +908,6 @@ function renderOwnMessages(){
   });
 }
 
-// ── MANAGER INBOX (messages from employees) ──
 function renderOwnInbox(){
   var el=document.getElementById('ownInboxList');if(!el)return;
   var unread=_ownInbox.filter(function(m){return !m.read;}).length;
@@ -709,9 +928,9 @@ function deleteInboxMsg(id){loading('Deleting...','ember');api({action:'deleteMa
 
 function addNotice(){var tx=document.getElementById('notice-text').value.trim(),tp=document.getElementById('notice-type').value;if(!tx){toast('Enter a message','err');return;}loading('Posting...','ember');api({action:'addNotice',text:tx,type:tp}).then(function(r){stopLoading();if(r.ok){document.getElementById('notice-text').value='';api({action:'getNotices'}).then(function(r2){if(r2.ok)renderNoticeList(r2.data||[]);});toast('Posted');}else toast('Error','err');}).catch(function(){stopLoading();toast('Error','err');});}
 function deleteNotice(id){loading('Deleting...','ember');api({action:'deleteNotice',id:id}).then(function(r){stopLoading();if(r.ok){api({action:'getNotices'}).then(function(r2){if(r2.ok)renderNoticeList(r2.data||[]);});toast('Removed');}}).catch(function(){stopLoading();toast('Error','err');});}
-function renderNoticeList(notices){var el=document.getElementById('noticeList');if(!notices.length){el.innerHTML='<p style="color:#A8A098;font-size:.82rem">No notices yet.</p>';return;}el.innerHTML='';notices.slice().reverse().forEach(function(n){var d=document.createElement('div');d.className='nli';d.innerHTML='<div class="ndot '+(n.type||'')+'"></div><div class="nli-body"><div class="nli-text">'+n.text+'</div><div class="nli-date">'+(n.date||'')+'</div></div><button class="del-btn" onclick="deleteNotice(\''+n.id+'\')">🗑</button>';el.appendChild(d);});}
-function changePassword(){var p1=document.getElementById('newPass1').value,p2=document.getElementById('newPass2').value,m=document.getElementById('passMsg');if(!p1){m.style.color='var(--red-hot)';m.textContent='Enter a password.';return;}if(p1!==p2){m.style.color='var(--red-hot)';m.textContent='Passwords do not match.';return;}loading('Saving...','ember');api({action:'setAdmin',pass:p1}).then(function(r){stopLoading();if(r.ok){m.style.color='var(--green)';m.textContent='Updated.';document.getElementById('newPass1').value='';document.getElementById('newPass2').value='';}else m.textContent='Error.';}).catch(function(){stopLoading();m.style.color='var(--red-hot)';m.textContent='Error.';});}
-function changeMasterPassword(){var p1=document.getElementById('newMaster1').value,p2=document.getElementById('newMaster2').value,m=document.getElementById('masterMsg');if(!p1){m.style.color='var(--red-hot)';m.textContent='Enter a password.';return;}if(p1!==p2){m.style.color='var(--red-hot)';m.textContent='Passwords do not match.';return;}loading('Saving...','ember');api({action:'setMaster',pass:p1}).then(function(r){stopLoading();if(r.ok){m.style.color='var(--green)';m.textContent='Master password updated.';document.getElementById('newMaster1').value='';document.getElementById('newMaster2').value='';}else m.textContent='Error.';}).catch(function(){stopLoading();m.style.color='var(--red-hot)';m.textContent='Error.';});}
+function renderNoticeList(notices){var el=document.getElementById('noticeList');if(!notices.length){el.innerHTML='<p style="color:#A8A098;font-size:.82rem">No notices yet.</p>';return;}el.innerHTML='';notices.slice().reverse().forEach(function(n){var d=document.createElement('div');d.className='nli';d.innerHTML='<div class="ndot '+(n.type||'')+'"></div><div class="nli-body"><div class="nli-text">'+n.text+'</div><div class="nli-date">'+fmtMsgDate(n.date||'')+'</div></div><button class="del-btn" onclick="deleteNotice(\''+n.id+'\')">🗑</button>';el.appendChild(d);});}
+function changePassword(){var p1=document.getElementById('newPass1').value,p2=document.getElementById('newPass2').value,m=document.getElementById('passMsg');if(!p1){m.style.color='var(--red-hot)';m.textContent='Enter a password.';return;}if(p1!==p2){m.style.color='var(--red-hot)';m.textContent='Passwords do not match.';return;}loading('Saving...','ember');api({action:'setAdmin',pass:p1}).then(function(r){stopLoading();if(r.ok){m.style.color='var(--green)';m.textContent='Updated.';document.getElementById('newPass1').value='';document.getElementById('newPass2').value='';api({action:'getPasswords'}).then(function(r2){if(r2.ok)renderCurrentPasswords(r2.data);});}else m.textContent='Error.';}).catch(function(){stopLoading();m.style.color='var(--red-hot)';m.textContent='Error.';});}
+function changeMasterPassword(){var p1=document.getElementById('newMaster1').value,p2=document.getElementById('newMaster2').value,m=document.getElementById('masterMsg');if(!p1){m.style.color='var(--red-hot)';m.textContent='Enter a password.';return;}if(p1!==p2){m.style.color='var(--red-hot)';m.textContent='Passwords do not match.';return;}loading('Saving...','ember');api({action:'setMaster',pass:p1}).then(function(r){stopLoading();if(r.ok){m.style.color='var(--green)';m.textContent='Master password updated.';document.getElementById('newMaster1').value='';document.getElementById('newMaster2').value='';api({action:'getPasswords'}).then(function(r2){if(r2.ok)renderCurrentPasswords(r2.data);});}else m.textContent='Error.';}).catch(function(){stopLoading();m.style.color='var(--red-hot)';m.textContent='Error.';});}
 
 var HH_LOGO='https://www.hotheadzsouthernfoods.com/images/HotHeadzLogo.png';
 function makeLogoRings(cid,sz,o){try{o=o||{};var cv=document.getElementById(cid);if(!cv||typeof THREE==='undefined')return null;cv.width=sz*Math.min(window.devicePixelRatio,2);cv.height=sz*Math.min(window.devicePixelRatio,2);cv.style.pointerEvents='none';var rn=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:true});rn.setSize(sz,sz);rn.setPixelRatio(Math.min(window.devicePixelRatio,2));rn.setClearColor(0,0);var sc=new THREE.Scene(),ca=new THREE.PerspectiveCamera(55,1,.1,100);ca.position.z=o.camZ||3.2;sc.add(new THREE.AmbientLight(0xffffff,.7));var rl=new THREE.PointLight(0xE74C3C,2,20);rl.position.set(3,3,5);sc.add(rl);var wl=new THREE.PointLight(0xE67E22,1.2,15);wl.position.set(-3,-2,4);sc.add(wl);var or=new THREE.Mesh(new THREE.TorusGeometry(o.outerR||1.1,o.outerT||.045,32,100),new THREE.MeshStandardMaterial({color:0xE74C3C,emissive:0x8B1A28,emissiveIntensity:.4,metalness:.8,roughness:.2}));or.rotation.x=.4;sc.add(or);var ir=new THREE.Mesh(new THREE.TorusGeometry(o.innerR||.72,o.innerT||.025,24,80),new THREE.MeshStandardMaterial({color:0xE67E22,emissive:0x8B4000,emissiveIntensity:.3,metalness:.9,roughness:.15}));ir.rotation.x=.4;sc.add(ir);var lp=new THREE.Mesh(new THREE.CircleGeometry(o.logoR||.58,64),new THREE.MeshBasicMaterial({transparent:true,opacity:0,side:THREE.DoubleSide}));sc.add(lp);new THREE.TextureLoader().load(HH_LOGO,function(tx){tx.minFilter=THREE.LinearFilter;lp.material.map=tx;lp.material.opacity=.95;lp.material.needsUpdate=true;});var run=true;(function a(){if(!run)return;requestAnimationFrame(a);var t=Date.now()*.001;or.rotation.x=.4+Math.sin(t*.3)*.1;or.rotation.y=t*.4;ir.rotation.x=.4+Math.sin(t*.25)*.08;ir.rotation.y=t*.28*-1;ir.rotation.z=Math.sin(t*.15)*.05;lp.rotation.y=t*.08;rl.intensity=2+Math.sin(t*1.5)*.35;wl.intensity=1.2+Math.cos(t*1.2)*.2;rn.render(sc,ca);})();return{stop:function(){run=false;}};}catch(e){return null;}}
