@@ -288,6 +288,10 @@ footer{padding:1.1rem .9rem;padding-bottom:max(1.1rem,env(safe-area-inset-bottom
 .sd-hrs{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--ember-light);font-weight:700;min-width:40px;text-align:right}
 .sd-total{display:flex;justify-content:space-between;padding:.5rem 0 .15rem;border-top:1px solid rgba(255,255,255,.1);margin-top:.3rem;font-family:'Space Mono',monospace;font-size:.65rem;font-weight:700}
 .sd-total-label{color:#A8A098;letter-spacing:.08em;text-transform:uppercase}.sd-total-value{color:var(--ember-light)}
+
+.punch-flag{font-family:'Space Mono',monospace;font-size:.52rem;letter-spacing:.04em;padding:1px 5px;border-radius:2px;margin-left:4px;display:inline-block}
+.punch-flag.warn{color:var(--ember-light);background:rgba(241,196,15,.08);border:1px solid rgba(241,196,15,.18)}
+.punch-flag.alert{color:var(--red-hot);background:rgba(231,76,60,.06);border:1px solid rgba(231,76,60,.15)}
 /* Manager Time Clock Tab */
 .tc-summary{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.75rem;margin-bottom:1.5rem}
 .tc-card{background:var(--dark2);border:1px solid rgba(255,255,255,.08);padding:.9rem;position:relative}
@@ -407,7 +411,7 @@ footer{padding:1.1rem .9rem;padding-bottom:max(1.1rem,env(safe-area-inset-bottom
   </div>
   <div class="panel-title">Notice Board</div><div class="panel-box" id="empNoticeBoard"></div>
   <div class="btm-grid">
-    <div><div class="panel-title">My Hours This Month</div><div class="stat-row"><div class="stat-cell"><div class="stat-num" id="empStatHours">0<span>h</span></div><div class="stat-label">Hours</div></div><div class="stat-cell"><div class="stat-num" id="empStatDays">0</div><div class="stat-label">Days</div></div><div class="stat-cell"><div class="stat-num" id="empStatIn">–</div><div class="stat-label">First In</div></div><div class="stat-cell"><div class="stat-num" id="empStatOut">–</div><div class="stat-label">Last Out</div></div></div><div class="shift-detail-toggle" id="empShiftDetailToggle" onclick="toggleShiftDetails()">View shift breakdown <span class="arrow">▾</span></div><div class="shift-detail-list" id="empShiftDetailList"></div></div>
+    <div><div class="panel-title">My Hours This Month</div><div class="stat-row" style="grid-template-columns:1fr 1fr 1fr"><div class="stat-cell"><div class="stat-num" id="empStatHours">0<span>h</span></div><div class="stat-label">Scheduled</div></div><div class="stat-cell"><div class="stat-num" id="empStatClocked" style="color:var(--green)">0<span>h</span></div><div class="stat-label">Clocked</div></div><div class="stat-cell"><div class="stat-num" id="empStatDays">0</div><div class="stat-label">Days Worked</div></div></div><div class="shift-detail-toggle" id="empShiftDetailToggle" onclick="toggleShiftDetails()">View shift breakdown <span class="arrow">▾</span></div><div class="shift-detail-list" id="empShiftDetailList"></div></div>
     <div><div class="panel-title">Contact & Info</div><div class="contact-card"><div class="c-row"><span class="c-ico">📍</span><div><div class="c-lbl">Location</div><div class="c-val">2741 US-190 · DeRidder, LA 70634</div></div></div><div class="c-row"><span class="c-ico">📞</span><div><div class="c-lbl">Phone</div><div class="c-val"><a href="tel:3372211035">(337) 221-1035</a></div></div></div><div class="c-row"><span class="c-ico">⏰</span><div><div class="c-lbl">Kitchen Hours</div><div class="c-val">Mon–Fri 5:30am – 2pm</div></div></div></div></div>
   </div>
 </div><footer><p>Hot Headz <span>Southern Foods</span> · Employee Portal · <a href='index.html' style='color:var(--ember-light);text-decoration:none'>← Back to site</a></p></footer></div>
@@ -611,7 +615,7 @@ function empChangeMonth(d){_empMonthOffset+=d;empRenderMonth();}
 function empGoToday(){_empMonthOffset=0;empRenderMonth();}
 function empRenderMonth(){renderCalendarGrid('empScheduleGrid','empMonthRange','empDowRow',_empMonthOffset,_schedule,_currentUser,false);empRenderStats();}
 function empRenderMyShifts(){var td=new Date();td.setHours(0,0,0,0);var me=_currentUser.trim().toLowerCase();var up=_schedule.filter(function(s){return s.name.trim().toLowerCase()===me&&new Date(s.date+'T00:00:00')>=td;}).sort(function(a,b){return a.date.localeCompare(b.date);}).slice(0,10);var el=document.getElementById('empMyShifts');if(!up.length){el.innerHTML='<div class="no-shifts"><span class="ns-icon">📅</span>No upcoming shifts.</div>';return;}el.innerHTML='';up.forEach(function(s,i){var d=new Date(s.date+'T00:00:00'),h=calcH(s.startTime,s.endTime);var r=document.createElement('div');r.className='panel-row';r.innerHTML='<div class="sdb '+(i===0?'next':'')+'"><div class="sdb-day">'+DAYS[d.getDay()]+'</div><div class="sdb-num">'+d.getDate()+'</div></div><div class="pi"><div class="pi-title">'+MO[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear()+'</div><div class="pi-meta">'+fmt12(s.startTime)+(s.endTime?' – '+fmt12(s.endTime):'')+'</div><div class="pi-role">'+(s.role||'Staff')+(s.notes?' · '+s.notes:'')+'</div></div><div class="hrs-badge">'+(h>0?h+'h':'–')+'<span>hours</span></div>';el.appendChild(r);});}
-function empRenderStats(){var md=getMonthDates(_empMonthOffset),mm=[];md.cells.forEach(function(c){if(!c.inMonth)return;_schedule.filter(function(s){return s.date===c.iso&&s.name.trim().toLowerCase()===_currentUser.trim().toLowerCase();}).forEach(function(s){mm.push(s);});});var th=mm.reduce(function(a,s){return a+calcH(s.startTime,s.endTime);},0);var td=[...new Set(mm.map(function(s){return s.date;}))].length;var so=mm.sort(function(a,b){return a.date.localeCompare(b.date);});document.getElementById('empStatHours').innerHTML=th+'<span>h</span>';document.getElementById('empStatDays').textContent=td;document.getElementById('empStatIn').textContent=so.length?fmt12(so[0].startTime):'–';document.getElementById('empStatOut').textContent=so.length?fmt12(so[so.length-1].endTime):'–';}
+function empRenderStats(){var md=getMonthDates(_empMonthOffset),mm=[];md.cells.forEach(function(c){if(!c.inMonth)return;_schedule.filter(function(s){return s.date===c.iso&&s.name.trim().toLowerCase()===_currentUser.trim().toLowerCase();}).forEach(function(s){mm.push(s);});});var th=mm.reduce(function(a,s){return a+calcH(s.startTime,s.endTime);},0);var td=[...new Set(mm.map(function(s){return s.date;}))].length;var so=mm.sort(function(a,b){return a.date.localeCompare(b.date);});document.getElementById('empStatHours').innerHTML=th+'<span>h</span>';document.getElementById('empStatDays').textContent=td;empRenderClockedHours();}
 function empRenderNotices(){var el=document.getElementById('empNoticeBoard');var all=_notices.slice().reverse().slice(0,8);if(!all.length){el.innerHTML='<div class="no-shifts"><span class="ns-icon">📋</span>No notices posted yet.</div>';return;}el.innerHTML='';all.forEach(function(n){var i=document.createElement('div');i.className='notice-item';i.innerHTML='<div class="ndot '+(n.type||'')+'"></div><div><div class="n-text">'+n.text+'</div><div class="n-date">'+fmtMsgDate(n.date||'')+'</div></div>';el.appendChild(i);});}
 function empRenderMessages(){var el=document.getElementById('empMessages');if(!_empMessages.length){el.innerHTML='<div class="no-shifts" style="padding:1.5rem"><span class="ns-icon" style="font-size:1.5rem">💬</span>No messages yet.</div>';return;}el.innerHTML='';_empMessages.slice().reverse().forEach(function(m){var dir=String(m.direction||'toEmployee');var fromLabel=dir==='toManager'?'You → Manager':'From: '+String(m.from||'Manager');var i=document.createElement('div');i.className='msg-item'+(m.read?'':' unread');i.innerHTML='<div class="msg-from">'+fromLabel+'</div><div class="msg-text">'+String(m.text||'—')+'</div><div class="msg-date">'+fmtMsgDate(m.date||'')+'</div>';el.appendChild(i);if(!m.read&&m.id&&dir!=='toManager')api({action:'markRead',id:m.id}).catch(function(){});});}
 
@@ -721,7 +725,17 @@ function renderClockTodayTotal(){
   });
   if(totalMs>0){
     var h=(totalMs/3600000).toFixed(1);
-    el.textContent='Today: '+h+'h total';
+    // Calculate this week's hours too
+  var now2=new Date(),dayOfWeek=now2.getDay(),mondayDiff=now2.getDate()-dayOfWeek+(dayOfWeek===0?-6:1);
+  var weekStartDate=new Date(now2.getFullYear(),now2.getMonth(),mondayDiff).toISOString().slice(0,10);
+  var weekMs=0;
+  _empPunches.filter(function(p2){return p2.clock_in&&p2.clock_in.slice(0,10)>=weekStartDate;}).forEach(function(p2){
+    weekMs+=((p2.clock_out?new Date(p2.clock_out).getTime():Date.now())-new Date(p2.clock_in).getTime());
+  });
+  var parts=[];
+  if(totalMs>0)parts.push('Today: '+h+'h');
+  if(weekMs>0)parts.push('This week: '+(weekMs/3600000).toFixed(1)+'h');
+  el.textContent=parts.join(' \xb7 ');
   }else{
     el.textContent='';
   }
@@ -744,6 +758,24 @@ function toggleClock(){
       else toast('Error','err');
     }).catch(function(){stopLoading();toast('Error','err');});
   }
+}
+
+
+function empRenderClockedHours(){
+  var el=document.getElementById('empStatClocked');
+  if(!el||!_empPunches)return;
+  var md=getMonthDates(_empMonthOffset);
+  var totalMs=0;
+  _empPunches.forEach(function(p){
+    if(!p.clock_in)return;
+    var pDate=p.clock_in.slice(0,10);
+    var inMonth=md.cells.some(function(c){return c.inMonth&&c.iso===pDate;});
+    if(!inMonth)return;
+    var inT=new Date(p.clock_in).getTime();
+    var outT=p.clock_out?new Date(p.clock_out).getTime():Date.now();
+    totalMs+=outT-inT;
+  });
+  el.innerHTML=(totalMs/3600000).toFixed(1)+'<span>h</span>';
 }
 
 // ═══ SHIFT DETAIL BREAKDOWN ═══
@@ -796,6 +828,18 @@ function loadManagerTimeClock(){
   });
 }
 
+function checkPunchAnomaly(punch){
+  if(!punch.clock_in)return null;
+  var pDate=punch.clock_in.slice(0,10);
+  var match=(_ownSchedule||[]).find(function(s){return s.date===pDate&&s.name.trim().toLowerCase()===punch.name.trim().toLowerCase();});
+  if(!match)return{msg:'No shift',level:'alert'};
+  if(match.startTime){
+    var sp=match.startTime.split(':').map(Number),sm=sp[0]*60+(sp[1]||0);
+    var ci=new Date(punch.clock_in),cm=ci.getHours()*60+ci.getMinutes();
+    if(cm<sm-30)return{msg:'Early',level:'warn'};
+  }
+  return null;
+}
 function renderTcSummary(){
   var el=document.getElementById('tcSummary');
   if(!el)return;
@@ -849,7 +893,7 @@ function renderTcTable(){
       hrs='<span style="color:var(--green)">'+(ms/3600000).toFixed(1)+'h (active)</span>';
     }
     var tr=document.createElement('tr');
-    tr.innerHTML='<td><strong>'+p.name+'</strong></td><td>'+dateStr+'</td><td>'+inStr+'</td><td>'+outStr+'</td><td><span class="badge be">'+hrs+'</span></td><td style="color:#A8A098;font-size:.78rem">'+(p.notes||'')+'</td><td><button class="del-btn" onclick="deletePunch(\''+p.id+'\')">\ud83d\uddd1</button></td>';
+    var anom=checkPunchAnomaly(p);var anomBadge=anom?'<span class="punch-flag '+anom.level+'">'+anom.msg+'</span>':'';tr.innerHTML='<td><strong>'+p.name+'</strong>'+anomBadge+'</td><td>'+dateStr+'</td><td>'+inStr+'</td><td>'+outStr+'</td><td><span class="badge be">'+hrs+'</span></td><td style="color:#A8A098;font-size:.78rem">'+(p.notes||'')+'</td><td><button class="del-btn" onclick="deletePunch(\''+p.id+'\')">\ud83d\uddd1</button></td>';
     tb.appendChild(tr);
   });
   document.getElementById('tcCount').textContent=d.length+' punch'+(d.length!==1?'es':'')+' \xb7 '+(totalMs/3600000).toFixed(1)+'h total';
