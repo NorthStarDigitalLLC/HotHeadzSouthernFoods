@@ -846,6 +846,24 @@ function findNextLunchDay(){
    by cross-referencing our known sides + any extras from
    menu_defaults.salad.saladBar.toppings.
    ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   SAME DAILY BLACKLIST — items that appear on every menu
+   regardless of day. These aren't "today's specials" so they
+   shouldn't clutter the meat picker. If the editor ever gets
+   a proper Same Daily field, this can go away.
+   ═══════════════════════════════════════════════════════════ */
+var SAME_DAILY_BLACKLIST = [
+  'Turkey Clubs', 'Turkey Club',
+  'Chicken Salad', 'Chicken Salad Croissants', 'Chicken Salad Croissant',
+  'Croissants', 'Croissant'
+];
+function isSameDaily(itemName){
+  var n = normalizeItemName(itemName);
+  for (var i = 0; i < SAME_DAILY_BLACKLIST.length; i++) {
+    if (n === normalizeItemName(SAME_DAILY_BLACKLIST[i])) return true;
+  }
+  return false;
+}
 function normalizeItemName(s){
   return String(s||'').toLowerCase()
     .replace(/^\s*[\u2022\u2023\u25E6\u2043\u2219\-\*]\s*/,'')   // leading bullet
@@ -861,7 +879,8 @@ function getKnownSidesSet(){
   var core = [
     'Mac & Cheese', 'Macaroni & Cheese', 'Macaroni and Cheese',
     'Cornbread', 'Rolls', 'Biscuits',
-    'Rice', 'Red Beans', 'Red Beans & Rice', 'Beans',
+    'Rice', 'White Rice', 'Steamed Rice',
+    'Beans', 'Baked Beans',
     'Greens', 'Collard Greens', 'Mustard Greens', 'Turnip Greens',
     'Mashed Potatoes', 'Mashed Potatoes & Gravy', 'Mashed Potatoes and Gravy',
     'Sweet Potato', 'Sweet Potatoes', 'Sweet Potato Casserole',
@@ -875,11 +894,13 @@ function getKnownSidesSet(){
     'Hushpuppies', 'Hush Puppies',
     'Baked Potato', 'Loaded Baked Potato',
     'French Fries', 'Fries', 'Fried Potatoes',
-    'Dirty Rice', 'White Rice',
+    'Dirty Rice',
     'Broccoli', 'Cauliflower', 'Carrots', 'Squash',
     'Dressing', 'Cornbread Dressing', 'Stuffing',
     'Macaroni Salad', 'Pasta Salad',
     'Lima Beans', 'Butter Beans', 'Pinto Beans', 'Black Beans'
+    // Note: "Red Beans & Rice" intentionally NOT listed — it's a Louisiana main dish,
+    // often served as the meat protein. If Hot Headz ever lists it as a side, swap it.
   ];
   var set = {};
   core.forEach(function(n){ set[normalizeItemName(n)] = true; });
@@ -912,6 +933,7 @@ function filterToMeats(rawItems){
     if (!name) return false;
     if (isNonMeat(name)) return false;
     if (isSide(name, sidesSet)) return false;
+    if (isSameDaily(name)) return false;
     return true;
   });
 }
