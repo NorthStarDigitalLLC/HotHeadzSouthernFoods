@@ -58,7 +58,7 @@
 <link rel="preconnect" href="https://zgqjzgonwvkxfbdseieg.supabase.co" crossorigin />
 <link rel="dns-prefetch" href="https://nominatim.openstreetmap.org" />
 
-<link rel="preload" as="image" href="/images/HotHeadzLogo.png" fetchpriority="high" />
+<!-- Logo is only used in header/footer references; skip preload since it's not critical for LCP -->
 
 <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&amp;family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&amp;family=DM+Serif+Display:ital@0;1&amp;display=swap" rel="stylesheet" />
 
@@ -770,6 +770,23 @@ function getTodaysMenu(){
   var iso = toISO(new Date());
   return live.dates[iso] || null;
 }
+/* If today's lunch isn't posted, find the next upcoming day that IS posted.
+   Returns { menu, iso, dayName, label, daysOut } or null. */
+function findNextLunchDay(){
+  var today = new Date();
+  for (var i = 0; i < 14; i++) {
+    var d = new Date(today);
+    d.setDate(today.getDate() + i);
+    var iso = toISO(d);
+    var menu = live.dates[iso];
+    if (menu && menu.lunch && Array.isArray(menu.lunch.items) && menu.lunch.items.length > 0) {
+      var dayName = d.toLocaleDateString('en-US', {weekday: 'long'});
+      var label = d.toLocaleDateString('en-US', {weekday: 'long', month: 'short', day: 'numeric'});
+      return { menu: menu, iso: iso, dayName: dayName, label: label, daysOut: i };
+    }
+  }
+  return null;
+}
 function findNextCrawfishDay(){
   // Look at today + next 7 days; return first one where crawfish.show === true
   var today = new Date();
@@ -787,12 +804,30 @@ function findNextCrawfishDay(){
 }
 function getTodaysLunchItems(){
   var menu = getTodaysMenu();
-  if (!menu || !menu.lunch || !Array.isArray(menu.lunch.items)) return [];
-  return menu.lunch.items.map(function(it){
+  var items = (menu && menu.lunch && Array.isArray(menu.lunch.items)) ? menu.lunch.items : [];
+  return items.map(function(it){
     if (typeof it === 'string') return { name: it, desc: '' };
     if (it && typeof it === 'object') return { name: String(it.name || '').trim(), desc: String(it.desc || '').trim() };
     return null;
   }).filter(function(x){ return x && x.name; });
+}
+/* Gets meats to show in the picker: prefers today's, falls back to next posted day.
+   Returns { items, source: 'today'|'next'|'none', dayInfo: {label, daysOut} or null } */
+function getPickerMeats(){
+  var todayItems = getTodaysLunchItems();
+  if (todayItems.length > 0) {
+    return { items: todayItems, source: 'today', dayInfo: null };
+  }
+  var next = findNextLunchDay();
+  if (next) {
+    var mapped = next.menu.lunch.items.map(function(it){
+      if (typeof it === 'string') return { name: it, desc: '' };
+      if (it && typeof it === 'object') return { name: String(it.name || '').trim(), desc: String(it.desc || '').trim() };
+      return null;
+    }).filter(function(x){ return x && x.name; });
+    return { items: mapped, source: 'next', dayInfo: { label: next.label, dayName: next.dayName, daysOut: next.daysOut } };
+  }
+  return { items: [], source: 'none', dayInfo: null };
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -897,18 +932,18 @@ function renderPickers(){
   var maxMeats = state.plateSize === 'child' ? 1 : parseInt(state.plateSize, 10);
   if (isNaN(maxMeats)) maxMeats = 1;
 
-  var lunchItems = getTodaysLunchItems();
+  var pickerData = getPickerMeats();
+  var lunchItems = pickerData.items;
 
   // MEATS
   if (lunchItems.length === 0) {
-    meatPicker.innerHTML = '<div class="picker-empty">Today\'s menu isn\'t posted yet. <strong>You can still get an estimate</strong> from the plate size and count &mdash; we\'ll confirm the meats when you call.</div>';
+    meatPicker.innerHTML = '<div class="picker-empty">No upcoming menus posted yet. <strong>You can still get an estimate</strong> from the plate size and count &mdash; we\'ll confirm meats when you call.</div>';
   } else {
     meatPicker.innerHTML = lunchItems.map(function(item){
       var isActive = state.selectedMeats.has(item.name);
       var atMax = !isActive && state.selectedMeats.size >= maxMeats;
       return '<button type="button" class="pick-chip' + (isActive?' active':'') + (atMax?' disabled':'') + '" data-meat="' + escapeAttr(item.name) + '"' + (atMax?' disabled':'') + ' title="' + escapeAttr(item.desc||'') + '">' +
         escapeHTML(item.name) +
-        (item.desc ? '<span class="desc-hint">\u2014 tap for detail</span>' : '') +
       '</button>';
     }).join('');
     meatPicker.querySelectorAll('.pick-chip[data-meat]').forEach(function(chip){
@@ -940,9 +975,16 @@ function renderPickers(){
   });
 
   // STATUS LINE
-  if (lunchItems.length === 0) {
+  if (pickerData.source === 'none') {
     statusEl.className = 'lunch-status pending';
-    statusEl.innerHTML = '\u23f3 Today\'s lunch isn\'t posted yet &mdash; you can still get an estimate. Call for today\'s actual menu.';
+    statusEl.innerHTML = '\u23f3 No lunch menu posted yet &mdash; you can still get an estimate. Call for today\'s actual menu.';
+  } else if (pickerData.source === 'next') {
+    statusEl.className = 'lunch-status pending';
+    var d = pickerData.dayInfo;
+    var whenText = d.daysOut === 1 ? 'tomorrow (' + d.dayName + ')' :
+                   d.daysOut === 0 ? 'today' :
+                   'on ' + d.dayName + ' (' + d.daysOut + ' days out)';
+    statusEl.innerHTML = '\u2139\ufe0f Today\'s lunch isn\'t posted yet. Showing menu for <strong>' + whenText + '</strong> &mdash; ' + lunchItems.length + ' meat' + (lunchItems.length===1?'':'s') + ' available. Order ahead or call for today.';
   } else {
     statusEl.className = 'lunch-status posted';
     statusEl.innerHTML = '\u2713 Today\'s menu loaded (' + lunchItems.length + ' meat' + (lunchItems.length===1?'':'s') + '). Pick up to ' + maxMeats + ', or skip and let us choose.';
