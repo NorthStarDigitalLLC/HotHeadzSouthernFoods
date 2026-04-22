@@ -127,6 +127,19 @@
     .hours-row{display:grid;grid-template-columns:80px 1fr 1fr;gap:6px;margin-bottom:6px;align-items:center;}
     .hours-row .hr-day{font-size:11px;font-weight:700;color:var(--text2);}
     .hours-row .fi{margin-bottom:0;padding:7px 10px;font-size:12px;}
+    /* ═══ Lunch Forecast three-card layout ═══ */
+    .lunch-section-card{background:rgba(255,122,24,.04);border:1px solid rgba(255,122,24,.14);border-radius:var(--radius);padding:12px;margin-bottom:10px;}
+    .lunch-section-card.sides{background:rgba(77,255,136,.03);border-color:rgba(77,255,136,.12);}
+    .lunch-section-card.samedaily{background:rgba(100,180,255,.03);border-color:rgba(100,180,255,.12);}
+    .lunch-section-title{font-size:12px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+    .lunch-section-title.meats{color:var(--fire);}
+    .lunch-section-title.meats::before{content:'';width:3px;height:11px;border-radius:2px;background:var(--fire);}
+    .lunch-section-title.sides{color:#7ae59a;}
+    .lunch-section-title.sides::before{content:'';width:3px;height:11px;border-radius:2px;background:#7ae59a;}
+    .lunch-section-title.samedaily{color:#7ac4ff;}
+    .lunch-section-title.samedaily::before{content:'';width:3px;height:11px;border-radius:2px;background:#7ac4ff;}
+    .lunch-section-hint{font-size:10px;color:var(--text3);line-height:1.4;margin-bottom:6px;}
+    .lunch-section-hint em{color:var(--text2);font-style:normal;font-weight:700;}
     @media(max-width:900px){
       .side-panel{display:none;position:fixed;inset:0;width:100%;z-index:10001;border-left:none;}
       .side-panel.mobile-open{display:flex;}
@@ -201,6 +214,7 @@
       <button class="tab-btn static-tab" data-tab="static-salad">🥗 Salad Bar</button>
       <button class="tab-btn static-tab" data-tab="static-dessert">🍮 Dessert</button>
       <button class="tab-btn static-tab" data-tab="static-crawfish">🦞 Crawfish</button>
+      <button class="tab-btn static-tab" data-tab="static-samedaily">📅 Same Daily</button>
       <button class="tab-btn static-tab" data-tab="static-hours">🕒 Hours</button>
       <button class="tab-btn static-tab" data-tab="static-settings">⚙ Settings</button>
     </div>
@@ -409,239 +423,93 @@ function triggerAutoSave(){clearTimeout(ast);ast=setTimeout(()=>{const s=loadSto
 function loadStore(){const s=safeJSON(localStorage.getItem(PK),null);if(s&&Array.isArray(s.items))return s;return{activeId:null,items:[]};}
 function saveStore(s){try{localStorage.setItem(PK,JSON.stringify(s));return{ok:true}}catch(e){return{ok:false,error:String(e?.message||e)}}}
 
-/* CLOUD API */
-// ═══════════════════════════════════════════════════════════════════
-// SUPABASE BACKEND
-// ═══════════════════════════════════════════════════════════════════
-// Anon key only — Supabase blocks secret keys from browsers.
-// Writes are allowed because our RLS policies permit anon to INSERT/UPDATE/DELETE.
-// Real security comes from: (1) the PIN gate on this editor, (2) this file
-// living at a non-public URL.
-// ═══════════════════════════════════════════════════════════════════
+/* CLOUD API — Supabase */
 const SUPABASE_URL = 'https://zgqjzgonwvkxfbdseieg.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpncWp6Z29ud3ZreGZiZHNlaWVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1Njk4NTksImV4cCI6MjA5MjE0NTg1OX0.1mGtFUKumyQUgU0pO2CxIYSKLEuYEzspCGk9ncYYavk';
-
 const CLOUD_NAME_KEY='hhMenuCloud_name';
 function getCloudName(){return localStorage.getItem(CLOUD_NAME_KEY)||'';}
 function setCloudName(n){localStorage.setItem(CLOUD_NAME_KEY,n);}
+function sbHeaders(){return{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json','Accept':'application/json'};}
+function sbJsonHeaders(){var h=sbHeaders();h['Prefer']='return=representation';return h;}
+function sbGet(path){return fetch(SUPABASE_URL+'/rest/v1/'+path,{headers:sbHeaders()}).then(function(r){return r.text();}).then(function(t){try{return JSON.parse(t);}catch(e){return{_raw:t};}});}
+function sbWrite(method,path,body){var init={method:method,headers:sbJsonHeaders()};if(body!==undefined)init.body=JSON.stringify(body);return fetch(SUPABASE_URL+'/rest/v1/'+path,init).then(function(r){return r.text().then(function(t){return{status:r.status,ok:r.ok,text:t};});}).then(function(resp){var parsed=null;try{parsed=resp.text?JSON.parse(resp.text):null;}catch(e){}if(!resp.ok){var msg=(parsed&&(parsed.message||parsed.error||parsed.hint))||resp.text||('HTTP '+resp.status);throw new Error(msg);}return parsed;});}
 
-// All requests use the anon key
-function sbHeaders(){
-  return {
-    'apikey': SUPABASE_ANON_KEY,
-    'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  };
-}
-
-function sbJsonHeaders(){
-  var h = sbHeaders();
-  h['Prefer'] = 'return=representation';
-  return h;
-}
-
-// Low-level Supabase fetch helpers
-function sbGet(path){
-  return fetch(SUPABASE_URL + '/rest/v1/' + path, { headers: sbHeaders() })
-    .then(function(r){ return r.text(); })
-    .then(function(t){ try { return JSON.parse(t); } catch(e) { return { _raw: t }; } });
-}
-
-function sbWrite(method, path, body){
-  var init = { method: method, headers: sbJsonHeaders() };
-  if (body !== undefined) init.body = JSON.stringify(body);
-  return fetch(SUPABASE_URL + '/rest/v1/' + path, init)
-    .then(function(r){ return r.text().then(function(t){ return { status: r.status, ok: r.ok, text: t }; }); })
-    .then(function(resp){
-      var parsed = null;
-      try { parsed = resp.text ? JSON.parse(resp.text) : null; } catch(e) {}
-      if (!resp.ok) {
-        var msg = (parsed && (parsed.message || parsed.error || parsed.hint)) || resp.text || ('HTTP ' + resp.status);
-        throw new Error(msg);
+async function apiPost(params){
+  var action=params.action;
+  try{
+    switch(action){
+      case 'getMenuDefaults':{
+        var rows=await sbGet('menu_defaults?select=key,value,updated_at');
+        if(!Array.isArray(rows))return{success:false,error:rows&&rows.message||'fetch failed'};
+        var defaults={};rows.forEach(function(r){defaults[r.key]=r.value;});
+        return{success:true,defaults:defaults};
       }
-      return parsed;
-    });
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// Action dispatcher — translates old Apps-Script-style {action:...} calls
-// into Supabase REST calls. Keeps the rest of the editor unchanged.
-// ═══════════════════════════════════════════════════════════════════
-async function apiPost(params) {
-  var action = params.action;
-  try {
-    switch(action) {
-
-      // ── Menu defaults (breakfast/lunch/beer/hours/settings/etc) ──
-      case 'getMenuDefaults': {
-        var rows = await sbGet('menu_defaults?select=key,value,updated_at');
-        if (!Array.isArray(rows)) return { success: false, error: rows && rows.message || 'fetch failed' };
-        var defaults = {};
-        rows.forEach(function(r){ defaults[r.key] = r.value; });
-        return { success: true, defaults: defaults };
+      case 'saveMenuDefault':{
+        var payload={key:params.key,value:typeof params.json==='string'?JSON.parse(params.json):params.json};
+        await fetch(SUPABASE_URL+'/rest/v1/menu_defaults',{method:'POST',headers:Object.assign({},sbJsonHeaders(),{'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(payload)}).then(function(r){if(!r.ok)return r.text().then(function(t){throw new Error(t||('HTTP '+r.status));});});
+        return{success:true};
       }
-
-      case 'saveMenuDefault': {
-        var payload = { key: params.key, value: typeof params.json === 'string' ? JSON.parse(params.json) : params.json };
-        // UPSERT via Prefer: resolution=merge-duplicates
-        await fetch(SUPABASE_URL + '/rest/v1/menu_defaults', {
-          method: 'POST',
-          headers: Object.assign({}, sbJsonHeaders(), { 'Prefer': 'resolution=merge-duplicates,return=representation' }),
-          body: JSON.stringify(payload)
-        }).then(function(r){
-          if (!r.ok) return r.text().then(function(t){ throw new Error(t || ('HTTP ' + r.status)); });
-        });
-        return { success: true };
+      case 'resetMenuDefault':{
+        await sbWrite('DELETE','menu_defaults?key=eq.'+encodeURIComponent(params.key));
+        return{success:true};
       }
-
-      case 'resetMenuDefault': {
-        await sbWrite('DELETE', 'menu_defaults?key=eq.' + encodeURIComponent(params.key));
-        return { success: true };
+      case 'getFullMenu':{
+        var res=await Promise.all([sbGet('menu_defaults?select=key,value'),sbGet('lunch_dates?select=lunch_date,data')]);
+        var defaults={};if(Array.isArray(res[0]))res[0].forEach(function(r){defaults[r.key]=r.value;});
+        var dates={};if(Array.isArray(res[1]))res[1].forEach(function(r){dates[r.lunch_date]=r.data;});
+        return{success:true,data:{defaults:defaults,dates:dates}};
       }
-
-      // ── Full combined menu (defaults + dates) ──
-      case 'getFullMenu': {
-        var res = await Promise.all([
-          sbGet('menu_defaults?select=key,value'),
-          sbGet('lunch_dates?select=lunch_date,data')
-        ]);
-        var defaults = {};
-        if (Array.isArray(res[0])) res[0].forEach(function(r){ defaults[r.key] = r.value; });
-        var dates = {};
-        if (Array.isArray(res[1])) res[1].forEach(function(r){ dates[r.lunch_date] = r.data; });
-        return { success: true, data: { defaults: defaults, dates: dates } };
+      case 'lunch':{
+        var rows=await sbGet('lunch_dates?select=lunch_date,data,updated_at&order=lunch_date.asc');
+        if(!Array.isArray(rows))return{success:false,error:rows&&rows.message||'fetch failed'};
+        var dates={};rows.forEach(function(r){dates[r.lunch_date]=r.data;});
+        return{success:true,dates:dates};
       }
-
-      // ── Lunch forecast (per-date rows) ──
-      case 'lunch': {
-        var rows = await sbGet('lunch_dates?select=lunch_date,data,updated_at&order=lunch_date.asc');
-        if (!Array.isArray(rows)) return { success: false, error: rows && rows.message || 'fetch failed' };
-        var dates = {};
-        rows.forEach(function(r){ dates[r.lunch_date] = r.data; });
-        return { success: true, dates: dates };
+      case 'save-lunch':{
+        var payload={lunch_date:params.date,data:params.data,saved_by:params.publishedBy||getCloudName()||null};
+        await fetch(SUPABASE_URL+'/rest/v1/lunch_dates',{method:'POST',headers:Object.assign({},sbJsonHeaders(),{'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(payload)}).then(function(r){if(!r.ok)return r.text().then(function(t){throw new Error(t||('HTTP '+r.status));});});
+        return{success:true};
       }
-
-      case 'save-lunch': {
-        var payload = { lunch_date: params.date, data: params.data, saved_by: params.publishedBy || getCloudName() || null };
-        await fetch(SUPABASE_URL + '/rest/v1/lunch_dates', {
-          method: 'POST',
-          headers: Object.assign({}, sbJsonHeaders(), { 'Prefer': 'resolution=merge-duplicates,return=representation' }),
-          body: JSON.stringify(payload)
-        }).then(function(r){
-          if (!r.ok) return r.text().then(function(t){ throw new Error(t || ('HTTP ' + r.status)); });
-        });
-        return { success: true };
+      case 'delete-lunch':{
+        await sbWrite('DELETE','lunch_dates?lunch_date=eq.'+encodeURIComponent(params.date));
+        return{success:true};
       }
-
-      case 'delete-lunch': {
-        await sbWrite('DELETE', 'lunch_dates?lunch_date=eq.' + encodeURIComponent(params.date));
-        return { success: true };
+      case 'list':{
+        var rows=await sbGet('drawing_projects?select=id,name,updated_at,created_at&order=updated_at.desc');
+        if(!Array.isArray(rows))return{success:false,error:rows&&rows.message||'fetch failed'};
+        return{success:true,projects:rows};
       }
-
-      // ── Drawing projects (canvas work) ──
-      case 'list': {
-        var rows = await sbGet('drawing_projects?select=id,name,updated_at,created_at&order=updated_at.desc');
-        if (!Array.isArray(rows)) return { success: false, error: rows && rows.message || 'fetch failed' };
-        return { success: true, projects: rows };
+      case 'load':{
+        var rows=await sbGet('drawing_projects?select=*&id=eq.'+encodeURIComponent(params.id));
+        if(!Array.isArray(rows)||!rows.length)return{success:false,error:'Project not found'};
+        var p=rows[0];return{success:true,project:{id:p.id,name:p.name,data:p.data,updatedAt:p.updated_at,createdAt:p.created_at}};
       }
-
-      case 'load': {
-        var rows = await sbGet('drawing_projects?select=*&id=eq.' + encodeURIComponent(params.id));
-        if (!Array.isArray(rows) || !rows.length) return { success: false, error: 'Project not found' };
-        var p = rows[0];
-        return { success: true, project: { id: p.id, name: p.name, data: p.data, updatedAt: p.updated_at, createdAt: p.created_at } };
+      case 'save':{
+        var proj=params.project||params;
+        var payload={id:proj.id,name:proj.name,data:proj.data,saved_by:proj.savedBy||params.savedBy||getCloudName()||null};
+        await fetch(SUPABASE_URL+'/rest/v1/drawing_projects',{method:'POST',headers:Object.assign({},sbJsonHeaders(),{'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(payload)}).then(function(r){if(!r.ok)return r.text().then(function(t){throw new Error(t||('HTTP '+r.status));});});
+        return{success:true,id:proj.id};
       }
-
-      case 'save': {
-        // Handle both shapes: {name, data, id} and {project: {name, data, id, savedBy}}
-        var proj = params.project || params;
-        var payload = {
-          id: proj.id,
-          name: proj.name,
-          data: proj.data,
-          saved_by: proj.savedBy || params.savedBy || getCloudName() || null
-        };
-        await fetch(SUPABASE_URL + '/rest/v1/drawing_projects', {
-          method: 'POST',
-          headers: Object.assign({}, sbJsonHeaders(), { 'Prefer': 'resolution=merge-duplicates,return=representation' }),
-          body: JSON.stringify(payload)
-        }).then(function(r){
-          if (!r.ok) return r.text().then(function(t){ throw new Error(t || ('HTTP ' + r.status)); });
-        });
-        return { success: true, id: proj.id };
+      case 'delete':{
+        await sbWrite('DELETE','drawing_projects?id=eq.'+encodeURIComponent(params.id));
+        return{success:true};
       }
-
-      case 'delete': {
-        await sbWrite('DELETE', 'drawing_projects?id=eq.' + encodeURIComponent(params.id));
-        return { success: true };
-      }
-
       default:
-        console.warn('[HH editor] Unknown action:', action);
-        return { success: false, error: 'Unknown action: ' + action };
+        console.warn('[HH editor] Unknown action:',action);
+        return{success:false,error:'Unknown action: '+action};
     }
-  } catch(err) {
-    console.warn('[HH editor] apiPost error for', action, ':', err.message);
-    return { success: false, error: err.message };
+  }catch(err){
+    console.warn('[HH editor] apiPost error for',action,':',err.message);
+    return{success:false,error:err.message};
   }
 }
-
-function apiGet(params){ return apiPost(params); }
-
-async function cloudRequest(action, body) {
-  body = body || {};
-  try {
-    return await apiPost(Object.assign({ action: action }, body));
-  } catch(e) {
-    toast('Cloud error: ' + e.message, 'error');
-    return null;
-  }
-}
-
-async function cloudSave(name){
-  const projName=name||prompt('Project name for cloud:','Menu '+new Date().toLocaleDateString());
-  if(!projName)return;
-  toast('Saving to cloud...','info');
-  const payload=currentPayload();
-  const lightPayload=Object.assign({},payload,{imgDataURL:''});
-  const result=await cloudRequest('save',{project:{id:uid(),name:projName.trim(),savedBy:getCloudName(),data:lightPayload}});
-  if(result?.success){toast('Saved "'+projName.trim()+'" to cloud!','success');rebuildSidePanel();}
-  else toast('Cloud save failed: '+(result?.error||'unknown'),'error');
-}
-
-async function cloudUpdate(id,name){
-  toast('Updating cloud...','info');
-  const payload=currentPayload();
-  const lightPayload=Object.assign({},payload,{imgDataURL:''});
-  const result=await cloudRequest('save',{project:{id,name,savedBy:getCloudName(),data:lightPayload}});
-  if(result?.success)toast('Updated "'+name+'" on cloud!','success');
-  else toast('Cloud update failed: '+(result?.error||'unknown'),'error');
-}
-
-async function cloudList(){
-  const result=await cloudRequest('list');
-  if(result?.success)return result.projects||[];
-  toast('Could not load cloud projects: '+(result?.error||'unknown'),'error');
-  return[];
-}
-
-async function cloudLoad(id){
-  toast('Loading from cloud...','info');
-  const result=await cloudRequest('load',{id});
-  if(result?.success&&result.project?.data){
-    await applyPayload(result.project.data);
-    toast('Loaded "'+result.project.name+'" from cloud!','success');
-    rebuildSidePanel();
-  }else toast('Cloud load failed: '+(result?.error||'unknown'),'error');
-}
-
-async function cloudDelete(id,name){
-  if(!confirm('Delete "'+name+'" from cloud? This affects everyone.'))return;
-  const result=await cloudRequest('delete',{id});
-  if(result?.success){toast('Deleted from cloud','info');rebuildSidePanel();}
-  else toast('Cloud delete failed: '+(result?.error||'unknown'),'error');
-}
+function apiGet(params){return apiPost(params);}
+async function cloudRequest(action,body){body=body||{};try{return await apiPost(Object.assign({action:action},body));}catch(e){toast('Cloud error: '+e.message,'error');return null;}}
+async function cloudSave(name){const projName=name||prompt('Project name for cloud:','Menu '+new Date().toLocaleDateString());if(!projName)return;toast('Saving to cloud...','info');const payload=currentPayload();const lightPayload=Object.assign({},payload,{imgDataURL:''});const result=await cloudRequest('save',{project:{id:uid(),name:projName.trim(),savedBy:getCloudName(),data:lightPayload}});if(result?.success){toast('Saved "'+projName.trim()+'" to cloud!','success');rebuildSidePanel();}else toast('Cloud save failed: '+(result?.error||'unknown'),'error');}
+async function cloudUpdate(id,name){toast('Updating cloud...','info');const payload=currentPayload();const lightPayload=Object.assign({},payload,{imgDataURL:''});const result=await cloudRequest('save',{project:{id,name,savedBy:getCloudName(),data:lightPayload}});if(result?.success)toast('Updated "'+name+'" on cloud!','success');else toast('Cloud update failed: '+(result?.error||'unknown'),'error');}
+async function cloudList(){const result=await cloudRequest('list');if(result?.success)return result.projects||[];toast('Could not load cloud projects: '+(result?.error||'unknown'),'error');return[];}
+async function cloudLoad(id){toast('Loading from cloud...','info');const result=await cloudRequest('load',{id});if(result?.success&&result.project?.data){await applyPayload(result.project.data);toast('Loaded "'+result.project.name+'" from cloud!','success');rebuildSidePanel();}else toast('Cloud load failed: '+(result?.error||'unknown'),'error');}
+async function cloudDelete(id,name){if(!confirm('Delete "'+name+'" from cloud? This affects everyone.'))return;const result=await cloudRequest('delete',{id});if(result?.success){toast('Deleted from cloud','info');rebuildSidePanel();}else toast('Cloud delete failed: '+(result?.error||'unknown'),'error');}
 
 /* IMAGE */
 function fileToDataURL(f){return new Promise((r,j)=>{const x=new FileReader();x.onload=()=>r(String(x.result||''));x.onerror=j;x.readAsDataURL(f);})}
@@ -675,103 +543,14 @@ function loadStarterBoxes(){
 function setCanvasSize(){canvas.width=outW;canvas.height=outH;}
 const pxX=p=>(p/100)*canvas.width,pxY=p=>(p/100)*canvas.height,pctX=px=>(px/canvas.width)*100,pctY=px=>(px/canvas.height)*100,fontPx=p=>Math.max(6,(p/100)*canvas.height);
 function roundRect(x,y,w,h,r){const rr=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();}
-function drawPhoto(){
-  ctx.fillStyle='#111216';ctx.fillRect(0,0,canvas.width,canvas.height);
-  if(!imgLoaded){ctx.save();ctx.fillStyle='rgba(255,255,255,0.6)';ctx.font='700 20px system-ui';ctx.textAlign='center';ctx.fillText('Upload your menu template image to start',canvas.width/2,canvas.height/2);ctx.restore();return;}
-  const w=canvas.width,h=canvas.height,iw=img.naturalWidth,ih=img.naturalHeight;
-  const rot=(photoRot%180)!==0,bw=rot?ih:iw,bh=rot?iw:ih;
-  const fit=Math.min(w/bw,h/bh)*photoScale;
-  ctx.save();ctx.translate(w/2+photoOffsetX,h/2+photoOffsetY);ctx.rotate(photoRot*Math.PI/180);
-  ctx.drawImage(img,-bw*fit/2,-bh*fit/2,bw*fit,bh*fit);ctx.restore();
-}
-function measureBox(b){
-  const size=fontPx(b.sizePct);
-  const rawLines=String(b.text??'').split('\n');
-  const lineH=size*(b.lineHeight||1.15);
-  const maxW_limit=b.maxWidthPct>0?pxX(b.maxWidthPct):0;
-  ctx.save();
-  ctx.font=`${b.italic?'italic ':''}${b.bold?'900 ':'700 '}${Math.round(size)}px ${b.fontFamily}`;
-  let lines=[];
-  if(maxW_limit>0){
-    for(const raw of rawLines){
-      const words=raw.split(' ');
-      let cur='';
-      for(const w of words){
-        const test=cur?cur+' '+w:w;
-        if(ctx.measureText(test).width>maxW_limit&&cur){lines.push(cur);cur=w;}
-        else cur=test;
-      }
-      if(cur)lines.push(cur); else lines.push('');
-    }
-  }else{lines=rawLines;}
-  let maxW=0;for(const l of lines)maxW=Math.max(maxW,ctx.measureText(l).width);
-  if(maxW_limit>0)maxW=Math.min(maxW,maxW_limit);
-  ctx.restore();
-  return{lines,size,lineH,maxW,totalH:lines.length*lineH};
-}
+function drawPhoto(){ctx.fillStyle='#111216';ctx.fillRect(0,0,canvas.width,canvas.height);if(!imgLoaded){ctx.save();ctx.fillStyle='rgba(255,255,255,0.6)';ctx.font='700 20px system-ui';ctx.textAlign='center';ctx.fillText('Upload your menu template image to start',canvas.width/2,canvas.height/2);ctx.restore();return;}const w=canvas.width,h=canvas.height,iw=img.naturalWidth,ih=img.naturalHeight;const rot=(photoRot%180)!==0,bw=rot?ih:iw,bh=rot?iw:ih;const fit=Math.min(w/bw,h/bh)*photoScale;ctx.save();ctx.translate(w/2+photoOffsetX,h/2+photoOffsetY);ctx.rotate(photoRot*Math.PI/180);ctx.drawImage(img,-bw*fit/2,-bh*fit/2,bw*fit,bh*fit);ctx.restore();}
+function measureBox(b){const size=fontPx(b.sizePct);const rawLines=String(b.text??'').split('\n');const lineH=size*(b.lineHeight||1.15);const maxW_limit=b.maxWidthPct>0?pxX(b.maxWidthPct):0;ctx.save();ctx.font=`${b.italic?'italic ':''}${b.bold?'900 ':'700 '}${Math.round(size)}px ${b.fontFamily}`;let lines=[];if(maxW_limit>0){for(const raw of rawLines){const words=raw.split(' ');let cur='';for(const w of words){const test=cur?cur+' '+w:w;if(ctx.measureText(test).width>maxW_limit&&cur){lines.push(cur);cur=w;}else cur=test;}if(cur)lines.push(cur);else lines.push('');}}else{lines=rawLines;}let maxW=0;for(const l of lines)maxW=Math.max(maxW,ctx.measureText(l).width);if(maxW_limit>0)maxW=Math.min(maxW,maxW_limit);ctx.restore();return{lines,size,lineH,maxW,totalH:lines.length*lineH};}
 function rotAABB(cx,cy,rw,rh,deg){const rad=(deg||0)*Math.PI/180,hw=rw/2,hh=rh/2;const cs=[{x:-hw,y:-hh},{x:hw,y:-hh},{x:hw,y:hh},{x:-hw,y:hh}];let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;for(const p of cs){const rx=p.x*Math.cos(rad)-p.y*Math.sin(rad)+cx,ry=p.x*Math.sin(rad)+p.y*Math.cos(rad)+cy;minX=Math.min(minX,rx);minY=Math.min(minY,ry);maxX=Math.max(maxX,rx);maxY=Math.max(maxY,ry);}return{left:minX,top:minY,right:maxX,bottom:maxY};}
-function drawTextBox(b){
-  const x=pxX(b.xPct),y=pxY(b.yPct),m=measureBox(b),lx=-m.maxW/2,ly=-m.totalH/2,px=b.bgPadX??14,py=b.bgPadY??10;
-  ctx.save();ctx.translate(x,y);ctx.rotate((b.rotationDeg||0)*Math.PI/180);
-  if(b.bgOn){ctx.save();ctx.shadowBlur=0;ctx.fillStyle=hexRgba(b.bgColor||'#000',clamp(b.bgOpacity??.3,0,1));roundRect(lx-px,ly-py,m.maxW+px*2,m.totalH+py*2,b.bgRadius??14);ctx.fill();ctx.restore();}
-  if(b.shadow){ctx.shadowColor=b.shadowColor||'rgba(0,0,0,0.7)';ctx.shadowBlur=b.shadowBlur??10;}else{ctx.shadowColor='rgba(0,0,0,0)';ctx.shadowBlur=0;}
-  ctx.fillStyle=hexRgba(b.color||'#fff',clamp(b.opacity??1,0,1));
-  ctx.font=`${b.italic?'italic ':''}${b.bold?'900 ':'700 '}${Math.round(m.size)}px ${b.fontFamily}`;
-  ctx.textBaseline='middle';
-  const al=(b.align||'left').toLowerCase();let dx=0;
-  if(al==='center'){ctx.textAlign='center';dx=0;}else if(al==='right'){ctx.textAlign='right';dx=lx+m.maxW;}else{ctx.textAlign='left';dx=lx;}
-  if(b.strokeOn&&b.strokeWidth>0){
-    ctx.save();ctx.shadowBlur=0;ctx.shadowColor='transparent';
-    ctx.strokeStyle=b.strokeColor||'#000000';ctx.lineWidth=b.strokeWidth||2;ctx.lineJoin='round';
-    for(let i=0;i<m.lines.length;i++)ctx.strokeText(m.lines[i],dx,ly+(i+.5)*m.lineH);
-    ctx.restore();
-    if(b.shadow){ctx.shadowColor=b.shadowColor||'rgba(0,0,0,0.7)';ctx.shadowBlur=b.shadowBlur??10;}
-  }
-  for(let i=0;i<m.lines.length;i++)ctx.fillText(m.lines[i],dx,ly+(i+.5)*m.lineH);
-  ctx.restore();
-  const constraintW=b.maxWidthPct>0?pxX(b.maxWidthPct):0;
-  const textW=m.maxW;
-  const boxW=Math.max(textW,constraintW)+(b.bgOn?px*2:0);
-  const rh=m.totalH+(b.bgOn?py*2:0);
-  b.__hit=rotAABB(x,y,boxW,rh,b.rotationDeg||0);
-  b.__rawW=boxW;b.__rawH=rh;b.__cx=x;b.__cy=y;
-}
+function drawTextBox(b){const x=pxX(b.xPct),y=pxY(b.yPct),m=measureBox(b),lx=-m.maxW/2,ly=-m.totalH/2,px=b.bgPadX??14,py=b.bgPadY??10;ctx.save();ctx.translate(x,y);ctx.rotate((b.rotationDeg||0)*Math.PI/180);if(b.bgOn){ctx.save();ctx.shadowBlur=0;ctx.fillStyle=hexRgba(b.bgColor||'#000',clamp(b.bgOpacity??.3,0,1));roundRect(lx-px,ly-py,m.maxW+px*2,m.totalH+py*2,b.bgRadius??14);ctx.fill();ctx.restore();}if(b.shadow){ctx.shadowColor=b.shadowColor||'rgba(0,0,0,0.7)';ctx.shadowBlur=b.shadowBlur??10;}else{ctx.shadowColor='rgba(0,0,0,0)';ctx.shadowBlur=0;}ctx.fillStyle=hexRgba(b.color||'#fff',clamp(b.opacity??1,0,1));ctx.font=`${b.italic?'italic ':''}${b.bold?'900 ':'700 '}${Math.round(m.size)}px ${b.fontFamily}`;ctx.textBaseline='middle';const al=(b.align||'left').toLowerCase();let dx=0;if(al==='center'){ctx.textAlign='center';dx=0;}else if(al==='right'){ctx.textAlign='right';dx=lx+m.maxW;}else{ctx.textAlign='left';dx=lx;}if(b.strokeOn&&b.strokeWidth>0){ctx.save();ctx.shadowBlur=0;ctx.shadowColor='transparent';ctx.strokeStyle=b.strokeColor||'#000000';ctx.lineWidth=b.strokeWidth||2;ctx.lineJoin='round';for(let i=0;i<m.lines.length;i++)ctx.strokeText(m.lines[i],dx,ly+(i+.5)*m.lineH);ctx.restore();if(b.shadow){ctx.shadowColor=b.shadowColor||'rgba(0,0,0,0.7)';ctx.shadowBlur=b.shadowBlur??10;}}for(let i=0;i<m.lines.length;i++)ctx.fillText(m.lines[i],dx,ly+(i+.5)*m.lineH);ctx.restore();const constraintW=b.maxWidthPct>0?pxX(b.maxWidthPct):0;const textW=m.maxW;const boxW=Math.max(textW,constraintW)+(b.bgOn?px*2:0);const rh=m.totalH+(b.bgOn?py*2:0);b.__hit=rotAABB(x,y,boxW,rh,b.rotationDeg||0);b.__rawW=boxW;b.__rawH=rh;b.__cx=x;b.__cy=y;}
 const HANDLE_SIZE=10;
-function getHandles(b){
-  if(!b||!b.__hit)return[];
-  const h=b.__hit;
-  const mx=(h.left+h.right)/2,my=(h.top+h.bottom)/2;
-  return[
-    {id:'tl',x:h.left,y:h.top},{id:'tr',x:h.right,y:h.top},
-    {id:'bl',x:h.left,y:h.bottom},{id:'br',x:h.right,y:h.bottom},
-    {id:'ml',x:h.left,y:my},{id:'mr',x:h.right,y:my},
-    {id:'tm',x:mx,y:h.top},{id:'bm',x:mx,y:h.bottom},
-  ];
-}
-function hitHandle(px,py,b){
-  const handles=getHandles(b);
-  const hs=HANDLE_SIZE*2.5;
-  for(const h of handles){if(Math.abs(px-h.x)<hs&&Math.abs(py-h.y)<hs)return h;}
-  return null;
-}
-function drawOutline(){
-  if(!document.getElementById('outlineOn').checked)return;
-  const b=boxes.find(x=>x.id===activeId);if(!b||!b.__hit)return;
-  const h=b.__hit;
-  ctx.save();ctx.strokeStyle='rgba(255,255,255,0.8)';ctx.lineWidth=2;ctx.setLineDash([6,5]);
-  ctx.strokeRect(h.left,h.top,h.right-h.left,h.bottom-h.top);ctx.setLineDash([]);
-  const handles=getHandles(b);
-  for(const handle of handles){
-    const isSide=handle.id==='ml'||handle.id==='mr';
-    const isTopBot=handle.id==='tm'||handle.id==='bm';
-    ctx.fillStyle=isSide?'rgba(100,180,255,0.95)':isTopBot?'rgba(100,255,150,0.95)':'rgba(255,122,24,0.95)';
-    ctx.strokeStyle='#fff';ctx.lineWidth=2;
-    if(isSide){ctx.beginPath();ctx.rect(handle.x-4,handle.y-10,8,20);ctx.fill();ctx.stroke();}
-    else if(isTopBot){ctx.beginPath();ctx.rect(handle.x-10,handle.y-4,20,8);ctx.fill();ctx.stroke();}
-    else{ctx.beginPath();ctx.arc(handle.x,handle.y,6,0,Math.PI*2);ctx.fill();ctx.stroke();}
-  }
-  ctx.restore();
-}
+function getHandles(b){if(!b||!b.__hit)return[];const h=b.__hit;const mx=(h.left+h.right)/2,my=(h.top+h.bottom)/2;return[{id:'tl',x:h.left,y:h.top},{id:'tr',x:h.right,y:h.top},{id:'bl',x:h.left,y:h.bottom},{id:'br',x:h.right,y:h.bottom},{id:'ml',x:h.left,y:my},{id:'mr',x:h.right,y:my},{id:'tm',x:mx,y:h.top},{id:'bm',x:mx,y:h.bottom}];}
+function hitHandle(px,py,b){const handles=getHandles(b);const hs=HANDLE_SIZE*2.5;for(const h of handles){if(Math.abs(px-h.x)<hs&&Math.abs(py-h.y)<hs)return h;}return null;}
+function drawOutline(){if(!document.getElementById('outlineOn').checked)return;const b=boxes.find(x=>x.id===activeId);if(!b||!b.__hit)return;const h=b.__hit;ctx.save();ctx.strokeStyle='rgba(255,255,255,0.8)';ctx.lineWidth=2;ctx.setLineDash([6,5]);ctx.strokeRect(h.left,h.top,h.right-h.left,h.bottom-h.top);ctx.setLineDash([]);const handles=getHandles(b);for(const handle of handles){const isSide=handle.id==='ml'||handle.id==='mr';const isTopBot=handle.id==='tm'||handle.id==='bm';ctx.fillStyle=isSide?'rgba(100,180,255,0.95)':isTopBot?'rgba(100,255,150,0.95)':'rgba(255,122,24,0.95)';ctx.strokeStyle='#fff';ctx.lineWidth=2;if(isSide){ctx.beginPath();ctx.rect(handle.x-4,handle.y-10,8,20);ctx.fill();ctx.stroke();}else if(isTopBot){ctx.beginPath();ctx.rect(handle.x-10,handle.y-4,20,8);ctx.fill();ctx.stroke();}else{ctx.beginPath();ctx.arc(handle.x,handle.y,6,0,Math.PI*2);ctx.fill();ctx.stroke();}}ctx.restore();}
 function draw(){setCanvasSize();ctx.save();ctx.translate(viewX,viewY);ctx.scale(viewScale,viewScale);drawPhoto();if(document.getElementById('showText').checked){for(const b of boxes)drawTextBox(b);if(activeId)drawOutline();}ctx.restore();}
 function resetAll(){photoScale=1;document.getElementById('photoZoom').value='1';photoRot=0;photoOffsetX=0;photoOffsetY=0;viewX=0;viewY=0;viewScale=1;document.getElementById('viewZoom').value='1';draw();}
 function fitView(){viewX=0;viewY=0;viewScale=1;document.getElementById('viewZoom').value='1';draw();}
@@ -782,46 +561,9 @@ function hitTest(px,py){for(let i=boxes.length-1;i>=0;i--){const b=boxes[i],h=b.
 
 /* POINTER EVENTS */
 let resizeHandle=null;
-canvas.addEventListener('pointerdown',e=>{
-  if(e.pointerType==='touch'){pointers.set(e.pointerId,{clientX:e.clientX,clientY:e.clientY});if(pointers.size===2){pinchActive=true;const p=computePinch();lastMid=p?.mid;lastDist=p?.dist;dragging=false;canvas.setPointerCapture(e.pointerId);return;}}
-  if(!isCoarse()&&e.button===2){const p=rawFromClient(e.clientX,e.clientY);dragging=true;dragMode='view';lastX=p.x;lastY=p.y;canvas.setPointerCapture(e.pointerId);return;}
-  const p=worldFromClient(e.clientX,e.clientY);lastX=p.x;lastY=p.y;
-  if(activeId&&document.getElementById('showText').checked){
-    const ab=boxes.find(x=>x.id===activeId);
-    if(ab){const rh=hitHandle(p.x,p.y,ab);if(rh){saveUndo();resizeHandle=rh;dragging=true;dragMode='resize';canvas.setPointerCapture(e.pointerId);return;}}
-  }
-  if(document.getElementById('showText').checked){const hit=hitTest(p.x,p.y);if(hit){saveUndo();activeId=hit.id;dragging=true;dragMode='text';resizeHandle=null;rebuildSidePanel();canvas.setPointerCapture(e.pointerId);draw();return;}}
-  activeId=null;resizeHandle=null;rebuildSidePanel();dragging=true;dragMode='image';canvas.setPointerCapture(e.pointerId);draw();
-});
+canvas.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'){pointers.set(e.pointerId,{clientX:e.clientX,clientY:e.clientY});if(pointers.size===2){pinchActive=true;const p=computePinch();lastMid=p?.mid;lastDist=p?.dist;dragging=false;canvas.setPointerCapture(e.pointerId);return;}}if(!isCoarse()&&e.button===2){const p=rawFromClient(e.clientX,e.clientY);dragging=true;dragMode='view';lastX=p.x;lastY=p.y;canvas.setPointerCapture(e.pointerId);return;}const p=worldFromClient(e.clientX,e.clientY);lastX=p.x;lastY=p.y;if(activeId&&document.getElementById('showText').checked){const ab=boxes.find(x=>x.id===activeId);if(ab){const rh=hitHandle(p.x,p.y,ab);if(rh){saveUndo();resizeHandle=rh;dragging=true;dragMode='resize';canvas.setPointerCapture(e.pointerId);return;}}}if(document.getElementById('showText').checked){const hit=hitTest(p.x,p.y);if(hit){saveUndo();activeId=hit.id;dragging=true;dragMode='text';resizeHandle=null;rebuildSidePanel();canvas.setPointerCapture(e.pointerId);draw();return;}}activeId=null;resizeHandle=null;rebuildSidePanel();dragging=true;dragMode='image';canvas.setPointerCapture(e.pointerId);draw();});
 function computePinch(){if(pointers.size!==2)return null;const pts=Array.from(pointers.values());const a=rawFromClient(pts[0].clientX,pts[0].clientY),b=rawFromClient(pts[1].clientX,pts[1].clientY);return{mid:{x:(a.x+b.x)/2,y:(a.y+b.y)/2},dist:Math.hypot(a.x-b.x,a.y-b.y)};}
-canvas.addEventListener('pointermove',e=>{
-  if(e.pointerType==='touch'&&pointers.has(e.pointerId))pointers.set(e.pointerId,{clientX:e.clientX,clientY:e.clientY});
-  if(pinchActive&&pointers.size===2){const p=computePinch();if(!p)return;if(lastMid){viewX+=p.mid.x-lastMid.x;viewY+=p.mid.y-lastMid.y;}if(lastDist&&p.dist){viewScale=clamp(viewScale*(p.dist/lastDist),.5,3);document.getElementById('viewZoom').value=String(viewScale);}lastMid=p.mid;lastDist=p.dist;draw();return;}
-  if(!dragging)return;
-  if(dragMode==='view'){const p=rawFromClient(e.clientX,e.clientY);viewX+=p.x-lastX;viewY+=p.y-lastY;lastX=p.x;lastY=p.y;draw();return;}
-  const p=worldFromClient(e.clientX,e.clientY),dx=p.x-lastX,dy=p.y-lastY;lastX=p.x;lastY=p.y;
-  if(dragMode==='image'){photoOffsetX+=dx;photoOffsetY+=dy;draw();return;}
-  if(dragMode==='resize'){
-    const b=boxes.find(x=>x.id===activeId);if(!b||!resizeHandle)return;
-    const hid=resizeHandle.id;
-    const hit=b.__hit;
-    if(hid==='tl'||hid==='tr'||hid==='bl'||hid==='br'){
-      const cx=(hit.left+hit.right)/2,cy=(hit.top+hit.bottom)/2;
-      const px=lastX,py=lastY;
-      const prevDist=Math.hypot((px-dx)-cx,(py-dy)-cy);
-      const newDist=Math.hypot(px-cx,py-cy);
-      if(prevDist>0){const ratio=newDist/prevDist;b.sizePct=clamp(b.sizePct*ratio,0.3,10);if(b.maxWidthPct>0)b.maxWidthPct=clamp(b.maxWidthPct*ratio,2,95);}
-    }
-    if(hid==='ml'||hid==='mr'){
-      if(!b.maxWidthPct||b.maxWidthPct===0)b.maxWidthPct=pctX(hit.right-hit.left);
-      const dir=hid==='mr'?1:-1;const deltaW=dx*dir;const newWPx=pxX(b.maxWidthPct)+deltaW*2;
-      b.maxWidthPct=clamp(pctX(newWPx),3,95);b.xPct=clamp(b.xPct+pctX(dx)/2,0,100);
-    }
-    if(hid==='tm'||hid==='bm'){const dir=hid==='bm'?1:-1;b.lineHeight=clamp((b.lineHeight||1.15)+dy*dir*0.003,0.8,2.5);}
-    draw();triggerAutoSave();return;
-  }
-  if(dragMode==='text'){const b=boxes.find(x=>x.id===activeId);if(!b)return;b.xPct=maybeSnap(clamp(pctX(pxX(b.xPct)+dx),0,100));b.yPct=maybeSnap(clamp(pctY(pxY(b.yPct)+dy),0,100));draw();triggerAutoSave();}
-});
+canvas.addEventListener('pointermove',e=>{if(e.pointerType==='touch'&&pointers.has(e.pointerId))pointers.set(e.pointerId,{clientX:e.clientX,clientY:e.clientY});if(pinchActive&&pointers.size===2){const p=computePinch();if(!p)return;if(lastMid){viewX+=p.mid.x-lastMid.x;viewY+=p.mid.y-lastMid.y;}if(lastDist&&p.dist){viewScale=clamp(viewScale*(p.dist/lastDist),.5,3);document.getElementById('viewZoom').value=String(viewScale);}lastMid=p.mid;lastDist=p.dist;draw();return;}if(!dragging)return;if(dragMode==='view'){const p=rawFromClient(e.clientX,e.clientY);viewX+=p.x-lastX;viewY+=p.y-lastY;lastX=p.x;lastY=p.y;draw();return;}const p=worldFromClient(e.clientX,e.clientY),dx=p.x-lastX,dy=p.y-lastY;lastX=p.x;lastY=p.y;if(dragMode==='image'){photoOffsetX+=dx;photoOffsetY+=dy;draw();return;}if(dragMode==='resize'){const b=boxes.find(x=>x.id===activeId);if(!b||!resizeHandle)return;const hid=resizeHandle.id;const hit=b.__hit;if(hid==='tl'||hid==='tr'||hid==='bl'||hid==='br'){const cx=(hit.left+hit.right)/2,cy=(hit.top+hit.bottom)/2;const px=lastX,py=lastY;const prevDist=Math.hypot((px-dx)-cx,(py-dy)-cy);const newDist=Math.hypot(px-cx,py-cy);if(prevDist>0){const ratio=newDist/prevDist;b.sizePct=clamp(b.sizePct*ratio,0.3,10);if(b.maxWidthPct>0)b.maxWidthPct=clamp(b.maxWidthPct*ratio,2,95);}}if(hid==='ml'||hid==='mr'){if(!b.maxWidthPct||b.maxWidthPct===0)b.maxWidthPct=pctX(hit.right-hit.left);const dir=hid==='mr'?1:-1;const deltaW=dx*dir;const newWPx=pxX(b.maxWidthPct)+deltaW*2;b.maxWidthPct=clamp(pctX(newWPx),3,95);b.xPct=clamp(b.xPct+pctX(dx)/2,0,100);}if(hid==='tm'||hid==='bm'){const dir=hid==='bm'?1:-1;b.lineHeight=clamp((b.lineHeight||1.15)+dy*dir*0.003,0.8,2.5);}draw();triggerAutoSave();return;}if(dragMode==='text'){const b=boxes.find(x=>x.id===activeId);if(!b)return;b.xPct=maybeSnap(clamp(pctX(pxX(b.xPct)+dx),0,100));b.yPct=maybeSnap(clamp(pctY(pxY(b.yPct)+dy),0,100));draw();triggerAutoSave();}});
 function endPointer(e){dragging=false;resizeHandle=null;if(e?.pointerType==='touch'){pointers.delete(e.pointerId);if(pointers.size<2){pinchActive=false;lastMid=null;lastDist=null;}}triggerAutoSave();}
 canvas.addEventListener('pointerup',endPointer);canvas.addEventListener('pointercancel',endPointer);
 canvas.addEventListener('wheel',e=>{e.preventDefault();const d=Math.sign(e.deltaY)*-0.08;if(e.altKey){photoScale=clamp(photoScale+d,.3,4);document.getElementById('photoZoom').value=String(photoScale);draw();return;}viewScale=clamp(viewScale+d,.5,3);document.getElementById('viewZoom').value=String(viewScale);draw();},{passive:false});
@@ -839,50 +581,19 @@ document.getElementById('hhMEfile').addEventListener('change',async()=>{const f=
 function currentPayload(){return{outW,outH,imgDataURL:imgDataURL||'',photoTransform:{photoScale,photoRot,photoOffsetX,photoOffsetY},boxes};}
 async function applyPayload(p){if(!p)return;if(p.imgDataURL){imgDataURL=p.imgDataURL;await loadImg(imgDataURL);}const t=p.photoTransform||{};photoScale=t.photoScale??photoScale;photoRot=t.photoRot??photoRot;photoOffsetX=t.photoOffsetX??photoOffsetX;photoOffsetY=t.photoOffsetY??photoOffsetY;document.getElementById('photoZoom').value=String(photoScale);if(Array.isArray(p.boxes))boxes=p.boxes;activeId=null;fitView();rebuildSidePanel();draw();}
 function createProject(name){const s=loadStore();const p={id:uid(),name:name||`Menu ${new Date().toLocaleDateString()}`,createdAt:Date.now(),updatedAt:Date.now(),data:currentPayload()};s.items.unshift(p);s.activeId=p.id;const r=saveStore(s);if(!r.ok){toast('Save failed: '+r.error,'error');return false;}toast('Project created!','success');rebuildSidePanel();return true;}
-function saveProject(askName){
-  const s=loadStore();const a=s.items.find(p=>p.id===s.activeId);
-  if(!a){const name=prompt('Name this project:','Menu '+new Date().toLocaleDateString());if(name===null)return;createProject(name.trim()||'Menu '+new Date().toLocaleDateString());return;}
-  if(askName){const name=prompt('Rename project:',a.name);if(name===null)return;a.name=name.trim()||a.name;}
-  a.updatedAt=Date.now();a.data=currentPayload();
-  const r=saveStore(s);if(!r.ok){toast('Save failed: '+r.error,'error');return;}
-  toast('Saved "'+a.name+'"!','success');rebuildSidePanel();
-}
+function saveProject(askName){const s=loadStore();const a=s.items.find(p=>p.id===s.activeId);if(!a){const name=prompt('Name this project:','Menu '+new Date().toLocaleDateString());if(name===null)return;createProject(name.trim()||'Menu '+new Date().toLocaleDateString());return;}if(askName){const name=prompt('Rename project:',a.name);if(name===null)return;a.name=name.trim()||a.name;}a.updatedAt=Date.now();a.data=currentPayload();const r=saveStore(s);if(!r.ok){toast('Save failed: '+r.error,'error');return;}toast('Saved "'+a.name+'"!','success');rebuildSidePanel();}
 function renameProject(id){const s=loadStore();const p=s.items.find(x=>x.id===id);if(!p)return;const name=prompt('Rename project:',p.name);if(name===null||!name.trim())return;p.name=name.trim();p.updatedAt=Date.now();saveStore(s);toast('Renamed to "'+p.name+'"','success');rebuildSidePanel();}
-function exportProjectFile(id){
-  const s=loadStore();const p=s.items.find(x=>x.id===id);
-  if(!p){toast('No project to export','error');return;}
-  const exportData=Object.assign({},p);
-  if(!exportData.data.imgDataURL&&imgDataURL){exportData.data.imgDataURL=imgDataURL;}
-  const blob=new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
-  const el=document.createElement('a');
-  const safeName=(p.name||'menu').replace(/[^a-zA-Z0-9-_ ]/g,'').replace(/\s+/g,'-').toLowerCase();
-  el.download=`hotheadz-${safeName}-${new Date().toISOString().slice(0,10)}.json`;
-  el.href=URL.createObjectURL(blob);document.body.appendChild(el);el.click();el.remove();
-  setTimeout(()=>URL.revokeObjectURL(el.href),1500);
-  toast('Project file exported!','success');
-}
+function exportProjectFile(id){const s=loadStore();const p=s.items.find(x=>x.id===id);if(!p){toast('No project to export','error');return;}const exportData=Object.assign({},p);if(!exportData.data.imgDataURL&&imgDataURL){exportData.data.imgDataURL=imgDataURL;}const blob=new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});const el=document.createElement('a');const safeName=(p.name||'menu').replace(/[^a-zA-Z0-9-_ ]/g,'').replace(/\s+/g,'-').toLowerCase();el.download=`hotheadz-${safeName}-${new Date().toISOString().slice(0,10)}.json`;el.href=URL.createObjectURL(blob);document.body.appendChild(el);el.click();el.remove();setTimeout(()=>URL.revokeObjectURL(el.href),1500);toast('Project file exported!','success');}
 async function loadProject(id){const s=loadStore();const p=s.items.find(x=>x.id===id);if(!p)return;s.activeId=id;saveStore(s);if(p.data)await applyPayload(p.data);rebuildSidePanel();}
 function deleteProject(id){const s=loadStore();const p=s.items.find(x=>x.id===id);if(!p||!confirm(`Delete "${p.name}"?`))return;s.items=s.items.filter(x=>x.id!==id);if(s.activeId===id)s.activeId=s.items[0]?.id??null;saveStore(s);const n=s.items.find(x=>x.id===s.activeId);if(n?.data)applyPayload(n.data);else{loadStarterBoxes();imgLoaded=false;imgDataURL='';resetAll();}toast('Deleted','info');rebuildSidePanel();}
 
 /* EXPORT */
 function getPhotoAABB(){if(!imgLoaded)return null;const w=canvas.width,h=canvas.height,iw=img.naturalWidth,ih=img.naturalHeight;const rot=(photoRot%180)!==0,bw=rot?ih:iw,bh=rot?iw:ih;const fit=Math.min(w/bw,h/bh)*photoScale;const cx=w/2+photoOffsetX,cy=h/2+photoOffsetY,dw=bw*fit,dh=bh*fit;const rad=photoRot*Math.PI/180;const corners=[{x:-dw/2,y:-dh/2},{x:dw/2,y:-dh/2},{x:dw/2,y:dh/2},{x:-dw/2,y:dh/2}];let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;for(const p of corners){const rx=p.x*Math.cos(rad)-p.y*Math.sin(rad)+cx,ry=p.x*Math.sin(rad)+p.y*Math.cos(rad)+cy;minX=Math.min(minX,rx);minY=Math.min(minY,ry);maxX=Math.max(maxX,rx);maxY=Math.max(maxY,ry);}return{sx:Math.max(0,Math.floor(minX)),sy:Math.max(0,Math.floor(minY)),sw:Math.max(1,Math.min(w,Math.ceil(maxX))-Math.max(0,Math.floor(minX))),sh:Math.max(1,Math.min(h,Math.ceil(maxY))-Math.max(0,Math.floor(minY)))};}
 function exportCropped(mime,ext,q){if(!imgLoaded){toast('Upload template first','error');return;}const ov={viewX,viewY,viewScale};viewX=0;viewY=0;viewScale=1;draw();const a=getPhotoAABB();viewX=ov.viewX;viewY=ov.viewY;viewScale=ov.viewScale;if(!a){toast('No photo bounds','error');return;}const out=document.createElement('canvas');out.width=a.sw;out.height=a.sh;out.getContext('2d').drawImage(canvas,a.sx,a.sy,a.sw,a.sh,0,0,a.sw,a.sh);out.toBlob(blob=>{if(!blob)return;const el=document.createElement('a');el.download=`hotheadz-menu-${new Date().toISOString().slice(0,10)}.${ext}`;el.href=URL.createObjectURL(blob);document.body.appendChild(el);el.click();el.remove();setTimeout(()=>URL.revokeObjectURL(el.href),1500);toast(`${ext.toUpperCase()} downloaded!`,'success');},mime,q);draw();}
-function exportJSON(){
-  const s=loadStore();const a=s.items.find(p=>p.id===s.activeId);
-  const payload=currentPayload();
-  if(!payload.imgDataURL&&imgDataURL)payload.imgDataURL=imgDataURL;
-  const proj={id:a?.id||uid(),name:a?.name||'Menu Export',createdAt:a?.createdAt||Date.now(),updatedAt:Date.now(),data:payload};
-  const blob=new Blob([JSON.stringify(proj,null,2)],{type:'application/json'});
-  const el=document.createElement('a');
-  const safeName=(proj.name||'menu').replace(/[^a-zA-Z0-9-_ ]/g,'').replace(/\s+/g,'-').toLowerCase();
-  el.download=`hotheadz-${safeName}-${new Date().toISOString().slice(0,10)}.json`;
-  el.href=URL.createObjectURL(blob);document.body.appendChild(el);el.click();el.remove();
-  toast('Project exported with template image!','success');
-}
+function exportJSON(){const s=loadStore();const a=s.items.find(p=>p.id===s.activeId);const payload=currentPayload();if(!payload.imgDataURL&&imgDataURL)payload.imgDataURL=imgDataURL;const proj={id:a?.id||uid(),name:a?.name||'Menu Export',createdAt:a?.createdAt||Date.now(),updatedAt:Date.now(),data:payload};const blob=new Blob([JSON.stringify(proj,null,2)],{type:'application/json'});const el=document.createElement('a');const safeName=(proj.name||'menu').replace(/[^a-zA-Z0-9-_ ]/g,'').replace(/\s+/g,'-').toLowerCase();el.download=`hotheadz-${safeName}-${new Date().toISOString().slice(0,10)}.json`;el.href=URL.createObjectURL(blob);document.body.appendChild(el);el.click();el.remove();toast('Project exported with template image!','success');}
 const exportModal=document.getElementById('exportModal');
 document.getElementById('exportBtn').addEventListener('click',()=>exportModal.classList.add('active'));
 document.getElementById('mobExportBtn').addEventListener('click',()=>exportModal.classList.add('active'));
-
 function signOut(){localStorage.removeItem(SESSION_KEY);window.location.href='/';}
 document.getElementById('signOutBtn').addEventListener('click',signOut);
 document.getElementById('mobSignOutBtn').addEventListener('click',signOut);
@@ -892,475 +603,251 @@ document.getElementById('dlJpg').addEventListener('click',()=>{exportCropped('im
 document.getElementById('dlPng').addEventListener('click',()=>{exportCropped('image/png','png',1);exportModal.classList.remove('active');});
 document.getElementById('dlJson').addEventListener('click',()=>{exportJSON();exportModal.classList.remove('active');});
 
-async function publishLunch(){
-  const lunchBox=boxes.find(b=>b.name==='Lunch');
-  if(!lunchBox||!lunchBox.text.trim()){toast('No Lunch text box found or it is empty','error');return;}
-  const lines=lunchBox.text.split('\n').map(l=>l.trim()).filter(Boolean);
-  const items=[];
-  for(const line of lines){
-    if(line.toUpperCase()==='LUNCH')continue;
-    if(/^\d{1,2}:\d{2}\s*(AM|PM)/i.test(line))continue;
-    if(/^(Same Daily|Same daily)/i.test(line)){items.push({name:line,desc:''});continue;}
-    let clean=line.replace(/^[\u2022\u2023\u25E6\u2043\u2219\u2219\-\*]\s*/,'').trim();
-    if(clean)items.push({name:clean,desc:''});
+/* ═══════════════════════════════════════════════════════════
+   SIDES CLASSIFIER — matches delivery.html's getKnownSidesSet
+   Used to auto-split legacy items[] into meats/sides on load.
+   ═══════════════════════════════════════════════════════════ */
+function normalizeItemName(s){return String(s||'').toLowerCase().replace(/^\s*[\u2022\u2023\u25E6\u2043\u2219\-\*]\s*/,'').replace(/\s*&\s*/g,' and ').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();}
+const KNOWN_SIDES = [
+  'Mac & Cheese','Macaroni & Cheese','Macaroni and Cheese','Cornbread','Rolls','Biscuits',
+  'Rice','White Rice','Steamed Rice','Beans','Baked Beans',
+  'Greens','Collard Greens','Mustard Greens','Turnip Greens',
+  'Mashed Potatoes','Mashed Potatoes & Gravy','Mashed Potatoes and Gravy',
+  'Sweet Potato','Sweet Potatoes','Sweet Potato Casserole',
+  'Black-eyed Peas','Black Eyed Peas','Field Peas','Green Beans','String Beans',
+  'Corn','Creamed Corn','Corn on the Cob','Cabbage','Fried Cabbage',
+  'Fried Okra','Okra','Stewed Okra','Potato Salad','Coleslaw','Cole Slaw','Slaw',
+  'Green Salad','Tossed Salad','Side Salad','Hushpuppies','Hush Puppies',
+  'Baked Potato','Loaded Baked Potato','French Fries','Fries','Fried Potatoes',
+  'Dirty Rice','Broccoli','Cauliflower','Carrots','Squash',
+  'Dressing','Cornbread Dressing','Stuffing','Macaroni Salad','Pasta Salad',
+  'Lima Beans','Butter Beans','Pinto Beans','Black Beans'
+];
+const KNOWN_SIDES_SET = (function(){var s={};KNOWN_SIDES.forEach(function(n){s[normalizeItemName(n)]=true;});return s;})();
+function isSideName(name){return !!KNOWN_SIDES_SET[normalizeItemName(name)];}
+function isSameDailyName(name){
+  // Uses menu_defaults.sameDaily if loaded, else known globals
+  var globals = (menuDefaultsCache && menuDefaultsCache.sameDaily && menuDefaultsCache.sameDaily.items) || [];
+  var normSet = {};
+  globals.forEach(function(it){var n=typeof it==='string'?it:(it&&it.name)||'';if(n)normSet[normalizeItemName(n)]=true;});
+  // Fallback hardcoded in case defaults haven't loaded
+  if (!globals.length) {
+    ['Turkey Clubs','Turkey Club','Chicken Salad','Chicken Salad Croissants','Chicken Salad Croissant','Croissants','Croissant'].forEach(function(n){normSet[normalizeItemName(n)]=true;});
   }
-  if(!items.length){toast('Could not parse any lunch items','error');return;}
-  const now=new Date();
-  const dateISO=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
-  const itemNames=items.map(i=>i.name).join(', ');
-  if(!confirm('Publish '+items.length+' lunch items to the live website for '+dateISO+'?\n\n'+itemNames))return;
-  toast('Publishing to live menu...','info');
-  try{
-    const result=await apiPost({action:'save-lunch',date:dateISO,data:{lunch:{show:true,items:items},dessert:{items:[]},crawfish:{show:false}},publishedBy:getCloudName()});
-    if(result?.success){toast('Published! '+items.length+' lunch items are now live.','success');}
-    else{toast('Publish failed: '+(result?.error||'unknown error'),'error');}
-  }catch(e){toast('Publish error: '+e.message,'error');}
+  return !!normSet[normalizeItemName(name)];
+}
+function isNonFoodLine(name){
+  var n = normalizeItemName(name);
+  if (!n) return true;
+  if (/\d+\s*\d*\s*(am|pm)/i.test(n)) return true;
+  if (n === 'lunch' || n === 'sides' || n === 'meats' || n === 'same daily') return true;
+  if (/^(lunch|breakfast|dinner|menu|sides|meats)\s*$/i.test(n)) return true;
+  return false;
+}
+/* Split legacy items[] into {meats, sides} — used to migrate old rows on load */
+function splitItemsIntoMeatsSides(items){
+  if (!Array.isArray(items)) return { meats: [], sides: [] };
+  var meats = [], sides = [];
+  items.forEach(function(it){
+    var name = typeof it === 'string' ? it : (it && it.name) || '';
+    if (!name) return;
+    if (isNonFoodLine(name)) return;
+    if (isSameDailyName(name)) return;   // drop same-daily items
+    var item = typeof it === 'object' ? it : { name: name, desc: '' };
+    if (isSideName(name)) sides.push(item);
+    else meats.push(item);
+  });
+  return { meats: meats, sides: sides };
+}
+
+async function publishLunch(){
+  // Detect whether the structured Lunch Forecast fields are present (and populated).
+  const meatsTA = document.getElementById('lunchMeatsTA');
+  const sidesTA = document.getElementById('lunchSidesTA');
+  const sameDailyTA = document.getElementById('lunchSameDailyTA');
+  const hasStructured = meatsTA && (meatsTA.value || '').trim().length > 0;
+
+  let meatsArr, sidesArr, sameDailyArr, itemsArr;
+
+  if (hasStructured) {
+    const parse = text => linesTo(text).map(line => {
+      const parts = line.split('|');
+      return { name: (parts[0]||'').trim(), desc: parts.slice(1).join('|').trim() };
+    }).filter(i => i.name);
+    meatsArr = parse(meatsTA.value);
+    sidesArr = parse(sidesTA?.value || '');
+    sameDailyArr = parse(sameDailyTA?.value || '');
+    const globals = (menuDefaultsCache?.sameDaily?.items) || [];
+    const effectiveSameDaily = sameDailyArr.length ? sameDailyArr :
+      globals.map(i => typeof i === 'string' ? { name: i, desc: '' } : i);
+    itemsArr = [].concat(meatsArr, sidesArr, effectiveSameDaily);
+  } else {
+    // Fallback: parse from canvas Lunch text box (old behavior, for folks still using it)
+    const lunchBox = boxes.find(b => b.name === 'Lunch');
+    if (!lunchBox || !lunchBox.text.trim()) { toast('Fill the Lunch Forecast fields (or the canvas Lunch text box)', 'error'); return; }
+    const lines = lunchBox.text.split('\n').map(l => l.trim()).filter(Boolean);
+    const parsedItems = [];
+    for (const line of lines) {
+      if (line.toUpperCase() === 'LUNCH') continue;
+      if (/^\d{1,2}:\d{2}\s*(AM|PM)/i.test(line)) continue;
+      if (/^(Same Daily|Same daily)/i.test(line)) continue;  // skip the header
+      let clean = line.replace(/^[\u2022\u2023\u25E6\u2043\u2219\-\*]\s*/, '').trim();
+      if (clean) parsedItems.push({name: clean, desc: ''});
+    }
+    if (!parsedItems.length) { toast('Could not parse any lunch items', 'error'); return; }
+    const split = splitItemsIntoMeatsSides(parsedItems);
+    meatsArr = split.meats;
+    sidesArr = split.sides;
+    sameDailyArr = [];
+    itemsArr = parsedItems;
+  }
+
+  const now = new Date();
+  const dateISO = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+  const preview = meatsArr.map(i => i.name).slice(0, 8).join(', ') + (meatsArr.length > 8 ? '...' : '');
+
+  if (!confirm('Publish lunch for ' + dateISO + '?\n\n' +
+      meatsArr.length + ' meat(s): ' + preview + '\n' +
+      sidesArr.length + ' side(s)\n' +
+      (sameDailyArr.length ? sameDailyArr.length + ' Same Daily override' : 'Using global Same Daily'))) return;
+
+  toast('Publishing to live menu...', 'info');
+  try {
+    const result = await apiPost({
+      action: 'save-lunch',
+      date: dateISO,
+      data: {
+        lunch: { show: true, items: itemsArr, meats: meatsArr, sides: sidesArr, sameDaily: sameDailyArr },
+        dessert: { items: [] },
+        crawfish: { show: false }
+      },
+      publishedBy: getCloudName()
+    });
+    if (result?.success) toast('Published! '+meatsArr.length+' meats, '+sidesArr.length+' sides now live.', 'success');
+    else toast('Publish failed: '+(result?.error||'unknown error'), 'error');
+  } catch(e) { toast('Publish error: '+e.message, 'error'); }
 }
 document.getElementById('publishLunch').addEventListener('click',()=>{publishLunch();exportModal.classList.remove('active');});
 
-/* ═══════════════════════════════════════════════════════════
-   MENU DEFAULTS CACHE — fetches from MenuDefaults sheet in cloud
-   ═══════════════════════════════════════════════════════════ */
-var menuDefaultsCache = null;   // full object: { breakfast:{}, drinks:{}, beer:[], ... }
-var menuDefaultsStatus = 'idle'; // 'idle' | 'loading' | 'loaded' | 'error'
-
+/* ═══ MENU DEFAULTS CACHE ═══ */
+var menuDefaultsCache = null;
+var menuDefaultsStatus = 'idle';
 async function loadMenuDefaults(force){
   if (menuDefaultsCache && !force) return menuDefaultsCache;
   menuDefaultsStatus = 'loading';
   try {
     const res = await cloudRequest('getMenuDefaults');
     if (res && res.success && res.defaults) {
-      menuDefaultsCache = res.defaults;
-      menuDefaultsStatus = 'loaded';
-      return menuDefaultsCache;
+      menuDefaultsCache = res.defaults; menuDefaultsStatus = 'loaded'; return menuDefaultsCache;
     }
-    menuDefaultsStatus = 'error';
-    console.warn('[HH editor] loadMenuDefaults unexpected response:', res);
-    return null;
-  } catch(e) {
-    menuDefaultsStatus = 'error';
-    console.warn('[HH editor] loadMenuDefaults error:', e.message);
-    return null;
-  }
+    menuDefaultsStatus = 'error'; return null;
+  } catch(e) { menuDefaultsStatus = 'error'; return null; }
 }
-
 async function saveMenuDefaultKey(key, value){
-  toast('Saving ' + key + '...', 'info');
+  toast('Saving '+key+'...', 'info');
   try {
-    const res = await apiPost({ action: 'saveMenuDefault', key: key, json: JSON.stringify(value) });
-    if (res && res.success) {
-      if (menuDefaultsCache) menuDefaultsCache[key] = value;
-      toast('Saved ' + key + '!', 'success');
-      return true;
-    }
-    toast('Save failed: ' + (res?.error || 'unknown'), 'error');
-    return false;
-  } catch(e) {
-    toast('Save error: ' + e.message, 'error');
-    return false;
-  }
+    const res = await apiPost({ action:'saveMenuDefault', key:key, json:JSON.stringify(value) });
+    if (res && res.success) { if (menuDefaultsCache) menuDefaultsCache[key] = value; toast('Saved '+key+'!', 'success'); return true; }
+    toast('Save failed: '+(res?.error||'unknown'), 'error'); return false;
+  } catch(e) { toast('Save error: '+e.message, 'error'); return false; }
 }
-
 async function resetMenuDefaultKey(key){
-  if (!confirm('Reset "' + key + '" to factory defaults? Your changes will be lost.')) return false;
-  toast('Resetting ' + key + '...', 'info');
+  if (!confirm('Reset "'+key+'" to factory defaults? Your changes will be lost.')) return false;
+  toast('Resetting '+key+'...', 'info');
   try {
-    const res = await apiPost({ action: 'resetMenuDefault', key: key });
-    if (res && res.success) {
-      await loadMenuDefaults(true);
-      toast('Reset ' + key + ' to defaults', 'success');
-      return true;
-    }
-    toast('Reset failed: ' + (res?.error || 'unknown'), 'error');
-    return false;
-  } catch(e) {
-    toast('Reset error: ' + e.message, 'error');
-    return false;
-  }
+    const res = await apiPost({ action:'resetMenuDefault', key:key });
+    if (res && res.success) { await loadMenuDefaults(true); toast('Reset '+key, 'success'); return true; }
+    toast('Reset failed: '+(res?.error||'unknown'), 'error'); return false;
+  } catch(e) { toast('Reset error: '+e.message, 'error'); return false; }
 }
-
 function linesTo(text){return String(text||'').split('\n').map(s=>s.trim()).filter(Boolean);}
 
-// ═══ lunch-date helpers (unchanged) ═══
 function todayISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function isoToDay(iso){const[y,m,d]=iso.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:'long'});}
 function isoToLabel(iso){const[y,m,d]=iso.split('-').map(Number);const dt=new Date(y,m-1,d);return dt.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});}
+function getClosingMinutes(dayName){const hours=(menuDefaultsCache&&menuDefaultsCache.hours&&menuDefaultsCache.hours.weekly)||[];const entry=hours.find(h=>String(h.day||'').toLowerCase()===String(dayName||'').toLowerCase());if(!entry||!entry.close)return 14*60;const m=entry.close.match(/(\d+):(\d+)\s*(AM|PM)/i);if(!m)return 14*60;let h=parseInt(m[1]),mn=parseInt(m[2]);if(m[3].toUpperCase()==='PM'&&h!==12)h+=12;if(m[3].toUpperCase()==='AM'&&h===12)h=0;return h*60+mn;}
+function getDayOffset(){const now=new Date();const dayName=now.toLocaleDateString('en-US',{weekday:'long'});const nowMins=now.getHours()*60+now.getMinutes();const closeMins=getClosingMinutes(dayName);return nowMins>=closeMins?1:0;}
+function dateOffsetAdj(n){const shift=getDayOffset();const d=new Date();d.setDate(d.getDate()+n+shift);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 
-function getClosingMinutes(dayName){
-  const hours = (menuDefaultsCache && menuDefaultsCache.hours && menuDefaultsCache.hours.weekly) || [];
-  const entry = hours.find(h => String(h.day||'').toLowerCase() === String(dayName||'').toLowerCase());
-  if (!entry || !entry.close) return 14*60;
-  const m = entry.close.match(/(\d+):(\d+)\s*(AM|PM)/i);
-  if (!m) return 14*60;
-  let h = parseInt(m[1]), mn = parseInt(m[2]);
-  if (m[3].toUpperCase() === 'PM' && h !== 12) h += 12;
-  if (m[3].toUpperCase() === 'AM' && h === 12) h = 0;
-  return h*60 + mn;
-}
-function getDayOffset(){
-  const now = new Date();
-  const dayName = now.toLocaleDateString('en-US',{weekday:'long'});
-  const nowMins = now.getHours()*60 + now.getMinutes();
-  const closeMins = getClosingMinutes(dayName);
-  return nowMins >= closeMins ? 1 : 0;
-}
-function dateOffsetAdj(n){
-  const shift = getDayOffset();
-  const d = new Date();
-  d.setDate(d.getDate() + n + shift);
-  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-}
+function statusPillHTML(){if(menuDefaultsStatus==='loading')return '<span class="status-pill loading">Loading…</span>';if(menuDefaultsStatus==='loaded')return '<span class="status-pill loaded">Loaded from cloud</span>';if(menuDefaultsStatus==='error')return '<span class="status-pill error">Cloud error</span>';return '';}
 
-/* ═══════════════════════════════════════════════════════════
-   SIDE PANEL — STATIC TAB BUILDERS
-   Each tab edits one key in the MenuDefaults sheet.
-   ═══════════════════════════════════════════════════════════ */
+function buildStaticBreakfast(){var d=menuDefaultsCache?.breakfast||{subtitle:'',plates:[],items:[]};var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83c\udf73 Breakfast</span>'+statusPillHTML()+'</div><div class="acc-body">';h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Edit the breakfast menu shown on the public website.</p>';h+='<div class="static-card"><div class="static-card-title">Subtitle</div><input class="fi" id="bkSub" value="'+esc(d.subtitle||'')+'" placeholder="(Same Daily – Served at opening)"></div>';h+='<div class="static-card"><div class="static-card-title">Plates & Pricing (one per line)</div><textarea class="fi fi-ta" id="bkPlates" rows="4" placeholder="Breakfast Plate – $9.99 (1 Meat)">'+esc((d.plates||[]).join('\n'))+'</textarea></div>';h+='<div class="static-card"><div class="static-card-title">Breakfast Items (one per line)</div><textarea class="fi fi-ta" id="bkItems" rows="14" placeholder="Scrambled Eggs">'+esc((d.items||[]).join('\n'))+'</textarea></div>';h+='<div class="btn-row"><button class="sm-btn success" id="bkSave">\ud83d\udcbe Save Breakfast</button><button class="sm-btn" id="bkReload">\ud83d\udd04 Reload</button><button class="sm-btn danger" id="bkReset">\u21ba Reset</button></div></div></div>';return h;}
+function buildStaticLunchPlates(){var d=menuDefaultsCache?.lunch||{subtitle:'',plates:[]};var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83d\udcb5 Lunch Plates & Pricing</span>'+statusPillHTML()+'</div><div class="acc-body">';h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">The lunch plate prices. Daily lunch ITEMS are in the Lunch Forecast tab.</p>';h+='<div class="static-card"><div class="static-card-title">Subtitle</div><input class="fi" id="lpSub" value="'+esc(d.subtitle||'')+'" placeholder="(Changes Daily)"></div>';h+='<div class="static-card"><div class="static-card-title">Plates & Pricing (one per line)</div><textarea class="fi fi-ta" id="lpPlates" rows="8" placeholder="Lunch Plate – $12.99 (1 Meat, 2 Sides)">'+esc((d.plates||[]).join('\n'))+'</textarea></div>';h+='<div class="btn-row"><button class="sm-btn success" id="lpSave">\ud83d\udcbe Save</button><button class="sm-btn" id="lpReload">\ud83d\udd04 Reload</button><button class="sm-btn danger" id="lpReset">\u21ba Reset</button></div></div></div>';return h;}
+function buildStaticDrinks(){var d=menuDefaultsCache?.drinks||{items:[]};var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83e\udd64 Drinks</span>'+statusPillHTML()+'</div><div class="acc-body">';h+='<div class="static-card"><div class="static-card-title">Drinks (one per line)</div><textarea class="fi fi-ta" id="drItems" rows="12">'+esc((d.items||[]).join('\n'))+'</textarea></div>';h+='<div class="btn-row"><button class="sm-btn success" id="drSave">\ud83d\udcbe Save</button><button class="sm-btn" id="drReload">\ud83d\udd04 Reload</button><button class="sm-btn danger" id="drReset">\u21ba Reset</button></div></div></div>';return h;}
+function buildStaticBeer(){var d=menuDefaultsCache?.beer||[];var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83c\udf7a Beer</span>'+statusPillHTML()+'</div><div class="acc-body">';h+='<div class="static-card"><div class="static-card-title">Beer (one per line)</div><textarea class="fi fi-ta" id="beItems" rows="10">'+esc(d.join('\n'))+'</textarea></div>';h+='<div class="btn-row"><button class="sm-btn success" id="beSave">\ud83d\udcbe Save</button><button class="sm-btn" id="beReload">\ud83d\udd04 Reload</button><button class="sm-btn danger" id="beReset">\u21ba Reset</button></div></div></div>';return h;}
+function buildStaticSalad(){var d=menuDefaultsCache?.salad||{subtitle:'',items:[],saladBar:{lettuce:[],toppings:[],dressing:[]}};var sb=d.saladBar||{};var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83e\udd57 Salad Bar</span>'+statusPillHTML()+'</div><div class="acc-body">';h+='<div class="static-card"><div class="static-card-title">Subtitle</div><input class="fi" id="sdSub" value="'+esc(d.subtitle||'')+'"></div>';h+='<div class="static-card"><div class="static-card-title">Pricing (one per line)</div><textarea class="fi fi-ta" id="sdItems" rows="3">'+esc((d.items||[]).join('\n'))+'</textarea></div>';h+='<div class="static-card"><div class="static-card-title">Lettuce</div><textarea class="fi fi-ta" id="sdLettuce" rows="3">'+esc((sb.lettuce||[]).join('\n'))+'</textarea></div>';h+='<div class="static-card"><div class="static-card-title">Toppings</div><textarea class="fi fi-ta" id="sdToppings" rows="10">'+esc((sb.toppings||[]).join('\n'))+'</textarea></div>';h+='<div class="static-card"><div class="static-card-title">Dressings</div><textarea class="fi fi-ta" id="sdDressing" rows="5">'+esc((sb.dressing||[]).join('\n'))+'</textarea></div>';h+='<div class="btn-row"><button class="sm-btn success" id="sdSave">\ud83d\udcbe Save</button><button class="sm-btn" id="sdReload">\ud83d\udd04 Reload</button><button class="sm-btn danger" id="sdReset">\u21ba Reset</button></div></div></div>';return h;}
+function buildStaticDessert(){var d=menuDefaultsCache?.dessert||{subtitle:'',items:[]};var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83c\udf6e Dessert Defaults</span>'+statusPillHTML()+'</div><div class="acc-body">';h+='<div class="static-card"><div class="static-card-title">Subtitle</div><input class="fi" id="dsSubDefault" value="'+esc(d.subtitle||'')+'"></div>';h+='<div class="static-card"><div class="static-card-title">Default Items (one per line)</div><textarea class="fi fi-ta" id="dsItemsDefault" rows="6">'+esc((d.items||[]).join('\n'))+'</textarea></div>';h+='<div class="btn-row"><button class="sm-btn success" id="dsSaveDefault">\ud83d\udcbe Save</button><button class="sm-btn" id="dsReloadDefault">\ud83d\udd04 Reload</button><button class="sm-btn danger" id="dsResetDefault">\u21ba Reset</button></div></div></div>';return h;}
+function buildStaticCrawfish(){var d=menuDefaultsCache?.crawfish||{subtitle:'',items:[]};var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83e\udd9e Crawfish</span>'+statusPillHTML()+'</div><div class="acc-body">';h+='<div class="static-card"><div class="static-card-title">Subtitle</div><input class="fi" id="cfSub" value="'+esc(d.subtitle||'')+'"></div>';h+='<div class="static-card"><div class="static-card-title">Details (one per line)</div><textarea class="fi fi-ta" id="cfItems" rows="6">'+esc((d.items||[]).join('\n'))+'</textarea></div>';h+='<div class="btn-row"><button class="sm-btn success" id="cfSave">\ud83d\udcbe Save</button><button class="sm-btn" id="cfReload">\ud83d\udd04 Reload</button><button class="sm-btn danger" id="cfReset">\u21ba Reset</button></div></div></div>';return h;}
 
-function statusPillHTML(){
-  if (menuDefaultsStatus === 'loading') return '<span class="status-pill loading">Loading…</span>';
-  if (menuDefaultsStatus === 'loaded')  return '<span class="status-pill loaded">Loaded from cloud</span>';
-  if (menuDefaultsStatus === 'error')   return '<span class="status-pill error">Cloud error</span>';
-  return '';
-}
-
-function buildStaticBreakfast(){
-  var d = menuDefaultsCache?.breakfast || { subtitle:'', plates:[], items:[] };
-  var h = '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83c\udf73 Breakfast</span>'+statusPillHTML()+'</div><div class="acc-body">';
-  h += '<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Edit the breakfast menu shown on the public website. Changes save to the Google Sheet.</p>';
-  h += '<div class="static-card">';
-  h += '<div class="static-card-title">Subtitle</div>';
-  h += '<input class="fi" id="bkSub" value="'+esc(d.subtitle||'')+'" placeholder="(Same Daily – Served at opening)">';
-  h += '</div>';
-  h += '<div class="static-card">';
-  h += '<div class="static-card-title">Plates & Pricing (one per line)</div>';
-  h += '<textarea class="fi fi-ta" id="bkPlates" rows="4" placeholder="Breakfast Plate – $9.99 (1 Meat)">'+esc((d.plates||[]).join('\n'))+'</textarea>';
-  h += '</div>';
-  h += '<div class="static-card">';
-  h += '<div class="static-card-title">Breakfast Items (one per line)</div>';
-  h += '<textarea class="fi fi-ta" id="bkItems" rows="14" placeholder="Scrambled Eggs\nBacon\nSausage">'+esc((d.items||[]).join('\n'))+'</textarea>';
-  h += '</div>';
-  h += '<div class="btn-row"><button class="sm-btn success" id="bkSave">\ud83d\udcbe Save Breakfast</button>';
-  h += '<button class="sm-btn" id="bkReload">\ud83d\udd04 Reload</button>';
-  h += '<button class="sm-btn danger" id="bkReset">\u21ba Reset to Factory</button></div>';
+/* ═══ NEW: Same Daily global tab ═══ */
+function buildStaticSameDaily(){
+  var d = menuDefaultsCache?.sameDaily || { items:[] };
+  var items = d.items || [];
+  var itemsText = items.map(function(it){
+    if (typeof it === 'string') return it;
+    if (it && typeof it === 'object') return it.name + (it.desc ? ' | ' + it.desc : '');
+    return '';
+  }).filter(Boolean).join('\n');
+  var h = '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83d\udcc5 Same Daily Items</span>'+statusPillHTML()+'</div><div class="acc-body">';
+  h += '<p style="font-size:12px;color:var(--text2);margin-bottom:6px;line-height:1.5;">Items that appear <strong>every day</strong> (like Turkey Clubs, Chicken Salad Croissants). The website automatically adds these to every lunch menu.</p>';
+  h += '<p style="font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.5;font-style:italic;">To override for a specific day, use the "Same Daily (this day only)" field in Lunch Forecast.</p>';
+  h += '<div class="static-card"><div class="static-card-title">Same Daily Items (one per line — Name | Description)</div>';
+  h += '<textarea class="fi fi-ta" id="sdGlobalItems" rows="8" placeholder="Turkey Clubs\nChicken Salad Croissants">'+esc(itemsText)+'</textarea></div>';
+  h += '<div class="btn-row"><button class="sm-btn success" id="sdGlobalSave">\ud83d\udcbe Save</button><button class="sm-btn" id="sdGlobalReload">\ud83d\udd04 Reload</button><button class="sm-btn danger" id="sdGlobalReset">\u21ba Reset</button></div>';
   h += '</div></div>';
   return h;
 }
 
-function buildStaticLunchPlates(){
-  var d = menuDefaultsCache?.lunch || { subtitle:'', plates:[] };
-  var h = '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83d\udcb5 Lunch Plates & Pricing</span>'+statusPillHTML()+'</div><div class="acc-body">';
-  h += '<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">The lunch plate prices shown on every day. Daily lunch ITEMS are edited in the Lunch Forecast tab.</p>';
-  h += '<div class="static-card">';
-  h += '<div class="static-card-title">Subtitle</div>';
-  h += '<input class="fi" id="lpSub" value="'+esc(d.subtitle||'')+'" placeholder="(Changes Daily)">';
-  h += '</div>';
-  h += '<div class="static-card">';
-  h += '<div class="static-card-title">Plates & Pricing (one per line)</div>';
-  h += '<textarea class="fi fi-ta" id="lpPlates" rows="8" placeholder="Lunch Plate – $12.99 (1 Meat, 2 Sides)">'+esc((d.plates||[]).join('\n'))+'</textarea>';
-  h += '</div>';
-  h += '<div class="btn-row"><button class="sm-btn success" id="lpSave">\ud83d\udcbe Save Lunch Plates</button>';
-  h += '<button class="sm-btn" id="lpReload">\ud83d\udd04 Reload</button>';
-  h += '<button class="sm-btn danger" id="lpReset">\u21ba Reset to Factory</button></div>';
-  h += '</div></div>';
-  return h;
-}
+function buildStaticHours(){var d=menuDefaultsCache?.hours||{note:'',weekly:[]};var DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83d\udd52 Business Hours</span>'+statusPillHTML()+'</div><div class="acc-body">';h+='<div class="static-card">';DAYS.forEach(function(day,idx){var entry=(d.weekly||[]).find(function(x){return String(x.day||'').toLowerCase()===day.toLowerCase();})||{day:day,open:'',close:'',breakfast:'',lunch:''};h+='<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.06);"><div style="font-size:12px;font-weight:800;color:#7ae59a;margin-bottom:6px;">'+day+'</div><div class="hours-row"><span class="hr-day">Open</span><input class="fi" data-hours-idx="'+idx+'" data-hours-field="open" value="'+esc(entry.open||'')+'" placeholder="5:30 AM"><input class="fi" data-hours-idx="'+idx+'" data-hours-field="close" value="'+esc(entry.close||'')+'" placeholder="2:00 PM"></div><div class="hours-row"><span class="hr-day">Breakfast</span><input class="fi" data-hours-idx="'+idx+'" data-hours-field="breakfast" value="'+esc(entry.breakfast||'')+'" placeholder="5:30 AM – 10:30 AM" style="grid-column:span 2;"></div><div class="hours-row"><span class="hr-day">Lunch</span><input class="fi" data-hours-idx="'+idx+'" data-hours-field="lunch" value="'+esc(entry.lunch||'')+'" placeholder="11:00 AM – 2:00 PM" style="grid-column:span 2;"></div></div>';});h+='</div><div class="static-card"><div class="static-card-title">Note (optional)</div><input class="fi" id="hrNote" value="'+esc(d.note||'')+'"></div>';h+='<div class="btn-row"><button class="sm-btn success" id="hrSave">\ud83d\udcbe Save</button><button class="sm-btn" id="hrReload">\ud83d\udd04 Reload</button><button class="sm-btn danger" id="hrReset">\u21ba Reset</button></div></div></div>';return h;}
+function buildStaticSettings(){var s=menuDefaultsCache?.settings||{showAdvancedTab:true,advancedDisclaimer:'',advancedWindowDays:7,noDescriptionText:'No description for this item.'};var phone=menuDefaultsCache?.phoneTel||'tel:3372211035';var delivery=menuDefaultsCache?.deliveryNote||'';var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u2699 Public Menu Settings</span>'+statusPillHTML()+'</div><div class="acc-body">';h+='<div class="static-card"><div class="static-card-title">Weekly Forecast</div><label class="cf-toggle" style="margin-bottom:8px;"><input type="checkbox" id="stShowAdv"'+(s.showAdvancedTab?' checked':'')+'> Show Weekly Forecast tab</label><div class="fl">Disclaimer</div><input class="fi" id="stDisclaimer" value="'+esc(s.advancedDisclaimer||'')+'"><div class="fl">Forecast Window (days)</div><input class="fi" type="number" id="stWinDays" min="1" max="14" value="'+(s.advancedWindowDays||7)+'"></div>';h+='<div class="static-card"><div class="static-card-title">Lunch Item "No Description"</div><input class="fi" id="stNoDesc" value="'+esc(s.noDescriptionText||'')+'"></div>';h+='<div class="static-card"><div class="static-card-title">Contact & Delivery</div><div class="fl">Phone</div><input class="fi" id="stPhone" value="'+esc(phone)+'"><div class="fl">Delivery Note</div><input class="fi" id="stDelivery" value="'+esc(delivery)+'"></div>';h+='<div class="btn-row"><button class="sm-btn success" id="stSave">\ud83d\udcbe Save</button><button class="sm-btn" id="stReload">\ud83d\udd04 Reload</button></div></div></div>';return h;}
 
-function buildStaticDrinks(){
-  var d = menuDefaultsCache?.drinks || { items:[] };
-  var h = '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83e\udd64 Drinks</span>'+statusPillHTML()+'</div><div class="acc-body">';
-  h += '<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">The drinks list shown on the public website.</p>';
-  h += '<div class="static-card">';
-  h += '<div class="static-card-title">Drinks (one per line)</div>';
-  h += '<textarea class="fi fi-ta" id="drItems" rows="12" placeholder="Coke\nDiet Coke\nSweet Tea">'+esc((d.items||[]).join('\n'))+'</textarea>';
-  h += '</div>';
-  h += '<div class="btn-row"><button class="sm-btn success" id="drSave">\ud83d\udcbe Save Drinks</button>';
-  h += '<button class="sm-btn" id="drReload">\ud83d\udd04 Reload</button>';
-  h += '<button class="sm-btn danger" id="drReset">\u21ba Reset to Factory</button></div>';
-  h += '</div></div>';
-  return h;
-}
-
-function buildStaticBeer(){
-  var d = menuDefaultsCache?.beer || [];
-  var h = '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83c\udf7a Beer</span>'+statusPillHTML()+'</div><div class="acc-body">';
-  h += '<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">The beer list shown on the public website.</p>';
-  h += '<div class="static-card">';
-  h += '<div class="static-card-title">Beer (one per line)</div>';
-  h += '<textarea class="fi fi-ta" id="beItems" rows="10" placeholder="Natural Light\nMiller Lite">'+esc(d.join('\n'))+'</textarea>';
-  h += '</div>';
-  h += '<div class="btn-row"><button class="sm-btn success" id="beSave">\ud83d\udcbe Save Beer</button>';
-  h += '<button class="sm-btn" id="beReload">\ud83d\udd04 Reload</button>';
-  h += '<button class="sm-btn danger" id="beReset">\u21ba Reset to Factory</button></div>';
-  h += '</div></div>';
-  return h;
-}
-
-function buildStaticSalad(){
-  var d = menuDefaultsCache?.salad || { subtitle:'', items:[], saladBar:{ lettuce:[], toppings:[], dressing:[] } };
-  var sb = d.saladBar || {};
-  var h = '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83e\udd57 Salad Bar</span>'+statusPillHTML()+'</div><div class="acc-body">';
-  h += '<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Edit the salad bar pricing and build-your-own options.</p>';
-  h += '<div class="static-card"><div class="static-card-title">Subtitle</div>';
-  h += '<input class="fi" id="sdSub" value="'+esc(d.subtitle||'')+'" placeholder="(Available Daily)"></div>';
-  h += '<div class="static-card"><div class="static-card-title">Pricing (one per line)</div>';
-  h += '<textarea class="fi fi-ta" id="sdItems" rows="3" placeholder="With Meal – $4.99">'+esc((d.items||[]).join('\n'))+'</textarea></div>';
-  h += '<div class="static-card"><div class="static-card-title">Lettuce (one per line)</div>';
-  h += '<textarea class="fi fi-ta" id="sdLettuce" rows="3" placeholder="Romaine\nIceberg">'+esc((sb.lettuce||[]).join('\n'))+'</textarea></div>';
-  h += '<div class="static-card"><div class="static-card-title">Toppings (one per line)</div>';
-  h += '<textarea class="fi fi-ta" id="sdToppings" rows="10" placeholder="Diced tomatoes\nCucumbers">'+esc((sb.toppings||[]).join('\n'))+'</textarea></div>';
-  h += '<div class="static-card"><div class="static-card-title">Dressings (one per line)</div>';
-  h += '<textarea class="fi fi-ta" id="sdDressing" rows="5" placeholder="Ranch\nItalian">'+esc((sb.dressing||[]).join('\n'))+'</textarea></div>';
-  h += '<div class="btn-row"><button class="sm-btn success" id="sdSave">\ud83d\udcbe Save Salad Bar</button>';
-  h += '<button class="sm-btn" id="sdReload">\ud83d\udd04 Reload</button>';
-  h += '<button class="sm-btn danger" id="sdReset">\u21ba Reset to Factory</button></div>';
-  h += '</div></div>';
-  return h;
-}
-
-function buildStaticDessert(){
-  var d = menuDefaultsCache?.dessert || { subtitle:'', items:[] };
-  var h = '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83c\udf6e Dessert Defaults</span>'+statusPillHTML()+'</div><div class="acc-body">';
-  h += '<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Dessert items that show on days where you haven\'t set specific desserts in the Lunch Forecast. Leave empty to show nothing by default.</p>';
-  h += '<div class="static-card"><div class="static-card-title">Subtitle</div>';
-  h += '<input class="fi" id="dsSub" value="'+esc(d.subtitle||'')+'" placeholder="(Changes Daily)"></div>';
-  h += '<div class="static-card"><div class="static-card-title">Default Dessert Items (one per line)</div>';
-  h += '<textarea class="fi fi-ta" id="dsItems" rows="6" placeholder="Leave empty if no defaults">'+esc((d.items||[]).join('\n'))+'</textarea></div>';
-  h += '<div class="btn-row"><button class="sm-btn success" id="dsSave">\ud83d\udcbe Save Dessert</button>';
-  h += '<button class="sm-btn" id="dsReload">\ud83d\udd04 Reload</button>';
-  h += '<button class="sm-btn danger" id="dsReset">\u21ba Reset to Factory</button></div>';
-  h += '</div></div>';
-  return h;
-}
-
-function buildStaticCrawfish(){
-  var d = menuDefaultsCache?.crawfish || { subtitle:'', items:[] };
-  var h = '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83e\udd9e Crawfish</span>'+statusPillHTML()+'</div><div class="acc-body">';
-  h += '<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Crawfish info shown on the public menu (on days it\'s enabled in the Lunch Forecast).</p>';
-  h += '<div class="static-card"><div class="static-card-title">Subtitle</div>';
-  h += '<input class="fi" id="cfSub" value="'+esc(d.subtitle||'')+'" placeholder="(Pricing is subject to change)"></div>';
-  h += '<div class="static-card"><div class="static-card-title">Crawfish Details (one per line)</div>';
-  h += '<textarea class="fi fi-ta" id="cfItems" rows="6" placeholder="Cooking starts at 4:00 PM\n$4.99 per pound">'+esc((d.items||[]).join('\n'))+'</textarea></div>';
-  h += '<div class="btn-row"><button class="sm-btn success" id="cfSave">\ud83d\udcbe Save Crawfish</button>';
-  h += '<button class="sm-btn" id="cfReload">\ud83d\udd04 Reload</button>';
-  h += '<button class="sm-btn danger" id="cfReset">\u21ba Reset to Factory</button></div>';
-  h += '</div></div>';
-  return h;
-}
-
-function buildStaticHours(){
-  var d = menuDefaultsCache?.hours || { note:'', weekly:[] };
-  var DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-  var h = '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83d\udd52 Business Hours</span>'+statusPillHTML()+'</div><div class="acc-body">';
-  h += '<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Edit open/close times and meal windows per day. Use format like "5:30 AM" and "2:00 PM".</p>';
-  h += '<div class="static-card">';
-  DAYS.forEach(function(day, idx){
-    var entry = (d.weekly||[]).find(function(x){return String(x.day||'').toLowerCase()===day.toLowerCase();}) || {day:day,open:'',close:'',breakfast:'',lunch:''};
-    h += '<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.06);">';
-    h += '<div style="font-size:12px;font-weight:800;color:#7ae59a;margin-bottom:6px;">'+day+'</div>';
-    h += '<div class="hours-row"><span class="hr-day">Open</span>';
-    h += '<input class="fi" data-hours-idx="'+idx+'" data-hours-field="open" value="'+esc(entry.open||'')+'" placeholder="5:30 AM">';
-    h += '<input class="fi" data-hours-idx="'+idx+'" data-hours-field="close" value="'+esc(entry.close||'')+'" placeholder="2:00 PM"></div>';
-    h += '<div class="hours-row"><span class="hr-day">Breakfast</span>';
-    h += '<input class="fi" data-hours-idx="'+idx+'" data-hours-field="breakfast" value="'+esc(entry.breakfast||'')+'" placeholder="5:30 AM – 10:30 AM" style="grid-column:span 2;"></div>';
-    h += '<div class="hours-row"><span class="hr-day">Lunch</span>';
-    h += '<input class="fi" data-hours-idx="'+idx+'" data-hours-field="lunch" value="'+esc(entry.lunch||'')+'" placeholder="11:00 AM – 2:00 PM" style="grid-column:span 2;"></div>';
-    h += '</div>';
-  });
-  h += '</div>';
-  h += '<div class="static-card"><div class="static-card-title">Note (optional)</div>';
-  h += '<input class="fi" id="hrNote" value="'+esc(d.note||'')+'" placeholder="(e.g., holiday notice)"></div>';
-  h += '<div class="btn-row"><button class="sm-btn success" id="hrSave">\ud83d\udcbe Save Hours</button>';
-  h += '<button class="sm-btn" id="hrReload">\ud83d\udd04 Reload</button>';
-  h += '<button class="sm-btn danger" id="hrReset">\u21ba Reset to Factory</button></div>';
-  h += '</div></div>';
-  return h;
-}
-
-function buildStaticSettings(){
-  var s = menuDefaultsCache?.settings || { showAdvancedTab:true, advancedDisclaimer:'', advancedWindowDays:7, noDescriptionText:'No description for this item.' };
-  var phone = menuDefaultsCache?.phoneTel || 'tel:3372211035';
-  var delivery = menuDefaultsCache?.deliveryNote || '';
-  var h = '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u2699 Public Menu Settings</span>'+statusPillHTML()+'</div><div class="acc-body">';
-  h += '<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Site-wide settings for the public menu page.</p>';
-  h += '<div class="static-card"><div class="static-card-title">Weekly Forecast Tab</div>';
-  h += '<label class="cf-toggle" style="margin-bottom:8px;"><input type="checkbox" id="stShowAdv"'+(s.showAdvancedTab?' checked':'')+'> Show Weekly Forecast tab on public menu</label>';
-  h += '<div class="fl">Disclaimer Text</div>';
-  h += '<input class="fi" id="stDisclaimer" value="'+esc(s.advancedDisclaimer||'')+'" placeholder="Lunch posted 1–2 days early is subject to change.">';
-  h += '<div class="fl">Forecast Window (days)</div>';
-  h += '<input class="fi" type="number" id="stWinDays" min="1" max="14" value="'+(s.advancedWindowDays||7)+'">';
-  h += '</div>';
-  h += '<div class="static-card"><div class="static-card-title">Lunch Item "No Description" Text</div>';
-  h += '<input class="fi" id="stNoDesc" value="'+esc(s.noDescriptionText||'')+'" placeholder="No description for this item.">';
-  h += '</div>';
-  h += '<div class="static-card"><div class="static-card-title">Contact & Delivery</div>';
-  h += '<div class="fl">Phone (tel: format)</div>';
-  h += '<input class="fi" id="stPhone" value="'+esc(phone)+'" placeholder="tel:3372211035">';
-  h += '<div class="fl">Delivery Note</div>';
-  h += '<input class="fi" id="stDelivery" value="'+esc(delivery)+'" placeholder="Delivery available for 10+ orders within a 10-mile radius.">';
-  h += '</div>';
-  h += '<div class="btn-row"><button class="sm-btn success" id="stSave">\ud83d\udcbe Save Settings</button>';
-  h += '<button class="sm-btn" id="stReload">\ud83d\udd04 Reload</button></div>';
-  h += '</div></div>';
-  return h;
-}
-
-/* ═══ STATIC TAB WIRE HANDLERS ═══ */
 async function wireStaticPanel(){
-  // Load fresh data if we don't have any
   if (!menuDefaultsCache && menuDefaultsStatus !== 'loading' && menuDefaultsStatus !== 'error') {
-    await loadMenuDefaults();
-    rebuildSidePanel();
-    return;
+    await loadMenuDefaults(); rebuildSidePanel(); return;
   }
-  // If we tried and failed, show the panel anyway with empty data so user can retry
-  if (menuDefaultsStatus === 'error' && !menuDefaultsCache) {
-    menuDefaultsCache = {}; // empty cache to avoid retriggering loads
-    console.warn('[HH editor] Proceeding with empty menu defaults cache after load error');
-  }
+  if (menuDefaultsStatus === 'error' && !menuDefaultsCache) { menuDefaultsCache = {}; }
 
   // BREAKFAST
-  var bkSave = document.getElementById('bkSave');
-  if (bkSave) {
-    bkSave.addEventListener('click', async function(){
-      var data = {
-        subtitle: (document.getElementById('bkSub').value||'').trim(),
-        plates: linesTo(document.getElementById('bkPlates').value),
-        items: linesTo(document.getElementById('bkItems').value)
-      };
-      if (await saveMenuDefaultKey('breakfast', data)) rebuildSidePanel();
-    });
-    document.getElementById('bkReload').addEventListener('click', async function(){ await loadMenuDefaults(true); rebuildSidePanel(); });
-    document.getElementById('bkReset').addEventListener('click', async function(){ if (await resetMenuDefaultKey('breakfast')) rebuildSidePanel(); });
-  }
-
+  var bkSave=document.getElementById('bkSave');
+  if(bkSave){bkSave.addEventListener('click',async()=>{var data={subtitle:(document.getElementById('bkSub').value||'').trim(),plates:linesTo(document.getElementById('bkPlates').value),items:linesTo(document.getElementById('bkItems').value)};if(await saveMenuDefaultKey('breakfast',data))rebuildSidePanel();});document.getElementById('bkReload').addEventListener('click',async()=>{await loadMenuDefaults(true);rebuildSidePanel();});document.getElementById('bkReset').addEventListener('click',async()=>{if(await resetMenuDefaultKey('breakfast'))rebuildSidePanel();});}
   // LUNCH PLATES
-  var lpSave = document.getElementById('lpSave');
-  if (lpSave) {
-    lpSave.addEventListener('click', async function(){
-      var data = {
-        subtitle: (document.getElementById('lpSub').value||'').trim(),
-        plates: linesTo(document.getElementById('lpPlates').value)
-      };
-      if (await saveMenuDefaultKey('lunch', data)) rebuildSidePanel();
-    });
-    document.getElementById('lpReload').addEventListener('click', async function(){ await loadMenuDefaults(true); rebuildSidePanel(); });
-    document.getElementById('lpReset').addEventListener('click', async function(){ if (await resetMenuDefaultKey('lunch')) rebuildSidePanel(); });
-  }
-
+  var lpSave=document.getElementById('lpSave');
+  if(lpSave){lpSave.addEventListener('click',async()=>{var data={subtitle:(document.getElementById('lpSub').value||'').trim(),plates:linesTo(document.getElementById('lpPlates').value)};if(await saveMenuDefaultKey('lunch',data))rebuildSidePanel();});document.getElementById('lpReload').addEventListener('click',async()=>{await loadMenuDefaults(true);rebuildSidePanel();});document.getElementById('lpReset').addEventListener('click',async()=>{if(await resetMenuDefaultKey('lunch'))rebuildSidePanel();});}
   // DRINKS
-  var drSave = document.getElementById('drSave');
-  if (drSave) {
-    drSave.addEventListener('click', async function(){
-      var data = { items: linesTo(document.getElementById('drItems').value) };
-      if (await saveMenuDefaultKey('drinks', data)) rebuildSidePanel();
-    });
-    document.getElementById('drReload').addEventListener('click', async function(){ await loadMenuDefaults(true); rebuildSidePanel(); });
-    document.getElementById('drReset').addEventListener('click', async function(){ if (await resetMenuDefaultKey('drinks')) rebuildSidePanel(); });
-  }
-
+  var drSave=document.getElementById('drSave');
+  if(drSave){drSave.addEventListener('click',async()=>{var data={items:linesTo(document.getElementById('drItems').value)};if(await saveMenuDefaultKey('drinks',data))rebuildSidePanel();});document.getElementById('drReload').addEventListener('click',async()=>{await loadMenuDefaults(true);rebuildSidePanel();});document.getElementById('drReset').addEventListener('click',async()=>{if(await resetMenuDefaultKey('drinks'))rebuildSidePanel();});}
   // BEER
-  var beSave = document.getElementById('beSave');
-  if (beSave) {
-    beSave.addEventListener('click', async function(){
-      var data = linesTo(document.getElementById('beItems').value);
-      if (await saveMenuDefaultKey('beer', data)) rebuildSidePanel();
-    });
-    document.getElementById('beReload').addEventListener('click', async function(){ await loadMenuDefaults(true); rebuildSidePanel(); });
-    document.getElementById('beReset').addEventListener('click', async function(){ if (await resetMenuDefaultKey('beer')) rebuildSidePanel(); });
-  }
-
+  var beSave=document.getElementById('beSave');
+  if(beSave){beSave.addEventListener('click',async()=>{var data=linesTo(document.getElementById('beItems').value);if(await saveMenuDefaultKey('beer',data))rebuildSidePanel();});document.getElementById('beReload').addEventListener('click',async()=>{await loadMenuDefaults(true);rebuildSidePanel();});document.getElementById('beReset').addEventListener('click',async()=>{if(await resetMenuDefaultKey('beer'))rebuildSidePanel();});}
   // SALAD
-  var sdSave = document.getElementById('sdSave');
-  if (sdSave) {
-    sdSave.addEventListener('click', async function(){
-      var data = {
-        subtitle: (document.getElementById('sdSub').value||'').trim(),
-        items: linesTo(document.getElementById('sdItems').value),
-        saladBar: {
-          lettuce:  linesTo(document.getElementById('sdLettuce').value),
-          toppings: linesTo(document.getElementById('sdToppings').value),
-          dressing: linesTo(document.getElementById('sdDressing').value)
-        }
-      };
-      if (await saveMenuDefaultKey('salad', data)) rebuildSidePanel();
-    });
-    document.getElementById('sdReload').addEventListener('click', async function(){ await loadMenuDefaults(true); rebuildSidePanel(); });
-    document.getElementById('sdReset').addEventListener('click', async function(){ if (await resetMenuDefaultKey('salad')) rebuildSidePanel(); });
-  }
-
-  // DESSERT
-  var dsSave = document.getElementById('dsSave');
-  if (dsSave) {
-    dsSave.addEventListener('click', async function(){
-      var data = {
-        subtitle: (document.getElementById('dsSub').value||'').trim(),
-        items: linesTo(document.getElementById('dsItems').value)
-      };
-      if (await saveMenuDefaultKey('dessert', data)) rebuildSidePanel();
-    });
-    document.getElementById('dsReload').addEventListener('click', async function(){ await loadMenuDefaults(true); rebuildSidePanel(); });
-    document.getElementById('dsReset').addEventListener('click', async function(){ if (await resetMenuDefaultKey('dessert')) rebuildSidePanel(); });
-  }
-
+  var sdSave=document.getElementById('sdSave');
+  if(sdSave){sdSave.addEventListener('click',async()=>{var data={subtitle:(document.getElementById('sdSub').value||'').trim(),items:linesTo(document.getElementById('sdItems').value),saladBar:{lettuce:linesTo(document.getElementById('sdLettuce').value),toppings:linesTo(document.getElementById('sdToppings').value),dressing:linesTo(document.getElementById('sdDressing').value)}};if(await saveMenuDefaultKey('salad',data))rebuildSidePanel();});document.getElementById('sdReload').addEventListener('click',async()=>{await loadMenuDefaults(true);rebuildSidePanel();});document.getElementById('sdReset').addEventListener('click',async()=>{if(await resetMenuDefaultKey('salad'))rebuildSidePanel();});}
+  // DESSERT (defaults)
+  var dsSaveDefault=document.getElementById('dsSaveDefault');
+  if(dsSaveDefault){dsSaveDefault.addEventListener('click',async()=>{var data={subtitle:(document.getElementById('dsSubDefault').value||'').trim(),items:linesTo(document.getElementById('dsItemsDefault').value)};if(await saveMenuDefaultKey('dessert',data))rebuildSidePanel();});document.getElementById('dsReloadDefault').addEventListener('click',async()=>{await loadMenuDefaults(true);rebuildSidePanel();});document.getElementById('dsResetDefault').addEventListener('click',async()=>{if(await resetMenuDefaultKey('dessert'))rebuildSidePanel();});}
   // CRAWFISH
-  var cfSave = document.getElementById('cfSave');
-  if (cfSave) {
-    cfSave.addEventListener('click', async function(){
-      var data = {
-        subtitle: (document.getElementById('cfSub').value||'').trim(),
-        items: linesTo(document.getElementById('cfItems').value)
-      };
-      if (await saveMenuDefaultKey('crawfish', data)) rebuildSidePanel();
+  var cfSave=document.getElementById('cfSave');
+  if(cfSave){cfSave.addEventListener('click',async()=>{var data={subtitle:(document.getElementById('cfSub').value||'').trim(),items:linesTo(document.getElementById('cfItems').value)};if(await saveMenuDefaultKey('crawfish',data))rebuildSidePanel();});document.getElementById('cfReload').addEventListener('click',async()=>{await loadMenuDefaults(true);rebuildSidePanel();});document.getElementById('cfReset').addEventListener('click',async()=>{if(await resetMenuDefaultKey('crawfish'))rebuildSidePanel();});}
+  // SAME DAILY (global)
+  var sdGlobalSave=document.getElementById('sdGlobalSave');
+  if(sdGlobalSave){
+    sdGlobalSave.addEventListener('click',async()=>{
+      var lines=linesTo(document.getElementById('sdGlobalItems').value);
+      var items=lines.map(function(line){var parts=line.split('|');return{name:(parts[0]||'').trim(),desc:parts.slice(1).join('|').trim()};}).filter(function(i){return i.name;});
+      if(await saveMenuDefaultKey('sameDaily',{items:items}))rebuildSidePanel();
     });
-    document.getElementById('cfReload').addEventListener('click', async function(){ await loadMenuDefaults(true); rebuildSidePanel(); });
-    document.getElementById('cfReset').addEventListener('click', async function(){ if (await resetMenuDefaultKey('crawfish')) rebuildSidePanel(); });
+    document.getElementById('sdGlobalReload').addEventListener('click',async()=>{await loadMenuDefaults(true);rebuildSidePanel();});
+    document.getElementById('sdGlobalReset').addEventListener('click',async()=>{if(await resetMenuDefaultKey('sameDaily'))rebuildSidePanel();});
   }
-
   // HOURS
-  var hrSave = document.getElementById('hrSave');
-  if (hrSave) {
-    hrSave.addEventListener('click', async function(){
-      var DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-      var weekly = DAYS.map(function(day, idx){
-        return {
-          day: day,
-          open:      (document.querySelector('[data-hours-idx="'+idx+'"][data-hours-field="open"]')?.value||'').trim(),
-          close:     (document.querySelector('[data-hours-idx="'+idx+'"][data-hours-field="close"]')?.value||'').trim(),
-          breakfast: (document.querySelector('[data-hours-idx="'+idx+'"][data-hours-field="breakfast"]')?.value||'').trim(),
-          lunch:     (document.querySelector('[data-hours-idx="'+idx+'"][data-hours-field="lunch"]')?.value||'').trim()
-        };
-      });
-      var data = { note: (document.getElementById('hrNote').value||'').trim(), weekly: weekly };
-      if (await saveMenuDefaultKey('hours', data)) rebuildSidePanel();
-    });
-    document.getElementById('hrReload').addEventListener('click', async function(){ await loadMenuDefaults(true); rebuildSidePanel(); });
-    document.getElementById('hrReset').addEventListener('click', async function(){ if (await resetMenuDefaultKey('hours')) rebuildSidePanel(); });
-  }
-
+  var hrSave=document.getElementById('hrSave');
+  if(hrSave){hrSave.addEventListener('click',async()=>{var DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];var weekly=DAYS.map(function(day,idx){return{day:day,open:(document.querySelector('[data-hours-idx="'+idx+'"][data-hours-field="open"]')?.value||'').trim(),close:(document.querySelector('[data-hours-idx="'+idx+'"][data-hours-field="close"]')?.value||'').trim(),breakfast:(document.querySelector('[data-hours-idx="'+idx+'"][data-hours-field="breakfast"]')?.value||'').trim(),lunch:(document.querySelector('[data-hours-idx="'+idx+'"][data-hours-field="lunch"]')?.value||'').trim()};});var data={note:(document.getElementById('hrNote').value||'').trim(),weekly:weekly};if(await saveMenuDefaultKey('hours',data))rebuildSidePanel();});document.getElementById('hrReload').addEventListener('click',async()=>{await loadMenuDefaults(true);rebuildSidePanel();});document.getElementById('hrReset').addEventListener('click',async()=>{if(await resetMenuDefaultKey('hours'))rebuildSidePanel();});}
   // SETTINGS
-  var stSave = document.getElementById('stSave');
-  if (stSave) {
-    stSave.addEventListener('click', async function(){
-      var settings = {
-        showAdvancedTab:     !!document.getElementById('stShowAdv').checked,
-        advancedDisclaimer:  (document.getElementById('stDisclaimer').value||'').trim(),
-        advancedWindowDays:  parseInt(document.getElementById('stWinDays').value||'7',10) || 7,
-        noDescriptionText:   (document.getElementById('stNoDesc').value||'').trim()
-      };
-      var phone    = (document.getElementById('stPhone').value||'').trim();
-      var delivery = (document.getElementById('stDelivery').value||'').trim();
-      var ok1 = await saveMenuDefaultKey('settings',     settings);
-      var ok2 = await saveMenuDefaultKey('phoneTel',     phone);
-      var ok3 = await saveMenuDefaultKey('deliveryNote', delivery);
-      if (ok1 && ok2 && ok3) rebuildSidePanel();
-    });
-    document.getElementById('stReload').addEventListener('click', async function(){ await loadMenuDefaults(true); rebuildSidePanel(); });
-  }
+  var stSave=document.getElementById('stSave');
+  if(stSave){stSave.addEventListener('click',async()=>{var settings={showAdvancedTab:!!document.getElementById('stShowAdv').checked,advancedDisclaimer:(document.getElementById('stDisclaimer').value||'').trim(),advancedWindowDays:parseInt(document.getElementById('stWinDays').value||'7',10)||7,noDescriptionText:(document.getElementById('stNoDesc').value||'').trim()};var phone=(document.getElementById('stPhone').value||'').trim();var delivery=(document.getElementById('stDelivery').value||'').trim();var ok1=await saveMenuDefaultKey('settings',settings);var ok2=await saveMenuDefaultKey('phoneTel',phone);var ok3=await saveMenuDefaultKey('deliveryNote',delivery);if(ok1&&ok2&&ok3)rebuildSidePanel();});document.getElementById('stReload').addEventListener('click',async()=>{await loadMenuDefaults(true);rebuildSidePanel();});}
 }
 
-/* ═══ SIDE PANEL ROUTER ═══ */
 let currentTab='quickfill';
-
 function rebuildSidePanel(){
   const c=document.getElementById('sideScroll');
   if (currentTab==='quickfill')           c.innerHTML=buildQF();
@@ -1368,19 +855,19 @@ function rebuildSidePanel(){
   else if (currentTab==='photo')          c.innerHTML=buildPH();
   else if (currentTab==='projects')       c.innerHTML=buildPR();
   else if (currentTab==='menu-lunch')     { c.innerHTML=buildMenuLunch(); wireMenuPanel(); return; }
-  else if (currentTab==='static-breakfast')   { c.innerHTML=buildStaticBreakfast();   wireStaticPanel(); return; }
-  else if (currentTab==='static-lunchplates') { c.innerHTML=buildStaticLunchPlates(); wireStaticPanel(); return; }
-  else if (currentTab==='static-drinks')      { c.innerHTML=buildStaticDrinks();      wireStaticPanel(); return; }
-  else if (currentTab==='static-beer')        { c.innerHTML=buildStaticBeer();        wireStaticPanel(); return; }
-  else if (currentTab==='static-salad')       { c.innerHTML=buildStaticSalad();       wireStaticPanel(); return; }
-  else if (currentTab==='static-dessert')     { c.innerHTML=buildStaticDessert();     wireStaticPanel(); return; }
-  else if (currentTab==='static-crawfish')    { c.innerHTML=buildStaticCrawfish();    wireStaticPanel(); return; }
-  else if (currentTab==='static-hours')       { c.innerHTML=buildStaticHours();       wireStaticPanel(); return; }
-  else if (currentTab==='static-settings')    { c.innerHTML=buildStaticSettings();    wireStaticPanel(); return; }
+  else if (currentTab==='static-breakfast')    { c.innerHTML=buildStaticBreakfast();    wireStaticPanel(); return; }
+  else if (currentTab==='static-lunchplates')  { c.innerHTML=buildStaticLunchPlates();  wireStaticPanel(); return; }
+  else if (currentTab==='static-drinks')       { c.innerHTML=buildStaticDrinks();       wireStaticPanel(); return; }
+  else if (currentTab==='static-beer')         { c.innerHTML=buildStaticBeer();         wireStaticPanel(); return; }
+  else if (currentTab==='static-salad')        { c.innerHTML=buildStaticSalad();        wireStaticPanel(); return; }
+  else if (currentTab==='static-dessert')      { c.innerHTML=buildStaticDessert();      wireStaticPanel(); return; }
+  else if (currentTab==='static-crawfish')     { c.innerHTML=buildStaticCrawfish();     wireStaticPanel(); return; }
+  else if (currentTab==='static-samedaily')    { c.innerHTML=buildStaticSameDaily();    wireStaticPanel(); return; }
+  else if (currentTab==='static-hours')        { c.innerHTML=buildStaticHours();        wireStaticPanel(); return; }
+  else if (currentTab==='static-settings')     { c.innerHTML=buildStaticSettings();     wireStaticPanel(); return; }
   wirePanel();
 }
 
-/* ═══ QUICK FILL (FB Menu) ═══ */
 function buildQF(){
   const sects=[{name:'Day',label:'Day of Week',ta:false},{name:'Date',label:'Date',ta:false},{name:'Breakfast',label:'\ud83c\udf73 Breakfast',ta:true,rows:10},{name:'Breakfast Sandwiches',label:'\ud83c\udf73 Breakfast Sandwiches',ta:true,rows:6},{name:'Lunch',label:'\ud83c\udf57 Lunch',ta:true,rows:10},{name:'Salad Bar',label:'\ud83e\udd57 Salad Bar (Left)',ta:true,rows:14},{name:'Dressings',label:'\ud83e\udd57 Dressings (Right)',ta:true,rows:5},{name:'Drinks',label:'\ud83e\udd64 Drinks',ta:true,rows:10},{name:'Bottom Note',label:'\ud83d\udccc Footer',ta:true,rows:2}];
   let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u26a1 Quick Fill</span></div><div class="acc-body">';
@@ -1392,477 +879,289 @@ function buildQF(){
   for(const cb of customBoxes)allSections.push({box:cb,label:cb.name,ta:true,rows:4,builtin:false});
   for(const s of allSections){
     const b=s.box;
-    h+='<div class="qf-card">';
-    h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">';
-    h+='<div class="qf-title" style="flex:1;margin-bottom:0;">'+esc(s.label)+'</div>';
-    h+='<label class="cf-toggle" style="font-size:9px;gap:3px;" title="Show/hide on canvas"><input type="checkbox" class="qf-vis" data-id="'+esc(b.id)+'"'+(b.opacity>0?' checked':'')+'> Visible</label>';
-    h+='<button class="sm-btn danger qf-del" data-id="'+esc(b.id)+'" data-name="'+esc(b.name)+'" style="padding:2px 7px;font-size:10px;" title="Delete field">\u00d7</button>';
-    h+='</div>';
+    h+='<div class="qf-card"><div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;"><div class="qf-title" style="flex:1;margin-bottom:0;">'+esc(s.label)+'</div><label class="cf-toggle" style="font-size:9px;gap:3px;"><input type="checkbox" class="qf-vis" data-id="'+esc(b.id)+'"'+(b.opacity>0?' checked':'')+'> Visible</label><button class="sm-btn danger qf-del" data-id="'+esc(b.id)+'" data-name="'+esc(b.name)+'" style="padding:2px 7px;font-size:10px;">\u00d7</button></div>';
     if(s.ta)h+='<textarea class="fi fi-ta qf-input" data-name="'+esc(b.name)+'" rows="'+s.rows+'">'+esc(b.text)+'</textarea>';
     else h+='<input class="fi qf-input" data-name="'+esc(b.name)+'" value="'+esc(b.text)+'">';
-    h+='<details class="qf-details"><summary style="font-size:10px;font-weight:700;color:var(--text3);cursor:pointer;margin-top:4px;user-select:none;">Style \u25be</summary>';
-    h+='<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;">';
-    h+='<label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">Color <input type="color" class="qf-color" data-id="'+esc(b.id)+'" value="'+toHex(b.color)+'" style="width:26px;height:26px;padding:1px;border:1px solid var(--border);border-radius:4px;cursor:pointer;background:transparent;"></label>';
-    h+='<label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">Size <input type="range" class="qf-size" data-id="'+esc(b.id)+'" min="0.3" max="10" step="0.05" value="'+b.sizePct+'" style="width:70px;accent-color:var(--fire);"><span class="qf-size-val" style="min-width:24px;">'+b.sizePct.toFixed(1)+'</span></label>';
-    h+='<button class="sm-btn qf-bold" data-id="'+esc(b.id)+'" style="padding:3px 8px;font-weight:900;'+(b.bold?'background:var(--ember);color:var(--fire);border-color:rgba(255,122,24,.3);':'')+'">B</button>';
-    h+='<button class="sm-btn qf-italic" data-id="'+esc(b.id)+'" style="padding:3px 8px;font-style:italic;'+(b.italic?'background:var(--ember);color:var(--fire);border-color:rgba(255,122,24,.3);':'')+'">I</button>';
-    h+='<select class="fs qf-font" data-id="'+esc(b.id)+'" style="font-size:10px;padding:4px 6px;max-width:120px;margin-bottom:0;">';
-    FONTS.forEach(f=>h+='<option value="'+esc(f.value)+'"'+(f.value===b.fontFamily?' selected':'')+'>'+esc(f.label)+'</option>');
-    h+='</select>';
-    h+='<select class="fs qf-align" data-id="'+esc(b.id)+'" style="font-size:10px;padding:4px 6px;max-width:80px;margin-bottom:0;">';
-    h+='<option value="left"'+(b.align==='left'?' selected':'')+'>Left</option><option value="center"'+(b.align==='center'?' selected':'')+'>Center</option><option value="right"'+(b.align==='right'?' selected':'')+'>Right</option>';
-    h+='</select>';
-    h+='<label class="cf-toggle" style="font-size:9px;gap:3px;"><input type="checkbox" class="qf-shadow" data-id="'+esc(b.id)+'"'+(b.shadow?' checked':'')+'> Shadow</label>';
-    h+='<label class="cf-toggle" style="font-size:9px;gap:3px;"><input type="checkbox" class="qf-stroke" data-id="'+esc(b.id)+'"'+(b.strokeOn?' checked':'')+'> Outline</label>';
-    h+='<label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">Outline W <input type="range" class="qf-strokew" data-id="'+esc(b.id)+'" min="0" max="8" step="0.5" value="'+(b.strokeWidth||2)+'" style="width:50px;accent-color:var(--fire);"></label>';
-    h+='<label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">Width <input type="range" class="qf-maxw" data-id="'+esc(b.id)+'" min="0" max="95" step="0.5" value="'+(b.maxWidthPct||0)+'" style="width:60px;accent-color:var(--fire);"></label>';
-    h+='<label class="cf-toggle" style="font-size:9px;gap:3px;"><input type="checkbox" class="qf-bg" data-id="'+esc(b.id)+'"'+(b.bgOn?' checked':'')+'> BG Box</label>';
-    h+='<label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">BG% <input type="range" class="qf-bgop" data-id="'+esc(b.id)+'" min="0" max="1" step="0.05" value="'+(b.bgOpacity??.3)+'" style="width:50px;accent-color:var(--fire);"></label>';
-    h+='</div>';
-    h+='<div style="display:flex;gap:3px;margin-top:5px;flex-wrap:wrap;">';
-    BRAND_COLORS.forEach(c=>h+='<div class="swatch qf-csw" data-id="'+esc(b.id)+'" data-color="'+c+'" style="width:18px;height:18px;border-radius:3px;background:'+c+';'+(toHex(b.color)===c?'border-color:#fff;':'')+'"></div>');
-    h+='</div>';
-    h+='</details>';
-    h+='</div>';
+    h+='<details class="qf-details"><summary style="font-size:10px;font-weight:700;color:var(--text3);cursor:pointer;margin-top:4px;user-select:none;">Style \u25be</summary><div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;"><label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">Color <input type="color" class="qf-color" data-id="'+esc(b.id)+'" value="'+toHex(b.color)+'" style="width:26px;height:26px;padding:1px;border:1px solid var(--border);border-radius:4px;cursor:pointer;background:transparent;"></label><label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text3);">Size <input type="range" class="qf-size" data-id="'+esc(b.id)+'" min="0.3" max="10" step="0.05" value="'+b.sizePct+'" style="width:70px;accent-color:var(--fire);"><span class="qf-size-val" style="min-width:24px;">'+b.sizePct.toFixed(1)+'</span></label><button class="sm-btn qf-bold" data-id="'+esc(b.id)+'" style="padding:3px 8px;font-weight:900;'+(b.bold?'background:var(--ember);color:var(--fire);border-color:rgba(255,122,24,.3);':'')+'">B</button><button class="sm-btn qf-italic" data-id="'+esc(b.id)+'" style="padding:3px 8px;font-style:italic;'+(b.italic?'background:var(--ember);color:var(--fire);border-color:rgba(255,122,24,.3);':'')+'">I</button></div></details></div>';
   }
   h+='<div style="margin-top:10px"><button class="sm-btn primary" id="qfAddCustom">+ Add Custom Field</button></div>';
   h+='</div></div>';return h;
 }
-
 function buildTB(){
   let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">Text Boxes</span><span class="acc-badge">'+boxes.length+'</span></div><div class="acc-body">';
   h+='<div class="btn-row"><button class="sm-btn primary" id="addBoxBtn">+ Add</button><button class="sm-btn" id="dupBoxBtn">Duplicate</button><button class="sm-btn danger" id="delBoxBtn">Delete</button></div>';
-  h+='<div class="fl">Select box</div><select class="fs" id="boxSelect" style="width:100%"><option value=""'+(!activeId?' selected':'')+' >(none)</option>';
+  h+='<div class="fl">Select</div><select class="fs" id="boxSelect" style="width:100%"><option value="">(none)</option>';
   boxes.forEach((b,i)=>h+='<option value="'+esc(b.id)+'"'+(b.id===activeId?' selected':'')+'>'+(i+1)+'. '+esc(b.name)+'</option>');
   h+='</select></div></div>';
   const b=boxes.find(x=>x.id===activeId);
-  if(b){
-    const fO=FONTS.map(f=>'<option value="'+esc(f.value)+'"'+(f.value===b.fontFamily?' selected':'')+'>'+esc(f.label)+'</option>').join('');
-    h+='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">Edit: '+esc(b.name)+'</span></div><div class="acc-body">';
-    h+='<div class="fl">Name</div><input class="fi" id="bName" value="'+esc(b.name)+'">';
-    h+='<div class="fl">Text</div><textarea class="fi fi-ta" id="bText" rows="5">'+esc(b.text)+'</textarea>';
-    h+='<div class="fr"><div><div class="fl">X</div><input class="fi" type="range" id="bX" min="0" max="100" step="0.1" value="'+b.xPct+'" style="accent-color:var(--fire)"></div><div><div class="fl">Y</div><input class="fi" type="range" id="bY" min="0" max="100" step="0.1" value="'+b.yPct+'" style="accent-color:var(--fire)"></div></div>';
-    h+='<div class="fr"><div><div class="fl">Size</div><input class="fi" type="range" id="bSize" min="0.3" max="10" step="0.05" value="'+b.sizePct+'" style="accent-color:var(--fire)"></div><div><div class="fl">Size #</div><input class="fi" type="number" id="bSizeN" min="0.3" max="10" step="0.05" value="'+b.sizePct+'"></div></div>';
-    h+='<div class="fr"><div><div class="fl">Max Width %</div><input class="fi" type="range" id="bMaxW" min="0" max="95" step="0.5" value="'+(b.maxWidthPct||0)+'" style="accent-color:var(--fire)"></div><div><div class="fl">Width #</div><input class="fi" type="number" id="bMaxWN" min="0" max="95" step="0.5" value="'+(b.maxWidthPct||0)+'"><div style="font-size:9px;color:var(--text3)">0 = auto width</div></div></div>';
-    h+='<div class="fr"><div><div class="fl">Font</div><select class="fs" id="bFont">'+fO+'</select></div><div><div class="fl">Align</div><select class="fs" id="bAlign"><option value="left"'+(b.align==='left'?' selected':'')+'>Left</option><option value="center"'+(b.align==='center'?' selected':'')+'>Center</option><option value="right"'+(b.align==='right'?' selected':'')+'>Right</option></select></div></div>';
-    h+='<div class="fl">Text Color</div><div class="swatch-row">';
-    BRAND_COLORS.forEach(c=>h+='<div class="swatch bCSw'+(toHex(b.color)===c?' active':'')+'" data-color="'+c+'" style="background:'+c+'"></div>');
-    h+='<input class="fi" type="color" id="bColor" value="'+toHex(b.color)+'" style="width:28px;height:28px;padding:2px;border-radius:5px;margin-bottom:0"></div>';
-    h+='<div class="fr"><div><div class="fl">Opacity</div><input class="fi" type="range" id="bOp" min="0" max="1" step="0.01" value="'+b.opacity+'" style="accent-color:var(--fire)"></div><div><div class="fl">Rotation</div><input class="fi" type="number" id="bRot" value="'+(b.rotationDeg||0)+'" step="1"></div></div>';
-    h+='<div class="fr"><div><div class="fl">Line Height</div><input class="fi" type="range" id="bLH" min="0.8" max="2.2" step="0.01" value="'+(b.lineHeight||1.15)+'" style="accent-color:var(--fire)"></div><div><div class="fl">Shadow</div><label class="cf-toggle" style="margin-top:6px"><input type="checkbox" id="bShadow"'+(b.shadow?' checked':'')+'> On</label></div></div>';
-    h+='<div class="fr"><div><div class="fl">Text Outline</div><label class="cf-toggle" style="margin-top:6px"><input type="checkbox" id="bStroke"'+(b.strokeOn?' checked':'')+'> On</label></div><div><div class="fl">Outline Width</div><input class="fi" type="range" id="bStrokeW" min="0" max="8" step="0.5" value="'+(b.strokeWidth||2)+'" style="accent-color:var(--fire)"></div></div>';
-    h+='<div class="fl">Background</div><label class="cf-toggle"><input type="checkbox" id="bBgOn"'+(b.bgOn?' checked':'')+'> Enable</label>';
-    h+='<div class="fr"><div><div class="fl">BG Color</div><input class="fi" type="color" id="bBgColor" value="'+toHex(b.bgColor)+'" style="height:36px;padding:3px 6px"></div><div><div class="fl">BG Opacity</div><input class="fi" type="range" id="bBgOp" min="0" max="1" step="0.01" value="'+(b.bgOpacity??.3)+'" style="accent-color:var(--fire)"></div></div>';
-    h+='</div></div>';
-  }
+  if(b){const fO=FONTS.map(f=>'<option value="'+esc(f.value)+'"'+(f.value===b.fontFamily?' selected':'')+'>'+esc(f.label)+'</option>').join('');h+='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">Edit: '+esc(b.name)+'</span></div><div class="acc-body"><div class="fl">Name</div><input class="fi" id="bName" value="'+esc(b.name)+'"><div class="fl">Text</div><textarea class="fi fi-ta" id="bText" rows="5">'+esc(b.text)+'</textarea></div></div>';}
   return h;
 }
-
-function buildPH(){return '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">Photo Settings</span></div><div class="acc-body"><div class="fl">Photo Zoom</div><input class="fi" type="range" id="pZoom2" min="0.3" max="4" step="0.01" value="'+photoScale+'" style="accent-color:var(--fire)"><div class="btn-row"><button class="sm-btn" id="pRot2">Rotate 90\u00b0</button><button class="sm-btn" id="pReset2">Reset Photo</button></div><p style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5;">Drag canvas = move photo. Right-drag = pan view.</p></div></div>';}
-
+function buildPH(){return '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">Photo</span></div><div class="acc-body"><div class="fl">Zoom</div><input class="fi" type="range" id="pZoom2" min="0.3" max="4" step="0.01" value="'+photoScale+'"><div class="btn-row"><button class="sm-btn" id="pRot2">Rotate 90\u00b0</button><button class="sm-btn" id="pReset2">Reset</button></div></div></div>';}
 function buildPR(){
-  const s=loadStore();const activeProj=s.items.find(p=>p.id===s.activeId);
-  const cloudName=getCloudName();
-  let h='';
-  h+='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u2601\ufe0f Cloud (Shared)</span></div><div class="acc-body">';
-  if(!cloudName){
-    h+='<div style="background:rgba(255,122,24,.06);border:1px solid rgba(255,122,24,.12);border-radius:var(--radius);padding:12px;margin-bottom:8px;">';
-    h+='<div style="font-size:12px;font-weight:800;color:var(--fire);margin-bottom:6px;">Enter Your Name</div>';
-    h+='<div style="font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:8px;">So the team knows who saved each project.</div>';
-    h+='<input class="fi" id="cloudNameInput" placeholder="Your name">';
-    h+='<button class="sm-btn primary" id="cloudSetName">\u2601\ufe0f Set Name & Connect</button>';
-    h+='</div>';
-  }else{
-    h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">';
-    h+='<div style="width:8px;height:8px;border-radius:50%;background:#4dff88;flex-shrink:0;"></div>';
-    h+='<span style="font-size:11px;color:var(--success);font-weight:700;">Connected</span>';
-    h+='<span style="font-size:10px;color:var(--text3);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">as '+esc(cloudName)+'</span>';
-    h+='<button class="sm-btn" id="cloudChangeName" style="font-size:10px;">Change Name</button>';
-    h+='</div>';
-    h+='<div class="btn-row" style="margin-bottom:8px;">';
-    h+='<button class="sm-btn primary" id="cloudSaveNew">\u2601\ufe0f Save to Cloud</button>';
-    h+='<button class="sm-btn" id="cloudRefresh">\ud83d\udd04 Load Cloud Projects</button>';
-    h+='</div>';
-    h+='<div id="cloudProjectsList" style="min-height:30px;"><div style="font-size:11px;color:var(--text3);padding:6px;">Click "Load Cloud Projects" to see shared saves.</div></div>';
-  }
+  const s=loadStore();const activeProj=s.items.find(p=>p.id===s.activeId);const cloudName=getCloudName();
+  let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u2601\ufe0f Cloud</span></div><div class="acc-body">';
+  if(!cloudName){h+='<input class="fi" id="cloudNameInput" placeholder="Your name"><button class="sm-btn primary" id="cloudSetName">Connect</button>';}
+  else{h+='<div style="font-size:11px;color:var(--success);margin-bottom:8px;">Connected as '+esc(cloudName)+'</div><div class="btn-row"><button class="sm-btn primary" id="cloudSaveNew">Save</button><button class="sm-btn" id="cloudRefresh">Load</button></div><div id="cloudProjectsList"></div>';}
   h+='</div></div>';
-  h+='<div class="acc"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83d\udcbe Local (This Device)</span><span class="acc-badge">'+s.items.length+'</span></div><div class="acc-body">';
-  if(activeProj){
-    h+='<div style="background:var(--ember);border:1px solid rgba(255,122,24,.2);border-radius:var(--radius);padding:10px;margin-bottom:10px;">';
-    h+='<div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Current Local Project</div>';
-    h+='<div style="font-size:14px;font-weight:800;color:var(--fire);margin-bottom:4px;">'+esc(activeProj.name)+'</div>';
-    h+='<div style="font-size:10px;color:var(--text3);margin-bottom:8px;">'+new Date(activeProj.updatedAt||Date.now()).toLocaleString()+'</div>';
-    h+='<div class="btn-row">';
-    h+='<button class="sm-btn primary" id="pSave">\ud83d\udcbe Save</button>';
-    h+='<button class="sm-btn" id="pSaveAs">Save As</button>';
-    h+='<button class="sm-btn" id="pRename">Rename</button>';
-    h+='<button class="sm-btn" id="pExportActive">\ud83d\udce4 Export</button>';
-    h+='</div></div>';
-  }
-  h+='<div class="btn-row" style="margin-bottom:8px;"><button class="sm-btn primary" id="pNew">\u2795 New</button><button class="sm-btn" id="pImport">\ud83d\udce5 Import File</button></div>';
-  if(!s.items.length)h+='<p style="font-size:12px;color:var(--text3)">No local projects.</p>';
-  else s.items.forEach(p=>{
-    const ac=p.id===s.activeId;const d=new Date(p.updatedAt||p.createdAt||Date.now()).toLocaleString();
-    h+='<div style="display:flex;align-items:center;gap:4px;padding:7px;border-radius:var(--radius-sm);margin-bottom:3px;background:'+(ac?'var(--ember)':'rgba(255,255,255,.03)')+';border:1px solid '+(ac?'rgba(255,122,24,.15)':'var(--border)')+'">';
-    h+='<div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:700;color:'+(ac?'var(--fire)':'var(--text)')+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(p.name)+'</div><div style="font-size:9px;color:var(--text3)">'+d+'</div></div>';
-    if(!ac)h+='<button class="sm-btn pLoad" data-id="'+esc(p.id)+'">Load</button>';
-    h+='<button class="sm-btn pExport" data-id="'+esc(p.id)+'">\ud83d\udce4</button>';
-    h+='<button class="sm-btn pRenameBtn" data-id="'+esc(p.id)+'">\u270f\ufe0f</button>';
-    h+='<button class="sm-btn danger pDel" data-id="'+esc(p.id)+'">\u00d7</button></div>';
-  });
+  h+='<div class="acc"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">Local</span><span class="acc-badge">'+s.items.length+'</span></div><div class="acc-body">';
+  if(activeProj){h+='<div style="background:var(--ember);padding:10px;border-radius:var(--radius);margin-bottom:10px;"><div style="font-size:14px;font-weight:800;color:var(--fire);">'+esc(activeProj.name)+'</div><div class="btn-row"><button class="sm-btn primary" id="pSave">Save</button><button class="sm-btn" id="pSaveAs">Save As</button></div></div>';}
+  h+='<button class="sm-btn primary" id="pNew">+ New</button>';
+  s.items.forEach(p=>{h+='<div style="padding:7px;border-radius:var(--radius-sm);margin-bottom:3px;background:rgba(255,255,255,.03);"><div style="font-size:11px;">'+esc(p.name)+'</div><button class="sm-btn pLoad" data-id="'+esc(p.id)+'">Load</button><button class="sm-btn danger pDel" data-id="'+esc(p.id)+'">\u00d7</button></div>';});
   h+='</div></div>';
   return h;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   LUNCH FORECAST — three-field editor with Meats/Sides/Same Daily
+   ═══════════════════════════════════════════════════════════ */
 function buildMenuLunch(){
   let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83c\udf7d Lunch Forecast</span></div><div class="acc-body">';
-  h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Set lunch items for each date. These show on the public menu and weekly forecast.</p>';
+  h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Set lunch for each date. Edit meats, sides, and same-daily separately. Old rows with only <em>items[]</em> will be auto-split on load.</p>';
   h+='<div class="btn-row" style="margin-bottom:10px;">';
-  for(let i=0;i<7;i++){
-    const iso=dateOffsetAdj(i);
-    const dayName=isoToDay(iso);
-    h+='<button class="sm-btn lunchDateBtn'+(i===0?' primary':'')+'" data-date="'+iso+'">'+dayName+'</button>';
-  }
+  for(let i=0;i<7;i++){const iso=dateOffsetAdj(i);const dayName=isoToDay(iso);h+='<button class="sm-btn lunchDateBtn'+(i===0?' primary':'')+'" data-date="'+iso+'">'+dayName+'</button>';}
   h+='</div>';
-  h+='<div id="lunchDateEditor"><div style="font-size:11px;color:var(--text3);padding:8px;">Select a date above...</div></div>';
+  h+='<div id="lunchDateEditor"><div style="font-size:11px;color:var(--text3);padding:8px;">Select a date...</div></div>';
   h+='</div></div>';
 
-  // ═══ SAVED DATES MANAGER ═══
   h+='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83d\uddd1\ufe0f Manage Saved Dates</span></div><div class="acc-body">';
-  h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">All lunch dates currently saved in the cloud. Past dates that have already happened still take up sheet rows and clutter the forecast \u2014 clean them out here.</p>';
-  h+='<div class="btn-row" style="margin-bottom:10px;">';
-  h+='<button class="sm-btn primary" id="loadSavedDates">\ud83d\udd04 Load Saved Dates</button>';
-  h+='<button class="sm-btn danger" id="deleteAllPastDates">\ud83d\uddd1\ufe0f Delete All Past Dates</button>';
-  h+='</div>';
-  h+='<div id="savedDatesList"><div style="font-size:11px;color:var(--text3);padding:6px;">Click "Load Saved Dates" to see what\'s in the spreadsheet.</div></div>';
+  h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">All dates in cloud. Clean past ones here.</p>';
+  h+='<div class="btn-row" style="margin-bottom:10px;"><button class="sm-btn primary" id="loadSavedDates">\ud83d\udd04 Load Saved</button><button class="sm-btn danger" id="deleteAllPastDates">\ud83d\uddd1\ufe0f Delete Past</button></div>';
+  h+='<div id="savedDatesList"></div>';
   h+='</div></div>';
   return h;
 }
 
-// Helper to render the saved-dates list
 async function refreshSavedDatesList(){
-  const el = document.getElementById('savedDatesList');
-  if (!el) return;
-  el.innerHTML = '<div style="font-size:11px;color:var(--text3);padding:6px;">Loading from cloud...</div>';
-  try {
-    const result = await apiPost({ action: 'lunch' });
-    if (!result || !result.success) {
-      el.innerHTML = '<div style="font-size:11px;color:var(--danger);padding:6px;">Could not load: ' + (result && result.error ? result.error : 'unknown error') + '</div>';
-      return;
-    }
-    const dates = result.dates || {};
-    const keys = Object.keys(dates).sort();
-    if (!keys.length) {
-      el.innerHTML = '<div style="font-size:11px;color:var(--text3);padding:6px;">No dates saved yet.</div>';
-      return;
-    }
-    const todayStr = todayISO();
-    let html = '';
-    let pastCount = 0;
-    keys.forEach(date => {
-      const isPast = date < todayStr;
-      const isToday = date === todayStr;
-      if (isPast) pastCount++;
-      const data = dates[date] || {};
-      const lunch = data.lunch || {};
-      const items = lunch.items || [];
-      const itemCount = items.length;
-      const day = isoToDay(date);
-      const label = isoToLabel(date);
-      const ageBadge = isPast ? '<span style="background:rgba(255,77,77,.15);color:#ff7a7a;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;">PAST</span>' :
-                       isToday ? '<span style="background:rgba(255,200,80,.15);color:#ffc850;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;">TODAY</span>' :
-                       '<span style="background:rgba(100,180,255,.15);color:#7ac4ff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;">UPCOMING</span>';
-      html += '<div style="display:flex;align-items:center;gap:6px;padding:8px;border-radius:var(--radius-sm);margin-bottom:4px;background:'+(isPast?'rgba(255,77,77,.04)':'rgba(255,255,255,.03)')+';border:1px solid '+(isPast?'rgba(255,77,77,.12)':'var(--border)')+';">';
-      html += '<div style="flex:1;min-width:0">';
-      html += '<div style="font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;">'+esc(day)+' '+ageBadge+'</div>';
-      html += '<div style="font-size:10px;color:var(--text3);">'+esc(label)+' \u2022 '+itemCount+' item'+(itemCount===1?'':'s')+'</div>';
-      html += '</div>';
-      html += '<button class="sm-btn savedDateLoad" data-date="'+esc(date)+'" style="font-size:10px;">Load</button>';
-      html += '<button class="sm-btn danger savedDateDel" data-date="'+esc(date)+'" data-day="'+esc(day)+'" style="font-size:10px;padding:4px 8px;">\u00d7</button>';
-      html += '</div>';
+  const el=document.getElementById('savedDatesList');if(!el)return;
+  el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:6px;">Loading...</div>';
+  try{
+    const result=await apiPost({action:'lunch'});
+    if(!result||!result.success){el.innerHTML='<div style="font-size:11px;color:var(--danger);padding:6px;">Could not load</div>';return;}
+    const dates=result.dates||{};const keys=Object.keys(dates).sort();
+    if(!keys.length){el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:6px;">No dates saved yet.</div>';return;}
+    const todayStr=todayISO();let html='';let pastCount=0;
+    keys.forEach(date=>{
+      const isPast=date<todayStr;const isToday=date===todayStr;if(isPast)pastCount++;
+      const data=dates[date]||{};const lunch=data.lunch||{};
+      const itemCount=(lunch.items||[]).length;const meatCount=(lunch.meats||[]).length;
+      const day=isoToDay(date);const label=isoToLabel(date);
+      const ageBadge=isPast?'<span style="background:rgba(255,77,77,.15);color:#ff7a7a;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;">PAST</span>':isToday?'<span style="background:rgba(255,200,80,.15);color:#ffc850;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;">TODAY</span>':'<span style="background:rgba(100,180,255,.15);color:#7ac4ff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;">UPCOMING</span>';
+      const shapeTag=meatCount>0?'<span style="background:rgba(77,255,136,.15);color:#7ae59a;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;margin-left:4px;">NEW</span>':'';
+      html+='<div style="display:flex;align-items:center;gap:6px;padding:8px;border-radius:var(--radius-sm);margin-bottom:4px;background:'+(isPast?'rgba(255,77,77,.04)':'rgba(255,255,255,.03)')+';border:1px solid '+(isPast?'rgba(255,77,77,.12)':'var(--border)')+';"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;">'+esc(day)+' '+ageBadge+shapeTag+'</div><div style="font-size:10px;color:var(--text3);">'+esc(label)+' \u2022 '+itemCount+' item'+(itemCount===1?'':'s')+(meatCount>0?' ('+meatCount+' meats)':'')+'</div></div><button class="sm-btn savedDateLoad" data-date="'+esc(date)+'">Load</button><button class="sm-btn danger savedDateDel" data-date="'+esc(date)+'" data-day="'+esc(day)+'" style="padding:4px 8px;">\u00d7</button></div>';
     });
-    if (pastCount > 0) {
-      html = '<div style="font-size:11px;color:var(--text2);padding:6px 0;margin-bottom:6px;">Total: '+keys.length+' dates saved \u2022 <span style="color:#ff7a7a;font-weight:700;">'+pastCount+' past</span></div>' + html;
-    } else {
-      html = '<div style="font-size:11px;color:var(--text2);padding:6px 0;margin-bottom:6px;">Total: '+keys.length+' dates saved</div>' + html;
-    }
-    el.innerHTML = html;
+    if(pastCount>0)html='<div style="font-size:11px;color:var(--text2);padding:6px 0;margin-bottom:6px;">Total: '+keys.length+' \u2022 <span style="color:#ff7a7a;font-weight:700;">'+pastCount+' past</span></div>'+html;
+    else html='<div style="font-size:11px;color:var(--text2);padding:6px 0;margin-bottom:6px;">Total: '+keys.length+' dates</div>'+html;
+    el.innerHTML=html;
+    el.querySelectorAll('.savedDateDel').forEach(btn=>{btn.addEventListener('click',async()=>{const date=btn.dataset.date;const day=btn.dataset.day;if(!confirm('Delete lunch for '+day+' ('+date+')?'))return;const ok=await deleteLunchForDate(date);if(ok)refreshSavedDatesList();});});
+    el.querySelectorAll('.savedDateLoad').forEach(btn=>{btn.addEventListener('click',()=>{const date=btn.dataset.date;const dayBtn=document.querySelector('.lunchDateBtn[data-date="'+date+'"]');if(dayBtn){dayBtn.click();}else{toast('Date '+date+' outside 7-day range','info');}});});
+    window._lastSavedDates=dates;
+  }catch(e){el.innerHTML='<div style="font-size:11px;color:var(--danger);padding:6px;">Error: '+e.message+'</div>';}
+}
 
-    // Wire individual delete and load buttons
-    el.querySelectorAll('.savedDateDel').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const date = btn.dataset.date;
-        const day = btn.dataset.day;
-        if (!confirm('Delete lunch for '+day+' ('+date+')? This removes the row from the spreadsheet.')) return;
-        const ok = await deleteLunchForDate(date);
-        if (ok) refreshSavedDatesList();
+async function deleteAllPastDates(){
+  try{
+    const result=await apiPost({action:'lunch'});if(!result||!result.success){toast('Could not load','error');return;}
+    const dates=result.dates||{};const todayStr=todayISO();const pastKeys=Object.keys(dates).filter(d=>d<todayStr).sort();
+    if(!pastKeys.length){toast('No past dates','info');return;}
+    if(!confirm('Delete '+pastKeys.length+' past dates?\n\n'+pastKeys.join('\n')))return;
+    toast('Deleting...','info');let deleted=0,failed=0;
+    for(const date of pastKeys){try{const r=await apiPost({action:'delete-lunch',date:date});if(r&&r.success)deleted++;else failed++;}catch(e){failed++;}}
+    if(failed===0)toast('Deleted '+deleted+' dates','success');else toast('Deleted '+deleted+', failed '+failed,'error');
+    refreshSavedDatesList();
+  }catch(e){toast('Error: '+e.message,'error');}
+}
+
+function wireMenuPanel(){
+  document.querySelectorAll('.lunchDateBtn').forEach(btn=>{
+    btn.addEventListener('click', async () => {
+      document.querySelectorAll('.lunchDateBtn').forEach(b=>b.classList.remove('primary'));
+      btn.classList.add('primary');
+      const date=btn.dataset.date;
+      const el=document.getElementById('lunchDateEditor');
+      if(!el) return;
+      el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:8px;">Loading...</div>';
+
+      // Make sure Same Daily globals are loaded (they affect auto-split)
+      if (!menuDefaultsCache) await loadMenuDefaults();
+
+      let lunchData=null;
+      try {
+        const result=await apiGet({action:'lunch'});
+        if(result?.success && result?.dates?.[date]) lunchData=result.dates[date];
+      } catch(e) { toast('Could not load','error'); }
+
+      const lunch = lunchData?.lunch || {};
+      let meats = Array.isArray(lunch.meats) ? lunch.meats : null;
+      let sides = Array.isArray(lunch.sides) ? lunch.sides : null;
+      let sameDailyOverride = Array.isArray(lunch.sameDaily) ? lunch.sameDaily : null;
+
+      // BACKWARD COMPAT: split legacy items[] on load
+      if (!meats && Array.isArray(lunch.items) && lunch.items.length) {
+        const split = splitItemsIntoMeatsSides(lunch.items);
+        meats = split.meats;
+        sides = split.sides;
+      }
+      meats = meats || []; sides = sides || []; sameDailyOverride = sameDailyOverride || [];
+
+      const fmtItems = arr => arr.map(i => {
+        if (typeof i === 'object') return i.name + (i.desc ? ' | ' + i.desc : '');
+        return i || '';
+      }).join('\n');
+
+      const dessertItems = lunchData?.dessert?.items || [];
+      const showCrawfish = lunchData?.crawfish?.show !== false;
+      const globalSameDaily = (menuDefaultsCache?.sameDaily?.items) || [];
+      const globalSdText = globalSameDaily.map(i => typeof i === 'object' ? i.name : i).join(', ');
+
+      let lh='<div style="font-size:12px;font-weight:700;color:var(--fire);margin-bottom:8px;">'+isoToDay(date)+' \u2022 '+date+'</div>';
+
+      lh+='<div class="lunch-section-card">';
+      lh+='<div class="lunch-section-title meats">\ud83c\udf57 Meats</div>';
+      lh+='<div class="lunch-section-hint">Main dishes only. Use <em>Name | Description</em> for expandable details.</div>';
+      lh+='<textarea class="fi fi-ta" id="lunchMeatsTA" rows="8" placeholder="Beef Tips | Tender beef in gravy\nBBQ Chicken\nMeatloaf">'+esc(fmtItems(meats))+'</textarea>';
+      lh+='</div>';
+
+      lh+='<div class="lunch-section-card sides">';
+      lh+='<div class="lunch-section-title sides">\ud83e\udd57 Sides</div>';
+      lh+='<div class="lunch-section-hint">The sides offered with today\'s plates.</div>';
+      lh+='<textarea class="fi fi-ta" id="lunchSidesTA" rows="6" placeholder="Mac & Cheese\nCornbread\nGreen Beans\nMashed Potatoes">'+esc(fmtItems(sides))+'</textarea>';
+      lh+='</div>';
+
+      lh+='<div class="lunch-section-card samedaily">';
+      lh+='<div class="lunch-section-title samedaily">\ud83d\udcc5 Same Daily Override (this day only)</div>';
+      lh+='<div class="lunch-section-hint">Leave blank to use global'+(globalSdText?' (<em>'+esc(globalSdText)+'</em>)':'')+'. Fill in to override.</div>';
+      lh+='<textarea class="fi fi-ta" id="lunchSameDailyTA" rows="3" placeholder="(blank = global)">'+esc(fmtItems(sameDailyOverride))+'</textarea>';
+      lh+='</div>';
+
+      lh+='<div class="fr"><div><div class="fl">Dessert</div><input class="fi" id="lunchDessert" value="'+esc(dessertItems.join(', '))+'" placeholder="Cake"></div><div><div class="fl">Crawfish</div><label class="cf-toggle" style="margin-top:8px;"><input type="checkbox" id="lunchCrawfish"'+(showCrawfish?' checked':'')+'> Available</label></div></div>';
+
+      lh+='<div class="btn-row" style="margin-top:8px;">';
+      lh+='<button class="sm-btn primary" id="saveLunchDate">\ud83d\udcbe Save '+isoToLabel(date)+'</button>';
+      lh+='<button class="sm-btn" id="syncCanvas" title="Push these items into the canvas Lunch text box">\ud83d\udd04 Sync to Canvas</button>';
+      lh+='<button class="sm-btn danger" id="deleteLunchDate">\u00d7 Clear</button>';
+      lh+='</div>';
+
+      el.innerHTML=lh;
+
+      const parseField = text => linesTo(text).map(line => {
+        const parts = line.split('|');
+        return { name: (parts[0]||'').trim(), desc: parts.slice(1).join('|').trim() };
+      }).filter(i => i.name);
+
+      document.getElementById('saveLunchDate')?.addEventListener('click', async () => {
+        const meatsArr = parseField(document.getElementById('lunchMeatsTA').value);
+        const sidesArr = parseField(document.getElementById('lunchSidesTA').value);
+        const sameDailyArr = parseField(document.getElementById('lunchSameDailyTA').value);
+        const effectiveSameDaily = sameDailyArr.length ? sameDailyArr :
+          ((menuDefaultsCache?.sameDaily?.items) || []).map(i => typeof i === 'string' ? { name: i, desc: '' } : i);
+        const itemsArr = [].concat(meatsArr, sidesArr, effectiveSameDaily);
+        const dessert = linesTo(document.getElementById('lunchDessert').value.replace(/,/g, '\n'));
+        const crawfish = document.getElementById('lunchCrawfish').checked;
+        const dateData = {
+          lunch: { show: true, items: itemsArr, meats: meatsArr, sides: sidesArr, sameDaily: sameDailyArr },
+          dessert: { items: dessert },
+          crawfish: { show: crawfish }
+        };
+        await saveLunchForDate(date, dateData);
       });
-    });
-    el.querySelectorAll('.savedDateLoad').forEach(btn => {
-      btn.addEventListener('click', () => {
-        // Switch to a date button if it's in the visible 7-day range, otherwise just info-toast
-        const date = btn.dataset.date;
-        const dayBtn = document.querySelector('.lunchDateBtn[data-date="'+date+'"]');
-        if (dayBtn) {
-          dayBtn.click();
-          dayBtn.scrollIntoView({behavior:'smooth',block:'nearest'});
+
+      document.getElementById('syncCanvas')?.addEventListener('click', () => {
+        const meatLines = linesTo(document.getElementById('lunchMeatsTA').value).map(l => l.split('|')[0].trim()).filter(Boolean);
+        const sideLines = linesTo(document.getElementById('lunchSidesTA').value).map(l => l.split('|')[0].trim()).filter(Boolean);
+        const sdLines = linesTo(document.getElementById('lunchSameDailyTA').value).map(l => l.split('|')[0].trim()).filter(Boolean);
+        const effectiveSameDaily = sdLines.length ? sdLines :
+          ((menuDefaultsCache?.sameDaily?.items) || []).map(i => typeof i === 'string' ? i : (i.name || '')).filter(Boolean);
+
+        let canvasText = 'LUNCH\n11:00 AM - 2:00 PM\n';
+        if (meatLines.length) canvasText += '\n' + meatLines.map(n => '\u2022 ' + n).join('\n');
+        if (sideLines.length) canvasText += '\n\n' + sideLines.map(n => '\u2022 ' + n).join('\n');
+        if (effectiveSameDaily.length) canvasText += '\n\nSame Daily\n' + effectiveSameDaily.map(n => '\u2022 ' + n).join('\n');
+
+        const lunchBox = boxes.find(b => b.name === 'Lunch');
+        if (lunchBox) {
+          saveUndo();
+          lunchBox.text = canvasText;
+          draw();
+          triggerAutoSave();
+          toast('Canvas updated!', 'success');
         } else {
-          toast('Date '+date+' is outside the 7-day editor range. Showing details only:', 'info');
-          // Render in the editor area as read-only-ish
-          const dayName = isoToDay(date);
-          const data = (window._lastSavedDates && window._lastSavedDates[date]) || {};
-          const items = (data.lunch && data.lunch.items) || [];
-          const dessert = (data.dessert && data.dessert.items) || [];
-          const showCrawfish = !data.crawfish || data.crawfish.show !== false;
-          let lh = '<div style="font-size:12px;font-weight:700;color:var(--fire);margin-bottom:8px;">'+dayName+' \u2022 '+date+' (read-only \u2014 outside editor range)</div>';
-          lh += '<div class="fl">Lunch Items</div>';
-          const itemsText = items.map(i => typeof i==='object' ? (i.name+(i.desc?' | '+i.desc:'')) : (i||'')).join('\n');
-          lh += '<textarea class="fi fi-ta" id="lunchItemsTA" rows="10">'+esc(itemsText)+'</textarea>';
-          lh += '<div class="fr"><div><div class="fl">Dessert</div><input class="fi" id="lunchDessert" value="'+esc(dessert.join(', '))+'"></div>';
-          lh += '<div><div class="fl">Crawfish</div><label class="cf-toggle" style="margin-top:8px;"><input type="checkbox" id="lunchCrawfish"'+(showCrawfish?' checked':'')+'> Available</label></div></div>';
-          lh += '<div class="btn-row" style="margin-top:8px;">';
-          lh += '<button class="sm-btn primary" id="saveLunchDate">\ud83d\udcbe Save '+date+'</button>';
-          lh += '<button class="sm-btn danger" id="deleteLunchDate">\u00d7 Clear This Date</button></div>';
-          const ed = document.getElementById('lunchDateEditor');
-          if (ed) {
-            ed.innerHTML = lh;
-            // Wire up these buttons too
-            document.getElementById('saveLunchDate')?.addEventListener('click', async () => {
-              const lines = linesTo(document.getElementById('lunchItemsTA')?.value);
-              const lunchItems = lines.map(line => { const [name, ...rest] = line.split('|'); return { name: (name||'').trim(), desc: rest.join('|').trim() }; }).filter(i => i.name);
-              const dess = linesTo(document.getElementById('lunchDessert')?.value.replace(/,/g,'\n'));
-              const crawfish = document.getElementById('lunchCrawfish')?.checked;
-              await saveLunchForDate(date, { lunch: { show:true, items: lunchItems }, dessert: { items: dess }, crawfish: { show: crawfish } });
-            });
-            document.getElementById('deleteLunchDate')?.addEventListener('click', async () => {
-              if (!confirm('Clear lunch for '+date+'?')) return;
-              await deleteLunchForDate(date);
-              refreshSavedDatesList();
-            });
-          }
+          toast('No "Lunch" text box on canvas','error');
         }
       });
-    });
-    // Stash the dates so the load handler can read them
-    window._lastSavedDates = dates;
-  } catch (e) {
-    el.innerHTML = '<div style="font-size:11px;color:var(--danger);padding:6px;">Error: '+e.message+'</div>';
-  }
-}
 
-// Bulk delete all past dates
-async function deleteAllPastDates(){
-  try {
-    const result = await apiPost({ action: 'lunch' });
-    if (!result || !result.success) {
-      toast('Could not load dates: '+(result?.error||'unknown'), 'error');
-      return;
-    }
-    const dates = result.dates || {};
-    const todayStr = todayISO();
-    const pastKeys = Object.keys(dates).filter(d => d < todayStr).sort();
-    if (!pastKeys.length) {
-      toast('No past dates to delete', 'info');
-      return;
-    }
-    if (!confirm('Delete '+pastKeys.length+' past lunch date'+(pastKeys.length===1?'':'s')+'?\n\nDates to delete:\n'+pastKeys.join('\n')+'\n\nThis cannot be undone.')) return;
-    toast('Deleting '+pastKeys.length+' dates...', 'info');
-    let deleted = 0, failed = 0;
-    for (const date of pastKeys) {
-      try {
-        const r = await apiPost({ action: 'delete-lunch', date: date });
-        if (r && r.success) deleted++; else failed++;
-      } catch (e) { failed++; }
-    }
-    if (failed === 0) toast('Deleted '+deleted+' past date'+(deleted===1?'':'s')+'!', 'success');
-    else toast('Deleted '+deleted+', failed '+failed, 'error');
-    refreshSavedDatesList();
-  } catch (e) {
-    toast('Error: '+e.message, 'error');
-  }
-}
-
-/* ═══ MENU LUNCH (forecast) wire handlers ═══ */
-function wireMenuPanel(){
-  document.querySelectorAll('.lunchDateBtn').forEach(btn=>{btn.addEventListener('click',async()=>{
-    document.querySelectorAll('.lunchDateBtn').forEach(b=>b.classList.remove('primary'));
-    btn.classList.add('primary');
-    const date=btn.dataset.date;
-    const el=document.getElementById('lunchDateEditor');
-    if(!el)return;
-    el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:8px;">Loading...</div>';
-    let lunchData=null;
-    try{
-      const result=await apiGet({action:'lunch'});
-      if(result?.success&&result?.dates?.[date])lunchData=result.dates[date];
-    }catch(e){toast('Could not load from cloud','error');}
-    const items=lunchData?.lunch?.items||[];
-    const itemsText=items.map(i=>typeof i==='object'?(i.name+(i.desc?' | '+i.desc:'')):(i||'')).join('\n');
-    const dessertItems=lunchData?.dessert?.items||[];
-    const showCrawfish=lunchData?.crawfish?.show!==false;
-    let lh='<div style="font-size:12px;font-weight:700;color:var(--fire);margin-bottom:8px;">'+isoToDay(date)+' \u2022 '+date+'</div>';
-    lh+='<div class="fl">Lunch Items (one per line \u2014 use Name | Description)</div>';
-    lh+='<textarea class="fi fi-ta" id="lunchItemsTA" rows="12" placeholder="Beef Tips | Tender beef tips in savory gravy">'+esc(itemsText)+'</textarea>';
-    lh+='<div class="fr"><div><div class="fl">Dessert</div><input class="fi" id="lunchDessert" value="'+esc(dessertItems.join(', '))+'" placeholder="Cake"></div>';
-    lh+='<div><div class="fl">Crawfish</div><label class="cf-toggle" style="margin-top:8px;"><input type="checkbox" id="lunchCrawfish"'+(showCrawfish?' checked':'')+'> Available</label></div></div>';
-    lh+='<div class="btn-row" style="margin-top:8px;"><button class="sm-btn primary" id="saveLunchDate">\ud83d\udcbe Save Lunch for '+isoToLabel(date)+'</button>';
-    lh+='<button class="sm-btn danger" id="deleteLunchDate">\u00d7 Clear This Date</button></div>';
-    el.innerHTML=lh;
-    document.getElementById('saveLunchDate')?.addEventListener('click',async()=>{
-      const lines=linesTo(document.getElementById('lunchItemsTA')?.value);
-      const lunchItems=lines.map(line=>{const[name,...rest]=line.split('|');return{name:(name||'').trim(),desc:rest.join('|').trim()};}).filter(i=>i.name);
-      const dessert=linesTo(document.getElementById('lunchDessert')?.value.replace(/,/g,'\n'));
-      const crawfish=document.getElementById('lunchCrawfish')?.checked;
-      const dateData={lunch:{show:true,items:lunchItems},dessert:{items:dessert},crawfish:{show:crawfish}};
-      await saveLunchForDate(date,dateData);
+      document.getElementById('deleteLunchDate')?.addEventListener('click', async () => {
+        if (!confirm('Clear lunch for '+date+'?')) return;
+        await deleteLunchForDate(date);
+        btn.click();
+        refreshSavedDatesList();
+      });
     });
-    document.getElementById('deleteLunchDate')?.addEventListener('click',async()=>{
-      if(!confirm('Clear lunch for '+date+'?'))return;
-      await deleteLunchForDate(date);
-      btn.click();
-      refreshSavedDatesList();
-    });
-  });});
+  });
   const todayBtn=document.querySelector('.lunchDateBtn');
-  if(todayBtn&&currentTab==='menu-lunch')todayBtn.click();
-
-  // Wire the saved dates manager buttons
-  const lsd = document.getElementById('loadSavedDates');
-  if (lsd) lsd.addEventListener('click', refreshSavedDatesList);
-  const dap = document.getElementById('deleteAllPastDates');
-  if (dap) dap.addEventListener('click', deleteAllPastDates);
-
-  // Auto-load saved dates list when the tab opens
-  if (currentTab === 'menu-lunch') {
-    setTimeout(refreshSavedDatesList, 100);
-  }
+  if(todayBtn && currentTab==='menu-lunch') todayBtn.click();
+  const lsd=document.getElementById('loadSavedDates');
+  if(lsd) lsd.addEventListener('click', refreshSavedDatesList);
+  const dap=document.getElementById('deleteAllPastDates');
+  if(dap) dap.addEventListener('click', deleteAllPastDates);
+  if (currentTab==='menu-lunch') setTimeout(refreshSavedDatesList, 100);
 }
 
-async function saveLunchForDate(date,data){
-  try{
-    const j=await apiPost({action:'save-lunch',date:date,data:data});
-    if(j.success){toast('Lunch saved for '+date+'!','success');if(typeof refreshSavedDatesList==='function')setTimeout(refreshSavedDatesList,300);return true;}
-    else{toast('Save failed: '+(j.error||''),'error');return false;}
-  }catch(e){toast('Save error: '+e.message,'error');return false;}
-}
-async function deleteLunchForDate(date){
-  try{
-    const j=await apiPost({action:'delete-lunch',date:date});
-    if(j.success){toast('Lunch removed for '+date,'info');return true;}
-  }catch(e){}
-  return false;
-}
+async function saveLunchForDate(date,data){try{const j=await apiPost({action:'save-lunch',date:date,data:data});if(j.success){toast('Saved for '+date,'success');if(typeof refreshSavedDatesList==='function')setTimeout(refreshSavedDatesList,300);return true;}else{toast('Save failed: '+(j.error||''),'error');return false;}}catch(e){toast('Save error: '+e.message,'error');return false;}}
+async function deleteLunchForDate(date){try{const j=await apiPost({action:'delete-lunch',date:date});if(j.success){toast('Removed '+date,'info');return true;}}catch(e){}return false;}
 
-/* ═══ Wire for Quick Fill + Text Boxes + Photo + Projects ═══ */
 function wirePanel(){
   document.querySelectorAll('.acc-head').forEach(h=>{h.addEventListener('click',()=>h.parentElement.classList.toggle('open'));});
   document.querySelectorAll('.qf-input').forEach(el=>{el.addEventListener('input',()=>{const box=boxes.find(b=>b.name===el.dataset.name);if(box){saveUndo();box.text=el.value;draw();triggerAutoSave();}});});
   document.querySelectorAll('.qf-color').forEach(el=>{el.addEventListener('input',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.color=el.value;draw();triggerAutoSave();}});});
-  document.querySelectorAll('.qf-size').forEach(el=>{el.addEventListener('input',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.sizePct=parseFloat(el.value);const lbl=el.parentElement.querySelector('.qf-size-val');if(lbl)lbl.textContent=b.sizePct.toFixed(1);draw();triggerAutoSave();}});});
+  document.querySelectorAll('.qf-size').forEach(el=>{el.addEventListener('input',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.sizePct=parseFloat(el.value);draw();triggerAutoSave();}});});
   document.querySelectorAll('.qf-bold').forEach(el=>{el.addEventListener('click',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){saveUndo();b.bold=!b.bold;draw();rebuildSidePanel();triggerAutoSave();}});});
   document.querySelectorAll('.qf-italic').forEach(el=>{el.addEventListener('click',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){saveUndo();b.italic=!b.italic;draw();rebuildSidePanel();triggerAutoSave();}});});
-  document.querySelectorAll('.qf-font').forEach(el=>{el.addEventListener('change',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.fontFamily=el.value;draw();triggerAutoSave();}});});
-  document.querySelectorAll('.qf-align').forEach(el=>{el.addEventListener('change',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.align=el.value;draw();triggerAutoSave();}});});
-  document.querySelectorAll('.qf-shadow').forEach(el=>{el.addEventListener('change',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.shadow=!!el.checked;draw();triggerAutoSave();}});});
-  document.querySelectorAll('.qf-stroke').forEach(el=>{el.addEventListener('change',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.strokeOn=!!el.checked;draw();triggerAutoSave();}});});
-  document.querySelectorAll('.qf-strokew').forEach(el=>{el.addEventListener('input',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.strokeWidth=parseFloat(el.value);draw();triggerAutoSave();}});});
-  document.querySelectorAll('.qf-maxw').forEach(el=>{el.addEventListener('input',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.maxWidthPct=parseFloat(el.value);draw();triggerAutoSave();}});});
-  document.querySelectorAll('.qf-bg').forEach(el=>{el.addEventListener('change',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.bgOn=!!el.checked;draw();triggerAutoSave();}});});
-  document.querySelectorAll('.qf-bgop').forEach(el=>{el.addEventListener('input',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.bgOpacity=parseFloat(el.value);draw();triggerAutoSave();}});});
   document.querySelectorAll('.qf-vis').forEach(el=>{el.addEventListener('change',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){saveUndo();b.opacity=el.checked?1:0;draw();triggerAutoSave();}});});
-  document.querySelectorAll('.qf-csw').forEach(el=>{el.addEventListener('click',()=>{const b=boxes.find(x=>x.id===el.dataset.id);if(b){b.color=el.dataset.color;draw();rebuildSidePanel();triggerAutoSave();}});});
-  document.querySelectorAll('.qf-del').forEach(el=>{el.addEventListener('click',()=>{const id=el.dataset.id;const name=el.dataset.name;if(!confirm('Delete "'+name+'" from the menu?'))return;saveUndo();boxes=boxes.filter(b=>b.id!==id);if(activeId===id)activeId=null;draw();rebuildSidePanel();triggerAutoSave();toast('Removed "'+name+'"','info');});});
-  const qfT=document.getElementById('qfToday');if(qfT)qfT.addEventListener('click',()=>{const t=todayDefaults();const d=boxes.find(b=>b.name==='Day'),dt=boxes.find(b=>b.name==='Date');if(d){saveUndo();d.text=t.weekday;}if(dt)dt.text=t.dateStr;draw();rebuildSidePanel();triggerAutoSave();toast("Today's date filled!",'success');});
-  const qfY=document.getElementById('qfYesterday');if(qfY)qfY.addEventListener('click',()=>{const s=loadStore();const prev=s.items.find(p=>p.id!==s.activeId);if(!prev||!prev.data?.boxes){toast('No previous project found','error');return;}saveUndo();for(const pb of prev.data.boxes){const cur=boxes.find(b=>b.name===pb.name);if(cur&&pb.name!=='Day'&&pb.name!=='Date')cur.text=pb.text;}const t=todayDefaults();const d=boxes.find(b=>b.name==='Day'),dt=boxes.find(b=>b.name==='Date');if(d)d.text=t.weekday;if(dt)dt.text=t.dateStr;draw();rebuildSidePanel();triggerAutoSave();toast("Copied previous items!",'success');});
-  const qfR=document.getElementById('qfReset');if(qfR)qfR.addEventListener('click',()=>{if(!confirm('Reset all?'))return;saveUndo();loadStarterBoxes();draw();rebuildSidePanel();triggerAutoSave();toast('Reset','info');});
-  const qfAC=document.getElementById('qfAddCustom');if(qfAC)qfAC.addEventListener('click',()=>{const name=prompt('Custom field name:','Special');if(!name)return;saveUndo();const b=defaultBox(name.trim(),name.trim()+'\n\n\u2022 Item 1\n\u2022 Item 2',50,50,{isCustom:true,sizePct:1.4,shadowBlur:8,lineHeight:1.22});boxes.push(b);activeId=b.id;draw();rebuildSidePanel();triggerAutoSave();toast('Custom field "'+name.trim()+'" added!','success');});
+  document.querySelectorAll('.qf-del').forEach(el=>{el.addEventListener('click',()=>{const id=el.dataset.id;const name=el.dataset.name;if(!confirm('Delete "'+name+'"?'))return;saveUndo();boxes=boxes.filter(b=>b.id!==id);if(activeId===id)activeId=null;draw();rebuildSidePanel();triggerAutoSave();});});
+  const qfT=document.getElementById('qfToday');if(qfT)qfT.addEventListener('click',()=>{const t=todayDefaults();const d=boxes.find(b=>b.name==='Day'),dt=boxes.find(b=>b.name==='Date');if(d){saveUndo();d.text=t.weekday;}if(dt)dt.text=t.dateStr;draw();rebuildSidePanel();triggerAutoSave();});
+  const qfR=document.getElementById('qfReset');if(qfR)qfR.addEventListener('click',()=>{if(!confirm('Reset all?'))return;saveUndo();loadStarterBoxes();draw();rebuildSidePanel();triggerAutoSave();});
+  const qfAC=document.getElementById('qfAddCustom');if(qfAC)qfAC.addEventListener('click',()=>{const name=prompt('Field name:','Special');if(!name)return;saveUndo();const b=defaultBox(name.trim(),name.trim(),50,50,{isCustom:true,sizePct:1.4});boxes.push(b);activeId=b.id;draw();rebuildSidePanel();triggerAutoSave();});
   const bS=document.getElementById('boxSelect');if(bS)bS.addEventListener('change',()=>{activeId=bS.value||null;rebuildSidePanel();draw();});
-  const aB=document.getElementById('addBoxBtn');if(aB)aB.addEventListener('click',()=>{saveUndo();const b=defaultBox('New Box','New text',50,50);boxes.push(b);activeId=b.id;rebuildSidePanel();draw();triggerAutoSave();});
+  const aB=document.getElementById('addBoxBtn');if(aB)aB.addEventListener('click',()=>{saveUndo();const b=defaultBox('New','New text',50,50);boxes.push(b);activeId=b.id;rebuildSidePanel();draw();triggerAutoSave();});
   const dB=document.getElementById('dupBoxBtn');if(dB)dB.addEventListener('click',()=>{const cur=boxes.find(x=>x.id===activeId);if(!cur)return;saveUndo();const c=JSON.parse(JSON.stringify(cur));c.id=uid();c.name+=' (copy)';c.xPct=clamp(cur.xPct+2,0,100);c.yPct=clamp(cur.yPct+2,0,100);boxes.push(c);activeId=c.id;rebuildSidePanel();draw();triggerAutoSave();});
-  const dlB=document.getElementById('delBoxBtn');if(dlB)dlB.addEventListener('click',()=>{const cur=boxes.find(x=>x.id===activeId);if(!cur||!confirm('Delete "'+cur.name+'"?'))return;saveUndo();boxes=boxes.filter(b=>b.id!==cur.id);activeId=null;rebuildSidePanel();draw();triggerAutoSave();});
+  const dlB=document.getElementById('delBoxBtn');if(dlB)dlB.addEventListener('click',()=>{const cur=boxes.find(x=>x.id===activeId);if(!cur||!confirm('Delete?'))return;saveUndo();boxes=boxes.filter(b=>b.id!==cur.id);activeId=null;rebuildSidePanel();draw();triggerAutoSave();});
   const b=boxes.find(x=>x.id===activeId);
-  if(b){const w=(id,fn,ev='input')=>{const el=document.getElementById(id);if(el)el.addEventListener(ev,fn);};
-    w('bName',e=>{b.name=e.target.value;draw();triggerAutoSave();});w('bText',e=>{b.text=e.target.value;draw();triggerAutoSave();});
-    w('bX',e=>{b.xPct=parseFloat(e.target.value);draw();triggerAutoSave();});w('bY',e=>{b.yPct=parseFloat(e.target.value);draw();triggerAutoSave();});
-    w('bSize',e=>{b.sizePct=parseFloat(e.target.value);const n=document.getElementById('bSizeN');if(n)n.value=b.sizePct;draw();triggerAutoSave();});
-    w('bSizeN',e=>{b.sizePct=clamp(parseFloat(e.target.value||'1'),.3,10);const s=document.getElementById('bSize');if(s)s.value=b.sizePct;draw();triggerAutoSave();});
-    w('bMaxW',e=>{b.maxWidthPct=parseFloat(e.target.value);const n=document.getElementById('bMaxWN');if(n)n.value=b.maxWidthPct;draw();triggerAutoSave();});
-    w('bMaxWN',e=>{b.maxWidthPct=clamp(parseFloat(e.target.value||'0'),0,95);const s=document.getElementById('bMaxW');if(s)s.value=b.maxWidthPct;draw();triggerAutoSave();});
-    w('bFont',e=>{b.fontFamily=e.target.value;draw();triggerAutoSave();},'change');w('bAlign',e=>{b.align=e.target.value;draw();triggerAutoSave();},'change');
-    w('bColor',e=>{b.color=e.target.value;draw();triggerAutoSave();});w('bOp',e=>{b.opacity=parseFloat(e.target.value);draw();triggerAutoSave();});
-    w('bRot',e=>{b.rotationDeg=parseFloat(e.target.value||'0');draw();triggerAutoSave();});w('bLH',e=>{b.lineHeight=parseFloat(e.target.value);draw();triggerAutoSave();});
-    w('bShadow',e=>{b.shadow=!!e.target.checked;draw();triggerAutoSave();},'change');
-    w('bStroke',e=>{b.strokeOn=!!e.target.checked;draw();triggerAutoSave();},'change');
-    w('bStrokeW',e=>{b.strokeWidth=parseFloat(e.target.value);draw();triggerAutoSave();});
-    w('bBgOn',e=>{b.bgOn=!!e.target.checked;draw();triggerAutoSave();},'change');
-    w('bBgColor',e=>{b.bgColor=e.target.value;draw();triggerAutoSave();});w('bBgOp',e=>{b.bgOpacity=parseFloat(e.target.value);draw();triggerAutoSave();});
-    document.querySelectorAll('.bCSw').forEach(sw=>{sw.addEventListener('click',()=>{b.color=sw.dataset.color;draw();triggerAutoSave();rebuildSidePanel();});});
-  }
+  if(b){const w=(id,fn,ev='input')=>{const el=document.getElementById(id);if(el)el.addEventListener(ev,fn);};w('bName',e=>{b.name=e.target.value;draw();triggerAutoSave();});w('bText',e=>{b.text=e.target.value;draw();triggerAutoSave();});}
   const pZ=document.getElementById('pZoom2');if(pZ)pZ.addEventListener('input',()=>{photoScale=parseFloat(pZ.value);document.getElementById('photoZoom').value=pZ.value;draw();});
   const pR=document.getElementById('pRot2');if(pR)pR.addEventListener('click',()=>{saveUndo();photoRot=(photoRot+90)%360;draw();triggerAutoSave();});
   const pRs=document.getElementById('pReset2');if(pRs)pRs.addEventListener('click',()=>{saveUndo();photoScale=1;photoRot=0;photoOffsetX=0;photoOffsetY=0;document.getElementById('photoZoom').value='1';draw();triggerAutoSave();});
-  const pN=document.getElementById('pNew');if(pN)pN.addEventListener('click',()=>{const n=prompt('Project name:','Menu '+new Date().toLocaleDateString());if(n===null)return;createProject(n.trim()||'Menu '+new Date().toLocaleDateString());rebuildSidePanel();});
+  const pN=document.getElementById('pNew');if(pN)pN.addEventListener('click',()=>{const n=prompt('Name:','Menu '+new Date().toLocaleDateString());if(n===null)return;createProject(n.trim());});
   const pSv=document.getElementById('pSave');if(pSv)pSv.addEventListener('click',()=>saveProject(false));
   const pSA=document.getElementById('pSaveAs');if(pSA)pSA.addEventListener('click',()=>saveProject(true));
-  const pRn=document.getElementById('pRename');if(pRn)pRn.addEventListener('click',()=>{const s=loadStore();if(s.activeId)renameProject(s.activeId);});
-  const pEA=document.getElementById('pExportActive');if(pEA)pEA.addEventListener('click',()=>{const s=loadStore();if(s.activeId)exportProjectFile(s.activeId);});
-  const pI=document.getElementById('pImport');if(pI)pI.addEventListener('click',()=>{const inp=document.createElement('input');inp.type='file';inp.accept='application/json';inp.onchange=async()=>{const f=inp.files?.[0];if(!f)return;const obj=safeJSON(await f.text(),null);if(!obj||!obj.data){toast('Invalid project file','error');return;}const s=loadStore();s.items.unshift({id:uid(),name:obj.name||'Imported',createdAt:Date.now(),updatedAt:Date.now(),data:obj.data});s.activeId=s.items[0].id;saveStore(s);if(s.items[0]?.data)await applyPayload(s.items[0].data);toast('Imported "'+( obj.name||'project')+'"!','success');rebuildSidePanel();};inp.click();});
-  document.querySelectorAll('.pLoad').forEach(btn=>{btn.addEventListener('click',()=>loadProject(btn.dataset.id));});
-  document.querySelectorAll('.pDel').forEach(btn=>{btn.addEventListener('click',()=>deleteProject(btn.dataset.id));});
-  document.querySelectorAll('.pExport').forEach(btn=>{btn.addEventListener('click',()=>exportProjectFile(btn.dataset.id));});
-  document.querySelectorAll('.pRenameBtn').forEach(btn=>{btn.addEventListener('click',()=>renameProject(btn.dataset.id));});
+  document.querySelectorAll('.pLoad').forEach(btn=>btn.addEventListener('click',()=>loadProject(btn.dataset.id)));
+  document.querySelectorAll('.pDel').forEach(btn=>btn.addEventListener('click',()=>deleteProject(btn.dataset.id)));
   const csn=document.getElementById('cloudSetName');
-  if(csn)csn.addEventListener('click',()=>{
-    const name=(document.getElementById('cloudNameInput').value||'').trim();
-    if(!name){toast('Enter your name','error');return;}
-    setCloudName(name);toast('Connected as '+name+'!','success');rebuildSidePanel();
-  });
-  const cnBtn=document.getElementById('cloudChangeName');
-  if(cnBtn)cnBtn.addEventListener('click',()=>{const n=prompt('Your name:',getCloudName());if(n&&n.trim()){setCloudName(n.trim());rebuildSidePanel();}});
-  const csBtn=document.getElementById('cloudSaveNew');
-  if(csBtn)csBtn.addEventListener('click',()=>cloudSave());
-  const crBtn=document.getElementById('cloudRefresh');
-  if(crBtn)crBtn.addEventListener('click',()=>refreshCloudList());
+  if(csn)csn.addEventListener('click',()=>{const name=(document.getElementById('cloudNameInput').value||'').trim();if(!name){toast('Enter your name','error');return;}setCloudName(name);rebuildSidePanel();});
+  const csBtn=document.getElementById('cloudSaveNew');if(csBtn)csBtn.addEventListener('click',()=>cloudSave());
+  const crBtn=document.getElementById('cloudRefresh');if(crBtn)crBtn.addEventListener('click',()=>refreshCloudList());
   if(getCloudName()&&document.getElementById('cloudProjectsList'))refreshCloudList();
 }
 
 async function refreshCloudList(){
-  const el=document.getElementById('cloudProjectsList');
-  if(!el)return;
-  el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:6px;">Loading from cloud...</div>';
+  const el=document.getElementById('cloudProjectsList');if(!el)return;
+  el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:6px;">Loading...</div>';
   const projects=await cloudList();
-  if(!document.getElementById('cloudProjectsList'))return;
-  if(!projects||!projects.length){el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:6px;">No cloud projects yet. Save one!</div>';return;}
+  if(!projects||!projects.length){el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:6px;">No projects</div>';return;}
   let ph='';
-  projects.forEach(p=>{
-    const d=p.updatedAt?new Date(p.updatedAt).toLocaleString():'';
-    ph+='<div style="display:flex;align-items:center;gap:4px;padding:7px;border-radius:var(--radius-sm);margin-bottom:3px;background:rgba(255,255,255,.03);border:1px solid var(--border);">';
-    ph+='<div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(p.name)+'</div>';
-    ph+='<div style="font-size:9px;color:var(--text3)">'+d+(p.savedBy?' \u2022 by '+esc(p.savedBy):'')+'</div></div>';
-    ph+='<button class="sm-btn cLoad" data-id="'+esc(p.id)+'">Load</button>';
-    ph+='<button class="sm-btn cUpdate" data-id="'+esc(p.id)+'" data-name="'+esc(p.name)+'">\u2601\ufe0f Update</button>';
-    ph+='<button class="sm-btn danger cDel" data-id="'+esc(p.id)+'" data-name="'+esc(p.name)+'">\u00d7</button></div>';
-  });
+  projects.forEach(p=>{ph+='<div style="padding:7px;margin-bottom:3px;background:rgba(255,255,255,.03);border-radius:var(--radius-sm);"><div style="font-size:11px;">'+esc(p.name)+'</div><button class="sm-btn cLoad" data-id="'+esc(p.id)+'">Load</button><button class="sm-btn danger cDel" data-id="'+esc(p.id)+'" data-name="'+esc(p.name)+'">\u00d7</button></div>';});
   el.innerHTML=ph;
-  el.querySelectorAll('.cLoad').forEach(btn=>{btn.addEventListener('click',()=>cloudLoad(btn.dataset.id));});
-  el.querySelectorAll('.cUpdate').forEach(btn=>{btn.addEventListener('click',()=>cloudUpdate(btn.dataset.id,btn.dataset.name));});
-  el.querySelectorAll('.cDel').forEach(btn=>{btn.addEventListener('click',()=>{cloudDelete(btn.dataset.id,btn.dataset.name).then(()=>refreshCloudList());});});
+  el.querySelectorAll('.cLoad').forEach(btn=>btn.addEventListener('click',()=>cloudLoad(btn.dataset.id)));
+  el.querySelectorAll('.cDel').forEach(btn=>btn.addEventListener('click',()=>cloudDelete(btn.dataset.id,btn.dataset.name).then(()=>refreshCloudList())));
 }
 
-/* ═══ TOP TAB EVENTS ═══ */
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click',async()=>{
     currentTab=btn.dataset.tab;
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
-    // For static tabs, trigger a load if not loaded yet
-    if (currentTab.startsWith('static-') && !menuDefaultsCache && menuDefaultsStatus !== 'loading') {
-      rebuildSidePanel();
-      await loadMenuDefaults();
-      rebuildSidePanel();
-    } else {
-      rebuildSidePanel();
-    }
+    if(currentTab.startsWith('static-')&&!menuDefaultsCache&&menuDefaultsStatus!=='loading'){rebuildSidePanel();await loadMenuDefaults();rebuildSidePanel();}
+    else rebuildSidePanel();
     if(window.innerWidth<=900)document.getElementById('sidePanel').classList.add('mobile-open');
   });
 });
@@ -1870,13 +1169,11 @@ document.getElementById('mobSettingsBtn').addEventListener('click',()=>{currentT
 document.getElementById('mobLunchBtn').addEventListener('click',()=>{currentTab='menu-lunch';document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));const mt=document.querySelector('.tab-btn[data-tab="menu-lunch"]');if(mt)mt.classList.add('active');rebuildSidePanel();document.getElementById('sidePanel').classList.add('mobile-open');});
 document.getElementById('closeSidePanel').addEventListener('click',()=>{document.getElementById('sidePanel').classList.remove('mobile-open');});
 
-/* ═══ INIT ═══ */
 loadStarterBoxes();rebuildSidePanel();
 (async()=>{
   const s=loadStore();if(s.items.length>0){const a=s.items.find(p=>p.id===s.activeId)||s.items[0];s.activeId=a.id;saveStore(s);if(a.data)await applyPayload(a.data);}else draw();
   const DI="/images/FBMenu.png";
   if(!imgDataURL&&DI){img=new Image();img.onload=()=>{imgLoaded=true;draw();};img.onerror=()=>{imgLoaded=false;draw();};img.src=DI;}
-  // Prefetch menu defaults silently so static tabs open instantly on first click
   loadMenuDefaults();
 })();
 
