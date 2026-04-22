@@ -678,6 +678,54 @@ function escapeHTML(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'
 function escapeAttr(s){return escapeHTML(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 /* ═══════════════════════════════════════════════════════════
+   POST-CLOSE ROLLOVER — if past today's close time, show tomorrow's menu
+   Uses menu_defaults.hours.weekly — same logic as the editor.
+   ═══════════════════════════════════════════════════════════ */
+function parseTime12(s){
+  if(!s)return null;
+  var m=String(s).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if(!m)return null;
+  var h=+m[1], mn=+m[2], ap=m[3].toUpperCase();
+  if(ap==='PM'&&h!==12)h+=12;
+  if(ap==='AM'&&h===12)h=0;
+  return h*60+mn;
+}
+function getClosingMinutes(dayName){
+  var hours = (live.defaults && live.defaults.hours && live.defaults.hours.weekly) || [];
+  var entry = null;
+  for (var i = 0; i < hours.length; i++) {
+    if (String(hours[i].day||'').toLowerCase() === String(dayName||'').toLowerCase()) { entry = hours[i]; break; }
+  }
+  if (!entry || !entry.close) {
+    // Defaults if hours aren't loaded: Sun 3PM, all others 2PM
+    return String(dayName||'').toLowerCase() === 'sunday' ? 15*60 : 14*60;
+  }
+  return parseTime12(entry.close) || 14*60;
+}
+/* Returns the "effective today" ISO — shifts to tomorrow if past close time */
+function getEffectiveTodayISO(){
+  var now = new Date();
+  var dayName = now.toLocaleDateString('en-US',{weekday:'long'});
+  var nowMins = now.getHours()*60 + now.getMinutes();
+  var closeMins = getClosingMinutes(dayName);
+  if (nowMins >= closeMins) {
+    // Past close — roll to tomorrow
+    var tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
+    return toISO(tomorrow);
+  }
+  return toISO(now);
+}
+/* Returns 0 if still open today, 1 if rolled to tomorrow */
+function getRolloverOffset(){
+  var now = new Date();
+  var dayName = now.toLocaleDateString('en-US',{weekday:'long'});
+  var nowMins = now.getHours()*60 + now.getMinutes();
+  var closeMins = getClosingMinutes(dayName);
+  return nowMins >= closeMins ? 1 : 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
    LIVE DATA — single source of truth, refreshed from Supabase
    Same shape the editor writes and menu.html reads.
    ═══════════════════════════════════════════════════════════ */
@@ -767,32 +815,114 @@ function parseCrawfishInfo(){
    TODAY + NEXT-CRAWFISH-DAY LOOKUP
    ═══════════════════════════════════════════════════════════ */
 function getTodaysMenu(){
-  var iso = toISO(new Date());
+  var iso = getEffectiveTodayISO();
   return live.dates[iso] || null;
 }
 /* If today's lunch isn't posted, find the next upcoming day that IS posted.
-   Returns { menu, iso, dayName, label, daysOut } or null. */
+   Starts from effective-today (already rolled past close-time). */
 function findNextLunchDay(){
-  var today = new Date();
+  var start = new Date();
+  var offset = getRolloverOffset();
+  start.setDate(start.getDate() + offset);
   for (var i = 0; i < 14; i++) {
-    var d = new Date(today);
-    d.setDate(today.getDate() + i);
+    var d = new Date(start);
+    d.setDate(start.getDate() + i);
     var iso = toISO(d);
     var menu = live.dates[iso];
     if (menu && menu.lunch && Array.isArray(menu.lunch.items) && menu.lunch.items.length > 0) {
       var dayName = d.toLocaleDateString('en-US', {weekday: 'long'});
       var label = d.toLocaleDateString('en-US', {weekday: 'long', month: 'short', day: 'numeric'});
+      // daysOut is relative to effective-today (already accounts for rollover)
       return { menu: menu, iso: iso, dayName: dayName, label: label, daysOut: i };
     }
   }
   return null;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   SIDES FILTER — the editor's publishLunch() publishes ALL
+   bullet points from the FB menu Lunch text box as lunch.items,
+   which mixes meats and sides together. Filter the sides out
+   by cross-referencing our known sides + any extras from
+   menu_defaults.salad.saladBar.toppings.
+   ═══════════════════════════════════════════════════════════ */
+function normalizeItemName(s){
+  return String(s||'').toLowerCase()
+    .replace(/^\s*[\u2022\u2023\u25E6\u2043\u2219\-\*]\s*/,'')   // leading bullet
+    .replace(/\s*&\s*/g,' and ')                                   // & → and
+    .replace(/[^a-z0-9\s]/g,' ')                                   // punctuation
+    .replace(/\s+/g,' ')                                           // collapse whitespace
+    .trim();
+}
+function getKnownSidesSet(){
+  // Core sides that ALWAYS accompany Southern lunch plates in Hot Headz style.
+  // Plus anything published to the salad bar. Plus phrases like "green beans",
+  // "mashed potatoes & gravy" etc. — normalized matching handles variations.
+  var core = [
+    'Mac & Cheese', 'Macaroni & Cheese', 'Macaroni and Cheese',
+    'Cornbread', 'Rolls', 'Biscuits',
+    'Rice', 'Red Beans', 'Red Beans & Rice', 'Beans',
+    'Greens', 'Collard Greens', 'Mustard Greens', 'Turnip Greens',
+    'Mashed Potatoes', 'Mashed Potatoes & Gravy', 'Mashed Potatoes and Gravy',
+    'Sweet Potato', 'Sweet Potatoes', 'Sweet Potato Casserole',
+    'Black-eyed Peas', 'Black Eyed Peas', 'Field Peas',
+    'Green Beans', 'String Beans',
+    'Corn', 'Creamed Corn', 'Corn on the Cob',
+    'Cabbage', 'Fried Cabbage',
+    'Fried Okra', 'Okra', 'Stewed Okra',
+    'Potato Salad', 'Coleslaw', 'Cole Slaw', 'Slaw',
+    'Green Salad', 'Tossed Salad', 'Side Salad',
+    'Hushpuppies', 'Hush Puppies',
+    'Baked Potato', 'Loaded Baked Potato',
+    'French Fries', 'Fries', 'Fried Potatoes',
+    'Dirty Rice', 'White Rice',
+    'Broccoli', 'Cauliflower', 'Carrots', 'Squash',
+    'Dressing', 'Cornbread Dressing', 'Stuffing',
+    'Macaroni Salad', 'Pasta Salad',
+    'Lima Beans', 'Butter Beans', 'Pinto Beans', 'Black Beans'
+  ];
+  var set = {};
+  core.forEach(function(n){ set[normalizeItemName(n)] = true; });
+
+  // Add any toppings from the salad bar as potential side matches
+  var toppings = (live.defaults && live.defaults.salad && live.defaults.salad.saladBar && live.defaults.salad.saladBar.toppings) || [];
+  toppings.forEach(function(n){ set[normalizeItemName(n)] = true; });
+
+  return set;
+}
+function isSide(itemName, sidesSet){
+  return !!sidesSet[normalizeItemName(itemName)];
+}
+/* Also detect header-y / non-food lines that sometimes sneak into Lunch text box */
+function isNonMeat(itemName){
+  var n = normalizeItemName(itemName);
+  if (!n) return true;
+  // Time ranges "11 00 am 2 00 pm"
+  if (/\d+\s*\d*\s*(am|pm)/i.test(n)) return true;
+  // Headers
+  if (n === 'lunch' || n === 'sides' || n === 'meats' || n === 'same daily') return true;
+  if (/^(lunch|breakfast|dinner|menu|sides|meats)\s*$/i.test(n)) return true;
+  return false;
+}
+function filterToMeats(rawItems){
+  if (!Array.isArray(rawItems)) return [];
+  var sidesSet = getKnownSidesSet();
+  return rawItems.filter(function(it){
+    var name = typeof it === 'string' ? it : (it && it.name) || '';
+    if (!name) return false;
+    if (isNonMeat(name)) return false;
+    if (isSide(name, sidesSet)) return false;
+    return true;
+  });
+}
 function findNextCrawfishDay(){
-  // Look at today + next 7 days; return first one where crawfish.show === true
-  var today = new Date();
+  // Start from effective-today (rolls to tomorrow if past close)
+  var start = new Date();
+  var offset = getRolloverOffset();
+  start.setDate(start.getDate() + offset);
   for (var i = 0; i < 8; i++) {
-    var d = new Date(today);
-    d.setDate(today.getDate() + i);
+    var d = new Date(start);
+    d.setDate(start.getDate() + i);
     var iso = toISO(d);
     var menu = live.dates[iso];
     if (menu && menu.crawfish && menu.crawfish.show === true) {
@@ -805,7 +935,8 @@ function findNextCrawfishDay(){
 function getTodaysLunchItems(){
   var menu = getTodaysMenu();
   var items = (menu && menu.lunch && Array.isArray(menu.lunch.items)) ? menu.lunch.items : [];
-  return items.map(function(it){
+  var meatsOnly = filterToMeats(items);
+  return meatsOnly.map(function(it){
     if (typeof it === 'string') return { name: it, desc: '' };
     if (it && typeof it === 'object') return { name: String(it.name || '').trim(), desc: String(it.desc || '').trim() };
     return null;
@@ -820,7 +951,8 @@ function getPickerMeats(){
   }
   var next = findNextLunchDay();
   if (next) {
-    var mapped = next.menu.lunch.items.map(function(it){
+    var filtered = filterToMeats(next.menu.lunch.items);
+    var mapped = filtered.map(function(it){
       if (typeof it === 'string') return { name: it, desc: '' };
       if (it && typeof it === 'object') return { name: String(it.name || '').trim(), desc: String(it.desc || '').trim() };
       return null;
@@ -975,19 +1107,29 @@ function renderPickers(){
   });
 
   // STATUS LINE
+  var rolled = getRolloverOffset() === 1;
+  var todayWord = rolled ? 'Tomorrow' : 'Today';
+  var todayWordLower = rolled ? 'tomorrow' : 'today';
+  var rolloverNote = rolled ? '<br><span style="font-size:11px;opacity:.75;">\ud83c\udf19 We\'re closed for today &mdash; showing tomorrow\'s menu so you can plan ahead.</span>' : '';
+
   if (pickerData.source === 'none') {
     statusEl.className = 'lunch-status pending';
-    statusEl.innerHTML = '\u23f3 No lunch menu posted yet &mdash; you can still get an estimate. Call for today\'s actual menu.';
+    statusEl.innerHTML = '\u23f3 No lunch menu posted yet &mdash; you can still get an estimate. Call for ' + todayWordLower + '\'s actual menu.';
   } else if (pickerData.source === 'next') {
     statusEl.className = 'lunch-status pending';
     var d = pickerData.dayInfo;
-    var whenText = d.daysOut === 1 ? 'tomorrow (' + d.dayName + ')' :
-                   d.daysOut === 0 ? 'today' :
-                   'on ' + d.dayName + ' (' + d.daysOut + ' days out)';
-    statusEl.innerHTML = '\u2139\ufe0f Today\'s lunch isn\'t posted yet. Showing menu for <strong>' + whenText + '</strong> &mdash; ' + lunchItems.length + ' meat' + (lunchItems.length===1?'':'s') + ' available. Order ahead or call for today.';
+    var whenText;
+    if (d.daysOut === 0) {
+      whenText = todayWordLower;
+    } else if (d.daysOut === 1) {
+      whenText = rolled ? 'the day after tomorrow (' + d.dayName + ')' : 'tomorrow (' + d.dayName + ')';
+    } else {
+      whenText = d.dayName + ' (' + d.daysOut + ' days out)';
+    }
+    statusEl.innerHTML = '\u2139\ufe0f ' + todayWord + '\'s lunch isn\'t posted yet. Showing menu for <strong>' + whenText + '</strong> &mdash; ' + lunchItems.length + ' meat' + (lunchItems.length===1?'':'s') + ' available.' + rolloverNote;
   } else {
     statusEl.className = 'lunch-status posted';
-    statusEl.innerHTML = '\u2713 Today\'s menu loaded (' + lunchItems.length + ' meat' + (lunchItems.length===1?'':'s') + '). Pick up to ' + maxMeats + ', or skip and let us choose.';
+    statusEl.innerHTML = '\u2713 ' + todayWord + '\'s menu loaded (' + lunchItems.length + ' meat' + (lunchItems.length===1?'':'s') + '). Pick up to ' + maxMeats + ', or skip and let us choose.' + rolloverNote;
   }
 }
 
@@ -1141,8 +1283,13 @@ function loadLiveData(){
       console.log('[delivery] today =', today, '| has menu?', !!live.dates[today]);
       if (live.dates[today]) {
         var li = (live.dates[today].lunch && live.dates[today].lunch.items) || [];
-        console.log('[delivery] today\'s lunch items:', li.length, li);
+        console.log('[delivery] today\'s raw lunch.items:', li.length, li);
+        var filtered = filterToMeats(li);
+        console.log('[delivery] after sides filter:', filtered.length, filtered.map(function(x){return typeof x==='string'?x:x.name;}));
       }
+      var rollover = getRolloverOffset();
+      console.log('[delivery] rollover offset:', rollover, '(0=open, 1=past close, showing tomorrow)');
+      console.log('[delivery] effective today:', getEffectiveTodayISO());
     } else if (dateRows && dateRows.message) {
       console.warn('[delivery] lunch_dates error:', dateRows.message);
     }
