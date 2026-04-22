@@ -956,7 +956,19 @@ function findNextCrawfishDay(){
 }
 function getTodaysLunchItems(){
   var menu = getTodaysMenu();
-  var items = (menu && menu.lunch && Array.isArray(menu.lunch.items)) ? menu.lunch.items : [];
+  if (!menu || !menu.lunch) return [];
+
+  // NEW: prefer the structured meats[] field if present (from updated editor)
+  if (Array.isArray(menu.lunch.meats) && menu.lunch.meats.length > 0) {
+    return menu.lunch.meats.map(function(it){
+      if (typeof it === 'string') return { name: it, desc: '' };
+      if (it && typeof it === 'object') return { name: String(it.name||'').trim(), desc: String(it.desc||'').trim() };
+      return null;
+    }).filter(function(x){ return x && x.name; });
+  }
+
+  // FALLBACK: old-style items[] → filter sides/sameDaily on the fly
+  var items = Array.isArray(menu.lunch.items) ? menu.lunch.items : [];
   var meatsOnly = filterToMeats(items);
   return meatsOnly.map(function(it){
     if (typeof it === 'string') return { name: it, desc: '' };
@@ -973,12 +985,22 @@ function getPickerMeats(){
   }
   var next = findNextLunchDay();
   if (next) {
-    var filtered = filterToMeats(next.menu.lunch.items);
-    var mapped = filtered.map(function(it){
-      if (typeof it === 'string') return { name: it, desc: '' };
-      if (it && typeof it === 'object') return { name: String(it.name || '').trim(), desc: String(it.desc || '').trim() };
-      return null;
-    }).filter(function(x){ return x && x.name; });
+    // Prefer structured meats[] from the next day's row if present
+    var mapped;
+    if (Array.isArray(next.menu.lunch.meats) && next.menu.lunch.meats.length > 0) {
+      mapped = next.menu.lunch.meats.map(function(it){
+        if (typeof it === 'string') return { name: it, desc: '' };
+        if (it && typeof it === 'object') return { name: String(it.name||'').trim(), desc: String(it.desc||'').trim() };
+        return null;
+      }).filter(function(x){ return x && x.name; });
+    } else {
+      var filtered = filterToMeats(next.menu.lunch.items);
+      mapped = filtered.map(function(it){
+        if (typeof it === 'string') return { name: it, desc: '' };
+        if (it && typeof it === 'object') return { name: String(it.name || '').trim(), desc: String(it.desc || '').trim() };
+        return null;
+      }).filter(function(x){ return x && x.name; });
+    }
     return { items: mapped, source: 'next', dayInfo: { label: next.label, dayName: next.dayName, daysOut: next.daysOut } };
   }
   return { items: [], source: 'none', dayInfo: null };
@@ -994,6 +1016,31 @@ function getSidesList(){
   // Hot Headz sides for lunch plates aren't in the schema. Use a curated list.
   // (The salad bar toppings are for the salad bar, not lunch plate sides.)
   return ['Mac & Cheese', 'Cornbread', 'Rice', 'Beans', 'Greens', 'Mashed Potatoes', 'Sweet Potato', 'Black-eyed Peas'];
+}
+
+/* If the new editor published day-specific sides, use those instead of the fallback.
+   Checks today first, then next available day. */
+function getDaySidesList(){
+  var menu = getTodaysMenu();
+  // Try today's structured sides
+  if (menu && menu.lunch && Array.isArray(menu.lunch.sides) && menu.lunch.sides.length > 0) {
+    return menu.lunch.sides.map(function(it){
+      if (typeof it === 'string') return it;
+      if (it && typeof it === 'object') return String(it.name||'').trim();
+      return '';
+    }).filter(Boolean);
+  }
+  // Try next day's structured sides
+  var next = findNextLunchDay();
+  if (next && next.menu && next.menu.lunch && Array.isArray(next.menu.lunch.sides) && next.menu.lunch.sides.length > 0) {
+    return next.menu.lunch.sides.map(function(it){
+      if (typeof it === 'string') return it;
+      if (it && typeof it === 'object') return String(it.name||'').trim();
+      return '';
+    }).filter(Boolean);
+  }
+  // Fallback
+  return getSidesList();
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -1111,8 +1158,8 @@ function renderPickers(){
     });
   }
 
-  // SIDES
-  var sides = getSidesList();
+  // SIDES — prefer structured sides[] from today/next day, else use fallback
+  var sides = getDaySidesList();
   sidePicker.innerHTML = sides.map(function(name){
     var isActive = state.selectedSides.has(name);
     var atMax = !isActive && state.selectedSides.size >= 2;
