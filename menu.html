@@ -295,6 +295,26 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:10000;
 .section-label.label-samedaily{color:#7ac4ff}
 .section-label.label-samedaily::after{background:linear-gradient(90deg,#7ac4ff,transparent)}
 
+/* ═══ Lunch three-column layout (Meats / Sides / Same Daily) ═══ */
+.lunch-triple{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:18px;margin-top:8px;align-items:start}
+.lunch-triple .lunch-col{min-width:0}
+.lunch-triple .section-label{margin-top:0;margin-bottom:10px}
+.lunch-triple .item-list{gap:3px}
+.lunch-triple .menu-item{padding:10px 14px;font-size:15px}
+.lunch-triple .menu-item .item-name{font-size:15px}
+.lunch-triple .menu-item .item-hint{font-size:10px}
+/* Two columns on narrower screens, one on mobile */
+@media(max-width:880px){
+  .lunch-triple{grid-template-columns:1fr 1fr;gap:14px}
+  /* Let same-daily span both columns when it wraps */
+  .lunch-triple .lunch-col-samedaily{grid-column:1/-1}
+}
+@media(max-width:560px){
+  .lunch-triple{grid-template-columns:1fr;gap:0}
+  .lunch-triple .lunch-col{margin-bottom:6px}
+  .lunch-triple .lunch-col-samedaily{grid-column:auto}
+}
+
 .plates-row{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}.plate-card{padding:18px 20px;border-radius:16px;border:1px solid var(--border-warm);background:linear-gradient(145deg,var(--surface-solid),rgba(40,28,18,.6));font-size:15px;font-weight:600;line-height:1.5;color:var(--text);transition:all .3s var(--ease-out-expo)}.plate-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.4)}
 .item-list{list-style:none;display:grid;gap:4px}.menu-item{padding:14px 18px;border-radius:14px;border:1px solid transparent;font-size:16px;font-weight:600;cursor:pointer;transition:all .35s var(--ease-out-expo);opacity:0;transform:translateY(16px)}.menu-item.revealed{opacity:1;transform:translateY(0)}.menu-item:hover{border-color:var(--border-warm);background:var(--surface);transform:translateX(6px);box-shadow:0 8px 24px rgba(0,0,0,.25)}.menu-item .item-name{font-weight:700;color:var(--text);font-size:16px}.menu-item:hover .item-name{color:var(--accent-light)}.menu-item .item-desc{max-height:0;opacity:0;overflow:hidden;transition:all .4s var(--ease-out-expo);font-size:14px;color:rgba(245,237,228,.88);line-height:1.6}.menu-item.expanded .item-desc{max-height:80px;opacity:1;margin-top:6px}.menu-item .item-hint{font-size:11px;color:rgba(245,237,228,.65);font-weight:600;margin-top:2px}.menu-item.expanded .item-hint{opacity:0;height:0;margin:0}
 /* Non-interactive list items (sides, same-daily) don't need click affordance */
@@ -668,37 +688,39 @@ function rCat(c){
   if(c.plates&&c.plates.length)
     h+='<div class="section-label">Plates &amp; Pricing</div><div class="plates-row">'+c.plates.map(function(p){return'<div class="plate-card">'+esc(p)+'</div>'}).join("")+'</div>';
 
-  // LUNCH: render structured meats / sides / same daily as separate sections
+  // LUNCH: render structured meats / sides / same daily as separate sections side-by-side
   if(c.hasLunch){
     var hasAny = (c.meats && c.meats.length) || (c.sides && c.sides.length) || (c.sameDaily && c.sameDaily.length);
     if (!hasAny) {
       h += '<p style="color:rgba(245,237,228,.65);margin-top:12px;padding:20px;text-align:center;font-style:italic;">Lunch not posted yet \u2014 call us for today\'s menu.</p>';
     } else {
+      h += '<div class="lunch-triple">';
       if(c.meats && c.meats.length){
-        h+='<div class="section-label label-meats">\ud83c\udf57 Today\'s Meats</div><ul class="item-list">';
+        h+='<div class="lunch-col lunch-col-meats"><div class="section-label label-meats">\ud83c\udf57 Meats</div><ul class="item-list">';
         c.meats.forEach(function(it){
           var desc = esc(it.desc||data.settings.noDescriptionText||"");
           h+='<li class="menu-item meat-item" onclick="this.classList.toggle(\'expanded\')"><div class="item-name">'+esc(it.name)+'</div><div class="item-desc">'+desc+'</div><div class="item-hint">tap for details</div></li>';
         });
-        h+='</ul>';
+        h+='</ul></div>';
       }
       if(c.sides && c.sides.length){
-        h+='<div class="section-label label-sides">\ud83e\udd57 Today\'s Sides</div><ul class="item-list">';
+        h+='<div class="lunch-col lunch-col-sides"><div class="section-label label-sides">\ud83e\udd57 Sides</div><ul class="item-list">';
         c.sides.forEach(function(it){
           h+='<li class="menu-item side-item static-item"><div class="item-name">'+esc(it.name)+'</div></li>';
         });
-        h+='</ul>';
+        h+='</ul></div>';
       }
       if(c.sameDaily && c.sameDaily.length){
-        h+='<div class="section-label label-samedaily">\ud83d\udcc5 Same Daily</div><ul class="item-list">';
+        h+='<div class="lunch-col lunch-col-samedaily"><div class="section-label label-samedaily">\ud83d\udcc5 Same Daily</div><ul class="item-list">';
         c.sameDaily.forEach(function(it){
           var desc = it.desc ? '<div class="item-desc">'+esc(it.desc)+'</div><div class="item-hint">tap for details</div>' : '';
           var clickable = it.desc ? ' onclick="this.classList.toggle(\'expanded\')"' : '';
           var staticClass = it.desc ? '' : ' static-item';
           h+='<li class="menu-item'+staticClass+'"'+clickable+'><div class="item-name">'+esc(it.name)+'</div>'+desc+'</li>';
         });
-        h+='</ul>';
+        h+='</ul></div>';
       }
+      h += '</div>';
     }
   }
 
@@ -931,28 +953,32 @@ function bAdv(sISO){
       inn+='<p style="color:rgba(245,237,228,.82)">'+esc(cl.message||"Closed")+"</p>";
     } else {
       if(lp.length) inn+='<div class="section-label">Plates</div><div class="plates-row">'+lp.map(function(p){return'<div class="plate-card">'+esc(p)+"</div>"}).join("")+"</div>";
-      if(breakdown.meats.length){
-        inn+='<div class="section-label label-meats">\ud83c\udf57 Meats</div><ul class="item-list">';
-        breakdown.meats.forEach(function(it){
-          inn+='<li class="menu-item meat-item" onclick="this.classList.toggle(\'expanded\')"><div class="item-name">'+esc(it.name)+'</div><div class="item-desc">'+esc(it.desc||"")+'</div><div class="item-hint">tap for details</div></li>';
-        });
-        inn+='</ul>';
-      }
-      if(breakdown.sides.length){
-        inn+='<div class="section-label label-sides">\ud83e\udd57 Sides</div><ul class="item-list">';
-        breakdown.sides.forEach(function(it){
-          inn+='<li class="menu-item side-item static-item"><div class="item-name">'+esc(it.name)+'</div></li>';
-        });
-        inn+='</ul>';
-      }
-      if(breakdown.sameDaily.length){
-        inn+='<div class="section-label label-samedaily">\ud83d\udcc5 Same Daily</div><ul class="item-list">';
-        breakdown.sameDaily.forEach(function(it){
-          inn+='<li class="menu-item static-item"><div class="item-name">'+esc(it.name)+'</div></li>';
-        });
-        inn+='</ul>';
-      }
-      if(!breakdown.meats.length && !breakdown.sides.length) {
+      var hasAnyAdv = breakdown.meats.length || breakdown.sides.length || breakdown.sameDaily.length;
+      if(hasAnyAdv){
+        inn+='<div class="lunch-triple">';
+        if(breakdown.meats.length){
+          inn+='<div class="lunch-col lunch-col-meats"><div class="section-label label-meats">\ud83c\udf57 Meats</div><ul class="item-list">';
+          breakdown.meats.forEach(function(it){
+            inn+='<li class="menu-item meat-item" onclick="this.classList.toggle(\'expanded\')"><div class="item-name">'+esc(it.name)+'</div><div class="item-desc">'+esc(it.desc||"")+'</div><div class="item-hint">tap for details</div></li>';
+          });
+          inn+='</ul></div>';
+        }
+        if(breakdown.sides.length){
+          inn+='<div class="lunch-col lunch-col-sides"><div class="section-label label-sides">\ud83e\udd57 Sides</div><ul class="item-list">';
+          breakdown.sides.forEach(function(it){
+            inn+='<li class="menu-item side-item static-item"><div class="item-name">'+esc(it.name)+'</div></li>';
+          });
+          inn+='</ul></div>';
+        }
+        if(breakdown.sameDaily.length){
+          inn+='<div class="lunch-col lunch-col-samedaily"><div class="section-label label-samedaily">\ud83d\udcc5 Same Daily</div><ul class="item-list">';
+          breakdown.sameDaily.forEach(function(it){
+            inn+='<li class="menu-item static-item"><div class="item-name">'+esc(it.name)+'</div></li>';
+          });
+          inn+='</ul></div>';
+        }
+        inn+='</div>';
+      } else {
         inn+='<p style="color:rgba(245,237,228,.65);margin-top:12px">Lunch not posted yet.</p>';
       }
     }
