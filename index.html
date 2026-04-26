@@ -1300,137 +1300,143 @@ function spawnNavParticles(hotDots,col){
 let crawfish = null; // active crawfish object during nav transition
 
 function buildCrawfishShape(scale){
-  // Returns array of {ox, oy, r, glow} relative to crawfish center.
+  // Returns array of {ox, oy, oz, r, glow} relative to crawfish center.
   // Crawfish faces RIGHT (direction of travel). +x = forward.
-  // Coordinates roughly match a top-down crawfish silhouette,
-  // with the body ~70px long at scale=1, claws extending another ~45px forward.
+  // oz is DEPTH: negative = closer to camera (raised above body plane),
+  //              positive = farther from camera (sunken below body plane).
+  // The shell is dome-shaped, claws are RAISED forward (negative oz),
+  // walking legs are BELOW body plane (positive oz), tail curves DOWN.
   const pts = [];
   const s = scale;
 
-  // ── BODY (cephalothorax) — solid oval, dense particles ──
-  // Centered at (0,0), about 28px wide x 22px tall
+  // ── BODY (cephalothorax) — domed shell, particles around the perimeter
+  // are slightly behind, top of dome is forward (toward camera).
   for(let i = 0; i < 18; i++){
     const t = (i / 17) * Math.PI * 2;
     const rr = 0.7 + Math.random() * 0.3;
-    pts.push({
-      ox: Math.cos(t) * 14 * s * rr,
-      oy: Math.sin(t) * 9 * s * rr,
-      r: 1.2 + Math.random() * 0.6,
-      glow: 1.0
-    });
+    const ox = Math.cos(t) * 14 * s * rr;
+    const oy = Math.sin(t) * 9 * s * rr;
+    // Dome: closer to center = closer to camera (raised)
+    const distFromCenter = Math.sqrt(ox*ox + oy*oy);
+    const maxDist = 14 * s;
+    const oz = -8 * s * (1 - Math.min(1, distFromCenter / maxDist));
+    pts.push({ ox, oy, oz, r: 1.2 + Math.random() * 0.6, glow: 1.0 });
   }
-  // body fill
+  // body fill — dome top, raised
   for(let i = 0; i < 8; i++){
-    pts.push({
-      ox: (Math.random() - .5) * 22 * s,
-      oy: (Math.random() - .5) * 14 * s,
-      r: 1.0 + Math.random() * 0.5,
-      glow: 0.85
-    });
+    const ox = (Math.random() - .5) * 22 * s;
+    const oy = (Math.random() - .5) * 14 * s;
+    const distFromCenter = Math.sqrt(ox*ox + oy*oy);
+    const oz = -10 * s * (1 - Math.min(1, distFromCenter / (14 * s)));
+    pts.push({ ox, oy, oz, r: 1.0 + Math.random() * 0.5, glow: 0.92 });
   }
 
-  // ── HEAD/ROSTRUM — small forward point ──
+  // ── HEAD/ROSTRUM — small forward point, slightly raised
   for(let i = 0; i < 4; i++){
     pts.push({
       ox: (16 + i * 3) * s,
       oy: ((i % 2) - 0.5) * 2 * s,
+      oz: -4 * s + i * 1 * s,
       r: 0.9 + Math.random() * 0.4,
       glow: 1.0
     });
   }
 
-  // ── EYES — two small bright dots near the head ──
-  pts.push({ ox: 14 * s, oy: -4 * s, r: 1.4, glow: 1.4 });
-  pts.push({ ox: 14 * s, oy:  4 * s, r: 1.4, glow: 1.4 });
+  // ── EYES — small bright dots, raised on stalks (closest to camera)
+  pts.push({ ox: 14 * s, oy: -4 * s, oz: -12 * s, r: 1.5, glow: 1.5 });
+  pts.push({ ox: 14 * s, oy:  4 * s, oz: -12 * s, r: 1.5, glow: 1.5 });
 
-  // ── ANTENNAE — long trailing dots from head ──
-  // upper antenna
+  // ── ANTENNAE — trail back from head, curve up and over
   for(let i = 0; i < 6; i++){
     const k = i / 5;
+    // upper antenna — arcs upward then forward
     pts.push({
       ox: (18 + k * 22) * s,
       oy: (-5 - k * 8 + Math.sin(i * 1.2) * 1.5) * s,
+      oz: -8 * s + k * 4 * s, // starts raised, curves down
       r: 0.6 + (1 - k) * 0.4,
       glow: 0.5 + (1 - k) * 0.3
     });
-  }
-  // lower antenna
-  for(let i = 0; i < 6; i++){
-    const k = i / 5;
+    // lower antenna
     pts.push({
       ox: (18 + k * 22) * s,
       oy: (5 + k * 8 - Math.sin(i * 1.2) * 1.5) * s,
+      oz: -8 * s + k * 4 * s,
       r: 0.6 + (1 - k) * 0.4,
       glow: 0.5 + (1 - k) * 0.3
     });
   }
 
-  // ── CLAWS (chelae) — two big pincers extending forward ──
-  // Right (upper) claw — arm + pincer
-  // arm
-  pts.push({ ox: 10 * s, oy: -10 * s, r: 1.2, glow: 0.9 });
-  pts.push({ ox: 14 * s, oy: -13 * s, r: 1.2, glow: 0.9 });
-  pts.push({ ox: 18 * s, oy: -15 * s, r: 1.2, glow: 0.9 });
-  // pincer body
-  pts.push({ ox: 22 * s, oy: -16 * s, r: 1.6, glow: 1.1 });
-  pts.push({ ox: 25 * s, oy: -15 * s, r: 1.6, glow: 1.1 });
-  pts.push({ ox: 27 * s, oy: -13 * s, r: 1.4, glow: 1.0 });
-  // pincer tips (split)
-  pts.push({ ox: 30 * s, oy: -17 * s, r: 1.2, glow: 1.0 });
-  pts.push({ ox: 30 * s, oy: -12 * s, r: 1.2, glow: 1.0 });
-  pts.push({ ox: 33 * s, oy: -16 * s, r: 1.0, glow: 0.9 });
-  pts.push({ ox: 33 * s, oy: -13 * s, r: 1.0, glow: 0.9 });
+  // ── CLAWS (chelae) — RAISED FORWARD, biggest closer to camera ──
+  // Right (upper) claw
+  // arm — slightly raised, ramping up toward pincer
+  pts.push({ ox: 10 * s, oy: -10 * s, oz: -3 * s, r: 1.2, glow: 0.9 });
+  pts.push({ ox: 14 * s, oy: -13 * s, oz: -6 * s, r: 1.3, glow: 0.95 });
+  pts.push({ ox: 18 * s, oy: -15 * s, oz: -9 * s, r: 1.3, glow: 1.0 });
+  // pincer body — most raised (closest to viewer)
+  pts.push({ ox: 22 * s, oy: -16 * s, oz: -14 * s, r: 1.7, glow: 1.15 });
+  pts.push({ ox: 25 * s, oy: -15 * s, oz: -15 * s, r: 1.7, glow: 1.15 });
+  pts.push({ ox: 27 * s, oy: -13 * s, oz: -14 * s, r: 1.5, glow: 1.05 });
+  // pincer tips (split open)
+  pts.push({ ox: 30 * s, oy: -17 * s, oz: -16 * s, r: 1.3, glow: 1.05 });
+  pts.push({ ox: 30 * s, oy: -12 * s, oz: -16 * s, r: 1.3, glow: 1.05 });
+  pts.push({ ox: 33 * s, oy: -16 * s, oz: -17 * s, r: 1.1, glow: 0.95 });
+  pts.push({ ox: 33 * s, oy: -13 * s, oz: -17 * s, r: 1.1, glow: 0.95 });
 
   // Left (lower) claw — mirror
-  pts.push({ ox: 10 * s, oy:  10 * s, r: 1.2, glow: 0.9 });
-  pts.push({ ox: 14 * s, oy:  13 * s, r: 1.2, glow: 0.9 });
-  pts.push({ ox: 18 * s, oy:  15 * s, r: 1.2, glow: 0.9 });
-  pts.push({ ox: 22 * s, oy:  16 * s, r: 1.6, glow: 1.1 });
-  pts.push({ ox: 25 * s, oy:  15 * s, r: 1.6, glow: 1.1 });
-  pts.push({ ox: 27 * s, oy:  13 * s, r: 1.4, glow: 1.0 });
-  pts.push({ ox: 30 * s, oy:  17 * s, r: 1.2, glow: 1.0 });
-  pts.push({ ox: 30 * s, oy:  12 * s, r: 1.2, glow: 1.0 });
-  pts.push({ ox: 33 * s, oy:  16 * s, r: 1.0, glow: 0.9 });
-  pts.push({ ox: 33 * s, oy:  13 * s, r: 1.0, glow: 0.9 });
+  pts.push({ ox: 10 * s, oy:  10 * s, oz: -3 * s, r: 1.2, glow: 0.9 });
+  pts.push({ ox: 14 * s, oy:  13 * s, oz: -6 * s, r: 1.3, glow: 0.95 });
+  pts.push({ ox: 18 * s, oy:  15 * s, oz: -9 * s, r: 1.3, glow: 1.0 });
+  pts.push({ ox: 22 * s, oy:  16 * s, oz: -14 * s, r: 1.7, glow: 1.15 });
+  pts.push({ ox: 25 * s, oy:  15 * s, oz: -15 * s, r: 1.7, glow: 1.15 });
+  pts.push({ ox: 27 * s, oy:  13 * s, oz: -14 * s, r: 1.5, glow: 1.05 });
+  pts.push({ ox: 30 * s, oy:  17 * s, oz: -16 * s, r: 1.3, glow: 1.05 });
+  pts.push({ ox: 30 * s, oy:  12 * s, oz: -16 * s, r: 1.3, glow: 1.05 });
+  pts.push({ ox: 33 * s, oy:  16 * s, oz: -17 * s, r: 1.1, glow: 0.95 });
+  pts.push({ ox: 33 * s, oy:  13 * s, oz: -17 * s, r: 1.1, glow: 0.95 });
 
-  // ── WALKING LEGS — 4 pairs underneath the body ──
+  // ── WALKING LEGS — UNDERNEATH the body (positive oz, in shadow)
   for(let pair = 0; pair < 4; pair++){
     const px = (8 - pair * 5) * s;
-    // upper leg (3 segments)
-    pts.push({ ox: px, oy: -10 * s, r: 0.8, glow: 0.7, _leg: pair });
-    pts.push({ ox: px - 1, oy: -14 * s, r: 0.7, glow: 0.6, _leg: pair });
-    // lower leg (3 segments)
-    pts.push({ ox: px, oy:  10 * s, r: 0.8, glow: 0.7, _leg: pair + 4 });
-    pts.push({ ox: px - 1, oy:  14 * s, r: 0.7, glow: 0.6, _leg: pair + 4 });
+    // upper leg (extends below body plane)
+    pts.push({ ox: px,     oy: -10 * s, oz: 4 * s, r: 0.8, glow: 0.55, _leg: pair });
+    pts.push({ ox: px - 1, oy: -14 * s, oz: 7 * s, r: 0.7, glow: 0.45, _leg: pair });
+    // lower leg
+    pts.push({ ox: px,     oy:  10 * s, oz: 4 * s, r: 0.8, glow: 0.55, _leg: pair + 4 });
+    pts.push({ ox: px - 1, oy:  14 * s, oz: 7 * s, r: 0.7, glow: 0.45, _leg: pair + 4 });
   }
 
-  // ── ABDOMEN/TAIL — segmented going backward ──
+  // ── ABDOMEN/TAIL — segmented going backward, curves DOWN behind body
   for(let seg = 0; seg < 5; seg++){
     const sx = -(15 + seg * 6) * s;
     const sw = (8 - seg * 0.8) * s;
-    // top edge
-    pts.push({ ox: sx, oy: -sw, r: 1.0, glow: 0.85 });
+    // The further back, the deeper (curves below body plane)
+    const segOz = seg * 1.5 * s;
+    // top edge of segment (slightly raised vs sides — segmented dome)
+    pts.push({ ox: sx, oy: -sw, oz: segOz - 2 * s, r: 1.0, glow: 0.78 });
     // bottom edge
-    pts.push({ ox: sx, oy:  sw, r: 1.0, glow: 0.85 });
-    // center
-    pts.push({ ox: sx, oy: 0, r: 0.9, glow: 0.75 });
-    pts.push({ ox: sx + 3 * s, oy: (Math.random() - .5) * sw * 1.2, r: 0.7, glow: 0.6 });
+    pts.push({ ox: sx, oy:  sw, oz: segOz - 2 * s, r: 1.0, glow: 0.78 });
+    // center top of each segment — most raised
+    pts.push({ ox: sx, oy: 0, oz: segOz - 5 * s, r: 0.9, glow: 0.85 });
+    pts.push({ ox: sx + 3 * s, oy: (Math.random() - .5) * sw * 1.2, oz: segOz - 3 * s, r: 0.7, glow: 0.65 });
   }
 
-  // ── TAIL FAN — splays at the back ──
+  // ── TAIL FAN — splays at the back, lower than body plane
   const fx = -45 * s;
   for(let f = -3; f <= 3; f++){
     pts.push({
       ox: fx + Math.abs(f) * -1.5 * s,
       oy: f * 3 * s,
+      oz: 8 * s,
       r: 1.0,
-      glow: 0.9
+      glow: 0.7
     });
     pts.push({
       ox: fx - 4 * s + Math.abs(f) * -1 * s,
       oy: f * 3.6 * s,
+      oz: 10 * s,
       r: 0.8,
-      glow: 0.75
+      glow: 0.6
     });
   }
 
@@ -1460,30 +1466,52 @@ function spawnCrawfish(){
 function drawCrawfish(elapsedSinceNavStart, dt){
   if(!crawfish || crawfish.exploded) return;
 
-  // Run the carrier across the screen between t=0ms and t=1900ms
-  const RUN_MS = 1900;
+  // Run the carrier across the screen between t=0ms and t=3400ms (slowed for visibility)
+  const RUN_MS = 3400;
   const t = Math.min(1, elapsedSinceNavStart / RUN_MS);
   crawfish.progress = t;
 
-  // Position on screen (linear with slight ease-out so it lingers slightly at the end)
-  const eased = 1 - Math.pow(1 - t, 1.8);
+  // Position on screen — gentle ease-out so it slows near the right side
+  const eased = 1 - Math.pow(1 - t, 1.6);
   const cx = crawfish.startX + (crawfish.endX - crawfish.startX) * eased;
-  // Vertical bob — like a real crawfish's wobble walk
-  const bob = Math.sin(elapsedSinceNavStart * 0.018) * 4;
+  // Vertical bob (slowed to match)
+  const bob = Math.sin(elapsedSinceNavStart * 0.011) * 4;
   const cy = crawfish.y + bob;
 
-  // Body rotation/pitch — slight wiggle so it feels alive
-  const tilt = Math.sin(elapsedSinceNavStart * 0.012) * 0.08;
+  // ─── 3D PERSPECTIVE: as crawfish moves right, it gets slightly closer
+  // to the camera (scale up ~18%). Also a subtle pitch/roll wobble.
+  const cameraScale = 1.0 + eased * 0.18;
+  const tilt = Math.sin(elapsedSinceNavStart * 0.008) * 0.07;
+  const pitch = Math.sin(elapsedSinceNavStart * 0.013) * 0.05; // y-axis micro-rotation feel
 
-  // Fade in the first 200ms, hold, fade out as we transition into explosion (last 150ms)
+  // Fade in 250ms, hold, slight dim before explosion
   let alpha = 1.0;
-  if(elapsedSinceNavStart < 200) alpha = elapsedSinceNavStart / 200;
-  if(elapsedSinceNavStart > RUN_MS - 50) alpha = Math.max(0.6, 1 - (elapsedSinceNavStart - (RUN_MS - 50)) / 100);
+  if(elapsedSinceNavStart < 250) alpha = elapsedSinceNavStart / 250;
+  if(elapsedSinceNavStart > RUN_MS - 80) alpha = Math.max(0.7, 1 - (elapsedSinceNavStart - (RUN_MS - 80)) / 150);
+
+  // ─── GROUND SHADOW: oval beneath the crawfish, gives it weight & 3D presence
+  // Width matches the crawfish, dims as it moves (more "ground" contact when moving)
+  const shadowScale = crawfish.scale * cameraScale;
+  const shadowW = 70 * shadowScale;
+  const shadowH = 12 * shadowScale;
+  const shadowY = cy + 18 * shadowScale; // slightly below the body
+  const shadowAlpha = 0.32 * alpha;
+  // Add a subtle shadow wobble synced with leg movement
+  const shadowWiggle = Math.sin(elapsedSinceNavStart * 0.02) * 1.5;
+  const sg = nx.createRadialGradient(cx, shadowY + shadowWiggle, 0, cx, shadowY + shadowWiggle, shadowW);
+  sg.addColorStop(0, `rgba(8,2,1,${shadowAlpha.toFixed(2)})`);
+  sg.addColorStop(0.5, `rgba(20,5,2,${(shadowAlpha * 0.5).toFixed(2)})`);
+  sg.addColorStop(1, 'rgba(0,0,0,0)');
+  nx.fillStyle = sg;
+  nx.beginPath();
+  nx.ellipse(cx, shadowY + shadowWiggle, shadowW, shadowH, 0, 0, Math.PI * 2);
+  nx.fill();
 
   // Trail particles (smoke/sparks behind the crawfish as it moves)
-  if(Math.random() < 0.6 && t > 0.05 && t < 0.95){
+  // Slowed spawn rate to match the slower run
+  if(Math.random() < 0.45 && t > 0.05 && t < 0.95){
     nx.beginPath();
-    const trailX = cx - 50 * crawfish.scale + (Math.random() - .5) * 8;
+    const trailX = cx - 50 * crawfish.scale * cameraScale + (Math.random() - .5) * 8;
     const trailY = cy + (Math.random() - .5) * 18;
     const trailA = (0.18 + Math.random() * 0.18) * alpha;
     const r = 1.0 + Math.random() * 1.4;
@@ -1492,47 +1520,92 @@ function drawCrawfish(elapsedSinceNavStart, dt){
     nx.fill();
   }
 
-  // Render each particle of the crawfish
+  // ─── 3D RENDER PIPELINE ───
+  // 1. Transform every point: rotate by tilt/pitch, apply perspective from oz.
+  // 2. Sort by transformed Z (depth) so back parts draw first, front parts on top.
+  // 3. Draw with depth-based brightness/scale.
   const cosT = Math.cos(tilt), sinT = Math.sin(tilt);
-  // leg waving motion - subtle phase per leg index
-  const legPhase = elapsedSinceNavStart * 0.02;
+  const cosP = Math.cos(pitch), sinP = Math.sin(pitch);
+  const legPhase = elapsedSinceNavStart * 0.014; // slower leg cycle
 
+  // Camera focal length controls strength of perspective effect.
+  // Smaller = stronger perspective (more dramatic 3D).
+  const FOCAL = 110;
+
+  // Transform all points to screen space first
+  const transformed = [];
   for(let i = 0; i < crawfish.points.length; i++){
     const p = crawfish.points[i];
-    let px = p.ox, py = p.oy;
+    let px = p.ox, py = p.oy, pz = p.oz || 0;
 
-    // Animate legs: small vertical sway based on _leg index
+    // Animate legs: small motion in 3D space
     if(p._leg !== undefined){
       const ph = legPhase + p._leg * 0.7;
       py += Math.sin(ph) * 1.8;
       px += Math.cos(ph) * 0.6;
+      // Legs lift up slightly as they swing forward (subtle Z motion)
+      pz += Math.sin(ph) * 1.5;
     }
 
-    // Apply tilt rotation
-    const rx = px * cosT - py * sinT;
-    const ry = px * sinT + py * cosT;
+    // Rotation around Y-axis (pitch): rotates X ↔ Z plane
+    const px2 = px * cosP - pz * sinP;
+    const pz2 = px * sinP + pz * cosP;
+    // Rotation around Z-axis (tilt/yaw): rotates X ↔ Y plane
+    const rx = px2 * cosT - py * sinT;
+    const ry = px2 * sinT + py * cosT;
+    const rz = pz2;
 
-    const drawX = cx + rx;
-    const drawY = cy + ry;
+    // Perspective projection
+    const persp = FOCAL / (FOCAL + rz);
 
-    // Skip particles that are already past the right edge (they "exit" first)
-    if(drawX < -10 || drawX > W + 10) continue;
+    // Final screen position — also apply cameraScale
+    const drawX = cx + rx * persp * cameraScale;
+    const drawY = cy + ry * persp * cameraScale;
+    const drawR = p.r * persp * cameraScale;
 
-    // Glow
-    const gA = p.glow * 0.85 * alpha;
-    nx.shadowBlur = 6;
-    nx.shadowColor = `rgba(255,90,40,${(gA * 0.6).toFixed(2)})`;
+    // Skip particles that would draw way off-screen
+    if(drawX < -20 || drawX > W + 20) continue;
+
+    // Depth-based brightness:
+    // - Closer to camera (smaller rz) = brighter
+    // - Farther from camera (larger rz) = dimmer (in shadow)
+    // rz typically ranges from -17 (closest claw tip) to +10 (tail fan)
+    const depthShade = Math.max(0.45, Math.min(1.15, 1.0 - rz * 0.025));
+
+    transformed.push({
+      x: drawX,
+      y: drawY,
+      r: drawR,
+      glow: p.glow * depthShade,
+      z: rz
+    });
+  }
+
+  // Sort back-to-front (largest z first = farthest from camera drawn first)
+  transformed.sort((a, b) => b.z - a.z);
+
+  // Draw all transformed particles
+  for(const tp of transformed){
+    const gA = Math.min(1, tp.glow * 0.9 * alpha);
+    if(gA < 0.02) continue;
+
+    // Outer glow halo
+    nx.shadowBlur = 8;
+    nx.shadowColor = `rgba(255,90,40,${(gA * 0.55).toFixed(2)})`;
     nx.beginPath();
-    nx.arc(drawX, drawY, p.r * 1.3, 0, Math.PI * 2);
+    nx.arc(tp.x, tp.y, tp.r * 1.4, 0, Math.PI * 2);
     nx.fillStyle = `rgba(255,140,60,${gA.toFixed(2)})`;
     nx.fill();
     nx.shadowBlur = 0;
 
-    // Hot core
-    nx.beginPath();
-    nx.arc(drawX, drawY, p.r * 0.7, 0, Math.PI * 2);
-    nx.fillStyle = `rgba(255,210,150,${Math.min(1, gA * 1.2).toFixed(2)})`;
-    nx.fill();
+    // Hot core (only on bright/forward particles for contrast)
+    if(tp.glow > 0.55){
+      nx.beginPath();
+      nx.arc(tp.x, tp.y, tp.r * 0.7, 0, Math.PI * 2);
+      const coreA = Math.min(1, gA * 1.25);
+      nx.fillStyle = `rgba(255,215,160,${coreA.toFixed(2)})`;
+      nx.fill();
+    }
   }
 }
 
@@ -1596,8 +1669,8 @@ function doNavigate(id){
     navRipples.push({x:originX, y:originY, r:10, life:1.0, fat:true,  col:navColor});
     navRipples.push({x:originX, y:originY, r:5,  life:0.8, fat:false, col:[255,255,255]});
     navRipples.push({x:originX, y:originY, r:0,  life:0.6, fat:false, col:navColor});
-  }, 2000);
-  setTimeout(() => { window.location.href = navDest; }, 2500);
+  }, 3500);
+  setTimeout(() => { window.location.href = navDest; }, 4000);
 }
 
 function flashEdgeGlow(kind){
