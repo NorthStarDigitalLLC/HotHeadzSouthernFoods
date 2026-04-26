@@ -120,6 +120,39 @@
     .static-card{background:rgba(77,255,136,.04);border:1px solid rgba(77,255,136,.12);border-radius:var(--radius);padding:12px;margin-bottom:10px;}
     .static-card-title{font-size:12px;font-weight:800;color:#7ae59a;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
     .static-card-title::before{content:'';width:3px;height:12px;border-radius:2px;background:#7ae59a;}
+    /* ═══ Projects tab — cleaner cards ═══ */
+    .proj-active-banner{background:linear-gradient(135deg,rgba(255,122,24,.16),rgba(255,179,71,.10));border:1px solid rgba(255,122,24,.35);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;}
+    .proj-active-label{font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--fire2);margin-bottom:4px;display:flex;align-items:center;gap:5px;}
+    .proj-active-label::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--fire);box-shadow:0 0 10px var(--fire);animation:projPulse 2s ease-in-out infinite;}
+    @keyframes projPulse{0%,100%{opacity:.6}50%{opacity:1}}
+    .proj-active-name{font-size:14px;font-weight:800;color:#fff;margin-bottom:2px;line-height:1.2;word-break:break-word;}
+    .proj-active-meta{font-size:10px;color:var(--text3);font-weight:600;margin-bottom:8px;}
+    .proj-active-actions{display:flex;gap:5px;flex-wrap:wrap;}
+    .proj-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 11px;margin-bottom:6px;transition:background .15s,border-color .15s;}
+    .proj-card:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.16);}
+    .proj-card.is-active{background:rgba(255,122,24,.06);border-color:rgba(255,122,24,.3);}
+    .proj-card-head{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;}
+    .proj-card-info{flex:1;min-width:0;}
+    .proj-card-name{font-size:13px;font-weight:700;color:var(--text);line-height:1.25;word-break:break-word;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+    .proj-card-active-tag{font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:var(--fire);color:#fff;padding:2px 6px;border-radius:6px;flex-shrink:0;}
+    .proj-card-date{font-size:10px;color:var(--text3);font-weight:600;margin-top:2px;display:flex;align-items:center;gap:5px;}
+    .proj-card-date::before{content:'🕒';font-size:9px;opacity:.7;}
+    .proj-card-by{font-size:10px;color:var(--text3);font-weight:600;margin-top:1px;font-style:italic;}
+    .proj-badges{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px;}
+    .proj-badge{display:inline-block;padding:1px 6px;border-radius:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);font-size:9px;font-weight:700;color:var(--text2);letter-spacing:.02em;}
+    .proj-badge-img{background:rgba(100,180,255,.1);border-color:rgba(100,180,255,.2);color:#7ac4ff;}
+    .proj-actions{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;}
+    .proj-actions .sm-btn{padding:4px 9px;font-size:10px;}
+    .proj-search{padding:8px 11px;border-radius:var(--radius-sm);border:1px solid var(--border);background:rgba(0,0,0,.3);color:var(--text);font-size:12px;font-weight:600;font-family:inherit;width:100%;margin-bottom:8px;}
+    .proj-search:focus{outline:none;border-color:var(--fire);}
+    .proj-empty{padding:14px;background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.1);border-radius:var(--radius-sm);color:var(--text3);font-size:11px;text-align:center;font-style:italic;line-height:1.5;}
+    .proj-empty strong{color:var(--text2);font-style:normal;font-weight:700;}
+    .proj-cloud-prompt{padding:12px;background:rgba(100,180,255,.05);border:1px solid rgba(100,180,255,.15);border-radius:var(--radius-sm);margin-bottom:8px;}
+    .proj-cloud-prompt p{font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:8px;}
+    .proj-cloud-prompt .fi{margin-bottom:6px;}
+    .proj-section-head{display:flex;align-items:center;gap:6px;margin:6px 0 8px;}
+    .proj-section-title{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);}
+    .proj-section-count{font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;background:rgba(255,255,255,.06);color:var(--text2);}
     .status-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:20px;font-size:10px;font-weight:700;}
     .status-pill.loading{background:rgba(100,140,255,.12);color:#7c9eff;}
     .status-pill.loaded{background:rgba(77,255,136,.12);color:#7ae59a;}
@@ -427,8 +460,41 @@ function saveStore(s){try{localStorage.setItem(PK,JSON.stringify(s));return{ok:t
 const SUPABASE_URL = 'https://zgqjzgonwvkxfbdseieg.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpncWp6Z29ud3ZreGZiZHNlaWVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1Njk4NTksImV4cCI6MjA5MjE0NTg1OX0.1mGtFUKumyQUgU0pO2CxIYSKLEuYEzspCGk9ncYYavk';
 const CLOUD_NAME_KEY='hhMenuCloud_name';
+const ACTIVE_CLOUD_KEY='hhMenuCloud_activeId';
+const ACTIVE_CLOUD_NAME_KEY='hhMenuCloud_activeName';
 function getCloudName(){return localStorage.getItem(CLOUD_NAME_KEY)||'';}
 function setCloudName(n){localStorage.setItem(CLOUD_NAME_KEY,n);}
+function getActiveCloudId(){return localStorage.getItem(ACTIVE_CLOUD_KEY)||'';}
+function setActiveCloudId(id,name){if(id){localStorage.setItem(ACTIVE_CLOUD_KEY,id);localStorage.setItem(ACTIVE_CLOUD_NAME_KEY,name||'');}else{localStorage.removeItem(ACTIVE_CLOUD_KEY);localStorage.removeItem(ACTIVE_CLOUD_NAME_KEY);}}
+function getActiveCloudName(){return localStorage.getItem(ACTIVE_CLOUD_NAME_KEY)||'';}
+/* Format a timestamp as "Tuesday, Apr 22 · 3:42 PM" */
+function fmtSavedAt(ts){
+  if(!ts)return '';
+  const d=typeof ts==='number'?new Date(ts):new Date(ts);
+  if(isNaN(d.getTime()))return '';
+  const now=new Date();
+  const sameDay=d.toDateString()===now.toDateString();
+  const yesterday=new Date(now); yesterday.setDate(now.getDate()-1);
+  const isYesterday=d.toDateString()===yesterday.toDateString();
+  const time=d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+  if(sameDay)return 'Today · '+time;
+  if(isYesterday)return 'Yesterday · '+time;
+  const day=d.toLocaleDateString(undefined,{weekday:'long'});
+  const date=d.toLocaleDateString(undefined,{month:'short',day:'numeric'});
+  // include year if not current year
+  const yearTag=d.getFullYear()===now.getFullYear()?'':', '+d.getFullYear();
+  return day+', '+date+yearTag+' · '+time;
+}
+/* Project metadata badges — item count and image-included indicator */
+function projectMetaBadges(p){
+  const data=p?.data||p||{};
+  const itemCount=Array.isArray(data.boxes)?data.boxes.length:0;
+  const hasImage=!!data.imgDataURL;
+  let badges='';
+  if(itemCount)badges+='<span class="proj-badge">'+itemCount+' field'+(itemCount===1?'':'s')+'</span>';
+  if(hasImage)badges+='<span class="proj-badge proj-badge-img">📸 image</span>';
+  return badges;
+}
 function sbHeaders(){return{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json','Accept':'application/json'};}
 function sbJsonHeaders(){var h=sbHeaders();h['Prefer']='return=representation';return h;}
 function sbGet(path){return fetch(SUPABASE_URL+'/rest/v1/'+path,{headers:sbHeaders()}).then(function(r){return r.text();}).then(function(t){try{return JSON.parse(t);}catch(e){return{_raw:t};}});}
@@ -505,11 +571,71 @@ async function apiPost(params){
 }
 function apiGet(params){return apiPost(params);}
 async function cloudRequest(action,body){body=body||{};try{return await apiPost(Object.assign({action:action},body));}catch(e){toast('Cloud error: '+e.message,'error');return null;}}
-async function cloudSave(name){const projName=name||prompt('Project name for cloud:','Menu '+new Date().toLocaleDateString());if(!projName)return;toast('Saving to cloud...','info');const payload=currentPayload();const lightPayload=Object.assign({},payload,{imgDataURL:''});const result=await cloudRequest('save',{project:{id:uid(),name:projName.trim(),savedBy:getCloudName(),data:lightPayload}});if(result?.success){toast('Saved "'+projName.trim()+'" to cloud!','success');rebuildSidePanel();}else toast('Cloud save failed: '+(result?.error||'unknown'),'error');}
-async function cloudUpdate(id,name){toast('Updating cloud...','info');const payload=currentPayload();const lightPayload=Object.assign({},payload,{imgDataURL:''});const result=await cloudRequest('save',{project:{id,name,savedBy:getCloudName(),data:lightPayload}});if(result?.success)toast('Updated "'+name+'" on cloud!','success');else toast('Cloud update failed: '+(result?.error||'unknown'),'error');}
+async function cloudSaveAs(name){
+  // Always creates a NEW cloud project (fork-style)
+  const projName=name||prompt('Save as new cloud project. Name:','Menu '+new Date().toLocaleDateString());
+  if(!projName||!projName.trim())return;
+  toast('Saving to cloud...','info');
+  const payload=currentPayload();
+  const lightPayload=Object.assign({},payload,{imgDataURL:''});
+  const newId=uid();
+  const result=await cloudRequest('save',{project:{id:newId,name:projName.trim(),savedBy:getCloudName(),data:lightPayload}});
+  if(result?.success){
+    setActiveCloudId(newId,projName.trim());
+    toast('Saved "'+projName.trim()+'" to cloud!','success');
+    rebuildSidePanel();
+  } else toast('Cloud save failed: '+(result?.error||'unknown'),'error');
+}
+async function cloudSaveOver(id,name){
+  // Overwrites an EXISTING cloud project — id required
+  if(!id){toast('No active cloud project to save over','error');return;}
+  toast('Updating "'+name+'"...','info');
+  const payload=currentPayload();
+  const lightPayload=Object.assign({},payload,{imgDataURL:''});
+  const result=await cloudRequest('save',{project:{id:id,name:name,savedBy:getCloudName(),data:lightPayload}});
+  if(result?.success){
+    setActiveCloudId(id,name);
+    toast('Saved "'+name+'"!','success');
+    rebuildSidePanel();
+  } else toast('Cloud save failed: '+(result?.error||'unknown'),'error');
+}
+/* Backward-compat alias used by old code paths */
+async function cloudSave(name){return cloudSaveAs(name);}
+async function cloudUpdate(id,name){return cloudSaveOver(id,name);}
 async function cloudList(){const result=await cloudRequest('list');if(result?.success)return result.projects||[];toast('Could not load cloud projects: '+(result?.error||'unknown'),'error');return[];}
-async function cloudLoad(id){toast('Loading from cloud...','info');const result=await cloudRequest('load',{id});if(result?.success&&result.project?.data){await applyPayload(result.project.data);toast('Loaded "'+result.project.name+'" from cloud!','success');rebuildSidePanel();}else toast('Cloud load failed: '+(result?.error||'unknown'),'error');}
-async function cloudDelete(id,name){if(!confirm('Delete "'+name+'" from cloud? This affects everyone.'))return;const result=await cloudRequest('delete',{id});if(result?.success){toast('Deleted from cloud','info');rebuildSidePanel();}else toast('Cloud delete failed: '+(result?.error||'unknown'),'error');}
+async function cloudLoad(id){
+  toast('Loading from cloud...','info');
+  const result=await cloudRequest('load',{id});
+  if(result?.success&&result.project?.data){
+    await applyPayload(result.project.data);
+    setActiveCloudId(result.project.id,result.project.name);
+    toast('Loaded "'+result.project.name+'"!','success');
+    rebuildSidePanel();
+  } else toast('Cloud load failed: '+(result?.error||'unknown'),'error');
+}
+async function cloudRename(id,oldName){
+  const newName=prompt('Rename cloud project:',oldName);
+  if(newName===null||!newName.trim()||newName.trim()===oldName)return;
+  // Load full data first (server save needs the data field)
+  toast('Renaming...','info');
+  const loadRes=await cloudRequest('load',{id});
+  if(!loadRes?.success||!loadRes.project){toast('Could not rename: load failed','error');return;}
+  const result=await cloudRequest('save',{project:{id:id,name:newName.trim(),savedBy:getCloudName(),data:loadRes.project.data}});
+  if(result?.success){
+    if(getActiveCloudId()===id)setActiveCloudId(id,newName.trim());
+    toast('Renamed!','success');
+    rebuildSidePanel();
+  } else toast('Rename failed: '+(result?.error||'unknown'),'error');
+}
+async function cloudDelete(id,name){
+  if(!confirm('Delete "'+name+'" from cloud? This affects everyone.'))return;
+  const result=await cloudRequest('delete',{id});
+  if(result?.success){
+    if(getActiveCloudId()===id)setActiveCloudId(null);
+    toast('Deleted from cloud','info');
+    rebuildSidePanel();
+  } else toast('Cloud delete failed: '+(result?.error||'unknown'),'error');
+}
 
 /* IMAGE */
 function fileToDataURL(f){return new Promise((r,j)=>{const x=new FileReader();x.onload=()=>r(String(x.result||''));x.onerror=j;x.readAsDataURL(f);})}
@@ -899,15 +1025,105 @@ function buildTB(){
 }
 function buildPH(){return '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">Photo</span></div><div class="acc-body"><div class="fl">Zoom</div><input class="fi" type="range" id="pZoom2" min="0.3" max="4" step="0.01" value="'+photoScale+'"><div class="btn-row"><button class="sm-btn" id="pRot2">Rotate 90\u00b0</button><button class="sm-btn" id="pReset2">Reset</button></div></div></div>';}
 function buildPR(){
-  const s=loadStore();const activeProj=s.items.find(p=>p.id===s.activeId);const cloudName=getCloudName();
-  let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u2601\ufe0f Cloud</span></div><div class="acc-body">';
-  if(!cloudName){h+='<input class="fi" id="cloudNameInput" placeholder="Your name"><button class="sm-btn primary" id="cloudSetName">Connect</button>';}
-  else{h+='<div style="font-size:11px;color:var(--success);margin-bottom:8px;">Connected as '+esc(cloudName)+'</div><div class="btn-row"><button class="sm-btn primary" id="cloudSaveNew">Save</button><button class="sm-btn" id="cloudRefresh">Load</button></div><div id="cloudProjectsList"></div>';}
+  const s=loadStore();
+  const activeLocal=s.items.find(p=>p.id===s.activeId);
+  const cloudName=getCloudName();
+  const activeCloudId=getActiveCloudId();
+  const activeCloudName=getActiveCloudName();
+  // Sort local projects by most-recently-updated first
+  const localSorted=s.items.slice().sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+
+  let h='';
+
+  // ═══ CLOUD SECTION ═══
+  h+='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u2601\ufe0f Cloud Projects</span>';
+  if(cloudName)h+='<span class="acc-badge" id="cloudCountBadge">…</span>';
+  h+='</div><div class="acc-body">';
+
+  if(!cloudName){
+    h+='<div class="proj-cloud-prompt">';
+    h+='<p>Connect to share saved menus with the rest of the team. Anything you save here is visible to everyone with the staff PIN.</p>';
+    h+='<input class="fi" id="cloudNameInput" placeholder="Your name (e.g. Brittany)" autocomplete="name">';
+    h+='<button class="sm-btn primary" id="cloudSetName" style="width:100%;">\u2192 Connect to Cloud</button>';
+    h+='</div>';
+  } else {
+    h+='<div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--success);margin-bottom:10px;font-weight:700;">';
+    h+='<span style="width:6px;height:6px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success);"></span>';
+    h+='Connected as <span style="color:var(--text);">'+esc(cloudName)+'</span>';
+    h+='<button class="sm-btn" id="cloudDisconnect" style="margin-left:auto;padding:2px 8px;font-size:10px;">Switch user</button>';
+    h+='</div>';
+
+    // Active cloud banner
+    if(activeCloudId&&activeCloudName){
+      h+='<div class="proj-active-banner">';
+      h+='<div class="proj-active-label">Currently editing</div>';
+      h+='<div class="proj-active-name">'+esc(activeCloudName)+'</div>';
+      h+='<div class="proj-active-meta">Cloud project &middot; saved changes update for the whole team</div>';
+      h+='<div class="proj-active-actions">';
+      h+='<button class="sm-btn success" id="cloudSaveOver">\ud83d\udcbe Save</button>';
+      h+='<button class="sm-btn" id="cloudSaveAs">\ud83d\udcc4 Save As New</button>';
+      h+='<button class="sm-btn" id="cloudCloseActive" title="Stop tracking this as the active cloud project">Close</button>';
+      h+='</div></div>';
+    } else {
+      h+='<div class="proj-cloud-prompt"><p>No active cloud project. Save what\'s on your canvas as a new cloud project so the team can load it.</p>';
+      h+='<button class="sm-btn primary" id="cloudSaveAsFirst" style="width:100%;">\ud83d\udcbe Save Current Canvas to Cloud</button>';
+      h+='</div>';
+    }
+
+    h+='<div class="proj-section-head"><div class="proj-section-title">All cloud projects</div><div style="flex:1"></div><button class="sm-btn" id="cloudRefresh" style="padding:3px 9px;font-size:10px;">\u21bb Refresh</button></div>';
+    h+='<input class="proj-search" id="cloudSearch" placeholder="Search by name…" autocomplete="off">';
+    h+='<div id="cloudProjectsList"><div class="proj-empty">Loading…</div></div>';
+  }
   h+='</div></div>';
-  h+='<div class="acc"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">Local</span><span class="acc-badge">'+s.items.length+'</span></div><div class="acc-body">';
-  if(activeProj){h+='<div style="background:var(--ember);padding:10px;border-radius:var(--radius);margin-bottom:10px;"><div style="font-size:14px;font-weight:800;color:var(--fire);">'+esc(activeProj.name)+'</div><div class="btn-row"><button class="sm-btn primary" id="pSave">Save</button><button class="sm-btn" id="pSaveAs">Save As</button></div></div>';}
-  h+='<button class="sm-btn primary" id="pNew">+ New</button>';
-  s.items.forEach(p=>{h+='<div style="padding:7px;border-radius:var(--radius-sm);margin-bottom:3px;background:rgba(255,255,255,.03);"><div style="font-size:11px;">'+esc(p.name)+'</div><button class="sm-btn pLoad" data-id="'+esc(p.id)+'">Load</button><button class="sm-btn danger pDel" data-id="'+esc(p.id)+'">\u00d7</button></div>';});
+
+  // ═══ LOCAL SECTION ═══
+  h+='<div class="acc'+(cloudName?'':' open')+'"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83d\udcbb Local Projects</span><span class="acc-badge">'+s.items.length+'</span></div><div class="acc-body">';
+  h+='<p style="font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.5;">Saved on this device only. <strong style="color:var(--text2);">Won\'t sync to other devices</strong> — use Cloud above for that.</p>';
+
+  if(activeLocal){
+    h+='<div class="proj-active-banner">';
+    h+='<div class="proj-active-label">Currently editing</div>';
+    h+='<div class="proj-active-name">'+esc(activeLocal.name)+'</div>';
+    h+='<div class="proj-active-meta">'+esc(fmtSavedAt(activeLocal.updatedAt)||'Just opened')+' &middot; this device only</div>';
+    h+='<div class="proj-active-actions">';
+    h+='<button class="sm-btn success" id="pSave">\ud83d\udcbe Save</button>';
+    h+='<button class="sm-btn" id="pSaveAs">\ud83d\udcc4 Save As New</button>';
+    h+='<button class="sm-btn" id="pRename">\u270e Rename</button>';
+    h+='</div></div>';
+  } else {
+    h+='<button class="sm-btn primary" id="pNew" style="width:100%;margin-bottom:10px;">+ New Local Project</button>';
+  }
+
+  if(localSorted.length){
+    h+='<div class="proj-section-head"><div class="proj-section-title">Saved on this device</div><div style="flex:1"></div>';
+    if(activeLocal)h+='<button class="sm-btn" id="pNew" style="padding:3px 9px;font-size:10px;">+ New</button>';
+    h+='</div>';
+    h+='<input class="proj-search" id="localSearch" placeholder="Search by name…" autocomplete="off">';
+    h+='<div id="localProjectsList">';
+    localSorted.forEach(p=>{
+      const isActive=p.id===s.activeId;
+      h+='<div class="proj-card'+(isActive?' is-active':'')+'" data-name="'+esc(p.name.toLowerCase())+'">';
+      h+='<div class="proj-card-head"><div class="proj-card-info">';
+      h+='<div class="proj-card-name">'+esc(p.name);
+      if(isActive)h+='<span class="proj-card-active-tag">Active</span>';
+      h+='</div>';
+      h+='<div class="proj-card-date">'+esc(fmtSavedAt(p.updatedAt)||fmtSavedAt(p.createdAt)||'No date')+'</div>';
+      const badges=projectMetaBadges(p);
+      if(badges)h+='<div class="proj-badges">'+badges+'</div>';
+      h+='</div></div>';
+      h+='<div class="proj-actions">';
+      if(!isActive)h+='<button class="sm-btn primary pLoad" data-id="'+esc(p.id)+'">Load</button>';
+      h+='<button class="sm-btn pRenameRow" data-id="'+esc(p.id)+'">Rename</button>';
+      h+='<button class="sm-btn pExportFile" data-id="'+esc(p.id)+'">Export</button>';
+      h+='<button class="sm-btn danger pDel" data-id="'+esc(p.id)+'" data-name="'+esc(p.name)+'" style="margin-left:auto;">\u00d7 Delete</button>';
+      h+='</div>';
+      h+='</div>';
+    });
+    h+='</div>';
+  } else {
+    h+='<div class="proj-empty">No local projects yet.<br><strong>Save</strong> your current canvas to keep it for next time.</div>';
+  }
+
   h+='</div></div>';
   return h;
 }
@@ -1131,27 +1347,85 @@ function wirePanel(){
   const pZ=document.getElementById('pZoom2');if(pZ)pZ.addEventListener('input',()=>{photoScale=parseFloat(pZ.value);document.getElementById('photoZoom').value=pZ.value;draw();});
   const pR=document.getElementById('pRot2');if(pR)pR.addEventListener('click',()=>{saveUndo();photoRot=(photoRot+90)%360;draw();triggerAutoSave();});
   const pRs=document.getElementById('pReset2');if(pRs)pRs.addEventListener('click',()=>{saveUndo();photoScale=1;photoRot=0;photoOffsetX=0;photoOffsetY=0;document.getElementById('photoZoom').value='1';draw();triggerAutoSave();});
-  const pN=document.getElementById('pNew');if(pN)pN.addEventListener('click',()=>{const n=prompt('Name:','Menu '+new Date().toLocaleDateString());if(n===null)return;createProject(n.trim());});
+  const pN=document.getElementById('pNew');if(pN)pN.addEventListener('click',()=>{const n=prompt('Name this project:','Menu '+new Date().toLocaleDateString());if(n===null||!n.trim())return;createProject(n.trim());});
   const pSv=document.getElementById('pSave');if(pSv)pSv.addEventListener('click',()=>saveProject(false));
-  const pSA=document.getElementById('pSaveAs');if(pSA)pSA.addEventListener('click',()=>saveProject(true));
+  const pSA=document.getElementById('pSaveAs');if(pSA)pSA.addEventListener('click',()=>{const n=prompt('Save As — new project name:','Menu '+new Date().toLocaleDateString());if(n===null||!n.trim())return;createProject(n.trim());});
+  const pRn=document.getElementById('pRename');if(pRn)pRn.addEventListener('click',()=>{const s=loadStore();if(s.activeId)renameProject(s.activeId);});
   document.querySelectorAll('.pLoad').forEach(btn=>btn.addEventListener('click',()=>loadProject(btn.dataset.id)));
   document.querySelectorAll('.pDel').forEach(btn=>btn.addEventListener('click',()=>deleteProject(btn.dataset.id)));
+  document.querySelectorAll('.pRenameRow').forEach(btn=>btn.addEventListener('click',()=>renameProject(btn.dataset.id)));
+  document.querySelectorAll('.pExportFile').forEach(btn=>btn.addEventListener('click',()=>exportProjectFile(btn.dataset.id)));
+  // Local search
+  const localSearch=document.getElementById('localSearch');
+  if(localSearch)localSearch.addEventListener('input',()=>{
+    const q=localSearch.value.toLowerCase().trim();
+    document.querySelectorAll('#localProjectsList .proj-card').forEach(card=>{
+      card.style.display=(!q||(card.dataset.name||'').includes(q))?'':'none';
+    });
+  });
+  // Cloud wiring
   const csn=document.getElementById('cloudSetName');
   if(csn)csn.addEventListener('click',()=>{const name=(document.getElementById('cloudNameInput').value||'').trim();if(!name){toast('Enter your name','error');return;}setCloudName(name);rebuildSidePanel();});
-  const csBtn=document.getElementById('cloudSaveNew');if(csBtn)csBtn.addEventListener('click',()=>cloudSave());
+  const cnInput=document.getElementById('cloudNameInput');
+  if(cnInput)cnInput.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('cloudSetName')?.click();});
+  const cdis=document.getElementById('cloudDisconnect');
+  if(cdis)cdis.addEventListener('click',()=>{if(confirm('Switch user — clear "'+getCloudName()+'" connection?')){setCloudName('');setActiveCloudId(null);rebuildSidePanel();}});
+  const csOver=document.getElementById('cloudSaveOver');
+  if(csOver)csOver.addEventListener('click',()=>{const id=getActiveCloudId();const nm=getActiveCloudName();if(!id){toast('No active cloud project','error');return;}cloudSaveOver(id,nm);});
+  const csAs=document.getElementById('cloudSaveAs');
+  if(csAs)csAs.addEventListener('click',()=>cloudSaveAs());
+  const csAsFirst=document.getElementById('cloudSaveAsFirst');
+  if(csAsFirst)csAsFirst.addEventListener('click',()=>cloudSaveAs());
+  const cClose=document.getElementById('cloudCloseActive');
+  if(cClose)cClose.addEventListener('click',()=>{setActiveCloudId(null);toast('Stopped tracking active cloud project','info');rebuildSidePanel();});
   const crBtn=document.getElementById('cloudRefresh');if(crBtn)crBtn.addEventListener('click',()=>refreshCloudList());
+  // Cloud search
+  const cloudSearch=document.getElementById('cloudSearch');
+  if(cloudSearch)cloudSearch.addEventListener('input',()=>{
+    const q=cloudSearch.value.toLowerCase().trim();
+    document.querySelectorAll('#cloudProjectsList .proj-card').forEach(card=>{
+      card.style.display=(!q||(card.dataset.name||'').includes(q))?'':'none';
+    });
+  });
   if(getCloudName()&&document.getElementById('cloudProjectsList'))refreshCloudList();
 }
 
 async function refreshCloudList(){
   const el=document.getElementById('cloudProjectsList');if(!el)return;
-  el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:6px;">Loading...</div>';
+  el.innerHTML='<div class="proj-empty">Loading projects from cloud…</div>';
   const projects=await cloudList();
-  if(!projects||!projects.length){el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:6px;">No projects</div>';return;}
+  const countBadge=document.getElementById('cloudCountBadge');
+  if(!projects||!projects.length){
+    el.innerHTML='<div class="proj-empty">No cloud projects yet.<br><strong>Save</strong> your first one above so the team can load it.</div>';
+    if(countBadge)countBadge.textContent='0';
+    return;
+  }
+  if(countBadge)countBadge.textContent=String(projects.length);
+  const activeId=getActiveCloudId();
   let ph='';
-  projects.forEach(p=>{ph+='<div style="padding:7px;margin-bottom:3px;background:rgba(255,255,255,.03);border-radius:var(--radius-sm);"><div style="font-size:11px;">'+esc(p.name)+'</div><button class="sm-btn cLoad" data-id="'+esc(p.id)+'">Load</button><button class="sm-btn danger cDel" data-id="'+esc(p.id)+'" data-name="'+esc(p.name)+'">\u00d7</button></div>';});
+  projects.forEach(p=>{
+    const isActive=p.id===activeId;
+    const updatedAt=p.updated_at||p.updatedAt;
+    const createdAt=p.created_at||p.createdAt;
+    const savedBy=p.saved_by||p.savedBy||'';
+    ph+='<div class="proj-card'+(isActive?' is-active':'')+'" data-name="'+esc((p.name||'').toLowerCase())+'">';
+    ph+='<div class="proj-card-head"><div class="proj-card-info">';
+    ph+='<div class="proj-card-name">'+esc(p.name||'(untitled)');
+    if(isActive)ph+='<span class="proj-card-active-tag">Active</span>';
+    ph+='</div>';
+    ph+='<div class="proj-card-date">'+esc(fmtSavedAt(updatedAt)||fmtSavedAt(createdAt)||'Unknown date')+'</div>';
+    if(savedBy)ph+='<div class="proj-card-by">by '+esc(savedBy)+'</div>';
+    ph+='</div></div>';
+    ph+='<div class="proj-actions">';
+    if(!isActive)ph+='<button class="sm-btn primary cLoad" data-id="'+esc(p.id)+'">Load</button>';
+    ph+='<button class="sm-btn cRename" data-id="'+esc(p.id)+'" data-name="'+esc(p.name||'')+'">Rename</button>';
+    ph+='<button class="sm-btn danger cDel" data-id="'+esc(p.id)+'" data-name="'+esc(p.name||'')+'" style="margin-left:auto;">\u00d7 Delete</button>';
+    ph+='</div>';
+    ph+='</div>';
+  });
   el.innerHTML=ph;
   el.querySelectorAll('.cLoad').forEach(btn=>btn.addEventListener('click',()=>cloudLoad(btn.dataset.id)));
+  el.querySelectorAll('.cRename').forEach(btn=>btn.addEventListener('click',()=>cloudRename(btn.dataset.id,btn.dataset.name).then(()=>refreshCloudList())));
   el.querySelectorAll('.cDel').forEach(btn=>btn.addEventListener('click',()=>cloudDelete(btn.dataset.id,btn.dataset.name).then(()=>refreshCloudList())));
 }
 
