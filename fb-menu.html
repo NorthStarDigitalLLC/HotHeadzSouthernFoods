@@ -490,17 +490,53 @@ function fmtSavedAt(ts){
   const yearTag=d.getFullYear()===now.getFullYear()?'':', '+d.getFullYear();
   return day+', '+date+yearTag+' · '+time;
 }
+/* Try to parse a date out of common project name patterns:
+   "Sunday 5/3/2026", "5/3/2026 Lunch", "Friday Lunch 04/28", "April 28 2026", etc.
+   Returns ms-since-epoch, or 0 if nothing parseable. */
+function parseTimestampFromName(name){
+  if (!name || typeof name !== 'string') return 0;
+  const now = new Date();
+  // Pattern: M/D/YYYY or MM/DD/YYYY
+  let m = name.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (m) {
+    const dt = new Date(parseInt(m[3]), parseInt(m[1])-1, parseInt(m[2]));
+    if (!isNaN(dt.getTime())) return dt.getTime();
+  }
+  // Pattern: M/D or MM/DD (assume current year)
+  m = name.match(/(?:^|\s)(\d{1,2})\/(\d{1,2})(?!\d)/);
+  if (m) {
+    const dt = new Date(now.getFullYear(), parseInt(m[1])-1, parseInt(m[2]));
+    if (!isNaN(dt.getTime())) return dt.getTime();
+  }
+  // Pattern: "April 28", "Apr 28 2026"
+  m = name.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{1,2})(?:[,\s]+(\d{4}))?/i);
+  if (m) {
+    const months = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+    const yr = m[3] ? parseInt(m[3]) : now.getFullYear();
+    const dt = new Date(yr, months[m[1].toLowerCase().slice(0,3)], parseInt(m[2]));
+    if (!isNaN(dt.getTime())) return dt.getTime();
+  }
+  return 0;
+}
+
 /* Group projects by date buckets for visual organization in the list.
-   Returns an array of { label, items[] } sections in newest-first order.
+   Tries timestamps first, then falls back to parsing dates out of the project NAME
+   (since older Supabase rows may have missing/null updated_at fields).
    Buckets: Today | Yesterday | Earlier This Week | Earlier This Month | <Month Year> ... */
 function groupProjectsByDate(projects, getTimestamp){
   if (!Array.isArray(projects) || !projects.length) return [];
   const getTs = getTimestamp || (p => p.updatedAt || p.updated_at || p.createdAt || p.created_at || 0);
-  const sorted = projects.slice().sort((a,b) => {
-    const ta = typeof getTs(a) === 'number' ? getTs(a) : new Date(getTs(a)).getTime();
-    const tb = typeof getTs(b) === 'number' ? getTs(b) : new Date(getTs(b)).getTime();
-    return (tb||0) - (ta||0);
-  });
+  function resolveTs(p){
+    let ts = getTs(p);
+    if (typeof ts !== 'number') ts = new Date(ts).getTime();
+    if (!ts || isNaN(ts)) {
+      // Fallback: parse from name (works for "Sunday 5/3/2026" style names)
+      ts = parseTimestampFromName(p.name || '');
+    }
+    return ts || 0;
+  }
+  const withTs = projects.map(p => ({ p: p, ts: resolveTs(p) }));
+  withTs.sort((a, b) => (b.ts||0) - (a.ts||0));
   const now = new Date();
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
   const startOfYesterday = startOfToday - 86400000;
@@ -512,10 +548,8 @@ function groupProjectsByDate(projects, getTimestamp){
     if (!buckets.has(label)) buckets.set(label, { label, items: [] });
     return buckets.get(label);
   }
-  sorted.forEach(p => {
-    let ts = getTs(p);
-    if (typeof ts !== 'number') ts = new Date(ts).getTime();
-    if (!ts || isNaN(ts)) { bucket('No Date').items.push(p); return; }
+  withTs.forEach(({p, ts}) => {
+    if (!ts) { bucket('No Date').items.push(p); return; }
     if (ts >= startOfToday)              bucket('Today').items.push(p);
     else if (ts >= startOfYesterday)     bucket('Yesterday').items.push(p);
     else if (ts >= startOfThisWeek)      bucket('Earlier This Week').items.push(p);
@@ -599,7 +633,7 @@ async function apiPost(params){
       }
       case 'save':{
         var proj=params.project||params;
-        var payload={id:proj.id,name:proj.name,data:proj.data,saved_by:proj.savedBy||params.savedBy||getCloudName()||null};
+        var payload={id:proj.id,name:proj.name,data:proj.data,saved_by:proj.savedBy||params.savedBy||getCloudName()||null,updated_at:new Date().toISOString()};
         await fetch(SUPABASE_URL+'/rest/v1/drawing_projects',{method:'POST',headers:Object.assign({},sbJsonHeaders(),{'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(payload)}).then(function(r){if(!r.ok)return r.text().then(function(t){throw new Error(t||('HTTP '+r.status));});});
         return{success:true,id:proj.id};
       }
@@ -1491,7 +1525,7 @@ async function refreshCloudList(){
     ph+='<div class="proj-card-name">'+esc(p.name||'(untitled)');
     if(isActive)ph+='<span class="proj-card-active-tag">Active</span>';
     ph+='</div>';
-    ph+='<div class="proj-card-date">'+esc(fmtSavedAt(updatedAt)||fmtSavedAt(createdAt)||'Unknown date')+'</div>';
+    ph+='<div class="proj-card-date">'+esc(fmtSavedAt(updatedAt)||fmtSavedAt(createdAt)||fmtSavedAt(parseTimestampFromName(p.name||''))||'Unknown date')+'</div>';
     if(savedBy)ph+='<div class="proj-card-by">by '+esc(savedBy)+'</div>';
     ph+='</div></div>';
     ph+='<div class="proj-actions">';
