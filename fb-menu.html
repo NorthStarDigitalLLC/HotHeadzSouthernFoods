@@ -147,6 +147,11 @@
     .proj-search:focus{outline:none;border-color:var(--fire);}
     .proj-empty{padding:14px;background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.1);border-radius:var(--radius-sm);color:var(--text3);font-size:11px;text-align:center;font-style:italic;line-height:1.5;}
     .proj-empty strong{color:var(--text2);font-style:normal;font-weight:700;}
+    .proj-date-group{margin:14px 0 6px;padding:0 2px;display:flex;align-items:center;gap:8px;}
+    .proj-date-group:first-child{margin-top:6px;}
+    .proj-date-group-label{font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--text2);}
+    .proj-date-group-line{flex:1;height:1px;background:linear-gradient(90deg,rgba(255,255,255,.08),transparent);}
+    .proj-date-group-count{font-size:9px;font-weight:700;padding:1px 7px;border-radius:20px;background:rgba(255,255,255,.05);color:var(--text3);letter-spacing:.05em;}
     .proj-cloud-prompt{padding:12px;background:rgba(100,180,255,.05);border:1px solid rgba(100,180,255,.15);border-radius:var(--radius-sm);margin-bottom:8px;}
     .proj-cloud-prompt p{font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:8px;}
     .proj-cloud-prompt .fi{margin-bottom:6px;}
@@ -485,6 +490,48 @@ function fmtSavedAt(ts){
   const yearTag=d.getFullYear()===now.getFullYear()?'':', '+d.getFullYear();
   return day+', '+date+yearTag+' · '+time;
 }
+/* Group projects by date buckets for visual organization in the list.
+   Returns an array of { label, items[] } sections in newest-first order.
+   Buckets: Today | Yesterday | Earlier This Week | Earlier This Month | <Month Year> ... */
+function groupProjectsByDate(projects, getTimestamp){
+  if (!Array.isArray(projects) || !projects.length) return [];
+  const getTs = getTimestamp || (p => p.updatedAt || p.updated_at || p.createdAt || p.created_at || 0);
+  const sorted = projects.slice().sort((a,b) => {
+    const ta = typeof getTs(a) === 'number' ? getTs(a) : new Date(getTs(a)).getTime();
+    const tb = typeof getTs(b) === 'number' ? getTs(b) : new Date(getTs(b)).getTime();
+    return (tb||0) - (ta||0);
+  });
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const startOfYesterday = startOfToday - 86400000;
+  const dow = now.getDay();
+  const startOfThisWeek = startOfToday - (dow * 86400000);
+  const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  const buckets = new Map();
+  function bucket(label){
+    if (!buckets.has(label)) buckets.set(label, { label, items: [] });
+    return buckets.get(label);
+  }
+  sorted.forEach(p => {
+    let ts = getTs(p);
+    if (typeof ts !== 'number') ts = new Date(ts).getTime();
+    if (!ts || isNaN(ts)) { bucket('No Date').items.push(p); return; }
+    if (ts >= startOfToday)              bucket('Today').items.push(p);
+    else if (ts >= startOfYesterday)     bucket('Yesterday').items.push(p);
+    else if (ts >= startOfThisWeek)      bucket('Earlier This Week').items.push(p);
+    else if (ts >= startOfThisMonth)     bucket('Earlier This Month').items.push(p);
+    else {
+      const d = new Date(ts);
+      const sameYear = d.getFullYear() === now.getFullYear();
+      const label = sameYear
+        ? d.toLocaleDateString(undefined, { month: 'long' })
+        : d.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+      bucket(label).items.push(p);
+    }
+  });
+  return Array.from(buckets.values());
+}
+
 /* Project metadata badges — item count and image-included indicator */
 function projectMetaBadges(p){
   const data=p?.data||p||{};
@@ -1100,7 +1147,10 @@ function buildPR(){
     h+='</div>';
     h+='<input class="proj-search" id="localSearch" placeholder="Search by name…" autocomplete="off">';
     h+='<div id="localProjectsList">';
-    localSorted.forEach(p=>{
+    const localGroups = groupProjectsByDate(localSorted, p => p.updatedAt || p.createdAt || 0);
+    localGroups.forEach(group => {
+      h+='<div class="proj-date-group" data-group-header="1"><span class="proj-date-group-label">'+esc(group.label)+'</span><span class="proj-date-group-line"></span><span class="proj-date-group-count">'+group.items.length+'</span></div>';
+      group.items.forEach(p=>{
       const isActive=p.id===s.activeId;
       h+='<div class="proj-card'+(isActive?' is-active':'')+'" data-name="'+esc(p.name.toLowerCase())+'">';
       h+='<div class="proj-card-head"><div class="proj-card-info">';
@@ -1118,6 +1168,7 @@ function buildPR(){
       h+='<button class="sm-btn danger pDel" data-id="'+esc(p.id)+'" data-name="'+esc(p.name)+'" style="margin-left:auto;">\u00d7 Delete</button>';
       h+='</div>';
       h+='</div>';
+      });
     });
     h+='</div>';
   } else {
@@ -1355,13 +1406,25 @@ function wirePanel(){
   document.querySelectorAll('.pDel').forEach(btn=>btn.addEventListener('click',()=>deleteProject(btn.dataset.id)));
   document.querySelectorAll('.pRenameRow').forEach(btn=>btn.addEventListener('click',()=>renameProject(btn.dataset.id)));
   document.querySelectorAll('.pExportFile').forEach(btn=>btn.addEventListener('click',()=>exportProjectFile(btn.dataset.id)));
-  // Local search
+  // Local search — also hide date-group headers when their group is empty
   const localSearch=document.getElementById('localSearch');
   if(localSearch)localSearch.addEventListener('input',()=>{
     const q=localSearch.value.toLowerCase().trim();
-    document.querySelectorAll('#localProjectsList .proj-card').forEach(card=>{
-      card.style.display=(!q||(card.dataset.name||'').includes(q))?'':'none';
+    const list=document.getElementById('localProjectsList');
+    if(!list)return;
+    const children=Array.from(list.children);
+    let currentHeader=null,currentVisible=0;
+    children.forEach(node=>{
+      if(node.dataset.groupHeader){
+        if(currentHeader)currentHeader.style.display=currentVisible?'':'none';
+        currentHeader=node;currentVisible=0;
+      } else if(node.classList.contains('proj-card')){
+        const visible=(!q||(node.dataset.name||'').includes(q));
+        node.style.display=visible?'':'none';
+        if(visible)currentVisible++;
+      }
     });
+    if(currentHeader)currentHeader.style.display=currentVisible?'':'none';
   });
   // Cloud wiring
   const csn=document.getElementById('cloudSetName');
@@ -1379,13 +1442,25 @@ function wirePanel(){
   const cClose=document.getElementById('cloudCloseActive');
   if(cClose)cClose.addEventListener('click',()=>{setActiveCloudId(null);toast('Stopped tracking active cloud project','info');rebuildSidePanel();});
   const crBtn=document.getElementById('cloudRefresh');if(crBtn)crBtn.addEventListener('click',()=>refreshCloudList());
-  // Cloud search
+  // Cloud search — also hide date-group headers when their group is empty
   const cloudSearch=document.getElementById('cloudSearch');
   if(cloudSearch)cloudSearch.addEventListener('input',()=>{
     const q=cloudSearch.value.toLowerCase().trim();
-    document.querySelectorAll('#cloudProjectsList .proj-card').forEach(card=>{
-      card.style.display=(!q||(card.dataset.name||'').includes(q))?'':'none';
+    const list=document.getElementById('cloudProjectsList');
+    if(!list)return;
+    const children=Array.from(list.children);
+    let currentHeader=null,currentVisible=0;
+    children.forEach(node=>{
+      if(node.dataset.groupHeader){
+        if(currentHeader)currentHeader.style.display=currentVisible?'':'none';
+        currentHeader=node;currentVisible=0;
+      } else if(node.classList.contains('proj-card')){
+        const visible=(!q||(node.dataset.name||'').includes(q));
+        node.style.display=visible?'':'none';
+        if(visible)currentVisible++;
+      }
     });
+    if(currentHeader)currentHeader.style.display=currentVisible?'':'none';
   });
   if(getCloudName()&&document.getElementById('cloudProjectsList'))refreshCloudList();
 }
@@ -1403,7 +1478,10 @@ async function refreshCloudList(){
   if(countBadge)countBadge.textContent=String(projects.length);
   const activeId=getActiveCloudId();
   let ph='';
-  projects.forEach(p=>{
+  const cloudGroups = groupProjectsByDate(projects, p => p.updated_at || p.updatedAt || p.created_at || p.createdAt || 0);
+  cloudGroups.forEach(group => {
+    ph+='<div class="proj-date-group" data-group-header="1"><span class="proj-date-group-label">'+esc(group.label)+'</span><span class="proj-date-group-line"></span><span class="proj-date-group-count">'+group.items.length+'</span></div>';
+    group.items.forEach(p=>{
     const isActive=p.id===activeId;
     const updatedAt=p.updated_at||p.updatedAt;
     const createdAt=p.created_at||p.createdAt;
@@ -1422,6 +1500,7 @@ async function refreshCloudList(){
     ph+='<button class="sm-btn danger cDel" data-id="'+esc(p.id)+'" data-name="'+esc(p.name||'')+'" style="margin-left:auto;">\u00d7 Delete</button>';
     ph+='</div>';
     ph+='</div>';
+    });
   });
   el.innerHTML=ph;
   el.querySelectorAll('.cLoad').forEach(btn=>btn.addEventListener('click',()=>cloudLoad(btn.dataset.id)));
