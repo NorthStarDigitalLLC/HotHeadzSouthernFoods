@@ -519,10 +519,12 @@ function parseTimestampFromName(name){
   return 0;
 }
 
-/* Group projects by date buckets for visual organization in the list.
-   Tries timestamps first, then falls back to parsing dates out of the project NAME
-   (since older Supabase rows may have missing/null updated_at fields).
-   Buckets: Today | Yesterday | Earlier This Week | Earlier This Month | <Month Year> ... */
+/* Group projects by date buckets — forward-looking for menu planning.
+   Buckets in order:
+     Today | Tomorrow | This Week (rest) | Next Week | Later | Past Dates
+   Within future buckets: ascending (soonest first).
+   Within Past Dates: descending (most recent past first).
+   Falls back to parsing date out of project name when timestamp is missing. */
 function groupProjectsByDate(projects, getTimestamp){
   if (!Array.isArray(projects) || !projects.length) return [];
   const getTs = getTimestamp || (p => p.updatedAt || p.updated_at || p.createdAt || p.created_at || 0);
@@ -530,40 +532,50 @@ function groupProjectsByDate(projects, getTimestamp){
     let ts = getTs(p);
     if (typeof ts !== 'number') ts = new Date(ts).getTime();
     if (!ts || isNaN(ts)) {
-      // Fallback: parse from name (works for "Sunday 5/3/2026" style names)
       ts = parseTimestampFromName(p.name || '');
     }
     return ts || 0;
   }
   const withTs = projects.map(p => ({ p: p, ts: resolveTs(p) }));
-  withTs.sort((a, b) => (b.ts||0) - (a.ts||0));
+
   const now = new Date();
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  const startOfYesterday = startOfToday - 86400000;
-  const dow = now.getDay();
-  const startOfThisWeek = startOfToday - (dow * 86400000);
-  const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  const startOfTomorrow = startOfToday + 86400000;
+  const startOfDayAfterTomorrow = startOfToday + 2 * 86400000;
+  // End of this week = next Sunday at 00:00 (so Sun..Sat current week)
+  const dow = now.getDay(); // 0=Sun
+  const startOfNextWeek = startOfToday + ((7 - dow) * 86400000);
+  const startOfWeekAfterNext = startOfNextWeek + (7 * 86400000);
+
+  // Build buckets in DESIRED order so iteration order is correct
+  const order = ['Today','Tomorrow','This Week','Next Week','Later','Past Dates','No Date'];
   const buckets = new Map();
-  function bucket(label){
-    if (!buckets.has(label)) buckets.set(label, { label, items: [] });
-    return buckets.get(label);
-  }
+  order.forEach(label => buckets.set(label, { label, items: [] }));
+
   withTs.forEach(({p, ts}) => {
-    if (!ts) { bucket('No Date').items.push(p); return; }
-    if (ts >= startOfToday)              bucket('Today').items.push(p);
-    else if (ts >= startOfYesterday)     bucket('Yesterday').items.push(p);
-    else if (ts >= startOfThisWeek)      bucket('Earlier This Week').items.push(p);
-    else if (ts >= startOfThisMonth)     bucket('Earlier This Month').items.push(p);
-    else {
-      const d = new Date(ts);
-      const sameYear = d.getFullYear() === now.getFullYear();
-      const label = sameYear
-        ? d.toLocaleDateString(undefined, { month: 'long' })
-        : d.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
-      bucket(label).items.push(p);
-    }
+    if (!ts) { buckets.get('No Date').items.push({p, ts:0}); return; }
+    if (ts < startOfToday)                     buckets.get('Past Dates').items.push({p, ts});
+    else if (ts < startOfTomorrow)             buckets.get('Today').items.push({p, ts});
+    else if (ts < startOfDayAfterTomorrow)     buckets.get('Tomorrow').items.push({p, ts});
+    else if (ts < startOfNextWeek)             buckets.get('This Week').items.push({p, ts});
+    else if (ts < startOfWeekAfterNext)        buckets.get('Next Week').items.push({p, ts});
+    else                                       buckets.get('Later').items.push({p, ts});
   });
-  return Array.from(buckets.values());
+
+  // Sort within each bucket
+  buckets.forEach((bucket, label) => {
+    if (label === 'Past Dates') {
+      // Descending: most recent past first
+      bucket.items.sort((a, b) => b.ts - a.ts);
+    } else {
+      // Ascending: soonest first (Today, Tomorrow, future)
+      bucket.items.sort((a, b) => a.ts - b.ts);
+    }
+    bucket.items = bucket.items.map(x => x.p);
+  });
+
+  // Drop empty buckets, preserve order
+  return order.map(label => buckets.get(label)).filter(b => b.items.length);
 }
 
 /* Project metadata badges — item count and image-included indicator */
