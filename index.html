@@ -12,6 +12,7 @@
        • Added preconnect for DoorDash (linked heavily on page)
        • Added priceRange, paymentAccepted, menu prices to schema
        • Added: scuttling particle crawfish during nav transition
+       • Added: Seasoning showcase nav item + menu loading screen with 3D GLB
      ═══════════════════════════════════════════════════════════════════════════ -->
 
 <meta charset="UTF-8" />
@@ -50,9 +51,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/images/HotHeadzLogo.png" />
 <link rel="mask-icon" href="/images/HotHeadzLogo.png" color="#e83010" />
 
-<!-- Open Graph — og:type "website" is the safe, current choice. Previously
-     "restaurant.restaurant" which is a deprecated Facebook namespace that
-     now often gets rejected by scrapers. -->
+<!-- Open Graph -->
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Hot Headz Southern Foods" />
 <meta property="og:title" content="Hot Headz Southern Foods | Breakfast &amp; Lunch in DeRidder, LA" />
@@ -66,7 +65,7 @@
 <meta property="og:url" content="https://hotheadzsouthernfoods.com/" />
 <meta property="og:locale" content="en_US" />
 
-<!-- Facebook-specific business contact data (still active, useful) -->
+<!-- Facebook-specific business contact data -->
 <meta property="business:contact_data:street_address" content="2741 US-190" />
 <meta property="business:contact_data:locality" content="DeRidder" />
 <meta property="business:contact_data:region" content="LA" />
@@ -90,14 +89,11 @@
 <meta name="application-name" content="Hot Headz Southern Foods" />
 <meta name="mobile-web-app-capable" content="yes" />
 
-<!-- Search engine verification (uncomment & fill when set up) -->
-<!-- <meta name="google-site-verification" content="YOUR_GOOGLE_CODE" /> -->
-<!-- <meta name="msvalidate.01" content="YOUR_BING_CODE" /> -->
-
 <!-- Performance hints for domains the page actually uses -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preconnect" href="https://www.doordash.com" />
+<link rel="preconnect" href="https://unpkg.com" />
 <link rel="dns-prefetch" href="https://www.facebook.com" />
 <link rel="dns-prefetch" href="https://maps.google.com" />
 
@@ -107,8 +103,6 @@
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
      STRUCTURED DATA — Single @graph block wrapping all entity types.
-     Google's Structured Data Testing Tool explicitly recommends this pattern
-     over multiple separate scripts. Entities cross-reference via @id.
      ═══════════════════════════════════════════════════════════════════════════ -->
 <script type="application/ld+json">
 {
@@ -140,7 +134,7 @@
       "paymentAccepted": "Cash, Credit Card, Debit Card, Apple Pay, Google Pay",
       "acceptsReservations": false,
       "foundingDate": "2020",
-      "dateModified": "2026-04-22",
+      "dateModified": "2026-05-15",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "2741 US-190",
@@ -156,38 +150,16 @@
       },
       "hasMap": "https://maps.google.com/?q=2741+US-190+DeRidder+LA+70634",
       "servesCuisine": [
-        "Southern",
-        "American",
-        "Cajun",
-        "Creole",
-        "Breakfast",
-        "Lunch",
-        "Comfort Food",
-        "Soul Food"
+        "Southern", "American", "Cajun", "Creole", "Breakfast", "Lunch", "Comfort Food", "Soul Food"
       ],
       "openingHoursSpecification": [
-        {
-          "@type": "OpeningHoursSpecification",
-          "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
-          "opens": "05:30",
-          "closes": "14:00"
-        },
-        {
-          "@type": "OpeningHoursSpecification",
-          "dayOfWeek": "Saturday",
-          "opens": "06:00",
-          "closes": "14:00"
-        },
-        {
-          "@type": "OpeningHoursSpecification",
-          "dayOfWeek": "Sunday",
-          "opens": "07:00",
-          "closes": "15:00"
-        }
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "05:30", "closes": "14:00" },
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "06:00", "closes": "14:00" },
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "07:00", "closes": "15:00" }
       ],
       "areaServed": [
-        { "@type": "City", "name": "DeRidder",   "sameAs": "https://en.wikipedia.org/wiki/DeRidder,_Louisiana" },
-        { "@type": "City", "name": "Leesville",  "sameAs": "https://en.wikipedia.org/wiki/Leesville,_Louisiana" },
+        { "@type": "City", "name": "DeRidder", "sameAs": "https://en.wikipedia.org/wiki/DeRidder,_Louisiana" },
+        { "@type": "City", "name": "Leesville", "sameAs": "https://en.wikipedia.org/wiki/Leesville,_Louisiana" },
         { "@type": "City", "name": "Rosepine" },
         { "@type": "City", "name": "Merryville" },
         { "@type": "City", "name": "Pickering" },
@@ -200,43 +172,15 @@
         "https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/",
         "https://www.doordash.com/store/hot-headz-southern-foods"
       ],
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "telephone": "+1-337-221-1035",
-        "contactType": "customer service",
-        "areaServed": "US-LA",
-        "availableLanguage": ["English"]
-      },
-      "potentialAction": {
-        "@type": "OrderAction",
-        "target": {
-          "@type": "EntryPoint",
-          "urlTemplate": "https://www.doordash.com/store/hot-headz-southern-foods",
-          "inLanguage": "en-US",
-          "actionPlatform": ["http://schema.org/DesktopWebPlatform","http://schema.org/MobileWebPlatform"]
-        },
-        "deliveryMethod": "http://purl.org/goodrelations/v1#DeliveryModeOwnFleet"
-      },
-      "publicAccess": true,
-      "smokingAllowed": false,
-      "amenityFeature": [
-        { "@type": "LocationFeatureSpecification", "name": "Takeout",              "value": true },
-        { "@type": "LocationFeatureSpecification", "name": "Dine-in",              "value": true },
-        { "@type": "LocationFeatureSpecification", "name": "Delivery",             "value": true },
-        { "@type": "LocationFeatureSpecification", "name": "DoorDash",             "value": true },
-        { "@type": "LocationFeatureSpecification", "name": "Wheelchair Accessible","value": true },
-        { "@type": "LocationFeatureSpecification", "name": "Free Parking",         "value": true },
-        { "@type": "LocationFeatureSpecification", "name": "Family Friendly",      "value": true }
-      ],
-      "knowsAbout": [
-        "Southern Cooking",
-        "Cajun Cuisine",
-        "Creole Cuisine",
-        "Crawfish",
-        "Gumbo",
-        "Po-Boys",
-        "Jambalaya",
-        "Comfort Food"
+      "makesOffer": [
+        {
+          "@type": "Offer",
+          "name": "Hot Headz Signature Seasoning",
+          "description": "Hot Headz Southern Foods signature seasoning blend — the same seasoning we use in our kitchen.",
+          "price": "4.99",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock"
+        }
       ]
     },
     {
@@ -250,224 +194,18 @@
       "inLanguage": "en-US"
     },
     {
-      "@type": "WebPage",
-      "@id": "https://hotheadzsouthernfoods.com/#home",
-      "url": "https://hotheadzsouthernfoods.com/",
-      "name": "Hot Headz Southern Foods | Breakfast & Lunch in DeRidder, LA",
-      "isPartOf": { "@id": "https://hotheadzsouthernfoods.com/#website" },
-      "about": { "@id": "https://hotheadzsouthernfoods.com/#restaurant" },
-      "primaryImageOfPage": {
-        "@type": "ImageObject",
-        "url": "https://hotheadzsouthernfoods.com/images/Hotheadzshare.png",
-        "width": 1200,
-        "height": 630
-      },
-      "datePublished": "2020-01-01",
-      "dateModified": "2026-04-22",
-      "inLanguage": "en-US",
-      "potentialAction": {
-        "@type": "ReadAction",
-        "target": "https://hotheadzsouthernfoods.com/"
+      "@type": "Product",
+      "@id": "https://hotheadzsouthernfoods.com/#seasoning",
+      "name": "Hot Headz Signature Seasoning",
+      "description": "Hot Headz Southern Foods signature seasoning blend — the same Cajun-Southern blend used in our kitchen, bottled for home cooks.",
+      "brand": { "@type": "Brand", "name": "Hot Headz Southern Foods" },
+      "offers": {
+        "@type": "Offer",
+        "price": "4.99",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock",
+        "seller": { "@id": "https://hotheadzsouthernfoods.com/#restaurant" }
       }
-    },
-    {
-      "@type": "Menu",
-      "@id": "https://hotheadzsouthernfoods.com/menu.html#menu",
-      "name": "Hot Headz Southern Foods Menu",
-      "url": "https://hotheadzsouthernfoods.com/menu.html",
-      "inLanguage": "en-US",
-      "hasMenuSection": [
-        {
-          "@type": "MenuSection",
-          "name": "Breakfast",
-          "description": "Made-from-scratch Southern breakfast served from opening",
-          "hasMenuItem": [
-            {
-              "@type": "MenuItem",
-              "name": "Breakfast Plate",
-              "description": "Eggs, bacon or sausage, grits, biscuit",
-              "offers": { "@type": "Offer", "priceCurrency": "USD", "price": "9.99" }
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Biscuits & Gravy",
-              "description": "Homemade biscuits with Southern sausage gravy"
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Cajun Boudin",
-              "description": "Louisiana-style boudin"
-            }
-          ]
-        },
-        {
-          "@type": "MenuSection",
-          "name": "Lunch Plates",
-          "description": "Daily Southern plate lunches — changes every day. Includes two sides.",
-          "hasMenuItem": [
-            {
-              "@type": "MenuItem",
-              "name": "Lunch Plate (1 Meat, 2 Sides)",
-              "offers": { "@type": "Offer", "priceCurrency": "USD", "price": "12.99" }
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Lunch Plate (2 Meats, 2 Sides)",
-              "offers": { "@type": "Offer", "priceCurrency": "USD", "price": "15.99" }
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Lunch Plate (3 Meats, 2 Sides)",
-              "offers": { "@type": "Offer", "priceCurrency": "USD", "price": "19.99" }
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Red Beans & Rice",
-              "description": "Slow-simmered red beans with smoked sausage over rice"
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Fried Chicken Plate",
-              "description": "Hand-breaded fried chicken with two sides"
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Catfish Plate",
-              "description": "Fried catfish fillet with hushpuppies and sides"
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Smothered Pork Chops",
-              "description": "Pork chops smothered in brown gravy"
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Chicken & Sausage Gumbo",
-              "description": "Louisiana gumbo over rice"
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Jambalaya",
-              "description": "Cajun jambalaya with chicken and sausage"
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Shrimp Po-Boy",
-              "description": "Fried shrimp on French bread, dressed"
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Crawfish Étouffée",
-              "description": "Crawfish in a Louisiana roux gravy over rice"
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Southern Meatloaf",
-              "description": "Homemade Southern meatloaf"
-            }
-          ]
-        },
-        {
-          "@type": "MenuSection",
-          "name": "Crawfish",
-          "description": "Boiled crawfish available seasonally, Thursday–Saturday 4–8 PM",
-          "hasMenuItem": [
-            {
-              "@type": "MenuItem",
-              "name": "Boiled Crawfish (per pound)",
-              "offers": { "@type": "Offer", "priceCurrency": "USD", "price": "5.99" }
-            }
-          ]
-        },
-        {
-          "@type": "MenuSection",
-          "name": "Sides",
-          "hasMenuItem": [
-            { "@type": "MenuItem", "name": "Mac & Cheese" },
-            { "@type": "MenuItem", "name": "Cornbread" },
-            { "@type": "MenuItem", "name": "Green Beans" },
-            { "@type": "MenuItem", "name": "Mashed Potatoes & Gravy" },
-            { "@type": "MenuItem", "name": "Sweet Tea" }
-          ]
-        },
-        {
-          "@type": "MenuSection",
-          "name": "Desserts",
-          "hasMenuItem": [
-            { "@type": "MenuItem", "name": "Homemade Bread Pudding", "description": "Louisiana-style bread pudding" }
-          ]
-        }
-      ]
-    },
-    {
-      "@type": "FAQPage",
-      "@id": "https://hotheadzsouthernfoods.com/#faq",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "What are Hot Headz Southern Foods hours?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Hot Headz Southern Foods in DeRidder, LA is open Monday through Friday 5:30 AM to 2:00 PM, Saturday 6:00 AM to 2:00 PM, and Sunday 7:00 AM to 3:00 PM. Call (337) 221-1035 for holiday hours."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Where is Hot Headz Southern Foods located?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Hot Headz Southern Foods is located at 2741 US-190, DeRidder, Louisiana 70634, in Beauregard Parish. We serve the surrounding communities of Leesville, Rosepine, Merryville, Pickering, and Fort Polk / JRTC."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Does Hot Headz deliver in DeRidder?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. Hot Headz Southern Foods offers in-house delivery on orders of 10 or more plates within 10 miles of DeRidder. We are also available on DoorDash for smaller orders. Call (337) 221-1035 to schedule a bulk delivery."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What kind of food does Hot Headz Southern Foods serve?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "We serve made-from-scratch Southern breakfast and lunch. The menu rotates daily but always includes Southern classics: red beans and rice, fried chicken, catfish plates, smothered pork chops, chicken and sausage gumbo, jambalaya, shrimp po-boys, meatloaf, and homemade desserts like bread pudding."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How much does a lunch plate cost at Hot Headz?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "A one-meat lunch plate with two sides is $12.99. Two meats with two sides is $15.99. Three meats with two sides is $19.99. Child plates for ages 10 and under are $6.99. An extra side is $2.99. Prices are subject to change."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Can I order from Hot Headz on DoorDash?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. Hot Headz Southern Foods is available on DoorDash for delivery across DeRidder, LA. Search Hot Headz Southern Foods on the DoorDash app or order online."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Does Hot Headz have crawfish?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. During crawfish season we boil crawfish Thursday through Saturday from 4 PM to 8 PM at our DeRidder location. Pricing is $5.99 per pound, subject to market rates. Follow our Facebook page for fresh batch announcements."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Is Hot Headz family-owned?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. Hot Headz Southern Foods is a family-owned and operated restaurant in DeRidder, Louisiana, serving Beauregard Parish since 2020."
-          }
-        }
-      ]
     }
   ]
 }
@@ -479,6 +217,7 @@
   --pepper:#c41800;--fire:#e83010;--chili:#f05020;--heat:#f87038;--burn:#ffa048;
   --cream:#f8ede6;--parch:#efd8cc;--sand:#d4a898;
   --dd-red:#EB1700;--dd-red-hot:#FF2D0E;--dd-red-deep:#B31100;
+  --gold:#d9a44a;--gold-hot:#f0c060;--gold-deep:#a87822;
   --serif:'DM Serif Display',Georgia,serif;
   --display:'Abril Fatface',Georgia,serif;
   --body:'DM Sans',sans-serif;
@@ -488,7 +227,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--void);
   color:var(--cream);font-family:var(--body);cursor:none;-webkit-tap-highlight-color:transparent;}
 @media(hover:none){html,body{cursor:auto;}}
 
-/* Screen-reader-only content — invisible to users, but crawled by Google. */
+/* Screen-reader-only content */
 .sr-only{
   position:absolute!important;
   width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
@@ -662,6 +401,48 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
 @keyframes ddGlow{0%,100%{box-shadow:inset 0 0 40px rgba(235,23,0,.08),0 0 0 rgba(235,23,0,0)}
   50%{box-shadow:inset 0 0 50px rgba(235,23,0,.14),0 0 20px rgba(235,23,0,.15)}}
 
+/* ═══════════════════════════════════════════════════════════════════════
+   SEASONING NAV ITEM — Gold/amber theme to differentiate from DoorDash red.
+   Distinctive enough to draw the eye but doesn't compete with primary CTA.
+   Price chip sits inline like a small badge.
+   ═══════════════════════════════════════════════════════════════════════ */
+.nav-item.seasoning{
+  border-top:1px solid rgba(217,164,74,.38)!important;
+  border-bottom:1px solid rgba(217,164,74,.38)!important;
+  background:linear-gradient(90deg,rgba(217,164,74,.10),rgba(217,164,74,.03) 60%,transparent);
+  box-shadow:inset 0 0 40px rgba(217,164,74,.08);
+  animation:fadeSlideU .6s .82s ease both, snGlow 4s ease-in-out 1.8s infinite;
+}
+.nav-item.seasoning::before{
+  background:linear-gradient(90deg,rgba(217,164,74,.0) 0%,rgba(217,164,74,.14) 25%,rgba(240,192,96,.20) 50%,rgba(217,164,74,.10) 75%,transparent 100%);
+}
+.nav-item.seasoning::after{
+  background:linear-gradient(to bottom,transparent,var(--gold-hot),var(--gold),transparent);
+  box-shadow:0 0 10px var(--gold-hot);
+  transform:scaleY(1);left:0;width:3px;
+}
+.nav-item.seasoning .ni-num{color:rgba(217,164,74,.9);font-weight:700;}
+.nav-item.seasoning .ni-name{color:#fff;}
+.nav-item.seasoning:hover .ni-name{text-shadow:0 0 60px rgba(240,192,96,.5);}
+.nav-item.seasoning .ni-sub{color:rgba(240,192,96,.78);}
+.nav-item.seasoning:hover .ni-sub{color:#ffd180;}
+.nav-item.seasoning .ni-arrow{
+  border-color:rgba(217,164,74,.6);color:var(--gold-hot);
+  background:rgba(217,164,74,.08);box-shadow:0 0 12px rgba(217,164,74,.3);}
+.nav-item.seasoning:hover .ni-arrow{
+  border-color:var(--gold-hot);color:#080407;background:var(--gold-hot);
+  box-shadow:0 0 20px var(--gold-hot);transform:rotate(-45deg) scale(1.15);}
+.price-tag{display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;margin-left:10px;border-radius:3px;
+  background:linear-gradient(135deg,var(--gold-hot),var(--gold-deep));
+  color:#0c0604;font-family:var(--body);font-weight:800;font-size:10px;
+  letter-spacing:.16em;text-transform:uppercase;
+  box-shadow:0 0 14px rgba(217,164,74,.55),inset 0 1px 0 rgba(255,255,255,.25);
+  white-space:nowrap;flex-shrink:0;vertical-align:middle;}
+.price-tag::before{content:'$';opacity:.7;font-weight:600;}
+@keyframes snGlow{0%,100%{box-shadow:inset 0 0 40px rgba(217,164,74,.08),0 0 0 rgba(217,164,74,0)}
+  50%{box-shadow:inset 0 0 55px rgba(217,164,74,.16),0 0 22px rgba(217,164,74,.18)}}
+
 .nav-item:nth-child(1){animation:fadeSlideU .6s .40s ease both}
 .nav-item:nth-child(2){animation:fadeSlideU .6s .47s ease both}
 .nav-item:nth-child(3){animation:fadeSlideU .6s .54s ease both}
@@ -672,6 +453,7 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
 .nav-item:nth-child(9){animation:fadeSlideU .6s .96s ease both}
 .nav-item:nth-child(10){animation:fadeSlideU .6s 1.03s ease both}
 .nav-item:nth-child(11){animation:fadeSlideU .6s 1.10s ease both}
+.nav-item:nth-child(12){animation:fadeSlideU .6s 1.17s ease both}
 
 .pv-label{font-family:var(--body);font-weight:700;font-size:10px;letter-spacing:.25em;
   text-transform:uppercase;color:rgba(232,180,160,.78);margin-bottom:7px;}
@@ -685,11 +467,13 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
   border:1px solid rgba(232,180,160,.35);color:rgba(239,216,204,.82);transition:all .35s;}
 .pv-chip.on{border-color:rgba(240,80,32,.65);color:var(--burn);background:rgba(240,80,32,.12);}
 .pv-chip.dd{border-color:rgba(235,23,0,.7);color:#ff8060;background:rgba(235,23,0,.15);}
+.pv-chip.sn{border-color:rgba(217,164,74,.7);color:var(--gold-hot);background:rgba(217,164,74,.13);}
 #pv-num{font-family:var(--display);font-weight:400;font-size:clamp(58px,10vw,110px);
   line-height:1;letter-spacing:.02em;color:rgba(196,24,0,.09);text-align:right;
   margin-top:auto;transition:color .5s;}
 #pv-num.lit{color:rgba(240,80,32,.22);}
 #pv-num.dd-lit{color:rgba(235,23,0,.3);}
+#pv-num.sn-lit{color:rgba(217,164,74,.3);}
 
 #botbar{flex-shrink:0;height:32px;display:flex;align-items:center;justify-content:space-between;
   padding:0 clamp(14px,2.5vw,28px);border-top:1px solid rgba(232,180,160,.1);
@@ -819,6 +603,40 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
 .dd-tag-m::before{content:'';width:4px;height:4px;border-radius:50%;background:#fff;
   box-shadow:0 0 5px #fff;animation:ddPulse 1.5s ease-in-out infinite;}
 
+/* Mobile seasoning item — gold/amber */
+.mob-nav-item.seasoning{
+  border-top:1px solid rgba(217,164,74,.38)!important;
+  border-bottom:1px solid rgba(217,164,74,.38)!important;
+  background:linear-gradient(90deg,rgba(217,164,74,.10),rgba(217,164,74,.03) 60%,transparent);
+  box-shadow:inset 0 0 40px rgba(217,164,74,.08);
+  animation:fadeSlideU .5s .72s ease both, snGlow 4s ease-in-out 1.6s infinite;
+}
+.mob-nav-item.seasoning::before{
+  background:linear-gradient(to bottom,transparent,var(--gold-hot),var(--gold),transparent);
+  box-shadow:0 0 10px var(--gold-hot);
+  transform:scaleY(1);width:3px;
+}
+.mob-nav-item.seasoning::after{
+  background:linear-gradient(90deg,rgba(217,164,74,.14),rgba(217,164,74,.04),transparent);
+  opacity:1;
+}
+.mob-nav-item.seasoning .mni-num{color:rgba(217,164,74,.9);font-weight:700;}
+.mob-nav-item.seasoning .mni-name{color:#fff;}
+.mob-nav-item.seasoning .mni-sub{color:rgba(240,192,96,.78);}
+.mob-nav-item.seasoning .mni-arrow{
+  border-color:rgba(217,164,74,.6);color:var(--gold-hot);
+  background:rgba(217,164,74,.08);box-shadow:0 0 10px rgba(217,164,74,.3);}
+.mob-nav-item.seasoning:active .mni-arrow{
+  border-color:var(--gold-hot);color:#0c0604;background:var(--gold-hot);}
+.price-tag-m{display:inline-flex;align-items:center;gap:4px;
+  padding:3px 9px;border-radius:3px;
+  background:linear-gradient(135deg,var(--gold-hot),var(--gold-deep));
+  color:#0c0604;font-family:var(--body);font-weight:800;font-size:10px;
+  letter-spacing:.14em;text-transform:uppercase;
+  box-shadow:0 0 12px rgba(217,164,74,.55),inset 0 1px 0 rgba(255,255,255,.25);
+  white-space:nowrap;}
+.price-tag-m::before{content:'$';opacity:.7;font-weight:600;}
+
 .mob-nav-item:nth-child(1){animation:fadeSlideU .5s .35s ease both}
 .mob-nav-item:nth-child(2){animation:fadeSlideU .5s .41s ease both}
 .mob-nav-item:nth-child(3){animation:fadeSlideU .5s .47s ease both}
@@ -829,6 +647,7 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
 .mob-nav-item:nth-child(9){animation:fadeSlideU .5s .83s ease both}
 .mob-nav-item:nth-child(10){animation:fadeSlideU .5s .89s ease both}
 .mob-nav-item:nth-child(11){animation:fadeSlideU .5s .95s ease both}
+.mob-nav-item:nth-child(12){animation:fadeSlideU .5s 1.01s ease both}
 
 #mob-botbar{flex-shrink:0;height:38px;display:flex;align-items:center;justify-content:center;
   border-top:1px solid rgba(232,180,160,.1);
@@ -853,23 +672,212 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
   #nav-center{overflow-y:auto;}
   #nav-center::-webkit-scrollbar{display:none;}
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MENU LOADING SCREEN — full-screen overlay shown when a user clicks any
+   menu-bound nav item. Three.js renders the Seasoning.glb spinning, with
+   a $4.99 price callout. Falls back to a stylized SVG seasoning shaker if
+   the GLB fails to load (so the loader never blocks navigation).
+
+   Layout:
+     - #menu-loader is fixed, full-screen, on top of everything.
+     - Centered card with rotating brand frame.
+     - Three.js canvas at #ml-canvas-host renders the GLB.
+     - Price callout below with animated reveal.
+     - Status text below that ("Loading the menu…") and a progress sliver.
+     - After GLB loads + min display time elapsed → navigate to menu.
+   ═══════════════════════════════════════════════════════════════════════ */
+#menu-loader{
+  position:fixed;inset:0;z-index:1000;
+  background:radial-gradient(ellipse at 50% 60%,#1a0807 0%,#0a0405 60%,#050203 100%);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .5s ease;
+  overflow:hidden;
+}
+#menu-loader.on{display:flex;opacity:1;}
+#menu-loader.fading{opacity:0;}
+
+/* Atmospheric grain over the loader */
+#menu-loader::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.06'/%3E%3C/svg%3E");
+  z-index:2;
+}
+/* Vignette */
+#menu-loader::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 50%,transparent 40%,rgba(8,4,7,.6) 80%,rgba(8,4,7,.9) 100%);
+  z-index:2;
+}
+
+#ml-brand{
+  position:relative;z-index:5;
+  font-family:var(--body);font-weight:700;font-size:10px;letter-spacing:.32em;
+  text-transform:uppercase;color:rgba(232,180,160,.68);
+  margin-bottom:14px;display:flex;align-items:center;gap:12px;
+  animation:mlFadeIn .6s ease both;
+}
+#ml-brand::before,#ml-brand::after{
+  content:'';width:24px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(217,164,74,.6),transparent);
+}
+
+#ml-title{
+  position:relative;z-index:5;
+  font-family:var(--display);font-weight:400;font-size:clamp(22px,4vw,36px);
+  letter-spacing:.01em;color:var(--cream);text-align:center;line-height:1;
+  text-shadow:0 0 60px rgba(217,164,74,.35);
+  margin-bottom:6px;
+  animation:mlFadeIn .7s .1s ease both;
+}
+#ml-title em{font-style:italic;color:var(--gold-hot);}
+
+#ml-subtitle{
+  position:relative;z-index:5;
+  font-family:var(--serif);font-style:italic;font-weight:400;
+  font-size:clamp(12px,1.4vw,15px);color:rgba(239,216,204,.72);
+  text-align:center;margin-bottom:clamp(18px,3.5vh,32px);
+  animation:mlFadeIn .7s .2s ease both;
+}
+
+/* Canvas host — the spinning seasoning shaker lives here */
+#ml-canvas-host{
+  position:relative;z-index:5;
+  width:clamp(220px,32vw,360px);height:clamp(280px,40vh,440px);
+  display:flex;align-items:center;justify-content:center;
+  animation:mlFadeIn .8s .25s ease both;
+}
+#ml-canvas-host canvas{
+  width:100%!important;height:100%!important;
+  display:block;
+  filter:drop-shadow(0 25px 40px rgba(0,0,0,.55)) drop-shadow(0 0 60px rgba(217,164,74,.18));
+}
+
+/* Decorative ring around the shaker */
+.ml-orbit{
+  position:absolute;border-radius:50%;
+  border:1px solid rgba(217,164,74,.18);
+  pointer-events:none;
+  animation:orbitRot 30s linear infinite;
+}
+.ml-orbit.o1{
+  width:88%;height:88%;
+  border-top-color:rgba(217,164,74,.55);
+  border-right-color:rgba(217,164,74,.32);
+}
+.ml-orbit.o2{
+  width:74%;height:74%;
+  border-bottom-color:rgba(232,48,16,.45);
+  border-left-color:rgba(232,48,16,.22);
+  animation-direction:reverse;animation-duration:22s;
+}
+@keyframes orbitRot{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* Fallback shaker illustration — shown when GLB isn't loaded */
+#ml-fallback{
+  width:60%;max-width:200px;aspect-ratio:1/1.4;
+  display:flex;align-items:center;justify-content:center;
+  animation:fbSpin 4s ease-in-out infinite;
+  display:none;
+}
+#ml-fallback.on{display:flex;}
+@keyframes fbSpin{
+  0%,100%{transform:rotateY(0deg)}
+  50%{transform:rotateY(180deg)}
+}
+
+/* Price callout */
+#ml-price-block{
+  position:relative;z-index:5;
+  display:flex;flex-direction:column;align-items:center;
+  margin-top:clamp(14px,2.5vh,24px);gap:4px;
+  animation:mlFadeIn .8s .4s ease both;
+}
+#ml-product-name{
+  font-family:var(--display);font-weight:400;font-size:clamp(18px,2.4vw,26px);
+  color:var(--cream);letter-spacing:.01em;text-align:center;line-height:1.1;
+}
+#ml-product-name em{font-style:italic;color:var(--gold-hot);}
+#ml-product-sub{
+  font-family:var(--body);font-weight:600;font-size:10px;letter-spacing:.28em;
+  text-transform:uppercase;color:rgba(232,180,160,.6);margin-top:2px;
+}
+#ml-price{
+  margin-top:10px;
+  display:inline-flex;align-items:baseline;gap:2px;
+  padding:10px 22px 11px;
+  background:linear-gradient(135deg,rgba(240,192,96,.16),rgba(168,120,34,.08));
+  border:1px solid rgba(217,164,74,.45);border-radius:4px;
+  box-shadow:0 0 30px rgba(217,164,74,.25),inset 0 1px 0 rgba(255,255,255,.08);
+  position:relative;
+  animation:pricePulse 2.4s ease-in-out infinite;
+}
+#ml-price::before{
+  content:'';position:absolute;inset:-1px;border-radius:4px;
+  background:linear-gradient(135deg,var(--gold-hot),transparent 40%,transparent 60%,var(--gold-deep));
+  opacity:.35;z-index:-1;
+}
+#ml-price .pp-curr{
+  font-family:var(--body);font-weight:600;font-size:14px;
+  color:var(--gold-hot);letter-spacing:.02em;
+}
+#ml-price .pp-num{
+  font-family:var(--display);font-weight:400;font-size:clamp(32px,4.5vw,46px);
+  color:#fff;letter-spacing:.01em;line-height:1;
+  text-shadow:0 0 20px rgba(240,192,96,.5);
+}
+#ml-price .pp-dec{
+  font-family:var(--body);font-weight:600;font-size:14px;
+  color:var(--gold-hot);letter-spacing:.02em;
+}
+@keyframes pricePulse{
+  0%,100%{box-shadow:0 0 30px rgba(217,164,74,.25),inset 0 1px 0 rgba(255,255,255,.08);transform:scale(1);}
+  50%{box-shadow:0 0 45px rgba(217,164,74,.4),inset 0 1px 0 rgba(255,255,255,.12);transform:scale(1.02);}
+}
+
+/* Status line + progress bar */
+#ml-status{
+  position:relative;z-index:5;
+  margin-top:clamp(16px,3vh,26px);
+  font-family:var(--body);font-weight:600;font-size:10px;letter-spacing:.28em;
+  text-transform:uppercase;color:rgba(232,180,160,.65);
+  display:flex;align-items:center;gap:10px;
+  animation:mlFadeIn .8s .5s ease both;
+}
+#ml-status .dot{
+  width:5px;height:5px;border-radius:50%;background:var(--gold-hot);
+  box-shadow:0 0 8px var(--gold-hot);
+  animation:dp 1.2s ease-in-out infinite;
+}
+#ml-progress{
+  position:relative;z-index:5;
+  margin-top:10px;
+  width:clamp(160px,18vw,220px);height:2px;
+  background:rgba(232,180,160,.12);border-radius:2px;overflow:hidden;
+  animation:mlFadeIn .8s .55s ease both;
+}
+#ml-progress-fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--gold-deep),var(--gold-hot),var(--gold));
+  box-shadow:0 0 10px var(--gold-hot);
+  transition:width .3s ease;
+}
+
+@keyframes mlFadeIn{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* Tighter mobile sizing for the loader */
+@media(max-width:600px){
+  #ml-canvas-host{width:78vw;height:46vh;}
+}
 </style>
 </head>
 <body>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
      CRAWLER-VISIBLE CONTENT (screen-reader-only)
-     Invisible to users but crawled by Google. This is how we give a
-     full-screen visual site proper SEO content without compromising design.
-     Key improvements over previous version:
-       • Single <h1> (was two — one in desktop shell, one in mobile shell)
-       • Keyword-rich anchor text in links (not just "Home", "Menu")
-       • Long-tail content blocks: "fried chicken near Fort Polk",
-         "catfish plate near Leesville" — where the real ranking
-         opportunities are given Presley's-level competition on core terms
-       • Richer internal linking to delivery.html and about.html
-       • Cuisine-specific section targeting "gumbo", "crawfish",
-         "po-boy" searches individually
      ═══════════════════════════════════════════════════════════════════════════ -->
 <a href="#nav-center" class="sr-only">Skip to main navigation</a>
 
@@ -885,6 +893,7 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
       <li><a href="menu.html">Full Menu &mdash; Breakfast, Lunch &amp; Daily Specials</a></li>
       <li><a href="menu.html#lunch">Today&rsquo;s Lunch Plates</a></li>
       <li><a href="menu.html#beer">Cold Beer Selection</a></li>
+      <li><a href="seasoning.html">Hot Headz Signature Seasoning &mdash; $4.99</a></li>
       <li><a href="delivery.html">Bulk Delivery in DeRidder &amp; Beauregard Parish</a></li>
       <li><a href="https://www.doordash.com/store/hot-headz-southern-foods" rel="noopener">Order Hot Headz on DoorDash</a></li>
       <li><a href="tel:+13372211035">Call to Order: (337) 221-1035</a></li>
@@ -894,10 +903,14 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
     </ul>
   </nav>
 
+  <section aria-labelledby="seasoning-heading">
+    <h2 id="seasoning-heading">Hot Headz Signature Seasoning &mdash; $4.99</h2>
+    <p>Take the Hot Headz kitchen home. Our <strong>signature seasoning blend</strong> is the same seasoning we use on our fried chicken, catfish, and Southern plates. <strong>$4.99 per bottle</strong>, available at the restaurant. Stop by <a href="https://maps.google.com/?q=2741+US-190+DeRidder+LA+70634" rel="noopener">2741 US-190 in DeRidder</a> or call <a href="tel:+13372211035">(337) 221-1035</a> to reserve.</p>
+  </section>
+
   <section aria-labelledby="about-heading">
     <h2 id="about-heading">Southern Restaurant in DeRidder, Louisiana</h2>
-    <p>Hot Headz Southern Foods is DeRidder&rsquo;s home for <strong>made-from-scratch Southern breakfast</strong> and <strong>Cajun lunch plates</strong>. Every morning our kitchen fires up to make biscuits, gravy, and Southern breakfast plates from scratch. By lunchtime we&rsquo;re serving red beans and rice, fried chicken, catfish plates, smothered pork chops, chicken and sausage gumbo, jambalaya, shrimp po-boys, meatloaf, and homemade desserts like Louisiana bread pudding. The lunch plate rotates every day &mdash; check our Facebook each morning to see what&rsquo;s on.</p>
-    <p>We&rsquo;re a <strong>locally owned, family-operated restaurant</strong> that has been feeding DeRidder and the wider Beauregard Parish community since 2020. Whether you stop in to dine, grab a carry-out plate on the way to work, order bulk delivery for a job site or event, or tap the DoorDash button for hot food at your door, Hot Headz has you covered.</p>
+    <p>Hot Headz Southern Foods is DeRidder&rsquo;s home for <strong>made-from-scratch Southern breakfast</strong> and <strong>Cajun lunch plates</strong>. Every morning our kitchen fires up to make biscuits, gravy, and Southern breakfast plates from scratch.</p>
   </section>
 
   <section aria-labelledby="hours-heading">
@@ -910,113 +923,75 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
       United States<br>
       Phone: <a href="tel:+13372211035">(337) 221-1035</a>
     </address>
-    <p>We&rsquo;re located on US Highway 190 in DeRidder, Louisiana. We serve the surrounding communities of <strong>Leesville, Rosepine, Merryville, Pickering, Sugartown, and Fort Polk / JRTC</strong> &mdash; a short drive down US-190 or LA-26.</p>
-    <h3>Business Hours</h3>
-    <ul>
-      <li>Monday: 5:30 AM &ndash; 2:00 PM</li>
-      <li>Tuesday: 5:30 AM &ndash; 2:00 PM</li>
-      <li>Wednesday: 5:30 AM &ndash; 2:00 PM</li>
-      <li>Thursday: 5:30 AM &ndash; 2:00 PM</li>
-      <li>Friday: 5:30 AM &ndash; 2:00 PM</li>
-      <li>Saturday: 6:00 AM &ndash; 2:00 PM</li>
-      <li>Sunday: 7:00 AM &ndash; 3:00 PM</li>
-    </ul>
-    <p>Crawfish season: Thursday through Saturday, 4:00 PM to 8:00 PM, priced at $5.99 per pound (subject to market rates).</p>
-  </section>
-
-  <section aria-labelledby="menu-heading">
-    <h2 id="menu-heading">Menu Highlights &mdash; Southern Breakfast &amp; Lunch</h2>
-
-    <h3>Southern Breakfast in DeRidder</h3>
-    <p>Served from 5:30 AM weekdays and 6:00 AM Saturday. Weekend breakfast until 10:30 AM Saturdays, 10:30 AM Sundays.</p>
-    <ul>
-      <li>Breakfast Plate &mdash; eggs, bacon or sausage, grits, biscuit &mdash; $9.99</li>
-      <li>Biscuits &amp; Gravy &mdash; Southern sausage gravy over house-made biscuits</li>
-      <li>Cajun Boudin</li>
-      <li>Breakfast Burrito &mdash; eggs, cheese, bacon or sausage</li>
-    </ul>
-
-    <h3>Lunch Plates &mdash; Southern Comfort Food</h3>
-    <p>Lunch served 11:00 AM to 2:00 PM (3:00 PM Sunday). One-meat plate with two sides $12.99, two-meat plate $15.99, three-meat plate $19.99, child plate $6.99, extra side $2.99.</p>
-    <ul>
-      <li>Red Beans &amp; Rice with smoked sausage &mdash; a Louisiana Monday classic</li>
-      <li>Fried Chicken Plate &mdash; hand-breaded and served with two sides</li>
-      <li>Catfish Plate &mdash; fried catfish fillet with hushpuppies</li>
-      <li>Smothered Pork Chops in brown gravy</li>
-      <li>Chicken &amp; Sausage Gumbo over rice</li>
-      <li>Jambalaya &mdash; Cajun jambalaya with chicken and sausage</li>
-      <li>Crawfish &Eacute;touff&eacute;e (seasonal)</li>
-      <li>Shrimp Po-Boy on French bread, dressed</li>
-      <li>Southern Meatloaf</li>
-    </ul>
-
-    <h3>Sides, Desserts &amp; Drinks</h3>
-    <ul>
-      <li>Mac &amp; Cheese, Cornbread, Green Beans, Mashed Potatoes &amp; Gravy</li>
-      <li>Sweet Tea, Coffee, Soft drinks</li>
-      <li>Homemade Louisiana Bread Pudding</li>
-    </ul>
-
-    <p>For today&rsquo;s live daily menu visit <a href="menu.html">our full menu page</a>.</p>
-  </section>
-
-  <section aria-labelledby="serving-heading">
-    <h2 id="serving-heading">Southern Food Near Fort Polk, Leesville &amp; Rosepine</h2>
-    <p>Hot Headz is the closest made-from-scratch Southern restaurant to <strong>Fort Polk / JRTC</strong>, a 30-minute drive north on US-171 and US-190. We serve military families, contractors, and civilian crews who want a real Cajun lunch plate instead of fast food. Leesville diners know us as the place for catfish plates and fried chicken. Rosepine and Merryville customers come through for lunch and bulk delivery to job sites and churches.</p>
-    <p>Serving communities throughout <strong>Beauregard Parish</strong> and <strong>Vernon Parish</strong>: DeRidder, Leesville, Rosepine, Merryville, Pickering, Sugartown, New Llano, Anacoco, and Hornbeck.</p>
-  </section>
-
-  <section aria-labelledby="crawfish-heading">
-    <h2 id="crawfish-heading">Boiled Crawfish in DeRidder, LA</h2>
-    <p>During crawfish season, Hot Headz boils fresh crawfish at our DeRidder location <strong>Thursday through Saturday from 4:00 PM to 8:00 PM</strong>. Pricing is <strong>$5.99 per pound</strong>, subject to market rates. Follow our <a href="https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/" rel="noopener">Facebook page</a> for fresh-batch announcements and seasonal availability.</p>
-  </section>
-
-  <section aria-labelledby="ordering-heading">
-    <h2 id="ordering-heading">How to Order from Hot Headz</h2>
-    <p><strong>Dine-in</strong> &mdash; walk into our DeRidder location at 2741 US-190 during business hours. Family-friendly with free parking, wheelchair accessible.</p>
-    <p><strong>Carry-out</strong> &mdash; call ahead at <a href="tel:+13372211035">(337) 221-1035</a> and your order will be ready when you arrive.</p>
-    <p><strong>Local bulk delivery</strong> &mdash; we deliver orders of 10 or more plates within 10 miles of DeRidder. Perfect for <strong>job sites, offices, churches, and events</strong>. Visit our <a href="delivery.html">delivery information page</a> for details and tier pricing.</p>
-    <p><strong>DoorDash delivery</strong> &mdash; <a href="https://www.doordash.com/store/hot-headz-southern-foods" rel="noopener">order Hot Headz on DoorDash</a> for single-order delivery across the DeRidder area.</p>
-  </section>
-
-  <section aria-labelledby="faq-heading">
-    <h2 id="faq-heading">Frequently Asked Questions</h2>
-
-    <h3>What are Hot Headz Southern Foods hours?</h3>
-    <p>Monday&ndash;Friday 5:30 AM to 2:00 PM, Saturday 6:00 AM to 2:00 PM, and Sunday 7:00 AM to 3:00 PM.</p>
-
-    <h3>Where is Hot Headz located?</h3>
-    <p>2741 US-190, DeRidder, Louisiana 70634, in Beauregard Parish.</p>
-
-    <h3>Does Hot Headz deliver?</h3>
-    <p>Yes. In-house bulk delivery on orders of 10 or more plates within 10 miles of DeRidder, and single-order delivery on DoorDash.</p>
-
-    <h3>What kind of food does Hot Headz serve?</h3>
-    <p>Made-from-scratch Southern breakfast and lunch, including Cajun and Creole dishes like gumbo, jambalaya, po-boys, and crawfish &eacute;touff&eacute;e.</p>
-
-    <h3>How much does a lunch plate cost?</h3>
-    <p>One meat with two sides is $12.99. Two meats with two sides is $15.99. Three meats with two sides is $19.99. Child plates are $6.99.</p>
-
-    <h3>Does Hot Headz have crawfish?</h3>
-    <p>Yes, during crawfish season Thursday through Saturday from 4 PM to 8 PM at $5.99 per pound.</p>
-
-    <h3>Is Hot Headz family-owned?</h3>
-    <p>Yes. Hot Headz Southern Foods is a family-owned and operated restaurant in DeRidder, Louisiana, serving Beauregard Parish since 2020.</p>
   </section>
 </main>
 
 <footer class="sr-only">
-  <p>&copy; 2026 Hot Headz Southern Foods &mdash; 2741 US-190, DeRidder, LA 70634 &mdash; <a href="tel:+13372211035">(337) 221-1035</a>. Family-owned Southern restaurant serving Beauregard Parish, Vernon Parish, and the Fort Polk / JRTC area in Louisiana.</p>
+  <p>&copy; 2026 Hot Headz Southern Foods &mdash; 2741 US-190, DeRidder, LA 70634 &mdash; <a href="tel:+13372211035">(337) 221-1035</a>.</p>
 </footer>
-<!-- ═══════════════════════════════════════════════════════════
-     END CRAWLER-VISIBLE CONTENT
-     ═══════════════════════════════════════════════════════════ -->
 
 <div id="cursor"><div id="c-dot"></div></div>
 <canvas id="cv-bg" aria-hidden="true"></canvas>
 <canvas id="cv-smoke" aria-hidden="true"></canvas>
 <canvas id="cv-ember" aria-hidden="true"></canvas>
 <canvas id="cv-nav" aria-hidden="true"></canvas>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     MENU LOADING SCREEN OVERLAY
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div id="menu-loader" role="dialog" aria-label="Loading menu" aria-hidden="true">
+  <div id="ml-brand">Hot Headz Southern Foods</div>
+  <div id="ml-title">The <em>Menu</em></div>
+  <div id="ml-subtitle">while you wait — meet our signature blend</div>
+
+  <div id="ml-canvas-host" aria-hidden="true">
+    <div class="ml-orbit o1"></div>
+    <div class="ml-orbit o2"></div>
+    <!-- Three.js canvas injected here -->
+    <!-- Fallback SVG shaker (shown only if Three.js / GLB fails) -->
+    <svg id="ml-fallback" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="fbBody" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#3a1a14"/>
+          <stop offset="50%" stop-color="#1e0a07"/>
+          <stop offset="100%" stop-color="#0a0403"/>
+        </linearGradient>
+        <linearGradient id="fbCap" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f0c060"/>
+          <stop offset="100%" stop-color="#a87822"/>
+        </linearGradient>
+        <linearGradient id="fbLabel" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#e83010"/>
+          <stop offset="100%" stop-color="#c41800"/>
+        </linearGradient>
+      </defs>
+      <!-- Cap -->
+      <rect x="55" y="20" width="90" height="30" rx="4" fill="url(#fbCap)"/>
+      <circle cx="80" cy="35" r="2.5" fill="#0a0403"/>
+      <circle cx="100" cy="35" r="2.5" fill="#0a0403"/>
+      <circle cx="120" cy="35" r="2.5" fill="#0a0403"/>
+      <!-- Bottle body -->
+      <rect x="45" y="50" width="110" height="200" rx="10" fill="url(#fbBody)" stroke="rgba(217,164,74,.3)" stroke-width="1"/>
+      <!-- Label -->
+      <rect x="55" y="100" width="90" height="120" rx="3" fill="url(#fbLabel)" stroke="rgba(255,200,150,.4)" stroke-width="1"/>
+      <text x="100" y="140" text-anchor="middle" font-family="Abril Fatface,serif" font-size="18" fill="#fff">HOT</text>
+      <text x="100" y="165" text-anchor="middle" font-family="Abril Fatface,serif" font-size="18" fill="#fff" font-style="italic">HEADZ</text>
+      <text x="100" y="190" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(255,255,255,.85)" letter-spacing="2">SIGNATURE</text>
+      <text x="100" y="205" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(255,255,255,.85)" letter-spacing="2">SEASONING</text>
+    </svg>
+  </div>
+
+  <div id="ml-price-block">
+    <div id="ml-product-name">Hot Headz <em>Signature</em> Seasoning</div>
+    <div id="ml-product-sub">Now Available · At The Restaurant</div>
+    <div id="ml-price">
+      <span class="pp-curr">$</span><span class="pp-num">4</span><span class="pp-dec">.99</span>
+    </div>
+  </div>
+
+  <div id="ml-status"><span class="dot"></span><span id="ml-status-text">Loading the menu</span></div>
+  <div id="ml-progress"><div id="ml-progress-fill"></div></div>
+</div>
 
 <!-- DESKTOP SHELL -->
 <div id="shell" aria-hidden="false">
@@ -1056,13 +1031,14 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
         <div class="nav-item" onclick="doNavigate('menu')"     onmouseenter="setPreview('menu')"     onmouseleave="clearPreview()" role="link" tabindex="0"><span class="ni-num">02</span><span class="ni-name">The Menu</span><span class="ni-sub">Breakfast, lunch, daily specials</span><span class="ni-arrow" aria-hidden="true">↗</span></div>
         <div class="nav-item sub" onclick="doNavigate('lunch')" onmouseenter="setPreview('lunch')" onmouseleave="clearPreview()" role="link" tabindex="0"><span class="ni-num">✦</span><span class="ni-name">Lunch</span><span class="ni-sub">Daily plates · Southern classics</span><span class="ni-arrow" aria-hidden="true">↗</span></div>
         <div class="nav-item sub" onclick="doNavigate('beer')"  onmouseenter="setPreview('beer')"  onmouseleave="clearPreview()" role="link" tabindex="0"><span class="ni-num">✦</span><span class="ni-name">Beer</span><span class="ni-sub">Cold drinks · What's on tap</span><span class="ni-arrow" aria-hidden="true">↗</span></div>
-        <div class="nav-item" onclick="doNavigate('delivery')" onmouseenter="setPreview('delivery')" onmouseleave="clearPreview()" role="link" tabindex="0"><span class="ni-num">03</span><span class="ni-name">Delivery</span><span class="ni-sub">10+ plates · within 10 miles</span><span class="ni-arrow" aria-hidden="true">↗</span></div>
-        <div class="nav-item doordash external" onclick="doNavigate('doordash')" onmouseenter="setPreview('doordash')" onmouseleave="clearPreview()" role="link" tabindex="0"><span class="ni-num">04</span><span class="ni-name">DoorDash<span class="dd-tag">New</span></span><span class="ni-sub">Opens DoorDash in new tab</span><span class="ni-arrow" aria-hidden="true">↗</span></div>
-        <div class="nav-item" onclick="doNavigate('order')"    onmouseenter="setPreview('order')"    onmouseleave="clearPreview()" role="link" tabindex="0"><span class="ni-num">05</span><span class="ni-name">Order Now</span><span class="ni-sub">Tap to call · Faster pickup</span><span class="ni-arrow" aria-hidden="true">↗</span></div>
-        <div class="nav-item" onclick="doNavigate('about')"    onmouseenter="setPreview('about')"    onmouseleave="clearPreview()" role="link" tabindex="0"><span class="ni-num">06</span><span class="ni-name">About Us</span><span class="ni-sub">Comfort food done right since 2020</span><span class="ni-arrow" aria-hidden="true">↗</span></div>
-        <div class="nav-item external" onclick="doNavigate('facebook')" onmouseenter="setPreview('facebook')" onmouseleave="clearPreview()" role="link" tabindex="0"><span class="ni-num">07</span><span class="ni-name">Facebook</span><span class="ni-sub">Opens Facebook in new tab</span><span class="ni-arrow" aria-hidden="true">↗</span></div>
-        <div class="nav-item external" onclick="doNavigate('find')"     onmouseenter="setPreview('find')"     onmouseleave="clearPreview()" role="link" tabindex="0"><span class="ni-num">08</span><span class="ni-name">Find Us</span><span class="ni-sub">Opens Google Maps in new tab</span><span class="ni-arrow" aria-hidden="true">↗</span></div>
-        <div class="nav-item" id="staff-desktop" data-nav="staff" onmouseenter="setPreview('staff')" onmouseleave="clearPreview()" role="link" tabindex="0"><span class="ni-num">09</span><span class="ni-name">Staff Portal</span><span class="ni-sub">Team access · Internal tools</span><span class="ni-arrow" aria-hidden="true">↗</span></div>
+        <div class="nav-item seasoning" onclick="doNavigate('seasoning')" onmouseenter="setPreview('seasoning')" onmouseleave="clearPreview()" role="link" tabindex="0"><span class="ni-num">03</span><span class="ni-name">Seasoning<span class="price-tag">4.99</span></span><span class="ni-sub">Our signature blend · Take it home</span><span class="ni-arrow" aria-hidden="true">↗</span></div>
+        <div class="nav-item" onclick="doNavigate('delivery')" onmouseenter="setPreview('delivery')" onmouseleave="clearPreview()" role="link" tabindex="0"><span class="ni-num">04</span><span class="ni-name">Delivery</span><span class="ni-sub">10+ plates · within 10 miles</span><span class="ni-arrow" aria-hidden="true">↗</span></div>
+        <div class="nav-item doordash external" onclick="doNavigate('doordash')" onmouseenter="setPreview('doordash')" onmouseleave="clearPreview()" role="link" tabindex="0"><span class="ni-num">05</span><span class="ni-name">DoorDash<span class="dd-tag">New</span></span><span class="ni-sub">Opens DoorDash in new tab</span><span class="ni-arrow" aria-hidden="true">↗</span></div>
+        <div class="nav-item" onclick="doNavigate('order')"    onmouseenter="setPreview('order')"    onmouseleave="clearPreview()" role="link" tabindex="0"><span class="ni-num">06</span><span class="ni-name">Order Now</span><span class="ni-sub">Tap to call · Faster pickup</span><span class="ni-arrow" aria-hidden="true">↗</span></div>
+        <div class="nav-item" onclick="doNavigate('about')"    onmouseenter="setPreview('about')"    onmouseleave="clearPreview()" role="link" tabindex="0"><span class="ni-num">07</span><span class="ni-name">About Us</span><span class="ni-sub">Comfort food done right since 2020</span><span class="ni-arrow" aria-hidden="true">↗</span></div>
+        <div class="nav-item external" onclick="doNavigate('facebook')" onmouseenter="setPreview('facebook')" onmouseleave="clearPreview()" role="link" tabindex="0"><span class="ni-num">08</span><span class="ni-name">Facebook</span><span class="ni-sub">Opens Facebook in new tab</span><span class="ni-arrow" aria-hidden="true">↗</span></div>
+        <div class="nav-item external" onclick="doNavigate('find')"     onmouseenter="setPreview('find')"     onmouseleave="clearPreview()" role="link" tabindex="0"><span class="ni-num">09</span><span class="ni-name">Find Us</span><span class="ni-sub">Opens Google Maps in new tab</span><span class="ni-arrow" aria-hidden="true">↗</span></div>
+        <div class="nav-item" id="staff-desktop" data-nav="staff" onmouseenter="setPreview('staff')" onmouseleave="clearPreview()" role="link" tabindex="0"><span class="ni-num">10</span><span class="ni-name">Staff Portal</span><span class="ni-sub">Team access · Internal tools</span><span class="ni-arrow" aria-hidden="true">↗</span></div>
       </nav>
     </div>
 
@@ -1078,7 +1054,7 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
   </div>
 </div>
 
-<!-- MOBILE SHELL (aria-hidden from screen readers — sr-only <main> above serves them) -->
+<!-- MOBILE SHELL -->
 <div id="mobile-shell" aria-hidden="true">
   <div id="mob-header" role="banner">
     <div id="mob-header-inner">
@@ -1097,16 +1073,31 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
     <div class="mob-nav-item" onclick="doNavigate('menu')" role="link" tabindex="0"><span class="mni-num">02</span><div class="mni-body"><div class="mni-name">The Menu</div><div class="mni-sub">Breakfast, lunch &amp; daily specials</div></div><span class="mni-arrow" aria-hidden="true">↗</span></div>
     <div class="mob-nav-item" onclick="doNavigate('lunch')" style="padding-left:36px;" role="link" tabindex="0"><span class="mni-num" style="font-size:9px;opacity:.6;">✦</span><div class="mni-body"><div class="mni-name" style="font-size:clamp(18px,4.5vw,23px);color:rgba(248,112,56,.88);">Lunch</div><div class="mni-sub">Daily plates · Southern classics</div></div><span class="mni-arrow" aria-hidden="true">↗</span></div>
     <div class="mob-nav-item" onclick="doNavigate('beer')" style="padding-left:36px;" role="link" tabindex="0"><span class="mni-num" style="font-size:9px;opacity:.6;">✦</span><div class="mni-body"><div class="mni-name" style="font-size:clamp(18px,4.5vw,23px);color:rgba(248,112,56,.88);">Beer</div><div class="mni-sub">Cold drinks · What's on tap</div></div><span class="mni-arrow" aria-hidden="true">↗</span></div>
-    <div class="mob-nav-item" onclick="doNavigate('delivery')" role="link" tabindex="0"><span class="mni-num">03</span><div class="mni-body"><div class="mni-name">Delivery</div><div class="mni-sub">10+ plates · within 10 miles</div></div><span class="mni-arrow" aria-hidden="true">↗</span></div>
-    <div class="mob-nav-item doordash external" onclick="doNavigate('doordash')" role="link" tabindex="0"><span class="mni-num">04</span><div class="mni-body"><div class="mni-name">DoorDash <span class="dd-tag-m">New</span></div><div class="mni-sub">Opens DoorDash in new tab</div></div><span class="mni-arrow" aria-hidden="true">↗</span></div>
-    <div class="mob-nav-item" onclick="doNavigate('order')" role="link" tabindex="0"><span class="mni-num">05</span><div class="mni-body"><div class="mni-name">Order Now</div><div class="mni-sub">Tap to call (337) 221-1035</div></div><span class="mni-arrow" aria-hidden="true">↗</span></div>
-    <div class="mob-nav-item" onclick="doNavigate('about')" role="link" tabindex="0"><span class="mni-num">06</span><div class="mni-body"><div class="mni-name">About Us</div><div class="mni-sub">Comfort food done right since 2020</div></div><span class="mni-arrow" aria-hidden="true">↗</span></div>
-    <div class="mob-nav-item external" onclick="doNavigate('facebook')" role="link" tabindex="0"><span class="mni-num">07</span><div class="mni-body"><div class="mni-name">Facebook</div><div class="mni-sub">Opens Facebook in new tab</div></div><span class="mni-arrow" aria-hidden="true">↗</span></div>
-    <div class="mob-nav-item external" onclick="doNavigate('find')" role="link" tabindex="0"><span class="mni-num">08</span><div class="mni-body"><div class="mni-name">Find Us</div><div class="mni-sub">Opens Google Maps in new tab</div></div><span class="mni-arrow" aria-hidden="true">↗</span></div>
-    <div class="mob-nav-item" id="staff-mobile" data-nav="staff" role="link" tabindex="0"><span class="mni-num">09</span><div class="mni-body"><div class="mni-name">Staff Portal</div><div class="mni-sub">Team access · Internal tools</div></div><span class="mni-arrow" aria-hidden="true">↗</span></div>
+    <div class="mob-nav-item seasoning" onclick="doNavigate('seasoning')" role="link" tabindex="0"><span class="mni-num">03</span><div class="mni-body"><div class="mni-name">Seasoning <span class="price-tag-m">4.99</span></div><div class="mni-sub">Our signature blend · Take it home</div></div><span class="mni-arrow" aria-hidden="true">↗</span></div>
+    <div class="mob-nav-item" onclick="doNavigate('delivery')" role="link" tabindex="0"><span class="mni-num">04</span><div class="mni-body"><div class="mni-name">Delivery</div><div class="mni-sub">10+ plates · within 10 miles</div></div><span class="mni-arrow" aria-hidden="true">↗</span></div>
+    <div class="mob-nav-item doordash external" onclick="doNavigate('doordash')" role="link" tabindex="0"><span class="mni-num">05</span><div class="mni-body"><div class="mni-name">DoorDash <span class="dd-tag-m">New</span></div><div class="mni-sub">Opens DoorDash in new tab</div></div><span class="mni-arrow" aria-hidden="true">↗</span></div>
+    <div class="mob-nav-item" onclick="doNavigate('order')" role="link" tabindex="0"><span class="mni-num">06</span><div class="mni-body"><div class="mni-name">Order Now</div><div class="mni-sub">Tap to call (337) 221-1035</div></div><span class="mni-arrow" aria-hidden="true">↗</span></div>
+    <div class="mob-nav-item" onclick="doNavigate('about')" role="link" tabindex="0"><span class="mni-num">07</span><div class="mni-body"><div class="mni-name">About Us</div><div class="mni-sub">Comfort food done right since 2020</div></div><span class="mni-arrow" aria-hidden="true">↗</span></div>
+    <div class="mob-nav-item external" onclick="doNavigate('facebook')" role="link" tabindex="0"><span class="mni-num">08</span><div class="mni-body"><div class="mni-name">Facebook</div><div class="mni-sub">Opens Facebook in new tab</div></div><span class="mni-arrow" aria-hidden="true">↗</span></div>
+    <div class="mob-nav-item external" onclick="doNavigate('find')" role="link" tabindex="0"><span class="mni-num">09</span><div class="mni-body"><div class="mni-name">Find Us</div><div class="mni-sub">Opens Google Maps in new tab</div></div><span class="mni-arrow" aria-hidden="true">↗</span></div>
+    <div class="mob-nav-item" id="staff-mobile" data-nav="staff" role="link" tabindex="0"><span class="mni-num">10</span><div class="mni-body"><div class="mni-name">Staff Portal</div><div class="mni-sub">Team access · Internal tools</div></div><span class="mni-arrow" aria-hidden="true">↗</span></div>
   </nav>
   <div id="mob-botbar"><div id="mob-ticker-track" aria-hidden="true"></div></div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     THREE.JS — loaded via import map for the menu loader.
+     Only fires when needed (when user clicks a menu-bound nav item).
+     ═══════════════════════════════════════════════════════════════════════ -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
 <script>
 /* BACKGROUND CANVASES */
 const cvBg=document.getElementById('cv-bg'),bx=cvBg.getContext('2d');
@@ -1161,7 +1152,7 @@ let mx=W/2,my=H/2;
 document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;curEl.style.left=e.clientX+'px';curEl.style.top=e.clientY+'px';});
 
 /* TICKERS */
-const tkItems=['Red Beans & Rice','Fried Chicken Plate','Catfish Plate','Meatloaf','Smothered Pork Chops','Chicken & Sausage Gumbo','Shrimp Po\' Boy','Crawfish Étouffée','Jambalaya','Mac & Cheese','Cornbread','Breakfast Plate','Biscuits & Gravy','Cajun Boudin','Sweet Tea','Bread Pudding','Now on DoorDash'];
+const tkItems=['Red Beans & Rice','Fried Chicken Plate','Catfish Plate','Meatloaf','Smothered Pork Chops','Chicken & Sausage Gumbo','Shrimp Po\' Boy','Crawfish Étouffée','Jambalaya','Mac & Cheese','Cornbread','Breakfast Plate','Biscuits & Gravy','Cajun Boudin','Sweet Tea','Bread Pudding','Now on DoorDash','Signature Seasoning $4.99'];
 const d4=[...tkItems,...tkItems,...tkItems,...tkItems];
 document.getElementById('ticker-track').innerHTML=d4.map(t=>`<span class="t-item">${t}</span>`).join('');
 document.getElementById('mob-ticker-track').innerHTML=d4.map(t=>`<span class="mt-item">${t}</span>`).join('');
@@ -1173,12 +1164,13 @@ const mobHoursStr=dow===0?'7am – 3pm':dow===6?'6am – 2pm':'5:30am – 2pm';
 document.getElementById('hours-today').textContent=hoursStr;
 document.getElementById('mob-hours').textContent=mobHoursStr;
 
-/* PAGE DATA */
+/* PAGE DATA — includes new seasoning route */
 const PAGES={
   home:    {dest:'home.html',      external:false},
-  menu:    {dest:'menu.html',      external:false},
-  lunch:   {dest:'menu.html#lunch',external:false},
-  beer:    {dest:'menu.html#beer', external:false},
+  menu:    {dest:'menu.html',      external:false, showMenuLoader:true},
+  lunch:   {dest:'menu.html#lunch',external:false, showMenuLoader:true},
+  beer:    {dest:'menu.html#beer', external:false, showMenuLoader:true},
+  seasoning:{dest:'seasoning.html',external:false, showMenuLoader:true},
   delivery:{dest:'delivery.html',  external:false},
   doordash:{dest:'https://www.doordash.com/store/hot-headz-southern-foods', external:true},
   order:   {dest:'tel:+13372211035', external:false, isTel:true},
@@ -1192,13 +1184,14 @@ const pvData={
   menu:{num:'02',title:'Fresh. From Scratch.',italic:'Breakfast · Lunch · Daily specials · Desserts',chips:['Breakfast Plates','Red Beans & Rice','Fried Chicken','Catfish']},
   lunch:{num:'✦',title:'Lunch. Done Right.',italic:'Daily Southern plates · Changes every day',chips:['Changes Daily','Southern Plates','Includes Sides','Check Facebook']},
   beer:{num:'✦',title:'Cold. Cold Beer.',italic:'Ice cold · Natural Light · Modelo · Budweiser',chips:['Natural Light','Miller Lite','Coors Light','Modelo']},
-  delivery:{num:'03',title:'We Bring The Food.',italic:'10+ plate orders · within 10 miles',chips:['10+ Plates','Within 10 Miles','Call Ahead','(337) 221-1035']},
-  doordash:{num:'04',title:'Now On DoorDash.',italic:'Order delivery · Opens in new tab',chips:['DoorDash','Delivery','Opens New Tab','Order Online'],dd:true},
-  order:{num:'05',title:'Tap To Call.',italic:'Skip the line · Ready when you arrive',chips:['(337) 221-1035','Phone Dialer','Mon–Fri from 5:30am','Sat from 6am']},
-  about:{num:'06',title:'Comfort Food Done Right.',italic:'Family-owned · DeRidder proud · Since 2020',chips:['Est. 2020','Family Owned','Made From Scratch','DeRidder Proud']},
-  facebook:{num:'07',title:'Follow The Feed.',italic:'Daily specials · Opens in new tab',chips:['Daily Specials','Morning Posts','Photos','Opens New Tab']},
-  find:{num:'08',title:"We're on US-190.",italic:'2741 US-190 · Opens Google Maps',chips:['2741 US-190','DeRidder, LA','Opens New Tab','Google Maps']},
-  staff:{num:'09',title:'Staff Portal.',italic:'Team access · Scheduling · Internal tools',chips:['Staff Only','Schedule','Internal','Portal']},
+  seasoning:{num:'03',title:'Our Signature Blend.',italic:'Take the kitchen home · $4.99 at the restaurant',chips:['$4.99','Signature Blend','Cajun · Southern','At The Restaurant'],sn:true},
+  delivery:{num:'04',title:'We Bring The Food.',italic:'10+ plate orders · within 10 miles',chips:['10+ Plates','Within 10 Miles','Call Ahead','(337) 221-1035']},
+  doordash:{num:'05',title:'Now On DoorDash.',italic:'Order delivery · Opens in new tab',chips:['DoorDash','Delivery','Opens New Tab','Order Online'],dd:true},
+  order:{num:'06',title:'Tap To Call.',italic:'Skip the line · Ready when you arrive',chips:['(337) 221-1035','Phone Dialer','Mon–Fri from 5:30am','Sat from 6am']},
+  about:{num:'07',title:'Comfort Food Done Right.',italic:'Family-owned · DeRidder proud · Since 2020',chips:['Est. 2020','Family Owned','Made From Scratch','DeRidder Proud']},
+  facebook:{num:'08',title:'Follow The Feed.',italic:'Daily specials · Opens in new tab',chips:['Daily Specials','Morning Posts','Photos','Opens New Tab']},
+  find:{num:'09',title:"We're on US-190.",italic:'2741 US-190 · Opens Google Maps',chips:['2741 US-190','DeRidder, LA','Opens New Tab','Google Maps']},
+  staff:{num:'10',title:'Staff Portal.',italic:'Team access · Scheduling · Internal tools',chips:['Staff Only','Schedule','Internal','Portal']},
 };
 
 function setPreview(id){
@@ -1207,16 +1200,16 @@ function setPreview(id){
   document.getElementById('pv-desc').textContent=p.italic;
   const num=document.getElementById('pv-num');
   num.textContent=p.num;
-  num.classList.remove('lit','dd-lit');
-  num.classList.add(p.dd?'dd-lit':'lit');
-  const chipClass=p.dd?' dd':' on';
+  num.classList.remove('lit','dd-lit','sn-lit');
+  num.classList.add(p.dd?'dd-lit':p.sn?'sn-lit':'lit');
+  const chipClass=p.dd?' dd':p.sn?' sn':' on';
   document.getElementById('pv-chips').innerHTML=p.chips.slice(0,4).map((c,i)=>`<span class="pv-chip${i<2?chipClass:''}">${c}</span>`).join('');
 }
 function clearPreview(){
   document.getElementById('pv-title').textContent='Hover any item to explore';
   document.getElementById('pv-desc').textContent='Each destination has its own story. Take your time.';
   const num=document.getElementById('pv-num');
-  num.classList.remove('lit','dd-lit');
+  num.classList.remove('lit','dd-lit','sn-lit');
   num.textContent='—';
   document.getElementById('pv-chips').innerHTML='';
 }
@@ -1282,47 +1275,23 @@ function spawnNavParticles(hotDots,col){
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   CRAWFISH PARTICLE SYSTEM — scuttles left-to-right under HOT HEADZ text
-   during the navigation transition. Once it reaches the right edge it
-   becomes the origin point of the explosion.
-
-   Built as ~85 particles forming the silhouette of a crawfish viewed from
-   above: tail fan at the back, segmented abdomen, body, two large claws
-   reaching forward, walking legs underneath, and antennae.
-
-   The whole thing rides on a "carrier" that moves linearly across the
-   screen with a subtle vertical bob. Each particle has a relative offset
-   from the carrier — so the crawfish stays cohesive while moving.
-
-   Color: same ember-orange palette as the rest of the system (boiled
-   crawfish red-orange — fits the brand AND the visual language).
+   CRAWFISH PARTICLE SYSTEM — unchanged from original
    ═══════════════════════════════════════════════════════════════════════ */
-let crawfish = null; // active crawfish object during nav transition
+let crawfish = null;
 
 function buildCrawfishShape(scale){
-  // Returns array of {ox, oy, oz, r, glow} relative to crawfish center.
-  // Crawfish faces RIGHT (direction of travel). +x = forward.
-  // oz is DEPTH: negative = closer to camera (raised above body plane),
-  //              positive = farther from camera (sunken below body plane).
-  // The shell is dome-shaped, claws are RAISED forward (negative oz),
-  // walking legs are BELOW body plane (positive oz), tail curves DOWN.
   const pts = [];
   const s = scale;
-
-  // ── BODY (cephalothorax) — domed shell, particles around the perimeter
-  // are slightly behind, top of dome is forward (toward camera).
   for(let i = 0; i < 18; i++){
     const t = (i / 17) * Math.PI * 2;
     const rr = 0.7 + Math.random() * 0.3;
     const ox = Math.cos(t) * 14 * s * rr;
     const oy = Math.sin(t) * 9 * s * rr;
-    // Dome: closer to center = closer to camera (raised)
     const distFromCenter = Math.sqrt(ox*ox + oy*oy);
     const maxDist = 14 * s;
     const oz = -8 * s * (1 - Math.min(1, distFromCenter / maxDist));
     pts.push({ ox, oy, oz, r: 1.2 + Math.random() * 0.6, glow: 1.0 });
   }
-  // body fill — dome top, raised
   for(let i = 0; i < 8; i++){
     const ox = (Math.random() - .5) * 22 * s;
     const oy = (Math.random() - .5) * 14 * s;
@@ -1330,60 +1299,26 @@ function buildCrawfishShape(scale){
     const oz = -10 * s * (1 - Math.min(1, distFromCenter / (14 * s)));
     pts.push({ ox, oy, oz, r: 1.0 + Math.random() * 0.5, glow: 0.92 });
   }
-
-  // ── HEAD/ROSTRUM — small forward point, slightly raised
   for(let i = 0; i < 4; i++){
-    pts.push({
-      ox: (16 + i * 3) * s,
-      oy: ((i % 2) - 0.5) * 2 * s,
-      oz: -4 * s + i * 1 * s,
-      r: 0.9 + Math.random() * 0.4,
-      glow: 1.0
-    });
+    pts.push({ ox: (16 + i * 3) * s, oy: ((i % 2) - 0.5) * 2 * s, oz: -4 * s + i * 1 * s, r: 0.9 + Math.random() * 0.4, glow: 1.0 });
   }
-
-  // ── EYES — small bright dots, raised on stalks (closest to camera)
   pts.push({ ox: 14 * s, oy: -4 * s, oz: -12 * s, r: 1.5, glow: 1.5 });
   pts.push({ ox: 14 * s, oy:  4 * s, oz: -12 * s, r: 1.5, glow: 1.5 });
-
-  // ── ANTENNAE — trail back from head, curve up and over
   for(let i = 0; i < 6; i++){
     const k = i / 5;
-    // upper antenna — arcs upward then forward
-    pts.push({
-      ox: (18 + k * 22) * s,
-      oy: (-5 - k * 8 + Math.sin(i * 1.2) * 1.5) * s,
-      oz: -8 * s + k * 4 * s, // starts raised, curves down
-      r: 0.6 + (1 - k) * 0.4,
-      glow: 0.5 + (1 - k) * 0.3
-    });
-    // lower antenna
-    pts.push({
-      ox: (18 + k * 22) * s,
-      oy: (5 + k * 8 - Math.sin(i * 1.2) * 1.5) * s,
-      oz: -8 * s + k * 4 * s,
-      r: 0.6 + (1 - k) * 0.4,
-      glow: 0.5 + (1 - k) * 0.3
-    });
+    pts.push({ ox: (18 + k * 22) * s, oy: (-5 - k * 8 + Math.sin(i * 1.2) * 1.5) * s, oz: -8 * s + k * 4 * s, r: 0.6 + (1 - k) * 0.4, glow: 0.5 + (1 - k) * 0.3 });
+    pts.push({ ox: (18 + k * 22) * s, oy: (5 + k * 8 - Math.sin(i * 1.2) * 1.5) * s, oz: -8 * s + k * 4 * s, r: 0.6 + (1 - k) * 0.4, glow: 0.5 + (1 - k) * 0.3 });
   }
-
-  // ── CLAWS (chelae) — RAISED FORWARD, biggest closer to camera ──
-  // Right (upper) claw
-  // arm — slightly raised, ramping up toward pincer
   pts.push({ ox: 10 * s, oy: -10 * s, oz: -3 * s, r: 1.2, glow: 0.9 });
   pts.push({ ox: 14 * s, oy: -13 * s, oz: -6 * s, r: 1.3, glow: 0.95 });
   pts.push({ ox: 18 * s, oy: -15 * s, oz: -9 * s, r: 1.3, glow: 1.0 });
-  // pincer body — most raised (closest to viewer)
   pts.push({ ox: 22 * s, oy: -16 * s, oz: -14 * s, r: 1.7, glow: 1.15 });
   pts.push({ ox: 25 * s, oy: -15 * s, oz: -15 * s, r: 1.7, glow: 1.15 });
   pts.push({ ox: 27 * s, oy: -13 * s, oz: -14 * s, r: 1.5, glow: 1.05 });
-  // pincer tips (split open)
   pts.push({ ox: 30 * s, oy: -17 * s, oz: -16 * s, r: 1.3, glow: 1.05 });
   pts.push({ ox: 30 * s, oy: -12 * s, oz: -16 * s, r: 1.3, glow: 1.05 });
   pts.push({ ox: 33 * s, oy: -16 * s, oz: -17 * s, r: 1.1, glow: 0.95 });
   pts.push({ ox: 33 * s, oy: -13 * s, oz: -17 * s, r: 1.1, glow: 0.95 });
-
-  // Left (lower) claw — mirror
   pts.push({ ox: 10 * s, oy:  10 * s, oz: -3 * s, r: 1.2, glow: 0.9 });
   pts.push({ ox: 14 * s, oy:  13 * s, oz: -6 * s, r: 1.3, glow: 0.95 });
   pts.push({ ox: 18 * s, oy:  15 * s, oz: -9 * s, r: 1.3, glow: 1.0 });
@@ -1394,109 +1329,58 @@ function buildCrawfishShape(scale){
   pts.push({ ox: 30 * s, oy:  12 * s, oz: -16 * s, r: 1.3, glow: 1.05 });
   pts.push({ ox: 33 * s, oy:  16 * s, oz: -17 * s, r: 1.1, glow: 0.95 });
   pts.push({ ox: 33 * s, oy:  13 * s, oz: -17 * s, r: 1.1, glow: 0.95 });
-
-  // ── WALKING LEGS — UNDERNEATH the body (positive oz, in shadow)
   for(let pair = 0; pair < 4; pair++){
     const px = (8 - pair * 5) * s;
-    // upper leg (extends below body plane)
-    pts.push({ ox: px,     oy: -10 * s, oz: 4 * s, r: 0.8, glow: 0.55, _leg: pair });
+    pts.push({ ox: px, oy: -10 * s, oz: 4 * s, r: 0.8, glow: 0.55, _leg: pair });
     pts.push({ ox: px - 1, oy: -14 * s, oz: 7 * s, r: 0.7, glow: 0.45, _leg: pair });
-    // lower leg
-    pts.push({ ox: px,     oy:  10 * s, oz: 4 * s, r: 0.8, glow: 0.55, _leg: pair + 4 });
-    pts.push({ ox: px - 1, oy:  14 * s, oz: 7 * s, r: 0.7, glow: 0.45, _leg: pair + 4 });
+    pts.push({ ox: px, oy: 10 * s, oz: 4 * s, r: 0.8, glow: 0.55, _leg: pair + 4 });
+    pts.push({ ox: px - 1, oy: 14 * s, oz: 7 * s, r: 0.7, glow: 0.45, _leg: pair + 4 });
   }
-
-  // ── ABDOMEN/TAIL — segmented going backward, curves DOWN behind body
   for(let seg = 0; seg < 5; seg++){
     const sx = -(15 + seg * 6) * s;
     const sw = (8 - seg * 0.8) * s;
-    // The further back, the deeper (curves below body plane)
     const segOz = seg * 1.5 * s;
-    // top edge of segment (slightly raised vs sides — segmented dome)
     pts.push({ ox: sx, oy: -sw, oz: segOz - 2 * s, r: 1.0, glow: 0.78 });
-    // bottom edge
     pts.push({ ox: sx, oy:  sw, oz: segOz - 2 * s, r: 1.0, glow: 0.78 });
-    // center top of each segment — most raised
     pts.push({ ox: sx, oy: 0, oz: segOz - 5 * s, r: 0.9, glow: 0.85 });
     pts.push({ ox: sx + 3 * s, oy: (Math.random() - .5) * sw * 1.2, oz: segOz - 3 * s, r: 0.7, glow: 0.65 });
   }
-
-  // ── TAIL FAN — splays at the back, lower than body plane
   const fx = -45 * s;
   for(let f = -3; f <= 3; f++){
-    pts.push({
-      ox: fx + Math.abs(f) * -1.5 * s,
-      oy: f * 3 * s,
-      oz: 8 * s,
-      r: 1.0,
-      glow: 0.7
-    });
-    pts.push({
-      ox: fx - 4 * s + Math.abs(f) * -1 * s,
-      oy: f * 3.6 * s,
-      oz: 10 * s,
-      r: 0.8,
-      glow: 0.6
-    });
+    pts.push({ ox: fx + Math.abs(f) * -1.5 * s, oy: f * 3 * s, oz: 8 * s, r: 1.0, glow: 0.7 });
+    pts.push({ ox: fx - 4 * s + Math.abs(f) * -1 * s, oy: f * 3.6 * s, oz: 10 * s, r: 0.8, glow: 0.6 });
   }
-
   return pts;
 }
 
 function spawnCrawfish(){
-  // Carrier moves from x=-120 to x=W+60 over 2000ms (covers phase 1 + phase 2).
-  // Vertical position: just BELOW HOT HEADZ text so the text reads cleanly above.
-  // HOT HEADZ text is centered at CY(); it's ~H*0.34 tall, so text bottom is ~CY()+H*0.17.
-  // Place crawfish center at CY() + H*0.20 so antennae graze the text bottom and legs sit clear.
-  const scale = Math.max(1.0, Math.min(1.8, W / 900)); // scale up on big screens
+  const scale = Math.max(1.0, Math.min(1.8, W / 900));
   const yPos = CY() + H * 0.21;
   const startX = -120;
   const endX = W + 80;
-  crawfish = {
-    startX: startX,
-    endX: endX,
-    y: yPos,
-    scale: scale,
-    points: buildCrawfishShape(scale),
-    progress: 0,    // 0 → 1 across the run
-    exploded: false
-  };
+  crawfish = { startX, endX, y: yPos, scale, points: buildCrawfishShape(scale), progress: 0, exploded: false };
 }
 
 function drawCrawfish(elapsedSinceNavStart, dt){
   if(!crawfish || crawfish.exploded) return;
-
-  // Run the carrier across the screen between t=0ms and t=3400ms (slowed for visibility)
   const RUN_MS = 3400;
   const t = Math.min(1, elapsedSinceNavStart / RUN_MS);
   crawfish.progress = t;
-
-  // Position on screen — gentle ease-out so it slows near the right side
   const eased = 1 - Math.pow(1 - t, 1.6);
   const cx = crawfish.startX + (crawfish.endX - crawfish.startX) * eased;
-  // Vertical bob (slowed to match)
   const bob = Math.sin(elapsedSinceNavStart * 0.011) * 4;
   const cy = crawfish.y + bob;
-
-  // ─── 3D PERSPECTIVE: as crawfish moves right, it gets slightly closer
-  // to the camera (scale up ~18%). Also a subtle pitch/roll wobble.
   const cameraScale = 1.0 + eased * 0.18;
   const tilt = Math.sin(elapsedSinceNavStart * 0.008) * 0.07;
-  const pitch = Math.sin(elapsedSinceNavStart * 0.013) * 0.05; // y-axis micro-rotation feel
-
-  // Fade in 250ms, hold, slight dim before explosion
+  const pitch = Math.sin(elapsedSinceNavStart * 0.013) * 0.05;
   let alpha = 1.0;
   if(elapsedSinceNavStart < 250) alpha = elapsedSinceNavStart / 250;
   if(elapsedSinceNavStart > RUN_MS - 80) alpha = Math.max(0.7, 1 - (elapsedSinceNavStart - (RUN_MS - 80)) / 150);
-
-  // ─── GROUND SHADOW: oval beneath the crawfish, gives it weight & 3D presence
-  // Width matches the crawfish, dims as it moves (more "ground" contact when moving)
   const shadowScale = crawfish.scale * cameraScale;
   const shadowW = 70 * shadowScale;
   const shadowH = 12 * shadowScale;
-  const shadowY = cy + 18 * shadowScale; // slightly below the body
+  const shadowY = cy + 18 * shadowScale;
   const shadowAlpha = 0.32 * alpha;
-  // Add a subtle shadow wobble synced with leg movement
   const shadowWiggle = Math.sin(elapsedSinceNavStart * 0.02) * 1.5;
   const sg = nx.createRadialGradient(cx, shadowY + shadowWiggle, 0, cx, shadowY + shadowWiggle, shadowW);
   sg.addColorStop(0, `rgba(8,2,1,${shadowAlpha.toFixed(2)})`);
@@ -1506,9 +1390,6 @@ function drawCrawfish(elapsedSinceNavStart, dt){
   nx.beginPath();
   nx.ellipse(cx, shadowY + shadowWiggle, shadowW, shadowH, 0, 0, Math.PI * 2);
   nx.fill();
-
-  // Trail particles (smoke/sparks behind the crawfish as it moves)
-  // Slowed spawn rate to match the slower run
   if(Math.random() < 0.45 && t > 0.05 && t < 0.95){
     nx.beginPath();
     const trailX = cx - 50 * crawfish.scale * cameraScale + (Math.random() - .5) * 8;
@@ -1519,77 +1400,37 @@ function drawCrawfish(elapsedSinceNavStart, dt){
     nx.fillStyle = `rgba(255,140,60,${trailA.toFixed(2)})`;
     nx.fill();
   }
-
-  // ─── 3D RENDER PIPELINE ───
-  // 1. Transform every point: rotate by tilt/pitch, apply perspective from oz.
-  // 2. Sort by transformed Z (depth) so back parts draw first, front parts on top.
-  // 3. Draw with depth-based brightness/scale.
   const cosT = Math.cos(tilt), sinT = Math.sin(tilt);
   const cosP = Math.cos(pitch), sinP = Math.sin(pitch);
-  const legPhase = elapsedSinceNavStart * 0.014; // slower leg cycle
-
-  // Camera focal length controls strength of perspective effect.
-  // Smaller = stronger perspective (more dramatic 3D).
+  const legPhase = elapsedSinceNavStart * 0.014;
   const FOCAL = 110;
-
-  // Transform all points to screen space first
   const transformed = [];
   for(let i = 0; i < crawfish.points.length; i++){
     const p = crawfish.points[i];
     let px = p.ox, py = p.oy, pz = p.oz || 0;
-
-    // Animate legs: small motion in 3D space
     if(p._leg !== undefined){
       const ph = legPhase + p._leg * 0.7;
       py += Math.sin(ph) * 1.8;
       px += Math.cos(ph) * 0.6;
-      // Legs lift up slightly as they swing forward (subtle Z motion)
       pz += Math.sin(ph) * 1.5;
     }
-
-    // Rotation around Y-axis (pitch): rotates X ↔ Z plane
     const px2 = px * cosP - pz * sinP;
     const pz2 = px * sinP + pz * cosP;
-    // Rotation around Z-axis (tilt/yaw): rotates X ↔ Y plane
     const rx = px2 * cosT - py * sinT;
     const ry = px2 * sinT + py * cosT;
     const rz = pz2;
-
-    // Perspective projection
     const persp = FOCAL / (FOCAL + rz);
-
-    // Final screen position — also apply cameraScale
     const drawX = cx + rx * persp * cameraScale;
     const drawY = cy + ry * persp * cameraScale;
     const drawR = p.r * persp * cameraScale;
-
-    // Skip particles that would draw way off-screen
     if(drawX < -20 || drawX > W + 20) continue;
-
-    // Depth-based brightness:
-    // - Closer to camera (smaller rz) = brighter
-    // - Farther from camera (larger rz) = dimmer (in shadow)
-    // rz typically ranges from -17 (closest claw tip) to +10 (tail fan)
     const depthShade = Math.max(0.45, Math.min(1.15, 1.0 - rz * 0.025));
-
-    transformed.push({
-      x: drawX,
-      y: drawY,
-      r: drawR,
-      glow: p.glow * depthShade,
-      z: rz
-    });
+    transformed.push({ x: drawX, y: drawY, r: drawR, glow: p.glow * depthShade, z: rz });
   }
-
-  // Sort back-to-front (largest z first = farthest from camera drawn first)
   transformed.sort((a, b) => b.z - a.z);
-
-  // Draw all transformed particles
   for(const tp of transformed){
     const gA = Math.min(1, tp.glow * 0.9 * alpha);
     if(gA < 0.02) continue;
-
-    // Outer glow halo
     nx.shadowBlur = 8;
     nx.shadowColor = `rgba(255,90,40,${(gA * 0.55).toFixed(2)})`;
     nx.beginPath();
@@ -1597,8 +1438,6 @@ function drawCrawfish(elapsedSinceNavStart, dt){
     nx.fillStyle = `rgba(255,140,60,${gA.toFixed(2)})`;
     nx.fill();
     nx.shadowBlur = 0;
-
-    // Hot core (only on bright/forward particles for contrast)
     if(tp.glow > 0.55){
       nx.beginPath();
       nx.arc(tp.x, tp.y, tp.r * 0.7, 0, Math.PI * 2);
@@ -1607,6 +1446,278 @@ function drawCrawfish(elapsedSinceNavStart, dt){
       nx.fill();
     }
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MENU LOADER LOGIC — sets up Three.js, loads Seasoning.glb,
+   shows the rotating shaker with $4.99 price, then navigates.
+
+   Behavior:
+   - Loader opens immediately on click (perceived instant feedback).
+   - Min display time of 2200ms even if GLB loads instantly (so the
+     showcase is actually seen — never just a flash on a fast connection).
+   - Max wait of 4500ms — if GLB takes longer, navigate anyway with the
+     SVG fallback shown.
+   - GLB path: /Seasoning.glb (root of site). Easy to change below.
+   ═══════════════════════════════════════════════════════════════════════ */
+const GLB_PATH = '/Seasoning.glb'; // ← change this if the file lives elsewhere
+const ML_MIN_MS = 2200;
+const ML_MAX_MS = 4500;
+
+let mlThreeReady = false;
+let mlLoadStartTs = 0;
+let mlPendingDest = null;
+let mlRenderer = null;
+let mlScene = null;
+let mlCamera = null;
+let mlMixer = null;
+let mlModel = null;
+let mlAnimId = null;
+let mlClock = null;
+let mlGlbLoaded = false;
+let mlNavScheduled = false;
+
+async function ensureThreeReady(){
+  if(mlThreeReady) return;
+  const [THREE, GLTFLoaderMod] = await Promise.all([
+    import('three'),
+    import('three/addons/loaders/GLTFLoader.js')
+  ]);
+  window.__THREE = THREE;
+  window.__GLTFLoader = GLTFLoaderMod.GLTFLoader;
+  mlThreeReady = true;
+}
+
+function setMlStatus(text){
+  const el = document.getElementById('ml-status-text');
+  if(el) el.textContent = text;
+}
+function setMlProgress(pct){
+  const el = document.getElementById('ml-progress-fill');
+  if(el) el.style.width = Math.max(0, Math.min(100, pct)) + '%';
+}
+
+function initThreeScene(){
+  const THREE = window.__THREE;
+  const host = document.getElementById('ml-canvas-host');
+  // Remove any pre-existing canvas (in case loader was opened before)
+  const oldCanvas = host.querySelector('canvas');
+  if(oldCanvas) oldCanvas.remove();
+
+  const w = host.clientWidth, h = host.clientHeight;
+  mlRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  mlRenderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  mlRenderer.setSize(w, h);
+  mlRenderer.outputColorSpace = THREE.SRGBColorSpace;
+  mlRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+  mlRenderer.toneMappingExposure = 1.05;
+  host.appendChild(mlRenderer.domElement);
+
+  mlScene = new THREE.Scene();
+  mlCamera = new THREE.PerspectiveCamera(35, w / h, 0.1, 100);
+  mlCamera.position.set(0, 0.1, 4.2);
+  mlCamera.lookAt(0, 0, 0);
+
+  // Warm key light (hearth glow)
+  const key = new THREE.DirectionalLight(0xfff0d8, 2.4);
+  key.position.set(3, 5, 4);
+  mlScene.add(key);
+
+  // Rim light from below (ember underlight)
+  const rim = new THREE.DirectionalLight(0xff6020, 1.4);
+  rim.position.set(-3, -2, -1);
+  mlScene.add(rim);
+
+  // Cool fill from opposite side for definition
+  const fill = new THREE.DirectionalLight(0xc8b8ff, 0.4);
+  fill.position.set(-4, 2, 3);
+  mlScene.add(fill);
+
+  // Soft ambient so dark areas don't go black
+  const amb = new THREE.AmbientLight(0xffe8c8, 0.35);
+  mlScene.add(amb);
+
+  // Gold accent point light close to the model (subtle product-shot vibe)
+  const accent = new THREE.PointLight(0xf0c060, 0.6, 6, 2);
+  accent.position.set(1.2, 0.6, 1.8);
+  mlScene.add(accent);
+
+  mlClock = new THREE.Clock();
+}
+
+function loadGlb(){
+  return new Promise((resolve, reject) => {
+    const THREE = window.__THREE;
+    const GLTFLoader = window.__GLTFLoader;
+    const loader = new GLTFLoader();
+    loader.load(
+      GLB_PATH,
+      (gltf) => {
+        const model = gltf.scene;
+        // Auto-frame: compute bounding box, center, scale to fit ~2.2 units tall
+        const box = new THREE.Box3().setFromObject(model);
+        const size = new THREE.Vector3();
+        const center = new THREE.Vector3();
+        box.getSize(size);
+        box.getCenter(center);
+        model.position.sub(center); // center on origin
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const targetSize = 2.2;
+        const scale = targetSize / Math.max(0.0001, maxDim);
+        model.scale.setScalar(scale);
+        // Small downward shift so the model sits visually centered (most bottles look better slightly lower)
+        model.position.y -= 0.05;
+
+        // Enhance materials: ensure they render with our tone mapping nicely
+        model.traverse((child) => {
+          if(child.isMesh){
+            if(child.material){
+              child.material.envMapIntensity = 1.0;
+              // If transparent maps cause depth issues, keep them but enable proper sorting
+              child.material.needsUpdate = true;
+            }
+            child.castShadow = false;
+            child.receiveShadow = false;
+          }
+        });
+
+        mlModel = model;
+        mlScene.add(model);
+
+        // Animation mixer if the GLB has built-in animations
+        if(gltf.animations && gltf.animations.length){
+          mlMixer = new THREE.AnimationMixer(model);
+          gltf.animations.forEach(clip => mlMixer.clipAction(clip).play());
+        }
+        resolve();
+      },
+      (progress) => {
+        if(progress.lengthComputable){
+          const pct = (progress.loaded / progress.total) * 70 + 10; // 10..80% during download
+          setMlProgress(pct);
+        }
+      },
+      (err) => reject(err)
+    );
+  });
+}
+
+function startMlAnimation(){
+  function tick(){
+    if(!mlRenderer || !mlScene || !mlCamera){ return; }
+    mlAnimId = requestAnimationFrame(tick);
+    const dt = mlClock ? mlClock.getDelta() : 0.016;
+    if(mlModel){
+      // Steady rotation showcasing the model from all angles
+      mlModel.rotation.y += dt * 0.9;
+      // Gentle bob/tilt for life
+      const t = performance.now() * 0.001;
+      mlModel.position.y = -0.05 + Math.sin(t * 1.2) * 0.04;
+      mlModel.rotation.x = Math.sin(t * 0.6) * 0.06;
+    }
+    if(mlMixer) mlMixer.update(dt);
+    mlRenderer.render(mlScene, mlCamera);
+  }
+  tick();
+}
+
+function stopMlAnimation(){
+  if(mlAnimId) cancelAnimationFrame(mlAnimId);
+  mlAnimId = null;
+}
+
+function mlResize(){
+  if(!mlRenderer || !mlCamera) return;
+  const host = document.getElementById('ml-canvas-host');
+  if(!host) return;
+  const w = host.clientWidth, h = host.clientHeight;
+  mlRenderer.setSize(w, h);
+  mlCamera.aspect = w / h;
+  mlCamera.updateProjectionMatrix();
+}
+window.addEventListener('resize', mlResize);
+
+function maybeFinishLoader(){
+  if(mlNavScheduled) return;
+  const elapsed = performance.now() - mlLoadStartTs;
+  const remaining = Math.max(0, ML_MIN_MS - elapsed);
+  mlNavScheduled = true;
+  setTimeout(() => {
+    finishLoaderAndNavigate();
+  }, remaining);
+}
+
+function finishLoaderAndNavigate(){
+  setMlProgress(100);
+  setMlStatus('Opening menu');
+  const loader = document.getElementById('menu-loader');
+  loader.classList.add('fading');
+  setTimeout(() => {
+    if(mlPendingDest){
+      window.location.href = mlPendingDest;
+    }
+  }, 360);
+}
+
+async function openMenuLoader(destUrl){
+  mlPendingDest = destUrl;
+  mlLoadStartTs = performance.now();
+  mlGlbLoaded = false;
+  mlNavScheduled = false;
+
+  // Show the overlay immediately
+  const loader = document.getElementById('menu-loader');
+  loader.setAttribute('aria-hidden', 'false');
+  loader.classList.add('on');
+  loader.classList.remove('fading');
+  setMlStatus('Loading the menu');
+  setMlProgress(5);
+
+  // Hide the cursor dot over the loader (the loader has its own focal point)
+  document.getElementById('cursor').style.display = 'none';
+
+  // Hard ceiling — if everything is slow, just navigate.
+  const maxTimer = setTimeout(() => {
+    if(!mlNavScheduled){
+      mlNavScheduled = true;
+      finishLoaderAndNavigate();
+    }
+  }, ML_MAX_MS);
+
+  try {
+    await ensureThreeReady();
+    setMlProgress(10);
+    initThreeScene();
+    startMlAnimation();
+    setMlProgress(15);
+
+    try {
+      await loadGlb();
+      mlGlbLoaded = true;
+      setMlProgress(90);
+      setMlStatus('Get yours at the restaurant');
+    } catch(glbErr){
+      console.warn('GLB failed to load, showing fallback:', glbErr);
+      // Stop Three.js and show the SVG fallback in the same slot
+      stopMlAnimation();
+      if(mlRenderer){
+        const host = document.getElementById('ml-canvas-host');
+        const c = host.querySelector('canvas');
+        if(c) c.remove();
+      }
+      document.getElementById('ml-fallback').classList.add('on');
+      setMlProgress(90);
+      setMlStatus('Our signature blend');
+    }
+  } catch(threeErr){
+    console.warn('Three.js failed, showing SVG fallback:', threeErr);
+    document.getElementById('ml-fallback').classList.add('on');
+    setMlProgress(90);
+    setMlStatus('Our signature blend');
+  }
+
+  clearTimeout(maxTimer);
+  maybeFinishLoader();
 }
 
 /* ROUTING LOGIC */
@@ -1624,6 +1735,13 @@ function doNavigate(id){
   if(page.isTel){
     window.location.href = page.dest;
     flashEdgeGlow('default');
+    return;
+  }
+
+  // Menu-bound items go through the loader showcase
+  if(page.showMenuLoader){
+    flashEdgeGlow('sn');
+    openMenuLoader(page.dest);
     return;
   }
 
@@ -1651,11 +1769,9 @@ function doNavigate(id){
   setTimeout(() => { navPhase = 2; navPhaseTs = performance.now(); }, 1100);
   setTimeout(() => {
     navPhase = 3; navPhaseTs = performance.now();
-    // Explosion now centered ON THE CRAWFISH (right side of screen) instead of dead center.
     let originX = CX(), originY = CY();
     if(crawfish){
-      const eased = 1 - Math.pow(1 - 1, 1.8);
-      originX = crawfish.endX - 80; // last visible position
+      originX = crawfish.endX - 80;
       originY = crawfish.y;
       crawfish.exploded = true;
     }
@@ -1674,7 +1790,10 @@ function doNavigate(id){
 }
 
 function flashEdgeGlow(kind){
-  const color = kind === 'dd' ? 'rgba(235,23,0,.4)' : 'rgba(240,80,32,.35)';
+  let color;
+  if(kind === 'dd') color = 'rgba(235,23,0,.4)';
+  else if(kind === 'sn') color = 'rgba(217,164,74,.4)';
+  else color = 'rgba(240,80,32,.35)';
   const flash = document.createElement('div');
   flash.style.cssText = `
     position:fixed;inset:0;pointer-events:none;z-index:500;
@@ -1700,7 +1819,6 @@ let navLastT=0;
   if(navPhase===1){const progress=Math.min(1,(ts-navPhaseTs)/800);nx.fillStyle=`rgba(3,1,3,${progress*.75})`;nx.fillRect(0,0,W,H);}
   else if(navPhase===2){nx.fillStyle='rgba(3,1,3,.78)';nx.fillRect(0,0,W,H);const elapsed=ts-navPhaseTs;const scanFrac=(elapsed%1200)/1200;const scanY=(CY()-H*.20)+scanFrac*H*.40;const[nr,ng,nb]=navColor;const sg=nx.createLinearGradient(0,scanY-40,0,scanY+40);sg.addColorStop(0,'transparent');sg.addColorStop(.4,`rgba(${nr},${ng},${nb},0.04)`);sg.addColorStop(.5,'rgba(255,255,255,0.06)');sg.addColorStop(.6,`rgba(${nr},${ng},${nb},0.04)`);sg.addColorStop(1,'transparent');nx.fillStyle=sg;nx.fillRect(0,scanY-40,W,80);}
   else if(navPhase===3){const fade=Math.min(1,(ts-navPhaseTs)/500);nx.fillStyle=`rgba(3,1,3,${.78*(1-fade*.3)})`;nx.fillRect(0,0,W,H);}
-  // HOT HEADZ text particles
   for(let i=0;i<navParticles.length;i++){
     const p=navParticles[i];p.wb+=p.ws;
     if(p._exploding){p.x+=p._vx*(dt/16);p.y+=p._vy*(dt/16);p._vx*=1.06;p._vy*=1.06;p.a*=.92;}
@@ -1709,12 +1827,9 @@ let navLastT=0;
     nx.beginPath();nx.arc(p.x,p.y,p.r,0,Math.PI*2);
     nx.fillStyle=`rgba(${p.rc},${p.gc},${p.bc},${p.a.toFixed(2)})`;nx.fill();
   }
-  // Crawfish — drawn AFTER text particles so the legs/body sit on top of background
-  // but in practice it's positioned BELOW the text so visually it's separate.
   if(navPhase < 3){
     drawCrawfish(elapsedSinceNavStart, dt);
   }
-  // Explosion ripples
   for(let i=navRipples.length-1;i>=0;i--){
     const r=navRipples[i];r.r+=r.fat?20:9;r.life-=r.fat?.016:.032;
     if(r.life<=0){navRipples.splice(i,1);continue;}
@@ -1798,6 +1913,29 @@ function resetPageState(){
   crawfish = null;
   navCv.style.display = 'none';
   nx.clearRect(0,0,W,H);
+  // Hide menu loader if it's visible from bfcache restore
+  const ml = document.getElementById('menu-loader');
+  if(ml){
+    ml.classList.remove('on','fading');
+    ml.setAttribute('aria-hidden','true');
+  }
+  document.getElementById('cursor').style.display = '';
+  mlNavScheduled = false;
+  mlPendingDest = null;
+  stopMlAnimation();
+  if(mlRenderer){
+    const host = document.getElementById('ml-canvas-host');
+    if(host){ const c = host.querySelector('canvas'); if(c) c.remove(); }
+    try { mlRenderer.dispose(); } catch(e){}
+    mlRenderer = null;
+    mlScene = null;
+    mlCamera = null;
+    mlModel = null;
+    mlMixer = null;
+  }
+  document.getElementById('ml-fallback').classList.remove('on');
+  setMlProgress(0);
+
   const topbar  = document.getElementById('topbar');
   const botbar  = document.getElementById('botbar');
   const mobHdr  = document.getElementById('mob-header');
