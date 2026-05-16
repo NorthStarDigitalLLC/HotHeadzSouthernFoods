@@ -893,7 +893,7 @@ body::after{content:'';position:fixed;inset:0;z-index:3;pointer-events:none;
       <li><a href="menu.html">Full Menu &mdash; Breakfast, Lunch &amp; Daily Specials</a></li>
       <li><a href="menu.html#lunch">Today&rsquo;s Lunch Plates</a></li>
       <li><a href="menu.html#beer">Cold Beer Selection</a></li>
-      <li><a href="index.html">Hot Headz Signature Seasoning &mdash; $4.99</a></li>
+      <li><a href="seasoning.html">Hot Headz Signature Seasoning &mdash; $4.99</a></li>
       <li><a href="delivery.html">Bulk Delivery in DeRidder &amp; Beauregard Parish</a></li>
       <li><a href="https://www.doordash.com/store/hot-headz-southern-foods" rel="noopener">Order Hot Headz on DoorDash</a></li>
       <li><a href="tel:+13372211035">Call to Order: (337) 221-1035</a></li>
@@ -1460,9 +1460,12 @@ function drawCrawfish(elapsedSinceNavStart, dt){
      SVG fallback shown.
    - GLB path: /Seasoning.glb (root of site). Easy to change below.
    ═══════════════════════════════════════════════════════════════════════ */
-const GLB_PATH = 'models/Seasoning.glb'; // ← change this if the file lives elsewhere
+const GLB_PATH = '/Seasoning.glb'; // ← change this if the file lives elsewhere
 const ML_MIN_MS = 2200;
 const ML_MAX_MS = 4500;
+// Seasoning click gets a longer dwell so people actually see the showcase
+const ML_MIN_MS_SEASONING = 7000;
+const ML_MAX_MS_SEASONING = 9000;
 
 let mlThreeReady = false;
 let mlLoadStartTs = 0;
@@ -1476,6 +1479,7 @@ let mlAnimId = null;
 let mlClock = null;
 let mlGlbLoaded = false;
 let mlNavScheduled = false;
+let mlActiveMinMs = ML_MIN_MS;
 
 async function ensureThreeReady(){
   if(mlThreeReady) return;
@@ -1640,7 +1644,7 @@ window.addEventListener('resize', mlResize);
 function maybeFinishLoader(){
   if(mlNavScheduled) return;
   const elapsed = performance.now() - mlLoadStartTs;
-  const remaining = Math.max(0, ML_MIN_MS - elapsed);
+  const remaining = Math.max(0, mlActiveMinMs - elapsed);
   mlNavScheduled = true;
   setTimeout(() => {
     finishLoaderAndNavigate();
@@ -1659,11 +1663,13 @@ function finishLoaderAndNavigate(){
   }, 360);
 }
 
-async function openMenuLoader(destUrl){
+async function openMenuLoader(destUrl, routeId){
   mlPendingDest = destUrl;
   mlLoadStartTs = performance.now();
   mlGlbLoaded = false;
   mlNavScheduled = false;
+  mlActiveMinMs = routeId === 'seasoning' ? ML_MIN_MS_SEASONING : ML_MIN_MS;
+  const maxMs = routeId === 'seasoning' ? ML_MAX_MS_SEASONING : ML_MAX_MS;
 
   // Show the overlay immediately
   const loader = document.getElementById('menu-loader');
@@ -1682,7 +1688,7 @@ async function openMenuLoader(destUrl){
       mlNavScheduled = true;
       finishLoaderAndNavigate();
     }
-  }, ML_MAX_MS);
+  }, maxMs);
 
   try {
     await ensureThreeReady();
@@ -1741,7 +1747,7 @@ function doNavigate(id){
   // Menu-bound items go through the loader showcase
   if(page.showMenuLoader){
     flashEdgeGlow('sn');
-    openMenuLoader(page.dest);
+    openMenuLoader(page.dest, id);
     return;
   }
 
