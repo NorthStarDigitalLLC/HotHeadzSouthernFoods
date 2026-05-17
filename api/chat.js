@@ -60,7 +60,9 @@ YOUR JOB: Return ONE JSON object with these fields. Every field must sound like 
   "storyProse": "Three short paragraphs about Hot Headz, as HTML. Each paragraph in <p> tags. Adapt to the visitor — if they're returning, mention something familiar. If they're from out of town or military (Fort Polk), acknowledge it lightly. If they searched for catering, weave that in.",
   "contactLede": "One sentence above the contact cards. Under 25 words.",
   "featuredDish": "Pick ONE dish name from menu.meats (use the exact name) to highlight as tonight's pick. Pick the one that best matches the weather, time, and visitor. Return null if menu.meats is empty.",
-  "featuredPitch": "A single sentence — under 14 words — about why this dish, for this visitor, today. Will appear under the featured card. Return null if featuredDish is null."
+  "featuredPitch": "A single sentence — under 14 words — about why this dish, for this visitor, today. Will appear under the featured card. Return null if featuredDish is null.",
+  "menuSectionOrder": "An array reordering menu.availableSections to put the most relevant section FIRST for this visitor. Possible values: 'breakfast','sides','salad','beer','drinks','dessert'. Examples: morning visitor → ['breakfast','sides','drinks','salad','dessert','beer']. Hot day → ['drinks','salad','beer','sides','dessert','breakfast']. Lunch hour → ['sides','salad','drinks','dessert','beer','breakfast']. Evening → ['beer','dessert','sides','drinks','salad','breakfast']. Return all 6 sections in the new order.",
+  "featuredSection": "One section key from menu.availableSections to mark as 'Picked for you' with a special highlight. Should match the first item in menuSectionOrder. e.g. 'breakfast' for a 7am visitor. Return null if no section deserves special highlight."
 }
 
 EXAMPLES OF GOOD vs BAD:
@@ -91,6 +93,8 @@ const FALLBACK = {
   contactLede: "Tap to call, get directions, or order through DoorDash. We're at 2741 US-190.",
   featuredDish: null,
   featuredPitch: null,
+  menuSectionOrder: ['breakfast','sides','salad','beer','drinks','dessert'],
+  featuredSection: null,
 };
 
 export default async function handler(req) {
