@@ -2468,6 +2468,17 @@ const AI = {
     const meats = DataLayer.getMeats();
     const sides = DataLayer.getSides();
 
+    // ═══ CLIENT-SIDE CACHE ═══
+    // If we've already gotten a response for this visitor in the last 30 minutes,
+    // reuse it. Stops accidental cost spikes from refreshes, tab switches, back/forward.
+    const cacheKey = this._buildCacheKey(ctx, meats);
+    const cached = this._getClientCache(cacheKey);
+    if (cached) {
+      log('Using client-cached AI response');
+      this.lastResponse = cached;
+      return cached;
+    }
+
     const payload = {
       visitor: {
         timeOfDay: ctx.timeOfDay,
@@ -2505,11 +2516,50 @@ const AI = {
       const data = await r.json();
       log('AI response:', data);
       this.lastResponse = data;
+      this._setClientCache(cacheKey, data);
       return data;
     } catch(e) {
       log('AI call failed:', e.message);
       return null;
     }
+  },
+
+  _buildCacheKey(ctx, meats) {
+    // 30-minute time bucket so morning visitors don't reuse afternoon copy
+    const halfHour = Math.floor((ctx.hour || 0) * 2) / 2;
+    return [
+      ctx.dayOfWeek,
+      halfHour,
+      ctx.weather?.condition || 'none',
+      ctx.intent?.type || 'direct',
+      ctx.isReturning ? 'r' : 'n',
+      (meats[0]?.name || '') + '|' + (meats[1]?.name || ''),
+    ].join('::');
+  },
+
+  _getClientCache(key) {
+    try {
+      const raw = sessionStorage.getItem('hh_ai_cache');
+      if (!raw) return null;
+      const cache = JSON.parse(raw);
+      const entry = cache[key];
+      if (!entry) return null;
+      if (Date.now() - entry.t > 30 * 60 * 1000) {
+        delete cache[key];
+        sessionStorage.setItem('hh_ai_cache', JSON.stringify(cache));
+        return null;
+      }
+      return entry.v;
+    } catch(e) { return null; }
+  },
+
+  _setClientCache(key, value) {
+    try {
+      const raw = sessionStorage.getItem('hh_ai_cache');
+      const cache = raw ? JSON.parse(raw) : {};
+      cache[key] = { t: Date.now(), v: value };
+      sessionStorage.setItem('hh_ai_cache', JSON.stringify(cache));
+    } catch(e) {}
   },
 
   applyToSlots(response) {
