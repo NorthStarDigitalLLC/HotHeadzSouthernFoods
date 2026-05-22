@@ -134,8 +134,7 @@
       },
       "hasMap": "https://maps.google.com/?q=2741+US-190+DeRidder+LA+70634",
       "openingHoursSpecification": [
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "05:30", "closes": "14:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "06:00", "closes": "14:00" },
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "06:00", "closes": "14:00" },
         { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday",   "opens": "07:00", "closes": "15:00" }
       ],
       "areaServed": ["DeRidder, LA","Beauregard Parish, LA","Vernon Parish, LA","Fort Polk, LA","Leesville, LA"],
@@ -327,7 +326,7 @@
           "name": "What time does Hot Headz serve breakfast?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Breakfast is served from opening until 10:30 AM. Weekdays we open at 5:30 AM, Saturdays at 6:00 AM, and Sundays at 7:00 AM."
+            "text": "Breakfast is served from opening until 10:30 AM. Mon–Sat we open at 6:00 AM, Sundays at 7:00 AM."
           }
         },
         {
@@ -674,7 +673,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:10000;
 
   <section aria-labelledby="breakfast-heading">
     <h2 id="breakfast-heading">Breakfast Menu</h2>
-    <p>Made-from-scratch Southern breakfast served from 5:30 AM weekdays, 6:00 AM Saturdays, and 7:00 AM Sundays until 10:30 AM.</p>
+    <p>Made-from-scratch Southern breakfast served from 6:00 AM Monday through Saturday and 7:00 AM Sundays until 10:30 AM.</p>
     <h3>Breakfast Plates &amp; Pricing</h3>
     <ul>
       <li>Breakfast Plate, 1 meat &mdash; $9.99</li>
@@ -779,8 +778,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:10000;
       Phone: <a href="tel:+13372211035">(337) 221-1035</a>
     </address>
     <ul>
-      <li>Monday&ndash;Friday: 5:30 AM &ndash; 2:00 PM</li>
-      <li>Saturday: 6:00 AM &ndash; 2:00 PM</li>
+      <li>Monday&ndash;Saturday: 6:00 AM &ndash; 2:00 PM</li>
       <li>Sunday: 7:00 AM &ndash; 3:00 PM</li>
     </ul>
   </section>
@@ -864,11 +862,11 @@ function supabaseHeaders(){return{'apikey':SUPABASE_ANON_KEY,'Authorization':'Be
 var MENU_DATA = {
   settings: { showAdvancedTab: true, advancedDisclaimer: "Lunch posted 1\u20132 days early is subject to change.", advancedWindowDays: 7, noDescriptionText: "No description for this item." },
   hours: { note: "", weekly: [
-    { day:"Monday",open:"5:30 AM",close:"2:00 PM",breakfast:"5:30 AM \u2013 10:30 AM",lunch:"11:00 AM \u2013 2:00 PM" },
-    { day:"Tuesday",open:"5:30 AM",close:"2:00 PM",breakfast:"5:30 AM \u2013 10:30 AM",lunch:"11:00 AM \u2013 2:00 PM" },
-    { day:"Wednesday",open:"5:30 AM",close:"2:00 PM",breakfast:"5:30 AM \u2013 10:30 AM",lunch:"11:00 AM \u2013 2:00 PM" },
-    { day:"Thursday",open:"5:30 AM",close:"2:00 PM",breakfast:"5:30 AM \u2013 10:30 AM",lunch:"11:00 AM \u2013 2:00 PM" },
-    { day:"Friday",open:"5:30 AM",close:"2:00 PM",breakfast:"5:30 AM \u2013 10:30 AM",lunch:"11:00 AM \u2013 2:00 PM" },
+    { day:"Monday",open:"6:00 AM",close:"2:00 PM",breakfast:"6:00 AM \u2013 10:30 AM",lunch:"11:00 AM \u2013 2:00 PM" },
+    { day:"Tuesday",open:"6:00 AM",close:"2:00 PM",breakfast:"6:00 AM \u2013 10:30 AM",lunch:"11:00 AM \u2013 2:00 PM" },
+    { day:"Wednesday",open:"6:00 AM",close:"2:00 PM",breakfast:"6:00 AM \u2013 10:30 AM",lunch:"11:00 AM \u2013 2:00 PM" },
+    { day:"Thursday",open:"6:00 AM",close:"2:00 PM",breakfast:"6:00 AM \u2013 10:30 AM",lunch:"11:00 AM \u2013 2:00 PM" },
+    { day:"Friday",open:"6:00 AM",close:"2:00 PM",breakfast:"6:00 AM \u2013 10:30 AM",lunch:"11:00 AM \u2013 2:00 PM" },
     { day:"Saturday",open:"6:00 AM",close:"2:00 PM",breakfast:"6:00 AM \u2013 10:30 AM",lunch:"11:00 AM \u2013 2:00 PM" },
     { day:"Sunday",open:"7:00 AM",close:"3:00 PM",breakfast:"7:00 AM \u2013 10:30 AM",lunch:"11:00 AM \u2013 3:00 PM" }
   ]},
@@ -910,7 +908,7 @@ function bizFromHours(day){
   var h = null;
   for (var i = 0; i < w.length; i++) { if (String(w[i].day||'').toLowerCase() === l) { h = w[i]; break; } }
   if (h) return { day: h.day, open: h.open, close: h.close, breakfast: h.breakfast, lunch: h.lunch, crawfish: ["thursday","friday","saturday","sunday"].indexOf(l)>=0 ? "4:00 PM \u2013 8:00 PM" : "" };
-  var o = l==="sunday"?"7:00 AM":l==="saturday"?"6:00 AM":"5:30 AM", c = l==="sunday"?"3:00 PM":"2:00 PM";
+  var o = l==="sunday"?"7:00 AM":"6:00 AM", c = l==="sunday"?"3:00 PM":"2:00 PM";
   return { day: day, open: o, close: c, breakfast: o+" \u2013 10:30 AM", lunch: "11:00 AM \u2013 "+c, crawfish: ["thursday","friday","saturday","sunday"].indexOf(l)>=0?"4:00 PM \u2013 8:00 PM":"" };
 }
 function t12(s){if(!s)return null;var m=String(s).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);if(!m)return null;var h=+m[1],mn=+m[2],ap=m[3].toUpperCase();if(ap==="PM"&&h!==12)h+=12;if(ap==="AM"&&h===12)h=0;return h*60+mn}
