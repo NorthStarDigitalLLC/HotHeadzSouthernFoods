@@ -61,6 +61,10 @@
     .tab-btn.active{background:var(--ember);color:var(--fire);}
     .tab-btn.menu-tab{border:1px solid rgba(255,255,255,.06);}
     .tab-btn.menu-tab.active{background:rgba(100,180,255,.12);color:#7ac4ff;border-color:rgba(100,180,255,.2);}
+    /* AI Publish tab — purple/magenta theme to match the brand cohesion of the feature */
+    .tab-btn.ai-tab{border:1px solid rgba(180,100,255,.18);background:rgba(180,100,255,.04);color:#c89cff;}
+    .tab-btn.ai-tab:hover{background:rgba(180,100,255,.1);color:#d8b8ff;}
+    .tab-btn.ai-tab.active{background:linear-gradient(135deg,rgba(180,100,255,.18),rgba(255,100,200,.12));color:#e0c0ff;border-color:rgba(180,100,255,.5);box-shadow:0 0 12px rgba(180,100,255,.15);}
     .tab-btn.static-tab{border:1px solid rgba(255,255,255,.06);}
     .tab-btn.static-tab.active{background:rgba(150,255,150,.1);color:#7ae59a;border-color:rgba(150,255,150,.2);}
     .tb-actions{display:flex;gap:5px;flex-shrink:0;}
@@ -249,6 +253,7 @@
       <button class="tab-btn" data-tab="textboxes">Text Boxes</button>
       <button class="tab-btn" data-tab="photo">Photo</button>
       <button class="tab-btn" data-tab="projects">Projects</button>
+      <button class="tab-btn ai-tab" data-tab="ai-publish">✨ AI Publish</button>
       <div class="topbar-sep" style="margin:0 4px;"></div>
       <button class="tab-btn menu-tab" data-tab="menu-lunch">🍽 Lunch</button>
       <div class="topbar-sep" style="margin:0 4px;"></div>
@@ -1080,6 +1085,7 @@ function rebuildSidePanel(){
   else if (currentTab==='textboxes')      c.innerHTML=buildTB();
   else if (currentTab==='photo')          c.innerHTML=buildPH();
   else if (currentTab==='projects')       c.innerHTML=buildPR();
+  else if (currentTab==='ai-publish')     { c.innerHTML=buildAiTab(); wireAiTab(); return; }
   else if (currentTab==='menu-lunch')     { c.innerHTML=buildMenuLunch(); wireMenuPanel(); return; }
   else if (currentTab==='static-breakfast')    { c.innerHTML=buildStaticBreakfast();    wireStaticPanel(); return; }
   else if (currentTab==='static-lunchplates')  { c.innerHTML=buildStaticLunchPlates();  wireStaticPanel(); return; }
@@ -1235,6 +1241,309 @@ function buildPR(){
 /* ═══════════════════════════════════════════════════════════
    LUNCH FORECAST — three-field editor with Meats/Sides/Same Daily
    ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   AI PUBLISH TAB — snap a photo, AI fills everything, publishes
+   to website + updates canvas Lunch text box in one action.
+   ═══════════════════════════════════════════════════════════ */
+function buildAiTab(){
+  let h='';
+
+  // Header explainer
+  h+='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u2728 AI Publish — One-Tap Daily Update</span></div><div class="acc-body">';
+  h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Snap a photo of today\'s menu list. AI reads it, writes descriptions, updates the canvas image text, and publishes to the website &mdash; all at once.</p>';
+
+  // Date selector
+  h+='<div class="fl">Publish to date</div>';
+  h+='<div class="btn-row" style="margin-bottom:10px;flex-wrap:wrap;">';
+  for(let i=0;i<7;i++){
+    const iso=dateOffsetAdj(i);
+    const dayName=isoToDay(iso);
+    h+='<button class="sm-btn aiDateBtn'+(i===0?' primary':'')+'" data-date="'+iso+'">'+dayName+'</button>';
+  }
+  h+='</div>';
+  h+='<div id="aiSelectedDate" style="font-size:11px;color:var(--text3);margin-bottom:12px;font-weight:600;"></div>';
+
+  // Optional prompt text
+  h+='<div class="ai-extract-card" style="margin-bottom:10px;">';
+  h+='<div class="ai-extract-title" style="margin-bottom:4px;">\ud83d\udcdd Optional note for the AI</div>';
+  h+='<div class="ai-extract-hint" style="margin-bottom:6px;">Add context or corrections (e.g. "the second item is meatloaf, not meatballs" or "ignore the price column").</div>';
+  h+='<textarea class="fi fi-ta" id="aiUserPrompt" rows="3" placeholder="Leave blank for default behavior. Add a note here if needed."></textarea>';
+  h+='</div>';
+
+  // Photo capture buttons
+  h+='<input type="file" id="aiPhotoFile" accept="image/*" capture="environment" style="display:none">';
+  h+='<div class="btn-row" style="margin-bottom:10px;">';
+  h+='<button class="sm-btn primary ai-extract-btn" id="aiSnapBtn">\ud83d\udcf8 Snap Menu Photo</button>';
+  h+='<button class="sm-btn" id="aiPickBtn">\ud83d\uddbc Pick from Library</button>';
+  h+='</div>';
+
+  // Auto-publish toggle (default ON)
+  h+='<label class="cf-toggle" style="margin-bottom:6px;display:flex;gap:6px;font-size:11px;"><input type="checkbox" id="aiAutoPublish" checked> Auto-publish to website after extract</label>';
+  h+='<label class="cf-toggle" style="margin-bottom:10px;display:flex;gap:6px;font-size:11px;"><input type="checkbox" id="aiAutoCanvas" checked> Auto-update canvas Lunch text box</label>';
+
+  // Status area
+  h+='<div id="aiStatus" style="display:none;margin-top:8px;padding:10px;border-radius:8px;font-size:12px;font-weight:600;line-height:1.5;"></div>';
+
+  // Preview of extracted items
+  h+='<div id="aiPreview" style="display:none;margin-top:12px;"></div>';
+
+  h+='</div></div>';
+
+  return h;
+}
+
+let _aiTabSelectedDate = null;
+
+function wireAiTab(){
+  // Default to today
+  _aiTabSelectedDate = dateOffsetAdj(0);
+  updateAiSelectedDateLabel();
+
+  document.querySelectorAll('.aiDateBtn').forEach(btn=>{
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.aiDateBtn').forEach(b=>b.classList.remove('primary'));
+      btn.classList.add('primary');
+      _aiTabSelectedDate = btn.dataset.date;
+      updateAiSelectedDateLabel();
+    });
+  });
+
+  const snapBtn = document.getElementById('aiSnapBtn');
+  const pickBtn = document.getElementById('aiPickBtn');
+  const fileInp = document.getElementById('aiPhotoFile');
+
+  if(snapBtn) snapBtn.addEventListener('click', ()=>{
+    fileInp.setAttribute('capture','environment');
+    fileInp.click();
+  });
+  if(pickBtn) pickBtn.addEventListener('click', ()=>{
+    fileInp.removeAttribute('capture');
+    fileInp.click();
+  });
+  if(fileInp) fileInp.addEventListener('change', async (e)=>{
+    const file = e.target.files?.[0];
+    if(!file) return;
+    e.target.value = '';
+    await runAiPublishFlow(file);
+  });
+}
+
+function updateAiSelectedDateLabel(){
+  const lbl = document.getElementById('aiSelectedDate');
+  if(!lbl) return;
+  const iso = _aiTabSelectedDate || dateOffsetAdj(0);
+  lbl.innerHTML = 'Selected: <strong style="color:var(--text);">'+esc(isoToDay(iso))+'</strong> &middot; <span style="color:var(--text2);">'+esc(isoToLabel(iso))+'</span>';
+}
+
+function setAiTabStatus(msg, kind){
+  const el = document.getElementById('aiStatus');
+  if(!el) return;
+  const colors = {
+    info:    'background:rgba(100,140,255,.12);color:#7c9eff;border:1px solid rgba(100,140,255,.25);',
+    loading: 'background:rgba(255,200,80,.12);color:#ffc850;border:1px solid rgba(255,200,80,.25);',
+    success: 'background:rgba(77,255,136,.12);color:#7ae59a;border:1px solid rgba(77,255,136,.25);',
+    error:   'background:rgba(255,77,77,.12);color:#ff7a7a;border:1px solid rgba(255,77,77,.25);'
+  };
+  el.style.cssText = 'display:block;margin-top:8px;padding:10px;border-radius:8px;font-size:12px;font-weight:600;line-height:1.5;' + (colors[kind]||colors.info);
+  el.textContent = msg;
+}
+
+function renderAiPreview(meats, sides){
+  const el = document.getElementById('aiPreview');
+  if(!el) return;
+  let h='<div class="static-card"><div class="static-card-title">Extracted Meats ('+meats.length+')</div><ul style="font-size:12px;color:var(--text);padding-left:18px;line-height:1.55;margin:0;">';
+  meats.forEach(m=>{ h+='<li><strong>'+esc(m.name)+'</strong>'+(m.desc?' &mdash; <span style="color:var(--text2);font-weight:normal;">'+esc(m.desc)+'</span>':'')+'</li>'; });
+  h+='</ul></div>';
+  h+='<div class="static-card"><div class="static-card-title">Extracted Sides ('+sides.length+')</div><ul style="font-size:12px;color:var(--text);padding-left:18px;line-height:1.55;margin:0;">';
+  sides.forEach(s=>{ h+='<li><strong>'+esc(s.name)+'</strong>'+(s.desc?' &mdash; <span style="color:var(--text2);font-weight:normal;">'+esc(s.desc)+'</span>':'')+'</li>'; });
+  h+='</ul></div>';
+  el.innerHTML = h;
+  el.style.display = 'block';
+}
+
+/* Build the canvas Lunch text box content in the exact format the user wants:
+   LUNCH
+   11:00 AM - 2:00 PM
+   
+   • <items>
+   
+   Same Daily
+   • <same daily items>
+*/
+function buildCanvasLunchText(meats, sides, sameDailyOverride){
+  // Meats first, then sides (the bullet list in the canvas image)
+  const items = [].concat(
+    (meats||[]).map(i => typeof i==='string' ? i : i.name),
+    (sides||[]).map(i => typeof i==='string' ? i : i.name)
+  ).filter(Boolean);
+
+  // Same Daily — use override if provided, otherwise pull from global defaults
+  let sd = (sameDailyOverride||[]).map(i => typeof i==='string' ? i : (i.name||'')).filter(Boolean);
+  if(!sd.length){
+    const globals = (menuDefaultsCache && menuDefaultsCache.sameDaily && menuDefaultsCache.sameDaily.items) || [];
+    sd = globals.map(i => typeof i==='string' ? i : (i.name||'')).filter(Boolean);
+  }
+
+  let txt = 'LUNCH\n11:00 AM - 2:00 PM\n';
+  if(items.length) txt += '\n' + items.map(n => '\u2022 ' + n).join('\n');
+  if(sd.length)    txt += '\n\nSame Daily\n' + sd.map(n => '\u2022 ' + n).join('\n');
+  return txt;
+}
+
+/* The main AI Publish flow — runs everything in sequence */
+async function runAiPublishFlow(file){
+  try {
+    // 1. Make sure defaults are loaded (we need sameDaily for the canvas text)
+    if(!menuDefaultsCache){
+      setAiTabStatus('Loading menu defaults…', 'loading');
+      await loadMenuDefaults();
+    }
+
+    // 2. Prepare the photo (always re-encode via canvas)
+    setAiTabStatus('Preparing photo ('+Math.round(file.size/1024)+' KB '+file.type+')…', 'loading');
+    let blob, mediaType;
+    try {
+      blob = await compressImageForAiTab(file, 1600, 0.85);
+      mediaType = 'image/jpeg';
+    } catch(prepErr){
+      const supportedTypes = ['image/jpeg','image/jpg','image/png','image/gif','image/webp'];
+      const fileType = (file.type||'').toLowerCase();
+      if(supportedTypes.includes(fileType)){
+        blob = file; mediaType = fileType;
+      } else {
+        setAiTabStatus('Cannot process this photo format ('+(file.type||'unknown')+'). On iPhone: Settings → Camera → Formats → Most Compatible.', 'error');
+        return;
+      }
+    }
+    if(blob.size > 5*1024*1024){
+      setAiTabStatus('Photo too large after compression ('+Math.round(blob.size/1024/1024)+'MB).', 'error');
+      return;
+    }
+
+    // 3. Send to AI
+    setAiTabStatus('Sending '+Math.round(blob.size/1024)+'KB to Claude…', 'loading');
+    const base64 = await fileToBase64Tab(blob);
+    const userPrompt = (document.getElementById('aiUserPrompt')?.value || '').trim();
+
+    const resp = await fetch('/api/ai-extract-menu', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageBase64: base64, imageMediaType: mediaType, userPrompt: userPrompt })
+    });
+    let data;
+    try { data = await resp.json(); }
+    catch(jsonErr){
+      const rawTxt = await resp.text().catch(()=>'(no body)');
+      setAiTabStatus('Server returned bad data (HTTP '+resp.status+'): '+rawTxt.slice(0,200), 'error');
+      return;
+    }
+    if(!resp.ok || !data.success){
+      let msg = data.error || ('HTTP '+resp.status);
+      if(data.debug) msg += ' [bytes:'+data.debug.imageBytes+' format:'+data.debug.detectedFormat+']';
+      setAiTabStatus('Failed: '+msg, 'error');
+      console.error('AI extract response:', data);
+      return;
+    }
+
+    const meats = data.meats || [];
+    const sides = data.sides || [];
+
+    // 4. Show preview of extracted items
+    renderAiPreview(meats, sides);
+
+    const date = _aiTabSelectedDate || dateOffsetAdj(0);
+    const autoPublish = document.getElementById('aiAutoPublish')?.checked;
+    const autoCanvas  = document.getElementById('aiAutoCanvas')?.checked;
+
+    const actions = [];
+
+    // 5. Update canvas Lunch text box
+    if(autoCanvas){
+      const lunchBox = boxes.find(b => b.name === 'Lunch');
+      if(lunchBox){
+        saveUndo();
+        lunchBox.text = buildCanvasLunchText(meats, sides, []);
+        draw();
+        triggerAutoSave();
+        actions.push('canvas updated');
+      } else {
+        actions.push('canvas SKIPPED (no "Lunch" text box on canvas)');
+      }
+    }
+
+    // 6. Auto-publish to website
+    if(autoPublish){
+      setAiTabStatus('Publishing to website for '+isoToLabel(date)+'…', 'loading');
+      const itemsArr = [].concat(meats, sides);
+      const dateData = {
+        lunch: { show: true, items: itemsArr, meats: meats, sides: sides, sameDaily: [] },
+        dessert: { items: [] },
+        crawfish: { show: false }  // default OFF per user request
+      };
+      try {
+        const pubRes = await apiPost({
+          action: 'save-lunch',
+          date: date,
+          data: dateData,
+          publishedBy: getCloudName()
+        });
+        if(pubRes?.success){
+          actions.push('published to '+date);
+        } else {
+          actions.push('publish FAILED ('+(pubRes?.error||'unknown')+')');
+        }
+      } catch(e){
+        actions.push('publish ERROR ('+e.message+')');
+      }
+    }
+
+    const summary = 'Done! '+meats.length+' meats, '+sides.length+' sides. '+actions.join(' &middot; ');
+    setAiTabStatus(summary.replace(/&middot;/g, '·'), 'success');
+    toast('AI extracted '+(meats.length+sides.length)+' items', 'success');
+
+  } catch (err) {
+    setAiTabStatus('Error: '+(err.message||String(err)), 'error');
+    console.error('AI publish error:', err);
+  }
+}
+
+// Helpers — keep them local to the AI tab to avoid name clashes
+function fileToBase64Tab(blob){
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => {
+      const dataUrl = String(r.result || '');
+      const comma = dataUrl.indexOf(',');
+      resolve(comma >= 0 ? dataUrl.slice(comma+1) : dataUrl);
+    };
+    r.onerror = reject;
+    r.readAsDataURL(blob);
+  });
+}
+async function compressImageForAiTab(file, maxDim, quality){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = e => { img.src = e.target.result; };
+    reader.onerror = reject;
+    img.onload = () => {
+      let w = img.naturalWidth, h = img.naturalHeight;
+      if(w > maxDim || h > maxDim){
+        const scale = Math.min(maxDim/w, maxDim/h);
+        w = Math.round(w*scale); h = Math.round(h*scale);
+      }
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      const cx = c.getContext('2d');
+      cx.fillStyle = '#fff'; cx.fillRect(0,0,w,h);
+      cx.drawImage(img, 0, 0, w, h);
+      c.toBlob(b => b ? resolve(b) : reject(new Error('toBlob failed')), 'image/jpeg', quality);
+    };
+    img.onerror = () => reject(new Error('Browser could not decode this image (type: '+(file.type||'unknown')+')'));
+    reader.readAsDataURL(file);
+  });
+}
+
 function buildMenuLunch(){
   let h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83c\udf7d Lunch Forecast</span></div><div class="acc-body">';
   h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Set lunch for each date. Edit meats, sides, and same-daily separately. Old rows with only <em>items[]</em> will be auto-split on load.</p>';
@@ -1330,23 +1639,11 @@ function wireMenuPanel(){
       }).join('\n');
 
       const dessertItems = lunchData?.dessert?.items || [];
-      const showCrawfish = lunchData?.crawfish?.show !== false;
+      const showCrawfish = lunchData?.crawfish?.show === true;
       const globalSameDaily = (menuDefaultsCache?.sameDaily?.items) || [];
       const globalSdText = globalSameDaily.map(i => typeof i === 'object' ? i.name : i).join(', ');
 
       let lh='<div style="font-size:12px;font-weight:700;color:var(--fire);margin-bottom:8px;">'+isoToDay(date)+' \u2022 '+date+'</div>';
-
-      // ── AI Extract: snap a photo of today's menu list, auto-fill the fields ──
-      lh+='<div class="ai-extract-card">';
-      lh+='<div class="ai-extract-title">\u2728 AI Extract from Photo</div>';
-      lh+='<div class="ai-extract-hint">Snap a photo of the daily menu list — Claude reads it, writes descriptions, and fills Meats + Sides for you.</div>';
-      lh+='<input type="file" id="aiExtractFile" accept="image/*" capture="environment" style="display:none">';
-      lh+='<div class="btn-row" style="margin-top:8px;">';
-      lh+='<button class="sm-btn primary ai-extract-btn" id="aiExtractBtn">\ud83d\udcf8 Snap & Extract</button>';
-      lh+='<button class="sm-btn" id="aiExtractPickBtn">\ud83d\uddbc Pick from Library</button>';
-      lh+='</div>';
-      lh+='<div id="aiExtractStatus" style="display:none;margin-top:8px;padding:8px;border-radius:6px;font-size:11px;font-weight:600;"></div>';
-      lh+='</div>';
 
       lh+='<div class="lunch-section-card">';
       lh+='<div class="lunch-section-title meats">\ud83c\udf57 Meats</div>';
@@ -1397,175 +1694,6 @@ function wireMenuPanel(){
         };
         await saveLunchForDate(date, dateData);
       });
-
-      // ─────── AI EXTRACT WIRING ───────
-      const aiBtn = document.getElementById('aiExtractBtn');
-      const aiPickBtn = document.getElementById('aiExtractPickBtn');
-      const aiFile = document.getElementById('aiExtractFile');
-      const aiStatus = document.getElementById('aiExtractStatus');
-
-      function setAiStatus(msg, kind){
-        if(!aiStatus) return;
-        aiStatus.style.display='block';
-        aiStatus.textContent = msg;
-        const colors = {
-          info:    'background:rgba(100,140,255,.12);color:#7c9eff;',
-          loading: 'background:rgba(255,200,80,.12);color:#ffc850;',
-          success: 'background:rgba(77,255,136,.12);color:#7ae59a;',
-          error:   'background:rgba(255,77,77,.12);color:#ff7a7a;'
-        };
-        aiStatus.style.cssText = 'display:block;margin-top:8px;padding:8px;border-radius:6px;font-size:11px;font-weight:600;line-height:1.4;' + (colors[kind]||colors.info);
-      }
-      function hideAiStatus(){ if(aiStatus) aiStatus.style.display='none'; }
-
-      if(aiBtn){
-        aiBtn.addEventListener('click', () => {
-          // Camera mode — capture attribute opens phone camera directly
-          aiFile.setAttribute('capture', 'environment');
-          aiFile.click();
-        });
-      }
-      if(aiPickBtn){
-        aiPickBtn.addEventListener('click', () => {
-          // Library mode — remove capture attribute so it opens the picker
-          aiFile.removeAttribute('capture');
-          aiFile.click();
-        });
-      }
-      if(aiFile){
-        aiFile.addEventListener('change', async (e) => {
-          const file = e.target.files?.[0];
-          if(!file){ return; }
-          e.target.value = ''; // allow re-picking same file
-          await runAiExtract(file);
-        });
-      }
-
-      async function runAiExtract(file){
-        try {
-          setAiStatus('Reading photo… ('+Math.round(file.size/1024)+' KB '+file.type+')', 'loading');
-
-          // Always normalize via canvas — guarantees clean JPEG bytes that match
-          // the media type we declare, regardless of source format quirks.
-          let blob, mediaType;
-          try {
-            setAiStatus('Preparing photo…', 'loading');
-            blob = await compressImageForAi(file, 1600, 0.85);
-            mediaType = 'image/jpeg';
-          } catch(prepErr){
-            const supportedTypes = ['image/jpeg','image/jpg','image/png','image/gif','image/webp'];
-            const fileType = (file.type||'').toLowerCase();
-            if(supportedTypes.includes(fileType)){
-              // Canvas failed but file format is OK — send original as fallback
-              blob = file;
-              mediaType = fileType;
-              setAiStatus('Canvas failed, sending original…', 'loading');
-            } else {
-              setAiStatus('Cannot process this photo format ('+(file.type||'unknown')+'). On iPhone: Settings → Camera → Formats → Most Compatible.', 'error');
-              return;
-            }
-          }
-
-          // Hard size cap (Anthropic limit is ~5MB)
-          if(blob.size > 5 * 1024 * 1024){
-            setAiStatus('Photo still too large after compression ('+Math.round(blob.size/1024/1024)+'MB). Try a smaller photo.', 'error');
-            return;
-          }
-
-          setAiStatus('Sending '+Math.round(blob.size/1024)+'KB to Claude…', 'loading');
-          const base64 = await fileToBase64(blob);
-          if(!base64 || base64.length < 100){
-            setAiStatus('Photo conversion produced empty data — try a different photo.', 'error');
-            return;
-          }
-
-          const resp = await fetch('/api/ai-extract-menu', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ imageBase64: base64, imageMediaType: mediaType })
-          });
-
-          let data;
-          try { data = await resp.json(); }
-          catch(jsonErr){
-            const rawTxt = await resp.text().catch(()=>'(no response body)');
-            setAiStatus('Server returned bad data (HTTP '+resp.status+'): '+rawTxt.slice(0,200), 'error');
-            return;
-          }
-
-          if(!resp.ok || !data.success){
-            let msg = data.error || ('HTTP '+resp.status);
-            if(data.debug){
-              msg += ' [bytes:'+data.debug.imageBytes+' format:'+data.debug.detectedFormat+' hex:'+data.debug.firstBytesHex+']';
-            }
-            setAiStatus('Failed: ' + msg, 'error');
-            console.error('AI extract response:', data);
-            return;
-          }
-
-          // Fill the textareas — but ask first if they already have content
-          const meatsTA = document.getElementById('lunchMeatsTA');
-          const sidesTA = document.getElementById('lunchSidesTA');
-          const hadContent = (meatsTA.value.trim() || sidesTA.value.trim());
-          if(hadContent){
-            const ok = confirm('There\'s already content in Meats/Sides. Replace it with the AI-extracted version?\n\nYou can still edit after.');
-            if(!ok){
-              setAiStatus('Canceled — your existing items are kept.', 'info');
-              return;
-            }
-          }
-          meatsTA.value = data.meatsText || '';
-          sidesTA.value = data.sidesText || '';
-
-          const count = (data.meats||[]).length + (data.sides||[]).length;
-          setAiStatus('Done! Filled in '+(data.meats||[]).length+' meat'+((data.meats||[]).length===1?'':'s')+' and '+(data.sides||[]).length+' side'+((data.sides||[]).length===1?'':'s')+'. Review and tap Save.', 'success');
-          toast('AI extracted '+count+' items','success');
-        } catch (err) {
-          setAiStatus('Error: ' + (err.message||String(err)), 'error');
-          console.error('AI extract error:', err);
-        }
-      }
-
-      // Helper: file → base64 string (without "data:image/...;base64," prefix)
-      function fileToBase64(blob){
-        return new Promise((resolve, reject) => {
-          const r = new FileReader();
-          r.onload = () => {
-            const dataUrl = String(r.result || '');
-            const comma = dataUrl.indexOf(',');
-            resolve(comma >= 0 ? dataUrl.slice(comma+1) : dataUrl);
-          };
-          r.onerror = reject;
-          r.readAsDataURL(blob);
-        });
-      }
-
-      // Helper: resize an image to max dimension + JPEG-compress.
-      // Returns a Blob with a `.type` of image/jpeg.
-      async function compressImageForAi(file, maxDim, quality){
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          const reader = new FileReader();
-          reader.onload = e => { img.src = e.target.result; };
-          reader.onerror = reject;
-          img.onload = () => {
-            let w = img.naturalWidth, h = img.naturalHeight;
-            if(w > maxDim || h > maxDim){
-              const scale = Math.min(maxDim/w, maxDim/h);
-              w = Math.round(w*scale); h = Math.round(h*scale);
-            }
-            const c = document.createElement('canvas');
-            c.width = w; c.height = h;
-            const cx = c.getContext('2d');
-            cx.fillStyle = '#fff'; cx.fillRect(0,0,w,h);
-            cx.drawImage(img, 0, 0, w, h);
-            c.toBlob(b => b ? resolve(b) : reject(new Error('toBlob failed')), 'image/jpeg', quality);
-          };
-          img.onerror = (ev) => reject(new Error('Browser could not decode this image (type: '+(file.type||'unknown')+', size: '+Math.round(file.size/1024)+'KB)'));
-          reader.readAsDataURL(file);
-        });
-      }
-      // ─────── /AI EXTRACT WIRING ───────
 
       document.getElementById('syncCanvas')?.addEventListener('click', () => {
         const meatLines = linesTo(document.getElementById('lunchMeatsTA').value).map(l => l.split('|')[0].trim()).filter(Boolean);
