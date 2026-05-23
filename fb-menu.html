@@ -1445,38 +1445,39 @@ function wireMenuPanel(){
         try {
           setAiStatus('Reading photo… ('+Math.round(file.size/1024)+' KB '+file.type+')', 'loading');
 
-          // Decide whether to resize. Skip the canvas entirely for small files,
-          // which avoids browser quirks that can fail on legit photos.
-          // Anthropic limits images to 5MB, so resize anything over 4MB.
-          let blob = file;
-          let mediaType = file.type || 'image/jpeg';
-          if(file.size > 4 * 1024 * 1024){
-            try {
-              setAiStatus('Resizing photo ('+Math.round(file.size/1024/1024)+'MB → smaller)…', 'loading');
-              blob = await compressImageForAi(file, 1600, 0.85);
-              mediaType = 'image/jpeg';
-            } catch(resizeErr){
-              setAiStatus('Could not resize: '+(resizeErr.message||'unknown')+'. Trying original…', 'loading');
+          // Always normalize via canvas — guarantees clean JPEG bytes that match
+          // the media type we declare, regardless of source format quirks.
+          let blob, mediaType;
+          try {
+            setAiStatus('Preparing photo…', 'loading');
+            blob = await compressImageForAi(file, 1600, 0.85);
+            mediaType = 'image/jpeg';
+          } catch(prepErr){
+            const supportedTypes = ['image/jpeg','image/jpg','image/png','image/gif','image/webp'];
+            const fileType = (file.type||'').toLowerCase();
+            if(supportedTypes.includes(fileType)){
+              // Canvas failed but file format is OK — send original as fallback
               blob = file;
-              mediaType = file.type || 'image/jpeg';
-            }
-          }
-
-          // Accept jpeg/png/gif/webp — anything else convert via canvas (best effort)
-          const supportedTypes = ['image/jpeg','image/jpg','image/png','image/gif','image/webp'];
-          if(!supportedTypes.includes(mediaType.toLowerCase())){
-            setAiStatus('Converting '+mediaType+' to JPEG…', 'loading');
-            try {
-              blob = await compressImageForAi(file, 1600, 0.85);
-              mediaType = 'image/jpeg';
-            } catch(convertErr){
-              setAiStatus('Cannot use '+mediaType+' photos. Set iPhone to "Most Compatible" (Settings → Camera → Formats).', 'error');
+              mediaType = fileType;
+              setAiStatus('Canvas failed, sending original…', 'loading');
+            } else {
+              setAiStatus('Cannot process this photo format ('+(file.type||'unknown')+'). On iPhone: Settings → Camera → Formats → Most Compatible.', 'error');
               return;
             }
           }
 
-          setAiStatus('Sending to Claude…', 'loading');
+          // Hard size cap (Anthropic limit is ~5MB)
+          if(blob.size > 5 * 1024 * 1024){
+            setAiStatus('Photo still too large after compression ('+Math.round(blob.size/1024/1024)+'MB). Try a smaller photo.', 'error');
+            return;
+          }
+
+          setAiStatus('Sending '+Math.round(blob.size/1024)+'KB to Claude…', 'loading');
           const base64 = await fileToBase64(blob);
+          if(!base64 || base64.length < 100){
+            setAiStatus('Photo conversion produced empty data — try a different photo.', 'error');
+            return;
+          }
 
           const resp = await fetch('/api/ai-extract-menu', {
             method: 'POST',
