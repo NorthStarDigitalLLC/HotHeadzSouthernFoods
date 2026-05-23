@@ -1443,21 +1443,55 @@ function wireMenuPanel(){
 
       async function runAiExtract(file){
         try {
-          setAiStatus('Resizing photo…', 'loading');
-          // Resize to keep under 8MB and speed up upload
-          const compressed = await compressImageForAi(file, 1600, 0.85);
-          setAiStatus('Sending to Claude…', 'loading');
+          setAiStatus('Reading photo… ('+Math.round(file.size/1024)+' KB '+file.type+')', 'loading');
 
-          // Convert to base64
-          const base64 = await fileToBase64(compressed);
-          const mediaType = compressed.type || 'image/jpeg';
+          // Decide whether to resize. Skip the canvas entirely for small files,
+          // which avoids browser quirks that can fail on legit photos.
+          // Anthropic limits images to 5MB, so resize anything over 4MB.
+          let blob = file;
+          let mediaType = file.type || 'image/jpeg';
+          if(file.size > 4 * 1024 * 1024){
+            try {
+              setAiStatus('Resizing photo ('+Math.round(file.size/1024/1024)+'MB → smaller)…', 'loading');
+              blob = await compressImageForAi(file, 1600, 0.85);
+              mediaType = 'image/jpeg';
+            } catch(resizeErr){
+              setAiStatus('Could not resize: '+(resizeErr.message||'unknown')+'. Trying original…', 'loading');
+              blob = file;
+              mediaType = file.type || 'image/jpeg';
+            }
+          }
+
+          // Accept jpeg/png/gif/webp — anything else convert via canvas (best effort)
+          const supportedTypes = ['image/jpeg','image/jpg','image/png','image/gif','image/webp'];
+          if(!supportedTypes.includes(mediaType.toLowerCase())){
+            setAiStatus('Converting '+mediaType+' to JPEG…', 'loading');
+            try {
+              blob = await compressImageForAi(file, 1600, 0.85);
+              mediaType = 'image/jpeg';
+            } catch(convertErr){
+              setAiStatus('Cannot use '+mediaType+' photos. Set iPhone to "Most Compatible" (Settings → Camera → Formats).', 'error');
+              return;
+            }
+          }
+
+          setAiStatus('Sending to Claude…', 'loading');
+          const base64 = await fileToBase64(blob);
 
           const resp = await fetch('/api/ai-extract-menu', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ imageBase64: base64, imageMediaType: mediaType })
           });
-          const data = await resp.json();
+
+          let data;
+          try { data = await resp.json(); }
+          catch(jsonErr){
+            const rawTxt = await resp.text().catch(()=>'(no response body)');
+            setAiStatus('Server returned bad data (HTTP '+resp.status+'): '+rawTxt.slice(0,200), 'error');
+            return;
+          }
+
           if(!resp.ok || !data.success){
             const msg = data.error || ('HTTP '+resp.status);
             setAiStatus('Failed: ' + msg, 'error');
@@ -1522,7 +1556,7 @@ function wireMenuPanel(){
             cx.drawImage(img, 0, 0, w, h);
             c.toBlob(b => b ? resolve(b) : reject(new Error('toBlob failed')), 'image/jpeg', quality);
           };
-          img.onerror = () => reject(new Error('Could not load image (HEIC/HEIF may not work — try JPEG/PNG)'));
+          img.onerror = (ev) => reject(new Error('Browser could not decode this image (type: '+(file.type||'unknown')+', size: '+Math.round(file.size/1024)+'KB)'));
           reader.readAsDataURL(file);
         });
       }
