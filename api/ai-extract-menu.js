@@ -128,6 +128,16 @@ OUTPUT FORMAT (exact):
   ]
 }`;
 
+    // Build the text instruction — incorporate the user's optional note if present
+    const rawUserPrompt = (req.body && typeof req.body.userPrompt === 'string') ? req.body.userPrompt.trim() : '';
+    // Cap user input at 500 chars so they can't blow up the prompt
+    const userPrompt = rawUserPrompt.slice(0, 500);
+    
+    let userText = 'Extract the lunch menu items from this photo. Return JSON only.';
+    if (userPrompt) {
+      userText += '\n\nADDITIONAL CONTEXT FROM THE USER (treat as instructions about what is in the photo, not as menu items themselves):\n' + userPrompt;
+    }
+
     const anthropicReq = {
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 1024,
@@ -141,7 +151,7 @@ OUTPUT FORMAT (exact):
           },
           {
             type: 'text',
-            text: 'Extract the lunch menu items from this photo. Return JSON only.'
+            text: userText
           }
         ]
       }]
