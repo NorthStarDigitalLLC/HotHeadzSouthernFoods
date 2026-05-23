@@ -224,6 +224,110 @@
     .export-big .meta{text-align:left;flex:1;}
     .export-big .meta small{display:block;font-size:11px;font-weight:600;opacity:.7;margin-top:1px;}
     .export-close{margin-top:10px;padding:8px;border:none;background:transparent;color:var(--text3);font-size:13px;font-weight:700;cursor:pointer;}
+
+    /* ═══════════════════════════════════════════════════════════
+       MOBILE-ONLY UI — hidden by default, shown only on ≤900px.
+       The mobile app replaces the desktop editor on phone/tablet.
+       Desktop is 100% untouched.
+       ═══════════════════════════════════════════════════════════ */
+    .mob-app{display:none;}
+    @media(max-width:900px){
+      /* Hide the desktop editor shell entirely on mobile */
+      .editor.active{display:none !important;}
+      /* Show the mobile shell */
+      .mob-app{display:flex !important;flex-direction:column;position:fixed;inset:0;z-index:9000;
+        background:radial-gradient(ellipse at 50% 0%,#1a1410 0%,#0a0707 60%,#040303 100%);
+        color:var(--text);font-family:'DM Sans',system-ui,sans-serif;}
+    }
+
+    .mob-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;
+      background:rgba(0,0,0,.5);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);
+      flex-shrink:0;z-index:10;position:sticky;top:0;}
+    .mob-topbar-title{font-family:'Abril Fatface',serif;font-size:18px;background:linear-gradient(135deg,var(--fire2),var(--fire));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .mob-back{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--text);
+      padding:8px 14px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;}
+    .mob-back:active{background:rgba(255,255,255,.12);transform:scale(.96);}
+
+    .mob-screen{display:none;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px 16px 60px;}
+    .mob-screen.mob-active{display:block;animation:mobScreenIn .25s ease;}
+    @keyframes mobScreenIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+
+    .mob-hero{padding:8px 4px 22px;text-align:left;}
+    .mob-hero-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,122,24,.7);margin-bottom:6px;}
+    .mob-hero-title{font-family:'Abril Fatface',serif;font-size:28px;line-height:1.15;color:var(--text);}
+
+    /* Big tappable cards on the landing page */
+    .mob-card{display:flex;align-items:center;gap:14px;width:100%;
+      padding:18px 16px;margin-bottom:12px;border-radius:18px;cursor:pointer;
+      background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--text);
+      font-family:inherit;text-align:left;transition:all .15s;-webkit-tap-highlight-color:transparent;}
+    .mob-card:active{transform:scale(.98);background:rgba(255,255,255,.07);}
+    .mob-card-primary{background:linear-gradient(135deg,rgba(180,100,255,.18),rgba(255,100,200,.10));
+      border-color:rgba(180,100,255,.4);box-shadow:0 4px 24px rgba(180,100,255,.15);}
+    .mob-card-primary .mob-card-title{color:#e0c0ff;}
+    .mob-card-sm{padding:14px 14px;border-radius:14px;margin-bottom:8px;}
+    .mob-card-export{background:linear-gradient(135deg,rgba(255,122,24,.15),rgba(255,179,71,.08));border-color:rgba(255,122,24,.3);}
+    .mob-card-emoji{font-size:28px;line-height:1;flex-shrink:0;}
+    .mob-card-sm .mob-card-emoji{font-size:22px;}
+    .mob-card-text{flex:1;min-width:0;}
+    .mob-card-title{font-size:16px;font-weight:800;line-height:1.2;margin-bottom:2px;}
+    .mob-card-sub{font-size:12px;color:var(--text2);font-weight:500;line-height:1.3;}
+    .mob-card-arrow{font-size:24px;color:var(--text3);font-weight:300;flex-shrink:0;}
+
+    .mob-section-title{font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,122,24,.7);margin:20px 4px 12px;display:flex;align-items:center;gap:8px;}
+    .mob-section-title:first-child{margin-top:0;}
+    .mob-section-hint{font-size:13px;color:var(--text2);line-height:1.5;margin:0 4px 16px;}
+
+    .mob-date-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;}
+    .mob-date-btn{padding:10px 4px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--text2);font-weight:700;font-size:12px;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;text-align:center;line-height:1.3;}
+    .mob-date-btn:active{transform:scale(.95);}
+    .mob-date-btn.active{background:linear-gradient(135deg,var(--fire),var(--fire2));border-color:transparent;color:#fff;}
+    .mob-date-btn .mob-date-day{display:block;font-size:11px;font-weight:600;opacity:.7;}
+    .mob-date-btn.active .mob-date-day{opacity:.9;}
+    .mob-date-btn .mob-date-num{display:block;font-size:16px;font-weight:800;margin-top:2px;}
+
+    .mob-photo-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+    .mob-big-btn{padding:24px 12px;border-radius:18px;border:1px solid rgba(255,255,255,.1);
+      background:rgba(255,255,255,.04);color:var(--text);font-family:inherit;cursor:pointer;
+      display:flex;flex-direction:column;align-items:center;gap:8px;-webkit-tap-highlight-color:transparent;
+      transition:all .15s;}
+    .mob-big-btn:active{transform:scale(.97);background:rgba(255,255,255,.08);}
+    .mob-big-btn-primary{background:linear-gradient(135deg,#b864ff,#7a3fd6);border-color:transparent;box-shadow:0 6px 20px rgba(180,100,255,.3);}
+    .mob-big-btn-icon{font-size:34px;line-height:1;}
+    .mob-big-btn-label{font-size:13px;font-weight:800;}
+
+    .mob-section-collapse{margin-bottom:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:0 14px;}
+    .mob-section-collapse summary{padding:14px 0;font-weight:700;font-size:13px;cursor:pointer;list-style:none;color:var(--text);}
+    .mob-section-collapse summary::-webkit-details-marker{display:none;}
+    .mob-section-collapse[open] summary{padding-bottom:8px;}
+    .mob-section-collapse[open]{padding-bottom:14px;}
+
+    .mob-input{width:100%;padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.3);color:var(--text);font-family:inherit;font-size:15px;}
+    .mob-input:focus{outline:none;border-color:var(--fire);}
+    .mob-textarea{resize:vertical;min-height:80px;line-height:1.45;}
+
+    .mob-toggle-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:6px 14px;margin-bottom:18px;}
+    .mob-toggle{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;font-size:14px;}
+    .mob-toggle:last-child{border-bottom:none;}
+    .mob-toggle input{width:18px;height:18px;accent-color:var(--fire);cursor:pointer;}
+    .mob-toggle span{flex:1;}
+
+    .mob-link-btn{display:block;width:100%;text-align:center;padding:14px;margin-top:8px;
+      background:transparent;border:none;color:#7ac4ff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+
+    /* Reuse the existing status pill colors for AI status on mobile too */
+    #mobAiStatus, #mobAiPreview { display:none; margin:14px 0; }
+    #mobAiStatus.show { display:block;padding:14px;border-radius:12px;font-size:13px;font-weight:600;line-height:1.5;}
+    #mobAiStatus.info    { background:rgba(100,140,255,.12);color:#7c9eff;border:1px solid rgba(100,140,255,.25);}
+    #mobAiStatus.loading { background:rgba(255,200,80,.12);color:#ffc850;border:1px solid rgba(255,200,80,.25);}
+    #mobAiStatus.success { background:rgba(77,255,136,.12);color:#7ae59a;border:1px solid rgba(77,255,136,.25);}
+    #mobAiStatus.error   { background:rgba(255,77,77,.12);color:#ff7a7a;border:1px solid rgba(255,77,77,.25);}
+    #mobAiPreview.show   { display:block; }
+    #mobAiPreview .static-card{padding:14px;margin-bottom:10px;}
+
+    /* Mobile screen-detail uses the existing side-panel styles for its content */
+    #mobDetailHost{}
+    #mobDetailHost .acc-body{padding:0;}
   </style>
 </head>
 <body>
@@ -253,6 +357,179 @@
     </div>
   </div>
 </div>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     MOBILE UI — full-screen overlay shown only on viewports ≤900px.
+     Provides a landing page with big tap targets and a clean section flow.
+     Desktop never sees this (hidden via CSS).
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div id="mobileApp" class="mob-app">
+  <!-- Top bar shown on every mobile screen -->
+  <div class="mob-topbar">
+    <button class="mob-back" id="mobBack" style="visibility:hidden;">‹ Back</button>
+    <div class="mob-topbar-title" id="mobTopbarTitle">Hot Headz</div>
+    <button class="mob-back" id="mobSignout2">Sign out</button>
+  </div>
+
+  <!-- Landing page (the home screen of the mobile app) -->
+  <div class="mob-screen mob-active" id="mobScreenHome" data-screen="home">
+    <div class="mob-hero">
+      <div class="mob-hero-eyebrow">Welcome back</div>
+      <div class="mob-hero-title">What do you want to do?</div>
+    </div>
+
+    <button class="mob-card mob-card-primary" data-go="ai">
+      <div class="mob-card-emoji">✨</div>
+      <div class="mob-card-text">
+        <div class="mob-card-title">AI Menu Update</div>
+        <div class="mob-card-sub">Snap a photo of today's menu — AI does the rest</div>
+      </div>
+      <div class="mob-card-arrow">›</div>
+    </button>
+
+    <button class="mob-card" data-go="image">
+      <div class="mob-card-emoji">🖼️</div>
+      <div class="mob-card-text">
+        <div class="mob-card-title">Edit Menu Image</div>
+        <div class="mob-card-sub">Customize text, photo, design</div>
+      </div>
+      <div class="mob-card-arrow">›</div>
+    </button>
+
+    <button class="mob-card" data-go="projects">
+      <div class="mob-card-emoji">📁</div>
+      <div class="mob-card-text">
+        <div class="mob-card-title">My Projects</div>
+        <div class="mob-card-sub">Saved menus, cloud sync</div>
+      </div>
+      <div class="mob-card-arrow">›</div>
+    </button>
+
+    <button class="mob-card" data-go="defaults">
+      <div class="mob-card-emoji">⚙️</div>
+      <div class="mob-card-text">
+        <div class="mob-card-title">Menu Defaults</div>
+        <div class="mob-card-sub">Breakfast, drinks, hours, settings</div>
+      </div>
+      <div class="mob-card-arrow">›</div>
+    </button>
+
+    <div class="mob-hero-eyebrow" style="margin-top:24px;text-align:center;opacity:.5;">Need the design tools? Open this page on a computer.</div>
+  </div>
+
+  <!-- AI MENU UPDATE screen -->
+  <div class="mob-screen" id="mobScreenAi" data-screen="ai">
+    <!-- Date picker -->
+    <div class="mob-section-title">Choose Date</div>
+    <div class="mob-date-grid" id="mobDateGrid"></div>
+
+    <!-- Photo capture -->
+    <div class="mob-section-title">Snap or Pick Photo</div>
+    <input type="file" id="mobAiPhotoFile" accept="image/*" capture="environment" style="display:none">
+    <div class="mob-photo-buttons">
+      <button class="mob-big-btn mob-big-btn-primary" id="mobAiSnapBtn">
+        <div class="mob-big-btn-icon">📸</div>
+        <div class="mob-big-btn-label">Snap Photo</div>
+      </button>
+      <button class="mob-big-btn" id="mobAiPickBtn">
+        <div class="mob-big-btn-icon">🖼️</div>
+        <div class="mob-big-btn-label">From Library</div>
+      </button>
+    </div>
+
+    <!-- Optional prompt -->
+    <details class="mob-section-collapse">
+      <summary>Optional note for the AI</summary>
+      <textarea class="mob-input mob-textarea" id="mobAiUserPrompt" rows="3" placeholder="e.g. 'second item is meatloaf, not meatballs'"></textarea>
+    </details>
+
+    <!-- Toggles -->
+    <div class="mob-toggle-card">
+      <label class="mob-toggle"><input type="checkbox" id="mobAiAutoPublish" checked> <span>Auto-publish to website</span></label>
+      <label class="mob-toggle"><input type="checkbox" id="mobAiAutoCanvas" checked> <span>Auto-update canvas image</span></label>
+      <label class="mob-toggle"><input type="checkbox" id="mobAiAutoFit" checked> <span>Auto-fit text to trained box</span></label>
+    </div>
+
+    <!-- Status / Preview -->
+    <div id="mobAiStatus" style="display:none;"></div>
+    <div id="mobAiPreview" style="display:none;"></div>
+
+    <!-- Manual edit handoff -->
+    <button class="mob-link-btn" id="mobAiEditManual">Open manual editor for this date →</button>
+  </div>
+
+  <!-- MENU IMAGE EDIT screen — opens the desktop side panel logic for canvas tools -->
+  <div class="mob-screen" id="mobScreenImage" data-screen="image">
+    <div class="mob-section-title">Pick a section to edit</div>
+    <button class="mob-card mob-card-sm" data-img-tab="quickfill">
+      <div class="mob-card-emoji">⚡</div>
+      <div class="mob-card-text"><div class="mob-card-title">FB Menu Quick Fill</div><div class="mob-card-sub">Day, date, breakfast, lunch text</div></div>
+      <div class="mob-card-arrow">›</div>
+    </button>
+    <button class="mob-card mob-card-sm" data-img-tab="textboxes">
+      <div class="mob-card-emoji">🔤</div>
+      <div class="mob-card-text"><div class="mob-card-title">Text Boxes</div><div class="mob-card-sub">Add, edit, style individual boxes</div></div>
+      <div class="mob-card-arrow">›</div>
+    </button>
+    <button class="mob-card mob-card-sm" data-img-tab="photo">
+      <div class="mob-card-emoji">📷</div>
+      <div class="mob-card-text"><div class="mob-card-title">Background Photo</div><div class="mob-card-sub">Zoom, rotate, reposition</div></div>
+      <div class="mob-card-arrow">›</div>
+    </button>
+    <button class="mob-card mob-card-sm mob-card-export" id="mobImageExport">
+      <div class="mob-card-emoji">⬇️</div>
+      <div class="mob-card-text"><div class="mob-card-title">Download / Export</div><div class="mob-card-sub">JPG, PNG, project file</div></div>
+      <div class="mob-card-arrow">›</div>
+    </button>
+  </div>
+
+  <!-- PROJECTS screen -->
+  <div class="mob-screen" id="mobScreenProjects" data-screen="projects">
+    <div class="mob-section-title">Projects</div>
+    <div id="mobProjectsHost"></div>
+  </div>
+
+  <!-- DEFAULTS screen — list of static menu sections -->
+  <div class="mob-screen" id="mobScreenDefaults" data-screen="defaults">
+    <div class="mob-section-title">Menu Defaults</div>
+    <p class="mob-section-hint">Edit the parts of the menu that don't change every day.</p>
+    <button class="mob-card mob-card-sm" data-def-tab="static-breakfast">
+      <div class="mob-card-emoji">🍳</div><div class="mob-card-text"><div class="mob-card-title">Breakfast</div></div><div class="mob-card-arrow">›</div>
+    </button>
+    <button class="mob-card mob-card-sm" data-def-tab="static-lunchplates">
+      <div class="mob-card-emoji">💵</div><div class="mob-card-text"><div class="mob-card-title">Lunch Plates &amp; Pricing</div></div><div class="mob-card-arrow">›</div>
+    </button>
+    <button class="mob-card mob-card-sm" data-def-tab="static-drinks">
+      <div class="mob-card-emoji">🥤</div><div class="mob-card-text"><div class="mob-card-title">Drinks</div></div><div class="mob-card-arrow">›</div>
+    </button>
+    <button class="mob-card mob-card-sm" data-def-tab="static-beer">
+      <div class="mob-card-emoji">🍺</div><div class="mob-card-text"><div class="mob-card-title">Beer</div></div><div class="mob-card-arrow">›</div>
+    </button>
+    <button class="mob-card mob-card-sm" data-def-tab="static-salad">
+      <div class="mob-card-emoji">🥗</div><div class="mob-card-text"><div class="mob-card-title">Salad Bar</div></div><div class="mob-card-arrow">›</div>
+    </button>
+    <button class="mob-card mob-card-sm" data-def-tab="static-dessert">
+      <div class="mob-card-emoji">🍮</div><div class="mob-card-text"><div class="mob-card-title">Dessert Defaults</div></div><div class="mob-card-arrow">›</div>
+    </button>
+    <button class="mob-card mob-card-sm" data-def-tab="static-crawfish">
+      <div class="mob-card-emoji">🦞</div><div class="mob-card-text"><div class="mob-card-title">Crawfish</div></div><div class="mob-card-arrow">›</div>
+    </button>
+    <button class="mob-card mob-card-sm" data-def-tab="static-samedaily">
+      <div class="mob-card-emoji">📅</div><div class="mob-card-text"><div class="mob-card-title">Same Daily Items</div></div><div class="mob-card-arrow">›</div>
+    </button>
+    <button class="mob-card mob-card-sm" data-def-tab="static-hours">
+      <div class="mob-card-emoji">🕒</div><div class="mob-card-text"><div class="mob-card-title">Business Hours</div></div><div class="mob-card-arrow">›</div>
+    </button>
+    <button class="mob-card mob-card-sm" data-def-tab="static-settings">
+      <div class="mob-card-emoji">⚙️</div><div class="mob-card-text"><div class="mob-card-title">Public Menu Settings</div></div><div class="mob-card-arrow">›</div>
+    </button>
+  </div>
+
+  <!-- DETAIL screen — used by Image & Defaults to host whatever tool the user picked -->
+  <div class="mob-screen" id="mobScreenDetail" data-screen="detail">
+    <div id="mobDetailHost"></div>
+  </div>
+</div>
+
 <div class="editor" id="editorShell">
   <div class="topbar">
     <div class="topbar-brand">Hot Headz</div>
@@ -433,6 +710,8 @@ function unlockEditor(){
   document.getElementById('adminGate').style.display='none';
   document.getElementById('editorShell').classList.add('active');
   setTimeout(()=>draw(),60);
+  // Initialize mobile UI if applicable (no-op on desktop)
+  setTimeout(()=>{ if(typeof initMobileIfNeeded === 'function') initMobileIfNeeded(); }, 80);
 }
 
 if(checkSession()){unlockEditor();}
@@ -2258,6 +2537,335 @@ loadStarterBoxes();rebuildSidePanel();
   if(!imgDataURL&&DI){img=new Image();img.onload=()=>{imgLoaded=true;draw();};img.onerror=()=>{imgLoaded=false;draw();};img.src=DI;}
   loadMenuDefaults();
 })();
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MOBILE CONTROLLER
+   Self-contained. Only does anything when the mob-app element is visible
+   (CSS shows it on ≤900px). Bridges to the existing desktop functions.
+   ═══════════════════════════════════════════════════════════════════════ */
+const mob = {
+  cur: 'home',
+  history: ['home'],
+  selectedDate: null,
+
+  init(){
+    // Initial label & back button
+    this.updateChrome();
+
+    // Landing-page card buttons
+    document.querySelectorAll('[data-go]').forEach(btn => {
+      btn.addEventListener('click', () => this.go(btn.dataset.go));
+    });
+
+    // Image-edit subtabs
+    document.querySelectorAll('[data-img-tab]').forEach(btn => {
+      btn.addEventListener('click', () => this.openSubTab(btn.dataset.imgTab, btn.querySelector('.mob-card-title')?.textContent || 'Edit'));
+    });
+    // Defaults subtabs
+    document.querySelectorAll('[data-def-tab]').forEach(btn => {
+      btn.addEventListener('click', () => this.openSubTab(btn.dataset.defTab, btn.querySelector('.mob-card-title')?.textContent || 'Defaults'));
+    });
+    // Image export shortcut → opens the existing export modal
+    document.getElementById('mobImageExport')?.addEventListener('click', () => {
+      document.getElementById('exportModal')?.classList.add('active');
+    });
+
+    // Back button
+    document.getElementById('mobBack')?.addEventListener('click', () => this.back());
+
+    // Sign out
+    document.getElementById('mobSignout2')?.addEventListener('click', () => signOut());
+
+    // AI tab buttons
+    document.getElementById('mobAiSnapBtn')?.addEventListener('click', () => {
+      const f = document.getElementById('mobAiPhotoFile');
+      f.setAttribute('capture','environment'); f.click();
+    });
+    document.getElementById('mobAiPickBtn')?.addEventListener('click', () => {
+      const f = document.getElementById('mobAiPhotoFile');
+      f.removeAttribute('capture'); f.click();
+    });
+    document.getElementById('mobAiPhotoFile')?.addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if(!file) return;
+      e.target.value = '';
+      await this.runAi(file);
+    });
+
+    // Manual editor link → opens the desktop Lunch editor inline as detail screen
+    document.getElementById('mobAiEditManual')?.addEventListener('click', () => {
+      this.openDetail('ai-lunch-manual', 'Manual Lunch Editor');
+    });
+  },
+
+  go(screen){
+    if(screen === this.cur) return;
+    // Hide current
+    document.querySelectorAll('.mob-screen').forEach(s => s.classList.remove('mob-active'));
+    // Show new
+    const target = document.getElementById('mobScreen' + screen.charAt(0).toUpperCase() + screen.slice(1));
+    if(target){
+      target.classList.add('mob-active');
+      this.history.push(screen);
+      this.cur = screen;
+      this.updateChrome();
+      // Per-screen init
+      if(screen === 'ai') this.initAiScreen();
+      if(screen === 'projects') this.initProjectsScreen();
+    }
+  },
+
+  back(){
+    if(this.history.length <= 1){
+      this.go('home');
+      return;
+    }
+    this.history.pop();
+    const prev = this.history[this.history.length - 1];
+    document.querySelectorAll('.mob-screen').forEach(s => s.classList.remove('mob-active'));
+    const target = document.getElementById('mobScreen' + prev.charAt(0).toUpperCase() + prev.slice(1));
+    if(target) target.classList.add('mob-active');
+    this.cur = prev;
+    this.updateChrome();
+  },
+
+  updateChrome(){
+    const back = document.getElementById('mobBack');
+    const title = document.getElementById('mobTopbarTitle');
+    const titles = { home:'Hot Headz', ai:'AI Menu Update', image:'Edit Menu Image', projects:'Projects', defaults:'Menu Defaults', detail:title?.textContent||'Edit' };
+    if(title && this.cur !== 'detail') title.textContent = titles[this.cur] || 'Hot Headz';
+    if(back) back.style.visibility = (this.cur === 'home') ? 'hidden' : 'visible';
+  },
+
+  /* ── AI screen ── */
+  initAiScreen(){
+    // Make sure menu defaults are loaded (so closed-day logic works)
+    if(!menuDefaultsCache && menuDefaultsStatus !== 'loading') loadMenuDefaults().then(()=>this.renderDateGrid());
+    this.renderDateGrid();
+  },
+
+  renderDateGrid(){
+    const grid = document.getElementById('mobDateGrid');
+    if(!grid) return;
+    let html = '';
+    for(let i = 0; i < 7; i++){
+      const iso = dateOffsetAdj(i);
+      const day = isoToDay(iso);
+      const [y, m, d] = iso.split('-').map(Number);
+      const isActive = (i === 0);
+      if(isActive) this.selectedDate = iso;
+      html += `<button class="mob-date-btn${isActive?' active':''}" data-iso="${iso}">
+        <span class="mob-date-day">${day.slice(0,3)}</span>
+        <span class="mob-date-num">${d}</span>
+      </button>`;
+    }
+    grid.innerHTML = html;
+    grid.querySelectorAll('.mob-date-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        grid.querySelectorAll('.mob-date-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        this.selectedDate = b.dataset.iso;
+      });
+    });
+  },
+
+  setAiStatus(msg, kind){
+    const el = document.getElementById('mobAiStatus');
+    if(!el) return;
+    el.className = 'show ' + (kind || 'info');
+    el.textContent = msg;
+  },
+
+  renderAiPreview(meats, sides){
+    const el = document.getElementById('mobAiPreview');
+    if(!el) return;
+    let h = '<div class="static-card"><div class="static-card-title">Extracted Meats ('+meats.length+')</div><ul style="font-size:13px;color:var(--text);padding-left:18px;line-height:1.6;margin:0;">';
+    meats.forEach(m => { h += '<li><strong>'+esc(m.name)+'</strong>'+(m.desc?' — <span style="color:var(--text2);font-weight:normal;">'+esc(m.desc)+'</span>':'')+'</li>'; });
+    h += '</ul></div>';
+    h += '<div class="static-card"><div class="static-card-title">Extracted Sides ('+sides.length+')</div><ul style="font-size:13px;color:var(--text);padding-left:18px;line-height:1.6;margin:0;">';
+    sides.forEach(s => { h += '<li><strong>'+esc(s.name)+'</strong>'+(s.desc?' — <span style="color:var(--text2);font-weight:normal;">'+esc(s.desc)+'</span>':'')+'</li>'; });
+    h += '</ul></div>';
+    el.innerHTML = h;
+    el.classList.add('show');
+  },
+
+  async runAi(file){
+    try {
+      if(!menuDefaultsCache){
+        this.setAiStatus('Loading menu defaults…','loading');
+        await loadMenuDefaults();
+      }
+
+      const date = this.selectedDate || dateOffsetAdj(0);
+
+      // Prep photo via canvas
+      this.setAiStatus('Preparing photo ('+Math.round(file.size/1024)+' KB)…','loading');
+      let blob, mediaType;
+      try {
+        blob = await compressImageForAiTab(file, 1600, 0.85);
+        mediaType = 'image/jpeg';
+      } catch(prepErr){
+        const supported = ['image/jpeg','image/jpg','image/png','image/gif','image/webp'];
+        const ft = (file.type||'').toLowerCase();
+        if(supported.includes(ft)){ blob = file; mediaType = ft; }
+        else { this.setAiStatus('Can\'t process '+(file.type||'photo')+'. iPhone: Settings → Camera → Formats → Most Compatible.','error'); return; }
+      }
+      if(blob.size > 5*1024*1024){ this.setAiStatus('Photo too big after compression ('+Math.round(blob.size/1024/1024)+'MB).','error'); return; }
+
+      this.setAiStatus('Sending '+Math.round(blob.size/1024)+'KB to Claude…','loading');
+      const base64 = await fileToBase64Tab(blob);
+      const userPrompt = (document.getElementById('mobAiUserPrompt')?.value || '').trim();
+
+      const resp = await fetch('/api/ai-extract-menu', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ imageBase64: base64, imageMediaType: mediaType, userPrompt: userPrompt })
+      });
+      let data;
+      try { data = await resp.json(); }
+      catch(je){ this.setAiStatus('Server error: '+resp.status,'error'); return; }
+      if(!resp.ok || !data.success){
+        this.setAiStatus('Failed: '+(data.error||resp.status),'error');
+        return;
+      }
+
+      const meats = data.meats || [];
+      const sides = data.sides || [];
+      this.renderAiPreview(meats, sides);
+
+      const autoPublish = document.getElementById('mobAiAutoPublish')?.checked;
+      const autoCanvas  = document.getElementById('mobAiAutoCanvas')?.checked;
+      const autoFit     = document.getElementById('mobAiAutoFit')?.checked;
+      const actions = [];
+
+      if(autoCanvas){
+        // Update Day, Date, Lunch boxes
+        const dayBox  = boxes.find(b => b.name === 'Day');
+        const dateBox = boxes.find(b => b.name === 'Date');
+        const [yyyy, mm, dd] = date.split('-').map(Number);
+        const dt = new Date(yyyy, mm-1, dd);
+        if(dayBox)  dayBox.text  = dt.toLocaleDateString(undefined, {weekday:'long'});
+        if(dateBox) dateBox.text = dt.toLocaleDateString(undefined, {month:'long', day:'numeric', year:'numeric'});
+        const lunchBox = boxes.find(b => b.name === 'Lunch');
+        if(lunchBox){
+          saveUndo();
+          lunchBox.text = buildCanvasLunchText(meats, sides, []);
+          if(autoFit) autoFitLunchBox(lunchBox);
+          actions.push('canvas updated' + (autoFit ? ' (auto-fit)' : ''));
+        }
+        draw(); triggerAutoSave();
+      }
+
+      if(autoPublish){
+        this.setAiStatus('Publishing to website for '+isoToLabel(date)+'…','loading');
+        const dateData = {
+          lunch:    { show:true, items:[].concat(meats,sides), meats:meats, sides:sides, sameDaily:[] },
+          dessert:  { items:[] },
+          crawfish: { show:false }
+        };
+        try {
+          const pr = await apiPost({ action:'save-lunch', date:date, data:dateData, publishedBy:getCloudName() });
+          if(pr?.success) actions.push('published to '+date);
+          else actions.push('publish FAILED ('+(pr?.error||'unknown')+')');
+        } catch(e){ actions.push('publish ERROR ('+e.message+')'); }
+      }
+
+      this.setAiStatus('Done! '+meats.length+' meats, '+sides.length+' sides. ' + actions.join(' · '), 'success');
+      toast('AI extracted '+(meats.length+sides.length)+' items','success');
+    } catch(err){
+      this.setAiStatus('Error: '+(err.message||String(err)),'error');
+      console.error('mob.runAi:', err);
+    }
+  },
+
+  /* ── Projects screen — reuses desktop buildPR ── */
+  initProjectsScreen(){
+    const host = document.getElementById('mobProjectsHost');
+    if(!host) return;
+    host.innerHTML = buildPR();
+    // Re-wire by triggering rebuild logic for the projects tab pieces
+    setTimeout(() => {
+      // Bind handlers similar to wirePanel() but only for project-related elements within this host
+      host.querySelectorAll('.acc-head').forEach(h => h.addEventListener('click', () => h.parentElement.classList.toggle('open')));
+      const pN = host.querySelector('#pNew');
+      if(pN) pN.addEventListener('click', () => { const n = prompt('Name this project:', 'Menu '+new Date().toLocaleDateString()); if(n && n.trim()) createProject(n.trim()); this.initProjectsScreen(); });
+      const pSv = host.querySelector('#pSave'); if(pSv) pSv.addEventListener('click', () => { saveProject(false); this.initProjectsScreen(); });
+      const pSA = host.querySelector('#pSaveAs'); if(pSA) pSA.addEventListener('click', () => { const n = prompt('Save As — new project name:', 'Menu '+new Date().toLocaleDateString()); if(n && n.trim()) createProject(n.trim()); this.initProjectsScreen(); });
+      const pRn = host.querySelector('#pRename'); if(pRn) pRn.addEventListener('click', () => { const s = loadStore(); if(s.activeId) renameProject(s.activeId); this.initProjectsScreen(); });
+      host.querySelectorAll('.pLoad').forEach(b => b.addEventListener('click', () => { loadProject(b.dataset.id); this.initProjectsScreen(); }));
+      host.querySelectorAll('.pDel').forEach(b => b.addEventListener('click', () => { deleteProject(b.dataset.id); this.initProjectsScreen(); }));
+      host.querySelectorAll('.pRenameRow').forEach(b => b.addEventListener('click', () => { renameProject(b.dataset.id); this.initProjectsScreen(); }));
+      host.querySelectorAll('.pExportFile').forEach(b => b.addEventListener('click', () => exportProjectFile(b.dataset.id)));
+      // Cloud
+      const csn = host.querySelector('#cloudSetName');
+      if(csn) csn.addEventListener('click', () => { const name = (host.querySelector('#cloudNameInput').value||'').trim(); if(!name){ toast('Enter your name','error'); return; } setCloudName(name); this.initProjectsScreen(); });
+      const cdis = host.querySelector('#cloudDisconnect');
+      if(cdis) cdis.addEventListener('click', () => { if(confirm('Switch user?')){ setCloudName(''); setActiveCloudId(null); this.initProjectsScreen(); } });
+      const csOver = host.querySelector('#cloudSaveOver'); if(csOver) csOver.addEventListener('click', () => { const id = getActiveCloudId(); cloudSaveOver(id, getActiveCloudName()).then(() => this.initProjectsScreen()); });
+      const csAs = host.querySelector('#cloudSaveAs'); if(csAs) csAs.addEventListener('click', () => cloudSaveAs().then(() => this.initProjectsScreen()));
+      const csAsFirst = host.querySelector('#cloudSaveAsFirst'); if(csAsFirst) csAsFirst.addEventListener('click', () => cloudSaveAs().then(() => this.initProjectsScreen()));
+      const cClose = host.querySelector('#cloudCloseActive'); if(cClose) cClose.addEventListener('click', () => { setActiveCloudId(null); this.initProjectsScreen(); });
+      const crBtn = host.querySelector('#cloudRefresh'); if(crBtn) crBtn.addEventListener('click', () => refreshCloudList());
+      if(getCloudName() && host.querySelector('#cloudProjectsList')) refreshCloudList();
+    }, 50);
+  },
+
+  /* ── Detail screen — generic host for desktop tab content ── */
+  openSubTab(tabId, title){
+    const host = document.getElementById('mobDetailHost');
+    if(!host) return;
+    // Save the current desktop tab so we can restore after
+    const savedTab = currentTab;
+    currentTab = tabId;
+    // Use desktop builder to generate HTML
+    let html = '';
+    if(tabId === 'quickfill')       html = buildQF();
+    else if(tabId === 'textboxes')  html = buildTB();
+    else if(tabId === 'photo')      html = buildPH();
+    else if(tabId === 'static-breakfast')   html = buildStaticBreakfast();
+    else if(tabId === 'static-lunchplates') html = buildStaticLunchPlates();
+    else if(tabId === 'static-drinks')      html = buildStaticDrinks();
+    else if(tabId === 'static-beer')        html = buildStaticBeer();
+    else if(tabId === 'static-salad')       html = buildStaticSalad();
+    else if(tabId === 'static-dessert')     html = buildStaticDessert();
+    else if(tabId === 'static-crawfish')    html = buildStaticCrawfish();
+    else if(tabId === 'static-samedaily')   html = buildStaticSameDaily();
+    else if(tabId === 'static-hours')       html = buildStaticHours();
+    else if(tabId === 'static-settings')    html = buildStaticSettings();
+    else if(tabId === 'ai-lunch-manual')    html = buildMenuLunch();
+
+    host.innerHTML = html;
+
+    // Wire it up
+    if(tabId.startsWith('static-')) wireStaticPanel();
+    else if(tabId === 'ai-lunch-manual') wireMenuPanel();
+    else wirePanel();
+
+    // Update title and switch screen
+    document.getElementById('mobTopbarTitle').textContent = title;
+    document.querySelectorAll('.mob-screen').forEach(s => s.classList.remove('mob-active'));
+    document.getElementById('mobScreenDetail')?.classList.add('mob-active');
+    this.history.push('detail');
+    this.cur = 'detail';
+    this.updateChrome();
+    // Don't restore currentTab — we want subsequent operations to know what tab they're in
+  }
+};
+
+// Initialize mobile controller (only does anything if viewport ≤900px).
+// Called from unlockEditor() so timing is right.
+function initMobileIfNeeded(){
+  if(window.matchMedia('(max-width:900px)').matches){
+    // Guard against double-init if called multiple times
+    if(mob._inited) return;
+    mob._inited = true;
+    mob.init();
+  }
+}
+// If session was already valid at page load, unlockEditor ran before this code
+// existed — kick init now for that case too.
+if(checkSession()){
+  setTimeout(initMobileIfNeeded, 120);
+}
 
 })();
 </script>
