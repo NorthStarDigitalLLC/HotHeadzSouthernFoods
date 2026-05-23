@@ -180,6 +180,11 @@
     .ai-extract-hint{font-size:10px;color:var(--text2);line-height:1.45;margin-bottom:2px;}
     .ai-extract-btn{background:linear-gradient(135deg,#b864ff,#7a3fd6) !important;border:none !important;color:#fff !important;font-weight:800 !important;padding:8px 14px !important;box-shadow:0 2px 10px rgba(180,100,255,.3);}
     .ai-extract-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(180,100,255,.4);}
+    /* ── AI Lunch merged-tab layout ── 
+       Side panel is 380px wide so we always stack — AI controls on top,
+       Lunch editor below. AI section is sticky-collapsible if needed. */
+    .ai-lunch-wrap{display:flex;flex-direction:column;gap:14px;}
+    .ai-lunch-left,.ai-lunch-right{min-width:0;}
     .lunch-section-title{font-size:12px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
     .lunch-section-title.meats{color:var(--fire);}
     .lunch-section-title.meats::before{content:'';width:3px;height:11px;border-radius:2px;background:var(--fire);}
@@ -253,9 +258,8 @@
       <button class="tab-btn" data-tab="textboxes">Text Boxes</button>
       <button class="tab-btn" data-tab="photo">Photo</button>
       <button class="tab-btn" data-tab="projects">Projects</button>
-      <button class="tab-btn ai-tab" data-tab="ai-publish">✨ AI Publish</button>
       <div class="topbar-sep" style="margin:0 4px;"></div>
-      <button class="tab-btn menu-tab" data-tab="menu-lunch">🍽 Lunch</button>
+      <button class="tab-btn ai-tab" data-tab="ai-lunch">✨ AI Lunch</button>
       <div class="topbar-sep" style="margin:0 4px;"></div>
       <button class="tab-btn static-tab" data-tab="static-breakfast">🍳 Breakfast</button>
       <button class="tab-btn static-tab" data-tab="static-lunchplates">💵 Lunch Plates</button>
@@ -997,8 +1001,22 @@ function todayISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMo
 function isoToDay(iso){const[y,m,d]=iso.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:'long'});}
 function isoToLabel(iso){const[y,m,d]=iso.split('-').map(Number);const dt=new Date(y,m-1,d);return dt.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});}
 function getClosingMinutes(dayName){const hours=(menuDefaultsCache&&menuDefaultsCache.hours&&menuDefaultsCache.hours.weekly)||[];const entry=hours.find(h=>String(h.day||'').toLowerCase()===String(dayName||'').toLowerCase());if(!entry||!entry.close)return 14*60;const m=entry.close.match(/(\d+):(\d+)\s*(AM|PM)/i);if(!m)return 14*60;let h=parseInt(m[1]),mn=parseInt(m[2]);if(m[3].toUpperCase()==='PM'&&h!==12)h+=12;if(m[3].toUpperCase()==='AM'&&h===12)h=0;return h*60+mn;}
+function isClosedDay(dayName){const hours=(menuDefaultsCache&&menuDefaultsCache.hours&&menuDefaultsCache.hours.weekly)||[];const entry=hours.find(h=>String(h.day||'').toLowerCase()===String(dayName||'').toLowerCase());// No entry OR no open/close = closed
+return !entry || (!entry.open && !entry.close);}
 function getDayOffset(){const now=new Date();const dayName=now.toLocaleDateString('en-US',{weekday:'long'});const nowMins=now.getHours()*60+now.getMinutes();const closeMins=getClosingMinutes(dayName);return nowMins>=closeMins?1:0;}
-function dateOffsetAdj(n){const shift=getDayOffset();const d=new Date();d.setDate(d.getDate()+n+shift);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function dateOffsetAdj(n){
+  // Start from today + the after-close shift
+  let shift=getDayOffset();
+  const d=new Date();
+  d.setDate(d.getDate()+n+shift);
+  // Now skip forward over any consecutive closed days (max 7 hops to prevent infinite loop)
+  for(let i=0;i<7;i++){
+    const dayName=d.toLocaleDateString('en-US',{weekday:'long'});
+    if(!isClosedDay(dayName))break;
+    d.setDate(d.getDate()+1);
+  }
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
 
 function statusPillHTML(){if(menuDefaultsStatus==='loading')return '<span class="status-pill loading">Loading…</span>';if(menuDefaultsStatus==='loaded')return '<span class="status-pill loaded">Loaded from cloud</span>';if(menuDefaultsStatus==='error')return '<span class="status-pill error">Cloud error</span>';return '';}
 
@@ -1085,8 +1103,7 @@ function rebuildSidePanel(){
   else if (currentTab==='textboxes')      c.innerHTML=buildTB();
   else if (currentTab==='photo')          c.innerHTML=buildPH();
   else if (currentTab==='projects')       c.innerHTML=buildPR();
-  else if (currentTab==='ai-publish')     { c.innerHTML=buildAiTab(); wireAiTab(); return; }
-  else if (currentTab==='menu-lunch')     { c.innerHTML=buildMenuLunch(); wireMenuPanel(); return; }
+  else if (currentTab==='ai-lunch')       { c.innerHTML=buildAiLunchTab(); wireAiLunchTab(); return; }
   else if (currentTab==='static-breakfast')    { c.innerHTML=buildStaticBreakfast();    wireStaticPanel(); return; }
   else if (currentTab==='static-lunchplates')  { c.innerHTML=buildStaticLunchPlates();  wireStaticPanel(); return; }
   else if (currentTab==='static-drinks')       { c.innerHTML=buildStaticDrinks();       wireStaticPanel(); return; }
@@ -1242,97 +1259,90 @@ function buildPR(){
    LUNCH FORECAST — three-field editor with Meats/Sides/Same Daily
    ═══════════════════════════════════════════════════════════ */
 /* ═══════════════════════════════════════════════════════════
-   AI PUBLISH TAB — snap a photo, AI fills everything, publishes
-   to website + updates canvas Lunch text box in one action.
+   AI LUNCH TAB (merged) — AI controls on left, Lunch editor on right
+   on desktop. Stacked on mobile (AI on top).
    ═══════════════════════════════════════════════════════════ */
-function buildAiTab(){
-  let h='';
-
-  // Header explainer
-  h+='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u2728 AI Publish — One-Tap Daily Update</span></div><div class="acc-body">';
-  h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Snap a photo of today\'s menu list. AI reads it, writes descriptions, updates the canvas image text, and publishes to the website &mdash; all at once.</p>';
-
-  // Date selector
-  h+='<div class="fl">Publish to date</div>';
-  h+='<div class="btn-row" style="margin-bottom:10px;flex-wrap:wrap;">';
-  for(let i=0;i<7;i++){
-    const iso=dateOffsetAdj(i);
-    const dayName=isoToDay(iso);
-    h+='<button class="sm-btn aiDateBtn'+(i===0?' primary':'')+'" data-date="'+iso+'">'+dayName+'</button>';
-  }
-  h+='</div>';
-  h+='<div id="aiSelectedDate" style="font-size:11px;color:var(--text3);margin-bottom:12px;font-weight:600;"></div>';
-
-  // Optional prompt text
-  h+='<div class="ai-extract-card" style="margin-bottom:10px;">';
-  h+='<div class="ai-extract-title" style="margin-bottom:4px;">\ud83d\udcdd Optional note for the AI</div>';
-  h+='<div class="ai-extract-hint" style="margin-bottom:6px;">Add context or corrections (e.g. "the second item is meatloaf, not meatballs" or "ignore the price column").</div>';
-  h+='<textarea class="fi fi-ta" id="aiUserPrompt" rows="3" placeholder="Leave blank for default behavior. Add a note here if needed."></textarea>';
-  h+='</div>';
-
-  // Photo capture buttons
-  h+='<input type="file" id="aiPhotoFile" accept="image/*" capture="environment" style="display:none">';
-  h+='<div class="btn-row" style="margin-bottom:10px;">';
-  h+='<button class="sm-btn primary ai-extract-btn" id="aiSnapBtn">\ud83d\udcf8 Snap Menu Photo</button>';
-  h+='<button class="sm-btn" id="aiPickBtn">\ud83d\uddbc Pick from Library</button>';
-  h+='</div>';
-
-  // Auto-publish toggle (default ON)
-  h+='<label class="cf-toggle" style="margin-bottom:6px;display:flex;gap:6px;font-size:11px;"><input type="checkbox" id="aiAutoPublish" checked> Auto-publish to website after extract</label>';
-  h+='<label class="cf-toggle" style="margin-bottom:10px;display:flex;gap:6px;font-size:11px;"><input type="checkbox" id="aiAutoCanvas" checked> Auto-update canvas Lunch text box</label>';
-
-  // Status area
-  h+='<div id="aiStatus" style="display:none;margin-top:8px;padding:10px;border-radius:8px;font-size:12px;font-weight:600;line-height:1.5;"></div>';
-
-  // Preview of extracted items
-  h+='<div id="aiPreview" style="display:none;margin-top:12px;"></div>';
-
-  h+='</div></div>';
-
-  return h;
-}
 
 let _aiTabSelectedDate = null;
 
-function wireAiTab(){
-  // Default to today
-  _aiTabSelectedDate = dateOffsetAdj(0);
-  updateAiSelectedDateLabel();
+function buildAiLunchTab(){
+  // The Lunch editor uses one shared date picker. The AI tab also has its own
+  // date picker, but for the merged view we use ONE — the Lunch editor's —
+  // and the AI flow publishes/edits whatever date is currently active there.
 
-  document.querySelectorAll('.aiDateBtn').forEach(btn=>{
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.aiDateBtn').forEach(b=>b.classList.remove('primary'));
-      btn.classList.add('primary');
-      _aiTabSelectedDate = btn.dataset.date;
-      updateAiSelectedDateLabel();
-    });
+  let h = '<div class="ai-lunch-wrap">';
+
+  // ── LEFT/TOP: AI controls (purple themed) ──
+  h += '<div class="ai-lunch-left">';
+  h += '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u2728 AI Update</span></div><div class="acc-body">';
+  h += '<p style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Snap today\'s menu list. AI reads it, fills in the form on the right, updates the canvas image text (auto-fits!), and publishes to the website.</p>';
+
+  // Optional prompt
+  h += '<div class="ai-extract-card" style="margin-bottom:10px;">';
+  h += '<div class="ai-extract-title" style="margin-bottom:4px;">\ud83d\udcdd Optional note for the AI</div>';
+  h += '<div class="ai-extract-hint" style="margin-bottom:6px;">Corrections or context (e.g. "second item is meatloaf, not meatballs").</div>';
+  h += '<textarea class="fi fi-ta" id="aiUserPrompt" rows="2" placeholder="Leave blank for default. Add a note here if needed."></textarea>';
+  h += '</div>';
+
+  // Photo buttons
+  h += '<input type="file" id="aiPhotoFile" accept="image/*" capture="environment" style="display:none">';
+  h += '<div class="btn-row" style="margin-bottom:8px;">';
+  h += '<button class="sm-btn primary ai-extract-btn" id="aiSnapBtn" style="flex:1;">\ud83d\udcf8 Snap Photo</button>';
+  h += '<button class="sm-btn" id="aiPickBtn" style="flex:1;">\ud83d\uddbc From Library</button>';
+  h += '</div>';
+
+  // Toggles
+  h += '<label class="cf-toggle" style="margin-bottom:4px;display:flex;gap:6px;font-size:11px;"><input type="checkbox" id="aiAutoPublish" checked> Auto-publish to website</label>';
+  h += '<label class="cf-toggle" style="margin-bottom:4px;display:flex;gap:6px;font-size:11px;"><input type="checkbox" id="aiAutoCanvas" checked> Auto-update canvas image</label>';
+  h += '<label class="cf-toggle" style="margin-bottom:10px;display:flex;gap:6px;font-size:11px;"><input type="checkbox" id="aiAutoFit" checked> Auto-fit text to canvas box</label>';
+
+  // Status + preview
+  h += '<div id="aiStatus" style="display:none;margin-top:8px;padding:10px;border-radius:8px;font-size:12px;font-weight:600;line-height:1.5;"></div>';
+  h += '<div id="aiPreview" style="display:none;margin-top:10px;"></div>';
+
+  h += '</div></div>'; // /acc
+  h += '</div>'; // /ai-lunch-left
+
+  // ── RIGHT/BOTTOM: the existing Lunch Forecast editor ──
+  h += '<div class="ai-lunch-right">';
+  h += buildMenuLunch();  // Reuse the existing function — full Lunch editor with date picker, fields, save button, manage saved dates
+  h += '</div>';
+
+  h += '</div>'; // /ai-lunch-wrap
+  return h;
+}
+
+function wireAiLunchTab(){
+  // 1) Wire the Lunch editor on the right (reuse existing handler)
+  wireMenuPanel();
+
+  // 2) Track the active date — the Lunch editor has buttons with class lunchDateBtn.
+  //    The "Today" one is auto-clicked by wireMenuPanel, so capture that initial value.
+  _aiTabSelectedDate = dateOffsetAdj(0);
+  // Also listen to clicks on those buttons so our flow always knows the current date
+  document.querySelectorAll('.lunchDateBtn').forEach(btn => {
+    btn.addEventListener('click', () => { _aiTabSelectedDate = btn.dataset.date; });
   });
 
+  // 3) Wire AI buttons
   const snapBtn = document.getElementById('aiSnapBtn');
   const pickBtn = document.getElementById('aiPickBtn');
   const fileInp = document.getElementById('aiPhotoFile');
 
-  if(snapBtn) snapBtn.addEventListener('click', ()=>{
+  if(snapBtn) snapBtn.addEventListener('click', () => {
     fileInp.setAttribute('capture','environment');
     fileInp.click();
   });
-  if(pickBtn) pickBtn.addEventListener('click', ()=>{
+  if(pickBtn) pickBtn.addEventListener('click', () => {
     fileInp.removeAttribute('capture');
     fileInp.click();
   });
-  if(fileInp) fileInp.addEventListener('change', async (e)=>{
+  if(fileInp) fileInp.addEventListener('change', async (e) => {
     const file = e.target.files?.[0];
     if(!file) return;
     e.target.value = '';
     await runAiPublishFlow(file);
   });
-}
-
-function updateAiSelectedDateLabel(){
-  const lbl = document.getElementById('aiSelectedDate');
-  if(!lbl) return;
-  const iso = _aiTabSelectedDate || dateOffsetAdj(0);
-  lbl.innerHTML = 'Selected: <strong style="color:var(--text);">'+esc(isoToDay(iso))+'</strong> &middot; <span style="color:var(--text2);">'+esc(isoToLabel(iso))+'</span>';
 }
 
 function setAiTabStatus(msg, kind){
@@ -1365,19 +1375,18 @@ function renderAiPreview(meats, sides){
    LUNCH
    11:00 AM - 2:00 PM
    
-   • <items>
+   • <meats>
+   • <sides>
    
    Same Daily
    • <same daily items>
 */
 function buildCanvasLunchText(meats, sides, sameDailyOverride){
-  // Meats first, then sides (the bullet list in the canvas image)
   const items = [].concat(
     (meats||[]).map(i => typeof i==='string' ? i : i.name),
     (sides||[]).map(i => typeof i==='string' ? i : i.name)
   ).filter(Boolean);
 
-  // Same Daily — use override if provided, otherwise pull from global defaults
   let sd = (sameDailyOverride||[]).map(i => typeof i==='string' ? i : (i.name||'')).filter(Boolean);
   if(!sd.length){
     const globals = (menuDefaultsCache && menuDefaultsCache.sameDaily && menuDefaultsCache.sameDaily.items) || [];
@@ -1390,16 +1399,63 @@ function buildCanvasLunchText(meats, sides, sameDailyOverride){
   return txt;
 }
 
+/* AUTO-FIT — measure the new text and adjust the Lunch box's font size and
+   maxWidthPct so the text comfortably fills (but does not exceed) the original
+   space. We use the box's CURRENT position+size as our target footprint.
+   Strategy: target a vertical extent similar to current; bump font size when
+   there's room, shrink when there isn't. Also adjust maxWidthPct to keep
+   lines from running off the canvas. */
+function autoFitLunchBox(lunchBox){
+  if(!lunchBox) return;
+  // Original size as the "ideal" footprint to maintain
+  const origSize  = lunchBox.sizePct || 1.31;
+  const origWidth = lunchBox.maxWidthPct > 0 ? lunchBox.maxWidthPct : 30;
+
+  // Measure with current size first to find natural extent
+  // (we don't have direct access to canvas measureText here without invoking the renderer,
+  // so we approximate based on line count + char count.)
+  const text = lunchBox.text || '';
+  const lines = text.split('\n');
+  const lineCount = lines.length;
+  const longestLineLen = lines.reduce((m, l) => Math.max(m, l.length), 0);
+
+  // Target footprint: ~50% canvas height for the Lunch box, ~30% width
+  const TARGET_HEIGHT_PCT = 50;  // % of canvas height
+  const TARGET_WIDTH_PCT  = 32;  // % of canvas width
+
+  // Each line at sizePct=1.0 occupies roughly 1% canvas height * line-height (~1.22)
+  // So sizePct that fits N lines into TARGET_HEIGHT_PCT is roughly TARGET_HEIGHT / (N * 1.22)
+  const lineHeight = lunchBox.lineHeight || 1.22;
+  let newSizePct = TARGET_HEIGHT_PCT / Math.max(1, lineCount * lineHeight);
+  // Cap between sane bounds — never bigger than the original size, never smaller than 0.6
+  newSizePct = Math.min(origSize * 1.25, Math.max(0.7, newSizePct));
+
+  // Width: estimate text width per char ratio. At sizePct 1.0, ~0.55% canvas width per char (rough)
+  const estCharWidthPct = 0.50 * newSizePct;
+  let newWidthPct = Math.min(TARGET_WIDTH_PCT, longestLineLen * estCharWidthPct + 2);
+  newWidthPct = Math.max(18, newWidthPct); // never less than 18% wide
+
+  lunchBox.sizePct     = newSizePct;
+  lunchBox.maxWidthPct = newWidthPct;
+}
+
 /* The main AI Publish flow — runs everything in sequence */
 async function runAiPublishFlow(file){
   try {
-    // 1. Make sure defaults are loaded (we need sameDaily for the canvas text)
+    // 1. Make sure defaults are loaded
     if(!menuDefaultsCache){
       setAiTabStatus('Loading menu defaults…', 'loading');
       await loadMenuDefaults();
     }
 
-    // 2. Prepare the photo (always re-encode via canvas)
+    // 2. Resolve the active date — first check our cached date, then the
+    //    actually-active button (in case user clicked one without our listener catching it)
+    let date = _aiTabSelectedDate;
+    const activeDateBtn = document.querySelector('.lunchDateBtn.primary');
+    if(activeDateBtn && activeDateBtn.dataset.date) date = activeDateBtn.dataset.date;
+    if(!date) date = dateOffsetAdj(0);
+
+    // 3. Prepare the photo (always re-encode via canvas)
     setAiTabStatus('Preparing photo ('+Math.round(file.size/1024)+' KB '+file.type+')…', 'loading');
     let blob, mediaType;
     try {
@@ -1420,7 +1476,7 @@ async function runAiPublishFlow(file){
       return;
     }
 
-    // 3. Send to AI
+    // 4. Send to AI
     setAiTabStatus('Sending '+Math.round(blob.size/1024)+'KB to Claude…', 'loading');
     const base64 = await fileToBase64Tab(blob);
     const userPrompt = (document.getElementById('aiUserPrompt')?.value || '').trim();
@@ -1448,30 +1504,53 @@ async function runAiPublishFlow(file){
     const meats = data.meats || [];
     const sides = data.sides || [];
 
-    // 4. Show preview of extracted items
+    // 5. Show preview of extracted items
     renderAiPreview(meats, sides);
 
-    const date = _aiTabSelectedDate || dateOffsetAdj(0);
+    // 6. Fill the right-side Lunch form fields with the new items
+    const meatsTA = document.getElementById('lunchMeatsTA');
+    const sidesTA = document.getElementById('lunchSidesTA');
+    if(meatsTA) meatsTA.value = data.meatsText || '';
+    if(sidesTA) sidesTA.value = data.sidesText || '';
+
     const autoPublish = document.getElementById('aiAutoPublish')?.checked;
     const autoCanvas  = document.getElementById('aiAutoCanvas')?.checked;
+    const autoFit     = document.getElementById('aiAutoFit')?.checked;
 
     const actions = [];
 
-    // 5. Update canvas Lunch text box
+    // 7. Update canvas Day & Date boxes for the selected date
     if(autoCanvas){
+      const dayBox  = boxes.find(b => b.name === 'Day');
+      const dateBox = boxes.find(b => b.name === 'Date');
+      const [yyyy, mm, dd] = date.split('-').map(Number);
+      const dt = new Date(yyyy, mm-1, dd);
+      const dayName = dt.toLocaleDateString(undefined, {weekday: 'long'});
+      const dateStr = dt.toLocaleDateString(undefined, {month: 'long', day: 'numeric', year: 'numeric'});
+      let canvasChanged = false;
+      if(dayBox && dayBox.text !== dayName) { dayBox.text = dayName; canvasChanged = true; }
+      if(dateBox && dateBox.text !== dateStr) { dateBox.text = dateStr; canvasChanged = true; }
+
+      // 8. Update canvas Lunch text box + auto-fit
       const lunchBox = boxes.find(b => b.name === 'Lunch');
       if(lunchBox){
-        saveUndo();
+        if(canvasChanged === false) saveUndo(); // saveUndo if we haven't already implicitly via earlier change
+        else saveUndo();
         lunchBox.text = buildCanvasLunchText(meats, sides, []);
+        if(autoFit) autoFitLunchBox(lunchBox);
+        canvasChanged = true;
+        actions.push('canvas updated' + (autoFit ? ' (auto-fit)' : ''));
+      } else {
+        actions.push('canvas SKIPPED (no "Lunch" text box)');
+      }
+
+      if(canvasChanged){
         draw();
         triggerAutoSave();
-        actions.push('canvas updated');
-      } else {
-        actions.push('canvas SKIPPED (no "Lunch" text box on canvas)');
       }
     }
 
-    // 6. Auto-publish to website
+    // 9. Auto-publish to website
     if(autoPublish){
       setAiTabStatus('Publishing to website for '+isoToLabel(date)+'…', 'loading');
       const itemsArr = [].concat(meats, sides);
@@ -1497,8 +1576,8 @@ async function runAiPublishFlow(file){
       }
     }
 
-    const summary = 'Done! '+meats.length+' meats, '+sides.length+' sides. '+actions.join(' &middot; ');
-    setAiTabStatus(summary.replace(/&middot;/g, '·'), 'success');
+    const summary = 'Done! '+meats.length+' meats, '+sides.length+' sides. '+actions.join(' \u2022 ');
+    setAiTabStatus(summary, 'success');
     toast('AI extracted '+(meats.length+sides.length)+' items', 'success');
 
   } catch (err) {
@@ -1507,7 +1586,7 @@ async function runAiPublishFlow(file){
   }
 }
 
-// Helpers — keep them local to the AI tab to avoid name clashes
+// Helpers — local to the AI tab to avoid name clashes
 function fileToBase64Tab(blob){
   return new Promise((resolve, reject) => {
     const r = new FileReader();
@@ -1728,12 +1807,12 @@ function wireMenuPanel(){
     });
   });
   const todayBtn=document.querySelector('.lunchDateBtn');
-  if(todayBtn && currentTab==='menu-lunch') todayBtn.click();
+  if(todayBtn && (currentTab==='menu-lunch' || currentTab==='ai-lunch')) todayBtn.click();
   const lsd=document.getElementById('loadSavedDates');
   if(lsd) lsd.addEventListener('click', refreshSavedDatesList);
   const dap=document.getElementById('deleteAllPastDates');
   if(dap) dap.addEventListener('click', deleteAllPastDates);
-  if (currentTab==='menu-lunch') setTimeout(refreshSavedDatesList, 100);
+  if (currentTab==='menu-lunch' || currentTab==='ai-lunch') setTimeout(refreshSavedDatesList, 100);
 }
 
 async function saveLunchForDate(date,data){try{const j=await apiPost({action:'save-lunch',date:date,data:data});if(j.success){toast('Saved for '+date,'success');if(typeof refreshSavedDatesList==='function')setTimeout(refreshSavedDatesList,300);return true;}else{toast('Save failed: '+(j.error||''),'error');return false;}}catch(e){toast('Save error: '+e.message,'error');return false;}}
@@ -1881,7 +1960,7 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
   });
 });
 document.getElementById('mobSettingsBtn').addEventListener('click',()=>{currentTab='quickfill';document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));const qt=document.querySelector('.tab-btn[data-tab="quickfill"]');if(qt)qt.classList.add('active');rebuildSidePanel();document.getElementById('sidePanel').classList.add('mobile-open');});
-document.getElementById('mobLunchBtn').addEventListener('click',()=>{currentTab='menu-lunch';document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));const mt=document.querySelector('.tab-btn[data-tab="menu-lunch"]');if(mt)mt.classList.add('active');rebuildSidePanel();document.getElementById('sidePanel').classList.add('mobile-open');});
+document.getElementById('mobLunchBtn').addEventListener('click',()=>{currentTab='ai-lunch';document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));const mt=document.querySelector('.tab-btn[data-tab="ai-lunch"]');if(mt)mt.classList.add('active');rebuildSidePanel();document.getElementById('sidePanel').classList.add('mobile-open');});
 document.getElementById('closeSidePanel').addEventListener('click',()=>{document.getElementById('sidePanel').classList.remove('mobile-open');});
 
 loadStarterBoxes();rebuildSidePanel();
