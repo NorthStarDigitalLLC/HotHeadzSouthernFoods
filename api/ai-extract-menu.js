@@ -37,15 +37,53 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Image data too small (' + cleanB64.length + ' chars) — likely corrupt upload' });
     }
     
-    // Detect actual format from base64 magic bytes (don't trust client's media type)
+    // Decode the base64 to inspect actual bytes
+    let imageBytes;
+    try {
+      imageBytes = Buffer.from(cleanB64, 'base64');
+    } catch (e) {
+      return res.status(400).json({ error: 'Base64 decode failed: ' + e.message });
+    }
+    
+    if (imageBytes.length < 100) {
+      return res.status(400).json({ 
+        error: 'Decoded image is too small (' + imageBytes.length + ' bytes) — upload was corrupted',
+        debug: { base64Length: cleanB64.length, decodedLength: imageBytes.length }
+      });
+    }
+    
+    // Detect actual format from magic bytes (more reliable than client claim or base64 prefix)
     let actualMediaType = imageMediaType || 'image/jpeg';
-    const firstBytes = cleanB64.slice(0, 12);
-    if (firstBytes.startsWith('/9j/'))         actualMediaType = 'image/jpeg';
-    else if (firstBytes.startsWith('iVBORw0')) actualMediaType = 'image/png';
-    else if (firstBytes.startsWith('R0lGOD'))  actualMediaType = 'image/gif';
-    else if (firstBytes.startsWith('UklGR'))   actualMediaType = 'image/webp';
-
+    let detectedFormat = 'unknown';
+    const b0 = imageBytes[0], b1 = imageBytes[1], b2 = imageBytes[2], b3 = imageBytes[3];
+    if (b0 === 0xFF && b1 === 0xD8 && b2 === 0xFF) {
+      actualMediaType = 'image/jpeg';
+      detectedFormat = 'jpeg';
+    } else if (b0 === 0x89 && b1 === 0x50 && b2 === 0x4E && b3 === 0x47) {
+      actualMediaType = 'image/png';
+      detectedFormat = 'png';
+    } else if (b0 === 0x47 && b1 === 0x49 && b2 === 0x46) {
+      actualMediaType = 'image/gif';
+      detectedFormat = 'gif';
+    } else if (b0 === 0x52 && b1 === 0x49 && b2 === 0x46 && b3 === 0x46) {
+      // RIFF — could be WebP
+      const isWebP = imageBytes.slice(8, 12).toString('ascii') === 'WEBP';
+      if (isWebP) {
+        actualMediaType = 'image/webp';
+        detectedFormat = 'webp';
+      }
+    }
+    
+    if (detectedFormat === 'unknown') {
+      const hexPreview = imageBytes.slice(0, 16).toString('hex');
+      return res.status(400).json({ 
+        error: 'Uploaded data is not a recognized image format. First 16 bytes: ' + hexPreview + ' (claimed: ' + (imageMediaType||'none') + ')',
+        debug: { decodedBytes: imageBytes.length, hexPreview }
+      });
+    }
+    
     const mediaType = actualMediaType;
+    console.log(`[ai-extract] Received ${imageBytes.length} bytes of ${detectedFormat} (claimed: ${imageMediaType||'none'})`);
     const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (!validTypes.includes(mediaType)) {
       return res.status(400).json({ error: 'Unsupported image type. Use JPEG, PNG, GIF, or WEBP.' });
@@ -122,7 +160,16 @@ OUTPUT FORMAT (exact):
     const apiText = await apiResp.text();
     if (!apiResp.ok) {
       console.error('Anthropic API error:', apiResp.status, apiText);
-      return res.status(502).json({ error: `Anthropic API error (${apiResp.status}): ${apiText.slice(0, 500)}` });
+      return res.status(502).json({ 
+        error: `Anthropic API error (${apiResp.status}): ${apiText.slice(0, 500)}`,
+        debug: {
+          imageBytes: imageBytes.length,
+          detectedFormat,
+          mediaType,
+          clientClaimedType: imageMediaType,
+          firstBytesHex: imageBytes.slice(0, 8).toString('hex')
+        }
+      });
     }
 
     let apiData;
