@@ -26,8 +26,26 @@ export default async function handler(req, res) {
   try {
     const { imageBase64, imageMediaType } = req.body || {};
     if (!imageBase64) return res.status(400).json({ error: 'imageBase64 is required' });
+    
+    // Strip any data URL prefix the client may have left in (defensive)
+    let cleanB64 = String(imageBase64);
+    const dataUrlMatch = cleanB64.match(/^data:image\/[^;]+;base64,(.+)$/);
+    if (dataUrlMatch) cleanB64 = dataUrlMatch[1];
+    cleanB64 = cleanB64.replace(/\s+/g, ''); // remove any whitespace
+    
+    if (cleanB64.length < 100) {
+      return res.status(400).json({ error: 'Image data too small (' + cleanB64.length + ' chars) — likely corrupt upload' });
+    }
+    
+    // Detect actual format from base64 magic bytes (don't trust client's media type)
+    let actualMediaType = imageMediaType || 'image/jpeg';
+    const firstBytes = cleanB64.slice(0, 12);
+    if (firstBytes.startsWith('/9j/'))         actualMediaType = 'image/jpeg';
+    else if (firstBytes.startsWith('iVBORw0')) actualMediaType = 'image/png';
+    else if (firstBytes.startsWith('R0lGOD'))  actualMediaType = 'image/gif';
+    else if (firstBytes.startsWith('UklGR'))   actualMediaType = 'image/webp';
 
-    const mediaType = imageMediaType || 'image/jpeg';
+    const mediaType = actualMediaType;
     const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (!validTypes.includes(mediaType)) {
       return res.status(400).json({ error: 'Unsupported image type. Use JPEG, PNG, GIF, or WEBP.' });
@@ -81,7 +99,7 @@ OUTPUT FORMAT (exact):
         content: [
           {
             type: 'image',
-            source: { type: 'base64', media_type: mediaType, data: imageBase64 }
+            source: { type: 'base64', media_type: mediaType, data: cleanB64 }
           },
           {
             type: 'text',
