@@ -87,7 +87,11 @@
     .canvas-foot{display:flex;gap:6px;padding:6px 10px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--border);background:var(--surface);}
     .cf-toggle{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text2);cursor:pointer;}
     .cf-toggle input{accent-color:var(--fire);}
-    .side-panel{width:380px;flex-shrink:0;border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+    .side-panel{width:380px;flex-shrink:0;border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;transition:width .25s ease;}
+    /* When AI Lunch tab is active, widen the panel to fit two columns (desktop only) */
+    @media(min-width:1100px){
+      .side-panel.wide{width:780px;}
+    }
     .side-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:0;}
     .side-scroll::-webkit-scrollbar{width:4px;}
     .side-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px;}
@@ -180,11 +184,22 @@
     .ai-extract-hint{font-size:10px;color:var(--text2);line-height:1.45;margin-bottom:2px;}
     .ai-extract-btn{background:linear-gradient(135deg,#b864ff,#7a3fd6) !important;border:none !important;color:#fff !important;font-weight:800 !important;padding:8px 14px !important;box-shadow:0 2px 10px rgba(180,100,255,.3);}
     .ai-extract-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(180,100,255,.4);}
-    /* ── AI Lunch merged-tab layout ── 
-       Side panel is 380px wide so we always stack — AI controls on top,
-       Lunch editor below. AI section is sticky-collapsible if needed. */
+    /* ── AI Lunch merged-tab layout ── */
     .ai-lunch-wrap{display:flex;flex-direction:column;gap:14px;}
     .ai-lunch-left,.ai-lunch-right{min-width:0;}
+    @media(min-width:1100px){
+      /* Side panel is widened to .wide (780px). Lunch goes LEFT, AI RIGHT. */
+      .ai-lunch-wrap{flex-direction:row;align-items:flex-start;gap:18px;}
+      .ai-lunch-left{flex:1 1 0;min-width:0;}
+      .ai-lunch-right{flex:0 0 320px;position:sticky;top:0;max-height:calc(100vh - 100px);overflow-y:auto;}
+      .ai-lunch-right::-webkit-scrollbar{width:4px;}
+      .ai-lunch-right::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px;}
+    }
+    /* Box-trainer overlay over canvas */
+    .train-overlay{position:absolute;inset:0;cursor:crosshair;background:rgba(0,0,0,.35);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:14px;}
+    .train-hint{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;color:#fff;background:linear-gradient(135deg,#b864ff,#7a3fd6);padding:10px 18px;border-radius:24px;box-shadow:0 4px 20px rgba(0,0,0,.5);pointer-events:none;text-align:center;line-height:1.4;}
+    .train-rect{position:absolute;border:2px dashed #c89cff;background:rgba(200,156,255,.12);pointer-events:none;box-shadow:0 0 0 1px rgba(0,0,0,.5);}
+    .train-cancel{position:absolute;top:14px;right:14px;background:rgba(40,8,8,.9);border:1px solid rgba(255,77,77,.4);color:#ff7a7a;font-weight:700;padding:8px 14px;border-radius:8px;cursor:pointer;z-index:51;font-family:'DM Sans',sans-serif;font-size:12px;}
     .lunch-section-title{font-size:12px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
     .lunch-section-title.meats{color:var(--fire);}
     .lunch-section-title.meats::before{content:'';width:3px;height:11px;border-radius:2px;background:var(--fire);}
@@ -1266,16 +1281,17 @@ function buildPR(){
 let _aiTabSelectedDate = null;
 
 function buildAiLunchTab(){
-  // The Lunch editor uses one shared date picker. The AI tab also has its own
-  // date picker, but for the merged view we use ONE — the Lunch editor's —
-  // and the AI flow publishes/edits whatever date is currently active there.
-
   let h = '<div class="ai-lunch-wrap">';
 
-  // ── LEFT/TOP: AI controls (purple themed) ──
+  // ── LEFT/TOP: the existing Lunch Forecast editor ──
   h += '<div class="ai-lunch-left">';
+  h += buildMenuLunch();
+  h += '</div>';
+
+  // ── RIGHT/BOTTOM: AI controls (purple themed) ──
+  h += '<div class="ai-lunch-right">';
   h += '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u2728 AI Update</span></div><div class="acc-body">';
-  h += '<p style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Snap today\'s menu list. AI reads it, fills in the form on the right, updates the canvas image text (auto-fits!), and publishes to the website.</p>';
+  h += '<p style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Snap today\'s menu list. AI reads it, fills in the form on the left, updates the canvas image text (auto-fits!), and publishes to the website.</p>';
 
   // Optional prompt
   h += '<div class="ai-extract-card" style="margin-bottom:10px;">';
@@ -1294,37 +1310,49 @@ function buildAiLunchTab(){
   // Toggles
   h += '<label class="cf-toggle" style="margin-bottom:4px;display:flex;gap:6px;font-size:11px;"><input type="checkbox" id="aiAutoPublish" checked> Auto-publish to website</label>';
   h += '<label class="cf-toggle" style="margin-bottom:4px;display:flex;gap:6px;font-size:11px;"><input type="checkbox" id="aiAutoCanvas" checked> Auto-update canvas image</label>';
-  h += '<label class="cf-toggle" style="margin-bottom:10px;display:flex;gap:6px;font-size:11px;"><input type="checkbox" id="aiAutoFit" checked> Auto-fit text to canvas box</label>';
+  h += '<label class="cf-toggle" style="margin-bottom:10px;display:flex;gap:6px;font-size:11px;"><input type="checkbox" id="aiAutoFit" checked> Auto-fit text to trained box</label>';
 
   // Status + preview
   h += '<div id="aiStatus" style="display:none;margin-top:8px;padding:10px;border-radius:8px;font-size:12px;font-weight:600;line-height:1.5;"></div>';
   h += '<div id="aiPreview" style="display:none;margin-top:10px;"></div>';
 
   h += '</div></div>'; // /acc
-  h += '</div>'; // /ai-lunch-left
 
-  // ── RIGHT/BOTTOM: the existing Lunch Forecast editor ──
-  h += '<div class="ai-lunch-right">';
-  h += buildMenuLunch();  // Reuse the existing function — full Lunch editor with date picker, fields, save button, manage saved dates
+  // ── TRAINING CARD: draw the lunch box on the canvas ──
+  h += '<div class="acc open" style="margin-top:10px;"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83c\udfaf Train Lunch Box Position</span></div><div class="acc-body">';
+  h += '<p style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Click <strong>Draw Box</strong>, then click-and-drag on the canvas to mark exactly where the lunch text should appear. AI will fit text inside that box every time. Saves to cloud so it works everywhere.</p>';
+  h += '<div class="static-card" id="trainedBoxInfo" style="margin-bottom:10px;">';
+  h += '<div class="static-card-title">Current Trained Box</div>';
+  h += '<div id="trainedBoxDetails" style="font-size:11px;color:var(--text3);font-family:monospace;">Loading…</div>';
   h += '</div>';
+  h += '<div class="btn-row">';
+  h += '<button class="sm-btn primary ai-extract-btn" id="trainStartBtn" style="flex:1;">\u270f\ufe0f Draw Box</button>';
+  h += '<button class="sm-btn" id="trainUseCurrentBtn">\ud83d\udccd Use Current Box</button>';
+  h += '<button class="sm-btn danger" id="trainClearBtn">\ud83d\uddd1\ufe0f Clear</button>';
+  h += '</div>';
+  h += '<div id="trainStatus" style="display:none;margin-top:8px;padding:8px;border-radius:6px;font-size:11px;font-weight:600;line-height:1.4;"></div>';
+  h += '</div></div>';
 
+  h += '</div>'; // /ai-lunch-right
   h += '</div>'; // /ai-lunch-wrap
   return h;
 }
 
 function wireAiLunchTab(){
-  // 1) Wire the Lunch editor on the right (reuse existing handler)
+  // 1) Widen the side panel so the two-column layout has room
+  document.getElementById('sidePanel')?.classList.add('wide');
+
+  // 2) Wire the Lunch editor on the left (reuse existing handler)
   wireMenuPanel();
 
-  // 2) Track the active date — the Lunch editor has buttons with class lunchDateBtn.
+  // 3) Track the active date — the Lunch editor has buttons with class lunchDateBtn.
   //    The "Today" one is auto-clicked by wireMenuPanel, so capture that initial value.
   _aiTabSelectedDate = dateOffsetAdj(0);
-  // Also listen to clicks on those buttons so our flow always knows the current date
   document.querySelectorAll('.lunchDateBtn').forEach(btn => {
     btn.addEventListener('click', () => { _aiTabSelectedDate = btn.dataset.date; });
   });
 
-  // 3) Wire AI buttons
+  // 4) Wire AI buttons
   const snapBtn = document.getElementById('aiSnapBtn');
   const pickBtn = document.getElementById('aiPickBtn');
   const fileInp = document.getElementById('aiPhotoFile');
@@ -1343,6 +1371,17 @@ function wireAiLunchTab(){
     e.target.value = '';
     await runAiPublishFlow(file);
   });
+
+  // 5) Wire training buttons
+  const trainStartBtn = document.getElementById('trainStartBtn');
+  const trainUseCurrentBtn = document.getElementById('trainUseCurrentBtn');
+  const trainClearBtn = document.getElementById('trainClearBtn');
+  if(trainStartBtn) trainStartBtn.addEventListener('click', startBoxTraining);
+  if(trainUseCurrentBtn) trainUseCurrentBtn.addEventListener('click', useCurrentBoxAsTrained);
+  if(trainClearBtn) trainClearBtn.addEventListener('click', clearTrainedBox);
+
+  // 6) Refresh the trained box info display
+  refreshTrainedBoxInfo();
 }
 
 function setAiTabStatus(msg, kind){
@@ -1399,49 +1438,277 @@ function buildCanvasLunchText(meats, sides, sameDailyOverride){
   return txt;
 }
 
-/* AUTO-FIT — keep the new bullet list inside the lunch column where it belongs.
-   The Lunch box on the canvas template lives in a specific column (bottom-left,
-   roughly 22% wide × 22% tall). We must not let the new text overflow that.
-   Strategy:
-     1. Reset position to the known-good template anchor (in case it got dragged)
-     2. Lock alignment to left + maxWidthPct to the column width so lines wrap
-     3. Shrink sizePct (font size) until total text height fits the column height
-*/
+/* ═══════════════════════════════════════════════════════════
+   BOX TRAINING — draw a rectangle on the canvas to set the
+   target area for the Lunch text. Saved to Supabase under the
+   `lunchBoxBounds` menu_default key so it works everywhere.
+
+   Stored format:
+     { xPct: <number>, yPct: <number>, wPct: <number>, hPct: <number> }
+   Where x,y are the TOP-LEFT corner of the box (% of canvas) and
+   w,h are the box's width/height (% of canvas).
+   ═══════════════════════════════════════════════════════════ */
+
+// Get the current trained bounds from the menu defaults cache
+function getTrainedLunchBounds(){
+  return (menuDefaultsCache && menuDefaultsCache.lunchBoxBounds) || null;
+}
+
+// Update the info card showing what's currently trained
+function refreshTrainedBoxInfo(){
+  const el = document.getElementById('trainedBoxDetails');
+  if(!el) return;
+  const b = getTrainedLunchBounds();
+  if(!b){
+    el.innerHTML = '<span style="color:var(--text3);">No trained box yet — defaults to template position. Draw one for best results.</span>';
+    return;
+  }
+  el.innerHTML = `x: ${(+b.xPct).toFixed(1)}%, y: ${(+b.yPct).toFixed(1)}%<br>w: ${(+b.wPct).toFixed(1)}%, h: ${(+b.hPct).toFixed(1)}%`;
+}
+
+function setTrainStatus(msg, kind){
+  const el = document.getElementById('trainStatus');
+  if(!el) return;
+  const colors = {
+    info:    'background:rgba(100,140,255,.12);color:#7c9eff;',
+    loading: 'background:rgba(255,200,80,.12);color:#ffc850;',
+    success: 'background:rgba(77,255,136,.12);color:#7ae59a;',
+    error:   'background:rgba(255,77,77,.12);color:#ff7a7a;'
+  };
+  el.style.cssText = 'display:block;margin-top:8px;padding:8px;border-radius:6px;font-size:11px;font-weight:600;line-height:1.4;' + (colors[kind]||colors.info);
+  el.textContent = msg;
+}
+
+// "Use current box" — just capture wherever the Lunch text box is RIGHT NOW
+// (in case user dragged/resized it manually and wants to lock that in)
+async function useCurrentBoxAsTrained(){
+  const lunchBox = boxes.find(b => b.name === 'Lunch');
+  if(!lunchBox){ setTrainStatus('No "Lunch" text box on canvas', 'error'); return; }
+  // Get its current rendered bounds
+  if(!lunchBox.__hit){ draw(); }
+  const h = lunchBox.__hit;
+  if(!h){ setTrainStatus('Could not measure box — try again after canvas renders', 'error'); return; }
+  const bounds = {
+    xPct: (h.left / canvas.width) * 100,
+    yPct: (h.top / canvas.height) * 100,
+    wPct: ((h.right - h.left) / canvas.width) * 100,
+    hPct: ((h.bottom - h.top) / canvas.height) * 100
+  };
+  await saveTrainedBounds(bounds);
+}
+
+async function clearTrainedBox(){
+  if(!confirm('Clear the trained lunch box position?\n\nAI will fall back to template defaults.')) return;
+  setTrainStatus('Clearing…', 'loading');
+  try {
+    const res = await apiPost({ action:'resetMenuDefault', key:'lunchBoxBounds' });
+    if(res && res.success){
+      if(menuDefaultsCache) delete menuDefaultsCache.lunchBoxBounds;
+      setTrainStatus('Trained box cleared.', 'success');
+      refreshTrainedBoxInfo();
+    } else {
+      setTrainStatus('Clear failed: '+(res?.error||'unknown'), 'error');
+    }
+  } catch(e){
+    setTrainStatus('Clear error: '+e.message, 'error');
+  }
+}
+
+async function saveTrainedBounds(bounds){
+  setTrainStatus('Saving trained box…', 'loading');
+  try {
+    const res = await apiPost({ action:'saveMenuDefault', key:'lunchBoxBounds', json: JSON.stringify(bounds) });
+    if(res && res.success){
+      if(!menuDefaultsCache) menuDefaultsCache = {};
+      menuDefaultsCache.lunchBoxBounds = bounds;
+      setTrainStatus('Saved! AI will now fit lunch text into this box.', 'success');
+      refreshTrainedBoxInfo();
+      // Apply the trained bounds to the current Lunch box right now so user sees the change
+      const lunchBox = boxes.find(b => b.name === 'Lunch');
+      if(lunchBox){
+        saveUndo();
+        autoFitLunchBox(lunchBox);
+        draw();
+        triggerAutoSave();
+      }
+    } else {
+      setTrainStatus('Save failed: '+(res?.error||'unknown'), 'error');
+    }
+  } catch(e){
+    setTrainStatus('Save error: '+e.message, 'error');
+  }
+}
+
+// State for the drawing session
+let _trainDragging = false;
+let _trainStartCanvas = null;  // {x,y} in canvas coordinates
+let _trainOverlay = null;
+let _trainRect = null;
+let _trainStartScreen = null;  // {x,y} in screen coordinates relative to canvas
+
+function startBoxTraining(){
+  // Build the overlay covering the canvas area
+  const canvasArea = document.querySelector('.canvas-area');
+  if(!canvasArea){ setTrainStatus('Could not find canvas area', 'error'); return; }
+
+  // Make sure the area is position:relative so we can absolutely-position overlay
+  if(getComputedStyle(canvasArea).position === 'static') canvasArea.style.position = 'relative';
+
+  // Clean up any prior overlay
+  endBoxTraining();
+
+  _trainOverlay = document.createElement('div');
+  _trainOverlay.className = 'train-overlay';
+  _trainOverlay.innerHTML = '<div class="train-hint">Click and drag on the canvas to draw the lunch text box.<br>Release to save.</div>';
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'train-cancel';
+  cancelBtn.textContent = '\u2715 Cancel';
+  cancelBtn.addEventListener('click', endBoxTraining);
+  _trainOverlay.appendChild(cancelBtn);
+  canvasArea.appendChild(_trainOverlay);
+
+  // Wire mouse/touch on the overlay
+  _trainOverlay.addEventListener('pointerdown', onTrainDown);
+  _trainOverlay.addEventListener('pointermove', onTrainMove);
+  _trainOverlay.addEventListener('pointerup',   onTrainUp);
+  _trainOverlay.addEventListener('pointercancel', onTrainUp);
+
+  setTrainStatus('Drawing mode — click & drag on the canvas', 'info');
+}
+
+function endBoxTraining(){
+  if(_trainOverlay){
+    _trainOverlay.remove();
+    _trainOverlay = null;
+  }
+  _trainRect = null;
+  _trainDragging = false;
+  _trainStartScreen = null;
+  _trainStartCanvas = null;
+}
+
+// Convert a pointer client position to canvas-pixel coords (matches the existing
+// rawFromClient helper used by the editor's drag handlers).
+function clientToCanvasCoords(cx, cy){
+  const r = canvas.getBoundingClientRect();
+  return {
+    x: (cx - r.left) * (canvas.width / r.width),
+    y: (cy - r.top)  * (canvas.height / r.height)
+  };
+}
+
+function onTrainDown(e){
+  e.preventDefault();
+  e.stopPropagation();
+  _trainDragging = true;
+  _trainStartCanvas = clientToCanvasCoords(e.clientX, e.clientY);
+  _trainStartScreen = { x: e.clientX, y: e.clientY };
+  // Create rect element
+  _trainRect = document.createElement('div');
+  _trainRect.className = 'train-rect';
+  const rect = canvas.getBoundingClientRect();
+  const overlayRect = _trainOverlay.getBoundingClientRect();
+  // Position relative to the overlay
+  const startX = e.clientX - overlayRect.left;
+  const startY = e.clientY - overlayRect.top;
+  _trainRect.style.left = startX + 'px';
+  _trainRect.style.top  = startY + 'px';
+  _trainRect.style.width = '0';
+  _trainRect.style.height = '0';
+  _trainOverlay.appendChild(_trainRect);
+  _trainOverlay.setPointerCapture(e.pointerId);
+}
+
+function onTrainMove(e){
+  if(!_trainDragging || !_trainRect) return;
+  e.preventDefault();
+  const overlayRect = _trainOverlay.getBoundingClientRect();
+  const startScreenX = _trainStartScreen.x - overlayRect.left;
+  const startScreenY = _trainStartScreen.y - overlayRect.top;
+  const curScreenX = e.clientX - overlayRect.left;
+  const curScreenY = e.clientY - overlayRect.top;
+  const left = Math.min(startScreenX, curScreenX);
+  const top  = Math.min(startScreenY, curScreenY);
+  const w = Math.abs(curScreenX - startScreenX);
+  const h = Math.abs(curScreenY - startScreenY);
+  _trainRect.style.left = left + 'px';
+  _trainRect.style.top  = top + 'px';
+  _trainRect.style.width = w + 'px';
+  _trainRect.style.height = h + 'px';
+}
+
+async function onTrainUp(e){
+  if(!_trainDragging) return;
+  _trainDragging = false;
+  const endCanvas = clientToCanvasCoords(e.clientX, e.clientY);
+  const x1 = Math.min(_trainStartCanvas.x, endCanvas.x);
+  const y1 = Math.min(_trainStartCanvas.y, endCanvas.y);
+  const x2 = Math.max(_trainStartCanvas.x, endCanvas.x);
+  const y2 = Math.max(_trainStartCanvas.y, endCanvas.y);
+  const wPx = x2 - x1, hPx = y2 - y1;
+
+  // Validate: minimum 30×30 px so accidental clicks don't save a tiny box
+  if(wPx < 30 || hPx < 30){
+    setTrainStatus('Box too small — try again (drag a bigger rectangle)', 'error');
+    endBoxTraining();
+    return;
+  }
+
+  const bounds = {
+    xPct: (x1 / canvas.width)  * 100,
+    yPct: (y1 / canvas.height) * 100,
+    wPct: (wPx / canvas.width)  * 100,
+    hPct: (hPx / canvas.height) * 100
+  };
+
+  endBoxTraining();
+  await saveTrainedBounds(bounds);
+}
+
+/* AUTO-FIT — apply trained bounds (if any), then shrink font to fit.
+   This replaces the prior simple version. */
 function autoFitLunchBox(lunchBox){
   if(!lunchBox) return;
 
-  // ── 1. Reset position to template default ──────────────────────────
-  // The original template puts Lunch at bottom-left of the menu.
-  // Match the original starter box defaults.
-  lunchBox.xPct  = 18.75;
-  lunchBox.yPct  = 78.79;
+  // Get the target bounds. Prefer trained, fall back to template default.
+  const trained = getTrainedLunchBounds();
+  const bounds = trained ? trained : {
+    xPct: 8,           // bottom-left column on template
+    yPct: 68,
+    wPct: 22,
+    hPct: 22
+  };
+
+  // Position the box so its TOP-LEFT corner lands at (xPct, yPct).
+  // The renderer centers boxes on (xPct, yPct), so we need to offset by half width/height.
+  // We render first to measure, then position. Use a 2-pass approach.
+  lunchBox.maxWidthPct = bounds.wPct;
   lunchBox.align = 'left';
 
-  // ── 2. Lock the lunch column geometry ──────────────────────────────
-  const COLUMN_WIDTH_PCT  = 22;   // % canvas width
-  const COLUMN_HEIGHT_PCT = 22;   // % canvas height
-  lunchBox.maxWidthPct = COLUMN_WIDTH_PCT;
+  // Center-point of the trained rectangle:
+  const centerX = bounds.xPct + bounds.wPct / 2;
+  const centerY = bounds.yPct + bounds.hPct / 2;
+  lunchBox.xPct = centerX;
+  lunchBox.yPct = centerY;
 
-  // ── 3. Calculate the largest font size that fits ───────────────────
+  // ── Shrink to fit ──
   const text = lunchBox.text || '';
   const explicitLines = text.split('\n');
   const lineHeight = lunchBox.lineHeight || 1.22;
 
-  // Estimate wrapped line count: at sizePct=1.0 roughly 50 chars fit a ~22% wide column.
-  // Scale chars-per-line inversely to font size when we compute.
-  // We do this iteratively: try a size, see if it fits, shrink if not.
-  let sizePct = 1.31; // starting size (matches original template default)
-  const minSize = 0.55;
-  const stepDown = 0.05;
+  // Iteratively try sizes from largest to smallest
+  let sizePct = 1.50; // start big — auto-grow first
+  const minSize = 0.50;
+  const stepDown = 0.04;
   while(sizePct >= minSize){
-    // chars per line at this size (smaller font = more chars per line)
-    const charsPerLine = Math.max(15, Math.round(COLUMN_WIDTH_PCT * 2.5 / sizePct));
+    // Estimate chars-per-line at this size given the box width
+    const charsPerLine = Math.max(12, Math.round(bounds.wPct * 2.5 / sizePct));
     let wrappedLines = 0;
     for(const l of explicitLines){
       wrappedLines += Math.max(1, Math.ceil((l.length || 1) / charsPerLine));
     }
     const totalHeight = wrappedLines * sizePct * lineHeight;
-    if(totalHeight <= COLUMN_HEIGHT_PCT) break; // fits!
+    if(totalHeight <= bounds.hPct) break;
     sizePct -= stepDown;
   }
   if(sizePct < minSize) sizePct = minSize;
@@ -1964,6 +2231,8 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
     currentTab=btn.dataset.tab;
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
+    // Only the AI Lunch tab uses the wide layout; remove the class elsewhere
+    if(currentTab!=='ai-lunch') document.getElementById('sidePanel')?.classList.remove('wide');
     if(currentTab.startsWith('static-')&&!menuDefaultsCache&&menuDefaultsStatus!=='loading'){rebuildSidePanel();await loadMenuDefaults();rebuildSidePanel();}
     else rebuildSidePanel();
     if(window.innerWidth<=900)document.getElementById('sidePanel').classList.add('mobile-open');
