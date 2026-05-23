@@ -267,6 +267,8 @@
     .mob-card-primary .mob-card-title{color:#e0c0ff;}
     .mob-card-sm{padding:14px 14px;border-radius:14px;margin-bottom:8px;}
     .mob-card-export{background:linear-gradient(135deg,rgba(255,122,24,.15),rgba(255,179,71,.08));border-color:rgba(255,122,24,.3);}
+    .mob-card-preview{background:linear-gradient(135deg,rgba(100,180,255,.15),rgba(150,210,255,.08));border-color:rgba(100,180,255,.3);}
+    .mob-card-preview .mob-card-title{color:#7ac4ff;}
     .mob-card-emoji{font-size:28px;line-height:1;flex-shrink:0;}
     .mob-card-sm .mob-card-emoji{font-size:22px;}
     .mob-card-text{flex:1;min-width:0;}
@@ -328,6 +330,33 @@
     /* Mobile screen-detail uses the existing side-panel styles for its content */
     #mobDetailHost{}
     #mobDetailHost .acc-body{padding:0;}
+
+    /* Preview screen — center the rendered canvas image */
+    .mob-preview-wrap{
+      width:100%;
+      background:#0a0606;
+      border-radius:14px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.08);
+      display:flex;align-items:center;justify-content:center;
+      min-height:280px;
+      position:relative;
+      box-shadow:0 8px 30px rgba(0,0,0,.4);
+    }
+    #mobPreviewImg{
+      max-width:100%;height:auto;display:block;
+      /* iOS long-press to save works on image elements */
+      -webkit-touch-callout:default;
+      user-select:none;
+    }
+    .mob-preview-empty{
+      position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+      color:var(--text3);font-size:13px;font-weight:600;pointer-events:none;
+    }
+    #mobPreviewImg[src]:not([src=""]) + .mob-preview-empty{display:none;}
+    .mob-preview-actions{
+      display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;
+    }
   </style>
 </head>
 <body>
@@ -455,10 +484,18 @@
 
     <!-- Manual edit handoff -->
     <button class="mob-link-btn" id="mobAiEditManual">Open manual editor for this date →</button>
+    <button class="mob-link-btn" data-go="preview">See preview of menu image →</button>
   </div>
 
   <!-- MENU IMAGE EDIT screen — opens the desktop side panel logic for canvas tools -->
   <div class="mob-screen" id="mobScreenImage" data-screen="image">
+    <div class="mob-section-title">Preview</div>
+    <button class="mob-card mob-card-preview" data-go="preview">
+      <div class="mob-card-emoji">👁️</div>
+      <div class="mob-card-text"><div class="mob-card-title">Preview Menu Image</div><div class="mob-card-sub">See what the final image looks like</div></div>
+      <div class="mob-card-arrow">›</div>
+    </button>
+
     <div class="mob-section-title">Pick a section to edit</div>
     <button class="mob-card mob-card-sm" data-img-tab="quickfill">
       <div class="mob-card-emoji">⚡</div>
@@ -480,6 +517,29 @@
       <div class="mob-card-text"><div class="mob-card-title">Download / Export</div><div class="mob-card-sub">JPG, PNG, project file</div></div>
       <div class="mob-card-arrow">›</div>
     </button>
+  </div>
+
+  <!-- PREVIEW screen — shows the actual canvas image rendered at full quality -->
+  <div class="mob-screen" id="mobScreenPreview" data-screen="preview">
+    <div class="mob-preview-wrap">
+      <img id="mobPreviewImg" alt="Menu preview" />
+      <div class="mob-preview-empty" id="mobPreviewEmpty">
+        Loading preview…
+      </div>
+    </div>
+    <div class="mob-preview-actions">
+      <button class="mob-big-btn mob-big-btn-primary" id="mobPreviewRefresh">
+        <div class="mob-big-btn-icon">🔄</div>
+        <div class="mob-big-btn-label">Refresh</div>
+      </button>
+      <button class="mob-big-btn" id="mobPreviewDownload">
+        <div class="mob-big-btn-icon">⬇️</div>
+        <div class="mob-big-btn-label">Download</div>
+      </button>
+    </div>
+    <p class="mob-section-hint" style="margin-top:14px;text-align:center;">
+      This is the live image as it will look when exported. Long-press the image to save it to your phone.
+    </p>
   </div>
 
   <!-- PROJECTS screen -->
@@ -2596,6 +2656,13 @@ const mob = {
     document.getElementById('mobAiEditManual')?.addEventListener('click', () => {
       this.openDetail('ai-lunch-manual', 'Manual Lunch Editor');
     });
+
+    // Preview screen buttons
+    document.getElementById('mobPreviewRefresh')?.addEventListener('click', () => this.renderPreview());
+    document.getElementById('mobPreviewDownload')?.addEventListener('click', () => {
+      // Reuse the existing export-as-JPG flow
+      exportCropped('image/jpeg', 'jpg', .92);
+    });
   },
 
   go(screen){
@@ -2612,6 +2679,7 @@ const mob = {
       // Per-screen init
       if(screen === 'ai') this.initAiScreen();
       if(screen === 'projects') this.initProjectsScreen();
+      if(screen === 'preview') this.renderPreview();
     }
   },
 
@@ -2632,7 +2700,7 @@ const mob = {
   updateChrome(){
     const back = document.getElementById('mobBack');
     const title = document.getElementById('mobTopbarTitle');
-    const titles = { home:'Hot Headz', ai:'AI Menu Update', image:'Edit Menu Image', projects:'Projects', defaults:'Menu Defaults', detail:title?.textContent||'Edit' };
+    const titles = { home:'Hot Headz', ai:'AI Menu Update', image:'Edit Menu Image', projects:'Projects', defaults:'Menu Defaults', preview:'Preview', detail:title?.textContent||'Edit' };
     if(title && this.cur !== 'detail') title.textContent = titles[this.cur] || 'Hot Headz';
     if(back) back.style.visibility = (this.cur === 'home') ? 'hidden' : 'visible';
   },
@@ -2777,7 +2845,48 @@ const mob = {
     }
   },
 
-  /* ── Projects screen — reuses desktop buildPR ── */
+  /* ── Preview screen — render the canvas as an image ── */
+  renderPreview(){
+    const img = document.getElementById('mobPreviewImg');
+    const empty = document.getElementById('mobPreviewEmpty');
+    if(!img) return;
+    try {
+      // Make sure the canvas has the latest content drawn.
+      // We need to render WITHOUT the view-zoom/pan transform so the export
+      // shows just the menu image, not the editor view state. We use the same
+      // approach the export does: temporarily reset view, draw, snapshot, restore.
+      const ov = { viewX, viewY, viewScale };
+      viewX = 0; viewY = 0; viewScale = 1;
+      // Hide the selected-box outline so the preview is clean
+      const wasActive = activeId;
+      activeId = null;
+      draw();
+      // Take snapshot
+      let dataUrl;
+      try {
+        dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      } catch(e){
+        // Tainted canvas (cross-origin image) — fall back to PNG which is more permissive
+        try { dataUrl = canvas.toDataURL('image/png'); }
+        catch(e2){ throw new Error('Could not capture preview: ' + e2.message); }
+      }
+      // Restore editor view state
+      viewX = ov.viewX; viewY = ov.viewY; viewScale = ov.viewScale;
+      activeId = wasActive;
+      draw();
+
+      img.src = dataUrl;
+      if(empty) empty.style.display = 'none';
+    } catch(err){
+      console.error('renderPreview failed:', err);
+      img.src = '';
+      if(empty){
+        empty.style.display = 'flex';
+        empty.textContent = 'Could not generate preview: ' + (err.message||'error');
+        empty.style.color = '#ff7a7a';
+      }
+    }
+  },
   initProjectsScreen(){
     const host = document.getElementById('mobProjectsHost');
     if(!host) return;
