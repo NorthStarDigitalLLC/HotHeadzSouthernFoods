@@ -87,11 +87,11 @@
     .canvas-foot{display:flex;gap:6px;padding:6px 10px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--border);background:var(--surface);}
     .cf-toggle{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text2);cursor:pointer;}
     .cf-toggle input{accent-color:var(--fire);}
-    .side-panel{width:380px;flex-shrink:0;border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;transition:width .25s ease;}
-    /* When AI Lunch tab is active, widen the panel to fit two columns (desktop only) */
-    @media(min-width:1100px){
-      .side-panel.wide{width:780px;}
-    }
+    .side-panel{width:380px;flex-shrink:0;border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+    /* The left side panel only appears when the AI Lunch tab is active.
+       Mirrors the right panel but with its border on the right side. */
+    .side-panel-left{order:-1;}
+    .side-panel-left.active{display:flex;}
     .side-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:0;}
     .side-scroll::-webkit-scrollbar{width:4px;}
     .side-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px;}
@@ -184,17 +184,6 @@
     .ai-extract-hint{font-size:10px;color:var(--text2);line-height:1.45;margin-bottom:2px;}
     .ai-extract-btn{background:linear-gradient(135deg,#b864ff,#7a3fd6) !important;border:none !important;color:#fff !important;font-weight:800 !important;padding:8px 14px !important;box-shadow:0 2px 10px rgba(180,100,255,.3);}
     .ai-extract-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(180,100,255,.4);}
-    /* ── AI Lunch merged-tab layout ── */
-    .ai-lunch-wrap{display:flex;flex-direction:column;gap:14px;}
-    .ai-lunch-left,.ai-lunch-right{min-width:0;}
-    @media(min-width:1100px){
-      /* Side panel is widened to .wide (780px). Lunch goes LEFT, AI RIGHT. */
-      .ai-lunch-wrap{flex-direction:row;align-items:flex-start;gap:18px;}
-      .ai-lunch-left{flex:1 1 0;min-width:0;}
-      .ai-lunch-right{flex:0 0 320px;position:sticky;top:0;max-height:calc(100vh - 100px);overflow-y:auto;}
-      .ai-lunch-right::-webkit-scrollbar{width:4px;}
-      .ai-lunch-right::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px;}
-    }
     /* Box-trainer overlay over canvas */
     .train-overlay{position:absolute;inset:0;cursor:crosshair;background:rgba(0,0,0,.35);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:14px;}
     .train-hint{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;color:#fff;background:linear-gradient(135deg,#b864ff,#7a3fd6);padding:10px 18px;border-radius:24px;box-shadow:0 4px 20px rgba(0,0,0,.5);pointer-events:none;text-align:center;line-height:1.4;}
@@ -295,6 +284,11 @@
     </div>
   </div>
   <div class="main-layout">
+    <!-- LEFT side panel — only visible when AI Lunch tab is active, hosts the Lunch editor -->
+    <div class="side-panel side-panel-left" id="sidePanelLeft" style="display:none;border-left:none;border-right:1px solid var(--border);">
+      <div class="mpc"><span class="mpc-title">Lunch Editor</span><button class="mpc-btn" id="closeSidePanelLeft">Done</button></div>
+      <div class="side-scroll" id="sideScrollLeft"></div>
+    </div>
     <div class="canvas-panel">
       <div class="canvas-toolbar">
         <input id="hhMEfile" type="file" accept="image/*" style="font-size:11px;color:rgba(240,236,230,.7);max-width:150px;">
@@ -1281,15 +1275,11 @@ function buildPR(){
 let _aiTabSelectedDate = null;
 
 function buildAiLunchTab(){
-  let h = '<div class="ai-lunch-wrap">';
+  // This builds ONLY the right-panel content (AI controls + training).
+  // The Lunch editor is rendered into the LEFT panel by wireAiLunchTab().
+  let h = '';
 
-  // ── LEFT/TOP: the existing Lunch Forecast editor ──
-  h += '<div class="ai-lunch-left">';
-  h += buildMenuLunch();
-  h += '</div>';
-
-  // ── RIGHT/BOTTOM: AI controls (purple themed) ──
-  h += '<div class="ai-lunch-right">';
+  // ── AI controls (purple themed) ──
   h += '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u2728 AI Update</span></div><div class="acc-body">';
   h += '<p style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Snap today\'s menu list. AI reads it, fills in the form on the left, updates the canvas image text (auto-fits!), and publishes to the website.</p>';
 
@@ -1318,9 +1308,9 @@ function buildAiLunchTab(){
 
   h += '</div></div>'; // /acc
 
-  // ── TRAINING CARD: draw the lunch box on the canvas ──
+  // ── TRAINING CARD ──
   h += '<div class="acc open" style="margin-top:10px;"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83c\udfaf Train Lunch Box Position</span></div><div class="acc-body">';
-  h += '<p style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Click <strong>Draw Box</strong>, then click-and-drag on the canvas to mark exactly where the lunch text should appear. AI will fit text inside that box every time. Saves to cloud so it works everywhere.</p>';
+  h += '<p style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Click <strong>Draw Box</strong>, then click-and-drag on the canvas to mark exactly where the lunch text should appear. AI will fit text inside that box every time. Saves to cloud.</p>';
   h += '<div class="static-card" id="trainedBoxInfo" style="margin-bottom:10px;">';
   h += '<div class="static-card-title">Current Trained Box</div>';
   h += '<div id="trainedBoxDetails" style="font-size:11px;color:var(--text3);font-family:monospace;">Loading…</div>';
@@ -1333,26 +1323,29 @@ function buildAiLunchTab(){
   h += '<div id="trainStatus" style="display:none;margin-top:8px;padding:8px;border-radius:6px;font-size:11px;font-weight:600;line-height:1.4;"></div>';
   h += '</div></div>';
 
-  h += '</div>'; // /ai-lunch-right
-  h += '</div>'; // /ai-lunch-wrap
   return h;
 }
 
 function wireAiLunchTab(){
-  // 1) Widen the side panel so the two-column layout has room
-  document.getElementById('sidePanel')?.classList.add('wide');
+  // 1) Show the LEFT side panel and render the Lunch editor into it
+  const leftPanel = document.getElementById('sidePanelLeft');
+  const leftScroll = document.getElementById('sideScrollLeft');
+  if(leftPanel && leftScroll){
+    leftPanel.style.display = 'flex';
+    leftPanel.classList.add('active');
+    leftScroll.innerHTML = buildMenuLunch();
+  }
 
-  // 2) Wire the Lunch editor on the left (reuse existing handler)
+  // 2) Wire the Lunch editor (it uses document.querySelectorAll so works regardless of where it lives)
   wireMenuPanel();
 
-  // 3) Track the active date — the Lunch editor has buttons with class lunchDateBtn.
-  //    The "Today" one is auto-clicked by wireMenuPanel, so capture that initial value.
+  // 3) Track the active date
   _aiTabSelectedDate = dateOffsetAdj(0);
   document.querySelectorAll('.lunchDateBtn').forEach(btn => {
     btn.addEventListener('click', () => { _aiTabSelectedDate = btn.dataset.date; });
   });
 
-  // 4) Wire AI buttons
+  // 4) Wire AI buttons (in the RIGHT panel)
   const snapBtn = document.getElementById('aiSnapBtn');
   const pickBtn = document.getElementById('aiPickBtn');
   const fileInp = document.getElementById('aiPhotoFile');
@@ -1382,6 +1375,17 @@ function wireAiLunchTab(){
 
   // 6) Refresh the trained box info display
   refreshTrainedBoxInfo();
+}
+
+/* Helper called by tab switcher to hide the left panel when leaving AI Lunch tab */
+function hideLeftPanel(){
+  const leftPanel = document.getElementById('sidePanelLeft');
+  if(leftPanel){
+    leftPanel.style.display = 'none';
+    leftPanel.classList.remove('active','mobile-open');
+    const ls = document.getElementById('sideScrollLeft');
+    if(ls) ls.innerHTML = ''; // clear so its IDs don't collide if we re-enter
+  }
 }
 
 function setAiTabStatus(msg, kind){
@@ -2231,16 +2235,21 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
     currentTab=btn.dataset.tab;
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
-    // Only the AI Lunch tab uses the wide layout; remove the class elsewhere
-    if(currentTab!=='ai-lunch') document.getElementById('sidePanel')?.classList.remove('wide');
+    // The left side panel only appears on the AI Lunch tab — hide it elsewhere
+    if(currentTab!=='ai-lunch') hideLeftPanel();
     if(currentTab.startsWith('static-')&&!menuDefaultsCache&&menuDefaultsStatus!=='loading'){rebuildSidePanel();await loadMenuDefaults();rebuildSidePanel();}
     else rebuildSidePanel();
     if(window.innerWidth<=900)document.getElementById('sidePanel').classList.add('mobile-open');
   });
 });
 document.getElementById('mobSettingsBtn').addEventListener('click',()=>{currentTab='quickfill';document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));const qt=document.querySelector('.tab-btn[data-tab="quickfill"]');if(qt)qt.classList.add('active');rebuildSidePanel();document.getElementById('sidePanel').classList.add('mobile-open');});
-document.getElementById('mobLunchBtn').addEventListener('click',()=>{currentTab='ai-lunch';document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));const mt=document.querySelector('.tab-btn[data-tab="ai-lunch"]');if(mt)mt.classList.add('active');rebuildSidePanel();document.getElementById('sidePanel').classList.add('mobile-open');});
+document.getElementById('mobLunchBtn').addEventListener('click',()=>{currentTab='ai-lunch';document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));const mt=document.querySelector('.tab-btn[data-tab="ai-lunch"]');if(mt)mt.classList.add('active');rebuildSidePanel();
+  // On mobile show the LEFT panel (Lunch editor) since that's what they tapped for
+  const lp=document.getElementById('sidePanelLeft');
+  if(lp){ lp.style.display='flex'; lp.classList.add('mobile-open'); }
+});
 document.getElementById('closeSidePanel').addEventListener('click',()=>{document.getElementById('sidePanel').classList.remove('mobile-open');});
+document.getElementById('closeSidePanelLeft')?.addEventListener('click',()=>{document.getElementById('sidePanelLeft').classList.remove('mobile-open');});
 
 loadStarterBoxes();rebuildSidePanel();
 (async()=>{
