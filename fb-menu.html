@@ -1399,44 +1399,54 @@ function buildCanvasLunchText(meats, sides, sameDailyOverride){
   return txt;
 }
 
-/* AUTO-FIT — measure the new text and adjust the Lunch box's font size and
-   maxWidthPct so the text comfortably fills (but does not exceed) the original
-   space. We use the box's CURRENT position+size as our target footprint.
-   Strategy: target a vertical extent similar to current; bump font size when
-   there's room, shrink when there isn't. Also adjust maxWidthPct to keep
-   lines from running off the canvas. */
+/* AUTO-FIT — keep the new bullet list inside the lunch column where it belongs.
+   The Lunch box on the canvas template lives in a specific column (bottom-left,
+   roughly 22% wide × 22% tall). We must not let the new text overflow that.
+   Strategy:
+     1. Reset position to the known-good template anchor (in case it got dragged)
+     2. Lock alignment to left + maxWidthPct to the column width so lines wrap
+     3. Shrink sizePct (font size) until total text height fits the column height
+*/
 function autoFitLunchBox(lunchBox){
   if(!lunchBox) return;
-  // Original size as the "ideal" footprint to maintain
-  const origSize  = lunchBox.sizePct || 1.31;
-  const origWidth = lunchBox.maxWidthPct > 0 ? lunchBox.maxWidthPct : 30;
 
-  // Measure with current size first to find natural extent
-  // (we don't have direct access to canvas measureText here without invoking the renderer,
-  // so we approximate based on line count + char count.)
+  // ── 1. Reset position to template default ──────────────────────────
+  // The original template puts Lunch at bottom-left of the menu.
+  // Match the original starter box defaults.
+  lunchBox.xPct  = 18.75;
+  lunchBox.yPct  = 78.79;
+  lunchBox.align = 'left';
+
+  // ── 2. Lock the lunch column geometry ──────────────────────────────
+  const COLUMN_WIDTH_PCT  = 22;   // % canvas width
+  const COLUMN_HEIGHT_PCT = 22;   // % canvas height
+  lunchBox.maxWidthPct = COLUMN_WIDTH_PCT;
+
+  // ── 3. Calculate the largest font size that fits ───────────────────
   const text = lunchBox.text || '';
-  const lines = text.split('\n');
-  const lineCount = lines.length;
-  const longestLineLen = lines.reduce((m, l) => Math.max(m, l.length), 0);
-
-  // Target footprint: ~50% canvas height for the Lunch box, ~30% width
-  const TARGET_HEIGHT_PCT = 50;  // % of canvas height
-  const TARGET_WIDTH_PCT  = 32;  // % of canvas width
-
-  // Each line at sizePct=1.0 occupies roughly 1% canvas height * line-height (~1.22)
-  // So sizePct that fits N lines into TARGET_HEIGHT_PCT is roughly TARGET_HEIGHT / (N * 1.22)
+  const explicitLines = text.split('\n');
   const lineHeight = lunchBox.lineHeight || 1.22;
-  let newSizePct = TARGET_HEIGHT_PCT / Math.max(1, lineCount * lineHeight);
-  // Cap between sane bounds — never bigger than the original size, never smaller than 0.6
-  newSizePct = Math.min(origSize * 1.25, Math.max(0.7, newSizePct));
 
-  // Width: estimate text width per char ratio. At sizePct 1.0, ~0.55% canvas width per char (rough)
-  const estCharWidthPct = 0.50 * newSizePct;
-  let newWidthPct = Math.min(TARGET_WIDTH_PCT, longestLineLen * estCharWidthPct + 2);
-  newWidthPct = Math.max(18, newWidthPct); // never less than 18% wide
+  // Estimate wrapped line count: at sizePct=1.0 roughly 50 chars fit a ~22% wide column.
+  // Scale chars-per-line inversely to font size when we compute.
+  // We do this iteratively: try a size, see if it fits, shrink if not.
+  let sizePct = 1.31; // starting size (matches original template default)
+  const minSize = 0.55;
+  const stepDown = 0.05;
+  while(sizePct >= minSize){
+    // chars per line at this size (smaller font = more chars per line)
+    const charsPerLine = Math.max(15, Math.round(COLUMN_WIDTH_PCT * 2.5 / sizePct));
+    let wrappedLines = 0;
+    for(const l of explicitLines){
+      wrappedLines += Math.max(1, Math.ceil((l.length || 1) / charsPerLine));
+    }
+    const totalHeight = wrappedLines * sizePct * lineHeight;
+    if(totalHeight <= COLUMN_HEIGHT_PCT) break; // fits!
+    sizePct -= stepDown;
+  }
+  if(sizePct < minSize) sizePct = minSize;
 
-  lunchBox.sizePct     = newSizePct;
-  lunchBox.maxWidthPct = newWidthPct;
+  lunchBox.sizePct = sizePct;
 }
 
 /* The main AI Publish flow — runs everything in sequence */
