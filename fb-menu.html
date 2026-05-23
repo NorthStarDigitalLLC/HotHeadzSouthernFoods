@@ -1494,8 +1494,12 @@ function wireMenuPanel(){
           }
 
           if(!resp.ok || !data.success){
-            const msg = data.error || ('HTTP '+resp.status);
+            let msg = data.error || ('HTTP '+resp.status);
+            if(data.debug){
+              msg += ' [bytes:'+data.debug.imageBytes+' format:'+data.debug.detectedFormat+' hex:'+data.debug.firstBytesHex+']';
+            }
             setAiStatus('Failed: ' + msg, 'error');
+            console.error('AI extract response:', data);
             return;
           }
 
