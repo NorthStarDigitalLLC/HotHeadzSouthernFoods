@@ -89,8 +89,15 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Unsupported image type. Use JPEG, PNG, GIF, or WEBP.' });
     }
 
+    // Today's date in YYYY-MM-DD for relative-date resolution by Claude
+    const todayDate = new Date();
+    const todayISO = todayDate.getFullYear()+'-'+String(todayDate.getMonth()+1).padStart(2,'0')+'-'+String(todayDate.getDate()).padStart(2,'0');
+    const todayDayName = todayDate.toLocaleDateString('en-US',{weekday:'long'});
+
     // The prompt that shapes Claude's output. Keep it tight & specific.
     const systemPrompt = `You read photos of handwritten or printed daily menu lists for a Southern restaurant called Hot Headz Southern Foods. You output the items in a strict JSON format with short, appetizing one-line descriptions.
+
+TODAY'S DATE FOR REFERENCE: ${todayISO} (${todayDayName})
 
 CRITICAL RULES:
 1. Output JSON ONLY. No markdown, no backticks, no commentary, no preamble.
@@ -111,8 +118,15 @@ CRITICAL RULES:
    - Potato Salad → "Creamy potato salad served chilled"
 5. Use proper title case ("Red Beans & Rice", not "red beans & rice").
 6. Use "&" not "and" when joining short words ("Red Beans & Rice", "Mac & Cheese").
-7. Ignore non-food lines (dates, headers, totals, notes).
+7. Ignore non-food lines (totals, notes).
 8. If you can't read an item clearly, OMIT it (don't guess wildly).
+
+DATE DETECTION:
+Look for a date written on the photo (handwritten or printed). Return it as detectedDate in YYYY-MM-DD format.
+- If a full date like "5/24/26" or "May 24" appears, return that date (assume current year if not stated).
+- If only a day name appears like "Monday" or "Mon", return the NEAREST UPCOMING date for that day (today or in the next 7 days).
+- If multiple dates appear (e.g. "Mon-Fri" range), return ONLY the FIRST date. Also fill detectedDateRange with first and last.
+- If no date is visible, return detectedDate as null. DO NOT GUESS.
 
 CLASSIFICATION HELP:
 MEATS/MAINS: brisket, pulled pork, chicken (any prep), beef tips, meatloaf, casseroles with protein in the name, fish, shrimp, sausage, ribs, ham, turkey, red beans & rice (counts as a main).
@@ -120,6 +134,8 @@ SIDES: cabbage, green beans, corn, mac & cheese, mashed potatoes, dirty rice, wh
 
 OUTPUT FORMAT (exact):
 {
+  "detectedDate": "2026-05-25" or null,
+  "detectedDateRange": ["2026-05-25", "2026-05-29"] or null,
   "meats": [
     {"name": "Red Beans & Rice", "desc": "Slow-cooked red beans served over seasoned rice"}
   ],
@@ -209,6 +225,20 @@ OUTPUT FORMAT (exact):
     const meats = Array.isArray(extracted.meats) ? extracted.meats.filter(i => i && i.name) : [];
     const sides = Array.isArray(extracted.sides) ? extracted.sides.filter(i => i && i.name) : [];
 
+    // Validate detected date(s) — must match YYYY-MM-DD pattern strictly
+    const isoPattern = /^\d{4}-\d{2}-\d{2}$/;
+    let detectedDate = null;
+    if (typeof extracted.detectedDate === 'string' && isoPattern.test(extracted.detectedDate)) {
+      detectedDate = extracted.detectedDate;
+    }
+    let detectedDateRange = null;
+    if (Array.isArray(extracted.detectedDateRange) 
+        && extracted.detectedDateRange.length === 2
+        && isoPattern.test(extracted.detectedDateRange[0])
+        && isoPattern.test(extracted.detectedDateRange[1])) {
+      detectedDateRange = extracted.detectedDateRange;
+    }
+
     return res.status(200).json({
       success: true,
       meats,
@@ -216,6 +246,8 @@ OUTPUT FORMAT (exact):
       // Pre-format the strings for direct paste into the editor's textareas
       meatsText: meats.map(i => i.desc ? `${i.name} | ${i.desc}` : i.name).join('\n'),
       sidesText: sides.map(i => i.desc ? `${i.name} | ${i.desc}` : i.name).join('\n'),
+      detectedDate,
+      detectedDateRange,
       usage: apiData.usage || null
     });
 
