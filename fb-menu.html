@@ -184,6 +184,24 @@
     .ai-extract-hint{font-size:10px;color:var(--text2);line-height:1.45;margin-bottom:2px;}
     .ai-extract-btn{background:linear-gradient(135deg,#b864ff,#7a3fd6) !important;border:none !important;color:#fff !important;font-weight:800 !important;padding:8px 14px !important;box-shadow:0 2px 10px rgba(180,100,255,.3);}
     .ai-extract-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(180,100,255,.4);}
+    /* AI date picker — sits inside the AI right-panel */
+    .ai-date-card{background:linear-gradient(135deg,rgba(100,180,255,.08),rgba(150,210,255,.04));border:1px solid rgba(100,180,255,.22);border-radius:12px;padding:12px;margin-bottom:12px;}
+    .ai-date-card-title{font-size:12px;font-weight:800;color:#7ac4ff;margin-bottom:4px;letter-spacing:.02em;}
+    .ai-date-hint{font-size:10px;color:var(--text3);line-height:1.4;margin-bottom:10px;}
+    .ai-date-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px;}
+    .ai-date-btn{padding:9px 4px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:var(--text2);font-family:inherit;font-weight:700;font-size:11px;cursor:pointer;transition:all .15s;text-align:center;line-height:1.2;-webkit-tap-highlight-color:transparent;}
+    .ai-date-btn:hover{background:rgba(100,180,255,.08);border-color:rgba(100,180,255,.3);color:var(--text);}
+    .ai-date-btn .ai-date-day{display:block;font-size:10px;font-weight:600;opacity:.75;margin-bottom:1px;}
+    .ai-date-btn .ai-date-num{display:block;font-size:16px;font-weight:800;}
+    .ai-date-btn.is-selected{background:linear-gradient(135deg,rgba(100,180,255,.35),rgba(150,210,255,.20));border-color:rgba(100,180,255,.7);color:#fff;box-shadow:0 2px 12px rgba(100,180,255,.25);}
+    .ai-date-btn.is-selected .ai-date-day{opacity:.9;}
+    .ai-date-btn.is-closed{opacity:.4;cursor:not-allowed;}
+    .ai-date-btn.is-closed:hover{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08);color:var(--text2);}
+    .ai-date-btn .ai-date-closed-marker{display:block;font-size:8px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-top:1px;}
+    .ai-date-actions{display:flex;gap:6px;flex-wrap:wrap;}
+    .ai-date-action{font-size:10px !important;padding:5px 10px !important;}
+    .ai-date-summary{font-size:11px;color:#7ac4ff;font-weight:700;margin-top:8px;padding:8px;border-radius:6px;background:rgba(100,180,255,.06);display:none;}
+    .ai-date-summary.show{display:block;}
     /* Box-trainer overlay over canvas */
     .train-overlay{position:absolute;inset:0;cursor:crosshair;background:rgba(0,0,0,.35);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:14px;}
     .train-hint{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;color:#fff;background:linear-gradient(135deg,#b864ff,#7a3fd6);padding:10px 18px;border-radius:24px;box-shadow:0 4px 20px rgba(0,0,0,.5);pointer-events:none;text-align:center;line-height:1.4;}
@@ -284,9 +302,14 @@
     .mob-date-btn{padding:10px 4px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--text2);font-weight:700;font-size:12px;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;text-align:center;line-height:1.3;}
     .mob-date-btn:active{transform:scale(.95);}
     .mob-date-btn.active{background:linear-gradient(135deg,var(--fire),var(--fire2));border-color:transparent;color:#fff;}
+    .mob-date-btn.is-closed{opacity:.45;}
     .mob-date-btn .mob-date-day{display:block;font-size:11px;font-weight:600;opacity:.7;}
     .mob-date-btn.active .mob-date-day{opacity:.9;}
     .mob-date-btn .mob-date-num{display:block;font-size:16px;font-weight:800;margin-top:2px;}
+    .mob-date-quick{display:flex;gap:6px;margin:8px 0 0;}
+    .mob-date-quick-btn{flex:1;padding:8px 6px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:var(--text2);font-family:inherit;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+    .mob-date-quick-btn:active{transform:scale(.96);background:rgba(255,255,255,.08);}
+    .mob-date-summary{margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(100,180,255,.08);border:1px solid rgba(100,180,255,.2);color:#7ac4ff;font-size:12px;font-weight:700;text-align:center;}
 
     .mob-photo-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
     .mob-big-btn{padding:24px 12px;border-radius:18px;border:1px solid rgba(255,255,255,.1);
@@ -448,8 +471,15 @@
   <!-- AI MENU UPDATE screen -->
   <div class="mob-screen" id="mobScreenAi" data-screen="ai">
     <!-- Date picker -->
-    <div class="mob-section-title">Choose Date</div>
+    <div class="mob-section-title">Choose Date(s)</div>
+    <p class="mob-section-hint" style="margin-bottom:8px;">Tap to select. Pick multiple to publish the same menu to several days.</p>
     <div class="mob-date-grid" id="mobDateGrid"></div>
+    <div class="mob-date-quick">
+      <button class="mob-date-quick-btn" data-mob-dq="clear">Clear</button>
+      <button class="mob-date-quick-btn" data-mob-dq="weekdays">Mon–Fri</button>
+      <button class="mob-date-quick-btn" data-mob-dq="all">All Open</button>
+    </div>
+    <div id="mobDateSummary" class="mob-date-summary" style="display:none;"></div>
 
     <!-- Photo capture -->
     <div class="mob-section-title">Snap or Pick Photo</div>
@@ -1611,7 +1641,8 @@ function buildPR(){
    on desktop. Stacked on mobile (AI on top).
    ═══════════════════════════════════════════════════════════ */
 
-let _aiTabSelectedDate = null;
+let _aiTabSelectedDate = null; // legacy single-date (kept for safety, not used)
+let _aiTabSelectedDates = new Set();
 
 function buildAiLunchTab(){
   // This builds ONLY the right-panel content (AI controls + training).
@@ -1620,7 +1651,19 @@ function buildAiLunchTab(){
 
   // ── AI controls (purple themed) ──
   h += '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u2728 AI Update</span></div><div class="acc-body">';
-  h += '<p style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Snap today\'s menu list. AI reads it, fills in the form on the left, updates the canvas image text (auto-fits!), and publishes to the website.</p>';
+  h += '<p style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Pick the date(s) below, then snap a photo. AI reads it, fills the form on the left, updates the canvas image, and publishes to every selected date.</p>';
+
+  // Date picker — explicit, multi-select. Tap to toggle.
+  h += '<div class="ai-date-card">';
+  h += '<div class="ai-date-card-title">\ud83d\udcc5 Publish to which day(s)?</div>';
+  h += '<div class="ai-date-hint" id="aiDateHint">Tap any day to select. Tap again to deselect. You can pick more than one.</div>';
+  h += '<div class="ai-date-grid" id="aiDateGrid"></div>';
+  h += '<div class="ai-date-actions">';
+  h += '<button class="sm-btn ai-date-action" data-date-act="clear">Clear</button>';
+  h += '<button class="sm-btn ai-date-action" data-date-act="weekdays">Mon–Fri</button>';
+  h += '<button class="sm-btn ai-date-action" data-date-act="all">All Open Days</button>';
+  h += '</div>';
+  h += '</div>';
 
   // Optional prompt
   h += '<div class="ai-extract-card" style="margin-bottom:10px;">';
@@ -1630,6 +1673,7 @@ function buildAiLunchTab(){
   h += '</div>';
 
   // Photo buttons
+  h += '<div class="ai-date-summary" id="aiDateSummary"></div>';
   h += '<input type="file" id="aiPhotoFile" accept="image/*" capture="environment" style="display:none">';
   h += '<div class="btn-row" style="margin-bottom:8px;">';
   h += '<button class="sm-btn primary ai-extract-btn" id="aiSnapBtn" style="flex:1;">\ud83d\udcf8 Snap Photo</button>';
@@ -1678,8 +1722,19 @@ function wireAiLunchTab(){
   // 2) Wire the Lunch editor (it uses document.querySelectorAll so works regardless of where it lives)
   wireMenuPanel();
 
-  // 3) Track the active date
-  _aiTabSelectedDate = dateOffsetAdj(0);
+  // 3) Build the multi-date picker for the AI side
+  _aiTabSelectedDates = new Set();
+  // Pre-select the smart default day (skips closed days, after-close, etc.)
+  _aiTabSelectedDates.add(dateOffsetAdj(0));
+  renderAiDateGrid();
+  updateAiDateSummary();
+
+  // Wire date-action buttons (clear / weekdays / all open)
+  document.querySelectorAll('[data-date-act]').forEach(btn => {
+    btn.addEventListener('click', () => handleAiDateAction(btn.dataset.dateAct));
+  });
+
+  // Also keep the Lunch editor's date in sync with the LATEST selected date (for any handler that reads it)
   document.querySelectorAll('.lunchDateBtn').forEach(btn => {
     btn.addEventListener('click', () => { _aiTabSelectedDate = btn.dataset.date; });
   });
@@ -1690,10 +1745,12 @@ function wireAiLunchTab(){
   const fileInp = document.getElementById('aiPhotoFile');
 
   if(snapBtn) snapBtn.addEventListener('click', () => {
+    if(_aiTabSelectedDates.size === 0){ toast('Pick at least one date first','error'); return; }
     fileInp.setAttribute('capture','environment');
     fileInp.click();
   });
   if(pickBtn) pickBtn.addEventListener('click', () => {
+    if(_aiTabSelectedDates.size === 0){ toast('Pick at least one date first','error'); return; }
     fileInp.removeAttribute('capture');
     fileInp.click();
   });
@@ -1714,6 +1771,104 @@ function wireAiLunchTab(){
 
   // 6) Refresh the trained box info display
   refreshTrainedBoxInfo();
+}
+
+/* ─── AI multi-date picker helpers ─── */
+
+// Renders 14 days starting from today (a full 2-week window)
+function renderAiDateGrid(){
+  const grid = document.getElementById('aiDateGrid');
+  if(!grid) return;
+  const today = new Date();
+  let html = '';
+  for(let i = 0; i < 14; i++){
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const iso = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const dayName = d.toLocaleDateString('en-US',{weekday:'long'});
+    const dayShort = dayName.slice(0,3);
+    const closed = isClosedDay(dayName);
+    const selected = _aiTabSelectedDates.has(iso);
+    const cls = 'ai-date-btn' + (selected?' is-selected':'') + (closed?' is-closed':'');
+    html += `<button class="${cls}" data-iso="${iso}" data-closed="${closed?1:0}">
+      <span class="ai-date-day">${dayShort}</span>
+      <span class="ai-date-num">${d.getDate()}</span>
+      ${closed ? '<span class="ai-date-closed-marker">closed</span>' : ''}
+    </button>`;
+  }
+  grid.innerHTML = html;
+  grid.querySelectorAll('.ai-date-btn').forEach(btn => {
+    btn.addEventListener('click', () => toggleAiDate(btn));
+  });
+}
+
+function toggleAiDate(btn){
+  if(btn.dataset.closed === '1'){
+    // Soft-allow closed-day selection so the user can override if needed
+    if(!confirm('That day is marked as closed in your Hours. Publish anyway?')) return;
+  }
+  const iso = btn.dataset.iso;
+  if(_aiTabSelectedDates.has(iso)){
+    _aiTabSelectedDates.delete(iso);
+    btn.classList.remove('is-selected');
+  } else {
+    _aiTabSelectedDates.add(iso);
+    btn.classList.add('is-selected');
+  }
+  updateAiDateSummary();
+}
+
+function handleAiDateAction(action){
+  const today = new Date();
+  if(action === 'clear'){
+    _aiTabSelectedDates.clear();
+  } else if(action === 'weekdays'){
+    _aiTabSelectedDates.clear();
+    for(let i = 0; i < 14; i++){
+      const d = new Date(today); d.setDate(today.getDate() + i);
+      const iso = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      const wd = d.getDay(); // 0 Sun..6 Sat
+      if(wd >= 1 && wd <= 5){
+        const dayName = d.toLocaleDateString('en-US',{weekday:'long'});
+        if(!isClosedDay(dayName)) _aiTabSelectedDates.add(iso);
+      }
+    }
+  } else if(action === 'all'){
+    _aiTabSelectedDates.clear();
+    for(let i = 0; i < 14; i++){
+      const d = new Date(today); d.setDate(today.getDate() + i);
+      const iso = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      const dayName = d.toLocaleDateString('en-US',{weekday:'long'});
+      if(!isClosedDay(dayName)) _aiTabSelectedDates.add(iso);
+    }
+  }
+  renderAiDateGrid();
+  updateAiDateSummary();
+}
+
+function updateAiDateSummary(){
+  const el = document.getElementById('aiDateSummary');
+  if(!el) return;
+  const n = _aiTabSelectedDates.size;
+  if(n === 0){
+    el.className = 'ai-date-summary';
+    el.textContent = '';
+    return;
+  }
+  // Sort dates for nice display
+  const sorted = [...(_aiTabSelectedDates)].sort();
+  let label = '';
+  if(n === 1){
+    const d = new Date(sorted[0] + 'T00:00');
+    label = '1 date selected: ' + d.toLocaleDateString('en-US',{weekday:'long', month:'short', day:'numeric'});
+  } else {
+    // Show first, last, and count
+    const first = new Date(sorted[0] + 'T00:00');
+    const last  = new Date(sorted[sorted.length-1] + 'T00:00');
+    label = n + ' dates selected · ' + first.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' \u2192 ' + last.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  }
+  el.className = 'ai-date-summary show';
+  el.textContent = label;
 }
 
 /* Helper called by tab switcher to hide the left panel when leaving AI Lunch tab */
@@ -2068,12 +2223,11 @@ async function runAiPublishFlow(file){
       await loadMenuDefaults();
     }
 
-    // 2. Resolve the active date — first check our cached date, then the
-    //    actually-active button (in case user clicked one without our listener catching it)
-    let date = _aiTabSelectedDate;
-    const activeDateBtn = document.querySelector('.lunchDateBtn.primary');
-    if(activeDateBtn && activeDateBtn.dataset.date) date = activeDateBtn.dataset.date;
-    if(!date) date = dateOffsetAdj(0);
+    // 2. Resolve the active dates from the multi-select picker.
+    //    Fall back to the smart default if nothing selected (shouldn't happen
+    //    since the buttons block the click, but defensive).
+    let dates = [...(_aiTabSelectedDates || new Set())].sort();
+    if(!dates.length) dates = [dateOffsetAdj(0)];
 
     // 3. Prepare the photo (always re-encode via canvas)
     setAiTabStatus('Preparing photo ('+Math.round(file.size/1024)+' KB '+file.type+')…', 'loading');
@@ -2096,7 +2250,7 @@ async function runAiPublishFlow(file){
       return;
     }
 
-    // 4. Send to AI
+    // 4. Send to AI (one call, then publish to all dates)
     setAiTabStatus('Sending '+Math.round(blob.size/1024)+'KB to Claude…', 'loading');
     const base64 = await fileToBase64Tab(blob);
     const userPrompt = (document.getElementById('aiUserPrompt')?.value || '').trim();
@@ -2127,7 +2281,8 @@ async function runAiPublishFlow(file){
     // 5. Show preview of extracted items
     renderAiPreview(meats, sides);
 
-    // 6. Fill the right-side Lunch form fields with the new items
+    // 6. Fill the left-side Lunch form fields with the new items (so the user
+    //    sees what got pushed to all dates)
     const meatsTA = document.getElementById('lunchMeatsTA');
     const sidesTA = document.getElementById('lunchSidesTA');
     if(meatsTA) meatsTA.value = data.meatsText || '';
@@ -2138,12 +2293,15 @@ async function runAiPublishFlow(file){
     const autoFit     = document.getElementById('aiAutoFit')?.checked;
 
     const actions = [];
+    let publishFail = 0;
 
-    // 7. Update canvas Day & Date boxes for the selected date
+    // 7. Update canvas Day & Date boxes to the FIRST selected date (the canvas
+    //    can only show one date at a time; pick the earliest selected).
     if(autoCanvas){
+      const firstDate = dates[0];
       const dayBox  = boxes.find(b => b.name === 'Day');
       const dateBox = boxes.find(b => b.name === 'Date');
-      const [yyyy, mm, dd] = date.split('-').map(Number);
+      const [yyyy, mm, dd] = firstDate.split('-').map(Number);
       const dt = new Date(yyyy, mm-1, dd);
       const dayName = dt.toLocaleDateString(undefined, {weekday: 'long'});
       const dateStr = dt.toLocaleDateString(undefined, {month: 'long', day: 'numeric', year: 'numeric'});
@@ -2154,12 +2312,11 @@ async function runAiPublishFlow(file){
       // 8. Update canvas Lunch text box + auto-fit
       const lunchBox = boxes.find(b => b.name === 'Lunch');
       if(lunchBox){
-        if(canvasChanged === false) saveUndo(); // saveUndo if we haven't already implicitly via earlier change
-        else saveUndo();
+        saveUndo();
         lunchBox.text = buildCanvasLunchText(meats, sides, []);
         if(autoFit) autoFitLunchBox(lunchBox);
         canvasChanged = true;
-        actions.push('canvas updated' + (autoFit ? ' (auto-fit)' : ''));
+        actions.push('canvas updated' + (autoFit ? ' (auto-fit)' : '') + (dates.length>1 ? ' (showing '+firstDate+')' : ''));
       } else {
         actions.push('canvas SKIPPED (no "Lunch" text box)');
       }
@@ -2170,34 +2327,43 @@ async function runAiPublishFlow(file){
       }
     }
 
-    // 9. Auto-publish to website
+    // 9. Auto-publish to EACH selected date
     if(autoPublish){
-      setAiTabStatus('Publishing to website for '+isoToLabel(date)+'…', 'loading');
+      setAiTabStatus('Publishing to '+dates.length+' date'+(dates.length===1?'':'s')+'…', 'loading');
       const itemsArr = [].concat(meats, sides);
       const dateData = {
         lunch: { show: true, items: itemsArr, meats: meats, sides: sides, sameDaily: [] },
         dessert: { items: [] },
-        crawfish: { show: false }  // default OFF per user request
+        crawfish: { show: false }
       };
-      try {
-        const pubRes = await apiPost({
-          action: 'save-lunch',
-          date: date,
-          data: dateData,
-          publishedBy: getCloudName()
-        });
-        if(pubRes?.success){
-          actions.push('published to '+date);
-        } else {
-          actions.push('publish FAILED ('+(pubRes?.error||'unknown')+')');
+      let ok = 0, fail = 0;
+      const failures = [];
+      for(const date of dates){
+        try {
+          const pubRes = await apiPost({
+            action: 'save-lunch',
+            date: date,
+            data: dateData,
+            publishedBy: getCloudName()
+          });
+          if(pubRes?.success){ ok++; }
+          else { fail++; failures.push(date+' ('+(pubRes?.error||'unknown')+')'); }
+        } catch(e){
+          fail++; failures.push(date+' ('+e.message+')');
         }
-      } catch(e){
-        actions.push('publish ERROR ('+e.message+')');
+      }
+      publishFail = fail;
+      if(fail === 0){
+        actions.push('published to '+ok+' date'+(ok===1?'':'s'));
+      } else if(ok === 0){
+        actions.push('publish FAILED for all '+fail+' dates: '+failures.slice(0,3).join(', '));
+      } else {
+        actions.push('published '+ok+' OK, '+fail+' FAILED ('+failures.slice(0,2).join(', ')+(failures.length>2?'…':'')+')');
       }
     }
 
     const summary = 'Done! '+meats.length+' meats, '+sides.length+' sides. '+actions.join(' \u2022 ');
-    setAiTabStatus(summary, 'success');
+    setAiTabStatus(summary, publishFail === 0 ? 'success' : 'error');
     toast('AI extracted '+(meats.length+sides.length)+' items', 'success');
 
   } catch (err) {
@@ -2606,7 +2772,8 @@ loadStarterBoxes();rebuildSidePanel();
 const mob = {
   cur: 'home',
   history: ['home'],
-  selectedDate: null,
+  selectedDate: null,          // legacy single (kept for safety)
+  selectedDates: new Set(),    // primary multi-select
 
   init(){
     // Initial label & back button
@@ -2638,10 +2805,12 @@ const mob = {
 
     // AI tab buttons
     document.getElementById('mobAiSnapBtn')?.addEventListener('click', () => {
+      if(this.selectedDates.size === 0){ toast('Pick at least one date first','error'); return; }
       const f = document.getElementById('mobAiPhotoFile');
       f.setAttribute('capture','environment'); f.click();
     });
     document.getElementById('mobAiPickBtn')?.addEventListener('click', () => {
+      if(this.selectedDates.size === 0){ toast('Pick at least one date first','error'); return; }
       const f = document.getElementById('mobAiPhotoFile');
       f.removeAttribute('capture'); f.click();
     });
@@ -2650,6 +2819,11 @@ const mob = {
       if(!file) return;
       e.target.value = '';
       await this.runAi(file);
+    });
+
+    // Mobile date quick-action buttons
+    document.querySelectorAll('[data-mob-dq]').forEach(btn => {
+      btn.addEventListener('click', () => this.dateQuickAction(btn.dataset.mobDq));
     });
 
     // Manual editor link → opens the desktop Lunch editor inline as detail screen
@@ -2715,26 +2889,95 @@ const mob = {
   renderDateGrid(){
     const grid = document.getElementById('mobDateGrid');
     if(!grid) return;
+    // Seed with today on first render
+    if(this.selectedDates.size === 0){
+      this.selectedDates.add(dateOffsetAdj(0));
+    }
     let html = '';
-    for(let i = 0; i < 7; i++){
-      const iso = dateOffsetAdj(i);
-      const day = isoToDay(iso);
-      const [y, m, d] = iso.split('-').map(Number);
-      const isActive = (i === 0);
-      if(isActive) this.selectedDate = iso;
-      html += `<button class="mob-date-btn${isActive?' active':''}" data-iso="${iso}">
-        <span class="mob-date-day">${day.slice(0,3)}</span>
-        <span class="mob-date-num">${d}</span>
+    const today = new Date();
+    for(let i = 0; i < 14; i++){
+      const d = new Date(today); d.setDate(today.getDate() + i);
+      const iso = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      const dayName = d.toLocaleDateString('en-US',{weekday:'long'});
+      const dayShort = dayName.slice(0,3);
+      const closed = isClosedDay(dayName);
+      const selected = this.selectedDates.has(iso);
+      const cls = 'mob-date-btn' + (selected?' active':'') + (closed?' is-closed':'');
+      html += `<button class="${cls}" data-iso="${iso}" data-closed="${closed?1:0}">
+        <span class="mob-date-day">${dayShort}</span>
+        <span class="mob-date-num">${d.getDate()}</span>
       </button>`;
     }
     grid.innerHTML = html;
     grid.querySelectorAll('.mob-date-btn').forEach(b => {
-      b.addEventListener('click', () => {
-        grid.querySelectorAll('.mob-date-btn').forEach(x => x.classList.remove('active'));
-        b.classList.add('active');
-        this.selectedDate = b.dataset.iso;
-      });
+      b.addEventListener('click', () => this.toggleDate(b));
     });
+    this.updateDateSummary();
+  },
+
+  toggleDate(btn){
+    if(btn.dataset.closed === '1'){
+      if(!confirm('That day is marked closed in your Hours. Publish anyway?')) return;
+    }
+    const iso = btn.dataset.iso;
+    if(this.selectedDates.has(iso)){
+      this.selectedDates.delete(iso);
+      btn.classList.remove('active');
+    } else {
+      this.selectedDates.add(iso);
+      btn.classList.add('active');
+    }
+    // Update legacy single-date field for any downstream consumer
+    const first = [...this.selectedDates].sort()[0];
+    this.selectedDate = first || null;
+    this.updateDateSummary();
+  },
+
+  updateDateSummary(){
+    const el = document.getElementById('mobDateSummary');
+    if(!el) return;
+    const n = this.selectedDates.size;
+    if(n === 0){
+      el.style.display = 'none';
+      return;
+    }
+    el.style.display = 'block';
+    const sorted = [...this.selectedDates].sort();
+    if(n === 1){
+      const d = new Date(sorted[0] + 'T00:00');
+      el.textContent = '1 date selected: ' + d.toLocaleDateString('en-US',{weekday:'long', month:'short', day:'numeric'});
+    } else {
+      const first = new Date(sorted[0] + 'T00:00');
+      const last  = new Date(sorted[sorted.length-1] + 'T00:00');
+      el.textContent = n + ' dates · ' + first.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' → ' + last.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    }
+  },
+
+  dateQuickAction(action){
+    const today = new Date();
+    if(action === 'clear'){
+      this.selectedDates.clear();
+    } else if(action === 'weekdays'){
+      this.selectedDates.clear();
+      for(let i = 0; i < 14; i++){
+        const d = new Date(today); d.setDate(today.getDate() + i);
+        const iso = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+        const wd = d.getDay();
+        if(wd >= 1 && wd <= 5){
+          const dayName = d.toLocaleDateString('en-US',{weekday:'long'});
+          if(!isClosedDay(dayName)) this.selectedDates.add(iso);
+        }
+      }
+    } else if(action === 'all'){
+      this.selectedDates.clear();
+      for(let i = 0; i < 14; i++){
+        const d = new Date(today); d.setDate(today.getDate() + i);
+        const iso = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+        const dayName = d.toLocaleDateString('en-US',{weekday:'long'});
+        if(!isClosedDay(dayName)) this.selectedDates.add(iso);
+      }
+    }
+    this.renderDateGrid();
   },
 
   setAiStatus(msg, kind){
@@ -2764,7 +3007,9 @@ const mob = {
         await loadMenuDefaults();
       }
 
-      const date = this.selectedDate || dateOffsetAdj(0);
+      // Resolve dates from the multi-select picker
+      let dates = [...(this.selectedDates || new Set())].sort();
+      if(!dates.length) dates = [dateOffsetAdj(0)];
 
       // Prep photo via canvas
       this.setAiStatus('Preparing photo ('+Math.round(file.size/1024)+' KB)…','loading');
@@ -2804,12 +3049,14 @@ const mob = {
       const autoCanvas  = document.getElementById('mobAiAutoCanvas')?.checked;
       const autoFit     = document.getElementById('mobAiAutoFit')?.checked;
       const actions = [];
+      let publishFail = 0;
 
+      // Canvas reflects FIRST date if user picked multiple
       if(autoCanvas){
-        // Update Day, Date, Lunch boxes
+        const firstDate = dates[0];
         const dayBox  = boxes.find(b => b.name === 'Day');
         const dateBox = boxes.find(b => b.name === 'Date');
-        const [yyyy, mm, dd] = date.split('-').map(Number);
+        const [yyyy, mm, dd] = firstDate.split('-').map(Number);
         const dt = new Date(yyyy, mm-1, dd);
         if(dayBox)  dayBox.text  = dt.toLocaleDateString(undefined, {weekday:'long'});
         if(dateBox) dateBox.text = dt.toLocaleDateString(undefined, {month:'long', day:'numeric', year:'numeric'});
@@ -2818,26 +3065,38 @@ const mob = {
           saveUndo();
           lunchBox.text = buildCanvasLunchText(meats, sides, []);
           if(autoFit) autoFitLunchBox(lunchBox);
-          actions.push('canvas updated' + (autoFit ? ' (auto-fit)' : ''));
+          actions.push('canvas updated' + (autoFit ? ' (auto-fit)' : '') + (dates.length>1 ? ' (showing '+firstDate+')' : ''));
         }
         draw(); triggerAutoSave();
       }
 
+      // Publish to EACH selected date
       if(autoPublish){
-        this.setAiStatus('Publishing to website for '+isoToLabel(date)+'…','loading');
+        this.setAiStatus('Publishing to '+dates.length+' date'+(dates.length===1?'':'s')+'…','loading');
         const dateData = {
           lunch:    { show:true, items:[].concat(meats,sides), meats:meats, sides:sides, sameDaily:[] },
           dessert:  { items:[] },
           crawfish: { show:false }
         };
-        try {
-          const pr = await apiPost({ action:'save-lunch', date:date, data:dateData, publishedBy:getCloudName() });
-          if(pr?.success) actions.push('published to '+date);
-          else actions.push('publish FAILED ('+(pr?.error||'unknown')+')');
-        } catch(e){ actions.push('publish ERROR ('+e.message+')'); }
+        let ok = 0;
+        const failures = [];
+        for(const date of dates){
+          try {
+            const pr = await apiPost({ action:'save-lunch', date:date, data:dateData, publishedBy:getCloudName() });
+            if(pr?.success) ok++;
+            else { publishFail++; failures.push(date+' ('+(pr?.error||'unknown')+')'); }
+          } catch(e){ publishFail++; failures.push(date+' ('+e.message+')'); }
+        }
+        if(publishFail === 0){
+          actions.push('published to '+ok+' date'+(ok===1?'':'s'));
+        } else if(ok === 0){
+          actions.push('publish FAILED for all '+publishFail+' dates');
+        } else {
+          actions.push('published '+ok+' OK, '+publishFail+' FAILED');
+        }
       }
 
-      this.setAiStatus('Done! '+meats.length+' meats, '+sides.length+' sides. ' + actions.join(' · '), 'success');
+      this.setAiStatus('Done! '+meats.length+' meats, '+sides.length+' sides. ' + actions.join(' · '), publishFail === 0 ? 'success' : 'error');
       toast('AI extracted '+(meats.length+sides.length)+' items','success');
     } catch(err){
       this.setAiStatus('Error: '+(err.message||String(err)),'error');
