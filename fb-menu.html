@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Hot Headz – Menu Editor</title>
+  <!-- Favicons (same as the rest of the site) -->
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/images/HotHeadzLogo.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/HotHeadzLogo.png" />
+  <link rel="mask-icon" href="/images/HotHeadzLogo.png" color="#e83010" />
+  <meta name="theme-color" content="#0a0707">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Serif+Display:ital@0;1&family=Playfair+Display:wght@700;900&family=Bebas+Neue&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
@@ -2278,7 +2284,61 @@ async function runAiPublishFlow(file){
     const meats = data.meats || [];
     const sides = data.sides || [];
 
-    // 5. Show preview of extracted items
+    // ── 5a. If AI detected a date in the photo, offer to use it ──
+    // The "preselected default" is just today (the auto-pick from page load).
+    // We treat "user only had the default selected" as no manual override, so
+    // we silently swap to the detected date. Otherwise, ask first.
+    const detectedDate = data.detectedDate;
+    const detectedRange = data.detectedDateRange;
+    if(detectedDate){
+      const todayISO = dateOffsetAdj(0);
+      const onlyDefaultSelected =
+        _aiTabSelectedDates.size === 1 &&
+        _aiTabSelectedDates.has(todayISO) &&
+        detectedDate !== todayISO;
+      const userHadCustomSelection =
+        _aiTabSelectedDates.size > 0 &&
+        !onlyDefaultSelected &&
+        !(_aiTabSelectedDates.size === 1 && _aiTabSelectedDates.has(detectedDate));
+
+      let useDetected = false;
+      if(onlyDefaultSelected){
+        // Silently switch to detected date — user hadn't deliberately picked anything
+        useDetected = true;
+        toast('Detected date in photo: ' + detectedDate, 'info');
+      } else if(userHadCustomSelection){
+        // Ask before stomping their manual selection
+        const sel = [...dates].sort();
+        const friendly = new Date(detectedDate + 'T00:00').toLocaleDateString('en-US',{weekday:'long', month:'short', day:'numeric'});
+        const msg = 'AI detected this date on the photo:\n\n  → ' + friendly + ' (' + detectedDate + ')\n\nYou currently have ' + sel.length + ' date(s) selected. Use the detected date instead?';
+        if(confirm(msg)) useDetected = true;
+      }
+
+      if(useDetected){
+        // Build new selection: detected single, or detected range if provided
+        _aiTabSelectedDates = new Set();
+        if(detectedRange && detectedRange.length === 2){
+          // Expand range into individual dates
+          const start = new Date(detectedRange[0] + 'T00:00');
+          const end   = new Date(detectedRange[1] + 'T00:00');
+          for(let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)){
+            const iso = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+            const dayName = d.toLocaleDateString('en-US',{weekday:'long'});
+            if(!isClosedDay(dayName)) _aiTabSelectedDates.add(iso);
+          }
+          // If everything got filtered as closed, fall back to the start date
+          if(_aiTabSelectedDates.size === 0) _aiTabSelectedDates.add(detectedRange[0]);
+        } else {
+          _aiTabSelectedDates.add(detectedDate);
+        }
+        // Refresh UI and the working dates list for the rest of this flow
+        renderAiDateGrid();
+        updateAiDateSummary();
+        dates = [...(_aiTabSelectedDates)].sort();
+      }
+    }
+
+    // 6. Show preview of extracted items
     renderAiPreview(meats, sides);
 
     // 6. Fill the left-side Lunch form fields with the new items (so the user
@@ -3043,6 +3103,50 @@ const mob = {
 
       const meats = data.meats || [];
       const sides = data.sides || [];
+
+      // If AI detected a date on the photo, offer to use it (silent when default,
+      // confirm when user had manual selection)
+      const detectedDate = data.detectedDate;
+      const detectedRange = data.detectedDateRange;
+      if(detectedDate){
+        const todayISO = dateOffsetAdj(0);
+        const onlyDefaultSelected =
+          this.selectedDates.size === 1 &&
+          this.selectedDates.has(todayISO) &&
+          detectedDate !== todayISO;
+        const userHadCustomSelection =
+          this.selectedDates.size > 0 &&
+          !onlyDefaultSelected &&
+          !(this.selectedDates.size === 1 && this.selectedDates.has(detectedDate));
+
+        let useDetected = false;
+        if(onlyDefaultSelected){
+          useDetected = true;
+          toast('Detected date in photo: ' + detectedDate, 'info');
+        } else if(userHadCustomSelection){
+          const friendly = new Date(detectedDate + 'T00:00').toLocaleDateString('en-US',{weekday:'long', month:'short', day:'numeric'});
+          if(confirm('AI detected this date on the photo:\n\n  → ' + friendly + '\n\nUse the detected date instead of your current selection?')) useDetected = true;
+        }
+
+        if(useDetected){
+          this.selectedDates = new Set();
+          if(detectedRange && detectedRange.length === 2){
+            const start = new Date(detectedRange[0] + 'T00:00');
+            const end   = new Date(detectedRange[1] + 'T00:00');
+            for(let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)){
+              const iso = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+              const dayName = d.toLocaleDateString('en-US',{weekday:'long'});
+              if(!isClosedDay(dayName)) this.selectedDates.add(iso);
+            }
+            if(this.selectedDates.size === 0) this.selectedDates.add(detectedRange[0]);
+          } else {
+            this.selectedDates.add(detectedDate);
+          }
+          this.renderDateGrid();
+          dates = [...this.selectedDates].sort();
+        }
+      }
+
       this.renderAiPreview(meats, sides);
 
       const autoPublish = document.getElementById('mobAiAutoPublish')?.checked;
