@@ -246,8 +246,8 @@ main{position:relative;z-index:5;}
         </div>
         <div class="badge">
           <span class="dot"></span>
-          <b>Open Today</b>
-          <span>· Mon–Sat, 6am–2pm</span>
+          <b id="badgeLabel">Today</b>
+          <span id="badgeHours">· 6am–2pm</span>
         </div>
       </div>
     </div>
@@ -289,14 +289,14 @@ main{position:relative;z-index:5;}
         <span class="section-eye">Come See Us</span>
         <h2 class="section-h">Fresh every morning, <em>six days a week.</em></h2>
       </div>
-      <div class="hours-grid">
+      <div class="hours-grid" id="hoursGrid">
         <div class="hcell"><div class="d">Mon</div><div class="t">6a–2p</div></div>
         <div class="hcell"><div class="d">Tue</div><div class="t">6a–2p</div></div>
         <div class="hcell"><div class="d">Wed</div><div class="t">6a–2p</div></div>
         <div class="hcell"><div class="d">Thu</div><div class="t">6a–2p</div></div>
         <div class="hcell"><div class="d">Fri</div><div class="t">6a–2p</div></div>
         <div class="hcell"><div class="d">Sat</div><div class="t">6a–2p</div></div>
-        <div class="hcell closed"><div class="d">Sun</div><div class="t">Closed</div></div>
+        <div class="hcell"><div class="d">Sun</div><div class="t">7a–3p</div></div>
       </div>
     </div>
   </section>
@@ -350,8 +350,10 @@ main{position:relative;z-index:5;}
         </div>
         <div class="foot-col">
           <h4>Hours</h4>
-          <p>Monday – Saturday<br>6:00am – 2:00pm</p>
-          <p>Sunday · Closed</p>
+          <div id="footHours">
+            <p>Monday – Saturday<br>6:00am – 2:00pm</p>
+            <p>Sunday<br>7:00am – 3:00pm</p>
+          </div>
         </div>
         <div class="foot-col">
           <h4>Order &amp; Connect</h4>
@@ -373,6 +375,60 @@ main{position:relative;z-index:5;}
   <a href="/delivery"><span class="ic">🚗</span><span class="tx">Delivery</span></a>
   <a href="/about"><span class="ic">👋</span><span class="tx">About</span></a>
 </nav>
+
+<!-- Live hours from Supabase (single source of truth — edited in the fb-editor) -->
+<script>
+(function(){
+  var URL="https://zgqjzgonwvkxfbdseieg.supabase.co/rest/v1/menu_defaults?key=eq.hours&select=value";
+  var KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpncWp6Z29ud3ZreGZiZHNlaWVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1Njk4NTksImV4cCI6MjA5MjE0NTg1OX0.1mGtFUKumyQUgU0pO2CxIYSKLEuYEzspCGk9ncYYavk";
+  var FULL=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var ORDER=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+  var ABBR={Monday:"Mon",Tuesday:"Tue",Wednesday:"Wed",Thursday:"Thu",Friday:"Fri",Saturday:"Sat",Sunday:"Sun"};
+  function shortT(t){
+    if(!t) return "";
+    var m=String(t).trim().match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i);
+    if(!m) return t;
+    return m[1]+(m[2]&&m[2]!=="00"?(":"+m[2]):"")+m[3].toLowerCase().charAt(0);
+  }
+  function val(w){return (!w||!w.open)?"Closed":(shortT(w.open)+"–"+shortT(w.close));}
+  fetch(URL,{headers:{apikey:KEY,Authorization:"Bearer "+KEY}})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var weekly=d&&d[0]&&d[0].value&&d[0].value.weekly;
+      if(!weekly||!weekly.length) return;
+      var byDay={}; weekly.forEach(function(w){byDay[w.day]=w;});
+      // 7-cell grid
+      var grid=document.getElementById("hoursGrid");
+      if(grid){
+        grid.innerHTML=ORDER.map(function(day){
+          var v=val(byDay[day]); var cl=(v==="Closed")?" closed":"";
+          return '<div class="hcell'+cl+'"><div class="d">'+ABBR[day]+'</div><div class="t">'+v+'</div></div>';
+        }).join("");
+      }
+      // footer: group consecutive identical days into ranges
+      var fh=document.getElementById("footHours");
+      if(fh){
+        var groups=[],cur=null;
+        ORDER.forEach(function(day){
+          var v=val(byDay[day]);
+          if(cur&&cur.v===v){cur.end=day;}
+          else{cur={start:day,end:day,v:v};groups.push(cur);}
+        });
+        fh.innerHTML=groups.map(function(g){
+          var label=g.start===g.end?ABBR[g.start]:(ABBR[g.start]+"–"+ABBR[g.end]);
+          return '<p style="margin:0 0 4px;">'+label+' · '+g.v+'</p>';
+        }).join("");
+      }
+      // hero badge: today's hours
+      var today=FULL[new Date().getDay()], tw=byDay[today];
+      var bl=document.getElementById("badgeLabel"), bh=document.getElementById("badgeHours");
+      if(bl&&bh){
+        if(!tw||!tw.open){bl.textContent="Closed Today";bh.textContent="";}
+        else{bl.textContent="Open Today";bh.textContent="· "+shortT(tw.open)+"–"+shortT(tw.close);}
+      }
+    }).catch(function(){/* keep static fallback */});
+})();
+</script>
 
 </body>
 </html>
