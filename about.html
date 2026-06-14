@@ -1,27 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>
-/* NorthStar relay — public menu now reads from NorthStar's central DB, scoped
-   to this client. (Editing happens in the NorthStar Control Center.) */
-(function(){
-  var NSD="https://lljvxmqpnkdtnwvuaqkd.supabase.co", HH="https://zgqjzgonwvkxfbdseieg.supabase.co";
-  var ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsanZ4bXFwbmtkdG53dnVhcWtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMzI4MDEsImV4cCI6MjA5NjkwODgwMX0.M28Idbz5N2deFmd9yhV5j0MxM6dLkum3mhxa4APFW5k", CID="fb272a86-5b9e-4199-9818-fa68efc5ccd6";
-  var MAP={menu_defaults:'site_menu_defaults',lunch_dates:'site_lunch_dates',drawing_projects:'site_drawing_projects'};
-  var real=window.fetch.bind(window);
-  window.fetch=function(input,init){
-    try{ var url=(typeof input==='string')?input:((input&&input.url)||''); var idx=url.indexOf('/rest/v1/');
-      if(idx>-1 && (url.indexOf(NSD)===0||url.indexOf(HH)===0)){
-        var rest=url.slice(idx+9), qm=rest.indexOf('?'); var tbl=qm<0?rest:rest.slice(0,qm), qs=qm<0?'':rest.slice(qm+1);
-        var mapped=MAP[tbl]||tbl; if(mapped.indexOf('site_')===0 && CID){ qs+=(qs?'&':'')+'client_id=eq.'+CID; }
-        init=Object.assign({},init||{}); var h=Object.assign({},init.headers||{}); h['apikey']=ANON; h['Authorization']='Bearer '+ANON; init.headers=h;
-        input=NSD+'/rest/v1/'+mapped+(qs?('?'+qs):'');
-      }
-    }catch(e){}
-    return real(input,init);
-  };
-})();
-</script>
+<script src="https://www.nsdsystems.com/nsd-connect.js" data-client="fb272a86-5b9e-4199-9818-fa68efc5ccd6"></script>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
