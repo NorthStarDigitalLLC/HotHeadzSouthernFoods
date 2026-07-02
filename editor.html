@@ -3438,3 +3438,163 @@ if(/[?&]fulledit=1/.test(location.search)){
 }})();
 </script>
 
+
+<!-- ═══════════════════════════════════════════════════════════════
+     First-run guided tour — walks a new user through building the
+     day's menu with AI. Self-contained; targets the real UI.
+     ═══════════════════════════════════════════════════════════════ -->
+<style id="hhTourCSS">
+.hht-mask{position:fixed;inset:0;z-index:2147482000;pointer-events:auto;background:transparent;}
+.hht-hole{position:fixed;border-radius:12px;box-shadow:0 0 0 9999px rgba(6,6,10,.74);outline:2px solid #ff5a2c;outline-offset:3px;pointer-events:none;transition:top .28s cubic-bezier(.22,1,.36,1),left .28s cubic-bezier(.22,1,.36,1),width .28s,height .28s;}
+.hht-tip{position:fixed;z-index:2147482002;width:min(310px,88vw);background:#141418;border:1px solid rgba(255,120,60,.4);border-radius:16px;padding:16px 17px 14px;box-shadow:0 24px 70px rgba(0,0,0,.65);color:#f2ece6;font-family:'DM Sans',system-ui,sans-serif;transition:top .2s ease,left .2s ease;}
+.hht-tip .hht-kick{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#8a837c;margin-bottom:5px;}
+.hht-tip h4{margin:0 0 6px;font-size:16px;font-weight:800;color:#ff7a4d;line-height:1.2;}
+.hht-tip p{margin:0;font-size:13.5px;line-height:1.55;color:#d5cfc8;}
+.hht-row{display:flex;align-items:center;justify-content:space-between;margin-top:14px;gap:10px;}
+.hht-dots{display:flex;gap:5px;}
+.hht-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.22);transition:background .2s;}
+.hht-dot.on{background:#ff5a2c;}
+.hht-btns{display:flex;gap:8px;align-items:center;}
+.hht-btn{font-family:inherit;font-weight:700;font-size:12.5px;border-radius:10px;padding:8px 14px;cursor:pointer;border:1px solid transparent;-webkit-tap-highlight-color:transparent;}
+.hht-next{background:linear-gradient(135deg,#ff6a34,#ff3d3d);color:#fff;box-shadow:0 4px 14px rgba(255,60,40,.32);}
+.hht-back{background:rgba(255,255,255,.06);color:#e8e2dc;border-color:rgba(255,255,255,.12);}
+.hht-skip{background:transparent;color:#8a837c;font-size:12px;padding:8px 6px;}
+.hht-fab{position:fixed;right:16px;bottom:16px;z-index:2147481000;height:44px;padding:0 16px 0 14px;border-radius:24px;border:none;cursor:pointer;background:linear-gradient(135deg,#ff6a34,#ff3d3d);color:#fff;font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:800;box-shadow:0 8px 26px rgba(255,60,40,.42);display:flex;align-items:center;gap:7px;-webkit-tap-highlight-color:transparent;}
+.hht-fab span.ic{font-size:16px;}
+@media (max-width:900px){ .hht-fab{bottom:76px;} }
+</style>
+<script>
+(function(){
+  if(window.__hhTourLoaded) return; window.__hhTourLoaded=1;
+  var SEEN='hh_editor_tour_v1';
+  var mask,hole,tip,tipKick,tipTitle,tipBody,dotsWrap,backBtn,nextBtn,skipBtn,fab;
+  var steps=[],cur=0,curTarget=null,active=false;
+
+  function q(sel){ try{ return typeof sel==='function'?sel():document.querySelector(sel); }catch(e){ return null; } }
+  function mobileActive(){ var m=document.getElementById('mobileApp'); return !!(m&&getComputedStyle(m).display!=='none'); }
+  function screenActive(id){ var s=document.getElementById(id); return !!(s&&s.classList.contains('mob-active')); }
+  function click(sel){ var e=q(sel); if(e) e.click(); }
+
+  // ---------- step sets ----------
+  var mobileSteps=[
+    { kick:'Welcome', title:"Let's make today's menu", body:"This takes about 30 seconds. Snap a photo of the day's menu and the AI builds and publishes it for you. Tap Next to see how.", sel:'[data-go="ai"]', place:'bottom' },
+    { kick:'Step 1', title:'Pick the day', body:'Tap the date this menu is for. You can select several days to publish the same menu to all of them at once.', sel:'#mobDateGrid', place:'bottom',
+      before:function(){ if(!screenActive('mobScreenAi')) click('[data-go="ai"]'); } },
+    { kick:'Shortcut', title:'Or select in one tap', body:'“Mon–Fri” or “All Open” select multiple days instantly — handy when the menu repeats.', sel:'.mob-date-quick', place:'bottom' },
+    { kick:'Step 2', title:'Snap the menu', body:'Point your phone at the printed or written menu and tap Snap Photo. The AI reads every item and price for you.', sel:'#mobAiSnapBtn', place:'top' },
+    { kick:'Step 2', title:'…or use a photo', body:'Already took a picture? Grab it from your library instead of snapping a new one.', sel:'#mobAiPickBtn', place:'top' },
+    { kick:'Step 3', title:'Correct anything (optional)', body:"If the AI might misread something, tell it here — e.g. “the second item is meatloaf, not meatballs.”", place:'top',
+      sel:function(){ var ta=document.getElementById('mobAiUserPrompt'); return ta?ta.closest('details'):null; },
+      before:function(){ var ta=document.getElementById('mobAiUserPrompt'); if(ta){var d=ta.closest('details'); if(d) d.open=true;} } },
+    { kick:'Step 4', title:'It publishes itself', body:'Leave these on. When the AI finishes it publishes to the website, updates the menu image, and fits the text to your layout — automatically.', sel:'.mob-toggle-card', place:'top' },
+    { kick:'Step 5', title:'Review & you’re done', body:"After it runs, open the preview to see the finished menu image that's now live. That's the whole flow: snap → review → live. 🎉", sel:'[data-go="preview"]', place:'top' },
+  ];
+  var desktopSteps=[
+    { kick:'Welcome', title:'The AI menu builder', body:'Turn a photo of the day’s menu into a published menu. Click the ✨ AI Lunch tab to begin — tap Next and I’ll show each step.', sel:'[data-tab="ai-lunch"]', place:'bottom' },
+    { kick:'Step 1', title:'Date, photo & AI', body:'Pick the date(s), then use the purple AI card to upload a photo of the menu. The AI extracts every item and price for you.', sel:'#sidePanel', place:'left',
+      before:function(){ click('[data-tab="ai-lunch"]'); } },
+    { kick:'Step 2', title:'Live preview', body:'Your menu image builds here in real time as the AI fills it in. You can fine-tune any text by hand if you want.', sel:'#hhMEcanvas', place:'left' },
+    { kick:'Step 3', title:'Publish', body:'When it looks right, hit Export / publish — it goes straight to the website. Done! Replay this tour anytime from the orange button.', sel:'#exportBtn', place:'bottom' },
+  ];
+
+  // ---------- build DOM ----------
+  function build(){
+    mask=document.createElement('div'); mask.className='hht-mask';
+    hole=document.createElement('div'); hole.className='hht-hole';
+    tip=document.createElement('div'); tip.className='hht-tip';
+    tip.innerHTML='<div class="hht-kick"></div><h4></h4><p></p>'+
+      '<div class="hht-row"><div class="hht-dots"></div><div class="hht-btns">'+
+      '<button class="hht-btn hht-skip">Skip</button>'+
+      '<button class="hht-btn hht-back">Back</button>'+
+      '<button class="hht-btn hht-next">Next</button></div></div>';
+    mask.appendChild(hole); mask.appendChild(tip);
+    tipKick=tip.querySelector('.hht-kick'); tipTitle=tip.querySelector('h4'); tipBody=tip.querySelector('p');
+    dotsWrap=tip.querySelector('.hht-dots'); backBtn=tip.querySelector('.hht-back'); nextBtn=tip.querySelector('.hht-next'); skipBtn=tip.querySelector('.hht-skip');
+    nextBtn.onclick=function(){ cur<steps.length-1?show(cur+1):end(true); };
+    backBtn.onclick=function(){ if(cur>0) show(cur-1); };
+    skipBtn.onclick=function(){ end(true); };
+    document.body.appendChild(mask);
+    window.addEventListener('resize',relayout); window.addEventListener('scroll',relayout,true);
+  }
+
+  function place(rect){
+    var s=steps[cur], vw=innerWidth, vh=innerHeight, m=12, tw=tip.offsetWidth, th=tip.offsetHeight, top,left, p=s.place||'bottom';
+    if(!rect){ tip.style.top=(vh/2-th/2)+'px'; tip.style.left=(vw/2-tw/2)+'px'; return; }
+    if(p==='top'){ top=rect.top-th-m; left=rect.left+rect.width/2-tw/2; }
+    else if(p==='left'){ top=rect.top+rect.height/2-th/2; left=rect.left-tw-m; }
+    else if(p==='right'){ top=rect.top+rect.height/2-th/2; left=rect.right+m; }
+    else { top=rect.bottom+m; left=rect.left+rect.width/2-tw/2; }
+    if(top<m) top=rect.bottom+m; if(top+th>vh-m) top=Math.max(m,rect.top-th-m);
+    left=Math.max(m,Math.min(left,vw-tw-m)); top=Math.max(m,Math.min(top,vh-th-m));
+    tip.style.top=top+'px'; tip.style.left=left+'px';
+  }
+  function frame(t){
+    if(!t){ hole.style.display='none'; place(null); return; }
+    var r=t.getBoundingClientRect(), pad=6;
+    hole.style.display='block';
+    hole.style.top=(r.top-pad)+'px'; hole.style.left=(r.left-pad)+'px';
+    hole.style.width=(r.width+pad*2)+'px'; hole.style.height=(r.height+pad*2)+'px';
+    place(r);
+  }
+  function relayout(){ if(active) frame(curTarget); }
+
+  function show(i){
+    cur=i; var s=steps[i];
+    if(s.before){ try{ s.before(); }catch(e){} }
+    setTimeout(function(){
+      tipKick.textContent=s.kick||''; tipKick.style.display=s.kick?'block':'none';
+      tipTitle.textContent=s.title; tipBody.textContent=s.body;
+      dotsWrap.innerHTML=steps.map(function(_,n){return '<span class="hht-dot'+(n===i?' on':'')+'"></span>';}).join('');
+      backBtn.style.display=i===0?'none':'inline-block';
+      nextBtn.textContent=i===steps.length-1?'Finish ✓':'Next';
+      var t=q(s.sel);
+      if(t && t.scrollIntoView){ try{ t.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} }
+      curTarget=t;
+      setTimeout(function(){ frame(curTarget); }, s.before?300:140);
+    }, s.before?230:0);
+  }
+
+  function start(){
+    if(active) return;
+    steps=mobileActive()?mobileSteps:desktopSteps;
+    if(!mask) build();
+    active=true; mask.style.display='block'; if(fab) fab.style.display='none';
+    try{ localStorage.setItem(SEEN,'1'); }catch(e){}
+    show(0);
+  }
+  function end(){
+    active=false; if(mask) mask.style.display='none'; if(fab) fab.style.display='flex';
+    try{ localStorage.setItem(SEEN,'1'); }catch(e){}
+  }
+
+  function addFab(){
+    if(fab) return;
+    fab=document.createElement('button'); fab.className='hht-fab';
+    fab.innerHTML='<span class="ic">🧭</span> Tour';
+    fab.title='Take the guided tour';
+    fab.onclick=start;
+    document.body.appendChild(fab);
+  }
+
+  function unlocked(){
+    var g=document.getElementById('adminGate');
+    if(!g) return true;
+    var st=getComputedStyle(g);
+    return st.display==='none'||st.visibility==='hidden'||g.offsetParent===null;
+  }
+  function init(){
+    var tries=0;
+    (function poll(){
+      if(unlocked()){
+        addFab();
+        if(!(function(){try{return localStorage.getItem(SEEN);}catch(e){return true;}})()){
+          setTimeout(start,1000);
+        }
+        return;
+      }
+      if(tries++<60) setTimeout(poll,500);
+    })();
+  }
+  if(document.readyState!=='loading') init(); else document.addEventListener('DOMContentLoaded',init);
+})();
+</script>
