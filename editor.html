@@ -516,6 +516,15 @@
       </button>
     </div>
 
+    <!-- Type the menu — submit with NO photo required -->
+    <div class="mob-section-title" style="margin-top:14px;">Or Type the Menu</div>
+    <p class="mob-section-hint" style="margin-bottom:8px;">No photo needed — just type or paste the menu and submit.</p>
+    <textarea class="mob-input mob-textarea" id="mobAiMenuText" rows="4" placeholder="Meats: Fried Chicken, Meatloaf, Smothered Pork Chops&#10;Sides: Mashed Potatoes, Green Beans, Mac &amp; Cheese, Cornbread"></textarea>
+    <button class="mob-big-btn mob-big-btn-primary" id="mobAiTextBtn" style="width:100%;margin-top:10px;">
+      <div class="mob-big-btn-icon">✨</div>
+      <div class="mob-big-btn-label">Build &amp; Publish From Text</div>
+    </button>
+
     <!-- Optional prompt -->
     <details class="mob-section-collapse">
       <summary>Optional note for the AI</summary>
@@ -2952,6 +2961,13 @@ const mob = {
       e.target.value = '';
       await this.runAi(file);
     });
+    // Text-only submit — build & publish the menu from typed text, no photo required
+    document.getElementById('mobAiTextBtn')?.addEventListener('click', async () => {
+      if(this.selectedDates.size === 0){ toast('Pick at least one date first','error'); return; }
+      const txt = (document.getElementById('mobAiMenuText')?.value || '').trim();
+      if(!txt){ toast('Type the menu first','error'); return; }
+      await this.runAi(null, txt);
+    });
 
     // Mobile date quick-action buttons
     document.querySelectorAll('[data-mob-dq]').forEach(btn => {
@@ -3132,7 +3148,7 @@ const mob = {
     el.classList.add('show');
   },
 
-  async runAi(file){
+  async runAi(file, menuText){
     try {
       if(!menuDefaultsCache){
         this.setAiStatus('Loading menu defaults…','loading');
@@ -3143,27 +3159,34 @@ const mob = {
       let dates = [...(this.selectedDates || new Set())].sort();
       if(!dates.length) dates = [dateOffsetAdj(0)];
 
-      // Prep photo via canvas
-      this.setAiStatus('Preparing photo ('+Math.round(file.size/1024)+' KB)…','loading');
-      let blob, mediaType;
-      try {
-        blob = await compressImageForAiTab(file, 1600, 0.85);
-        mediaType = 'image/jpeg';
-      } catch(prepErr){
-        const supported = ['image/jpeg','image/jpg','image/png','image/gif','image/webp'];
-        const ft = (file.type||'').toLowerCase();
-        if(supported.includes(ft)){ blob = file; mediaType = ft; }
-        else { this.setAiStatus('Can\'t process '+(file.type||'photo')+'. iPhone: Settings → Camera → Formats → Most Compatible.','error'); return; }
-      }
-      if(blob.size > 5*1024*1024){ this.setAiStatus('Photo too big after compression ('+Math.round(blob.size/1024/1024)+'MB).','error'); return; }
-
-      this.setAiStatus('Sending '+Math.round(blob.size/1024)+'KB to Claude…','loading');
-      const base64 = await fileToBase64Tab(blob);
+      // Build the request from a photo, typed text, or both
+      menuText = (menuText || '').trim();
+      if(!file && !menuText){ this.setAiStatus('Snap a photo or type the menu first.','error'); return; }
       const userPrompt = (document.getElementById('mobAiUserPrompt')?.value || '').trim();
+      const reqBody = { userPrompt: userPrompt };
 
+      if(file){
+        this.setAiStatus('Preparing photo ('+Math.round(file.size/1024)+' KB)…','loading');
+        let blob, mediaType;
+        try {
+          blob = await compressImageForAiTab(file, 1600, 0.85);
+          mediaType = 'image/jpeg';
+        } catch(prepErr){
+          const supported = ['image/jpeg','image/jpg','image/png','image/gif','image/webp'];
+          const ft = (file.type||'').toLowerCase();
+          if(supported.includes(ft)){ blob = file; mediaType = ft; }
+          else { this.setAiStatus('Can\'t process '+(file.type||'photo')+'. iPhone: Settings → Camera → Formats → Most Compatible.','error'); return; }
+        }
+        if(blob.size > 5*1024*1024){ this.setAiStatus('Photo too big after compression ('+Math.round(blob.size/1024/1024)+'MB).','error'); return; }
+        reqBody.imageBase64 = await fileToBase64Tab(blob);
+        reqBody.imageMediaType = mediaType;
+      }
+      if(menuText) reqBody.menuText = menuText;
+
+      this.setAiStatus(file ? 'Sending photo to Claude…' : 'Sending menu text to Claude…','loading');
       const resp = await fetch('/api/ai-extract-menu', {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ imageBase64: base64, imageMediaType: mediaType, userPrompt: userPrompt })
+        body: JSON.stringify(reqBody)
       });
       let data;
       try { data = await resp.json(); }
