@@ -1195,7 +1195,7 @@ function loadStarterBoxes(){
   boxes=[
     defaultBox('Day',t.weekday||'Monday',51.06,6.83,Object.assign({},base,{align:'center',sizePct:5.8,shadowBlur:14,fontFamily:'"Abril Fatface",Georgia,serif',lineHeight:1.0})),
     defaultBox('Date',t.dateStr||'April 13, 2026',50.61,12.26,Object.assign({},base,{align:'center',sizePct:2.6,shadowBlur:10,fontFamily:'"DM Serif Display",Georgia,serif',italic:true,lineHeight:1.0})),
-    defaultBox('Breakfast','BREAKFAST\n6:00 AM - 10:30 AM\n\n\u2022 Scrambled Eggs\n\u2022 Bacon\n\u2022 Sausage, Hotlinks\n\u2022 Pancakes\n\u2022 French Toast Sticks\n\u2022 Biscuits\n\u2022 Hashbrowns\n\u2022 Cheesy Grits\n\u2022 Grits\n\u2022 Sausage Gravy\n\u2022 Oatmeal',19.80,48.21,Object.assign({},base,{fontFamily:SF,sizePct:1.31,lineHeight:1.22,maxWidthPct:24.6})),
+    defaultBox('Breakfast','BREAKFAST\n5:30 AM - 10:30 AM\n\n\u2022 Scrambled Eggs\n\u2022 Bacon\n\u2022 Sausage, Hotlinks\n\u2022 Pancakes\n\u2022 French Toast Sticks\n\u2022 Biscuits\n\u2022 Hashbrowns\n\u2022 Cheesy Grits\n\u2022 Grits\n\u2022 Sausage Gravy\n\u2022 Oatmeal',19.80,48.21,Object.assign({},base,{fontFamily:SF,sizePct:1.31,lineHeight:1.22,maxWidthPct:24.6})),
     defaultBox('Salad Bar','SALAD BAR\n\nLettuce:\n\u2022 Romaine\n\u2022 Iceburg\nToppings:\n\u2022 Diced Tomatoes\n\u2022 Cucumbers\n\u2022 Onions\n\u2022 Broccoli\n\u2022 Carrots\n\u2022 Cauliflower\n\u2022 Peppers\n\u2022 Cheese\n\u2022 Croutons\n\u2022 Bacon Bits\n\u2022 Eggs\n\u2022 Diced Ham\n\u2022 Crackers\n\u2022 Sunflower Seeds\n\u2022 Pickled Okra\n\u2022 Jalapenos\n\u2022 Pickled beets\n\u2022 Green Olives\n\u2022 Banana Peppers\n\u2022 Pickled Green Tomatoes',69.07,53.09,Object.assign({},base,{fontFamily:SF,sizePct:1.28,lineHeight:1.18})),
     defaultBox('Dressings','Dressings:\n\u2022 Ranch\n\u2022 Italian\n\u2022 Blue Cheese\n\u2022 Caesar\n\u2022 Thousand Island',81.33,38.21,Object.assign({},base,{fontFamily:SF,sizePct:1.28,lineHeight:1.18})),
     defaultBox('Lunch','LUNCH\n11:00 AM - 2:00 PM\n\n\u2022 Beef Tips\n\u2022 Red Beans & Rice\n\u2022 BBQ Chicken\n\u2022 Mashed Potatoes\n& Gravy\n\u2022 Cabbage\n\u2022 Green Beans\n\u2022 Corn\n\u2022 Rolls\n\u2022 Fried Okra\n\nSame Daily\n\u2022 Turkey Clubs\n\u2022 Chicken Salad\nCroissants',18.75,78.79,Object.assign({},base,{fontFamily:SF,sizePct:1.31,lineHeight:1.22})),
@@ -1413,13 +1413,24 @@ document.getElementById('publishLunch').addEventListener('click',()=>{publishLun
 /* ═══ MENU DEFAULTS CACHE ═══ */
 var menuDefaultsCache = null;
 var menuDefaultsStatus = 'idle';
+function enforceWeekdayOpeningTimesInEditor(defaults){
+  var weekly=defaults&&defaults.hours&&Array.isArray(defaults.hours.weekly)?defaults.hours.weekly:[];
+  var weekdays=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  weekly.forEach(function(entry){
+    if(entry&&weekdays.indexOf(entry.day)>-1){
+      entry.open='5:30 AM';
+      entry.breakfast='5:30 AM – 10:30 AM';
+    }
+  });
+  return defaults;
+}
 async function loadMenuDefaults(force){
   if (menuDefaultsCache && !force) return menuDefaultsCache;
   menuDefaultsStatus = 'loading';
   try {
     const res = await cloudRequest('getMenuDefaults');
     if (res && res.success && res.defaults) {
-      menuDefaultsCache = res.defaults; menuDefaultsStatus = 'loaded'; return menuDefaultsCache;
+      menuDefaultsCache = enforceWeekdayOpeningTimesInEditor(res.defaults); menuDefaultsStatus = 'loaded'; return menuDefaultsCache;
     }
     menuDefaultsStatus = 'error'; return null;
   } catch(e) { menuDefaultsStatus = 'error'; return null; }
