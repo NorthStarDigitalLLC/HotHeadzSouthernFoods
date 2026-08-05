@@ -34,7 +34,7 @@
   "priceRange":"$$",
   "servesCuisine":["Southern","Cajun","American Breakfast"],
   "address":{"@type":"PostalAddress","streetAddress":"2741 US-190","addressLocality":"DeRidder","addressRegion":"LA","postalCode":"70634","addressCountry":"US"},
-  "openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"06:00","closes":"14:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":["Sunday"],"opens":"07:00","closes":"15:00"}]
+  "openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"05:30","closes":"14:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":["Saturday"],"opens":"06:00","closes":"14:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":["Sunday"],"opens":"07:00","closes":"15:00"}]
 }
 </script>
 
@@ -278,7 +278,7 @@ main{position:relative;z-index:5;}
         <div class="badge">
           <span class="dot"></span>
           <b id="badgeLabel">Today</b>
-          <span id="badgeHours">· 6am–2pm</span>
+          <span id="badgeHours">· 5:30am–2pm</span>
         </div>
       </div>
     </div>
@@ -348,11 +348,11 @@ main{position:relative;z-index:5;}
         <h2 class="section-h">Fresh every morning, <em>Seven days a week.</em></h2>
       </div>
       <div class="hours-grid" id="hoursGrid">
-        <div class="hcell"><div class="d">Mon</div><div class="t">6a–2p</div></div>
-        <div class="hcell"><div class="d">Tue</div><div class="t">6a–2p</div></div>
-        <div class="hcell"><div class="d">Wed</div><div class="t">6a–2p</div></div>
-        <div class="hcell"><div class="d">Thu</div><div class="t">6a–2p</div></div>
-        <div class="hcell"><div class="d">Fri</div><div class="t">6a–2p</div></div>
+        <div class="hcell"><div class="d">Mon</div><div class="t">5:30a–2p</div></div>
+        <div class="hcell"><div class="d">Tue</div><div class="t">5:30a–2p</div></div>
+        <div class="hcell"><div class="d">Wed</div><div class="t">5:30a–2p</div></div>
+        <div class="hcell"><div class="d">Thu</div><div class="t">5:30a–2p</div></div>
+        <div class="hcell"><div class="d">Fri</div><div class="t">5:30a–2p</div></div>
         <div class="hcell"><div class="d">Sat</div><div class="t">6a–2p</div></div>
         <div class="hcell"><div class="d">Sun</div><div class="t">7a–3p</div></div>
       </div>
@@ -404,7 +404,8 @@ main{position:relative;z-index:5;}
         <div class="foot-col">
           <h4>Hours</h4>
           <div id="footHours">
-            <p>Monday – Saturday<br>6:00am – 2:00pm</p>
+            <p>Monday – Friday<br>5:30am – 2:00pm</p>
+            <p>Saturday<br>6:00am – 2:00pm</p>
             <p>Sunday<br>7:00am – 3:00pm</p>
           </div>
         </div>
@@ -449,7 +450,13 @@ main{position:relative;z-index:5;}
     .then(function(d){
       var weekly=d&&d[0]&&d[0].value&&d[0].value.weekly;
       if(!weekly||!weekly.length) return;
-      var byDay={}; weekly.forEach(function(w){byDay[w.day]=w;});
+      var byDay={}; weekly.forEach(function(w){byDay[w.day]=Object.assign({},w);});
+      ["Monday","Tuesday","Wednesday","Thursday","Friday"].forEach(function(day){
+        if(byDay[day]){
+          byDay[day].open="5:30 AM";
+          byDay[day].breakfast="5:30 AM – 10:30 AM";
+        }
+      });
       // 7-cell grid
       var grid=document.getElementById("hoursGrid");
       if(grid){
