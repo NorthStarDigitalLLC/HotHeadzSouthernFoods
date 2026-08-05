@@ -111,6 +111,12 @@ main{position:relative;z-index:5;}
 .foot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(24px,4vw,48px);text-align:center;}
 .foot-col h4{font-family:var(--cond);font-weight:700;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--honey);margin-bottom:12px;}
 .foot-col p,.foot-col a{font-size:14.5px;line-height:1.7;color:rgba(255,253,248,.82);}
+.hours-stack{display:grid;gap:10px;justify-items:center;}
+.hours-block{display:grid;gap:1px;text-align:center;}
+.hours-block strong{display:block;font-family:var(--cond);font-size:14px;font-weight:700;letter-spacing:.04em;color:inherit;}
+.hours-block span{display:block;font-size:14.5px;line-height:1.45;color:inherit;}
+.foot .hours-block strong{color:#fff;}
+.foot .hours-block span{color:rgba(255,253,248,.82);}
 .foot-col a:hover{color:var(--honey);}
 .foot-phone{font-family:var(--serif);font-size:20px;color:#fff;}
 .foot-bottom{border-top:1px solid rgba(255,253,248,.14);margin-top:30px;padding-top:18px;text-align:center;font-family:var(--cond);font-size:12px;letter-spacing:.08em;color:rgba(255,253,248,.55);}
@@ -210,7 +216,7 @@ main{position:relative;z-index:5;}
         </div>
         <div class="visit-card">
           <h3>🕒 Hours</h3>
-          <p><span id="cardHours">Mon – Fri · 5:30am – 2pm<br>Saturday · 6am – 2pm<br>Sunday · 7am – 3pm</span><br><span style="color:var(--terra-deep);font-weight:600;">Crawfish · Thu–Sat, 4pm–8pm</span></p>
+          <p><span id="cardHours" class="hours-stack"><span class="hours-block"><strong>Monday – Friday</strong><span>5:30am–2pm</span></span><span class="hours-block"><strong>Saturday</strong><span>6am–2pm</span></span><span class="hours-block"><strong>Sunday</strong><span>7am–3pm</span></span></span><br><span style="color:var(--terra-deep);font-weight:600;">Crawfish · Thu–Sat, 4pm–8pm</span></p>
         </div>
         <div class="visit-card">
           <h3>📞 Call</h3>
@@ -236,7 +242,7 @@ main{position:relative;z-index:5;}
     <div class="wrap">
       <div class="foot-grid">
         <div class="foot-col"><h4>Visit Us</h4><p>2741 US-190<br>DeRidder, LA 70634</p><p><a href="https://maps.google.com/?q=2741+US-190+DeRidder+LA+70634" target="_blank" rel="noopener">Get Directions →</a></p></div>
-        <div class="foot-col"><h4>Hours</h4><div id="footHours"><p>Mon – Fri · 5:30am – 2pm<br>Saturday · 6am – 2pm<br>Sunday · 7am – 3pm</p></div></div>
+        <div class="foot-col"><h4>Hours</h4><div id="footHours" class="hours-stack"><div class="hours-block"><strong>Monday – Friday</strong><span>5:30am–2pm</span></div><div class="hours-block"><strong>Saturday</strong><span>6am–2pm</span></div><div class="hours-block"><strong>Sunday</strong><span>7am–3pm</span></div></div></div>
         <div class="foot-col"><h4>Order &amp; Connect</h4><p><a class="foot-phone" href="tel:+13372211035">(337) 221-1035</a></p><p><a href="https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/" target="_blank" rel="noopener">Facebook →</a></p></div>
       </div>
       <div class="foot-bottom">© 2026 Hot Headz Southern Foods · Website by <a href="https://www.northstardigitalweb.com" target="_blank" rel="noopener">NorthStar Digital</a></div>
@@ -274,8 +280,8 @@ main{position:relative;z-index:5;}
       if(cur&&cur.v===v){cur.end=day;} else {cur={start:day,end:day,v:v};groups.push(cur);}
     });
     return groups.map(function(g){
-      var label=g.start===g.end?ABBR[g.start]:(ABBR[g.start]+"–"+ABBR[g.end]);
-      return label+" · "+g.v;
+      var label=g.start===g.end?g.start:(g.start+" – "+g.end);
+      return '<span class="hours-block"><strong>'+label+'</strong><span>'+g.v+'</span></span>';
     });
   }
   fetch(URL,{headers:{apikey:KEY,Authorization:"Bearer "+KEY}})
@@ -292,9 +298,9 @@ main{position:relative;z-index:5;}
       });
       var lines=grouped(byDay);
       var card=document.getElementById("cardHours");
-      if(card) card.innerHTML=lines.join("<br>");
+      if(card) card.innerHTML=lines.join("");
       var fh=document.getElementById("footHours");
-      if(fh) fh.innerHTML="<p style='margin:0;'>"+lines.join("<br>")+"</p>";
+      if(fh) fh.innerHTML=lines.join("");
     }).catch(function(){});
 })();
 </script>
