@@ -1,0 +1,278 @@
+/* Hot Headz public-site refresh — shared across all customer-facing pages */
+:root{
+  --hh-cream:#fbf4e6;
+  --hh-paper:#fffdf8;
+  --hh-ink:#33271b;
+  --hh-muted:#6b5844;
+  --hh-terra:#b94f31;
+  --hh-terra-dark:#923b25;
+  --hh-honey:#e0a24e;
+  --hh-line:rgba(120,86,52,.18);
+  --hh-shadow:0 22px 55px -30px rgba(60,34,14,.55);
+  --hh-radius:20px;
+  --hh-ease:cubic-bezier(.16,1,.3,1);
+}
+html{scroll-behavior:smooth;scroll-padding-top:92px}
+body.hh-refresh{overflow-x:hidden}
+body.hh-refresh :where(a,button,input,select,textarea,summary):focus-visible{
+  outline:3px solid var(--hh-honey)!important;
+  outline-offset:3px!important;
+}
+body.hh-refresh :where(button,a){touch-action:manipulation}
+.hh-skip-link{
+  position:fixed;top:8px;left:8px;z-index:100000;
+  transform:translateY(-160%);padding:11px 16px;border-radius:10px;
+  background:#fff;color:#24170f;font:700 14px/1.2 system-ui,sans-serif;
+  box-shadow:0 8px 30px rgba(0,0,0,.25);
+}
+.hh-skip-link:focus{transform:none}
+body.hh-refresh img{height:auto}
+
+/* Shared navigation */
+body.hh-refresh .topbar{
+  isolation:isolate;
+  box-shadow:0 8px 28px -26px rgba(50,28,12,.8);
+}
+body.hh-refresh .topbar-in{min-height:64px}
+body.hh-refresh .brand img{width:42px;height:42px}
+body.hh-refresh .topnav a{min-height:40px;display:inline-flex;align-items:center}
+body.hh-refresh .topnav a[aria-current="page"]{
+  color:var(--hh-terra-dark);
+  background:rgba(185,79,49,.11);
+}
+body.hh-refresh .topnav a.cta{color:#fff}
+body.hh-refresh .topnav a.cta[aria-current="page"]{color:#fff}
+.hh-announcement{
+  position:relative;z-index:35;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:8px 18px;text-align:center;
+  background:#39271b;color:#fff7eb;border-bottom:1px solid rgba(255,255,255,.12);
+  font:600 13px/1.35 system-ui,sans-serif;
+}
+.hh-announcement strong{color:#ffd792}
+.hh-announcement a{text-decoration:underline;text-underline-offset:3px}
+.hh-announcement a:hover{color:#ffd792}
+
+/* Shared visible footer used on the dark utility pages */
+.hh-site-footer{
+  position:relative;z-index:6;
+  max-width:1040px;margin:34px auto 112px;padding:0 18px;
+  color:rgba(255,255,255,.74);font:400 14px/1.6 system-ui,sans-serif;
+}
+.hh-site-footer-inner{
+  display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:18px;
+  padding:24px;border:1px solid rgba(255,255,255,.1);border-radius:18px;
+  background:rgba(17,11,10,.82);box-shadow:0 18px 50px rgba(0,0,0,.22);
+}
+.hh-site-footer h2{
+  margin:0 0 7px;color:#ffd792;font:800 12px/1.2 system-ui,sans-serif;
+  letter-spacing:.13em;text-transform:uppercase;
+}
+.hh-site-footer p{margin:0}
+.hh-site-footer a{color:#fff;text-decoration:none}
+.hh-site-footer a:hover{text-decoration:underline;text-underline-offset:3px}
+.hh-site-footer .hours-stack{justify-items:start}
+.hh-site-footer .hours-block{text-align:left}
+
+/* Homepage */
+.hh-home .hero{padding-top:clamp(28px,5vw,56px)}
+.hh-home .hero-copy{max-width:590px}
+.hh-home .hero h1{max-width:13ch}
+.hh-home .hero-cta{margin-bottom:18px}
+.hero-trust{
+  display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;
+  color:var(--hh-muted);font-size:13px;
+}
+.hero-trust span{
+  display:inline-flex;align-items:center;gap:6px;padding:8px 11px;
+  border:1px solid var(--hh-line);border-radius:999px;background:rgba(255,253,248,.72);
+}
+.hh-home .quick{padding:18px 0 22px;background:var(--hh-cream)}
+.hh-home .quick-grid{grid-template-columns:repeat(4,1fr);gap:12px}
+.hh-home .quick-card{
+  min-height:104px;padding:18px 14px;border-radius:18px;
+  display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;
+  column-gap:12px;text-align:left;align-content:center;
+}
+.hh-home .quick-card .quick-ic{grid-row:1/3;margin:0;font-size:27px}
+.hh-home .quick-card .quick-tx{font-size:18px;line-height:1.05}
+.quick-sub{
+  color:var(--hh-muted);font-size:12.5px;line-height:1.3;margin-top:4px;
+  font-family:var(--body,system-ui);
+}
+.hh-home .school-promo{padding:clamp(24px,4vw,40px) 0}
+.hh-home .school-promo-card{max-width:980px}
+.hh-home .school-promo-art img{max-height:430px;object-fit:cover;object-position:top}
+.hh-home .preview-head{max-width:680px;margin:0 auto 24px;text-align:center}
+.hh-home .preview-head .section-eye{justify-content:center}
+.hh-home .specials-wrap{gap:14px}
+.hh-home .spec-card{
+  border-radius:17px!important;box-shadow:var(--hh-shadow)!important;
+}
+.hh-home .hours-grid{gap:10px}
+.hh-home .hcell{border-radius:15px}
+.hh-home .hcell .t{font-size:14px}
+.hh-home .foot{padding-bottom:34px}
+
+/* Menu: retain the energetic dark mood, but use the same brand shell and rhythm. */
+.hh-menu{--hh-menu-top:64px;background:#0b0808!important}
+.hh-menu .topbar{
+  position:sticky;top:0;z-index:1200;
+  background:rgba(251,244,230,.96)!important;
+  border-bottom:1px solid rgba(120,86,52,.2)!important;
+  color:var(--hh-ink);
+}
+.hh-menu .topbar-in{max-width:1080px}
+.hh-menu .brand-name{color:var(--hh-ink)}
+.hh-menu .brand-sub{color:#8a5a2b}
+.hh-menu .topnav a{color:var(--hh-muted)}
+.hh-menu .topnav a.cta{color:#fff;background:linear-gradient(135deg,var(--hh-terra),#c9853a)}
+.hh-menu .app{max-width:960px;padding-top:24px;padding-bottom:170px}
+.hh-menu .hero{
+  padding:28px 18px 22px!important;min-height:0!important;margin-bottom:20px!important;
+  border:1px solid rgba(255,255,255,.08);border-radius:24px;
+  background:linear-gradient(145deg,rgba(91,29,19,.34),rgba(20,10,10,.72));
+  box-shadow:0 20px 70px rgba(0,0,0,.25);
+}
+.hh-menu .hero-flame{font-size:38px!important;margin-bottom:6px!important}
+.hh-menu .hero-title{font-size:clamp(38px,7vw,64px)!important;line-height:.93!important}
+.hh-menu .hero-sub{max-width:650px;margin-left:auto!important;margin-right:auto!important}
+.hh-menu .status-badge{border-color:rgba(255,255,255,.14)}
+.hh-menu .school-deal{
+  grid-template-columns:minmax(210px,.68fr) 1.32fr!important;
+  gap:24px!important;margin:0 0 22px!important;padding:20px!important;border-radius:22px!important;
+  background:linear-gradient(145deg,rgba(255,248,231,.98),rgba(250,229,192,.96))!important;
+  color:#3b2116!important;box-shadow:0 24px 70px -26px rgba(0,0,0,.8)!important;
+}
+.hh-menu .school-deal-art{max-height:280px;border-radius:16px!important;overflow:hidden}
+.hh-menu .school-deal-art img{width:100%;height:100%;max-height:280px;object-fit:cover;object-position:top}
+.hh-menu .school-deal h2{color:#9f2e1d!important;font-size:clamp(30px,5vw,46px)!important}
+.hh-menu .school-deal-start,.hh-menu .school-deal-note{color:#704b38!important}
+.hh-menu .school-deal-prices{gap:8px!important}
+.hh-menu .school-deal-prices li{
+  min-height:60px!important;padding:10px 12px!important;background:rgba(255,255,255,.68)!important;
+  border-color:rgba(159,46,29,.16)!important;
+}
+.hh-menu .day-tabs-wrap{
+  position:sticky!important;top:64px!important;z-index:80!important;
+  margin:0 -8px 18px!important;padding:10px 8px!important;
+  background:linear-gradient(180deg,rgba(11,8,8,.98) 76%,transparent)!important;
+  backdrop-filter:blur(12px);
+}
+.hh-menu .day-tabs{max-width:680px;margin:0 auto}
+.hh-menu .day-tab{min-height:46px}
+.hh-menu .panel{scroll-margin-top:132px}
+.hh-menu .cat-top-bar{
+  position:sticky;top:126px;z-index:65;
+  padding:10px 4px!important;margin:0 0 14px!important;
+  background:rgba(11,8,8,.94);backdrop-filter:blur(10px);
+  overflow-x:auto;scrollbar-width:none;
+}
+.hh-menu .cat-top-bar::-webkit-scrollbar{display:none}
+.hh-menu .cat-top-bar :where(a,button){min-height:42px}
+.hh-menu .menu-card,.hh-menu .category-card,.hh-menu .cat-section{
+  scroll-margin-top:188px;
+}
+.hh-menu .action-bar{
+  padding-bottom:max(10px,env(safe-area-inset-bottom))!important;
+  background:rgba(16,10,10,.96)!important;border-top-color:rgba(255,255,255,.13)!important;
+}
+.hh-menu .action-btn{min-height:52px}
+.hh-menu .action-btn.home{min-width:48px}
+.hh-menu #particles{opacity:.36}
+.hh-menu .ticker-wrap{border-radius:16px;overflow:hidden}
+
+/* Delivery */
+.hh-delivery-page{background:#0b0808!important}
+.hh-delivery-page .topbar{
+  position:sticky;top:0;z-index:1200;
+  background:rgba(251,244,230,.96)!important;border-bottom:1px solid rgba(120,86,52,.2)!important;
+}
+.hh-delivery-page .topbar-in{max-width:1080px}
+.hh-delivery-page .brand-name{color:var(--hh-ink)}
+.hh-delivery-page .brand-sub{color:#8a5a2b}
+.hh-delivery-page .topnav a{color:var(--hh-muted)}
+.hh-delivery-page .topnav a.cta{color:#fff;background:linear-gradient(135deg,var(--hh-terra),#c9853a)}
+.hh-delivery-page .back-btn{display:none!important}
+.hh-delivery-page .hh-delivery{padding-top:30px!important}
+.hh-delivery-page .hh-headerbox{border-radius:24px!important}
+.hh-delivery-page .hh-card{border-radius:20px!important}
+.hh-delivery-page .hh-qBtn{min-height:48px}
+.hh-delivery-page details summary{min-height:50px;display:flex;align-items:center}
+.hh-delivery-page .hh-site-footer{margin-bottom:38px}
+
+/* About */
+.hh-about .hero{padding-top:clamp(30px,5vw,56px)}
+.hh-about .story-grid,.hh-about .visit-grid,.hh-about .values{gap:18px}
+.hh-about .visit-card,.hh-about .value{border-radius:18px}
+.hh-about .foot{padding-bottom:34px}
+
+/* Mobile */
+@media(max-width:760px){
+  html{scroll-padding-top:74px}
+  .hh-announcement{font-size:12.5px;padding:7px 12px}
+  body.hh-refresh .topbar-in{min-height:58px;padding-block:8px}
+  body.hh-refresh .brand img{width:38px;height:38px}
+  body.hh-refresh .brand-name{font-size:16px}
+  .hh-home .hero{padding-top:24px}
+  .hh-home .hero h1{max-width:15ch;margin-inline:auto}
+  .hero-trust{justify-content:center}
+  .hh-home .quick{padding-top:12px}
+  .hh-home .quick-grid{grid-template-columns:repeat(2,1fr)}
+  .hh-home .quick-card{min-height:94px;padding:15px 12px}
+  .hh-home .quick-card:last-child{display:none}
+  .hh-home .school-promo-card{grid-template-columns:1fr}
+  .hh-home .school-promo-art{max-height:230px}
+  .hh-home .school-promo-art img{max-height:230px;object-fit:cover;object-position:center 18%}
+  .hh-home .hours-grid{grid-template-columns:repeat(2,1fr)!important}
+  .hh-home .hcell{padding:13px 8px}
+  .hh-home .hcell .d{font-size:13px}
+  .hh-home .hcell .t{font-size:14px!important}
+  .hh-site-footer-inner{grid-template-columns:1fr;text-align:center}
+  .hh-site-footer .hours-stack{justify-items:center}
+  .hh-site-footer .hours-block{text-align:center}
+  .hh-menu .topnav a.ghost:nth-of-type(n+3),
+  .hh-delivery-page .topnav a.ghost:nth-of-type(n+3){display:none}
+  .hh-menu .app{padding:16px 12px 168px!important}
+  .hh-menu .hero{padding:22px 12px 18px!important;margin-bottom:14px!important}
+  .hh-menu .hero-flame{font-size:30px!important}
+  .hh-menu .hero-title{font-size:42px!important}
+  .hh-menu .countdown-wrap{margin-top:12px!important}
+  .hh-menu .school-deal{grid-template-columns:1fr!important;padding:17px!important;gap:12px!important}
+  .hh-menu .school-deal-art{display:none!important}
+  .hh-menu .school-deal-prices{grid-template-columns:repeat(3,1fr)!important}
+  .hh-menu .school-deal-prices li{min-width:0!important;text-align:center!important;padding:9px 5px!important}
+  .hh-menu .school-deal-prices li span{font-size:11px!important}
+  .hh-menu .school-deal-prices li strong{font-size:20px!important}
+  .hh-menu .school-deal-prices li small{font-size:10px!important}
+  .hh-menu .school-deal-note,.hh-menu .school-deal-hours{margin-bottom:4px!important}
+  .hh-menu .day-tabs-wrap{top:58px!important;margin-inline:-12px!important}
+  .hh-menu .day-tab{font-size:12px!important;padding-inline:9px!important}
+  .hh-menu .cat-top-bar{top:116px}
+  .hh-menu .cat-rail{display:none!important}
+  .hh-menu #particles{display:none!important}
+  .hh-menu .action-bar{gap:2px!important}
+  .hh-menu .action-btn{min-width:0!important}
+  .hh-menu .action-label{font-size:10px!important}
+  .hh-delivery-page .hh-delivery{padding:18px 12px 30px!important}
+}
+@media(max-width:430px){
+  body.hh-refresh .topnav{gap:4px}
+  body.hh-refresh .topnav a{padding:8px 9px;font-size:13px}
+  body.hh-refresh .topnav a.ghost:nth-of-type(n+2){display:none}
+  .hh-home .quick-card .quick-ic{font-size:24px}
+  .hh-home .quick-card .quick-tx{font-size:16px}
+  .quick-sub{font-size:11.5px}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  body.hh-refresh *,body.hh-refresh *::before,body.hh-refresh *::after{
+    animation-duration:.01ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important;scroll-behavior:auto!important;
+  }
+  .hh-menu #particles{display:none!important}
+}
+@media print{
+  .topbar,.hh-announcement,.dock,.action-bar,.hh-skip-link{display:none!important}
+  body{padding-bottom:0!important}
+}
