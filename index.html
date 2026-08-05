@@ -209,6 +209,12 @@ main{position:relative;z-index:5;}
 .foot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(24px,4vw,48px);text-align:center;}
 .foot-col h4{font-family:var(--cond);font-weight:700;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--honey);margin-bottom:12px;}
 .foot-col p,.foot-col a{font-size:14.5px;line-height:1.7;color:rgba(255,253,248,.82);}
+.hours-stack{display:grid;gap:10px;justify-items:center;}
+.hours-block{display:grid;gap:1px;text-align:center;}
+.hours-block strong{display:block;font-family:var(--cond);font-size:14px;font-weight:700;letter-spacing:.04em;color:inherit;}
+.hours-block span{display:block;font-size:14.5px;line-height:1.45;color:inherit;}
+.foot .hours-block strong{color:#fff;}
+.foot .hours-block span{color:rgba(255,253,248,.82);}
 .foot-col a:hover{color:var(--honey);}
 .foot-phone{font-family:var(--serif);font-size:20px;color:#fff;}
 .foot-bottom{border-top:1px solid rgba(255,253,248,.14);margin-top:30px;padding-top:18px;text-align:center;font-family:var(--cond);font-size:12px;letter-spacing:.08em;color:rgba(255,253,248,.55);}
@@ -403,10 +409,10 @@ main{position:relative;z-index:5;}
         </div>
         <div class="foot-col">
           <h4>Hours</h4>
-          <div id="footHours">
-            <p>Monday – Friday<br>5:30am – 2:00pm</p>
-            <p>Saturday<br>6:00am – 2:00pm</p>
-            <p>Sunday<br>7:00am – 3:00pm</p>
+          <div id="footHours" class="hours-stack">
+            <div class="hours-block"><strong>Monday – Friday</strong><span>5:30am–2pm</span></div>
+            <div class="hours-block"><strong>Saturday</strong><span>6am–2pm</span></div>
+            <div class="hours-block"><strong>Sunday</strong><span>7am–3pm</span></div>
           </div>
         </div>
         <div class="foot-col">
@@ -475,8 +481,8 @@ main{position:relative;z-index:5;}
           else{cur={start:day,end:day,v:v};groups.push(cur);}
         });
         fh.innerHTML=groups.map(function(g){
-          var label=g.start===g.end?ABBR[g.start]:(ABBR[g.start]+"–"+ABBR[g.end]);
-          return '<p style="margin:0 0 4px;">'+label+' · '+g.v+'</p>';
+          var label=g.start===g.end?g.start:(g.start+" – "+g.end);
+          return '<div class="hours-block"><strong>'+label+'</strong><span>'+g.v+'</span></div>';
         }).join("");
       }
       // hero badge: today's hours
