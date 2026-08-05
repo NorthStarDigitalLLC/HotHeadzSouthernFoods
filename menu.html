@@ -642,6 +642,21 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:10000;
 .print-footer{display:none}
 .section-divider{width:100%;height:1px;border:none;background:linear-gradient(90deg,transparent,var(--border-warm),transparent);margin:10px 0 4px}
 .flash-overlay{position:fixed;inset:0;display:none;place-items:center;z-index:200;background:rgba(0,0,0,.78);backdrop-filter:blur(16px);padding:18px}.flash-overlay.show{display:grid}.flash-card{width:min(460px,calc(100vw - 32px));border-radius:28px;border:1px solid var(--border-warm);background:var(--surface-solid);padding:36px;text-align:center;animation:fp .4s var(--ease-spring)}@keyframes fp{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}.flash-title{font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--accent-light);margin-bottom:10px}.flash-text{color:rgba(245,237,228,.90);font-size:15px;line-height:1.6;margin-bottom:16px}.flash-countdown{display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent-hot),var(--ember));color:#fff;font-weight:900;font-size:22px;margin-bottom:12px}.flash-sub{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(245,237,228,.70)}
+.school-deal{display:grid;grid-template-columns:minmax(190px,270px) minmax(0,1fr);gap:24px;align-items:center;margin:0 auto 28px;padding:20px;background:linear-gradient(145deg,rgba(74,34,16,.96),rgba(30,18,12,.96));border:1px solid rgba(255,160,72,.38);border-radius:22px;box-shadow:0 20px 60px rgba(0,0,0,.34),0 0 44px rgba(255,106,26,.08)}
+.school-deal-art{overflow:hidden;border-radius:15px;border:1px solid rgba(255,192,120,.25);background:#180d08}
+.school-deal-art img{display:block;width:100%;height:auto}
+.school-deal-kicker{display:block;font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-light);margin-bottom:8px}
+.school-deal h2{font-family:var(--font-display);font-size:clamp(30px,5vw,44px);line-height:.98;color:var(--text);margin-bottom:8px}
+.school-deal-start{font-size:14px;font-weight:700;color:var(--gold);margin-bottom:15px}
+.school-deal-prices{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:13px}
+.school-deal-prices li{padding:10px 7px;text-align:center;border-radius:12px;background:rgba(255,255,255,.055);border:1px solid var(--border)}
+.school-deal-prices span{display:block;font-size:11px;font-weight:700;color:var(--text-mid)}
+.school-deal-prices strong{display:block;font-family:var(--font-display);font-size:27px;line-height:1;color:var(--accent-light);margin:4px 0 2px}
+.school-deal-prices small{display:block;font-size:10px;font-weight:700;color:var(--text-dim)}
+.school-deal-note{font-size:12px;line-height:1.55;color:var(--text-dim)}
+.school-deal-hours{margin-top:10px;font-size:13px;font-weight:800;color:var(--accent-light)}
+@media(max-width:640px){.school-deal{grid-template-columns:1fr;text-align:center;padding:16px}.school-deal-art{max-width:330px;margin:0 auto}.school-deal-prices{grid-template-columns:1fr}.school-deal-prices li{display:grid;grid-template-columns:1fr auto auto;align-items:baseline;gap:8px;text-align:left;padding:10px 12px}.school-deal-prices strong{font-size:25px}.school-deal-prices small{text-align:right}}
+
 .hide{display:none!important}
 @media(max-width:640px){.plates-row{grid-template-columns:1fr}.salad-grid{grid-template-columns:1fr}.app{padding:0 12px 140px}.hero{padding:40px 0 24px}}
 </style>
@@ -675,7 +690,14 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:10000;
 
   <section aria-labelledby="breakfast-heading">
     <h2 id="breakfast-heading">Breakfast Menu</h2>
-    <p>Made-from-scratch Southern breakfast served from 6:00 AM Monday through Saturday and 7:00 AM Sundays until 10:30 AM.</p>
+    <p>Made-from-scratch Southern breakfast served daily until 10:30 AM.</p>
+    <h3>Back to School Breakfast &mdash; Starting August 6, 2026</h3>
+    <p>Each Back to School Breakfast plate includes coffee with one refill. Hot Headz opens at 5:30 AM Monday through Friday.</p>
+    <ul>
+      <li>1 meat breakfast plate with coffee &mdash; $8.30</li>
+      <li>2 meat breakfast plate with coffee &mdash; $9.75</li>
+      <li>3 meat breakfast plate with coffee &mdash; $10.99</li>
+    </ul>
     <h3>Breakfast Plates &amp; Pricing</h3>
     <ul>
       <li>Breakfast Plate, 1 meat &mdash; $9.99</li>
@@ -815,6 +837,23 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:10000;
 
 <div class="app">
   <header class="hero"><div class="hero-flame">🔥</div><div class="hero-eyebrow">DeRidder, Louisiana</div><h1 class="hero-title" aria-hidden="true">Hot Headz<br><em>Southern Foods</em></h1><p class="hero-sub" id="heroSub">Loading menu&hellip;</p><div class="status-wrap"><div class="status-badge"><span class="status-dot closed" id="statusDot"></span><span id="statusText">Checking&hellip;</span></div></div><div class="countdown-wrap" id="countdownWrap" style="display:none"><div class="countdown-label" id="countdownLabel"></div><div class="countdown-timer"><div class="countdown-block"><span class="countdown-num" id="cdHours">00</span><span class="countdown-unit">HR</span></div><div class="countdown-sep">:</div><div class="countdown-block"><span class="countdown-num" id="cdMins">00</span><span class="countdown-unit">MIN</span></div><div class="countdown-sep">:</div><div class="countdown-block"><span class="countdown-num" id="cdSecs">00</span><span class="countdown-unit">SEC</span></div></div></div></header>
+  <section class="school-deal" aria-labelledby="schoolDealTitle">
+    <figure class="school-deal-art">
+      <img src="/images/back-to-school-breakfast.svg?v=1" alt="Back to School Breakfast deal at Hot Headz Southern Foods" loading="eager">
+    </figure>
+    <div>
+      <span class="school-deal-kicker">Back to School Special</span>
+      <h2 id="schoolDealTitle">Breakfast Deals</h2>
+      <p class="school-deal-start">New prices starting <time datetime="2026-08-06">Thursday, Aug. 6</time></p>
+      <ul class="school-deal-prices" aria-label="Back to School Breakfast prices">
+        <li><span>1 meat plate</span><strong>$8.30</strong><small>with coffee</small></li>
+        <li><span>2 meat plate</span><strong>$9.75</strong><small>with coffee</small></li>
+        <li><span>3 meat plate</span><strong>$10.99</strong><small>with coffee</small></li>
+      </ul>
+      <p class="school-deal-note">Coffee includes one refill.</p>
+      <p class="school-deal-hours">☀ Now open at 5:30am Monday–Friday</p>
+    </div>
+  </section>
   <div class="specials-banner" id="specialsBanner"></div>
   <div class="ticker-wrap" id="tickerWrap">
     <div class="ticker-label">🔥 This week</div>
