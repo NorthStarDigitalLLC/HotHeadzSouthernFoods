@@ -210,7 +210,7 @@ main{position:relative;z-index:5;}
         </div>
         <div class="visit-card">
           <h3>🕒 Hours</h3>
-          <p><span id="cardHours">Mon – Sat · 6am – 2pm<br>Sunday · 7am – 3pm</span><br><span style="color:var(--terra-deep);font-weight:600;">Crawfish · Thu–Sat, 4pm–8pm</span></p>
+          <p><span id="cardHours">Mon – Fri · 5:30am – 2pm<br>Saturday · 6am – 2pm<br>Sunday · 7am – 3pm</span><br><span style="color:var(--terra-deep);font-weight:600;">Crawfish · Thu–Sat, 4pm–8pm</span></p>
         </div>
         <div class="visit-card">
           <h3>📞 Call</h3>
@@ -236,7 +236,7 @@ main{position:relative;z-index:5;}
     <div class="wrap">
       <div class="foot-grid">
         <div class="foot-col"><h4>Visit Us</h4><p>2741 US-190<br>DeRidder, LA 70634</p><p><a href="https://maps.google.com/?q=2741+US-190+DeRidder+LA+70634" target="_blank" rel="noopener">Get Directions →</a></p></div>
-        <div class="foot-col"><h4>Hours</h4><div id="footHours"><p>Mon – Sat · 6am – 2pm<br>Sunday · 7am – 3pm</p></div></div>
+        <div class="foot-col"><h4>Hours</h4><div id="footHours"><p>Mon – Fri · 5:30am – 2pm<br>Saturday · 6am – 2pm<br>Sunday · 7am – 3pm</p></div></div>
         <div class="foot-col"><h4>Order &amp; Connect</h4><p><a class="foot-phone" href="tel:+13372211035">(337) 221-1035</a></p><p><a href="https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/" target="_blank" rel="noopener">Facebook →</a></p></div>
       </div>
       <div class="foot-bottom">© 2026 Hot Headz Southern Foods · Website by <a href="https://www.northstardigitalweb.com" target="_blank" rel="noopener">NorthStar Digital</a></div>
@@ -283,7 +283,13 @@ main{position:relative;z-index:5;}
     .then(function(d){
       var weekly=d&&d[0]&&d[0].value&&d[0].value.weekly;
       if(!weekly||!weekly.length) return;
-      var byDay={}; weekly.forEach(function(w){byDay[w.day]=w;});
+      var byDay={}; weekly.forEach(function(w){byDay[w.day]=Object.assign({},w);});
+      ["Monday","Tuesday","Wednesday","Thursday","Friday"].forEach(function(day){
+        if(byDay[day]){
+          byDay[day].open="5:30 AM";
+          byDay[day].breakfast="5:30 AM – 10:30 AM";
+        }
+      });
       var lines=grouped(byDay);
       var card=document.getElementById("cardHours");
       if(card) card.innerHTML=lines.join("<br>");
