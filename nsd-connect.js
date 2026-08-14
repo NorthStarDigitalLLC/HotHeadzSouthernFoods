@@ -15,11 +15,25 @@
   var CID = (me && me.getAttribute('data-client'))
           || window.NSD_CLIENT
           || new URLSearchParams(location.search).get('client') || '';
-  var NSD = "https://lljvxmqpnkdtnwvuaqkd.supabase.co";
-  var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsanZ4bXFwbmtkdG53dnVhcWtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMzI4MDEsImV4cCI6MjA5NjkwODgwMX0.M28Idbz5N2deFmd9yhV5j0MxM6dLkum3mhxa4APFW5k";
+  // This is the live central project returned by both northstardigitalweb.com
+  // and bhiservices.org. Keep Hotheadz on that exact source of truth.
+  var NSD = "https://fkisefambrcyxjrwrplb.supabase.co";
+  var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZraXNlZmFtYnJjeHhqcndycGxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNzA2NzEsImV4cCI6MjA5OTk0NjY3MX0.sDy0HJdssg_vxMQz0NvgLD7OykFZ2LfD6a6qtYevnyk";
   var LEGACY = "https://zgqjzgonwvkxfbdseieg.supabase.co"; // catch old hardcoded calls
-  var MAP = { menu_defaults:'site_menu_defaults', lunch_dates:'site_lunch_dates', drawing_projects:'site_drawing_projects' };
-  var PK  = { site_menu_defaults:'client_id,key', site_lunch_dates:'client_id,lunch_date', site_drawing_projects:'client_id,id' };
+  // Hotheadz now has dedicated, visibly labelled tables in the same central
+  // Supabase project used by NorthStar and BHI. Keep the logical names here so
+  // older page code is upgraded automatically instead of ever reaching the
+  // retired restaurant database.
+  var MAP = {
+    menu_defaults:'Hotheadz_menu_defaults',
+    lunch_dates:'Hotheadz_lunch_dates',
+    drawing_projects:'Hotheadz_drawing_projects'
+  };
+  var PK  = {
+    Hotheadz_menu_defaults:'key',
+    Hotheadz_lunch_dates:'lunch_date',
+    Hotheadz_drawing_projects:'id'
+  };
   function tok(){ try{ var s=JSON.parse(localStorage.getItem('ncc_session')); return (s&&s.access_token)||ANON; }catch(e){ return ANON; } }
   window.NSD_CONFIG = { url:NSD, anonKey:ANON, clientId:CID };
   // Upload a file/blob to the central 'media' bucket; returns its public URL.
