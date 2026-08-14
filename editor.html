@@ -16,7 +16,7 @@
   <meta name="theme-color" content="#0a0707">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Serif+Display:ital@0;1&family=Playfair+Display:wght@700;900&family=Bebas+Neue&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Caveat:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Serif+Display:ital@0;1&family=Patrick+Hand&family=Playfair+Display:wght@700;900&family=Bebas+Neue&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
     :root{--void:#0a0a0e;--surface:#131318;--card:#1a1a22;--border:rgba(255,255,255,.1);--text:#f0ece6;--text2:rgba(240,236,230,.7);--text3:rgba(240,236,230,.45);--fire:#ff7a18;--fire2:#ffb347;--ember:rgba(255,122,24,.12);--danger:#ff4d4d;--success:#4dff88;--radius:14px;--radius-sm:10px;}
@@ -396,6 +396,7 @@
       display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;
     }
   </style>
+  <link rel="stylesheet" href="/editor-rework.css">
 </head>
 <body>
 <div id="toastBox"></div>
@@ -440,51 +441,54 @@
   <!-- Landing page (the home screen of the mobile app) -->
   <div class="mob-screen mob-active" id="mobScreenHome" data-screen="home">
     <div class="mob-hero">
-      <div class="mob-hero-eyebrow">Welcome back</div>
-      <div class="mob-hero-title">What do you want to do?</div>
+      <div class="mob-hero-eyebrow">The kitchen board</div>
+      <div class="mob-hero-title">What are we serving?</div>
+      <div class="mob-chalk-rule" aria-hidden="true"></div>
+      <p class="mob-hero-copy">Start with a photo or type it yourself. You always review the board before it goes live.</p>
     </div>
 
     <button class="mob-card mob-card-primary" data-go="ai">
-      <div class="mob-card-emoji">✨</div>
+      <div class="mob-card-emoji">01</div>
       <div class="mob-card-text">
-        <div class="mob-card-title">AI Menu Update</div>
-        <div class="mob-card-sub">Snap a photo of today's menu — AI does the rest</div>
+        <div class="mob-card-kicker">Fastest path</div>
+        <div class="mob-card-title">Build Today’s Board</div>
+        <div class="mob-card-sub">Photo or typed list → review → publish</div>
       </div>
       <div class="mob-card-arrow">›</div>
     </button>
 
     <button class="mob-card" data-go="image">
-      <div class="mob-card-emoji">🖼️</div>
+      <div class="mob-card-emoji">02</div>
       <div class="mob-card-text">
-        <div class="mob-card-title">Edit Menu Image</div>
-        <div class="mob-card-sub">Customize text, photo, design</div>
+        <div class="mob-card-title">Edit the Chalkboard</div>
+        <div class="mob-card-sub">Move text, change the photo, preview and export</div>
       </div>
       <div class="mob-card-arrow">›</div>
     </button>
 
     <button class="mob-card" data-go="projects">
-      <div class="mob-card-emoji">📁</div>
+      <div class="mob-card-emoji">03</div>
       <div class="mob-card-text">
-        <div class="mob-card-title">My Projects</div>
-        <div class="mob-card-sub">Saved menus, cloud sync</div>
+        <div class="mob-card-title">Saved Boards</div>
+        <div class="mob-card-sub">Reuse an earlier menu or restore a design</div>
       </div>
       <div class="mob-card-arrow">›</div>
     </button>
 
     <button class="mob-card" data-go="defaults">
-      <div class="mob-card-emoji">⚙️</div>
+      <div class="mob-card-emoji">04</div>
       <div class="mob-card-text">
-        <div class="mob-card-title">Menu Defaults</div>
-        <div class="mob-card-sub">Breakfast, drinks, hours, settings</div>
+        <div class="mob-card-title">Things That Stay the Same</div>
+        <div class="mob-card-sub">Breakfast, drinks, same-daily items and hours</div>
       </div>
       <div class="mob-card-arrow">›</div>
     </button>
 
     <button class="mob-card mob-card-export" id="mobFullEditorBtn" style="margin-top:18px;">
-      <div class="mob-card-emoji">🎨</div>
+      <div class="mob-card-emoji">✎</div>
       <div class="mob-card-text">
-        <div class="mob-card-title">Full Design Editor</div>
-        <div class="mob-card-sub">Drag, resize &amp; position text right on the menu image</div>
+        <div class="mob-card-title">Open Full Design Studio</div>
+        <div class="mob-card-sub">For detailed dragging, resizing and positioning</div>
       </div>
       <div class="mob-card-arrow">›</div>
     </button>
@@ -493,8 +497,11 @@
 
   <!-- AI MENU UPDATE screen -->
   <div class="mob-screen" id="mobScreenAi" data-screen="ai">
+    <div class="mob-workflow" aria-label="Menu update steps">
+      <span class="active">1 Days</span><span>2 Add</span><span>3 Review</span><span>4 Live</span>
+    </div>
     <!-- Date picker -->
-    <div class="mob-section-title">Choose Date(s)</div>
+    <div class="mob-section-title">1. Choose the serving days</div>
     <p class="mob-section-hint" style="margin-bottom:8px;">Tap to select. Pick multiple to publish the same menu to several days.</p>
     <div class="mob-date-grid" id="mobDateGrid"></div>
     <div class="mob-date-quick">
@@ -505,26 +512,26 @@
     <div id="mobDateSummary" class="mob-date-summary" style="display:none;"></div>
 
     <!-- Photo capture -->
-    <div class="mob-section-title">Snap or Pick Photo</div>
+    <div class="mob-section-title">2. Add the menu</div>
     <input type="file" id="mobAiPhotoFile" accept="image/*" capture="environment" style="display:none">
     <div class="mob-photo-buttons">
       <button class="mob-big-btn mob-big-btn-primary" id="mobAiSnapBtn">
         <div class="mob-big-btn-icon">📸</div>
-        <div class="mob-big-btn-label">Snap Photo</div>
+        <div class="mob-big-btn-label">Photograph the list</div>
       </button>
       <button class="mob-big-btn" id="mobAiPickBtn">
         <div class="mob-big-btn-icon">🖼️</div>
-        <div class="mob-big-btn-label">From Library</div>
+        <div class="mob-big-btn-label">Choose a photo</div>
       </button>
     </div>
 
     <!-- Type the menu — submit with NO photo required -->
-    <div class="mob-section-title" style="margin-top:14px;">Or Type the Menu</div>
-    <p class="mob-section-hint" style="margin-bottom:8px;">No photo needed — just type or paste the menu and submit.</p>
+    <div class="mob-or"><span>or write it here</span></div>
+    <p class="mob-section-hint" style="margin-bottom:8px;">Separate meats and sides if you can. If the assistant is down, this still works.</p>
     <textarea class="mob-input mob-textarea" id="mobAiMenuText" rows="4" placeholder="Meats: Fried Chicken, Meatloaf, Smothered Pork Chops&#10;Sides: Mashed Potatoes, Green Beans, Mac &amp; Cheese, Cornbread"></textarea>
     <button class="mob-big-btn mob-big-btn-primary" id="mobAiTextBtn" style="width:100%;margin-top:10px;">
       <div class="mob-big-btn-icon">✨</div>
-      <div class="mob-big-btn-label">Build &amp; Publish From Text</div>
+        <div class="mob-big-btn-label">Build a review draft</div>
     </button>
 
     <!-- Optional prompt -->
@@ -533,19 +540,28 @@
       <textarea class="mob-input mob-textarea" id="mobAiUserPrompt" rows="3" placeholder="e.g. 'second item is meatloaf, not meatballs'"></textarea>
     </details>
 
-    <!-- Toggles -->
+    <!-- Safe automation settings: publishing always requires an explicit review. -->
     <div class="mob-toggle-card">
-      <label class="mob-toggle"><input type="checkbox" id="mobAiAutoPublish" checked> <span>Auto-publish to website</span></label>
       <label class="mob-toggle"><input type="checkbox" id="mobAiAutoCanvas" checked> <span>Auto-update canvas image</span></label>
       <label class="mob-toggle"><input type="checkbox" id="mobAiAutoFit" checked> <span>Auto-fit text to trained box</span></label>
     </div>
+
+    <details class="mob-section-collapse mob-boundary-card">
+      <summary>Menu safe area &amp; text boundary</summary>
+      <p class="mob-section-hint">The safe area keeps a long lunch list from spilling over another section.</p>
+      <div id="mobBoundaryHealth" class="boundary-health">Checking the saved boundary…</div>
+      <div class="mob-boundary-actions">
+        <button class="mob-date-quick-btn" id="mobTrainPreset">Use safe preset</button>
+        <button class="mob-date-quick-btn" id="mobTrainCurrent">Use current box</button>
+      </div>
+    </details>
 
     <!-- Status / Preview -->
     <div id="mobAiStatus" style="display:none;"></div>
     <div id="mobAiPreview" style="display:none;"></div>
 
     <!-- Manual edit handoff -->
-    <button class="mob-link-btn" id="mobAiEditManual">Open manual editor for this date →</button>
+    <button class="mob-link-btn" id="mobAiEditManual">Skip the assistant — edit everything by hand →</button>
     <button class="mob-link-btn" data-go="preview">See preview of menu image →</button>
   </div>
 
@@ -654,38 +670,40 @@
 
 <div class="editor" id="editorShell">
   <div class="topbar">
-    <div class="topbar-brand">Hot Headz</div>
-    <div class="topbar-sep"></div>
+    <div class="topbar-brand-wrap">
+      <img src="/images/HotHeadzLogo.png" alt="" class="topbar-logo">
+      <div><div class="topbar-brand">Hot Headz</div><div class="topbar-sub">Menu chalkboard</div></div>
+    </div>
     <div class="topbar-tabs">
-      <button class="tab-btn active" data-tab="quickfill">⚡ FB Menu</button>
-      <button class="tab-btn" data-tab="textboxes">Text Boxes</button>
-      <button class="tab-btn" data-tab="photo">Photo</button>
-      <button class="tab-btn" data-tab="projects">Projects</button>
-      <div class="topbar-sep" style="margin:0 4px;"></div>
-      <button class="tab-btn ai-tab" data-tab="ai-lunch">✨ AI Lunch</button>
-      <div class="topbar-sep" style="margin:0 4px;"></div>
-      <button class="tab-btn static-tab" data-tab="static-breakfast">🍳 Breakfast</button>
-      <button class="tab-btn static-tab" data-tab="static-lunchplates">💵 Lunch Plates</button>
-      <button class="tab-btn static-tab" data-tab="static-drinks">🥤 Drinks</button>
-      <button class="tab-btn static-tab" data-tab="static-beer">🍺 Beer</button>
-      <button class="tab-btn static-tab" data-tab="static-salad">🥗 Salad Bar</button>
-      <button class="tab-btn static-tab" data-tab="static-dessert">🍮 Dessert</button>
-      <button class="tab-btn static-tab" data-tab="static-crawfish">🦞 Crawfish</button>
-      <button class="tab-btn static-tab" data-tab="static-samedaily">📅 Same Daily</button>
-      <button class="tab-btn static-tab" data-tab="static-hours">🕒 Hours</button>
-      <button class="tab-btn static-tab" data-tab="static-settings">⚙ Settings</button>
+      <div class="nav-group-label">Today’s work</div>
+      <button class="tab-btn ai-tab active" data-tab="ai-lunch"><span>01</span> Build Today’s Board</button>
+      <button class="tab-btn" data-tab="quickfill"><span>02</span> Quick Fill Image</button>
+      <button class="tab-btn" data-tab="projects"><span>03</span> Saved Boards</button>
+      <div class="nav-group-label">Design studio</div>
+      <button class="tab-btn" data-tab="textboxes"><span>✎</span> Words &amp; Type</button>
+      <button class="tab-btn" data-tab="photo"><span>▧</span> Background Photo</button>
+      <div class="nav-group-label">Menu library</div>
+      <button class="tab-btn static-tab" data-tab="static-breakfast"><span>•</span> Breakfast</button>
+      <button class="tab-btn static-tab" data-tab="static-lunchplates"><span>•</span> Lunch Pricing</button>
+      <button class="tab-btn static-tab" data-tab="static-drinks"><span>•</span> Drinks &amp; Beer</button>
+      <button class="tab-btn static-tab" data-tab="static-salad"><span>•</span> Salad Bar</button>
+      <button class="tab-btn static-tab" data-tab="static-dessert"><span>•</span> Dessert &amp; Crawfish</button>
+      <button class="tab-btn static-tab" data-tab="static-samedaily"><span>•</span> Same Daily</button>
+      <button class="tab-btn static-tab" data-tab="static-hours"><span>•</span> Hours</button>
+      <button class="tab-btn static-tab" data-tab="static-settings"><span>•</span> Website Settings</button>
+      <button class="tab-btn static-tab nav-secondary" data-tab="static-beer">Beer list</button>
+      <button class="tab-btn static-tab nav-secondary" data-tab="static-crawfish">Crawfish details</button>
     </div>
     <div class="tb-actions">
-      <button class="tb-btn undo" id="undoBtn" title="Undo">↩</button>
-      <button class="tb-btn undo" id="redoBtn" title="Redo">↪</button>
-      <button class="tb-btn export-btn" id="exportBtn">Export ↓</button>
-      <button class="tb-btn signout-btn" id="signOutBtn">Sign Out ←</button>
+      <div class="history-actions"><button class="tb-btn undo" id="undoBtn" title="Undo">↩ Undo</button><button class="tb-btn undo" id="redoBtn" title="Redo">Redo ↪</button></div>
+      <button class="tb-btn export-btn" id="exportBtn">Download board ↓</button>
+      <button class="tb-btn signout-btn" id="signOutBtn">Sign out</button>
     </div>
   </div>
   <div class="main-layout">
     <!-- LEFT side panel — only visible when AI Lunch tab is active, hosts the Lunch editor -->
     <div class="side-panel side-panel-left" id="sidePanelLeft" style="display:none;border-left:none;border-right:1px solid var(--border);">
-      <div class="mpc"><span class="mpc-title">Lunch Editor</span><button class="mpc-btn" id="closeSidePanelLeft">Done</button></div>
+      <div class="mpc"><span class="mpc-title">Manual corrections</span><button class="mpc-btn" id="closeSidePanelLeft">Done</button></div>
       <div class="side-scroll" id="sideScrollLeft"></div>
     </div>
     <div class="canvas-panel">
@@ -710,7 +728,7 @@
       </div>
     </div>
     <div class="side-panel" id="sidePanel">
-      <div class="mpc"><span class="mpc-title">Settings</span><button class="mpc-btn" id="closeSidePanel">Done</button></div>
+      <div class="mpc"><span class="mpc-title">Update desk</span><button class="mpc-btn" id="closeSidePanel">Done</button></div>
       <div class="side-scroll" id="sideScroll"></div>
     </div>
   </div>
@@ -749,6 +767,8 @@ const isCoarse=()=>{try{return matchMedia('(pointer:coarse)').matches||navigator
 const FONTS=[
   {label:"System",value:'system-ui,-apple-system,Segoe UI,Roboto,Arial'},
   {label:"DM Sans",value:'"DM Sans",system-ui,sans-serif'},
+  {label:"Patrick Hand (Chalk)",value:'"Patrick Hand",cursive'},
+  {label:"Caveat (Handwritten)",value:'"Caveat",cursive'},
   {label:"Abril Fatface",value:'"Abril Fatface",Georgia,serif'},
   {label:"DM Serif Display",value:'"DM Serif Display",Georgia,serif'},
   {label:"Playfair Display",value:'"Playfair Display",Georgia,serif'},
@@ -1192,17 +1212,17 @@ function defaultBox(name,text,xPct,yPct,ov={}){
 function loadStarterBoxes(){
   const t=todayDefaults();
   const C='#d4a898';
-  const SF='system-ui,-apple-system,Segoe UI,Roboto,Arial';
+  const SF='"Patrick Hand",cursive';
   const base={color:C,shadow:true,shadowBlur:8,shadowColor:'rgba(0,0,0,0.7)'};
   boxes=[
-    defaultBox('Day',t.weekday||'Monday',51.06,6.83,Object.assign({},base,{align:'center',sizePct:5.8,shadowBlur:14,fontFamily:'"Abril Fatface",Georgia,serif',lineHeight:1.0})),
-    defaultBox('Date',t.dateStr||'April 13, 2026',50.61,12.26,Object.assign({},base,{align:'center',sizePct:2.6,shadowBlur:10,fontFamily:'"DM Serif Display",Georgia,serif',italic:true,lineHeight:1.0})),
+    defaultBox('Day',t.weekday||'Monday',51.06,6.83,Object.assign({},base,{align:'center',sizePct:5.8,shadowBlur:14,fontFamily:'"Caveat",cursive',lineHeight:1.0})),
+    defaultBox('Date',t.dateStr||'April 13, 2026',50.61,12.26,Object.assign({},base,{align:'center',sizePct:2.6,shadowBlur:10,fontFamily:'"Patrick Hand",cursive',italic:false,lineHeight:1.0})),
     defaultBox('Breakfast','BREAKFAST\n5:30 AM - 10:30 AM\n\n\u2022 Scrambled Eggs\n\u2022 Bacon\n\u2022 Sausage, Hotlinks\n\u2022 Pancakes\n\u2022 French Toast Sticks\n\u2022 Biscuits\n\u2022 Hashbrowns\n\u2022 Cheesy Grits\n\u2022 Grits\n\u2022 Sausage Gravy\n\u2022 Oatmeal',19.80,48.21,Object.assign({},base,{fontFamily:SF,sizePct:1.31,lineHeight:1.22,maxWidthPct:24.6})),
     defaultBox('Salad Bar','SALAD BAR\n\nLettuce:\n\u2022 Romaine\n\u2022 Iceburg\nToppings:\n\u2022 Diced Tomatoes\n\u2022 Cucumbers\n\u2022 Onions\n\u2022 Broccoli\n\u2022 Carrots\n\u2022 Cauliflower\n\u2022 Peppers\n\u2022 Cheese\n\u2022 Croutons\n\u2022 Bacon Bits\n\u2022 Eggs\n\u2022 Diced Ham\n\u2022 Crackers\n\u2022 Sunflower Seeds\n\u2022 Pickled Okra\n\u2022 Jalapenos\n\u2022 Pickled beets\n\u2022 Green Olives\n\u2022 Banana Peppers\n\u2022 Pickled Green Tomatoes',69.07,53.09,Object.assign({},base,{fontFamily:SF,sizePct:1.28,lineHeight:1.18})),
     defaultBox('Dressings','Dressings:\n\u2022 Ranch\n\u2022 Italian\n\u2022 Blue Cheese\n\u2022 Caesar\n\u2022 Thousand Island',81.33,38.21,Object.assign({},base,{fontFamily:SF,sizePct:1.28,lineHeight:1.18})),
     defaultBox('Lunch','LUNCH\n11:00 AM - 2:00 PM\n\n\u2022 Beef Tips\n\u2022 Red Beans & Rice\n\u2022 BBQ Chicken\n\u2022 Mashed Potatoes\n& Gravy\n\u2022 Cabbage\n\u2022 Green Beans\n\u2022 Corn\n\u2022 Rolls\n\u2022 Fried Okra\n\nSame Daily\n\u2022 Turkey Clubs\n\u2022 Chicken Salad\nCroissants',18.75,78.79,Object.assign({},base,{fontFamily:SF,sizePct:1.31,lineHeight:1.22})),
     defaultBox('Drinks','DRINKS\n\n\u2022 Sweet Tea\n\u2022 Unsweet Tea\n\u2022 Dr. Pepper\n\u2022 Rootbeer\n\u2022 Sprite\n\u2022 Fruit Punch\n\u2022 Blue Powerade\n\u2022 Diet Coke\n\u2022 Coke Zero\n\u2022 Coke\n\u2022 Coffee\n\u2022 Orange Juice\n\u2022 Milk\n\u2022 Chocolate Milk',40.43,78.79,Object.assign({},base,{fontFamily:SF,sizePct:1.38,lineHeight:1.22})),
-    defaultBox('Bottom Note','For pricing and hours please visit\nHotHeadzSouthernFoods.com',42.11,57.53,Object.assign({},base,{align:'center',sizePct:1.40,shadowBlur:10,fontFamily:'"DM Serif Display",Georgia,serif',italic:true,lineHeight:1.25})),
+    defaultBox('Bottom Note','For pricing and hours please visit\nHotHeadzSouthernFoods.com',42.11,57.53,Object.assign({},base,{align:'center',sizePct:1.40,shadowBlur:10,fontFamily:'"Caveat",cursive',italic:false,lineHeight:1.25})),
     defaultBox('Breakfast Sandwiches','BREAKFAST SANDWICHES\n- Same Daily\n\n\u2022 BLT\n\u2022 Bacon, Egg and Cheese\n\u2022 Sausage, Egg and cheese\n\u2022 Breakfast Burritos',43.02,43.08,Object.assign({},base,{fontFamily:SF,sizePct:1.41,lineHeight:1.27,isCustom:true})),
   ];
   activeId=null;
@@ -1460,7 +1480,7 @@ function todayISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMo
 function isoToDay(iso){const[y,m,d]=iso.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:'long'});}
 function isoToLabel(iso){const[y,m,d]=iso.split('-').map(Number);const dt=new Date(y,m-1,d);return dt.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});}
 function getClosingMinutes(dayName){const hours=(menuDefaultsCache&&menuDefaultsCache.hours&&menuDefaultsCache.hours.weekly)||[];const entry=hours.find(h=>String(h.day||'').toLowerCase()===String(dayName||'').toLowerCase());if(!entry||!entry.close)return 14*60;const m=entry.close.match(/(\d+):(\d+)\s*(AM|PM)/i);if(!m)return 14*60;let h=parseInt(m[1]),mn=parseInt(m[2]);if(m[3].toUpperCase()==='PM'&&h!==12)h+=12;if(m[3].toUpperCase()==='AM'&&h===12)h=0;return h*60+mn;}
-function isClosedDay(dayName){const hours=(menuDefaultsCache&&menuDefaultsCache.hours&&menuDefaultsCache.hours.weekly)||[];const entry=hours.find(h=>String(h.day||'').toLowerCase()===String(dayName||'').toLowerCase());// No entry OR no open/close = closed
+function isClosedDay(dayName){const hours=(menuDefaultsCache&&menuDefaultsCache.hours&&menuDefaultsCache.hours.weekly)||[];if(!hours.length)return false;const entry=hours.find(h=>String(h.day||'').toLowerCase()===String(dayName||'').toLowerCase());// Once hours are loaded, no entry or no open/close means closed.
 return !entry || (!entry.open && !entry.close);}
 function getDayOffset(){const now=new Date();const dayName=now.toLocaleDateString('en-US',{weekday:'long'});const nowMins=now.getHours()*60+now.getMinutes();const closeMins=getClosingMinutes(dayName);return nowMins>=closeMins?1:0;}
 function dateOffsetAdj(n){
@@ -1555,7 +1575,7 @@ async function wireStaticPanel(){
   if(stSave){stSave.addEventListener('click',async()=>{var settings={showAdvancedTab:!!document.getElementById('stShowAdv').checked,advancedDisclaimer:(document.getElementById('stDisclaimer').value||'').trim(),advancedWindowDays:parseInt(document.getElementById('stWinDays').value||'7',10)||7,noDescriptionText:(document.getElementById('stNoDesc').value||'').trim()};var phone=(document.getElementById('stPhone').value||'').trim();var delivery=(document.getElementById('stDelivery').value||'').trim();var ok1=await saveMenuDefaultKey('settings',settings);var ok2=await saveMenuDefaultKey('phoneTel',phone);var ok3=await saveMenuDefaultKey('deliveryNote',delivery);if(ok1&&ok2&&ok3)rebuildSidePanel();});document.getElementById('stReload').addEventListener('click',async()=>{await loadMenuDefaults(true);rebuildSidePanel();});}
 }
 
-let currentTab='quickfill';
+let currentTab='ai-lunch';
 function rebuildSidePanel(){
   const c=document.getElementById('sideScroll');
   if (currentTab==='quickfill')           c.innerHTML=buildQF();
@@ -1724,19 +1744,33 @@ function buildPR(){
 
 let _aiTabSelectedDate = null; // legacy single-date (kept for safety, not used)
 let _aiTabSelectedDates = new Set();
+let _aiDraft = null;
+const SAFE_LUNCH_BOUNDS = { xPct:7.5, yPct:67, wPct:23, hPct:24 };
+const AI_DRAFT_KEY = 'hhMenuReviewDraftV2';
+
+function persistAiDraft(draft, dates){
+  try { sessionStorage.setItem(AI_DRAFT_KEY, JSON.stringify({draft:draft,dates:dates||[],savedAt:Date.now()})); } catch(e){}
+}
+function restoreAiDraft(){
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(AI_DRAFT_KEY)||'null');
+    if(!saved || !saved.draft || Date.now()-(saved.savedAt||0) > 8*60*60*1000) return null;
+    return saved;
+  } catch(e){ return null; }
+}
 
 function buildAiLunchTab(){
   // This builds ONLY the right-panel content (AI controls + training).
   // The Lunch editor is rendered into the LEFT panel by wireAiLunchTab().
   let h = '';
 
-  // ── AI controls (purple themed) ──
-  h += '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\u2728 AI Update</span></div><div class="acc-body">';
-  h += '<p style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Pick the date(s) below, then snap a photo. AI reads it, fills the form on the left, updates the canvas image, and publishes to every selected date.</p>';
+  h += '<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">Today\'s Board</span></div><div class="acc-body">';
+  h += '<div class="workflow-strip"><span class="active">1 Days</span><span>2 Add</span><span>3 Review</span><span>4 Live</span></div>';
+  h += '<p style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Choose the day, add a photo or typed list, then review every item. Nothing publishes until you press the final button.</p>';
 
   // Date picker — explicit, multi-select. Tap to toggle.
   h += '<div class="ai-date-card">';
-  h += '<div class="ai-date-card-title">\ud83d\udcc5 Publish to which day(s)?</div>';
+  h += '<div class="ai-date-card-title">1. Which day is this for?</div>';
   h += '<div class="ai-date-hint" id="aiDateHint">Tap any day to select. Tap again to deselect. You can pick more than one.</div>';
   h += '<div class="ai-date-grid" id="aiDateGrid"></div>';
   h += '<div class="ai-date-actions">';
@@ -1748,7 +1782,7 @@ function buildAiLunchTab(){
 
   // Optional prompt
   h += '<div class="ai-extract-card" style="margin-bottom:10px;">';
-  h += '<div class="ai-extract-title" style="margin-bottom:4px;">\ud83d\udcdd Optional note for the AI</div>';
+  h += '<div class="ai-extract-title" style="margin-bottom:4px;">A note for the menu assistant</div>';
   h += '<div class="ai-extract-hint" style="margin-bottom:6px;">Corrections or context (e.g. "second item is meatloaf, not meatballs").</div>';
   h += '<textarea class="fi fi-ta" id="aiUserPrompt" rows="2" placeholder="Leave blank for default. Add a note here if needed."></textarea>';
   h += '</div>';
@@ -1757,17 +1791,17 @@ function buildAiLunchTab(){
   h += '<div class="ai-date-summary" id="aiDateSummary"></div>';
   h += '<input type="file" id="aiPhotoFile" accept="image/*" capture="environment" style="display:none">';
   h += '<div class="btn-row" style="margin-bottom:8px;">';
-  h += '<button class="sm-btn primary ai-extract-btn" id="aiSnapBtn" style="flex:1;">\ud83d\udcf8 Snap Photo</button>';
-  h += '<button class="sm-btn" id="aiPickBtn" style="flex:1;">\ud83d\uddbc From Library</button>';
+  h += '<button class="sm-btn primary ai-extract-btn" id="aiSnapBtn" style="flex:1;">Photograph list</button>';
+  h += '<button class="sm-btn" id="aiPickBtn" style="flex:1;">Choose photo</button>';
   h += '</div>';
 
   // Type-the-menu option (text instead of / in addition to a photo)
-  h += '<div class="ai-extract-title" style="margin:4px 0;">\u2328\ufe0f Or type the menu</div>';
+  h += '<div class="ai-extract-title" style="margin:4px 0;">2. Or write the menu here</div>';
   h += '<textarea class="fi fi-ta" id="aiMenuText" rows="4" placeholder="Type or paste the menu, e.g.\nMeats: Fried Chicken, Meatloaf, Smothered Pork\nSides: Mashed Potatoes, Green Beans, Mac & Cheese"></textarea>';
-  h += '<button class="sm-btn primary ai-extract-btn" id="aiTextBtn" style="width:100%;margin:6px 0 8px;">\u2728 Build menu from text</button>';
+  h += '<button class="sm-btn primary ai-extract-btn" id="aiTextBtn" style="width:100%;margin:6px 0 8px;">Build a review draft</button>';
+  h += '<button class="sm-btn" id="aiOpenManualDesk" style="width:100%;margin-bottom:10px;">Skip the assistant — edit by hand</button>';
 
-  // Toggles
-  h += '<label class="cf-toggle" style="margin-bottom:4px;display:flex;gap:6px;font-size:11px;"><input type="checkbox" id="aiAutoPublish" checked> Auto-publish to website</label>';
+  // Safe automation settings. Publishing is deliberately review-first.
   h += '<label class="cf-toggle" style="margin-bottom:4px;display:flex;gap:6px;font-size:11px;"><input type="checkbox" id="aiAutoCanvas" checked> Auto-update canvas image</label>';
   h += '<label class="cf-toggle" style="margin-bottom:10px;display:flex;gap:6px;font-size:11px;"><input type="checkbox" id="aiAutoFit" checked> Auto-fit text to trained box</label>';
 
@@ -1778,16 +1812,18 @@ function buildAiLunchTab(){
   h += '</div></div>'; // /acc
 
   // ── TRAINING CARD ──
-  h += '<div class="acc open" style="margin-top:10px;"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83c\udfaf Train Lunch Box Position</span></div><div class="acc-body">';
-  h += '<p style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Click <strong>Draw Box</strong>, then click-and-drag on the canvas to mark exactly where the lunch text should appear. AI will fit text inside that box every time. Saves to cloud.</p>';
+  h += '<div class="acc open" style="margin-top:10px;"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">Menu Safe Area</span></div><div class="acc-body">';
+  h += '<p style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5;">This boundary keeps long lunch lists from crossing into drinks or the footer. The safe preset works immediately; drawing your own gives exact control.</p>';
   h += '<div class="static-card" id="trainedBoxInfo" style="margin-bottom:10px;">';
   h += '<div class="static-card-title">Current Trained Box</div>';
   h += '<div id="trainedBoxDetails" style="font-size:11px;color:var(--text3);font-family:monospace;">Loading…</div>';
+  h += '<div id="trainedFitHealth" class="boundary-health" style="margin-top:8px;">Checking text fit…</div>';
   h += '</div>';
   h += '<div class="btn-row">';
-  h += '<button class="sm-btn primary ai-extract-btn" id="trainStartBtn" style="flex:1;">\u270f\ufe0f Draw Box</button>';
-  h += '<button class="sm-btn" id="trainUseCurrentBtn">\ud83d\udccd Use Current Box</button>';
-  h += '<button class="sm-btn danger" id="trainClearBtn">\ud83d\uddd1\ufe0f Clear</button>';
+  h += '<button class="sm-btn primary ai-extract-btn" id="trainPresetBtn" style="flex:1;">Use safe preset</button>';
+  h += '<button class="sm-btn" id="trainStartBtn">Draw my own</button>';
+  h += '<button class="sm-btn" id="trainUseCurrentBtn">Use current box</button>';
+  h += '<button class="sm-btn danger" id="trainClearBtn">Reset</button>';
   h += '</div>';
   h += '<div id="trainStatus" style="display:none;margin-top:8px;padding:8px;border-radius:6px;font-size:11px;font-weight:600;line-height:1.4;"></div>';
   h += '</div></div>';
@@ -1809,9 +1845,15 @@ function wireAiLunchTab(){
   wireMenuPanel();
 
   // 3) Build the multi-date picker for the AI side
-  _aiTabSelectedDates = new Set();
-  // Pre-select the smart default day (skips closed days, after-close, etc.)
-  _aiTabSelectedDates.add(dateOffsetAdj(0));
+  // Keep the user's selection if the panel is rebuilt while they work on the canvas.
+  const recovered = !_aiDraft ? restoreAiDraft() : null;
+  if(recovered){
+    _aiDraft = recovered.draft;
+    if(Array.isArray(recovered.dates) && recovered.dates.length) _aiTabSelectedDates = new Set(recovered.dates);
+  }
+  if(!_aiTabSelectedDates || _aiTabSelectedDates.size === 0){
+    _aiTabSelectedDates = new Set([dateOffsetAdj(0)]);
+  }
   renderAiDateGrid();
   updateAiDateSummary();
 
@@ -1853,17 +1895,24 @@ function wireAiLunchTab(){
     if(!txt){ toast('Type the menu first','error'); return; }
     await runAiPublishFlow(null, txt);
   });
+  document.getElementById('aiMenuText')?.addEventListener('keydown', e => {
+    if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){ e.preventDefault(); textBtn?.click(); }
+  });
+  document.getElementById('aiOpenManualDesk')?.addEventListener('click', openDesktopManualDesk);
 
   // 5) Wire training buttons
   const trainStartBtn = document.getElementById('trainStartBtn');
+  const trainPresetBtn = document.getElementById('trainPresetBtn');
   const trainUseCurrentBtn = document.getElementById('trainUseCurrentBtn');
   const trainClearBtn = document.getElementById('trainClearBtn');
   if(trainStartBtn) trainStartBtn.addEventListener('click', startBoxTraining);
+  if(trainPresetBtn) trainPresetBtn.addEventListener('click', applySafeLunchPreset);
   if(trainUseCurrentBtn) trainUseCurrentBtn.addEventListener('click', useCurrentBoxAsTrained);
   if(trainClearBtn) trainClearBtn.addEventListener('click', clearTrainedBox);
 
   // 6) Refresh the trained box info display
   refreshTrainedBoxInfo();
+  if(_aiDraft) renderAiPreview(_aiDraft.meats, _aiDraft.sides, _aiDraft);
 }
 
 /* ─── AI multi-date picker helpers ─── */
@@ -1988,17 +2037,180 @@ function setAiTabStatus(msg, kind){
   el.textContent = msg;
 }
 
-function renderAiPreview(meats, sides){
+function reviewItemsText(items){
+  return (items||[]).map(i => {
+    if(typeof i === 'string') return i;
+    return (i.name||'') + (i.desc ? ' | ' + i.desc : '');
+  }).filter(Boolean).join('\n');
+}
+
+function parseReviewItems(text){
+  return linesTo(text).map(line => {
+    const parts = line.replace(/^[•*\-]\s*/, '').split('|');
+    return { name:(parts.shift()||'').trim().slice(0,80), desc:parts.join('|').trim().slice(0,180) };
+  }).filter(i => i.name).slice(0,30);
+}
+
+function fallbackMenuDraft(raw){
+  const text = String(raw||'').trim();
+  const meatWords = /\b(chicken|beef|pork|fish|shrimp|turkey|ham|sausage|ribs?|meatloaf|brisket|tips|chops?|casserole|red beans(?:\s*&\s*rice)?)\b/i;
+  let section = '';
+  const meats = [], sides = [];
+  const add = (value, forced) => {
+    String(value||'').split(/\s*[,;]\s*/).forEach(piece => {
+      const name = piece.replace(/^[•*\-]\s*/, '').trim();
+      if(!name) return;
+      const item = {name:name.slice(0,80), desc:'', confidence:'manual'};
+      (forced === 'meats' || (!forced && meatWords.test(name)) ? meats : sides).push(item);
+    });
+  };
+  text.split(/\r?\n/).forEach(rawLine => {
+    let line = rawLine.trim();
+    if(!line) return;
+    const heading = line.match(/^(meats?|mains?|entrees?|lunch|sides?|vegetables?|veggies?)\s*:?\s*(.*)$/i);
+    if(heading){
+      section = /side|vegetable|veggie/i.test(heading[1]) ? 'sides' : 'meats';
+      add(heading[2], section);
+      return;
+    }
+    add(line, section || '');
+  });
+  return {
+    meats:meats.slice(0,30),
+    sides:sides.slice(0,30),
+    warnings:['The online assistant was unavailable, so this draft was organized on this device. Check the meat/side split.'],
+    source:'local fallback'
+  };
+}
+
+function buildReviewMarkup(prefix, draft, dates){
+  const meats = draft.meats || [], sides = draft.sides || [];
+  const warnings = Array.isArray(draft.warnings) ? draft.warnings : [];
+  const low = meats.concat(sides).filter(i => i.confidence === 'low').length;
+  const dateCount = (dates||[]).length;
+  let h = '<div class="ai-review-sheet">';
+  h += '<div class="ai-review-meta">';
+  h += '<span class="ai-review-chip safe">'+dateCount+' day'+(dateCount===1?'':'s')+'</span>';
+  h += '<span class="ai-review-chip">'+meats.length+' meats</span><span class="ai-review-chip">'+sides.length+' sides</span>';
+  if(low || warnings.length) h += '<span class="ai-review-chip warn">'+(low || warnings.length)+' item'+((low || warnings.length)===1?'':'s')+' to check</span>';
+  h += '</div>';
+  if(warnings.length) h += '<p class="ai-review-note">'+warnings.map(esc).join(' ')+'</p>';
+  h += '<label class="ai-review-label" for="'+prefix+'ReviewMeats">Meats / main dishes</label>';
+  h += '<textarea class="ai-review-textarea" id="'+prefix+'ReviewMeats" rows="7" placeholder="One item per line — Name | Description">'+esc(reviewItemsText(meats))+'</textarea>';
+  h += '<label class="ai-review-label" for="'+prefix+'ReviewSides">Sides</label>';
+  h += '<textarea class="ai-review-textarea" id="'+prefix+'ReviewSides" rows="8" placeholder="One item per line — Name | Description">'+esc(reviewItemsText(sides))+'</textarea>';
+  h += '<div class="ai-review-actions">';
+  h += '<button class="sm-btn" id="'+prefix+'ApplyReview">Update the preview</button>';
+  h += '<button class="sm-btn ai-publish-btn" id="'+prefix+'PublishReview">Looks right — publish '+dateCount+' day'+(dateCount===1?'':'s')+'</button>';
+  h += '<button class="sm-btn" id="'+prefix+'ManualReview">Keep editing by hand</button>';
+  h += '</div><p class="ai-review-note">Nothing is live until you press the publish button. You can correct any line above first.</p></div>';
+  return h;
+}
+
+function getReviewDraft(prefix, base){
+  const draft = Object.assign({}, base, {
+    meats:parseReviewItems(document.getElementById(prefix+'ReviewMeats')?.value || ''),
+    sides:parseReviewItems(document.getElementById(prefix+'ReviewSides')?.value || '')
+  });
+  const dates = prefix === 'mobAi' && typeof mob !== 'undefined' ? [...mob.selectedDates].sort() : [..._aiTabSelectedDates].sort();
+  persistAiDraft(draft, dates);
+  return draft;
+}
+
+function fillLunchFields(draft){
+  const meatsTA = document.getElementById('lunchMeatsTA');
+  const sidesTA = document.getElementById('lunchSidesTA');
+  if(meatsTA) meatsTA.value = reviewItemsText(draft.meats);
+  if(sidesTA) sidesTA.value = reviewItemsText(draft.sides);
+}
+
+function openDesktopManualDesk(){
+  const panel = document.getElementById('sidePanelLeft');
+  if(panel) panel.classList.add('manual-popout');
+  document.getElementById('lunchMeatsTA')?.focus();
+}
+
+function updateDraftCanvas(draft, dates, autoFit){
+  fillLunchFields(draft);
+  const firstDate = (dates||[])[0];
+  if(!firstDate) return null;
+  const [yyyy, mm, dd] = firstDate.split('-').map(Number);
+  const dt = new Date(yyyy, mm-1, dd);
+  const dayBox = boxes.find(b => b.name === 'Day');
+  const dateBox = boxes.find(b => b.name === 'Date');
+  const lunchBox = boxes.find(b => b.name === 'Lunch');
+  saveUndo();
+  if(dayBox) dayBox.text = dt.toLocaleDateString(undefined,{weekday:'long'});
+  if(dateBox) dateBox.text = dt.toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'});
+  let fit = null;
+  if(lunchBox){
+    lunchBox.text = buildCanvasLunchText(draft.meats, draft.sides, []);
+    if(autoFit) fit = autoFitLunchBox(lunchBox);
+  }
+  draw();
+  triggerAutoSave();
+  return fit;
+}
+
+async function publishReviewedDraft(draft, dates, setStatus){
+  const targetDates = Array.from(new Set(dates||[])).sort();
+  if(!targetDates.length){ setStatus('Choose at least one serving day first.','error'); return {ok:0,fail:0}; }
+  if(!(draft.meats||[]).length && !(draft.sides||[]).length){ setStatus('Add at least one menu item before publishing.','error'); return {ok:0,fail:0}; }
+  setStatus('Publishing the reviewed menu to '+targetDates.length+' day'+(targetDates.length===1?'':'s')+'…','loading');
+  const dateData = {
+    lunch:{show:true,items:[].concat(draft.meats||[],draft.sides||[]),meats:draft.meats||[],sides:draft.sides||[],sameDaily:[]},
+    dessert:{items:[]},
+    crawfish:{show:false}
+  };
+  let ok = 0, fail = 0;
+  const failures = [];
+  for(const date of targetDates){
+    try {
+      const result = await apiPost({action:'save-lunch',date:date,data:dateData,publishedBy:getCloudName()});
+      if(result?.success) ok++;
+      else { fail++; failures.push(date); }
+    } catch(e){ fail++; failures.push(date); }
+  }
+  if(fail){
+    setStatus(ok+' day'+(ok===1?'':'s')+' live; '+fail+' failed: '+failures.join(', ')+'. Your reviewed draft is still here—try again.','error');
+  } else {
+    try { sessionStorage.removeItem(AI_DRAFT_KEY); } catch(e){}
+    setStatus('Live! The reviewed menu was published to '+ok+' day'+(ok===1?'':'s')+'.','success');
+    toast('Menu published to '+ok+' day'+(ok===1?'':'s'),'success');
+  }
+  return {ok,fail};
+}
+
+function renderAiPreview(meats, sides, meta){
   const el = document.getElementById('aiPreview');
   if(!el) return;
-  let h='<div class="static-card"><div class="static-card-title">Extracted Meats ('+meats.length+')</div><ul style="font-size:12px;color:var(--text);padding-left:18px;line-height:1.55;margin:0;">';
-  meats.forEach(m=>{ h+='<li><strong>'+esc(m.name)+'</strong>'+(m.desc?' &mdash; <span style="color:var(--text2);font-weight:normal;">'+esc(m.desc)+'</span>':'')+'</li>'; });
-  h+='</ul></div>';
-  h+='<div class="static-card"><div class="static-card-title">Extracted Sides ('+sides.length+')</div><ul style="font-size:12px;color:var(--text);padding-left:18px;line-height:1.55;margin:0;">';
-  sides.forEach(s=>{ h+='<li><strong>'+esc(s.name)+'</strong>'+(s.desc?' &mdash; <span style="color:var(--text2);font-weight:normal;">'+esc(s.desc)+'</span>':'')+'</li>'; });
-  h+='</ul></div>';
-  el.innerHTML = h;
+  _aiDraft = Object.assign({meats:meats||[],sides:sides||[],warnings:[]}, meta||{});
+  const dates = [...(_aiTabSelectedDates||new Set())].sort();
+  persistAiDraft(_aiDraft, dates);
+  el.innerHTML = buildReviewMarkup('ai', _aiDraft, dates);
   el.style.display = 'block';
+  document.getElementById('aiApplyReview')?.addEventListener('click', () => {
+    _aiDraft = getReviewDraft('ai', _aiDraft);
+    const fit = updateDraftCanvas(_aiDraft, [..._aiTabSelectedDates].sort(), document.getElementById('aiAutoFit')?.checked);
+    updateFitHealth(fit);
+    setAiTabStatus('Preview updated. Review once more, then publish when it looks right.','info');
+  });
+  document.getElementById('aiPublishReview')?.addEventListener('click', async e => {
+    _aiDraft = getReviewDraft('ai', _aiDraft);
+    fillLunchFields(_aiDraft);
+    e.currentTarget.disabled = true;
+    const result = await publishReviewedDraft(_aiDraft, [..._aiTabSelectedDates].sort(), setAiTabStatus);
+    if(result.fail) e.currentTarget.disabled = false;
+  });
+  document.getElementById('aiManualReview')?.addEventListener('click', () => {
+    _aiDraft = getReviewDraft('ai', _aiDraft);
+    fillLunchFields(_aiDraft);
+    openDesktopManualDesk();
+    setAiTabStatus('Draft copied to Manual Corrections. Use the save button there when you are ready.','info');
+  });
+  ['aiReviewMeats','aiReviewSides'].forEach(id => document.getElementById(id)?.addEventListener('input', () => {
+    _aiDraft = getReviewDraft('ai', _aiDraft);
+  }));
 }
 
 /* Build the canvas Lunch text box content in the exact format the user wants:
@@ -2042,7 +2254,45 @@ function buildCanvasLunchText(meats, sides, sameDailyOverride){
 
 // Get the current trained bounds from the menu defaults cache
 function getTrainedLunchBounds(){
-  return (menuDefaultsCache && menuDefaultsCache.lunchBoxBounds) || null;
+  const saved = (menuDefaultsCache && menuDefaultsCache.lunchBoxBounds) || null;
+  return saved ? normalizeLunchBounds(saved) : null;
+}
+
+function normalizeLunchBounds(raw){
+  let x = clamp(Number(raw?.xPct)||SAFE_LUNCH_BOUNDS.xPct, 0, 91);
+  let y = clamp(Number(raw?.yPct)||SAFE_LUNCH_BOUNDS.yPct, 0, 91);
+  let w = clamp(Number(raw?.wPct)||SAFE_LUNCH_BOUNDS.wPct, 8, 55);
+  let h = clamp(Number(raw?.hPct)||SAFE_LUNCH_BOUNDS.hPct, 8, 55);
+  x = Math.min(x, 99 - w);
+  y = Math.min(y, 99 - h);
+  return {xPct:x,yPct:y,wPct:w,hPct:h};
+}
+
+function boundaryHealth(bounds){
+  const b = normalizeLunchBounds(bounds||SAFE_LUNCH_BOUNDS);
+  const issues = [];
+  if(b.wPct < 18) issues.push('too narrow');
+  if(b.hPct < 18) issues.push('too short');
+  if(b.xPct + b.wPct > 99 || b.yPct + b.hPct > 99) issues.push('outside board');
+  return {safe:issues.length===0, label:issues.length ? 'Needs attention: '+issues.join(', ') : 'Safe area ready'};
+}
+
+function updateFitHealth(fit){
+  const el = document.getElementById('trainedFitHealth');
+  const mobEl = document.getElementById('mobBoundaryHealth');
+  const bounds = getTrainedLunchBounds() || SAFE_LUNCH_BOUNDS;
+  const health = boundaryHealth(bounds);
+  let label = health.label;
+  let safe = health.safe;
+  if(fit){
+    safe = health.safe && fit.fits;
+    label = fit.fits ? 'Safe: '+fit.lines+' lines fit at '+fit.sizePct.toFixed(2)+'% type' : 'Overflow warning: shorten the list or make the safe area taller';
+  }
+  [el,mobEl].forEach(node => {
+    if(!node) return;
+    node.className = 'boundary-health '+(safe?'safe':'warn');
+    node.textContent = label;
+  });
 }
 
 // Update the info card showing what's currently trained
@@ -2051,10 +2301,16 @@ function refreshTrainedBoxInfo(){
   if(!el) return;
   const b = getTrainedLunchBounds();
   if(!b){
-    el.innerHTML = '<span style="color:var(--text3);">No trained box yet — defaults to template position. Draw one for best results.</span>';
+    el.innerHTML = '<span style="color:var(--text3);">Using the tested Hot Headz safe preset. Save it or draw your own boundary.</span>';
+    updateFitHealth(null);
     return;
   }
   el.innerHTML = `x: ${(+b.xPct).toFixed(1)}%, y: ${(+b.yPct).toFixed(1)}%<br>w: ${(+b.wPct).toFixed(1)}%, h: ${(+b.hPct).toFixed(1)}%`;
+  updateFitHealth(null);
+}
+
+async function applySafeLunchPreset(){
+  await saveTrainedBounds(Object.assign({}, SAFE_LUNCH_BOUNDS));
 }
 
 function setTrainStatus(msg, kind){
@@ -2106,6 +2362,7 @@ async function clearTrainedBox(){
 }
 
 async function saveTrainedBounds(bounds){
+  bounds = normalizeLunchBounds(bounds);
   setTrainStatus('Saving trained box…', 'loading');
   try {
     const res = await apiPost({ action:'saveMenuDefault', key:'lunchBoxBounds', json: JSON.stringify(bounds) });
@@ -2259,16 +2516,11 @@ async function onTrainUp(e){
 /* AUTO-FIT — apply trained bounds (if any), then shrink font to fit.
    This replaces the prior simple version. */
 function autoFitLunchBox(lunchBox){
-  if(!lunchBox) return;
+  if(!lunchBox) return null;
 
   // Get the target bounds. Prefer trained, fall back to template default.
   const trained = getTrainedLunchBounds();
-  const bounds = trained ? trained : {
-    xPct: 8,           // bottom-left column on template
-    yPct: 68,
-    wPct: 22,
-    hPct: 22
-  };
+  const bounds = normalizeLunchBounds(trained || SAFE_LUNCH_BOUNDS);
 
   // Position the box so its TOP-LEFT corner lands at (xPct, yPct).
   // The renderer centers boxes on (xPct, yPct), so we need to offset by half width/height.
@@ -2282,32 +2534,44 @@ function autoFitLunchBox(lunchBox){
   lunchBox.xPct = centerX;
   lunchBox.yPct = centerY;
 
-  // ── Shrink to fit ──
-  const text = lunchBox.text || '';
-  const explicitLines = text.split('\n');
-  const lineHeight = lunchBox.lineHeight || 1.22;
-
-  // Iteratively try sizes from largest to smallest
-  let sizePct = 1.50; // start big — auto-grow first
-  const minSize = 0.50;
-  const stepDown = 0.04;
+  // Measure with the same wrapping function used by the actual canvas renderer.
+  const availableHeight = (bounds.hPct / 100) * canvas.height * .96;
+  const minSize = .48;
+  let sizePct = 1.72;
+  let measured = null;
+  let fits = false;
   while(sizePct >= minSize){
-    // Estimate chars-per-line at this size given the box width
-    const charsPerLine = Math.max(12, Math.round(bounds.wPct * 2.5 / sizePct));
-    let wrappedLines = 0;
-    for(const l of explicitLines){
-      wrappedLines += Math.max(1, Math.ceil((l.length || 1) / charsPerLine));
-    }
-    const totalHeight = wrappedLines * sizePct * lineHeight;
-    if(totalHeight <= bounds.hPct) break;
-    sizePct -= stepDown;
+    lunchBox.sizePct = sizePct;
+    measured = measureBox(lunchBox);
+    if(measured.totalH <= availableHeight){ fits = true; break; }
+    sizePct -= .03;
   }
-  if(sizePct < minSize) sizePct = minSize;
-
-  lunchBox.sizePct = sizePct;
+  lunchBox.sizePct = Math.max(minSize, sizePct);
+  measured = measureBox(lunchBox);
+  fits = measured.totalH <= availableHeight;
+  const result = {fits:fits,sizePct:lunchBox.sizePct,lines:measured.lines.length,bounds:bounds};
+  lunchBox.__fitState = result;
+  updateFitHealth(result);
+  return result;
 }
 
-/* The main AI Publish flow — runs everything in sequence */
+function showDesktopAiFallback(menuText, reason){
+  if(!String(menuText||'').trim()){
+    setAiTabStatus(reason+' Open Manual Corrections to type the menu without the assistant.','error');
+    return false;
+  }
+  const draft = fallbackMenuDraft(menuText);
+  const dates = [...(_aiTabSelectedDates||new Set())].sort();
+  renderAiPreview(draft.meats, draft.sides, draft);
+  if(document.getElementById('aiAutoCanvas')?.checked){
+    const fit = updateDraftCanvas(draft, dates, document.getElementById('aiAutoFit')?.checked);
+    updateFitHealth(fit);
+  } else fillLunchFields(draft);
+  setAiTabStatus('The online assistant did not answer, so your typed menu was organized locally. Review the split below—nothing has been published.','info');
+  return true;
+}
+
+/* The main AI draft flow — extraction, review, then an explicit publish. */
 async function runAiPublishFlow(file, menuText){
   try {
     // 1. Make sure defaults are loaded
@@ -2353,8 +2617,8 @@ async function runAiPublishFlow(file, menuText){
     }
     if(menuText) reqBody.menuText = menuText;
 
-    // 4. Send to AI (one call, then publish to all dates)
-    setAiTabStatus(file ? 'Sending photo to Claude…' : 'Sending menu text to Claude…', 'loading');
+    // 4. Send to the menu assistant. One low-cost call creates a review draft.
+    setAiTabStatus(file ? 'Reading the menu photo…' : 'Organizing the typed menu…', 'loading');
     const resp = await fetch('/api/ai-extract-menu', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -2363,14 +2627,17 @@ async function runAiPublishFlow(file, menuText){
     let data;
     try { data = await resp.json(); }
     catch(jsonErr){
-      const rawTxt = await resp.text().catch(()=>'(no body)');
-      setAiTabStatus('Server returned bad data (HTTP '+resp.status+'): '+rawTxt.slice(0,200), 'error');
+      if(!showDesktopAiFallback(menuText, 'The assistant returned an unreadable response.')){
+        setAiTabStatus('The assistant returned an unreadable response. Your photo was not published.','error');
+      }
       return;
     }
     if(!resp.ok || !data.success){
       let msg = data.error || ('HTTP '+resp.status);
       if(data.debug) msg += ' [bytes:'+data.debug.imageBytes+' format:'+data.debug.detectedFormat+']';
-      setAiTabStatus('Failed: '+msg, 'error');
+      if(!showDesktopAiFallback(menuText, 'The assistant could not build this draft.')){
+        setAiTabStatus('Could not read that photo. Try a brighter, straighter photo or use Manual Corrections. Nothing was published.','error');
+      }
       console.error('AI extract response:', data);
       return;
     }
@@ -2432,97 +2699,26 @@ async function runAiPublishFlow(file, menuText){
       }
     }
 
-    // 6. Show preview of extracted items
-    renderAiPreview(meats, sides);
+    // 6. Build an editable review. Nothing is sent to the live menu here.
+    const draftMeta = {warnings:data.warnings||[],source:'menu assistant'};
+    renderAiPreview(meats, sides, draftMeta);
+    fillLunchFields({meats:meats,sides:sides});
 
-    // 6. Fill the left-side Lunch form fields with the new items (so the user
-    //    sees what got pushed to all dates)
-    const meatsTA = document.getElementById('lunchMeatsTA');
-    const sidesTA = document.getElementById('lunchSidesTA');
-    if(meatsTA) meatsTA.value = data.meatsText || '';
-    if(sidesTA) sidesTA.value = data.sidesText || '';
-
-    const autoPublish = document.getElementById('aiAutoPublish')?.checked;
     const autoCanvas  = document.getElementById('aiAutoCanvas')?.checked;
     const autoFit     = document.getElementById('aiAutoFit')?.checked;
-
-    const actions = [];
-    let publishFail = 0;
-
-    // 7. Update canvas Day & Date boxes to the FIRST selected date (the canvas
-    //    can only show one date at a time; pick the earliest selected).
+    let fit = null;
     if(autoCanvas){
-      const firstDate = dates[0];
-      const dayBox  = boxes.find(b => b.name === 'Day');
-      const dateBox = boxes.find(b => b.name === 'Date');
-      const [yyyy, mm, dd] = firstDate.split('-').map(Number);
-      const dt = new Date(yyyy, mm-1, dd);
-      const dayName = dt.toLocaleDateString(undefined, {weekday: 'long'});
-      const dateStr = dt.toLocaleDateString(undefined, {month: 'long', day: 'numeric', year: 'numeric'});
-      let canvasChanged = false;
-      if(dayBox && dayBox.text !== dayName) { dayBox.text = dayName; canvasChanged = true; }
-      if(dateBox && dateBox.text !== dateStr) { dateBox.text = dateStr; canvasChanged = true; }
-
-      // 8. Update canvas Lunch text box + auto-fit
-      const lunchBox = boxes.find(b => b.name === 'Lunch');
-      if(lunchBox){
-        saveUndo();
-        lunchBox.text = buildCanvasLunchText(meats, sides, []);
-        if(autoFit) autoFitLunchBox(lunchBox);
-        canvasChanged = true;
-        actions.push('canvas updated' + (autoFit ? ' (auto-fit)' : '') + (dates.length>1 ? ' (showing '+firstDate+')' : ''));
-      } else {
-        actions.push('canvas SKIPPED (no "Lunch" text box)');
-      }
-
-      if(canvasChanged){
-        draw();
-        triggerAutoSave();
-      }
+      fit = updateDraftCanvas({meats:meats,sides:sides}, dates, autoFit);
+      updateFitHealth(fit);
     }
-
-    // 9. Auto-publish to EACH selected date
-    if(autoPublish){
-      setAiTabStatus('Publishing to '+dates.length+' date'+(dates.length===1?'':'s')+'…', 'loading');
-      const itemsArr = [].concat(meats, sides);
-      const dateData = {
-        lunch: { show: true, items: itemsArr, meats: meats, sides: sides, sameDaily: [] },
-        dessert: { items: [] },
-        crawfish: { show: false }
-      };
-      let ok = 0, fail = 0;
-      const failures = [];
-      for(const date of dates){
-        try {
-          const pubRes = await apiPost({
-            action: 'save-lunch',
-            date: date,
-            data: dateData,
-            publishedBy: getCloudName()
-          });
-          if(pubRes?.success){ ok++; }
-          else { fail++; failures.push(date+' ('+(pubRes?.error||'unknown')+')'); }
-        } catch(e){
-          fail++; failures.push(date+' ('+e.message+')');
-        }
-      }
-      publishFail = fail;
-      if(fail === 0){
-        actions.push('published to '+ok+' date'+(ok===1?'':'s'));
-      } else if(ok === 0){
-        actions.push('publish FAILED for all '+fail+' dates: '+failures.slice(0,3).join(', '));
-      } else {
-        actions.push('published '+ok+' OK, '+fail+' FAILED ('+failures.slice(0,2).join(', ')+(failures.length>2?'…':'')+')');
-      }
-    }
-
-    const summary = 'Done! '+meats.length+' meats, '+sides.length+' sides. '+actions.join(' \u2022 ');
-    setAiTabStatus(summary, publishFail === 0 ? 'success' : 'error');
-    toast('AI extracted '+(meats.length+sides.length)+' items', 'success');
+    setAiTabStatus('Draft ready: '+meats.length+' meats and '+sides.length+' sides. Correct anything below, then publish. Nothing is live yet.','success');
+    toast('Review draft ready','success');
 
   } catch (err) {
-    setAiTabStatus('Error: '+(err.message||String(err)), 'error');
-    console.error('AI publish error:', err);
+    if(!showDesktopAiFallback(menuText, 'The assistant is temporarily unavailable.')){
+      setAiTabStatus('The assistant is temporarily unavailable. Use Manual Corrections—your live menu was not changed.','error');
+    }
+    console.error('AI draft error:', err);
   }
 }
 
@@ -2908,14 +3104,24 @@ document.getElementById('mobLunchBtn').addEventListener('click',()=>{currentTab=
   if(lp){ lp.style.display='flex'; lp.classList.add('mobile-open'); }
 });
 document.getElementById('closeSidePanel').addEventListener('click',()=>{document.getElementById('sidePanel').classList.remove('mobile-open');});
-document.getElementById('closeSidePanelLeft')?.addEventListener('click',()=>{document.getElementById('sidePanelLeft').classList.remove('mobile-open');});
+document.getElementById('closeSidePanelLeft')?.addEventListener('click',()=>{document.getElementById('sidePanelLeft').classList.remove('mobile-open','manual-popout');});
 
 loadStarterBoxes();rebuildSidePanel();
 (async()=>{
   const s=loadStore();if(s.items.length>0){const a=s.items.find(p=>p.id===s.activeId)||s.items[0];s.activeId=a.id;saveStore(s);if(a.data)await applyPayload(a.data);}else draw();
   const DI="/images/FBMenu.png";
   if(!imgDataURL&&DI){img=new Image();img.crossOrigin='anonymous';img.onload=()=>{imgLoaded=true;draw();};img.onerror=()=>{imgLoaded=false;draw();};img.src=DI;}
-  loadMenuDefaults();
+  loadMenuDefaults().then(()=>{
+    if(currentTab==='ai-lunch'){
+      renderAiDateGrid();
+      updateAiDateSummary();
+      refreshTrainedBoxInfo();
+    }
+    if(window.matchMedia('(max-width:900px)').matches && typeof mob !== 'undefined' && mob._inited){
+      mob.renderDateGrid();
+      updateFitHealth(null);
+    }
+  });
 })();
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -2928,6 +3134,7 @@ const mob = {
   history: ['home'],
   selectedDate: null,          // legacy single (kept for safety)
   selectedDates: new Set(),    // primary multi-select
+  aiDraft: null,
 
   init(){
     // Initial label & back button
@@ -2981,6 +3188,12 @@ const mob = {
       if(!txt){ toast('Type the menu first','error'); return; }
       await this.runAi(null, txt);
     });
+    document.getElementById('mobAiMenuText')?.addEventListener('keydown', e => {
+      if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+        e.preventDefault();
+        document.getElementById('mobAiTextBtn')?.click();
+      }
+    });
 
     // Mobile date quick-action buttons
     document.querySelectorAll('[data-mob-dq]').forEach(btn => {
@@ -2989,7 +3202,17 @@ const mob = {
 
     // Manual editor link → opens the desktop Lunch editor inline as detail screen
     document.getElementById('mobAiEditManual')?.addEventListener('click', () => {
-      this.openDetail('ai-lunch-manual', 'Manual Lunch Editor');
+      this.openManualEditor();
+    });
+    document.getElementById('mobTrainPreset')?.addEventListener('click', async () => {
+      await applySafeLunchPreset();
+      updateFitHealth(null);
+      toast('Safe lunch area saved','success');
+    });
+    document.getElementById('mobTrainCurrent')?.addEventListener('click', async () => {
+      await useCurrentBoxAsTrained();
+      updateFitHealth(null);
+      toast('Current lunch area saved','success');
     });
 
     // Preview screen buttons
@@ -3044,7 +3267,17 @@ const mob = {
   initAiScreen(){
     // Make sure menu defaults are loaded (so closed-day logic works)
     if(!menuDefaultsCache && menuDefaultsStatus !== 'loading') loadMenuDefaults().then(()=>this.renderDateGrid());
+    const recovered = !this.aiDraft ? restoreAiDraft() : null;
+    if(recovered){
+      this.aiDraft = recovered.draft;
+      if(Array.isArray(recovered.dates) && recovered.dates.length) this.selectedDates = new Set(recovered.dates);
+    }
     this.renderDateGrid();
+    updateFitHealth(null);
+    if(this.aiDraft){
+      this.renderAiPreview(this.aiDraft.meats, this.aiDraft.sides, this.aiDraft);
+      this.setAiStatus('Recovered your unfinished review draft. Nothing was published.','info');
+    }
   },
 
   renderDateGrid(){
@@ -3148,17 +3381,50 @@ const mob = {
     el.textContent = msg;
   },
 
-  renderAiPreview(meats, sides){
+  renderAiPreview(meats, sides, meta){
     const el = document.getElementById('mobAiPreview');
     if(!el) return;
-    let h = '<div class="static-card"><div class="static-card-title">Extracted Meats ('+meats.length+')</div><ul style="font-size:13px;color:var(--text);padding-left:18px;line-height:1.6;margin:0;">';
-    meats.forEach(m => { h += '<li><strong>'+esc(m.name)+'</strong>'+(m.desc?' — <span style="color:var(--text2);font-weight:normal;">'+esc(m.desc)+'</span>':'')+'</li>'; });
-    h += '</ul></div>';
-    h += '<div class="static-card"><div class="static-card-title">Extracted Sides ('+sides.length+')</div><ul style="font-size:13px;color:var(--text);padding-left:18px;line-height:1.6;margin:0;">';
-    sides.forEach(s => { h += '<li><strong>'+esc(s.name)+'</strong>'+(s.desc?' — <span style="color:var(--text2);font-weight:normal;">'+esc(s.desc)+'</span>':'')+'</li>'; });
-    h += '</ul></div>';
-    el.innerHTML = h;
+    this.aiDraft = Object.assign({meats:meats||[],sides:sides||[],warnings:[]}, meta||{});
+    const dates = [...this.selectedDates].sort();
+    persistAiDraft(this.aiDraft, dates);
+    el.innerHTML = buildReviewMarkup('mobAi', this.aiDraft, dates);
     el.classList.add('show');
+    document.getElementById('mobAiApplyReview')?.addEventListener('click', () => {
+      this.aiDraft = getReviewDraft('mobAi', this.aiDraft);
+      if(document.getElementById('mobAiAutoCanvas')?.checked){
+        const fit = updateDraftCanvas(this.aiDraft, [...this.selectedDates].sort(), document.getElementById('mobAiAutoFit')?.checked);
+        updateFitHealth(fit);
+      }
+      this.setAiStatus('Preview updated. Check the board, then publish when ready.','info');
+    });
+    document.getElementById('mobAiPublishReview')?.addEventListener('click', async e => {
+      this.aiDraft = getReviewDraft('mobAi', this.aiDraft);
+      e.currentTarget.disabled = true;
+      const result = await publishReviewedDraft(this.aiDraft, [...this.selectedDates].sort(), (msg,kind)=>this.setAiStatus(msg,kind));
+      if(result.fail) e.currentTarget.disabled = false;
+    });
+    document.getElementById('mobAiManualReview')?.addEventListener('click', () => {
+      this.aiDraft = getReviewDraft('mobAi', this.aiDraft);
+      this.openManualEditor();
+    });
+    ['mobAiReviewMeats','mobAiReviewSides'].forEach(id => document.getElementById(id)?.addEventListener('input', () => {
+      this.aiDraft = getReviewDraft('mobAi', this.aiDraft);
+    }));
+  },
+
+  showAiFallback(menuText){
+    if(!String(menuText||'').trim()){
+      this.setAiStatus('Could not read that photo. Try a brighter photo or use the manual editor. Nothing was published.','error');
+      return false;
+    }
+    const draft = fallbackMenuDraft(menuText);
+    this.renderAiPreview(draft.meats, draft.sides, draft);
+    if(document.getElementById('mobAiAutoCanvas')?.checked){
+      const fit = updateDraftCanvas(draft, [...this.selectedDates].sort(), document.getElementById('mobAiAutoFit')?.checked);
+      updateFitHealth(fit);
+    }
+    this.setAiStatus('The online assistant did not answer, so your text was organized on this phone. Review it below—nothing is live yet.','info');
+    return true;
   },
 
   async runAi(file, menuText){
@@ -3196,16 +3462,16 @@ const mob = {
       }
       if(menuText) reqBody.menuText = menuText;
 
-      this.setAiStatus(file ? 'Sending photo to Claude…' : 'Sending menu text to Claude…','loading');
+      this.setAiStatus(file ? 'Reading the menu photo…' : 'Organizing the typed menu…','loading');
       const resp = await fetch('/api/ai-extract-menu', {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify(reqBody)
       });
       let data;
       try { data = await resp.json(); }
-      catch(je){ this.setAiStatus('Server error: '+resp.status,'error'); return; }
+      catch(je){ this.showAiFallback(menuText); return; }
       if(!resp.ok || !data.success){
-        this.setAiStatus('Failed: '+(data.error||resp.status),'error');
+        this.showAiFallback(menuText);
         return;
       }
 
@@ -3255,63 +3521,18 @@ const mob = {
         }
       }
 
-      this.renderAiPreview(meats, sides);
+      this.renderAiPreview(meats, sides, {warnings:data.warnings||[],source:'menu assistant'});
 
-      const autoPublish = document.getElementById('mobAiAutoPublish')?.checked;
       const autoCanvas  = document.getElementById('mobAiAutoCanvas')?.checked;
       const autoFit     = document.getElementById('mobAiAutoFit')?.checked;
-      const actions = [];
-      let publishFail = 0;
-
-      // Canvas reflects FIRST date if user picked multiple
       if(autoCanvas){
-        const firstDate = dates[0];
-        const dayBox  = boxes.find(b => b.name === 'Day');
-        const dateBox = boxes.find(b => b.name === 'Date');
-        const [yyyy, mm, dd] = firstDate.split('-').map(Number);
-        const dt = new Date(yyyy, mm-1, dd);
-        if(dayBox)  dayBox.text  = dt.toLocaleDateString(undefined, {weekday:'long'});
-        if(dateBox) dateBox.text = dt.toLocaleDateString(undefined, {month:'long', day:'numeric', year:'numeric'});
-        const lunchBox = boxes.find(b => b.name === 'Lunch');
-        if(lunchBox){
-          saveUndo();
-          lunchBox.text = buildCanvasLunchText(meats, sides, []);
-          if(autoFit) autoFitLunchBox(lunchBox);
-          actions.push('canvas updated' + (autoFit ? ' (auto-fit)' : '') + (dates.length>1 ? ' (showing '+firstDate+')' : ''));
-        }
-        draw(); triggerAutoSave();
+        const fit = updateDraftCanvas({meats:meats,sides:sides}, dates, autoFit);
+        updateFitHealth(fit);
       }
-
-      // Publish to EACH selected date
-      if(autoPublish){
-        this.setAiStatus('Publishing to '+dates.length+' date'+(dates.length===1?'':'s')+'…','loading');
-        const dateData = {
-          lunch:    { show:true, items:[].concat(meats,sides), meats:meats, sides:sides, sameDaily:[] },
-          dessert:  { items:[] },
-          crawfish: { show:false }
-        };
-        let ok = 0;
-        const failures = [];
-        for(const date of dates){
-          try {
-            const pr = await apiPost({ action:'save-lunch', date:date, data:dateData, publishedBy:getCloudName() });
-            if(pr?.success) ok++;
-            else { publishFail++; failures.push(date+' ('+(pr?.error||'unknown')+')'); }
-          } catch(e){ publishFail++; failures.push(date+' ('+e.message+')'); }
-        }
-        if(publishFail === 0){
-          actions.push('published to '+ok+' date'+(ok===1?'':'s'));
-        } else if(ok === 0){
-          actions.push('publish FAILED for all '+publishFail+' dates');
-        } else {
-          actions.push('published '+ok+' OK, '+publishFail+' FAILED');
-        }
-      }
-
-      this.setAiStatus('Done! '+meats.length+' meats, '+sides.length+' sides. ' + actions.join(' · '), publishFail === 0 ? 'success' : 'error');
-      toast('AI extracted '+(meats.length+sides.length)+' items','success');
+      this.setAiStatus('Draft ready: '+meats.length+' meats and '+sides.length+' sides. Correct anything below, then publish. Nothing is live yet.','success');
+      toast('Review draft ready','success');
     } catch(err){
-      this.setAiStatus('Error: '+(err.message||String(err)),'error');
+      this.showAiFallback(menuText);
       console.error('mob.runAi:', err);
     }
   },
@@ -3390,6 +3611,16 @@ const mob = {
   },
 
   /* ── Detail screen — generic host for desktop tab content ── */
+  openManualEditor(){
+    this.openSubTab('ai-lunch-manual', 'Manual Lunch Editor');
+    if(this.aiDraft){
+      const copyDraft = () => fillLunchFields(this.aiDraft);
+      copyDraft();
+      setTimeout(copyDraft, 250);
+      setTimeout(copyDraft, 900);
+    }
+  },
+
   openSubTab(tabId, title){
     const host = document.getElementById('mobDetailHost');
     if(!host) return;
@@ -3466,7 +3697,7 @@ if(/[?&]fulledit=1/.test(location.search)){
 
 })();
 </script>
-</html><script>
+<script>
 (function(){ if(new URLSearchParams(location.search).get('client')){
   var go=function(){ try{ if(typeof unlockEditor==='function') unlockEditor();
     else { var g=document.getElementById('adminGate'); if(g)g.style.display='none'; var e=document.getElementById('editorShell'); if(e)e.classList.add('active'); } }catch(e){} };
@@ -3481,28 +3712,28 @@ if(/[?&]fulledit=1/.test(location.search)){
      ═══════════════════════════════════════════════════════════════ -->
 <style id="hhTourCSS">
 .hht-mask{position:fixed;inset:0;z-index:2147482000;pointer-events:auto;background:transparent;}
-.hht-hole{position:fixed;border-radius:12px;box-shadow:0 0 0 9999px rgba(6,6,10,.74);outline:2px solid #ff5a2c;outline-offset:3px;pointer-events:none;transition:top .28s cubic-bezier(.22,1,.36,1),left .28s cubic-bezier(.22,1,.36,1),width .28s,height .28s;}
-.hht-tip{position:fixed;z-index:2147482002;width:min(310px,88vw);background:#141418;border:1px solid rgba(255,120,60,.4);border-radius:16px;padding:16px 17px 14px;box-shadow:0 24px 70px rgba(0,0,0,.65);color:#f2ece6;font-family:'DM Sans',system-ui,sans-serif;transition:top .2s ease,left .2s ease;}
+.hht-hole{position:fixed;border-radius:2px;box-shadow:0 0 0 9999px rgba(6,8,5,.78);outline:2px solid #e6c88f;outline-offset:3px;pointer-events:none;transition:top .28s cubic-bezier(.22,1,.36,1),left .28s cubic-bezier(.22,1,.36,1),width .28s,height .28s;}
+.hht-tip{position:fixed;z-index:2147482002;width:min(330px,88vw);background:#12150f;border:2px solid rgba(168,117,67,.7);border-radius:2px;padding:16px 17px 14px;box-shadow:inset 0 0 0 1px #2d2116,0 24px 70px rgba(0,0,0,.65);color:#f3eedb;font-family:'Patrick Hand','Caveat',cursive;transition:top .2s ease,left .2s ease;}
 .hht-tip .hht-kick{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#8a837c;margin-bottom:5px;}
-.hht-tip h4{margin:0 0 6px;font-size:16px;font-weight:800;color:#ff7a4d;line-height:1.2;}
-.hht-tip p{margin:0;font-size:13.5px;line-height:1.55;color:#d5cfc8;}
+.hht-tip h4{margin:0 0 6px;font-size:23px;font-weight:400;color:#efa44d;line-height:1.2;}
+.hht-tip p{margin:0;font-family:'DM Sans',system-ui,sans-serif;font-size:13px;line-height:1.55;color:#d5cfc8;}
 .hht-row{display:flex;align-items:center;justify-content:space-between;margin-top:14px;gap:10px;}
 .hht-dots{display:flex;gap:5px;}
 .hht-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.22);transition:background .2s;}
 .hht-dot.on{background:#ff5a2c;}
 .hht-btns{display:flex;gap:8px;align-items:center;}
-.hht-btn{font-family:inherit;font-weight:700;font-size:12.5px;border-radius:10px;padding:8px 14px;cursor:pointer;border:1px solid transparent;-webkit-tap-highlight-color:transparent;}
-.hht-next{background:linear-gradient(135deg,#ff6a34,#ff3d3d);color:#fff;box-shadow:0 4px 14px rgba(255,60,40,.32);}
+.hht-btn{font-family:inherit;font-weight:400;font-size:16px;border-radius:2px;padding:8px 14px;cursor:pointer;border:1px solid transparent;-webkit-tap-highlight-color:transparent;}
+.hht-next{background:#e6c88f;color:#1b1309;box-shadow:none;}
 .hht-back{background:rgba(255,255,255,.06);color:#e8e2dc;border-color:rgba(255,255,255,.12);}
 .hht-skip{background:transparent;color:#8a837c;font-size:12px;padding:8px 6px;}
-.hht-fab{position:fixed;right:16px;bottom:16px;z-index:2147481000;height:44px;padding:0 16px 0 14px;border-radius:24px;border:none;cursor:pointer;background:linear-gradient(135deg,#ff6a34,#ff3d3d);color:#fff;font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:800;box-shadow:0 8px 26px rgba(255,60,40,.42);display:flex;align-items:center;gap:7px;-webkit-tap-highlight-color:transparent;}
+.hht-fab{position:fixed;right:16px;bottom:16px;z-index:2147481000;height:44px;padding:0 16px 0 14px;border-radius:2px;border:1px solid rgba(168,117,67,.7);cursor:pointer;background:#171a14;color:#f3eedb;font-family:'Patrick Hand','Caveat',cursive;font-size:17px;font-weight:400;box-shadow:0 8px 26px rgba(0,0,0,.42);display:flex;align-items:center;gap:7px;-webkit-tap-highlight-color:transparent;}
 .hht-fab span.ic{font-size:16px;}
 @media (max-width:900px){ .hht-fab{bottom:76px;} }
 </style>
 <script>
 (function(){
   if(window.__hhTourLoaded) return; window.__hhTourLoaded=1;
-  var SEEN='hh_editor_tour_v1';
+  var SEEN='hh_editor_tour_v2';
   var mask,hole,tip,tipKick,tipTitle,tipBody,dotsWrap,backBtn,nextBtn,skipBtn,fab;
   var steps=[],cur=0,curTarget=null,active=false;
 
@@ -3513,7 +3744,7 @@ if(/[?&]fulledit=1/.test(location.search)){
 
   // ---------- step sets ----------
   var mobileSteps=[
-    { kick:'Welcome', title:"Let's make today's menu", body:"This takes about 30 seconds. Snap a photo of the day's menu and the AI builds and publishes it for you. Tap Next to see how.", sel:'[data-go="ai"]', place:'bottom' },
+    { kick:'Welcome', title:"Let’s make today’s menu", body:"Choose the day, add a photo or type the list, review every item, then publish. The live menu never changes before your review.", sel:'[data-go="ai"]', place:'bottom' },
     { kick:'Step 1', title:'Pick the day', body:'Tap the date this menu is for. You can select several days to publish the same menu to all of them at once.', sel:'#mobDateGrid', place:'bottom',
       before:function(){ if(!screenActive('mobScreenAi')) click('[data-go="ai"]'); } },
     { kick:'Shortcut', title:'Or select in one tap', body:'“Mon–Fri” or “All Open” select multiple days instantly — handy when the menu repeats.', sel:'.mob-date-quick', place:'bottom' },
@@ -3522,15 +3753,15 @@ if(/[?&]fulledit=1/.test(location.search)){
     { kick:'Step 3', title:'Correct anything (optional)', body:"If the AI might misread something, tell it here — e.g. “the second item is meatloaf, not meatballs.”", place:'top',
       sel:function(){ var ta=document.getElementById('mobAiUserPrompt'); return ta?ta.closest('details'):null; },
       before:function(){ var ta=document.getElementById('mobAiUserPrompt'); if(ta){var d=ta.closest('details'); if(d) d.open=true;} } },
-    { kick:'Step 4', title:'It publishes itself', body:'Leave these on. When the AI finishes it publishes to the website, updates the menu image, and fits the text to your layout — automatically.', sel:'.mob-toggle-card', place:'top' },
-    { kick:'Step 5', title:'Review & you’re done', body:"After it runs, open the preview to see the finished menu image that's now live. That's the whole flow: snap → review → live. 🎉", sel:'[data-go="preview"]', place:'top' },
+    { kick:'Step 4', title:'The board fits itself', body:'These options update the menu image and keep the lunch text inside its safe area. They do not publish anything.', sel:'.mob-toggle-card', place:'top' },
+    { kick:'Step 5', title:'Review, then go live', body:"Correct the editable draft and press the one publish button. If the assistant fails, use the manual editor without losing your work.", sel:'#mobAiPreview', place:'top' },
   ];
   var desktopSteps=[
-    { kick:'Welcome', title:'The AI menu builder', body:'Turn a photo of the day’s menu into a published menu. Click the ✨ AI Lunch tab to begin — tap Next and I’ll show each step.', sel:'[data-tab="ai-lunch"]', place:'bottom' },
-    { kick:'Step 1', title:'Date, photo & AI', body:'Pick the date(s), then use the purple AI card to upload a photo of the menu. The AI extracts every item and price for you.', sel:'#sidePanel', place:'left',
+    { kick:'Welcome', title:'The menu chalkboard', body:'Build the daily menu from a photo or typed list, check it, then publish. The left rail keeps every other menu setting close by.', sel:'[data-tab="ai-lunch"]', place:'right' },
+    { kick:'Step 1', title:'Days and menu', body:'Pick one or more days, then photograph or type the menu. The assistant creates an editable draft.', sel:'#sidePanel', place:'left',
       before:function(){ click('[data-tab="ai-lunch"]'); } },
     { kick:'Step 2', title:'Live preview', body:'Your menu image builds here in real time as the AI fills it in. You can fine-tune any text by hand if you want.', sel:'#hhMEcanvas', place:'left' },
-    { kick:'Step 3', title:'Publish', body:'When it looks right, hit Export / publish — it goes straight to the website. Done! Replay this tour anytime from the orange button.', sel:'#exportBtn', place:'bottom' },
+    { kick:'Step 3', title:'Review and publish', body:'Fix any line in the review card, update the preview, and use the final publish button. Export is only for downloading the menu image.', sel:'#sidePanel', place:'left' },
   ];
 
   // ---------- build DOM ----------
@@ -3634,3 +3865,5 @@ if(/[?&]fulledit=1/.test(location.search)){
   if(document.readyState!=='loading') init(); else document.addEventListener('DOMContentLoaded',init);
 })();
 </script>
+</body>
+</html>
