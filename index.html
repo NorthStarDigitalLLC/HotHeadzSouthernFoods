@@ -448,8 +448,8 @@ main{position:relative;z-index:5;}
 <!-- Live hours from Supabase (single source of truth — edited in the fb-editor) -->
 <script>
 (function(){
-  var URL="https://zgqjzgonwvkxfbdseieg.supabase.co/rest/v1/menu_defaults?key=eq.hours&select=value";
-  var KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpncWp6Z29ud3ZreGZiZHNlaWVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1Njk4NTksImV4cCI6MjA5MjE0NTg1OX0.1mGtFUKumyQUgU0pO2CxIYSKLEuYEzspCGk9ncYYavk";
+  var URL="https://fkisefambrcyxjrwrplb.supabase.co/rest/v1/Hotheadz_menu_defaults?key=eq.hours&select=value";
+  var KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsanZ4bXFwbmtkdG53dnVhcWtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMzI4MDEsImV4cCI6MjA5NjkwODgwMX0.M28Idbz5N2deFmd9yhV5j0MxM6dLkum3mhxa4APFW5k";
   var FULL=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   var ORDER=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
   var ABBR={Monday:"Mon",Tuesday:"Tue",Wednesday:"Wed",Thursday:"Thu",Friday:"Fri",Saturday:"Sat",Sunday:"Sun"};
@@ -508,8 +508,8 @@ main{position:relative;z-index:5;}
 <!-- Today's specials — live from Supabase (lunch_dates), set in the Menu Editor -->
 <script>
 (function(){
-  var SB="https://zgqjzgonwvkxfbdseieg.supabase.co/rest/v1";
-  var KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpncWp6Z29ud3ZreGZiZHNlaWVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1Njk4NTksImV4cCI6MjA5MjE0NTg1OX0.1mGtFUKumyQUgU0pO2CxIYSKLEuYEzspCGk9ncYYavk";
+  var SB="https://fkisefambrcyxjrwrplb.supabase.co/rest/v1";
+  var KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsanZ4bXFwbmtkdG53dnVhcWtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMzI4MDEsImV4cCI6MjA5NjkwODgwMX0.M28Idbz5N2deFmd9yhV5j0MxM6dLkum3mhxa4APFW5k";
   var MO=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   var WD=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   var d=new Date();
@@ -519,25 +519,30 @@ main{position:relative;z-index:5;}
   function fallback(){ if(wrap) wrap.innerHTML='<p style="grid-column:1/-1;text-align:center;color:var(--ink-soft);">Today\'s lunch is posted fresh each morning — <a href="/menu" style="color:var(--terra-deep);font-weight:600;">see the full menu →</a> or check our <a href="https://www.facebook.com/people/Hot-Headz-Southern-Foods/100064025473003/" target="_blank" rel="noopener" style="color:var(--terra-deep);font-weight:600;">Facebook</a>.</p>'; }
   function col(title,icon,arr){
     if(!arr||!arr.length) return "";
-    var li=arr.map(function(x){return "<li>"+esc(x.name)+(x.desc?"<small>"+esc(x.desc)+"</small>":"")+"</li>";}).join("");
+    var li=arr.map(function(x){var item=typeof x==="string"?{name:x,desc:""}:(x||{});return "<li>"+esc(item.name)+(item.desc?"<small>"+esc(item.desc)+"</small>":"")+"</li>";}).join("");
     return '<div class="spec-col"><h3>'+icon+" "+title+"</h3><ul>"+li+"</ul></div>";
   }
-  fetch(SB+"/lunch_dates?select=lunch_date,data&lunch_date=gte."+iso+"&order=lunch_date.asc&limit=1",
-        {headers:{apikey:KEY,Authorization:"Bearer "+KEY}})
-    .then(function(r){return r.json();})
-    .then(function(rows){
+  Promise.all([
+    fetch(SB+"/Hotheadz_lunch_dates?select=lunch_date,data&lunch_date=gte."+iso+"&order=lunch_date.asc&limit=1",
+          {headers:{apikey:KEY,Authorization:"Bearer "+KEY}}).then(function(r){return r.json();}),
+    fetch(SB+"/Hotheadz_menu_defaults?select=value&key=eq.sameDaily",
+          {headers:{apikey:KEY,Authorization:"Bearer "+KEY}}).then(function(r){return r.json();})
+  ])
+    .then(function(results){
+      var rows=results[0], defaults=results[1];
       if(!rows||!rows.length){return fallback();}
       var row=rows[0], data=row.data||{}, lunch=data.lunch||{};
       if(lunch.show===false){return fallback();}
-      var meats=lunch.meats||[], sides=lunch.sides||[];
-      if(!meats.length&&!sides.length){return fallback();}
+      var meats=lunch.meats||[], sides=lunch.sides||[], sameDaily=lunch.sameDaily||[];
+      if(!sameDaily.length&&defaults&&defaults[0]&&defaults[0].value){sameDaily=defaults[0].value.items||[];}
+      if(!meats.length&&!sides.length&&!sameDaily.length){return fallback();}
       // date label
       var dateEl=document.getElementById("specialsDate"), eyeEl=document.getElementById("specialsEyebrow");
       var parts=row.lunch_date.split("-"), rd=new Date(parts[0],parts[1]-1,parts[2]);
       var isToday=row.lunch_date===iso;
       if(eyeEl) eyeEl.textContent=isToday?"Today's Lunch":(WD[rd.getDay()]+"'s Lunch");
       if(dateEl) dateEl.textContent=(isToday?"Serving today, ":"Coming up ")+WD[rd.getDay()]+", "+MO[rd.getMonth()]+" "+rd.getDate()+" · while it lasts.";
-      var html=col("Mains","🍗",meats)+col("Sides","🥬",sides);
+      var html=col("Mains","🍗",meats)+col("Sides","🥬",sides)+col("Same Daily","📅",sameDaily);
       if(data.crawfish&&data.crawfish.show) html+='<div class="spec-crawfish">🦞 Crawfish boiling today — come get \'em while they\'re hot!</div>';
       wrap.innerHTML=html;
     }).catch(fallback);

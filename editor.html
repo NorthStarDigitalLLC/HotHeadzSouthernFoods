@@ -890,8 +890,8 @@ function loadStore(){const s=safeJSON(localStorage.getItem(PK),null);if(s&&Array
 function saveStore(s){try{localStorage.setItem(PK,JSON.stringify(s));return{ok:true}}catch(e){return{ok:false,error:String(e?.message||e)}}}
 
 /* CLOUD API — Supabase */
-const SUPABASE_URL = 'https://lljvxmqpnkdtnwvuaqkd.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsanZ4bXFwbmtkdG53dnVhcWtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMzI4MDEsImV4cCI6MjA5NjkwODgwMX0.M28Idbz5N2deFmd9yhV5j0MxM6dLkum3mhxa4APFW5k';
+const SUPABASE_URL = 'https://fkisefambrcyxjrwrplb.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZraXNlZmFtYnJjeHhqcndycGxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNzA2NzEsImV4cCI6MjA5OTk0NjY3MX0.sDy0HJdssg_vxMQz0NvgLD7OykFZ2LfD6a6qtYevnyk';
 const CLOUD_NAME_KEY='hhMenuCloud_name';
 const ACTIVE_CLOUD_KEY='hhMenuCloud_activeId';
 const ACTIVE_CLOUD_NAME_KEY='hhMenuCloud_activeName';
@@ -1041,7 +1041,7 @@ async function apiPost(params){
   try{
     switch(action){
       case 'getMenuDefaults':{
-        var rows=await sbGet('menu_defaults?select=key,value,updated_at');
+        var rows=await sbGet('Hotheadz_menu_defaults?select=key,value,updated_at');
         if(!Array.isArray(rows))return{success:false,error:rows&&rows.message||'fetch failed'};
         var defaults={};rows.forEach(function(r){defaults[r.key]=r.value;});
         return{success:true,defaults:defaults};
@@ -1056,13 +1056,13 @@ async function apiPost(params){
         return{success:true};
       }
       case 'getFullMenu':{
-        var res=await Promise.all([sbGet('menu_defaults?select=key,value'),sbGet('lunch_dates?select=lunch_date,data')]);
+        var res=await Promise.all([sbGet('Hotheadz_menu_defaults?select=key,value'),sbGet('Hotheadz_lunch_dates?select=lunch_date,data')]);
         var defaults={};if(Array.isArray(res[0]))res[0].forEach(function(r){defaults[r.key]=r.value;});
         var dates={};if(Array.isArray(res[1]))res[1].forEach(function(r){dates[r.lunch_date]=r.data;});
         return{success:true,data:{defaults:defaults,dates:dates}};
       }
       case 'lunch':{
-        var rows=await sbGet('lunch_dates?select=lunch_date,data,updated_at&order=lunch_date.asc');
+        var rows=await sbGet('Hotheadz_lunch_dates?select=lunch_date,data,updated_at&order=lunch_date.asc');
         if(!Array.isArray(rows))return{success:false,error:rows&&rows.message||'fetch failed'};
         var dates={};rows.forEach(function(r){dates[r.lunch_date]=r.data;});
         return{success:true,dates:dates};
@@ -1077,12 +1077,12 @@ async function apiPost(params){
         return{success:true};
       }
       case 'list':{
-        var rows=await sbGet('drawing_projects?select=id,name,updated_at,created_at&order=updated_at.desc');
+        var rows=await sbGet('Hotheadz_drawing_projects?select=id,name,updated_at,created_at&order=updated_at.desc');
         if(!Array.isArray(rows))return{success:false,error:rows&&rows.message||'fetch failed'};
         return{success:true,projects:rows};
       }
       case 'load':{
-        var rows=await sbGet('drawing_projects?select=*&id=eq.'+encodeURIComponent(params.id));
+        var rows=await sbGet('Hotheadz_drawing_projects?select=*&id=eq.'+encodeURIComponent(params.id));
         if(!Array.isArray(rows)||!rows.length)return{success:false,error:'Project not found'};
         var p=rows[0];return{success:true,project:{id:p.id,name:p.name,data:p.data,updatedAt:p.updated_at,createdAt:p.created_at}};
       }
