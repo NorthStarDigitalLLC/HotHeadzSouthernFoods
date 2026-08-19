@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#17110e">
   <title>Hot Headz Menu Studio</title>
   <link rel="icon" href="/images/HotHeadzLogo.png">
-  <link rel="stylesheet" href="/editor.css?v=1">
+  <link rel="stylesheet" href="/editor.css?v=2">
 </head>
 <body>
   <div class="toast-stack" id="toastStack" aria-live="polite"></div>
@@ -39,7 +39,7 @@
       <nav class="mode-tabs" aria-label="Editor mode">
         <button data-mode="ai" type="button">AI menu</button>
         <button data-mode="manual" type="button">Manual</button>
-        <button data-mode="setup" class="desktop-only" type="button">Layouts</button>
+        <button data-mode="setup" type="button">Background</button>
       </nav>
       <div class="header-actions">
         <a href="/menu" target="_blank" rel="noopener">Live menu</a>
@@ -69,7 +69,7 @@
           <i>Type the menu →</i>
         </button>
       </div>
-      <button class="setup-link desktop-only" data-go="setup" type="button">Set up backgrounds and menu layouts</button>
+      <button class="setup-link" data-go="setup" type="button">Change the background picture or move the text boxes</button>
     </section>
 
     <section class="workspace screen" id="aiScreen" hidden>
@@ -78,7 +78,7 @@
         <p class="eyebrow">AI menu</p>
         <h1>Send the menu photos.</h1>
         <p class="lede">Use the clearest photo you have. You can add extra photos when handwriting, shadows, or crossed-out lines are hard to read.</p>
-        <button class="ai-setup-link desktop-only" data-go="setup" type="button"><span>Desktop setup</span><b>Adjust backgrounds, layouts, or the daily Lunch box →</b></button>
+        <button class="ai-setup-link" data-go="setup" type="button"><span>Background &amp; boxes</span><b>Add a background picture or move where the text lands →</b></button>
 
         <div class="field-card">
           <label for="aiDate">Serving date</label>
@@ -130,21 +130,22 @@
       <aside class="preview-column" data-preview-host></aside>
     </section>
 
-    <section class="setup-screen screen desktop-only" id="setupScreen" hidden>
+    <section class="setup-screen screen" id="setupScreen" hidden>
       <header class="setup-head">
-        <div><button class="back-link" data-go="home" type="button">← Menu studio</button><p class="eyebrow">Desktop setup</p><h1>Backgrounds and layouts</h1><p>Upload reusable backgrounds to Supabase, position the daily Lunch box, and save as many layouts as you need.</p></div>
+        <div><button class="back-link" data-go="home" type="button">← Menu studio</button><p class="eyebrow">Background &amp; text boxes</p><h1>Pick the picture. Move the boxes.</h1><p>Step 1 — add or choose a background picture. Step 2 — drag the outlined boxes so each part of the menu prints where you want it. The outlines are guides for you only; they never show up on the menu you download or publish.</p></div>
         <div class="cloud-badge"><span></span><b>Hot Headz cloud library</b><small>Shared across staff devices</small></div>
       </header>
 
       <div class="setup-grid">
-        <aside class="library-panel">
+        <aside class="library-panel" id="libraryPanel">
           <section>
-            <div class="section-title"><div><b>Backgrounds</b><small>Stored in Supabase</small></div><label class="small-button" for="backgroundUpload">+ Add image</label></div>
-            <input id="backgroundUpload" class="visually-hidden" type="file" accept="image/*" multiple>
+            <div class="section-title"><div><b>1. Background picture</b><small>Shared with every staff device</small></div></div>
+            <button class="drop-button" id="pickBackground" type="button"><b>Add a background picture</b><small>Tap to choose a photo, or drag one in here</small></button>
+            <div class="upload-progress" id="backgroundProgress" hidden role="status"><span></span><b>Saving…</b></div>
             <div class="asset-list" id="backgroundList"></div>
           </section>
           <section>
-            <div class="section-title"><div><b>Saved layouts</b><small>Background + Lunch box position</small></div></div>
+            <div class="section-title"><div><b>Saved layouts</b><small>A background plus all five box positions</small></div></div>
             <div class="layout-list" id="layoutList"></div>
           </section>
         </aside>
@@ -152,12 +153,39 @@
         <div class="layout-stage">
           <div class="stage-toolbar">
             <label>Layout name<input id="layoutName" value="Original Menu"></label>
-            <label>Text size<input id="layoutScale" type="range" min="0.7" max="1.35" step="0.05" value="1"></label>
+            <label>All text size<input id="layoutScale" type="range" min="0.7" max="1.35" step="0.05" value="1"></label>
             <label>Text color<input id="layoutColor" type="color" value="#f5eee5"></label>
           </div>
-          <div class="trainer-wrap"><canvas id="trainerCanvas" width="1080" height="1350" aria-label="Layout preview and Lunch box trainer"></canvas></div>
-          <p class="trainer-help">Drag the highlighted box to move it. Drag the square in its lower-right corner to resize it. This is the exact area the daily Lunch items will use.</p>
+
+          <p class="step-label">2. Pick a box, then drag it on the picture</p>
+          <div class="region-tabs" id="regionTabs" aria-label="Which text box to move"></div>
+
+          <div class="trainer-wrap"><canvas id="trainerCanvas" width="1080" height="1350" tabindex="0" aria-label="Background with the five text boxes drawn on it"></canvas></div>
+          <p class="trainer-help" id="regionHelp">The dishes that change every single day.</p>
+
+          <div class="box-controls">
+            <div class="nudge-pad" aria-label="Move the chosen box">
+              <button data-nudge="y:-1" type="button" aria-label="Move up">↑</button>
+              <button data-nudge="x:-1" type="button" aria-label="Move left">←</button>
+              <button data-nudge="x:1" type="button" aria-label="Move right">→</button>
+              <button data-nudge="y:1" type="button" aria-label="Move down">↓</button>
+            </div>
+            <div class="box-fields">
+              <label>From left %<input id="boxX" type="number" min="0" max="100" step="0.5"></label>
+              <label>From top %<input id="boxY" type="number" min="0" max="100" step="0.5"></label>
+              <label>Width %<input id="boxW" type="number" min="4" max="100" step="0.5"></label>
+              <label>Height %<input id="boxH" type="number" min="4" max="100" step="0.5"></label>
+              <label>This box’s text size<input id="boxScale" type="range" min="0.4" max="2" step="0.05"></label>
+              <label>Line up text<select id="boxAlign"><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></label>
+              <label class="check-field" id="boxTitleField"><input id="boxTitle" type="checkbox" checked><span>Print the heading word above the list (turn this off when the picture already has it)</span></label>
+            </div>
+          </div>
+
+          <p class="trainer-help">Drag a box to move it. Drag the orange square in its bottom-right corner to resize it. Arrow keys nudge the chosen box, and holding Shift while pressing them resizes it.</p>
+
           <div class="setup-actions">
+            <button class="secondary" id="resetBoxBtn" type="button">Reset this box</button>
+            <button class="secondary" id="resetAllBtn" type="button">Reset all boxes</button>
             <button class="secondary" id="saveLayoutAsBtn" type="button">Save as new layout</button>
             <button class="primary" id="updateLayoutBtn" type="button">Update selected layout</button>
           </div>
@@ -165,6 +193,8 @@
         </div>
       </div>
     </section>
+
+    <input id="backgroundUpload" class="visually-hidden" type="file" accept="image/*" multiple>
   </div>
 
   <template id="previewTemplate">
@@ -172,8 +202,9 @@
       <div class="preview-head"><div><p class="eyebrow">Menu image</p><h2>Preview</h2></div><span data-preview-state>Not published</span></div>
       <div class="preview-options">
         <label>Layout<select data-layout-select></select></label>
-        <label>Background<select data-background-select></select></label>
+        <label>Background<span class="select-with-add"><select data-background-select></select><button class="small-button" data-add-background type="button" title="Add a background picture" aria-label="Add a background picture">+</button></span></label>
       </div>
+      <label class="outline-toggle"><input type="checkbox" data-outline-toggle> Show me where each block of text lands</label>
       <div class="canvas-shell"><canvas width="1080" height="1350" data-menu-canvas></canvas><div class="empty-preview" data-empty-preview><b>Your preview will appear here.</b><small>Build the menu first.</small></div></div>
       <div class="preview-actions">
         <button class="secondary" data-download type="button" disabled>Download image</button>
@@ -183,6 +214,6 @@
     </section>
   </template>
 
-  <script src="/editor.js?v=1" defer></script>
+  <script src="/editor.js?v=2" defer></script>
 </body>
 </html>

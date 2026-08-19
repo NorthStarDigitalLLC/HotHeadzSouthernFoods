@@ -7,28 +7,74 @@
   const SESSION_PIN_KEY = 'hhPin';
   const AI_FILE_LIMIT = 4;
 
+  const clone = value => JSON.parse(JSON.stringify(value));
+
+  // The finished image is sized from the background picture itself, so an
+  // uploaded photo never gets black bars down the side. The longest edge is
+  // normalised to this many pixels so every published menu is the same weight.
+  const CANVAS_LONG_EDGE = 1350;
+  // Font sizes below are tuned against a 1350px tall image. Anything taller or
+  // shorter scales from this so text keeps its proportion on any background.
+  const FONT_BASE_HEIGHT = 1350;
+
   const builtInBackground = {
     id: 'hotheadz-original',
     name: 'Original Hot Headz menu',
     url: '/images/FBMenu.png',
     source: 'website'
   };
+
+  // Every block of text the studio prints is a named box. Staff drag these
+  // outlines on the Backgrounds & boxes screen, so a brand new background can
+  // be laid out without anybody touching code. Box positions are percentages
+  // of the background picture, not of the canvas, so they stay glued to the
+  // artwork whatever shape the picture is.
+  const REGION_DEFS = [
+    { key: 'header', label: 'Date header', help: 'The weekday and date printed across the top.' },
+    { key: 'breakfast', label: 'Breakfast', help: 'The standing breakfast list.' },
+    { key: 'salad', label: 'Salad bar', help: 'The salad bar list.' },
+    { key: 'drinks', label: 'Drinks', help: 'The drinks list.' },
+    { key: 'lunch', label: 'Today’s lunch', help: 'The dishes that change every single day.' }
+  ];
+  const REGION_KEYS = REGION_DEFS.map(def => def.key);
+
+  // Starting positions, measured against the original Hot Headz background.
+  const DEFAULT_REGIONS = {
+    header: { x: 0, y: 4.05, w: 100, h: 9.6, scale: 1, align: 'center' },
+    breakfast: { x: 2.6, y: 34, w: 51.6, h: 25, scale: .82, align: 'left' },
+    salad: { x: 60.8, y: 34, w: 38.4, h: 32, scale: .72, align: 'left' },
+    drinks: { x: 29, y: 65, w: 24, h: 25, scale: .8, align: 'left' },
+    lunch: { x: 1.4, y: 64.5, w: 26.4, h: 29, scale: 1, align: 'left' }
+  };
+
+  // The same boxes as the studio used to hard-code them: percentages of the
+  // old fixed 1080x1350 canvas. Layouts saved before boxes existed are read
+  // with these numbers and then converted onto the picture itself.
+  const LEGACY_REGIONS = {
+    header: { x: 5, y: 4.05, w: 90, h: 9.6, scale: 1, align: 'center' },
+    breakfast: { x: 10.5, y: 34, w: 43, h: 25, scale: .82, align: 'left' },
+    salad: { x: 59, y: 34, w: 32, h: 32, scale: .72, align: 'left' },
+    drinks: { x: 32.5, y: 65, w: 20, h: 25, scale: .8, align: 'left' },
+    lunch: { x: 9.5, y: 64.5, w: 22, h: 29, scale: 1, align: 'left' }
+  };
+  const LEGACY_CANVAS = { width: 1080, height: 1350 };
+
   const builtInLayout = {
     id: 'hotheadz-original-layout',
     name: 'Original Menu',
     builtIn: true,
     data: {
       kind: 'menu-layout-v2',
-      version: 2,
+      version: 3,
+      space: 'image',
       backgroundId: builtInBackground.id,
       backgroundUrl: builtInBackground.url,
-      lunchBox: { x: 9.5, y: 64.5, w: 22, h: 29 },
+      regions: clone(DEFAULT_REGIONS),
+      lunchBox: { x: 1.4, y: 64.5, w: 26.4, h: 29 },
       textColor: '#f5eee5',
       textScale: 1
     }
   };
-
-  const clone = value => JSON.parse(JSON.stringify(value));
 
   const state = {
     mode: 'home',
@@ -43,6 +89,8 @@
     previews: {},
     trainerLayout: clone(builtInLayout),
     trainerDrag: null,
+    activeRegion: 'lunch',
+    previewOutlines: false,
     imageCache: new Map(),
     renderToken: 0
   };
@@ -56,6 +104,80 @@
   };
   const uid = prefix => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
   const esc = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+  const round2 = value => Math.round(Number(value) * 100) / 100;
+  const regionLabel = key => (REGION_DEFS.find(def => def.key === key) || {}).label || key;
+
+  function normalizeBox(saved, fallback) {
+    const base = fallback || DEFAULT_REGIONS.lunch;
+    const box = {
+      x: Number.isFinite(Number(saved?.x)) ? Number(saved.x) : base.x,
+      y: Number.isFinite(Number(saved?.y)) ? Number(saved.y) : base.y,
+      w: Number.isFinite(Number(saved?.w)) ? Number(saved.w) : base.w,
+      h: Number.isFinite(Number(saved?.h)) ? Number(saved.h) : base.h,
+      scale: Number(saved?.scale) > 0 ? Number(saved.scale) : base.scale,
+      align: ['left', 'center', 'right'].includes(saved?.align) ? saved.align : base.align,
+      // Most backgrounds already have "BREAKFAST", "DRINKS" and so on printed
+      // on the artwork, so staff can switch our own heading off per box.
+      showTitle: saved?.showTitle !== false
+    };
+    box.w = clamp(box.w, 4, 100);
+    box.h = clamp(box.h, 4, 100);
+    box.x = clamp(box.x, 0, 100 - box.w);
+    box.y = clamp(box.y, 0, 100 - box.h);
+    box.scale = clamp(box.scale, .4, 2);
+    return box;
+  }
+
+  // Brings any saved layout — brand new, v2, or the very first canvas editor —
+  // up to the box model, in place, so the rest of the studio only ever deals
+  // with one shape.
+  function ensureLayoutShape(layout) {
+    if (!layout) return layout;
+    const data = layout.data && typeof layout.data === 'object' ? layout.data : {};
+    const isNewModel = !!data.regions;
+    const fallbacks = isNewModel || data.space === 'image' ? DEFAULT_REGIONS : LEGACY_REGIONS;
+    const regions = {};
+    REGION_KEYS.forEach(key => {
+      let saved = data.regions?.[key];
+      if (!saved && key === 'lunch' && data.lunchBox) saved = data.lunchBox;
+      regions[key] = normalizeBox(saved, fallbacks[key]);
+    });
+    data.regions = regions;
+    data.kind = 'menu-layout-v2';
+    data.space = data.space === 'image' || isNewModel ? 'image' : 'canvas';
+    data.version = data.space === 'image' ? 3 : 2;
+    data.textColor = data.textColor || '#f5eee5';
+    data.textScale = clamp(Number(data.textScale) || 1, .5, 2);
+    data.lunchBox = { x: regions.lunch.x, y: regions.lunch.y, w: regions.lunch.w, h: regions.lunch.h };
+    layout.data = data;
+    return layout;
+  }
+
+  // Older layouts positioned text against the fixed 1080x1350 frame, where the
+  // background sat letterboxed in the middle. Re-measure those boxes against
+  // the picture so the printed menu looks the same but the bars are gone.
+  function convertToImageSpace(data, image) {
+    if (!data || data.space === 'image') return false;
+    if (!image?.naturalWidth || !image?.naturalHeight) return false;
+    const fit = Math.min(LEGACY_CANVAS.width / image.naturalWidth, LEGACY_CANVAS.height / image.naturalHeight);
+    const drawWidth = image.naturalWidth * fit;
+    const drawHeight = image.naturalHeight * fit;
+    const offsetX = (LEGACY_CANVAS.width - drawWidth) / 2;
+    const offsetY = (LEGACY_CANVAS.height - drawHeight) / 2;
+    REGION_KEYS.forEach(key => {
+      const box = data.regions[key];
+      const width = clamp(box.w / 100 * LEGACY_CANVAS.width / drawWidth * 100, 4, 100);
+      const height = clamp(box.h / 100 * LEGACY_CANVAS.height / drawHeight * 100, 4, 100);
+      box.x = round2(clamp((box.x / 100 * LEGACY_CANVAS.width - offsetX) / drawWidth * 100, 0, 100 - width));
+      box.y = round2(clamp((box.y / 100 * LEGACY_CANVAS.height - offsetY) / drawHeight * 100, 0, 100 - height));
+      box.w = round2(width);
+      box.h = round2(height);
+    });
+    data.space = 'image';
+    data.version = 3;
+    data.lunchBox = { x: data.regions.lunch.x, y: data.regions.lunch.y, w: data.regions.lunch.w, h: data.regions.lunch.h };
+    return true;
+  }
 
   function toast(message, kind = 'info') {
     const el = document.createElement('div');
@@ -177,6 +299,7 @@
         }
       });
       state.layouts = [builtInLayout, ...cloudLayouts.filter(item => item.id !== builtInLayout.id)];
+      state.layouts.forEach(ensureLayoutShape);
 
       const preferredLayout = defaults.editorActiveLayout?.id;
       if (preferredLayout && state.layouts.some(layout => layout.id === preferredLayout)) state.activeLayoutId = preferredLayout;
@@ -256,14 +379,13 @@
   }
 
   function switchMode(mode) {
-    if (mode === 'setup' && matchMedia('(max-width: 900px)').matches) mode = 'ai';
     state.mode = mode;
     const map = { home: '#welcomeScreen', ai: '#aiScreen', manual: '#manualScreen', setup: '#setupScreen' };
     $$('.screen').forEach(screen => { screen.hidden = true; });
     $(map[mode] || map.home).hidden = false;
     $$('[data-mode]').forEach(button => button.classList.toggle('active', button.dataset.mode === mode));
     if (mode === 'setup') {
-      state.trainerLayout = clone(getActiveLayout());
+      state.trainerLayout = clone(ensureLayoutShape(getActiveLayout()));
       refreshLibraries();
       syncTrainerControls();
       drawTrainer();
@@ -471,7 +593,9 @@
       download: $('[data-download]', card),
       publish: $('[data-publish]', card),
       status: $('[data-publish-status]', card),
-      badge: $('[data-preview-state]', card)
+      badge: $('[data-preview-state]', card),
+      addBackground: $('[data-add-background]', card),
+      outlineToggle: $('[data-outline-toggle]', card)
     };
     preview.layoutSelect.addEventListener('change', () => {
       state.activeLayoutId = preview.layoutSelect.value;
@@ -483,6 +607,12 @@
     preview.backgroundSelect.addEventListener('change', () => {
       state.activeBackgroundId = preview.backgroundSelect.value;
       refreshPreviewSelectors();
+      renderAllPreviews();
+    });
+    if (preview.addBackground) preview.addBackground.addEventListener('click', () => openBackgroundPicker());
+    if (preview.outlineToggle) preview.outlineToggle.addEventListener('change', () => {
+      state.previewOutlines = preview.outlineToggle.checked;
+      Object.values(state.previews).forEach(item => { if (item.outlineToggle) item.outlineToggle.checked = state.previewOutlines; });
       renderAllPreviews();
     });
     preview.download.addEventListener('click', () => downloadPreview(kind));
@@ -523,14 +653,36 @@
     return promise;
   }
 
-  function drawImageContain(context, image, width, height) {
+  // The canvas takes the shape of the background picture, so the picture fills
+  // it edge to edge and every box percentage lines up with the artwork.
+  function canvasSizeForImage(image) {
+    if (!image?.naturalWidth || !image?.naturalHeight) return { width: 1080, height: 1350 };
+    const fit = CANVAS_LONG_EDGE / Math.max(image.naturalWidth, image.naturalHeight);
+    return {
+      width: Math.max(320, Math.round(image.naturalWidth * fit)),
+      height: Math.max(320, Math.round(image.naturalHeight * fit))
+    };
+  }
+
+  function drawBackground(context, image, width, height) {
     context.fillStyle = '#0b0908';
     context.fillRect(0, 0, width, height);
-    if (!image) return;
-    const scale = Math.min(width / image.naturalWidth, height / image.naturalHeight);
-    const drawWidth = image.naturalWidth * scale;
-    const drawHeight = image.naturalHeight * scale;
-    context.drawImage(image, (width - drawWidth) / 2, (height - drawHeight) / 2, drawWidth, drawHeight);
+    if (image) context.drawImage(image, 0, 0, width, height);
+  }
+
+  function boxRect(canvas, box) {
+    return {
+      x: box.x / 100 * canvas.width,
+      y: box.y / 100 * canvas.height,
+      width: box.w / 100 * canvas.width,
+      height: box.h / 100 * canvas.height
+    };
+  }
+
+  function alignedX(rect, align) {
+    if (align === 'center') return rect.x + rect.width / 2;
+    if (align === 'right') return rect.x + rect.width;
+    return rect.x;
   }
 
   function wrapLine(context, text, maxWidth) {
@@ -547,10 +699,11 @@
     return lines;
   }
 
-  function fittedLines(context, sourceLines, boxWidth, boxHeight, scale = 1) {
-    let size = Math.round(23 * scale);
+  function fittedLines(context, sourceLines, boxWidth, boxHeight, scale = 1, unit = 1) {
+    const smallest = Math.max(9, Math.round(12 * unit));
+    let size = Math.max(smallest, Math.round(23 * scale * unit));
     let lines = [];
-    while (size >= 12) {
+    while (size >= smallest) {
       context.font = `700 ${size}px Arial, sans-serif`;
       lines = sourceLines.flatMap(line => wrapLine(context, line, boxWidth));
       const height = lines.length * size * 1.25;
@@ -560,26 +713,110 @@
     return { size, lines, lineHeight: size * 1.25 };
   }
 
-  function drawSection(context, title, sourceItems, box, color, scale = 1) {
-    const x = box.x / 100 * context.canvas.width;
-    const y = box.y / 100 * context.canvas.height;
-    const width = box.w / 100 * context.canvas.width;
-    const height = box.h / 100 * context.canvas.height;
+  function drawSection(context, title, sourceItems, box, color, scale = 1, unit = 1) {
+    const rect = boxRect(context.canvas, box);
+    const align = box.align || 'left';
     const items = (sourceItems || []).map(item => typeof item === 'string' ? item : item.name).filter(Boolean);
-    const source = [title, ...items.map(item => `• ${item}`)];
+    const showTitle = box.showTitle !== false;
+    const source = showTitle ? [title, ...items.map(item => `• ${item}`)] : items.map(item => `• ${item}`);
+    if (!source.length) return;
     context.save();
     context.fillStyle = color;
     context.textBaseline = 'top';
+    context.textAlign = align;
     context.shadowColor = 'rgba(0,0,0,.9)';
-    context.shadowBlur = 8;
-    const fit = fittedLines(context, source, width, height, scale);
-    let cursorY = y;
+    context.shadowBlur = 8 * unit;
+    const fit = fittedLines(context, source, rect.width, rect.height, scale * (box.scale || 1), unit);
+    const x = alignedX(rect, align);
+    let cursorY = rect.y;
     fit.lines.forEach((line, index) => {
-      context.font = `${index === 0 ? '900' : '700'} ${fit.size}px Arial, sans-serif`;
-      context.fillText(line, x, cursorY, width);
+      context.font = `${showTitle && index === 0 ? '900' : '700'} ${fit.size}px Arial, sans-serif`;
+      context.fillText(line, x, cursorY, rect.width);
       cursorY += fit.lineHeight;
     });
     context.restore();
+  }
+
+  function drawHeader(context, date, box, color, scale = 1, unit = 1) {
+    const rect = boxRect(context.canvas, box);
+    const align = box.align || 'center';
+    const dateObject = new Date(`${date || todayISO()}T12:00:00`);
+    const weekday = dateObject.toLocaleDateString('en-US', { weekday: 'long' });
+    const full = dateObject.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    const smallest = Math.max(12, Math.round(18 * unit));
+    let size = Math.max(smallest, Math.round(64 * scale * (box.scale || 1) * unit));
+    let subSize = Math.round(size * 31 / 64);
+    context.save();
+    while (size > smallest) {
+      subSize = Math.max(Math.round(smallest * .55), Math.round(size * 31 / 64));
+      context.font = `900 ${size}px Arial, sans-serif`;
+      const weekdayWidth = context.measureText(weekday).width;
+      context.font = `700 ${subSize}px Arial, sans-serif`;
+      const dateWidth = context.measureText(full).width;
+      const stackHeight = size * 1.25 + subSize * 1.2;
+      if (Math.max(weekdayWidth, dateWidth) <= rect.width && stackHeight <= rect.height) break;
+      size -= 1;
+    }
+    context.fillStyle = color;
+    context.textBaseline = 'top';
+    context.textAlign = align;
+    context.shadowColor = 'rgba(0,0,0,.92)';
+    context.shadowBlur = 12 * unit;
+    const x = alignedX(rect, align);
+    context.font = `900 ${size}px Arial, sans-serif`;
+    context.fillText(weekday, x, rect.y, rect.width);
+    context.font = `700 ${subSize}px Arial, sans-serif`;
+    context.fillText(full, x, rect.y + size * 1.25, rect.width);
+    context.restore();
+  }
+
+  // Guide outlines. These are painted on screen only — the download and the
+  // published image are always redrawn without them.
+  function drawRegionOutlines(context, regions, activeKey, unit) {
+    const canvas = context.canvas;
+    REGION_DEFS.forEach(def => {
+      const box = regions[def.key];
+      if (!box) return;
+      const rect = boxRect(canvas, box);
+      const active = def.key === activeKey;
+      context.save();
+      context.lineWidth = Math.max(2, (active ? 5 : 2.5) * unit);
+      context.setLineDash(active ? [18 * unit, 10 * unit] : [9 * unit, 8 * unit]);
+      context.strokeStyle = active ? '#ff7b43' : 'rgba(255,255,255,.55)';
+      if (active) {
+        context.fillStyle = 'rgba(242,107,53,.13)';
+        context.fillRect(rect.x, rect.y, rect.width, rect.height);
+      }
+      context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+      context.setLineDash([]);
+
+      const label = def.label.toUpperCase();
+      const labelSize = Math.max(11, Math.round(19 * unit));
+      context.font = `900 ${labelSize}px Arial, sans-serif`;
+      const padding = Math.round(8 * unit);
+      const chipHeight = Math.round(labelSize * 1.7);
+      const chipWidth = Math.min(rect.width + padding * 2, context.measureText(label).width + padding * 2);
+      let chipY = rect.y - chipHeight - 3 * unit;
+      if (chipY < 2) chipY = rect.y + 3 * unit;
+      context.fillStyle = active ? '#ff7b43' : 'rgba(0,0,0,.62)';
+      context.fillRect(rect.x, chipY, chipWidth, chipHeight);
+      context.fillStyle = '#fff';
+      context.textAlign = 'left';
+      context.textBaseline = 'middle';
+      context.fillText(label, rect.x + padding, chipY + chipHeight / 2, chipWidth - padding * 2);
+
+      if (active) {
+        const handle = Math.max(22, 34 * unit);
+        const hx = rect.x + rect.width - handle / 2;
+        const hy = rect.y + rect.height - handle / 2;
+        context.fillStyle = '#ff7b43';
+        context.fillRect(hx, hy, handle, handle);
+        context.lineWidth = Math.max(1.5, 2 * unit);
+        context.strokeStyle = '#fff';
+        context.strokeRect(hx, hy, handle, handle);
+      }
+      context.restore();
+    });
   }
 
   function dailyLunchItems(draft) {
@@ -592,54 +829,45 @@
     return lines;
   }
 
-  async function drawMenu(canvas, draft, date, layout, background, showTrainingBox = false) {
+  function sectionItems(key, draft) {
+    if (key === 'lunch') return dailyLunchItems(draft);
+    if (key === 'breakfast') return state.defaults.breakfast?.items || ['Scrambled Eggs', 'Bacon', 'Sausage', 'Biscuits', 'Hashbrowns', 'Cheesy Grits', 'Sausage Gravy'];
+    if (key === 'drinks') return state.defaults.drinks?.items || ['Sweet Tea', 'Unsweet Tea', 'Dr Pepper', 'Sprite', 'Coke', 'Coffee'];
+    if (key === 'salad') {
+      const salad = state.defaults.salad?.saladBar || {};
+      return [...(salad.lettuce || []), ...(salad.toppings || []).slice(0, 15), ...(salad.dressing || []).slice(0, 5)];
+    }
+    return [];
+  }
+
+  const SECTION_TITLES = { breakfast: 'BREAKFAST', salad: 'SALAD BAR', drinks: 'DRINKS', lunch: 'LUNCH' };
+
+  async function drawMenu(canvas, draft, date, layout, background, outline = null) {
     const context = canvas.getContext('2d', { alpha: false });
-    const image = await loadImage(background?.url || layout?.data?.backgroundUrl || builtInBackground.url);
-    drawImageContain(context, image, canvas.width, canvas.height);
-    const data = layout?.data || builtInLayout.data;
+    const target = layout || builtInLayout;
+    ensureLayoutShape(target);
+    const image = await loadImage(background?.url || target.data.backgroundUrl || builtInBackground.url);
+    convertToImageSpace(target.data, image);
+
+    const size = canvasSizeForImage(image);
+    if (canvas.width !== size.width || canvas.height !== size.height) {
+      canvas.width = size.width;
+      canvas.height = size.height;
+    }
+    drawBackground(context, image, canvas.width, canvas.height);
+
+    const data = target.data;
+    const regions = data.regions;
     const color = data.textColor || '#f5eee5';
     const textScale = Number(data.textScale) || 1;
-    const dateObject = new Date(`${date || todayISO()}T12:00:00`);
+    const unit = canvas.height / FONT_BASE_HEIGHT;
 
-    context.save();
-    context.fillStyle = color;
-    context.textAlign = 'center';
-    context.shadowColor = 'rgba(0,0,0,.92)';
-    context.shadowBlur = 12;
-    context.font = `900 ${Math.round(64 * textScale)}px Arial, sans-serif`;
-    context.fillText(dateObject.toLocaleDateString('en-US', { weekday: 'long' }), canvas.width * .5, canvas.height * .075);
-    context.font = `700 ${Math.round(31 * textScale)}px Arial, sans-serif`;
-    context.fillText(dateObject.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }), canvas.width * .5, canvas.height * .115);
-    context.restore();
+    drawHeader(context, date, regions.header, color, textScale, unit);
+    ['breakfast', 'salad', 'drinks', 'lunch'].forEach(key => {
+      drawSection(context, SECTION_TITLES[key], sectionItems(key, draft), regions[key], color, textScale, unit);
+    });
 
-    drawSection(context, 'BREAKFAST', state.defaults.breakfast?.items || ['Scrambled Eggs', 'Bacon', 'Sausage', 'Biscuits', 'Hashbrowns', 'Cheesy Grits', 'Sausage Gravy'], { x: 10.5, y: 34, w: 43, h: 25 }, color, textScale * .82);
-    const salad = state.defaults.salad?.saladBar || {};
-    drawSection(context, 'SALAD BAR', [...(salad.lettuce || []), ...(salad.toppings || []).slice(0, 15), ...(salad.dressing || []).slice(0, 5)], { x: 59, y: 34, w: 32, h: 32 }, color, textScale * .72);
-    drawSection(context, 'DRINKS', state.defaults.drinks?.items || ['Sweet Tea', 'Unsweet Tea', 'Dr Pepper', 'Sprite', 'Coke', 'Coffee'], { x: 32.5, y: 65, w: 20, h: 25 }, color, textScale * .8);
-    drawSection(context, 'LUNCH', dailyLunchItems(draft), data.lunchBox || builtInLayout.data.lunchBox, color, textScale);
-
-    if (showTrainingBox) {
-      const box = data.lunchBox || builtInLayout.data.lunchBox;
-      const x = box.x / 100 * canvas.width;
-      const y = box.y / 100 * canvas.height;
-      const width = box.w / 100 * canvas.width;
-      const height = box.h / 100 * canvas.height;
-      context.save();
-      context.fillStyle = 'rgba(242,107,53,.12)';
-      context.strokeStyle = '#ff7b43';
-      context.lineWidth = 6;
-      context.setLineDash([18, 10]);
-      context.fillRect(x, y, width, height);
-      context.strokeRect(x, y, width, height);
-      context.setLineDash([]);
-      context.fillStyle = '#ff7b43';
-      context.fillRect(x + width - 22, y + height - 22, 44, 44);
-      context.fillStyle = '#fff';
-      context.font = '900 22px Arial, sans-serif';
-      context.textAlign = 'left';
-      context.fillText('DAILY LUNCH ITEMS', x + 12, Math.max(28, y - 14));
-      context.restore();
-    }
+    if (outline) drawRegionOutlines(context, regions, outline.activeKey, unit);
   }
 
   async function renderPreview(kind) {
@@ -654,7 +882,7 @@
     const token = ++state.renderToken;
     const layout = getActiveLayout();
     const background = getActiveBackground();
-    await drawMenu(preview.canvas, draft, currentDate(kind), layout, background);
+    await drawMenu(preview.canvas, draft, currentDate(kind), layout, background, state.previewOutlines ? { activeKey: null } : null);
     if (token !== state.renderToken && state.mode === kind) return;
   }
 
@@ -662,10 +890,14 @@
     Object.keys(state.previews).forEach(renderPreview);
   }
 
-  function downloadPreview(kind) {
+  async function downloadPreview(kind) {
     const preview = state.previews[kind];
-    if (!currentDraft(kind) || !preview) return;
+    const draft = currentDraft(kind);
+    if (!draft || !preview) return;
     try {
+      // Always hand over a clean image: the guide outlines are a screen aid and
+      // must never end up on the menu that goes out to customers.
+      await drawMenu(preview.canvas, draft, currentDate(kind), getActiveLayout(), getActiveBackground(), null);
       const link = document.createElement('a');
       link.download = `hot-headz-menu-${currentDate(kind)}.jpg`;
       link.href = preview.canvas.toDataURL('image/jpeg', .92);
@@ -673,6 +905,8 @@
       toast('Menu image downloaded.', 'success');
     } catch {
       toast('The image could not be downloaded. Try the original background or upload it again.', 'error');
+    } finally {
+      if (state.previewOutlines) renderPreview(kind);
     }
   }
 
@@ -711,25 +945,26 @@
     const backgroundList = $('#backgroundList');
     const layoutList = $('#layoutList');
     if (!backgroundList || !layoutList) return;
+    const activeBackgroundId = state.trainerLayout?.data?.backgroundId;
     backgroundList.innerHTML = state.backgrounds.map(background => `
-      <button class="asset-item ${background.id === state.trainerLayout?.data?.backgroundId ? 'active' : ''}" data-background-id="${esc(background.id)}" type="button">
-        <img src="${esc(background.url)}" alt=""><span><b>${esc(background.name)}</b><small>${background.source === 'supabase' ? 'Supabase background' : 'Original website background'}</small></span>
-      </button>`).join('');
+      <div class="asset-row ${background.id === activeBackgroundId ? 'active' : ''}">
+        <button class="asset-item" data-background-id="${esc(background.id)}" type="button">
+          <img src="${esc(background.url)}" alt="" loading="lazy"><span><b>${esc(background.name)}</b><small>${background.source === 'supabase' ? 'Added by staff' : 'Came with the website'}</small></span>
+        </button>
+        ${background.source === 'supabase' ? `<button class="asset-remove" data-remove-background="${esc(background.id)}" type="button" title="Take this off the list" aria-label="Take ${esc(background.name)} off the list">&#10005;</button>` : ''}
+      </div>`).join('');
     layoutList.innerHTML = state.layouts.map(layout => `
-      <button class="layout-item ${layout.id === state.trainerLayout?.id ? 'active' : ''}" data-layout-id="${esc(layout.id)}" type="button"><span><b>${esc(layout.name)}</b><small>${layout.builtIn ? 'Built-in starting layout' : 'Shared Supabase layout'}</small></span></button>`).join('');
+      <button class="layout-item ${layout.id === state.trainerLayout?.id ? 'active' : ''}" data-layout-id="${esc(layout.id)}" type="button"><span><b>${esc(layout.name)}</b><small>${layout.builtIn ? 'Built-in starting layout' : 'Saved by staff'}</small></span></button>`).join('');
     $$('[data-background-id]', backgroundList).forEach(button => button.addEventListener('click', () => {
       const background = state.backgrounds.find(item => item.id === button.dataset.backgroundId);
       if (!background) return;
-      state.trainerLayout.data.backgroundId = background.id;
-      state.trainerLayout.data.backgroundUrl = background.url;
-      state.activeBackgroundId = background.id;
-      refreshLibraries();
-      drawTrainer();
+      useBackground(background);
     }));
+    $$('[data-remove-background]', backgroundList).forEach(button => button.addEventListener('click', () => removeBackground(button.dataset.removeBackground)));
     $$('[data-layout-id]', layoutList).forEach(button => button.addEventListener('click', () => {
       const layout = state.layouts.find(item => item.id === button.dataset.layoutId);
       if (!layout) return;
-      state.trainerLayout = clone(layout);
+      state.trainerLayout = clone(ensureLayoutShape(layout));
       state.activeLayoutId = layout.id;
       state.activeBackgroundId = backgroundForLayout(layout).id;
       syncTrainerControls();
@@ -740,11 +975,109 @@
     }));
   }
 
+  function useBackground(background) {
+    if (state.trainerLayout) {
+      state.trainerLayout.data.backgroundId = background.id;
+      state.trainerLayout.data.backgroundUrl = background.url;
+    }
+    state.activeBackgroundId = background.id;
+    refreshLibraries();
+    refreshPreviewSelectors();
+    drawTrainer();
+    renderAllPreviews();
+  }
+
+  async function removeBackground(id) {
+    const background = state.backgrounds.find(item => item.id === id);
+    if (!background || background.source !== 'supabase') return;
+    if (!window.confirm(`Take “${background.name}” off the background list?`)) return;
+    const previous = state.backgrounds.slice();
+    state.backgrounds = state.backgrounds.filter(item => item.id !== id);
+    if (state.activeBackgroundId === id) state.activeBackgroundId = builtInBackground.id;
+    if (state.trainerLayout?.data?.backgroundId === id) {
+      state.trainerLayout.data.backgroundId = builtInBackground.id;
+      state.trainerLayout.data.backgroundUrl = builtInBackground.url;
+    }
+    refreshLibraries();
+    refreshPreviewSelectors();
+    drawTrainer();
+    renderAllPreviews();
+    try {
+      await saveBackgroundLibrary();
+      setStatus($('#setupStatus'), `“${background.name}” was taken off the list.`, 'success');
+    } catch (error) {
+      state.backgrounds = previous;
+      refreshLibraries();
+      refreshPreviewSelectors();
+      setStatus($('#setupStatus'), `That background could not be removed: ${error.message}`, 'error');
+    }
+  }
+
+  function activeRegionKey() {
+    return REGION_KEYS.includes(state.activeRegion) ? state.activeRegion : 'lunch';
+  }
+
+  function activeRegionBox() {
+    const regions = state.trainerLayout?.data?.regions;
+    return regions ? regions[activeRegionKey()] : null;
+  }
+
+  function syncLunchMirror(data) {
+    if (!data?.regions?.lunch) return;
+    data.lunchBox = { x: data.regions.lunch.x, y: data.regions.lunch.y, w: data.regions.lunch.w, h: data.regions.lunch.h };
+  }
+
+  function renderRegionTabs() {
+    const tabs = $('#regionTabs');
+    if (!tabs) return;
+    const active = activeRegionKey();
+    tabs.innerHTML = REGION_DEFS.map(def => `
+      <button class="region-tab ${def.key === active ? 'active' : ''}" data-region="${esc(def.key)}" type="button" aria-pressed="${def.key === active}">${esc(def.label)}</button>`).join('');
+    $$('[data-region]', tabs).forEach(button => button.addEventListener('click', () => selectRegion(button.dataset.region)));
+  }
+
+  function selectRegion(key) {
+    if (!REGION_KEYS.includes(key)) return;
+    state.activeRegion = key;
+    renderRegionTabs();
+    syncBoxFields();
+    drawTrainer();
+  }
+
+  function syncBoxFields() {
+    const box = activeRegionBox();
+    const help = $('#regionHelp');
+    const def = REGION_DEFS.find(item => item.key === activeRegionKey());
+    if (help && def) help.textContent = def.help;
+    if (!box) return;
+    const fields = { boxX: box.x, boxY: box.y, boxW: box.w, boxH: box.h };
+    Object.entries(fields).forEach(([id, value]) => {
+      const input = $(`#${id}`);
+      if (input && document.activeElement !== input) input.value = String(round2(value));
+    });
+    const scale = $('#boxScale');
+    if (scale) scale.value = String(box.scale || 1);
+    const align = $('#boxAlign');
+    if (align) align.value = box.align || 'left';
+    const title = $('#boxTitle');
+    const titleField = $('#boxTitleField');
+    if (title) {
+      const isHeader = activeRegionKey() === 'header';
+      title.checked = box.showTitle !== false;
+      title.disabled = isHeader;
+      if (titleField) titleField.hidden = isHeader;
+    }
+  }
+
   function syncTrainerControls() {
-    $('#layoutName').value = state.trainerLayout?.name || 'Menu Layout';
-    $('#layoutScale').value = String(state.trainerLayout?.data?.textScale || 1);
-    $('#layoutColor').value = state.trainerLayout?.data?.textColor || '#f5eee5';
-    $('#updateLayoutBtn').disabled = !!state.trainerLayout?.builtIn;
+    if (!state.trainerLayout) return;
+    ensureLayoutShape(state.trainerLayout);
+    $('#layoutName').value = state.trainerLayout.name || 'Menu Layout';
+    $('#layoutScale').value = String(state.trainerLayout.data.textScale || 1);
+    $('#layoutColor').value = state.trainerLayout.data.textColor || '#f5eee5';
+    $('#updateLayoutBtn').disabled = !!state.trainerLayout.builtIn;
+    renderRegionTabs();
+    syncBoxFields();
   }
 
   async function drawTrainer() {
@@ -755,7 +1088,8 @@
       sides: [{ name: 'Mashed Potatoes & Gravy' }, { name: 'Cabbage' }, { name: 'Green Beans' }, { name: 'Fried Okra' }]
     };
     const background = state.backgrounds.find(item => item.id === state.trainerLayout.data.backgroundId) || builtInBackground;
-    await drawMenu(canvas, sample, todayISO(), state.trainerLayout, background, true);
+    await drawMenu(canvas, sample, todayISO(), state.trainerLayout, background, { activeKey: activeRegionKey() });
+    syncBoxFields();
   }
 
   async function saveBackgroundLibrary() {
@@ -776,43 +1110,68 @@
     return canvas.toDataURL('image/jpeg', .86);
   }
 
+  function openBackgroundPicker() {
+    const input = $('#backgroundUpload');
+    if (input && !input.disabled) input.click();
+  }
+
+  function setUploadBusy(busy, message) {
+    const progress = $('#backgroundProgress');
+    const input = $('#backgroundUpload');
+    const picker = $('#pickBackground');
+    if (input) input.disabled = busy;
+    if (picker) picker.disabled = busy;
+    Object.values(state.previews).forEach(preview => { if (preview.addBackground) preview.addBackground.disabled = busy; });
+    if (progress) {
+      progress.hidden = !busy;
+      const label = $('b', progress);
+      if (label && message) label.textContent = message;
+    }
+  }
+
   async function uploadBackgrounds(files) {
-    const chosen = Array.from(files || []).slice(0, 8);
-    if (!chosen.length) return;
-    setStatus($('#setupStatus'), `Uploading ${chosen.length} background${chosen.length === 1 ? '' : 's'} to Supabase…`);
-    $('#backgroundUpload').disabled = true;
+    const chosen = Array.from(files || []).filter(file => /^image\//.test(file.type) || /\.(jpe?g|png|webp|heic|heif)$/i.test(file.name)).slice(0, 8);
+    if (!chosen.length) {
+      if ((files || []).length) toast('That file is not a picture. Choose a JPG, PNG, or HEIC.', 'error');
+      return;
+    }
+    const many = chosen.length === 1 ? 'picture' : 'pictures';
+    setUploadBusy(true, `Saving ${chosen.length} ${many}…`);
+    setStatus($('#setupStatus'), `Saving ${chosen.length} ${many} to the shared library…`);
+    let added = 0;
     try {
       for (const file of chosen) {
         const id = uid('background');
         const dataUrl = await compressBackground(file);
         const safeName = file.name.replace(/\.[^.]+$/, '').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase() || 'menu-background';
         const url = await cloudUpload(`hotheadz/backgrounds/${id}-${safeName}.jpg`, dataUrl);
-        state.backgrounds.push({ id, name: file.name.replace(/\.[^.]+$/, ''), url, source: 'supabase', createdAt: new Date().toISOString() });
+        state.backgrounds.push({ id, name: file.name.replace(/\.[^.]+$/, '') || 'Menu background', url, source: 'supabase', createdAt: new Date().toISOString() });
+        added += 1;
       }
       await saveBackgroundLibrary();
       const newest = state.backgrounds[state.backgrounds.length - 1];
-      state.trainerLayout.data.backgroundId = newest.id;
-      state.trainerLayout.data.backgroundUrl = newest.url;
-      state.activeBackgroundId = newest.id;
-      refreshLibraries();
-      refreshPreviewSelectors();
-      await drawTrainer();
-      setStatus($('#setupStatus'), 'Backgrounds saved to the Hot Headz Supabase library.', 'success');
-      toast('Background library updated.', 'success');
+      useBackground(newest);
+      setStatus($('#setupStatus'), added === 1 ? 'Picture added and switched on. Drag the outlined boxes to fit it.' : `${added} pictures added. The newest one is switched on.`, 'success');
+      toast(added === 1 ? 'Background added.' : `${added} backgrounds added.`, 'success');
     } catch (error) {
-      setStatus($('#setupStatus'), `Upload failed: ${error.message}`, 'error');
+      setStatus($('#setupStatus'), `That picture could not be saved: ${error.message}`, 'error');
+      toast('The background could not be saved.', 'error');
     } finally {
-      $('#backgroundUpload').disabled = false;
-      $('#backgroundUpload').value = '';
+      setUploadBusy(false);
+      const input = $('#backgroundUpload');
+      if (input) input.value = '';
     }
   }
 
   function trainerPayload(id, name) {
-    const data = clone(state.trainerLayout.data || builtInLayout.data);
+    ensureLayoutShape(state.trainerLayout);
+    const data = clone(state.trainerLayout.data);
     data.kind = 'menu-layout-v2';
-    data.version = 2;
+    data.version = 3;
+    data.space = 'image';
     data.textScale = Number($('#layoutScale').value) || 1;
     data.textColor = $('#layoutColor').value || '#f5eee5';
+    syncLunchMirror(data);
     return { id, name, data, saved_by: 'Menu Studio', updated_at: new Date().toISOString() };
   }
 
@@ -825,7 +1184,7 @@
     setStatus($('#setupStatus'), asNew ? 'Saving new layout…' : 'Updating layout…');
     try {
       await cloudWrite('upsert', 'drawing_projects', { row: payload });
-      const layout = { id, name, data: payload.data, updatedAt: payload.updated_at };
+      const layout = ensureLayoutShape({ id, name, data: payload.data, updatedAt: payload.updated_at });
       const index = state.layouts.findIndex(item => item.id === id);
       if (index >= 0) state.layouts[index] = layout;
       else state.layouts.push(layout);
@@ -838,21 +1197,168 @@
       refreshPreviewSelectors();
       syncTrainerControls();
       renderAllPreviews();
-      setStatus($('#setupStatus'), `Saved “${name}” to the shared layout library.`, 'success');
+      setStatus($('#setupStatus'), `Saved “${name}”. Every staff device sees it now.`, 'success');
       toast('Layout saved.', 'success');
     } catch (error) {
       setStatus($('#setupStatus'), `Layout save failed: ${error.message}`, 'error');
     }
   }
 
-  function trainerPoint(event) {
+  function resetActiveRegion() {
+    const key = activeRegionKey();
+    state.trainerLayout.data.regions[key] = clone(DEFAULT_REGIONS[key]);
+    syncLunchMirror(state.trainerLayout.data);
+    syncBoxFields();
+    drawTrainer();
+    setStatus($('#setupStatus'), `“${regionLabel(key)}” is back where it started.`);
+  }
+
+  function resetAllRegions() {
+    if (!window.confirm('Put all five boxes back to their starting positions?')) return;
+    state.trainerLayout.data.regions = clone(DEFAULT_REGIONS);
+    syncLunchMirror(state.trainerLayout.data);
+    syncBoxFields();
+    drawTrainer();
+    setStatus($('#setupStatus'), 'All boxes are back where they started.');
+  }
+
+  // The canvas is letterboxed inside its shell whenever the picture is a
+  // different shape, so pointer positions are measured against the drawn
+  // picture rather than the element box.
+  function trainerMetrics() {
     const canvas = $('#trainerCanvas');
     const rect = canvas.getBoundingClientRect();
-    return { x: (event.clientX - rect.left) / rect.width * 100, y: (event.clientY - rect.top) / rect.height * 100 };
+    const scale = Math.min(rect.width / canvas.width, rect.height / canvas.height) || 1;
+    const drawWidth = canvas.width * scale;
+    const drawHeight = canvas.height * scale;
+    return {
+      canvas,
+      scale,
+      drawWidth,
+      drawHeight,
+      left: rect.left + (rect.width - drawWidth) / 2,
+      top: rect.top + (rect.height - drawHeight) / 2
+    };
+  }
+
+  function trainerPoint(event) {
+    const metrics = trainerMetrics();
+    return {
+      x: (event.clientX - metrics.left) / metrics.drawWidth * 100,
+      y: (event.clientY - metrics.top) / metrics.drawHeight * 100
+    };
+  }
+
+  function hitRegion(point) {
+    const regions = state.trainerLayout.data.regions;
+    const canvas = $('#trainerCanvas');
+    const tolerance = { x: 30 / canvas.width * 100, y: 30 / canvas.height * 100 };
+    const active = activeRegionKey();
+    const inside = key => {
+      const box = regions[key];
+      return point.x >= box.x && point.x <= box.x + box.w && point.y >= box.y && point.y <= box.y + box.h;
+    };
+    const onHandle = key => {
+      const box = regions[key];
+      return Math.abs(point.x - (box.x + box.w)) <= tolerance.x && Math.abs(point.y - (box.y + box.h)) <= tolerance.y;
+    };
+    if (onHandle(active)) return { key: active, mode: 'resize' };
+    if (inside(active)) return { key: active, mode: 'move' };
+    // Smallest box wins, so a little box sitting on a big one is still reachable.
+    const covered = REGION_KEYS.filter(key => key !== active && inside(key))
+      .sort((a, b) => (regions[a].w * regions[a].h) - (regions[b].w * regions[b].h));
+    if (covered.length) return { key: covered[0], mode: 'move' };
+    const handled = REGION_KEYS.find(key => key !== active && onHandle(key));
+    if (handled) return { key: handled, mode: 'resize' };
+    return null;
+  }
+
+  function nudgeActiveBox(dx, dy, resize) {
+    const box = activeRegionBox();
+    if (!box) return;
+    if (resize) {
+      box.w = round2(clamp(box.w + dx, 4, 100 - box.x));
+      box.h = round2(clamp(box.h + dy, 4, 100 - box.y));
+    } else {
+      box.x = round2(clamp(box.x + dx, 0, 100 - box.w));
+      box.y = round2(clamp(box.y + dy, 0, 100 - box.h));
+    }
+    syncLunchMirror(state.trainerLayout.data);
+    syncBoxFields();
+    drawTrainer();
+  }
+
+  function initBoxFields() {
+    [['#boxX', 'x'], ['#boxY', 'y'], ['#boxW', 'w'], ['#boxH', 'h']].forEach(([selector, key]) => {
+      const input = $(selector);
+      if (!input) return;
+      input.addEventListener('input', () => {
+        const box = activeRegionBox();
+        if (!box) return;
+        const value = Number(input.value);
+        if (!Number.isFinite(value) || input.value === '') return;
+        if (key === 'w') box.w = clamp(value, 4, 100 - box.x);
+        else if (key === 'h') box.h = clamp(value, 4, 100 - box.y);
+        else if (key === 'x') box.x = clamp(value, 0, 100 - box.w);
+        else box.y = clamp(value, 0, 100 - box.h);
+        syncLunchMirror(state.trainerLayout.data);
+        drawTrainer();
+      });
+      input.addEventListener('blur', syncBoxFields);
+    });
+    const scale = $('#boxScale');
+    if (scale) scale.addEventListener('input', () => {
+      const box = activeRegionBox();
+      if (!box) return;
+      box.scale = clamp(Number(scale.value) || 1, .4, 2);
+      drawTrainer();
+    });
+    const align = $('#boxAlign');
+    if (align) align.addEventListener('change', () => {
+      const box = activeRegionBox();
+      if (!box) return;
+      box.align = align.value;
+      drawTrainer();
+    });
+    const title = $('#boxTitle');
+    if (title) title.addEventListener('change', () => {
+      const box = activeRegionBox();
+      if (!box) return;
+      box.showTitle = title.checked;
+      drawTrainer();
+    });
+    $$('[data-nudge]').forEach(button => button.addEventListener('click', () => {
+      const [axis, direction] = button.dataset.nudge.split(':');
+      const step = .5 * Number(direction);
+      nudgeActiveBox(axis === 'x' ? step : 0, axis === 'y' ? step : 0, false);
+    }));
+    const resetBox = $('#resetBoxBtn');
+    if (resetBox) resetBox.addEventListener('click', resetActiveRegion);
+    const resetAll = $('#resetAllBtn');
+    if (resetAll) resetAll.addEventListener('click', resetAllRegions);
+  }
+
+  function initBackgroundDropzone() {
+    const input = $('#backgroundUpload');
+    if (input) input.addEventListener('change', event => uploadBackgrounds(event.target.files));
+    const picker = $('#pickBackground');
+    if (picker) picker.addEventListener('click', openBackgroundPicker);
+    const zone = $('#libraryPanel');
+    if (!zone) return;
+    ['dragenter', 'dragover'].forEach(type => zone.addEventListener(type, event => {
+      event.preventDefault();
+      if (picker) picker.classList.add('drag');
+    }));
+    ['dragleave', 'drop'].forEach(type => zone.addEventListener(type, event => {
+      event.preventDefault();
+      if (picker) picker.classList.remove('drag');
+    }));
+    zone.addEventListener('drop', event => uploadBackgrounds(event.dataTransfer?.files));
   }
 
   function initTrainer() {
-    $('#backgroundUpload').addEventListener('change', event => uploadBackgrounds(event.target.files));
+    initBackgroundDropzone();
+    initBoxFields();
     $('#layoutScale').addEventListener('input', () => { state.trainerLayout.data.textScale = Number($('#layoutScale').value); drawTrainer(); });
     $('#layoutColor').addEventListener('input', () => { state.trainerLayout.data.textColor = $('#layoutColor').value; drawTrainer(); });
     $('#layoutName').addEventListener('input', () => { state.trainerLayout.name = $('#layoutName').value; });
@@ -862,32 +1368,47 @@
     const canvas = $('#trainerCanvas');
     canvas.addEventListener('pointerdown', event => {
       const point = trainerPoint(event);
-      const box = state.trainerLayout.data.lunchBox;
-      const handle = Math.abs(point.x - (box.x + box.w)) < 3 && Math.abs(point.y - (box.y + box.h)) < 3;
-      const inside = point.x >= box.x && point.x <= box.x + box.w && point.y >= box.y && point.y <= box.y + box.h;
-      if (!handle && !inside) return;
-      state.trainerDrag = { mode: handle ? 'resize' : 'move', start: point, original: clone(box) };
-      canvas.setPointerCapture(event.pointerId);
+      const hit = hitRegion(point);
+      if (!hit) return;
+      if (hit.key !== activeRegionKey()) selectRegion(hit.key);
+      try { canvas.focus({ preventScroll: true }); } catch { canvas.focus(); }
+      state.trainerDrag = { mode: hit.mode, key: hit.key, start: point, original: clone(state.trainerLayout.data.regions[hit.key]) };
+      try { canvas.setPointerCapture(event.pointerId); } catch {}
+      event.preventDefault();
     });
     canvas.addEventListener('pointermove', event => {
-      if (!state.trainerDrag) return;
-      const point = trainerPoint(event);
       const drag = state.trainerDrag;
+      if (!drag) return;
+      const point = trainerPoint(event);
       const dx = point.x - drag.start.x;
       const dy = point.y - drag.start.y;
-      const box = state.trainerLayout.data.lunchBox;
+      const box = state.trainerLayout.data.regions[drag.key];
       if (drag.mode === 'move') {
-        box.x = clamp(drag.original.x + dx, 0, 100 - box.w);
-        box.y = clamp(drag.original.y + dy, 0, 100 - box.h);
+        box.x = round2(clamp(drag.original.x + dx, 0, 100 - box.w));
+        box.y = round2(clamp(drag.original.y + dy, 0, 100 - box.h));
       } else {
-        box.w = clamp(drag.original.w + dx, 8, 100 - box.x);
-        box.h = clamp(drag.original.h + dy, 10, 100 - box.y);
+        box.w = round2(clamp(drag.original.w + dx, 4, 100 - box.x));
+        box.h = round2(clamp(drag.original.h + dy, 4, 100 - box.y));
       }
+      syncLunchMirror(state.trainerLayout.data);
       drawTrainer();
     });
-    const stop = event => { if (state.trainerDrag) { state.trainerDrag = null; try { canvas.releasePointerCapture(event.pointerId); } catch {} } };
+    const stop = event => {
+      if (!state.trainerDrag) return;
+      state.trainerDrag = null;
+      syncBoxFields();
+      try { canvas.releasePointerCapture(event.pointerId); } catch {}
+    };
     canvas.addEventListener('pointerup', stop);
     canvas.addEventListener('pointercancel', stop);
+    canvas.addEventListener('keydown', event => {
+      const steps = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+      const step = steps[event.key];
+      if (!step) return;
+      event.preventDefault();
+      const amount = event.altKey ? .1 : .5;
+      nudgeActiveBox(step[0] * amount, step[1] * amount, event.shiftKey);
+    });
   }
 
   function init() {
