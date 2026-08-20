@@ -891,9 +891,13 @@ body{background:#07060a;color:rgba(255,255,255,0.96);font-family:'DM Sans',sans-
 /* ═══════════════════════════════════════════════════════════
    SUPABASE — same data source as menu.html and the editor
    ═══════════════════════════════════════════════════════════ */
-var SUPABASE_URL = 'https://fkisefambrcyxjrwrplb.supabase.co';
-var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZraXNlZmFtYnJjeHhqcndycGxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNzA2NzEsImV4cCI6MjA5OTk0NjY3MX0.sDy0HJdssg_vxMQz0NvgLD7OykFZ2LfD6a6qtYevnyk';
-function sbHeaders(){return{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Accept':'application/json'};}
+// Reads go through this site's own /api/menu-read rather than straight to
+// Supabase, so no database key is shipped to the browser.
+function menuRead(table){
+  return fetch('/api/menu-read?table=' + encodeURIComponent(table), { headers: { 'Accept':'application/json' } })
+    .then(function(r){ return r.json(); })
+    .then(function(payload){ return (payload && Array.isArray(payload.rows)) ? payload.rows : []; });
+}
 
 function toISO(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function $(id){return document.getElementById(id);}
@@ -1432,8 +1436,8 @@ bindStepper('lbMinus','lbPlus','lbCount','lbCount',1);
 
 function loadLiveData(){
   return Promise.all([
-    fetch(SUPABASE_URL + '/rest/v1/Hotheadz_menu_defaults?select=key,value', { headers: sbHeaders() }).then(function(r){ return r.json(); }),
-    fetch(SUPABASE_URL + '/rest/v1/Hotheadz_lunch_dates?select=lunch_date,data', { headers: sbHeaders() }).then(function(r){ return r.json(); })
+    menuRead('menu_defaults'),
+    menuRead('lunch_dates')
   ]).then(function(results){
     var defRows = results[0];
     var dateRows = results[1];

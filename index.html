@@ -448,8 +448,7 @@ main{position:relative;z-index:5;}
 <!-- Live hours from Supabase (single source of truth — edited in the fb-editor) -->
 <script>
 (function(){
-  var URL="https://fkisefambrcyxjrwrplb.supabase.co/rest/v1/Hotheadz_menu_defaults?key=eq.hours&select=value";
-  var KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsanZ4bXFwbmtkdG53dnVhcWtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMzI4MDEsImV4cCI6MjA5NjkwODgwMX0.M28Idbz5N2deFmd9yhV5j0MxM6dLkum3mhxa4APFW5k";
+  var HOURS_URL="/api/menu-read?table=menu_defaults&match=hours";
   var FULL=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   var ORDER=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
   var ABBR={Monday:"Mon",Tuesday:"Tue",Wednesday:"Wed",Thursday:"Thu",Friday:"Fri",Saturday:"Sat",Sunday:"Sun"};
@@ -460,9 +459,10 @@ main{position:relative;z-index:5;}
     return m[1]+(m[2]&&m[2]!=="00"?(":"+m[2]):"")+m[3].toLowerCase();
   }
   function val(w){return (!w||!w.open)?"Closed":(shortT(w.open)+"–"+shortT(w.close));}
-  fetch(URL,{headers:{apikey:KEY,Authorization:"Bearer "+KEY}})
+  fetch(HOURS_URL)
     .then(function(r){return r.json();})
-    .then(function(d){
+    .then(function(payload){
+      var d=(payload&&payload.rows)||[];
       var weekly=d&&d[0]&&d[0].value&&d[0].value.weekly;
       if(!weekly||!weekly.length) return;
       var byDay={}; weekly.forEach(function(w){byDay[w.day]=Object.assign({},w);});
@@ -508,8 +508,6 @@ main{position:relative;z-index:5;}
 <!-- Today's specials — live from Supabase (lunch_dates), set in the Menu Editor -->
 <script>
 (function(){
-  var SB="https://fkisefambrcyxjrwrplb.supabase.co/rest/v1";
-  var KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsanZ4bXFwbmtkdG53dnVhcWtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMzI4MDEsImV4cCI6MjA5NjkwODgwMX0.M28Idbz5N2deFmd9yhV5j0MxM6dLkum3mhxa4APFW5k";
   var MO=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   var WD=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   var d=new Date();
@@ -523,10 +521,10 @@ main{position:relative;z-index:5;}
     return '<div class="spec-col"><h3>'+icon+" "+title+"</h3><ul>"+li+"</ul></div>";
   }
   Promise.all([
-    fetch(SB+"/Hotheadz_lunch_dates?select=lunch_date,data&lunch_date=gte."+iso+"&order=lunch_date.asc&limit=1",
-          {headers:{apikey:KEY,Authorization:"Bearer "+KEY}}).then(function(r){return r.json();}),
-    fetch(SB+"/Hotheadz_menu_defaults?select=value&key=eq.sameDaily",
-          {headers:{apikey:KEY,Authorization:"Bearer "+KEY}}).then(function(r){return r.json();})
+    fetch("/api/menu-read?table=lunch_dates&direction=asc&limit=1&from="+encodeURIComponent(iso))
+      .then(function(r){return r.json();}).then(function(p){return (p&&p.rows)||[];}),
+    fetch("/api/menu-read?table=menu_defaults&match=sameDaily")
+      .then(function(r){return r.json();}).then(function(p){return (p&&p.rows)||[];})
   ])
     .then(function(results){
       var rows=results[0], defaults=results[1];

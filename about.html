@@ -267,8 +267,7 @@ main{position:relative;z-index:5;}
 <!-- Live hours from Supabase (single source of truth — edited in the fb-editor) -->
 <script>
 (function(){
-  var URL="https://fkisefambrcyxjrwrplb.supabase.co/rest/v1/Hotheadz_menu_defaults?key=eq.hours&select=value";
-  var KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsanZ4bXFwbmtkdG53dnVhcWtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMzI4MDEsImV4cCI6MjA5NjkwODgwMX0.M28Idbz5N2deFmd9yhV5j0MxM6dLkum3mhxa4APFW5k";
+  var HOURS_URL="/api/menu-read?table=menu_defaults&match=hours";
   var ORDER=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
   var ABBR={Monday:"Mon",Tuesday:"Tue",Wednesday:"Wed",Thursday:"Thu",Friday:"Fri",Saturday:"Sat",Sunday:"Sun"};
   function shortT(t){
@@ -289,9 +288,10 @@ main{position:relative;z-index:5;}
       return '<span class="hours-block"><strong>'+label+'</strong><span>'+g.v+'</span></span>';
     });
   }
-  fetch(URL,{headers:{apikey:KEY,Authorization:"Bearer "+KEY}})
+  fetch(HOURS_URL)
     .then(function(r){return r.json();})
-    .then(function(d){
+    .then(function(payload){
+      var d=(payload&&payload.rows)||[];
       var weekly=d&&d[0]&&d[0].value&&d[0].value.weekly;
       if(!weekly||!weekly.length) return;
       var byDay={}; weekly.forEach(function(w){byDay[w.day]=Object.assign({},w);});

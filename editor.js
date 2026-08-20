@@ -1,8 +1,6 @@
 (() => {
   'use strict';
 
-  const SUPABASE_URL = 'https://fkisefambrcyxjrwrplb.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZraXNlZmFtYnJjeHhqcndycGxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNzA2NzEsImV4cCI6MjA5OTk0NjY3MX0.sDy0HJdssg_vxMQz0NvgLD7OykFZ2LfD6a6qtYevnyk';
   const PIN_HASH = '77334823791bea53e508ba59387c1287c8da962026769657b4686756db4b7bc8';
   const SESSION_PIN_KEY = 'hhPin';
   const AI_FILE_LIMIT = 4;
@@ -203,17 +201,15 @@
     try { return sessionStorage.getItem(SESSION_PIN_KEY) || ''; } catch { return ''; }
   }
 
-  function supabaseHeaders() {
-    return { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Accept: 'application/json' };
-  }
-
-  async function sbGet(path) {
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, { headers: supabaseHeaders() });
+  // Reads go through this site's own /api/menu-read, which asks NorthStar's
+  // backend for the rows. No database key is shipped to the browser.
+  async function menuRead(table) {
+    const response = await fetch(`/api/menu-read?table=${encodeURIComponent(table)}`, { headers: { Accept: 'application/json' } });
     const text = await response.text();
     let data;
     try { data = text ? JSON.parse(text) : null; } catch { data = null; }
     if (!response.ok) throw new Error((data && (data.message || data.error)) || text || `HTTP ${response.status}`);
-    return data;
+    return Array.isArray(data?.rows) ? data.rows : [];
   }
 
   async function cloudWrite(op, table, extra = {}) {
@@ -245,8 +241,8 @@
   async function loadCloudData() {
     try {
       const [defaultRows, layoutRows] = await Promise.all([
-        sbGet('Hotheadz_menu_defaults?select=key,value,updated_at'),
-        sbGet('Hotheadz_drawing_projects?select=id,name,data,updated_at&order=updated_at.desc')
+        menuRead('menu_defaults'),
+        menuRead('drawing_projects')
       ]);
       const defaults = {};
       (defaultRows || []).forEach(row => { defaults[row.key] = row.value; });
