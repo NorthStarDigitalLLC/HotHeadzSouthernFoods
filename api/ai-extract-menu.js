@@ -48,23 +48,27 @@ function outputSchema() {
     },
     required: ['name', 'desc', 'confidence']
   };
+  // Structured outputs reject array-length and numeric constraints (minItems,
+  // maxItems, minimum, minLength, ...). The official SDKs quietly strip those
+  // and re-check them on the client, but this endpoint talks to the API over
+  // raw HTTP, so anything left here is sent as-is and the request is refused.
+  // Every cap these once expressed is already enforced below in normalizeItems
+  // and the slice() calls, so stating them twice bought nothing. Union types
+  // use anyOf, which the schema compiler supports, rather than a type array.
   return {
     type: 'object',
     additionalProperties: false,
     properties: {
-      detectedDate: { type: ['string', 'null'], description: 'YYYY-MM-DD or null.' },
+      detectedDate: { anyOf: [{ type: 'string' }, { type: 'null' }], description: 'YYYY-MM-DD or null.' },
       detectedDateRange: {
-        type: ['array', 'null'],
-        items: { type: 'string' },
-        minItems: 2,
-        maxItems: 2,
-        description: 'First and last date as YYYY-MM-DD, or null.'
+        anyOf: [{ type: 'array', items: { type: 'string' } }, { type: 'null' }],
+        description: 'Exactly two entries — the first and last date as YYYY-MM-DD — or null.'
       },
-      meats: { type: 'array', items: item, maxItems: 36 },
-      sides: { type: 'array', items: item, maxItems: 36 },
+      meats: { type: 'array', items: item, description: 'At most 36 main dishes.' },
+      sides: { type: 'array', items: item, description: 'At most 36 sides.' },
       excluded: {
         type: 'array',
-        maxItems: 20,
+        description: 'At most 20 items that were visibly crossed out or rejected.',
         items: {
           type: 'object',
           additionalProperties: false,
@@ -75,7 +79,7 @@ function outputSchema() {
           required: ['text', 'reason']
         }
       },
-      warnings: { type: 'array', items: { type: 'string' }, maxItems: 8 }
+      warnings: { type: 'array', items: { type: 'string' }, description: 'At most 8 short warnings.' }
     },
     required: ['detectedDate', 'detectedDateRange', 'meats', 'sides', 'excluded', 'warnings']
   };
@@ -98,6 +102,31 @@ function normalizeItems(items) {
     if (result.length >= 36) break;
   }
   return result;
+}
+
+// Staff used to get one blanket "could not read the photos" line for every
+// possible failure, which hid a broken request shape for as long as it existed.
+// Name the cause instead — the wording stays plain enough to act on.
+function assistantFailureMessage(status, payload) {
+  const type = payload?.error?.type || '';
+  const detail = cleanText(payload?.error?.message, 200);
+  if (status === 401 || status === 403 || type === 'authentication_error' || type === 'permission_error') {
+    return 'The menu assistant key was rejected. The ANTHROPIC_API_KEY on this site needs updating.';
+  }
+  if (status === 404 || type === 'not_found_error') {
+    return `The menu assistant model is unavailable to this account${detail ? ` (${detail})` : ''}.`;
+  }
+  if (status === 429 || type === 'rate_limit_error') {
+    return 'The menu assistant is rate limited right now. Wait a minute and read the photos again.';
+  }
+  if (status === 529 || type === 'overloaded_error') {
+    return 'The menu assistant is overloaded right now. Try again in a moment.';
+  }
+  if (type === 'invalid_request_error') {
+    // Ours to fix, not theirs — say so plainly so it gets reported.
+    return `The menu assistant request was rejected${detail ? `: ${detail}` : ''}. This is a bug in the site, not the photo.`;
+  }
+  return 'The menu assistant could not read the photos right now. Try again in a moment.';
 }
 
 export default async function handler(req, res) {
@@ -151,17 +180,27 @@ NON-NEGOTIABLE READING RULES:
     if (userPrompt) instruction += `\n\nStaff note:\n${userPrompt}`;
     content.push({ type: 'text', text: instruction });
 
-    const model = process.env.ANTHROPIC_MENU_MODEL || 'claude-sonnet-4-6';
+    // The model must be one that supports structured outputs, because the
+    // request below constrains the reply to a JSON schema. Sonnet 4.6 does
+    // not, which is why every read failed here.
+    const model = process.env.ANTHROPIC_MENU_MODEL || 'claude-opus-5';
     const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01',
+        'anthropic-beta': 'server-side-fallback-2026-07-01',
         'content-type': 'application/json'
       },
       body: JSON.stringify({
         model,
-        max_tokens: 2600,
+        // Thinking is on by default on this model and its tokens come out of
+        // max_tokens, so the old 2600 ceiling would truncate the JSON.
+        max_tokens: 16000,
+        thinking: { type: 'adaptive' },
+        // If a safety classifier ever declines a photo, retry it server-side
+        // rather than telling staff the menu could not be read.
+        fallbacks: 'default',
         system,
         messages: [{ role: 'user', content }],
         output_config: {
@@ -177,9 +216,20 @@ NON-NEGOTIABLE READING RULES:
     catch { return res.status(502).json({ error: 'The menu assistant returned an unreadable response.' }); }
     if (!anthropicResponse.ok) {
       console.error('[ai-extract-menu]', anthropicResponse.status, responseText.slice(0, 1000));
-      return res.status(502).json({ error: 'The menu assistant could not read the photos right now. Try again in a moment.' });
+      return res.status(502).json({ error: assistantFailureMessage(anthropicResponse.status, responseData) });
     }
 
+    // A refusal or a truncated reply both arrive as HTTP 200 with content that
+    // will not parse as the schema, so name them instead of failing later with
+    // "the menu draft could not be opened".
+    if (responseData.stop_reason === 'refusal') {
+      console.error('[ai-extract-menu] refusal', JSON.stringify(responseData.stop_details || null));
+      return res.status(502).json({ error: 'The assistant declined to read that photo. Try a clearer photo of just the menu, or use the manual editor.' });
+    }
+    if (responseData.stop_reason === 'max_tokens') {
+      console.error('[ai-extract-menu] truncated', JSON.stringify(responseData.usage || null));
+      return res.status(502).json({ error: 'That menu was too long to finish reading. Try fewer photos at once, or split the menu.' });
+    }
     const textBlock = (responseData.content || []).find(block => block.type === 'text');
     if (!textBlock?.text) return res.status(502).json({ error: 'No menu draft was returned.' });
     let extracted;
@@ -228,5 +278,8 @@ NON-NEGOTIABLE READING RULES:
 }
 
 export const config = {
-  api: { bodyParser: { sizeLimit: '8mb' } }
+  api: { bodyParser: { sizeLimit: '8mb' } },
+  // Reading up to 8 photos carefully takes longer than the 10s default, and a
+  // cut-off function looks identical to a failed read from the studio.
+  maxDuration: 60
 };
