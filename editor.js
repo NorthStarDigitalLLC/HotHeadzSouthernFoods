@@ -7,6 +7,17 @@
 
   const clone = value => JSON.parse(JSON.stringify(value));
 
+  // The printed Hot Headz board is set in a serif, so that is the default.
+  // Georgia is on Windows, macOS, iOS and most Android builds, and falls back
+  // to whatever serif the device has.
+  const FONT_STACKS = {
+    serif: 'Georgia, "Times New Roman", Times, serif',
+    sans: 'Arial, Helvetica, sans-serif'
+  };
+  const fontStack = key => FONT_STACKS[key] || FONT_STACKS.serif;
+  // Sampled from the headings printed on the original board, images/FBMenu.png.
+  const DEFAULT_TEXT_COLOR = '#eaddcf';
+
   // The finished image is sized from the background picture itself, so an
   // uploaded photo never gets black bars down the side. The longest edge is
   // normalised to this many pixels so every published menu is the same weight.
@@ -94,7 +105,7 @@
       backgroundUrl: builtInBackground.url,
       regions: clone(DEFAULT_REGIONS),
       lunchBox: { x: 1.4, y: 64.5, w: 26.4, h: 29 },
-      textColor: '#f5eee5',
+      textColor: DEFAULT_TEXT_COLOR,
       textScale: 1
     }
   };
@@ -169,7 +180,8 @@
     data.kind = 'menu-layout-v2';
     data.space = data.space === 'image' || isNewModel ? 'image' : 'canvas';
     data.version = data.space === 'image' ? 3 : 2;
-    data.textColor = data.textColor || '#f5eee5';
+    data.textColor = data.textColor || DEFAULT_TEXT_COLOR;
+    data.fontFamily = FONT_STACKS[data.fontFamily] ? data.fontFamily : 'serif';
     data.textScale = clamp(Number(data.textScale) || 1, .5, 2);
     data.lunchBox = { x: regions.lunch.x, y: regions.lunch.y, w: regions.lunch.w, h: regions.lunch.h };
     layout.data = data;
@@ -306,7 +318,7 @@
                 w: Number(savedBounds.wPct ?? lunch.maxWidthPct ?? 22),
                 h: Number(savedBounds.hPct ?? 29)
               },
-              textColor: lunch.color || '#f5eee5',
+              textColor: lunch.color || DEFAULT_TEXT_COLOR,
               textScale: 1
             }
           };
@@ -436,13 +448,23 @@
       const active = getActiveBackground();
       state.trainerLayout.data.backgroundId = active.id;
       state.trainerLayout.data.backgroundUrl = active.url;
-      if (isLunchAreaSet(active)) {
+      // Start from whatever was last saved onto this picture so staff carry on
+      // from where they left it rather than from the built-in positions.
+      if (active.regions) {
+        REGION_KEYS.forEach(key => {
+          const saved = active.regions[key];
+          if (saved) state.trainerLayout.data.regions[key] = normalizeBox(saved, state.trainerLayout.data.regions[key]);
+        });
+      } else if (isLunchAreaSet(active)) {
         const area = active.lunchBox;
         state.trainerLayout.data.regions.lunch = {
           ...state.trainerLayout.data.regions.lunch,
           x: Number(area.x), y: Number(area.y), w: Number(area.w), h: Number(area.h)
         };
       }
+      if (active.textColor) state.trainerLayout.data.textColor = active.textColor;
+      if (active.fontFamily) state.trainerLayout.data.fontFamily = active.fontFamily;
+      if (Number(active.textScale) > 0) state.trainerLayout.data.textScale = Number(active.textScale);
       refreshLibraries();
       syncTrainerControls();
       drawTrainer();
@@ -762,12 +784,12 @@
     return lines;
   }
 
-  function fittedLines(context, sourceLines, boxWidth, boxHeight, scale = 1, unit = 1) {
+  function fittedLines(context, sourceLines, boxWidth, boxHeight, scale = 1, unit = 1, font = FONT_STACKS.serif) {
     const smallest = Math.max(9, Math.round(12 * unit));
     let size = Math.max(smallest, Math.round(23 * scale * unit));
     let lines = [];
     while (size >= smallest) {
-      context.font = `700 ${size}px Arial, sans-serif`;
+      context.font = `700 ${size}px ${font}`;
       lines = sourceLines.flatMap(line => wrapLine(context, line, boxWidth));
       const height = lines.length * size * 1.25;
       if (height <= boxHeight) break;
@@ -778,7 +800,7 @@
 
   const isGroupHeading = line => /:$/.test(String(line || '').trim());
 
-  function drawSection(context, title, sourceItems, box, color, scale = 1, unit = 1, subtitle = '') {
+  function drawSection(context, title, sourceItems, box, color, scale = 1, unit = 1, subtitle = '', font = FONT_STACKS.serif) {
     const rect = boxRect(context.canvas, box);
     const align = box.align || 'left';
     const items = (sourceItems || []).map(item => typeof item === 'string' ? item : item.name).filter(Boolean);
@@ -799,13 +821,13 @@
     context.textAlign = align;
     context.shadowColor = 'rgba(0,0,0,.9)';
     context.shadowBlur = 8 * unit;
-    const fit = fittedLines(context, source.map(entry => entry.text), rect.width, rect.height, scale * (box.scale || 1), unit);
+    const fit = fittedLines(context, source.map(entry => entry.text), rect.width, rect.height, scale * (box.scale || 1), unit, font);
     const x = alignedX(rect, align);
     // Map every wrapped line back to the entry it came from so continuation
     // lines keep the style of their entry.
     const styles = [];
     source.forEach(entry => {
-      context.font = `700 ${fit.size}px Arial, sans-serif`;
+      context.font = `700 ${fit.size}px ${font}`;
       wrapLine(context, entry.text, rect.width).forEach(() => styles.push(entry.kind));
     });
     let cursorY = rect.y;
@@ -813,14 +835,14 @@
       const kind = styles[index] || 'item';
       const weight = kind === 'title' ? '900' : kind === 'group' ? '800' : '700';
       const size = kind === 'title' ? fit.size : kind === 'group' || kind === 'subtitle' ? Math.round(fit.size * .94) : fit.size;
-      context.font = `${weight} ${size}px Arial, sans-serif`;
+      context.font = `${weight} ${size}px ${font}`;
       context.fillText(line, x, cursorY, rect.width);
       cursorY += fit.lineHeight;
     });
     context.restore();
   }
 
-  function drawHeader(context, date, box, color, scale = 1, unit = 1) {
+  function drawHeader(context, date, box, color, scale = 1, unit = 1, font = FONT_STACKS.serif) {
     const rect = boxRect(context.canvas, box);
     const align = box.align || 'center';
     const dateObject = new Date(`${date || todayISO()}T12:00:00`);
@@ -832,9 +854,9 @@
     context.save();
     while (size > smallest) {
       subSize = Math.max(Math.round(smallest * .55), Math.round(size * 31 / 64));
-      context.font = `900 ${size}px Arial, sans-serif`;
+      context.font = `900 ${size}px ${font}`;
       const weekdayWidth = context.measureText(weekday).width;
-      context.font = `700 ${subSize}px Arial, sans-serif`;
+      context.font = `700 ${subSize}px ${font}`;
       const dateWidth = context.measureText(full).width;
       const stackHeight = size * 1.25 + subSize * 1.2;
       if (Math.max(weekdayWidth, dateWidth) <= rect.width && stackHeight <= rect.height) break;
@@ -846,9 +868,9 @@
     context.shadowColor = 'rgba(0,0,0,.92)';
     context.shadowBlur = 12 * unit;
     const x = alignedX(rect, align);
-    context.font = `900 ${size}px Arial, sans-serif`;
+    context.font = `900 ${size}px ${font}`;
     context.fillText(weekday, x, rect.y, rect.width);
-    context.font = `700 ${subSize}px Arial, sans-serif`;
+    context.font = `700 ${subSize}px ${font}`;
     context.fillText(full, x, rect.y + size * 1.25, rect.width);
     context.restore();
   }
@@ -913,6 +935,7 @@
   // a bulleted item, which is how the printed menu groups the salad bar.
   const GROUP = label => `${label}:`;
   const FOOTER_LINE = 'For pricing and hours please visit HotHeadzSouthernFoods.com';
+
 
   // The standing sections, taken from the printed menu and held here on
   // purpose. Everything except lunch is fixed, so the board prints the same
@@ -995,23 +1018,32 @@
 
     const data = target.data;
     const regions = data.regions;
-    // The area outlined on this picture wins over whatever the layout carries,
-    // so the day's items always land where they were outlined. While the
-    // trainer is open the box being dragged has to stay live, so the override
-    // is skipped there.
-    if (!editing && isLunchAreaSet(background)) {
+    // What was saved onto this picture wins over whatever the layout carries,
+    // so every block prints where it was put on this particular board. While
+    // the trainer is open the boxes being dragged have to stay live, so the
+    // override is skipped there.
+    if (!editing && background?.regions) {
+      REGION_KEYS.forEach(key => {
+        const saved = background.regions[key];
+        if (saved) regions[key] = normalizeBox(saved, regions[key]);
+      });
+    } else if (!editing && isLunchAreaSet(background)) {
       const area = background.lunchBox;
       regions.lunch = { ...regions.lunch, x: Number(area.x), y: Number(area.y), w: Number(area.w), h: Number(area.h) };
     }
-    const color = data.textColor || '#f5eee5';
+    if (!editing && background?.textColor) data.textColor = background.textColor;
+    if (!editing && background?.fontFamily) data.fontFamily = background.fontFamily;
+    if (!editing && Number(background?.textScale) > 0) data.textScale = Number(background.textScale);
+    const color = data.textColor || DEFAULT_TEXT_COLOR;
     const textScale = Number(data.textScale) || 1;
     const unit = canvas.height / FONT_BASE_HEIGHT;
 
-    drawHeader(context, date, regions.header, color, textScale, unit);
+    const font = fontStack(data.fontFamily);
+    drawHeader(context, date, regions.header, color, textScale, unit, font);
     ['breakfast', 'breakfastSandwiches', 'salad', 'saladDressings', 'lunch', 'drinks', 'dessert'].forEach(key => {
-      drawSection(context, SECTION_TITLES[key], sectionItems(key, draft), regions[key], color, textScale, unit, sectionSubtitle(key, date));
+      drawSection(context, SECTION_TITLES[key], sectionItems(key, draft), regions[key], color, textScale, unit, sectionSubtitle(key, date), font);
     });
-    drawSection(context, '', [], regions.footer, color, textScale, unit, FOOTER_LINE);
+    drawSection(context, '', [], regions.footer, color, textScale, unit, FOOTER_LINE, font);
 
     if (outline) drawRegionOutlines(context, regions, outline.activeKey, unit);
   }
@@ -1251,7 +1283,9 @@
     ensureLayoutShape(state.trainerLayout);
     $('#layoutName').value = state.trainerLayout.name || 'Menu Layout';
     $('#layoutScale').value = String(state.trainerLayout.data.textScale || 1);
-    $('#layoutColor').value = state.trainerLayout.data.textColor || '#f5eee5';
+    $('#layoutColor').value = state.trainerLayout.data.textColor || DEFAULT_TEXT_COLOR;
+    const fontSelect = $('#layoutFont');
+    if (fontSelect) fontSelect.value = state.trainerLayout.data.fontFamily || 'serif';
     $('#updateLayoutBtn').disabled = !!state.trainerLayout.builtIn;
     renderRegionTabs();
     syncBoxFields();
@@ -1283,21 +1317,28 @@
     const note = $('small', callout);
     const button = $('#saveLunchAreaBtn');
     if (done) {
-      if (title) title.textContent = 'Lunch area is set for this picture.';
-      if (note) note.textContent = 'Today’s lunch items will print inside the orange box. Drag it and press the button again to move it.';
-      if (button) button.textContent = 'Update the lunch area';
+      if (title) title.textContent = 'This picture is set up.';
+      if (note) note.textContent = 'Today’s lunch prints in the orange box. Move any box, change the text size, colour or font, then save again to keep it on this picture.';
+      if (button) button.textContent = 'Save these positions';
     } else {
       if (title) title.textContent = 'Outline the lunch area before you use this picture.';
-      if (note) note.textContent = 'Pick “Today’s lunch”, drag the box over the panel where the day’s items should print, then save it. Nothing can be built until this is set.';
+      if (note) note.textContent = 'Pick “Today’s lunch”, drag the box over the panel where the day’s items should print, then save. Everything you move here is saved onto this picture. Nothing can be built until it is set.';
       if (button) button.textContent = 'Save this as the lunch area';
     }
   }
 
+  // Saves every box position and the look onto the picture, not just the lunch
+  // area, so moving the standing sections sticks the same way.
   async function saveLunchArea() {
     const background = state.backgrounds.find(item => item.id === state.trainerLayout?.data?.backgroundId);
     if (!background) return;
-    const box = state.trainerLayout.data.regions.lunch;
+    const data = state.trainerLayout.data;
+    const box = data.regions.lunch;
+    background.regions = clone(data.regions);
     background.lunchBox = { x: round2(box.x), y: round2(box.y), w: round2(box.w), h: round2(box.h) };
+    background.textColor = data.textColor;
+    background.fontFamily = data.fontFamily;
+    background.textScale = data.textScale;
     refreshLunchAreaCallout();
     refreshLibraries();
     renderAllPreviews();
@@ -1423,7 +1464,7 @@
     data.version = 3;
     data.space = 'image';
     data.textScale = Number($('#layoutScale').value) || 1;
-    data.textColor = $('#layoutColor').value || '#f5eee5';
+    data.textColor = $('#layoutColor').value || DEFAULT_TEXT_COLOR;
     syncLunchMirror(data);
     return { id, name, data, saved_by: 'Menu Studio', updated_at: new Date().toISOString() };
   }
@@ -1614,6 +1655,8 @@
     initBoxFields();
     $('#layoutScale').addEventListener('input', () => { state.trainerLayout.data.textScale = Number($('#layoutScale').value); drawTrainer(); });
     $('#layoutColor').addEventListener('input', () => { state.trainerLayout.data.textColor = $('#layoutColor').value; drawTrainer(); });
+    const fontSelect = $('#layoutFont');
+    if (fontSelect) fontSelect.addEventListener('change', () => { state.trainerLayout.data.fontFamily = fontSelect.value; drawTrainer(); });
     $('#layoutName').addEventListener('input', () => { state.trainerLayout.name = $('#layoutName').value; });
     $('#saveLayoutAsBtn').addEventListener('click', () => saveLayout(true));
     $('#updateLayoutBtn').addEventListener('click', () => saveLayout(false));
