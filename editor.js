@@ -1110,6 +1110,21 @@
     return canvas.toDataURL('image/jpeg', .86);
   }
 
+  // Turns the raw failure from Supabase storage into something a staff member
+  // can act on, instead of a wall of JSON.
+  function uploadFailureReason(message) {
+    const text = String(message || 'Unknown error');
+    if (/NoSuchBucket|Bucket not found/i.test(text)) {
+      return 'the “media” storage bucket does not exist in Supabase yet. Ask NorthStar to create it (see database/005-storage-media-bucket.sql).';
+    }
+    if (/Bucket not public/i.test(text)) return 'the “media” bucket is private, so saved pictures cannot be shown. It needs to be public.';
+    if (/Wrong PIN/i.test(text)) return 'the staff PIN was not accepted. Sign out and back in.';
+    if (/too large/i.test(text)) return 'the picture is too big. Try one under about 5 MB.';
+    if (/not configured|same Supabase project/i.test(text)) return 'the NorthStar database backend is not configured for this site.';
+    if (/Failed to fetch|NetworkError/i.test(text)) return 'the connection dropped. Check the internet and try again.';
+    return text.length > 140 ? `${text.slice(0, 140)}…` : text;
+  }
+
   function openBackgroundPicker() {
     const input = $('#backgroundUpload');
     if (input && !input.disabled) input.click();
@@ -1154,8 +1169,12 @@
       setStatus($('#setupStatus'), added === 1 ? 'Picture added and switched on. Drag the outlined boxes to fit it.' : `${added} pictures added. The newest one is switched on.`, 'success');
       toast(added === 1 ? 'Background added.' : `${added} backgrounds added.`, 'success');
     } catch (error) {
-      setStatus($('#setupStatus'), `That picture could not be saved: ${error.message}`, 'error');
-      toast('The background could not be saved.', 'error');
+      // The detailed reason lives on the setup screen, but staff can start an
+      // upload from the preview screens too, so put the reason in the toast as
+      // well or they are left with "it failed" and nowhere to look.
+      const reason = uploadFailureReason(error.message);
+      setStatus($('#setupStatus'), `That picture could not be saved: ${reason}`, 'error');
+      toast(`Background not saved: ${reason}`, 'error');
     } finally {
       setUploadBusy(false);
       const input = $('#backgroundUpload');
