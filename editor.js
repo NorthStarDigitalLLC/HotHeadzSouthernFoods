@@ -29,20 +29,31 @@
   // artwork whatever shape the picture is.
   const REGION_DEFS = [
     { key: 'header', label: 'Date header', help: 'The weekday and date printed across the top.' },
-    { key: 'breakfast', label: 'Breakfast', help: 'The standing breakfast list.' },
-    { key: 'salad', label: 'Salad bar', help: 'The salad bar list.' },
+    { key: 'breakfast', label: 'Breakfast', help: 'The standing breakfast list, with this weekday’s breakfast hours.' },
+    { key: 'breakfastSandwiches', label: 'Breakfast sandwiches', help: 'The “Same Daily” sandwiches beside the breakfast list.' },
+    { key: 'salad', label: 'Salad bar', help: 'Lettuce and toppings.' },
+    { key: 'saladDressings', label: 'Dressings', help: 'The dressings column beside the salad bar.' },
+    { key: 'lunch', label: 'Today’s lunch', help: 'The only section that changes daily — it comes from the draft you just built.' },
     { key: 'drinks', label: 'Drinks', help: 'The drinks list.' },
-    { key: 'lunch', label: 'Today’s lunch', help: 'The dishes that change every single day.' }
+    { key: 'dessert', label: 'Dessert', help: 'The dessert list.' },
+    { key: 'footer', label: 'Website line', help: 'The “for pricing and hours” line along the bottom.' }
   ];
   const REGION_KEYS = REGION_DEFS.map(def => def.key);
 
-  // Starting positions, measured against the original Hot Headz background.
+  // Starting positions, measured against the blank Hot Headz board so each
+  // block lands inside its own panel: breakfast and its sandwiches share the
+  // big left panel, salad and dressings share the right one, and lunch, drinks
+  // and dessert take the three panels along the bottom.
   const DEFAULT_REGIONS = {
-    header: { x: 0, y: 4.05, w: 100, h: 9.6, scale: 1, align: 'center' },
-    breakfast: { x: 2.6, y: 34, w: 51.6, h: 25, scale: .82, align: 'left' },
-    salad: { x: 60.8, y: 34, w: 38.4, h: 32, scale: .72, align: 'left' },
-    drinks: { x: 29, y: 65, w: 24, h: 25, scale: .8, align: 'left' },
-    lunch: { x: 1.4, y: 64.5, w: 26.4, h: 29, scale: 1, align: 'left' }
+    header: { x: 15, y: 4.6, w: 70, h: 10, scale: 1, align: 'center' },
+    breakfast: { x: 4.4, y: 33.4, w: 25, h: 25.5, scale: .78, align: 'left' },
+    breakfastSandwiches: { x: 31, y: 37.6, w: 25, h: 21, scale: .78, align: 'left' },
+    salad: { x: 61, y: 31, w: 18.5, h: 39, scale: .66, align: 'left' },
+    saladDressings: { x: 80.5, y: 35, w: 16, h: 34, scale: .66, align: 'left' },
+    lunch: { x: 4.4, y: 60.8, w: 22, h: 31.5, scale: .82, align: 'left' },
+    drinks: { x: 30.6, y: 60.8, w: 24, h: 31.5, scale: .78, align: 'left' },
+    dessert: { x: 61.5, y: 73.2, w: 33, h: 19, scale: .82, align: 'left' },
+    footer: { x: 18, y: 94.6, w: 64, h: 3.6, scale: .62, align: 'center' }
   };
 
   // The same boxes as the studio used to hard-code them: percentages of the
@@ -51,9 +62,13 @@
   const LEGACY_REGIONS = {
     header: { x: 5, y: 4.05, w: 90, h: 9.6, scale: 1, align: 'center' },
     breakfast: { x: 10.5, y: 34, w: 43, h: 25, scale: .82, align: 'left' },
+    breakfastSandwiches: { x: 31, y: 37.6, w: 25, h: 21, scale: .78, align: 'left' },
     salad: { x: 59, y: 34, w: 32, h: 32, scale: .72, align: 'left' },
+    saladDressings: { x: 80.5, y: 35, w: 16, h: 34, scale: .66, align: 'left' },
     drinks: { x: 32.5, y: 65, w: 20, h: 25, scale: .8, align: 'left' },
-    lunch: { x: 9.5, y: 64.5, w: 22, h: 29, scale: 1, align: 'left' }
+    lunch: { x: 9.5, y: 64.5, w: 22, h: 29, scale: 1, align: 'left' },
+    dessert: { x: 61.5, y: 73.2, w: 33, h: 19, scale: .82, align: 'left' },
+    footer: { x: 18, y: 94.6, w: 64, h: 3.6, scale: .62, align: 'center' }
   };
   const LEGACY_CANVAS = { width: 1080, height: 1350 };
 
@@ -709,12 +724,22 @@
     return { size, lines, lineHeight: size * 1.25 };
   }
 
-  function drawSection(context, title, sourceItems, box, color, scale = 1, unit = 1) {
+  const isGroupHeading = line => /:$/.test(String(line || '').trim());
+
+  function drawSection(context, title, sourceItems, box, color, scale = 1, unit = 1, subtitle = '') {
     const rect = boxRect(context.canvas, box);
     const align = box.align || 'left';
     const items = (sourceItems || []).map(item => typeof item === 'string' ? item : item.name).filter(Boolean);
-    const showTitle = box.showTitle !== false;
-    const source = showTitle ? [title, ...items.map(item => `• ${item}`)] : items.map(item => `• ${item}`);
+    const showTitle = box.showTitle !== false && !!title;
+    // Headings and the service-time line keep their own styling; everything
+    // else is a bulleted item.
+    const source = [
+      ...(showTitle ? [{ text: title, kind: 'title' }] : []),
+      ...(subtitle ? [{ text: subtitle, kind: 'subtitle' }] : []),
+      ...items.map(item => isGroupHeading(item)
+        ? { text: item, kind: 'group' }
+        : { text: `• ${item}`, kind: 'item' })
+    ];
     if (!source.length) return;
     context.save();
     context.fillStyle = color;
@@ -722,11 +747,21 @@
     context.textAlign = align;
     context.shadowColor = 'rgba(0,0,0,.9)';
     context.shadowBlur = 8 * unit;
-    const fit = fittedLines(context, source, rect.width, rect.height, scale * (box.scale || 1), unit);
+    const fit = fittedLines(context, source.map(entry => entry.text), rect.width, rect.height, scale * (box.scale || 1), unit);
     const x = alignedX(rect, align);
+    // Map every wrapped line back to the entry it came from so continuation
+    // lines keep the style of their entry.
+    const styles = [];
+    source.forEach(entry => {
+      context.font = `700 ${fit.size}px Arial, sans-serif`;
+      wrapLine(context, entry.text, rect.width).forEach(() => styles.push(entry.kind));
+    });
     let cursorY = rect.y;
     fit.lines.forEach((line, index) => {
-      context.font = `${showTitle && index === 0 ? '900' : '700'} ${fit.size}px Arial, sans-serif`;
+      const kind = styles[index] || 'item';
+      const weight = kind === 'title' ? '900' : kind === 'group' ? '800' : '700';
+      const size = kind === 'title' ? fit.size : kind === 'group' || kind === 'subtitle' ? Math.round(fit.size * .94) : fit.size;
+      context.font = `${weight} ${size}px Arial, sans-serif`;
       context.fillText(line, x, cursorY, rect.width);
       cursorY += fit.lineHeight;
     });
@@ -815,28 +850,65 @@
     });
   }
 
+  // Only what changes today. The "Same Daily" sandwiches now print in their own
+  // box beside breakfast, which is where the printed menu puts them — appending
+  // them here is what made the lunch box overflow.
   function dailyLunchItems(draft) {
-    const sameDaily = state.defaults.sameDaily?.items || [];
-    const lines = [
-      ...(draft?.meats || []),
-      ...(draft?.sides || []),
-      ...(sameDaily.length ? [{ name: 'Same Daily' }, ...sameDaily] : [])
-    ];
-    return lines;
+    return [...(draft?.meats || []), ...(draft?.sides || [])];
   }
 
+  // A line ending in ':' is drawn as a small heading inside the box rather than
+  // a bulleted item, which is how the printed menu groups the salad bar.
+  const GROUP = label => `${label}:`;
+  const FOOTER_LINE = 'For pricing and hours please visit HotHeadzSouthernFoods.com';
+
   function sectionItems(key, draft) {
+    const defaults = state.defaults;
     if (key === 'lunch') return dailyLunchItems(draft);
-    if (key === 'breakfast') return state.defaults.breakfast?.items || ['Scrambled Eggs', 'Bacon', 'Sausage', 'Biscuits', 'Hashbrowns', 'Cheesy Grits', 'Sausage Gravy'];
-    if (key === 'drinks') return state.defaults.drinks?.items || ['Sweet Tea', 'Unsweet Tea', 'Dr Pepper', 'Sprite', 'Coke', 'Coffee'];
+    if (key === 'breakfast') return defaults.breakfast?.items || ['Scrambled Eggs', 'Bacon', 'Sausage, Hotlinks', 'Pancakes', 'French Toast Sticks', 'Biscuits', 'Hashbrowns', 'Cheesy Grits', 'Grits', 'Sausage Gravy', 'Oatmeal'];
+    if (key === 'breakfastSandwiches') return defaults.sameDaily?.items || [];
+    if (key === 'drinks') return defaults.drinks?.items || ['Sweet Tea', 'Unsweet Tea', 'Dr. Pepper', 'Sprite', 'Coke', 'Coffee'];
+    if (key === 'dessert') return defaults.dessert?.items || [];
     if (key === 'salad') {
-      const salad = state.defaults.salad?.saladBar || {};
-      return [...(salad.lettuce || []), ...(salad.toppings || []).slice(0, 15), ...(salad.dressing || []).slice(0, 5)];
+      const salad = defaults.salad?.saladBar || {};
+      const lettuce = salad.lettuce || [];
+      const toppings = salad.toppings || [];
+      return [
+        ...(lettuce.length ? [GROUP('Lettuce'), ...lettuce] : []),
+        ...(toppings.length ? [GROUP('Toppings'), ...toppings] : [])
+      ];
     }
+    if (key === 'saladDressings') return state.defaults.salad?.saladBar?.dressing || [];
+    if (key === 'footer') return [];
     return [];
   }
 
-  const SECTION_TITLES = { breakfast: 'BREAKFAST', salad: 'SALAD BAR', drinks: 'DRINKS', lunch: 'LUNCH' };
+  const SECTION_TITLES = {
+    breakfast: 'BREAKFAST',
+    breakfastSandwiches: 'BREAKFAST SANDWICHES',
+    salad: 'SALAD BAR',
+    saladDressings: 'Dressings:',
+    drinks: 'DRINKS',
+    lunch: 'LUNCH',
+    dessert: 'DESSERT',
+    footer: ''
+  };
+
+  // Service times come from the saved hours for the day being printed, so the
+  // menu can never disagree with the hours shown on the website.
+  function serviceTime(key, date) {
+    if (key !== 'breakfast' && key !== 'lunch') return '';
+    const weekly = state.defaults.hours?.weekly;
+    if (!Array.isArray(weekly)) return '';
+    const weekday = new Date(`${date || todayISO()}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long' });
+    const today = weekly.find(entry => entry?.day === weekday);
+    return String(today?.[key] || '').trim();
+  }
+
+  function sectionSubtitle(key, date) {
+    if (key === 'breakfastSandwiches') return '- Same Daily';
+    return serviceTime(key, date);
+  }
 
   async function drawMenu(canvas, draft, date, layout, background, outline = null) {
     const context = canvas.getContext('2d', { alpha: false });
@@ -859,9 +931,10 @@
     const unit = canvas.height / FONT_BASE_HEIGHT;
 
     drawHeader(context, date, regions.header, color, textScale, unit);
-    ['breakfast', 'salad', 'drinks', 'lunch'].forEach(key => {
-      drawSection(context, SECTION_TITLES[key], sectionItems(key, draft), regions[key], color, textScale, unit);
+    ['breakfast', 'breakfastSandwiches', 'salad', 'saladDressings', 'lunch', 'drinks', 'dessert'].forEach(key => {
+      drawSection(context, SECTION_TITLES[key], sectionItems(key, draft), regions[key], color, textScale, unit, sectionSubtitle(key, date));
     });
+    drawSection(context, '', [], regions.footer, color, textScale, unit, FOOTER_LINE);
 
     if (outline) drawRegionOutlines(context, regions, outline.activeKey, unit);
   }
