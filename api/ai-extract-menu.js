@@ -265,6 +265,11 @@ NON-NEGOTIABLE READING RULES:
       success: true,
       meats: safeMeats,
       sides: safeSides,
+      // The editor pastes these straight into its two textareas. They were
+      // dropped when this endpoint was rewritten; without them the AI tab
+      // fills in nothing.
+      meatsText: safeMeats.map(item => item.desc ? `${item.name} | ${item.desc}` : item.name).join('\n'),
+      sidesText: safeSides.map(item => item.desc ? `${item.name} | ${item.desc}` : item.name).join('\n'),
       excluded,
       warnings,
       detectedDate,
