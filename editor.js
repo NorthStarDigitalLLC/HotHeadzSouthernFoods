@@ -15,11 +15,21 @@
   // shorter scales from this so text keeps its proportion on any background.
   const FONT_BASE_HEIGHT = 1350;
 
+  // A background is only usable once someone has outlined the area on it where
+  // the day's lunch will print. That outline is stored on the picture itself,
+  // as lunchBox, so it travels with the image rather than with a layout. The
+  // original board ships already outlined.
   const builtInBackground = {
     id: 'hotheadz-original',
     name: 'Original Hot Headz menu',
     url: '/images/FBMenu.png',
-    source: 'website'
+    source: 'website',
+    lunchBox: { x: 1.4, y: 64.5, w: 26.4, h: 29 }
+  };
+
+  const isLunchAreaSet = background => {
+    const box = background?.lunchBox;
+    return !!box && Number.isFinite(Number(box.x)) && Number(box.w) > 0 && Number(box.h) > 0;
   };
 
   // Every block of text the studio prints is a named box. Staff drag these
@@ -324,11 +334,34 @@
     }
     refreshLibraries();
     refreshPreviewSelectors();
+    updateBuildGates();
     renderAllPreviews();
   }
 
   function getActiveLayout() {
     return state.layouts.find(layout => layout.id === state.activeLayoutId) || builtInLayout;
+  }
+
+  // Nothing may be read or built until the chosen picture has an outlined
+  // lunch area, because that outline is the only thing that says where the
+  // day's items go.
+  function lunchAreaReady() {
+    return isLunchAreaSet(getActiveBackground());
+  }
+
+  function updateBuildGates() {
+    const ready = lunchAreaReady();
+    const background = getActiveBackground();
+    [['#readMenuBtn', '#aiGate'], ['#manualPreviewBtn', '#manualGate']].forEach(([buttonSelector, gateSelector]) => {
+      const button = $(buttonSelector);
+      const gate = $(gateSelector);
+      if (button) button.disabled = !ready;
+      if (gate) {
+        gate.hidden = ready;
+        const note = $('small', gate);
+        if (note) note.textContent = `“${background?.name || 'This picture'}” has no lunch area yet. Outline where the day’s items should print, then come back.`;
+      }
+    });
   }
 
   function getActiveBackground() {
@@ -397,12 +430,26 @@
     $$('[data-mode]').forEach(button => button.classList.toggle('active', button.dataset.mode === mode));
     if (mode === 'setup') {
       state.trainerLayout = clone(ensureLayoutShape(getActiveLayout()));
+      // Open on the picture that is actually selected, not whichever one the
+      // layout was last saved against — otherwise the lunch area gets outlined
+      // on the wrong background.
+      const active = getActiveBackground();
+      state.trainerLayout.data.backgroundId = active.id;
+      state.trainerLayout.data.backgroundUrl = active.url;
+      if (isLunchAreaSet(active)) {
+        const area = active.lunchBox;
+        state.trainerLayout.data.regions.lunch = {
+          ...state.trainerLayout.data.regions.lunch,
+          x: Number(area.x), y: Number(area.y), w: Number(area.w), h: Number(area.h)
+        };
+      }
       refreshLibraries();
       syncTrainerControls();
       drawTrainer();
     }
     if (mode === 'ai' || mode === 'manual') {
       mountPreview(mode);
+      updateBuildGates();
       renderPreview(mode);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -521,6 +568,7 @@
   }
 
   async function readAiMenu() {
+    if (!lunchAreaReady()) return toast('Outline the lunch area on this background first.', 'error');
     if (!state.aiFiles.length) return toast('Choose at least one menu photo.', 'error');
     const button = $('#readMenuBtn');
     const progress = $('#aiProgress');
@@ -568,6 +616,7 @@
   }
 
   function buildManualPreview() {
+    if (!lunchAreaReady()) return toast('Outline the lunch area on this background first.', 'error');
     const meats = parseItems($('#manualMeats').value);
     const sides = parseItems($('#manualSides').value);
     if (!meats.length && !sides.length) return toast('Type at least one menu item.', 'error');
@@ -613,11 +662,13 @@
       const layout = getActiveLayout();
       state.activeBackgroundId = backgroundForLayout(layout).id;
       refreshPreviewSelectors();
+      updateBuildGates();
       renderAllPreviews();
     });
     preview.backgroundSelect.addEventListener('change', () => {
       state.activeBackgroundId = preview.backgroundSelect.value;
       refreshPreviewSelectors();
+      updateBuildGates();
       renderAllPreviews();
     });
     if (preview.addBackground) preview.addBackground.addEventListener('click', () => openBackgroundPicker());
@@ -630,6 +681,7 @@
     preview.publish.addEventListener('click', () => publishDraft(kind));
     state.previews[kind] = preview;
     refreshPreviewSelectors();
+    renderPreview(kind);
     return preview;
   }
 
@@ -862,24 +914,41 @@
   const GROUP = label => `${label}:`;
   const FOOTER_LINE = 'For pricing and hours please visit HotHeadzSouthernFoods.com';
 
+  // The standing sections, taken from the printed menu and held here on
+  // purpose. Everything except lunch is fixed, so the board prints the same
+  // way on any device without waiting on a database read, and so the photo
+  // reader never has to work them out from a picture. Lunch is the one section
+  // that changes daily and it comes from the draft instead.
+  const STANDING_MENU = {
+    breakfast: [
+      'Scrambled Eggs', 'Bacon', 'Sausage, Hotlinks', 'Pancakes', 'French Toast Sticks',
+      'Biscuits', 'Hashbrowns', 'Cheesy Grits', 'Grits', 'Sausage Gravy', 'Oatmeal'
+    ],
+    breakfastSandwiches: ['BLT', 'Bacon, Egg and Cheese', 'Sausage, Egg and Cheese', 'Breakfast Burritos'],
+    saladLettuce: ['Romaine', 'Iceberg'],
+    saladToppings: [
+      'Diced Tomatoes', 'Cucumbers', 'Onions', 'Broccoli', 'Carrots', 'Cauliflower',
+      'Peppers', 'Cheese', 'Croutons', 'Bacon Bits', 'Eggs', 'Diced Ham', 'Crackers',
+      'Sunflower Seeds', 'Pickled Okra', 'Jalapenos', 'Pickled Beets', 'Green Olives',
+      'Banana Peppers', 'Pickled Green Tomatoes'
+    ],
+    saladDressings: ['Ranch', 'Italian', 'Blue Cheese', 'Caesar', 'Thousand Island'],
+    drinks: [
+      'Sweet Tea', 'Unsweet Tea', 'Dr. Pepper', 'Rootbeer', 'Sprite', 'Fruit Punch',
+      'Blue Powerade', 'Diet Coke', 'Coke Zero', 'Coke', 'Coffee', 'Orange Juice',
+      'Milk', 'Chocolate Milk'
+    ],
+    dessert: ['Cake']
+  };
+
   function sectionItems(key, draft) {
-    const defaults = state.defaults;
     if (key === 'lunch') return dailyLunchItems(draft);
-    if (key === 'breakfast') return defaults.breakfast?.items || ['Scrambled Eggs', 'Bacon', 'Sausage, Hotlinks', 'Pancakes', 'French Toast Sticks', 'Biscuits', 'Hashbrowns', 'Cheesy Grits', 'Grits', 'Sausage Gravy', 'Oatmeal'];
-    if (key === 'breakfastSandwiches') return defaults.sameDaily?.items || [];
-    if (key === 'drinks') return defaults.drinks?.items || ['Sweet Tea', 'Unsweet Tea', 'Dr. Pepper', 'Sprite', 'Coke', 'Coffee'];
-    if (key === 'dessert') return defaults.dessert?.items || [];
-    if (key === 'salad') {
-      const salad = defaults.salad?.saladBar || {};
-      const lettuce = salad.lettuce || [];
-      const toppings = salad.toppings || [];
-      return [
-        ...(lettuce.length ? [GROUP('Lettuce'), ...lettuce] : []),
-        ...(toppings.length ? [GROUP('Toppings'), ...toppings] : [])
-      ];
-    }
-    if (key === 'saladDressings') return state.defaults.salad?.saladBar?.dressing || [];
-    if (key === 'footer') return [];
+    if (key === 'breakfast') return STANDING_MENU.breakfast;
+    if (key === 'breakfastSandwiches') return STANDING_MENU.breakfastSandwiches;
+    if (key === 'drinks') return STANDING_MENU.drinks;
+    if (key === 'dessert') return STANDING_MENU.dessert;
+    if (key === 'salad') return [GROUP('Lettuce'), ...STANDING_MENU.saladLettuce, GROUP('Toppings'), ...STANDING_MENU.saladToppings];
+    if (key === 'saladDressings') return STANDING_MENU.saladDressings;
     return [];
   }
 
@@ -910,7 +979,7 @@
     return serviceTime(key, date);
   }
 
-  async function drawMenu(canvas, draft, date, layout, background, outline = null) {
+  async function drawMenu(canvas, draft, date, layout, background, outline = null, editing = false) {
     const context = canvas.getContext('2d', { alpha: false });
     const target = layout || builtInLayout;
     ensureLayoutShape(target);
@@ -926,6 +995,14 @@
 
     const data = target.data;
     const regions = data.regions;
+    // The area outlined on this picture wins over whatever the layout carries,
+    // so the day's items always land where they were outlined. While the
+    // trainer is open the box being dragged has to stay live, so the override
+    // is skipped there.
+    if (!editing && isLunchAreaSet(background)) {
+      const area = background.lunchBox;
+      regions.lunch = { ...regions.lunch, x: Number(area.x), y: Number(area.y), w: Number(area.w), h: Number(area.h) };
+    }
     const color = data.textColor || '#f5eee5';
     const textScale = Number(data.textScale) || 1;
     const unit = canvas.height / FONT_BASE_HEIGHT;
@@ -944,10 +1021,12 @@
     if (!preview) return;
     const draft = currentDraft(kind);
     const hasItems = !!draft && ((draft.meats?.length || 0) + (draft.sides?.length || 0) > 0);
-    preview.empty.hidden = hasItems;
+    // Draw the board even with nothing in it. Staff need to see a background
+    // the moment they pick one, and an empty lunch panel is exactly what an
+    // unfinished menu should look like.
+    preview.empty.hidden = true;
     preview.download.disabled = !hasItems;
     preview.publish.disabled = !hasItems;
-    if (!hasItems) return;
     const token = ++state.renderToken;
     const layout = getActiveLayout();
     const background = getActiveBackground();
@@ -1018,9 +1097,12 @@
     backgroundList.innerHTML = state.backgrounds.map(background => `
       <div class="asset-row ${background.id === activeBackgroundId ? 'active' : ''}">
         <button class="asset-item" data-background-id="${esc(background.id)}" type="button">
-          <img src="${esc(background.url)}" alt="" loading="lazy"><span><b>${esc(background.name)}</b><small>${background.source === 'supabase' ? 'Added by staff' : 'Came with the website'}</small></span>
+          <img src="${esc(background.url)}" alt="" loading="lazy"><span><b>${esc(background.name)}</b><small>${isLunchAreaSet(background) ? 'Lunch area set' : 'Needs a lunch area'}</small></span>
         </button>
-        ${background.source === 'supabase' ? `<button class="asset-remove" data-remove-background="${esc(background.id)}" type="button" title="Take this off the list" aria-label="Take ${esc(background.name)} off the list">&#10005;</button>` : ''}
+        ${background.source === 'supabase' ? `<span class="asset-tools">
+          <button class="asset-tool" data-rename-background="${esc(background.id)}" type="button" title="Rename this picture" aria-label="Rename ${esc(background.name)}">&#9998;</button>
+          <button class="asset-tool danger" data-remove-background="${esc(background.id)}" type="button" title="Take this off the list" aria-label="Take ${esc(background.name)} off the list">&#10005;</button>
+        </span>` : ''}
       </div>`).join('');
     layoutList.innerHTML = state.layouts.map(layout => `
       <button class="layout-item ${layout.id === state.trainerLayout?.id ? 'active' : ''}" data-layout-id="${esc(layout.id)}" type="button"><span><b>${esc(layout.name)}</b><small>${layout.builtIn ? 'Built-in starting layout' : 'Saved by staff'}</small></span></button>`).join('');
@@ -1030,6 +1112,7 @@
       useBackground(background);
     }));
     $$('[data-remove-background]', backgroundList).forEach(button => button.addEventListener('click', () => removeBackground(button.dataset.removeBackground)));
+    $$('[data-rename-background]', backgroundList).forEach(button => button.addEventListener('click', () => renameBackground(button.dataset.renameBackground)));
     $$('[data-layout-id]', layoutList).forEach(button => button.addEventListener('click', () => {
       const layout = state.layouts.find(item => item.id === button.dataset.layoutId);
       if (!layout) return;
@@ -1052,8 +1135,33 @@
     state.activeBackgroundId = background.id;
     refreshLibraries();
     refreshPreviewSelectors();
+    updateBuildGates();
     drawTrainer();
     renderAllPreviews();
+  }
+
+  async function renameBackground(id) {
+    const background = state.backgrounds.find(item => item.id === id);
+    if (!background) return;
+    const next = window.prompt('Name this background', background.name || '');
+    if (next === null) return;
+    const name = String(next).trim().slice(0, 80);
+    if (!name || name === background.name) return;
+    const previous = background.name;
+    background.name = name;
+    refreshLibraries();
+    refreshPreviewSelectors();
+    updateBuildGates();
+    if (background.source !== 'supabase') return;
+    try {
+      await saveBackgroundLibrary();
+      setStatus($('#setupStatus'), `Renamed to “${name}”.`, 'success');
+    } catch (error) {
+      background.name = previous;
+      refreshLibraries();
+      refreshPreviewSelectors();
+      setStatus($('#setupStatus'), `That name could not be saved: ${error.message}`, 'error');
+    }
   }
 
   async function removeBackground(id) {
@@ -1157,8 +1265,54 @@
       sides: [{ name: 'Mashed Potatoes & Gravy' }, { name: 'Cabbage' }, { name: 'Green Beans' }, { name: 'Fried Okra' }]
     };
     const background = state.backgrounds.find(item => item.id === state.trainerLayout.data.backgroundId) || builtInBackground;
-    await drawMenu(canvas, sample, todayISO(), state.trainerLayout, background, { activeKey: activeRegionKey() });
+    await drawMenu(canvas, sample, todayISO(), state.trainerLayout, background, { activeKey: activeRegionKey() }, true);
     syncBoxFields();
+    refreshLunchAreaCallout();
+  }
+
+  // The gate: nothing can be built until the picture on screen has an outlined
+  // lunch area.
+  function refreshLunchAreaCallout() {
+    const callout = $('#lunchAreaCallout');
+    if (!callout) return;
+    const background = state.backgrounds.find(item => item.id === state.trainerLayout?.data?.backgroundId);
+    const done = isLunchAreaSet(background);
+    callout.hidden = false;
+    callout.classList.toggle('done', done);
+    const title = $('b', callout);
+    const note = $('small', callout);
+    const button = $('#saveLunchAreaBtn');
+    if (done) {
+      if (title) title.textContent = 'Lunch area is set for this picture.';
+      if (note) note.textContent = 'Today’s lunch items will print inside the orange box. Drag it and press the button again to move it.';
+      if (button) button.textContent = 'Update the lunch area';
+    } else {
+      if (title) title.textContent = 'Outline the lunch area before you use this picture.';
+      if (note) note.textContent = 'Pick “Today’s lunch”, drag the box over the panel where the day’s items should print, then save it. Nothing can be built until this is set.';
+      if (button) button.textContent = 'Save this as the lunch area';
+    }
+  }
+
+  async function saveLunchArea() {
+    const background = state.backgrounds.find(item => item.id === state.trainerLayout?.data?.backgroundId);
+    if (!background) return;
+    const box = state.trainerLayout.data.regions.lunch;
+    background.lunchBox = { x: round2(box.x), y: round2(box.y), w: round2(box.w), h: round2(box.h) };
+    refreshLunchAreaCallout();
+    refreshLibraries();
+    renderAllPreviews();
+    updateBuildGates();
+    if (background.source !== 'supabase') {
+      setStatus($('#setupStatus'), 'Lunch area set for the original board.', 'success');
+      return;
+    }
+    try {
+      await saveBackgroundLibrary();
+      setStatus($('#setupStatus'), 'Lunch area saved. Every staff device will print the day’s items there.', 'success');
+      toast('Lunch area saved.', 'success');
+    } catch (error) {
+      setStatus($('#setupStatus'), `The lunch area could not be saved: ${error.message}`, 'error');
+    }
   }
 
   async function saveBackgroundLibrary() {
@@ -1232,11 +1386,22 @@
         state.backgrounds.push({ id, name: file.name.replace(/\.[^.]+$/, '') || 'Menu background', url, source: 'supabase', createdAt: new Date().toISOString() });
         added += 1;
       }
-      await saveBackgroundLibrary();
       const newest = state.backgrounds[state.backgrounds.length - 1];
+      // Offer the rename straight away rather than living with the camera's
+      // filename, then send them to outline the lunch area, which is the one
+      // step a new picture cannot be used without.
+      if (added === 1) {
+        const chosen = window.prompt('Name this background', newest.name || '');
+        if (chosen !== null && String(chosen).trim()) newest.name = String(chosen).trim().slice(0, 80);
+      }
+      await saveBackgroundLibrary();
       useBackground(newest);
-      setStatus($('#setupStatus'), added === 1 ? 'Picture added and switched on. Drag the outlined boxes to fit it.' : `${added} pictures added. The newest one is switched on.`, 'success');
-      toast(added === 1 ? 'Background added.' : `${added} backgrounds added.`, 'success');
+      switchMode('setup');
+      selectRegion('lunch');
+      setStatus($('#setupStatus'), added === 1
+        ? 'Picture added. Now drag the orange box over the panel where the day’s lunch should print, then save the lunch area.'
+        : `${added} pictures added. Outline the lunch area on the newest one before using it.`, 'success');
+      toast(added === 1 ? 'Background added — outline the lunch area.' : `${added} backgrounds added.`, 'success');
     } catch (error) {
       // The detailed reason lives on the setup screen, but staff can start an
       // upload from the preview screens too, so put the reason in the toast as
@@ -1452,6 +1617,8 @@
     $('#layoutName').addEventListener('input', () => { state.trainerLayout.name = $('#layoutName').value; });
     $('#saveLayoutAsBtn').addEventListener('click', () => saveLayout(true));
     $('#updateLayoutBtn').addEventListener('click', () => saveLayout(false));
+    const saveArea = $('#saveLunchAreaBtn');
+    if (saveArea) saveArea.addEventListener('click', saveLunchArea);
 
     const canvas = $('#trainerCanvas');
     canvas.addEventListener('pointerdown', event => {
