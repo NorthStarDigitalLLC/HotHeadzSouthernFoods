@@ -65,6 +65,14 @@
     .topbar-brand{font-family:'Abril Fatface',serif;font-size:15px;white-space:nowrap;background:linear-gradient(135deg,var(--fire2),var(--fire));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
     .topbar-sep{width:1px;height:22px;background:var(--border);flex-shrink:0;}
     .topbar-tabs{display:flex;gap:3px;flex:1;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    /* ── Which-editor switcher ── lives in the top bar so it never hides. */
+    .mode-seg{display:flex;gap:2px;padding:2px;border-radius:var(--radius-sm);background:rgba(255,255,255,.04);border:1px solid var(--border);flex-shrink:0;}
+    .mode-seg-btn{font-family:inherit;font-size:11.5px;font-weight:700;white-space:nowrap;padding:6px 11px;border-radius:8px;
+      border:none;background:transparent;color:var(--text3);cursor:pointer;transition:all .18s;}
+    .mode-seg-btn:hover{color:var(--text);background:rgba(255,255,255,.05);}
+    .mode-seg-btn.on{background:linear-gradient(135deg,var(--fire),#e85520);color:#fff;box-shadow:0 2px 10px rgba(255,122,24,.28);}
+    .mode-seg-btn:focus-visible{outline:2px solid var(--fire);outline-offset:1px;}
+    @media(max-width:640px){.mode-seg-btn{padding:6px 8px;font-size:11px;}}
     .topbar-tabs::-webkit-scrollbar{display:none;}
     .tab-btn{padding:6px 13px;border-radius:8px;border:none;background:transparent;color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;}
     .tab-btn:hover{background:rgba(255,255,255,.06);color:var(--text);}
@@ -640,6 +648,11 @@
   <div class="topbar">
     <div class="topbar-brand">Hot Headz</div>
     <div class="topbar-sep"></div>
+    <div class="mode-seg" role="tablist" aria-label="Which editor">
+      <button class="mode-seg-btn" data-pick="site" type="button" role="tab">🌐 Website</button>
+      <button class="mode-seg-btn" data-pick="fb" type="button" role="tab">🖼️ FB Menu</button>
+    </div>
+    <div class="topbar-sep"></div>
     <div class="topbar-tabs">
       <button class="tab-btn active" data-mode="fb" data-tab="quickfill">⚡ FB Menu</button>
       <button class="tab-btn" data-mode="fb" data-tab="textboxes">Text Boxes</button>
@@ -659,9 +672,7 @@
       <button class="tab-btn static-tab" data-mode="site" data-tab="static-hours">🕒 Hours</button>
       <button class="tab-btn static-tab" data-mode="site" data-tab="static-settings">⚙ Settings</button>
     </div>
-    <div class="tb-actions">
-      <button class="tb-btn" id="switchModeBtn" title="Switch editor">⇄ Switch</button>
-      <button class="tb-btn undo" id="undoBtn" title="Undo">↩</button>
+    <div class="tb-actions">      <button class="tb-btn undo" id="undoBtn" title="Undo">↩</button>
       <button class="tb-btn undo" id="redoBtn" title="Redo">↪</button>
       <button class="tb-btn export-btn" id="exportBtn">Export ↓</button>
       <button class="tb-btn signout-btn" id="signOutBtn">Sign Out ←</button>
@@ -886,22 +897,24 @@ function setEditorMode(mode){
   document.querySelectorAll('.topbar-tabs .topbar-sep').forEach(function(s){ s.style.display='none'; });
   var pick = document.getElementById('modePick');
   if(pick) pick.classList.add('hidden');
+  // Keep the top-bar switcher showing where you are.
+  document.querySelectorAll('.mode-seg-btn').forEach(function(b){
+    var on = b.dataset.pick === mode;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
   // Activate the first tab of the chosen mode.
   var first = document.querySelector('.tab-btn[data-mode="'+mode+'"]');
   if(first && !first.classList.contains('active')) first.click();
   else if(first){ first.classList.add('active'); }
 }
 
-function showModePick(){
-  var pick = document.getElementById('modePick');
-  if(pick) pick.classList.remove('hidden');
-}
-
-document.querySelectorAll('.mode-card[data-pick]').forEach(function(card){
-  card.addEventListener('click', function(){ setEditorMode(card.dataset.pick); });
+/* Both ways in are the same call: the opening cards, and the segmented
+   control in the top bar that stays put so you always know which editor you
+   are in and can leave it in one click. */
+document.querySelectorAll('[data-pick]').forEach(function(el){
+  el.addEventListener('click', function(){ setEditorMode(el.dataset.pick); });
 });
-var _switchBtn = document.getElementById('switchModeBtn');
-if(_switchBtn) _switchBtn.addEventListener('click', showModePick);
 function unlockEditor(){
   localStorage.setItem(SESSION_KEY,String(Date.now()));
   localStorage.removeItem(LOCKOUT_KEY);
