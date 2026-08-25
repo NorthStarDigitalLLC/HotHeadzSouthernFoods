@@ -107,11 +107,46 @@
     .tb-btn.export-btn{background:linear-gradient(135deg,var(--fire),var(--fire2));border-color:transparent;font-weight:900;padding:7px 16px;}
     .tb-btn.signout-btn{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.15);color:var(--text2);font-weight:800;padding:7px 14px;margin-left:4px;}
     .tb-btn.signout-btn:hover{background:rgba(255,77,77,.12);border-color:rgba(255,77,77,.3);color:var(--danger);}
-    .main-layout{flex:1;display:flex;min-height:0;overflow:hidden;}
+    .main-layout{flex:1;display:flex;min-height:0;overflow:hidden;position:relative;}
     /* ── Section rail ──────────────────────────────────────────────
        Was a 15-button strip across the top that scrolled sideways. The
        window is far wider than it is tall, so the sections live down the
        left edge instead and the space either side of the canvas gets used. */
+    /* ── Rail: what is in each section, without opening it ── */
+    .rail-count{margin-left:auto;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;
+      background:rgba(255,255,255,.08);color:var(--text3);flex-shrink:0;}
+    .rail-count.empty{background:transparent;color:rgba(240,236,230,.28);font-weight:600;font-style:italic;}
+    .side-rail .tab-btn.active .rail-count{background:rgba(0,0,0,.25);color:#fff;}
+    .side-rail .tab-btn.is-dirty::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--fire);
+      flex-shrink:0;margin-right:2px;box-shadow:0 0 0 3px rgba(255,122,24,.18);}
+
+    /* ── Unsaved bar ── each section saves on its own, so say so out loud ── */
+    .site-dirty-bar{display:none;position:absolute;left:50%;transform:translateX(-50%);top:8px;z-index:60;
+      background:linear-gradient(135deg,var(--fire),#e85520);color:#fff;font-size:12px;font-weight:700;
+      padding:7px 16px;border-radius:20px;box-shadow:0 4px 18px rgba(255,122,24,.32);pointer-events:none;}
+    body.mode-site .site-dirty-bar.show{display:block;}
+
+    /* ── Live preview ── the wide half of the window, earning its place ── */
+    .site-preview{display:none;}
+    body.mode-site .side-panel{flex-direction:row;}
+    body.mode-site .side-scroll{flex:1 1 0;min-width:0;column-width:auto;padding:18px 22px;}
+    body.mode-site .site-preview{display:block;flex:1 1 0;min-width:0;max-width:560px;overflow-y:auto;
+      border-left:1px solid var(--border);background:rgba(0,0,0,.16);padding:18px 22px;}
+    .sp-head{margin-bottom:16px;}
+    .sp-eyebrow{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--fire2);}
+    .sp-title{font-family:'Abril Fatface',Georgia,serif;font-size:22px;color:var(--text);margin-top:3px;}
+    .sp-note{font-size:11px;color:var(--text3);margin-top:4px;}
+    .sp-empty{font-size:13px;color:var(--text3);line-height:1.6;padding:22px;border:1px dashed var(--border);border-radius:var(--radius);text-align:center;}
+    .sp-sheet{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
+    .sp-block{margin-bottom:18px;}
+    .sp-block:last-child{margin-bottom:0;}
+    .sp-block-title{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--fire2);
+      border-bottom:1px solid var(--border);padding-bottom:5px;margin-bottom:8px;}
+    .sp-list{margin:0;padding-left:17px;display:flex;flex-direction:column;gap:3px;}
+    .sp-list li{font-size:13.5px;color:var(--text);line-height:1.45;}
+    .sp-line{margin:0;font-size:13.5px;color:var(--text);line-height:1.5;}
+
+    @media(max-width:1100px){ body.mode-site .site-preview{display:none;} }
     .side-rail{width:186px;flex-shrink:0;display:flex;flex-direction:column;gap:2px;padding:8px;
       border-right:1px solid var(--border);background:var(--surface);overflow-y:auto;}
     .side-rail .tab-btn{width:100%;text-align:left;justify-content:flex-start;white-space:nowrap;}
@@ -710,6 +745,7 @@
     </div>
   </div>
   <div class="main-layout">
+    <div class="site-dirty-bar" id="siteDirtyBar">Unsaved changes in this section &mdash; press Ctrl+S or hit Save</div>
     <nav class="side-rail" id="sideRail" aria-label="Sections">
       <button class="tab-btn active" data-mode="fb" data-tab="quickfill">⚡ FB Menu</button>
       <button class="tab-btn" data-mode="fb" data-tab="textboxes">Text Boxes</button>
@@ -758,6 +794,7 @@
     <div class="side-panel" id="sidePanel">
       <div class="mpc"><span class="mpc-title">Settings</span><button class="mpc-btn" id="closeSidePanel">Done</button></div>
       <div class="side-scroll" id="sideScroll"></div>
+      <aside class="site-preview" id="sitePreview" aria-label="Preview"></aside>
     </div>
   </div>
   <div class="mobile-bar">
@@ -941,6 +978,7 @@ function checkSession(){
    (static-*) and the Facebook menu picture (canvas tabs). Showing all
    fifteen at once was the confusing part. Pick one, see only its tabs. */
 function setEditorMode(mode){
+  if(typeof siteConfirmLeave==='function' && !siteConfirmLeave()) return;
   document.querySelectorAll('.tab-btn[data-mode]').forEach(function(b){
     b.style.display = (b.dataset.mode === mode) ? '' : 'none';
   });
@@ -1730,6 +1768,166 @@ async function wireStaticPanel(){
 }
 
 let currentTab='quickfill';
+
+/* ══════════════════════════════════════════════════════════════════
+   WEBSITE EDITOR HELPERS
+
+   Three things, all aimed at the same problem: this screen is wide, and
+   somebody editing a menu on it cannot see what they are doing.
+
+     1. A live preview of the section as it will read on the website.
+     2. Item counts in the rail, so you can see what is filled in without
+        opening all ten sections.
+     3. Unsaved-work protection. Each section has its own Save button, so
+        typing into Breakfast and clicking Drinks used to lose the lot
+        silently. Now it warns, marks the section, and Ctrl+S saves.
+   ══════════════════════════════════════════════════════════════════ */
+
+var _siteDirty = false;
+
+/* Count what is in a section, for the rail. Every section stores a
+   different shape, so this reads each one on its own terms rather than
+   pretending they are uniform. */
+function siteSectionCount(tab){
+  var d = menuDefaultsCache;
+  if(!d) return null;
+  var n = function(a){ return Array.isArray(a) ? a.length : 0; };
+  switch(tab){
+    case 'static-breakfast':   return n(d.breakfast && d.breakfast.items) + n(d.breakfast && d.breakfast.plates);
+    case 'static-lunchplates': return n(d.lunch && d.lunch.plates);
+    case 'static-drinks':      return n(d.drinks && d.drinks.items);
+    case 'static-beer':        return n(d.beer);
+    case 'static-salad':       var s = d.salad || {}, sb = s.saladBar || {};
+                               return n(s.items) + n(sb.lettuce) + n(sb.toppings) + n(sb.dressing);
+    case 'static-dessert':     return n(d.dessert && d.dessert.items);
+    case 'static-crawfish':    return n(d.crawfish && d.crawfish.items);
+    case 'static-samedaily':   return n(d.sameDaily && d.sameDaily.items);
+    case 'static-hours':       return n(d.hours && d.hours.weekly);
+    default:                   return null;   // Settings has no item list
+  }
+}
+
+function refreshRailCounts(){
+  document.querySelectorAll('.side-rail .tab-btn[data-mode="site"]').forEach(function(btn){
+    var old = btn.querySelector('.rail-count');
+    if(old) old.remove();
+    var c = siteSectionCount(btn.dataset.tab);
+    if(c === null) return;
+    var el = document.createElement('span');
+    el.className = 'rail-count' + (c === 0 ? ' empty' : '');
+    el.textContent = c === 0 ? 'empty' : c;
+    btn.appendChild(el);
+  });
+}
+
+/* Read whatever the section's form currently holds. Generic on purpose:
+   every section is built from .static-card blocks with a title and one or
+   more fields, so this works for all ten without a per-section map that
+   would drift the moment somebody adds a field. */
+function readSiteForm(){
+  var host = document.getElementById('sideScroll');
+  if(!host) return [];
+  var out = [];
+  host.querySelectorAll('.static-card').forEach(function(card){
+    var title = card.querySelector('.static-card-title');
+    var vals = [];
+    card.querySelectorAll('input.fi, textarea.fi').forEach(function(f){
+      if(f.type === 'checkbox' || f.type === 'radio') return;
+      var v = (f.value || '').trim();
+      if(v) vals.push(v);
+    });
+    if(title && vals.length) out.push({ label: title.textContent.trim(), values: vals });
+  });
+  return out;
+}
+
+function renderSitePreview(){
+  var host = document.getElementById('sitePreview');
+  if(!host) return;
+  if(!document.body.classList.contains('mode-site') || !String(currentTab||'').startsWith('static-')){
+    host.innerHTML = '';
+    return;
+  }
+  var blocks = readSiteForm();
+  var titleBtn = document.querySelector('.side-rail .tab-btn.active');
+  var secName = titleBtn ? titleBtn.textContent.replace(/\d+$|empty$/,'').trim() : 'Section';
+
+  var h = '<div class="sp-head"><div class="sp-eyebrow">Preview</div>' +
+          '<div class="sp-title">' + esc(secName) + '</div>' +
+          '<div class="sp-note">Updates as you type. This is what saves to the website.</div></div>';
+
+  if(!blocks.length){
+    h += '<div class="sp-empty">Nothing in this section yet. What you type on the left shows up here.</div>';
+  } else {
+    h += '<div class="sp-sheet">';
+    blocks.forEach(function(b){
+      h += '<div class="sp-block"><div class="sp-block-title">' + esc(b.label) + '</div>';
+      b.values.forEach(function(v){
+        var lines = v.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+        if(lines.length > 1){
+          h += '<ul class="sp-list">';
+          lines.forEach(function(l){ h += '<li>' + esc(l) + '</li>'; });
+          h += '</ul>';
+        } else {
+          h += '<p class="sp-line">' + esc(lines[0] || '') + '</p>';
+        }
+      });
+      h += '</div>';
+    });
+    h += '</div>';
+  }
+  host.innerHTML = h;
+}
+
+function markSiteDirty(on){
+  _siteDirty = !!on;
+  var btn = document.querySelector('.side-rail .tab-btn.active');
+  document.querySelectorAll('.side-rail .tab-btn').forEach(function(b){ b.classList.remove('is-dirty'); });
+  if(on && btn) btn.classList.add('is-dirty');
+  var bar = document.getElementById('siteDirtyBar');
+  if(bar) bar.classList.toggle('show', !!on);
+}
+
+/* Called after every side-panel rebuild: rewire the live bits to the new DOM. */
+function wireSiteTools(){
+  refreshRailCounts();
+  renderSitePreview();
+  markSiteDirty(false);
+  var host = document.getElementById('sideScroll');
+  if(!host) return;
+  host.addEventListener('input', function(){
+    if(!document.body.classList.contains('mode-site')) return;
+    markSiteDirty(true);
+    renderSitePreview();
+  });
+  // Any Save button in this section clears the warning and refreshes counts.
+  host.querySelectorAll('button').forEach(function(b){
+    if(!/save/i.test(b.id || '') && !/save/i.test(b.textContent || '')) return;
+    b.addEventListener('click', function(){
+      markSiteDirty(false);
+      setTimeout(function(){ refreshRailCounts(); renderSitePreview(); }, 700);
+    });
+  });
+}
+
+/* Ctrl/Cmd+S saves the section you are looking at. */
+document.addEventListener('keydown', function(e){
+  if(!(e.ctrlKey || e.metaKey) || String(e.key).toLowerCase() !== 's') return;
+  if(!document.body.classList.contains('mode-site')) return;
+  e.preventDefault();
+  var host = document.getElementById('sideScroll');
+  if(!host) return;
+  var save = [].slice.call(host.querySelectorAll('button')).filter(function(b){
+    return /save/i.test(b.id || '') || /save/i.test(b.textContent || '');
+  })[0];
+  if(save) save.click();
+  else toast('Nothing to save in this section', 'info');
+});
+
+function siteConfirmLeave(){
+  if(!_siteDirty) return true;
+  return confirm('You have unsaved changes in this section. Leave without saving?');
+}
 function rebuildSidePanel(){
   const c=document.getElementById('sideScroll');
   if (currentTab==='quickfill')           c.innerHTML=buildQF();
@@ -1737,16 +1935,16 @@ function rebuildSidePanel(){
   else if (currentTab==='photo')          c.innerHTML=buildPH();
   else if (currentTab==='projects')       c.innerHTML=buildPR();
   else if (currentTab==='board')       { c.innerHTML=buildBoardTab(); wireBoardTab(); return; }
-  else if (currentTab==='static-breakfast')    { c.innerHTML=buildStaticBreakfast();    wireStaticPanel(); return; }
-  else if (currentTab==='static-lunchplates')  { c.innerHTML=buildStaticLunchPlates();  wireStaticPanel(); return; }
-  else if (currentTab==='static-drinks')       { c.innerHTML=buildStaticDrinks();       wireStaticPanel(); return; }
-  else if (currentTab==='static-beer')         { c.innerHTML=buildStaticBeer();         wireStaticPanel(); return; }
-  else if (currentTab==='static-salad')        { c.innerHTML=buildStaticSalad();        wireStaticPanel(); return; }
-  else if (currentTab==='static-dessert')      { c.innerHTML=buildStaticDessert();      wireStaticPanel(); return; }
-  else if (currentTab==='static-crawfish')     { c.innerHTML=buildStaticCrawfish();     wireStaticPanel(); return; }
-  else if (currentTab==='static-samedaily')    { c.innerHTML=buildStaticSameDaily();    wireStaticPanel(); return; }
-  else if (currentTab==='static-hours')        { c.innerHTML=buildStaticHours();        wireStaticPanel(); return; }
-  else if (currentTab==='static-settings')     { c.innerHTML=buildStaticSettings();     wireStaticPanel(); return; }
+  else if (currentTab==='static-breakfast') { c.innerHTML=buildStaticBreakfast(); wireStaticPanel(); wireSiteTools(); return; }
+  else if (currentTab==='static-lunchplates') { c.innerHTML=buildStaticLunchPlates(); wireStaticPanel(); wireSiteTools(); return; }
+  else if (currentTab==='static-drinks') { c.innerHTML=buildStaticDrinks(); wireStaticPanel(); wireSiteTools(); return; }
+  else if (currentTab==='static-beer') { c.innerHTML=buildStaticBeer(); wireStaticPanel(); wireSiteTools(); return; }
+  else if (currentTab==='static-salad') { c.innerHTML=buildStaticSalad(); wireStaticPanel(); wireSiteTools(); return; }
+  else if (currentTab==='static-dessert') { c.innerHTML=buildStaticDessert(); wireStaticPanel(); wireSiteTools(); return; }
+  else if (currentTab==='static-crawfish') { c.innerHTML=buildStaticCrawfish(); wireStaticPanel(); wireSiteTools(); return; }
+  else if (currentTab==='static-samedaily') { c.innerHTML=buildStaticSameDaily(); wireStaticPanel(); wireSiteTools(); return; }
+  else if (currentTab==='static-hours') { c.innerHTML=buildStaticHours(); wireStaticPanel(); wireSiteTools(); return; }
+  else if (currentTab==='static-settings') { c.innerHTML=buildStaticSettings(); wireStaticPanel(); wireSiteTools(); return; }
   wirePanel();
 }
 
@@ -2400,6 +2598,7 @@ async function refreshCloudList(){
 
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click',async()=>{
+    if(typeof siteConfirmLeave==='function' && !siteConfirmLeave()) return;
     currentTab=btn.dataset.tab;
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
