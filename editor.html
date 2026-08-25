@@ -70,13 +70,28 @@
     .tab-btn:hover{background:rgba(255,255,255,.06);color:var(--text);}
     .tab-btn.active{background:var(--ember);color:var(--fire);}
     .tab-btn.menu-tab{border:1px solid rgba(255,255,255,.06);}
-    .tab-btn.menu-tab.active{background:rgba(100,180,255,.12);color:#7ac4ff;border-color:rgba(100,180,255,.2);}
+    .tab-btn.menu-tab.active{background:rgba(100,180,255,.12);color:var(--fire2);border-color:rgba(100,180,255,.2);}
     /* Daily Board tab */
-    .tab-btn.board-tab{border:1px solid rgba(180,100,255,.18);background:rgba(180,100,255,.04);color:#c89cff;}
-    .tab-btn.board-tab:hover{background:rgba(180,100,255,.1);color:#d8b8ff;}
-    .tab-btn.board-tab.active{background:linear-gradient(135deg,rgba(180,100,255,.18),rgba(255,100,200,.12));color:#e0c0ff;border-color:rgba(180,100,255,.5);box-shadow:0 0 12px rgba(180,100,255,.15);}
+    .tab-btn.board-tab{border:1px solid rgba(255,122,24,.22);background:rgba(255,122,24,.05);color:var(--fire2);}
+    .tab-btn.board-tab:hover{background:rgba(255,122,24,.12);color:#ffd08a;}
+    .tab-btn.board-tab.active{background:linear-gradient(135deg,rgba(255,122,24,.22),rgba(255,179,71,.14));color:#fff;border-color:rgba(255,122,24,.4);}
     .tab-btn.static-tab{border:1px solid rgba(255,255,255,.06);}
     .tab-btn.static-tab.active{background:rgba(150,255,150,.1);color:#7ae59a;border-color:rgba(150,255,150,.2);}
+    /* ── Editor chooser ── two jobs, one tool. Sits over the shell until picked. */
+    .mode-pick{position:absolute;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse at 30% 20%,#1a1410,var(--void) 60%);}
+    .mode-pick.hidden{display:none;}
+    .mode-pick-inner{width:100%;max-width:760px;text-align:center;}
+    .mode-pick-title{font-size:26px;font-weight:800;color:var(--text);margin:0 0 6px;letter-spacing:-.01em;}
+    .mode-pick-sub{font-size:13px;color:var(--text3);margin:0 0 26px;}
+    .mode-pick-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .mode-card{display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;padding:22px;border-radius:var(--radius);
+      border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;transition:all .2s;font-family:inherit;}
+    .mode-card:hover{border-color:rgba(255,122,24,.45);background:rgba(255,122,24,.06);transform:translateY(-2px);}
+    .mode-card:focus-visible{outline:2px solid var(--fire);outline-offset:2px;}
+    .mode-card-ic{font-size:28px;line-height:1;}
+    .mode-card-name{font-size:17px;font-weight:800;color:var(--text);}
+    .mode-card-desc{font-size:12.5px;line-height:1.5;color:var(--text3);}
+    @media(max-width:720px){.mode-pick-cards{grid-template-columns:1fr;}}
     .tb-actions{display:flex;gap:5px;flex-shrink:0;}
     .tb-btn{padding:7px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;}
     .tb-btn:hover{background:rgba(255,255,255,.1);}
@@ -158,7 +173,7 @@
     .proj-card-by{font-size:10px;color:var(--text3);font-weight:600;margin-top:1px;font-style:italic;}
     .proj-badges{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px;}
     .proj-badge{display:inline-block;padding:1px 6px;border-radius:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);font-size:9px;font-weight:700;color:var(--text2);letter-spacing:.02em;}
-    .proj-badge-img{background:rgba(100,180,255,.1);border-color:rgba(100,180,255,.2);color:#7ac4ff;}
+    .proj-badge-img{background:rgba(100,180,255,.1);border-color:rgba(100,180,255,.2);color:var(--fire2);}
     .proj-actions{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;}
     .proj-actions .sm-btn{padding:4px 9px;font-size:10px;}
     .proj-search{padding:8px 11px;border-radius:var(--radius-sm);border:1px solid var(--border);background:rgba(0,0,0,.3);color:var(--text);font-size:12px;font-weight:600;font-family:inherit;width:100%;margin-bottom:8px;}
@@ -188,34 +203,30 @@
     .lunch-section-card.sides{background:rgba(77,255,136,.03);border-color:rgba(77,255,136,.12);}
     .lunch-section-card.samedaily{background:rgba(100,180,255,.03);border-color:rgba(100,180,255,.12);}
     /* Date picker — sits inside the Daily Board right-panel */
-    .date-card{background:linear-gradient(135deg,rgba(100,180,255,.08),rgba(150,210,255,.04));border:1px solid rgba(100,180,255,.22);border-radius:12px;padding:12px;margin-bottom:12px;}
-    .date-card-title{font-size:12px;font-weight:800;color:#7ac4ff;margin-bottom:4px;letter-spacing:.02em;}
+    .date-card{background:linear-gradient(135deg,rgba(255,122,24,.07),rgba(255,179,71,.04));border:1px solid rgba(255,122,24,.18);border-radius:var(--radius);padding:12px;margin-bottom:10px;}
+    .date-card-title{font-size:12px;font-weight:800;color:var(--fire2);margin-bottom:4px;letter-spacing:.02em;}
     .date-hint{font-size:10px;color:var(--text3);line-height:1.4;margin-bottom:10px;}
     .date-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px;}
     .date-btn{padding:9px 4px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:var(--text2);font-family:inherit;font-weight:700;font-size:11px;cursor:pointer;transition:all .15s;text-align:center;line-height:1.2;-webkit-tap-highlight-color:transparent;}
-    .date-btn:hover{background:rgba(100,180,255,.08);border-color:rgba(100,180,255,.3);color:var(--text);}
+    .date-btn:hover{background:rgba(255,122,24,.08);border-color:rgba(255,122,24,.3);color:var(--text);}
     .date-btn .date-day{display:block;font-size:10px;font-weight:600;opacity:.75;margin-bottom:1px;}
     .date-btn .date-num{display:block;font-size:16px;font-weight:800;}
-    .date-btn.is-selected{background:linear-gradient(135deg,rgba(100,180,255,.35),rgba(150,210,255,.20));border-color:rgba(100,180,255,.7);color:#fff;box-shadow:0 2px 12px rgba(100,180,255,.25);}
+    .date-btn.is-selected{background:linear-gradient(135deg,rgba(255,122,24,.35),rgba(150,210,255,.20));border-color:rgba(100,180,255,.7);color:#fff;box-shadow:0 2px 12px rgba(100,180,255,.25);}
     .date-btn.is-selected .date-day{opacity:.9;}
     .date-btn.is-closed{opacity:.4;cursor:not-allowed;}
     .date-btn.is-closed:hover{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08);color:var(--text2);}
     .date-btn .date-closed-marker{display:block;font-size:8px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-top:1px;}
     .date-actions{display:flex;gap:6px;flex-wrap:wrap;}
     .date-action{font-size:10px !important;padding:5px 10px !important;}
-    .date-summary{font-size:11px;color:#7ac4ff;font-weight:700;margin-top:8px;padding:8px;border-radius:6px;background:rgba(100,180,255,.06);display:none;}
+    .date-summary{font-size:11px;color:var(--fire2);font-weight:700;margin-top:8px;padding:8px;border-radius:6px;background:rgba(100,180,255,.06);display:none;}
     .date-summary.show{display:block;}
     /* Box-trainer overlay over canvas */
-    .train-overlay{position:absolute;inset:0;cursor:crosshair;background:rgba(0,0,0,.35);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:14px;}
-    .train-hint{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;color:#fff;background:linear-gradient(135deg,#b864ff,#7a3fd6);padding:10px 18px;border-radius:24px;box-shadow:0 4px 20px rgba(0,0,0,.5);pointer-events:none;text-align:center;line-height:1.4;}
-    .train-rect{position:absolute;border:2px dashed #c89cff;background:rgba(200,156,255,.12);pointer-events:none;box-shadow:0 0 0 1px rgba(0,0,0,.5);}
-    .train-cancel{position:absolute;top:14px;right:14px;background:rgba(40,8,8,.9);border:1px solid rgba(255,77,77,.4);color:#ff7a7a;font-weight:700;padding:8px 14px;border-radius:8px;cursor:pointer;z-index:51;font-family:'DM Sans',sans-serif;font-size:12px;}
     .lunch-section-title{font-size:12px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
     .lunch-section-title.meats{color:var(--fire);}
     .lunch-section-title.meats::before{content:'';width:3px;height:11px;border-radius:2px;background:var(--fire);}
     .lunch-section-title.sides{color:#7ae59a;}
     .lunch-section-title.sides::before{content:'';width:3px;height:11px;border-radius:2px;background:#7ae59a;}
-    .lunch-section-title.samedaily{color:#7ac4ff;}
+    .lunch-section-title.samedaily{color:var(--fire2);}
     .lunch-section-title.samedaily::before{content:'';width:3px;height:11px;border-radius:2px;background:#7ac4ff;}
     .lunch-section-hint{font-size:10px;color:var(--text3);line-height:1.4;margin-bottom:6px;}
     .lunch-section-hint em{color:var(--text2);font-style:normal;font-weight:700;}
@@ -288,13 +299,13 @@
       background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--text);
       font-family:inherit;text-align:left;transition:all .15s;-webkit-tap-highlight-color:transparent;}
     .mob-card:active{transform:scale(.98);background:rgba(255,255,255,.07);}
-    .mob-card-primary{background:linear-gradient(135deg,rgba(180,100,255,.18),rgba(255,100,200,.10));
-      border-color:rgba(180,100,255,.4);box-shadow:0 4px 24px rgba(180,100,255,.15);}
+    .mob-card-primary{background:linear-gradient(135deg,rgba(255,122,24,.20),rgba(255,179,71,.10));
+      border-color:rgba(255,122,24,.42);box-shadow:0 4px 24px rgba(255,122,24,.15);}
     .mob-card-primary .mob-card-title{color:#e0c0ff;}
     .mob-card-sm{padding:14px 14px;border-radius:14px;margin-bottom:8px;}
     .mob-card-export{background:linear-gradient(135deg,rgba(255,122,24,.15),rgba(255,179,71,.08));border-color:rgba(255,122,24,.3);}
-    .mob-card-preview{background:linear-gradient(135deg,rgba(100,180,255,.15),rgba(150,210,255,.08));border-color:rgba(100,180,255,.3);}
-    .mob-card-preview .mob-card-title{color:#7ac4ff;}
+    .mob-card-preview{background:linear-gradient(135deg,rgba(100,180,255,.15),rgba(150,210,255,.08));border-color:rgba(255,122,24,.3);}
+    .mob-card-preview .mob-card-title{color:var(--fire2);}
     .mob-card-emoji{font-size:28px;line-height:1;flex-shrink:0;}
     .mob-card-sm .mob-card-emoji{font-size:22px;}
     .mob-card-text{flex:1;min-width:0;}
@@ -317,23 +328,15 @@
     .mob-date-quick{display:flex;gap:6px;margin:8px 0 0;}
     .mob-date-quick-btn{flex:1;padding:8px 6px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:var(--text2);font-family:inherit;font-weight:700;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
     .mob-date-quick-btn:active{transform:scale(.96);background:rgba(255,255,255,.08);}
-    .mob-date-summary{margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(100,180,255,.08);border:1px solid rgba(100,180,255,.2);color:#7ac4ff;font-size:12px;font-weight:700;text-align:center;}
-
-    .mob-photo-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+    .mob-date-summary{margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(255,122,24,.08);border:1px solid rgba(100,180,255,.2);color:var(--fire2);font-size:12px;font-weight:700;text-align:center;}
     .mob-big-btn{padding:24px 12px;border-radius:18px;border:1px solid rgba(255,255,255,.1);
       background:rgba(255,255,255,.04);color:var(--text);font-family:inherit;cursor:pointer;
       display:flex;flex-direction:column;align-items:center;gap:8px;-webkit-tap-highlight-color:transparent;
       transition:all .15s;}
     .mob-big-btn:active{transform:scale(.97);background:rgba(255,255,255,.08);}
-    .mob-big-btn-primary{background:linear-gradient(135deg,#b864ff,#7a3fd6);border-color:transparent;box-shadow:0 6px 20px rgba(180,100,255,.3);}
+    .mob-big-btn-primary{background:linear-gradient(135deg,var(--fire),#e85520);border-color:transparent;box-shadow:0 6px 20px rgba(255,122,24,.3);}
     .mob-big-btn-icon{font-size:34px;line-height:1;}
     .mob-big-btn-label{font-size:13px;font-weight:800;}
-
-    .mob-section-collapse{margin-bottom:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:0 14px;}
-    .mob-section-collapse summary{padding:14px 0;font-weight:700;font-size:13px;cursor:pointer;list-style:none;color:var(--text);}
-    .mob-section-collapse summary::-webkit-details-marker{display:none;}
-    .mob-section-collapse[open] summary{padding-bottom:8px;}
-    .mob-section-collapse[open]{padding-bottom:14px;}
 
     .mob-input{width:100%;padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.3);color:var(--text);font-family:inherit;font-size:15px;}
     .mob-input:focus{outline:none;border-color:var(--fire);}
@@ -346,7 +349,7 @@
     .mob-toggle span{flex:1;}
 
     .mob-link-btn{display:block;width:100%;text-align:center;padding:14px;margin-top:8px;
-      background:transparent;border:none;color:#7ac4ff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+      background:transparent;border:none;color:var(--fire2);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
 
     /* Status pill colours, shared on mobile */
     #mobDateStatus { display:none; margin:14px 0; }
@@ -614,29 +617,50 @@
 </div>
 
 <div class="editor" id="editorShell">
+  <!-- Two jobs live in this tool and they were previously one long tab strip.
+       Pick which one you are doing; the tab strip then only shows that one. -->
+  <div class="mode-pick" id="modePick">
+    <div class="mode-pick-inner">
+      <h2 class="mode-pick-title">What are you working on?</h2>
+      <p class="mode-pick-sub">You can switch at any time from the top bar.</p>
+      <div class="mode-pick-cards">
+        <button class="mode-card" data-pick="site" type="button">
+          <span class="mode-card-ic">🌐</span>
+          <span class="mode-card-name">Website Editor</span>
+          <span class="mode-card-desc">The menu on hotheadzsouthernfoods.com — breakfast, lunch plates, drinks, beer, salad bar, dessert, crawfish, hours.</span>
+        </button>
+        <button class="mode-card" data-pick="fb" type="button">
+          <span class="mode-card-ic">🖼️</span>
+          <span class="mode-card-name">FB Menu Editor</span>
+          <span class="mode-card-desc">The daily menu picture for Facebook — background photo, text boxes, fonts, and the dates it publishes to.</span>
+        </button>
+      </div>
+    </div>
+  </div>
   <div class="topbar">
     <div class="topbar-brand">Hot Headz</div>
     <div class="topbar-sep"></div>
     <div class="topbar-tabs">
-      <button class="tab-btn active" data-tab="quickfill">⚡ FB Menu</button>
-      <button class="tab-btn" data-tab="textboxes">Text Boxes</button>
-      <button class="tab-btn" data-tab="photo">Photo</button>
-      <button class="tab-btn" data-tab="projects">Projects</button>
+      <button class="tab-btn active" data-mode="fb" data-tab="quickfill">⚡ FB Menu</button>
+      <button class="tab-btn" data-mode="fb" data-tab="textboxes">Text Boxes</button>
+      <button class="tab-btn" data-mode="fb" data-tab="photo">Photo</button>
+      <button class="tab-btn" data-mode="fb" data-tab="projects">Projects</button>
       <div class="topbar-sep" style="margin:0 4px;"></div>
-      <button class="tab-btn board-tab" data-tab="board">🗓 Daily Board</button>
+      <button class="tab-btn board-tab" data-mode="fb" data-tab="board">🗓 Daily Board</button>
       <div class="topbar-sep" style="margin:0 4px;"></div>
-      <button class="tab-btn static-tab" data-tab="static-breakfast">🍳 Breakfast</button>
-      <button class="tab-btn static-tab" data-tab="static-lunchplates">💵 Lunch Plates</button>
-      <button class="tab-btn static-tab" data-tab="static-drinks">🥤 Drinks</button>
-      <button class="tab-btn static-tab" data-tab="static-beer">🍺 Beer</button>
-      <button class="tab-btn static-tab" data-tab="static-salad">🥗 Salad Bar</button>
-      <button class="tab-btn static-tab" data-tab="static-dessert">🍮 Dessert</button>
-      <button class="tab-btn static-tab" data-tab="static-crawfish">🦞 Crawfish</button>
-      <button class="tab-btn static-tab" data-tab="static-samedaily">📅 Same Daily</button>
-      <button class="tab-btn static-tab" data-tab="static-hours">🕒 Hours</button>
-      <button class="tab-btn static-tab" data-tab="static-settings">⚙ Settings</button>
+      <button class="tab-btn static-tab" data-mode="site" data-tab="static-breakfast">🍳 Breakfast</button>
+      <button class="tab-btn static-tab" data-mode="site" data-tab="static-lunchplates">💵 Lunch Plates</button>
+      <button class="tab-btn static-tab" data-mode="site" data-tab="static-drinks">🥤 Drinks</button>
+      <button class="tab-btn static-tab" data-mode="site" data-tab="static-beer">🍺 Beer</button>
+      <button class="tab-btn static-tab" data-mode="site" data-tab="static-salad">🥗 Salad Bar</button>
+      <button class="tab-btn static-tab" data-mode="site" data-tab="static-dessert">🍮 Dessert</button>
+      <button class="tab-btn static-tab" data-mode="site" data-tab="static-crawfish">🦞 Crawfish</button>
+      <button class="tab-btn static-tab" data-mode="site" data-tab="static-samedaily">📅 Same Daily</button>
+      <button class="tab-btn static-tab" data-mode="site" data-tab="static-hours">🕒 Hours</button>
+      <button class="tab-btn static-tab" data-mode="site" data-tab="static-settings">⚙ Settings</button>
     </div>
     <div class="tb-actions">
+      <button class="tb-btn" id="switchModeBtn" title="Switch editor">⇄ Switch</button>
       <button class="tb-btn undo" id="undoBtn" title="Undo">↩</button>
       <button class="tb-btn undo" id="redoBtn" title="Redo">↪</button>
       <button class="tb-btn export-btn" id="exportBtn">Export ↓</button>
@@ -679,7 +703,7 @@
     <button class="mob-btn" id="mobSimpleBtn">📱 Simple</button>
     <button class="mob-btn" id="mobUndoBtn">↩ Undo</button>
     <button class="mob-btn" id="mobSettingsBtn">⚙ Edit</button>
-    <button class="mob-btn" id="mobLunchBtn" style="background:rgba(100,180,255,.15);border-color:rgba(100,180,255,.25);color:#7ac4ff;">🍽 Lunch</button>
+    <button class="mob-btn" id="mobLunchBtn" style="background:rgba(100,180,255,.15);border-color:rgba(100,180,255,.25);color:var(--fire2);">🍽 Lunch</button>
     <button class="mob-btn primary" id="mobExportBtn">Export ↓</button>
     <button class="mob-btn mob-signout" id="mobSignOutBtn">Sign Out ←</button>
   </div>
@@ -850,6 +874,34 @@ function checkSession(){
   return false;
 }
 
+
+/* ── Which editor am I in? ──────────────────────────────────────────
+   The tab strip carries two unrelated jobs: the website's menu content
+   (static-*) and the Facebook menu picture (canvas tabs). Showing all
+   fifteen at once was the confusing part. Pick one, see only its tabs. */
+function setEditorMode(mode){
+  document.querySelectorAll('.tab-btn[data-mode]').forEach(function(b){
+    b.style.display = (b.dataset.mode === mode) ? '' : 'none';
+  });
+  document.querySelectorAll('.topbar-tabs .topbar-sep').forEach(function(s){ s.style.display='none'; });
+  var pick = document.getElementById('modePick');
+  if(pick) pick.classList.add('hidden');
+  // Activate the first tab of the chosen mode.
+  var first = document.querySelector('.tab-btn[data-mode="'+mode+'"]');
+  if(first && !first.classList.contains('active')) first.click();
+  else if(first){ first.classList.add('active'); }
+}
+
+function showModePick(){
+  var pick = document.getElementById('modePick');
+  if(pick) pick.classList.remove('hidden');
+}
+
+document.querySelectorAll('.mode-card[data-pick]').forEach(function(card){
+  card.addEventListener('click', function(){ setEditorMode(card.dataset.pick); });
+});
+var _switchBtn = document.getElementById('switchModeBtn');
+if(_switchBtn) _switchBtn.addEventListener('click', showModePick);
 function unlockEditor(){
   localStorage.setItem(SESSION_KEY,String(Date.now()));
   localStorage.removeItem(LOCKOUT_KEY);
@@ -1986,7 +2038,7 @@ async function refreshSavedDatesList(){
       const data=dates[date]||{};const lunch=data.lunch||{};
       const itemCount=(lunch.items||[]).length;const meatCount=(lunch.meats||[]).length;
       const day=isoToDay(date);const label=isoToLabel(date);
-      const ageBadge=isPast?'<span style="background:rgba(255,77,77,.15);color:#ff7a7a;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;">PAST</span>':isToday?'<span style="background:rgba(255,200,80,.15);color:#ffc850;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;">TODAY</span>':'<span style="background:rgba(100,180,255,.15);color:#7ac4ff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;">UPCOMING</span>';
+      const ageBadge=isPast?'<span style="background:rgba(255,77,77,.15);color:#ff7a7a;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;">PAST</span>':isToday?'<span style="background:rgba(255,200,80,.15);color:#ffc850;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;">TODAY</span>':'<span style="background:rgba(100,180,255,.15);color:var(--fire2);font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;">UPCOMING</span>';
       const shapeTag=meatCount>0?'<span style="background:rgba(77,255,136,.15);color:#7ae59a;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;margin-left:4px;">NEW</span>':'';
       html+='<div style="display:flex;align-items:center;gap:6px;padding:8px;border-radius:var(--radius-sm);margin-bottom:4px;background:'+(isPast?'rgba(255,77,77,.04)':'rgba(255,255,255,.03)')+';border:1px solid '+(isPast?'rgba(255,77,77,.12)':'var(--border)')+';"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;">'+esc(day)+' '+ageBadge+shapeTag+'</div><div style="font-size:10px;color:var(--text3);">'+esc(label)+' \u2022 '+itemCount+' item'+(itemCount===1?'':'s')+(meatCount>0?' ('+meatCount+' meats)':'')+'</div></div><button class="sm-btn savedDateLoad" data-date="'+esc(date)+'">Load</button><button class="sm-btn danger savedDateDel" data-date="'+esc(date)+'" data-day="'+esc(day)+'" style="padding:4px 8px;">\u00d7</button></div>';
     });
