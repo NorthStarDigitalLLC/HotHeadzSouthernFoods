@@ -108,6 +108,41 @@
     .tb-btn.signout-btn{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.15);color:var(--text2);font-weight:800;padding:7px 14px;margin-left:4px;}
     .tb-btn.signout-btn:hover{background:rgba(255,77,77,.12);border-color:rgba(255,77,77,.3);color:var(--danger);}
     .main-layout{flex:1;display:flex;min-height:0;overflow:hidden;}
+    /* ── Section rail ──────────────────────────────────────────────
+       Was a 15-button strip across the top that scrolled sideways. The
+       window is far wider than it is tall, so the sections live down the
+       left edge instead and the space either side of the canvas gets used. */
+    .side-rail{width:186px;flex-shrink:0;display:flex;flex-direction:column;gap:2px;padding:8px;
+      border-right:1px solid var(--border);background:var(--surface);overflow-y:auto;}
+    .side-rail .tab-btn{width:100%;text-align:left;justify-content:flex-start;white-space:nowrap;}
+    .tb-actions{margin-left:auto;}
+
+    /* ── Website Editor: full screen, no canvas ────────────────────
+       The menu picture is the Facebook post. It has nothing to do with the
+       website menu, so in this mode the form gets the whole window. */
+    body.mode-site .canvas-panel,
+    body.mode-site .side-panel-left,
+    body.mode-site .mobile-bar,
+    body.mode-site #exportBtn{display:none !important;}
+    body.mode-site .side-panel{width:auto;flex:1;border-left:none;}
+    body.mode-site .side-panel .mpc{display:none;}
+    /* Wide window: run the section's fields in columns instead of one long
+       strip, so the eye travels down a short column rather than a tall one. */
+    body.mode-site .side-scroll{padding:18px 22px;}
+    @media(min-width:1100px){ body.mode-site .side-scroll{column-width:420px;column-gap:26px;} }
+    body.mode-site .side-scroll > *{break-inside:avoid;}
+
+    /* ── Narrow screens / phones ───────────────────────────────────
+       The rail turns back into a scrolling strip; the canvas and panel stack. */
+    @media(max-width:860px){
+      .side-rail{width:100%;flex-direction:row;overflow-x:auto;overflow-y:hidden;gap:4px;padding:6px 8px;
+        border-right:none;border-bottom:1px solid var(--border);}
+      .side-rail .tab-btn{width:auto;}
+      .main-layout{flex-direction:column;}
+      body.mode-site .side-scroll{padding:14px;column-width:auto;}
+      .topbar{flex-wrap:wrap;gap:6px;}
+      .mode-seg{order:-1;}
+    }
     .canvas-panel{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--void);}
     .canvas-toolbar{display:flex;gap:6px;padding:6px 10px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--surface);}
     .ct-btn{padding:5px 10px;border-radius:7px;border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;}
@@ -303,6 +338,10 @@
 
     /* Big tappable cards on the landing page */
     .mob-card{display:flex;align-items:center;gap:14px;width:100%;
+    .mob-group{margin-bottom:22px;}
+    .mob-group-head{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800;color:var(--text);margin-bottom:2px;}
+    .mob-group-head span{font-size:18px;}
+    .mob-group-sub{font-size:12px;color:var(--text3);margin:0 0 12px;line-height:1.45;}
       padding:18px 16px;margin-bottom:12px;border-radius:18px;cursor:pointer;
       background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--text);
       font-family:inherit;text-align:left;transition:all .15s;-webkit-tap-highlight-color:transparent;}
@@ -443,54 +482,65 @@
   <div class="mob-screen mob-active" id="mobScreenHome" data-screen="home">
     <div class="mob-hero">
       <div class="mob-hero-eyebrow">Welcome back</div>
-      <div class="mob-hero-title">What do you want to do?</div>
+      <div class="mob-hero-title">What are you working on?</div>
     </div>
 
-    <button class="mob-card mob-card-primary" data-go="dates">
-      <div class="mob-card-emoji">✨</div>
-      <div class="mob-card-text">
-        <div class="mob-card-title">Set Today's Menu</div>
-        <div class="mob-card-sub">Pick the days, then type and place the menu</div>
-      </div>
-      <div class="mob-card-arrow">›</div>
-    </button>
+    <!-- Same two jobs as the desktop editor, in the same order, so the tool
+         works the same way whichever screen you pick it up on. -->
+    <div class="mob-group">
+      <div class="mob-group-head"><span>🌐</span> Website Editor</div>
+      <p class="mob-group-sub">The menu on hotheadzsouthernfoods.com</p>
+      <button class="mob-card mob-card-primary" data-go="defaults">
+        <div class="mob-card-emoji">🍳</div>
+        <div class="mob-card-text">
+          <div class="mob-card-title">Menu Sections</div>
+          <div class="mob-card-sub">Breakfast, lunch plates, drinks, beer, salad bar, dessert, crawfish, hours</div>
+        </div>
+        <div class="mob-card-arrow">›</div>
+      </button>
+    </div>
 
-    <button class="mob-card" data-go="image">
-      <div class="mob-card-emoji">🖼️</div>
-      <div class="mob-card-text">
-        <div class="mob-card-title">Edit Menu Image</div>
-        <div class="mob-card-sub">Customize text, photo, design</div>
-      </div>
-      <div class="mob-card-arrow">›</div>
-    </button>
+    <div class="mob-group">
+      <div class="mob-group-head"><span>🖼️</span> FB Menu Editor</div>
+      <p class="mob-group-sub">The daily menu picture for Facebook</p>
+      <button class="mob-card" data-go="dates">
+        <div class="mob-card-emoji">🗓</div>
+        <div class="mob-card-text">
+          <div class="mob-card-title">Set Today's Menu</div>
+          <div class="mob-card-sub">Pick the days, then type and place the menu</div>
+        </div>
+        <div class="mob-card-arrow">›</div>
+      </button>
 
-    <button class="mob-card" data-go="projects">
-      <div class="mob-card-emoji">📁</div>
-      <div class="mob-card-text">
-        <div class="mob-card-title">My Projects</div>
-        <div class="mob-card-sub">Saved menus, cloud sync</div>
-      </div>
-      <div class="mob-card-arrow">›</div>
-    </button>
+      <button class="mob-card" data-go="image">
+        <div class="mob-card-emoji">✍️</div>
+        <div class="mob-card-text">
+          <div class="mob-card-title">Edit Menu Image</div>
+          <div class="mob-card-sub">Text, photo, fonts and layout</div>
+        </div>
+        <div class="mob-card-arrow">›</div>
+      </button>
 
-    <button class="mob-card" data-go="defaults">
-      <div class="mob-card-emoji">⚙️</div>
-      <div class="mob-card-text">
-        <div class="mob-card-title">Menu Defaults</div>
-        <div class="mob-card-sub">Breakfast, drinks, hours, settings</div>
-      </div>
-      <div class="mob-card-arrow">›</div>
-    </button>
+      <button class="mob-card" data-go="projects">
+        <div class="mob-card-emoji">📁</div>
+        <div class="mob-card-text">
+          <div class="mob-card-title">My Projects</div>
+          <div class="mob-card-sub">Saved menus, cloud sync</div>
+        </div>
+        <div class="mob-card-arrow">›</div>
+      </button>
 
-    <button class="mob-card mob-card-export" id="mobFullEditorBtn" style="margin-top:18px;">
-      <div class="mob-card-emoji">🎨</div>
-      <div class="mob-card-text">
-        <div class="mob-card-title">Full Design Editor</div>
-        <div class="mob-card-sub">Drag, resize &amp; position text right on the menu image</div>
-      </div>
-      <div class="mob-card-arrow">›</div>
-    </button>
-    <div class="mob-hero-eyebrow" style="margin-top:12px;text-align:center;opacity:.45;">Tip: turn your phone sideways for more room.</div>
+      <button class="mob-card mob-card-export" id="mobFullEditorBtn">
+        <div class="mob-card-emoji">🎨</div>
+        <div class="mob-card-text">
+          <div class="mob-card-title">Full Design Editor</div>
+          <div class="mob-card-sub">Drag, resize &amp; position text right on the menu image</div>
+        </div>
+        <div class="mob-card-arrow">›</div>
+      </button>
+    </div>
+
+    <div class="mob-hero-eyebrow" style="margin-top:12px;text-align:center;opacity:.45;">Tip: turn your phone sideways for more room</div>
   </div>
 
   <!-- CHOOSE DATES screen -->
@@ -653,7 +703,14 @@
       <button class="mode-seg-btn" data-pick="fb" type="button" role="tab">🖼️ FB Menu</button>
     </div>
     <div class="topbar-sep"></div>
-    <div class="topbar-tabs">
+    <div class="tb-actions">      <button class="tb-btn undo" id="undoBtn" title="Undo">↩</button>
+      <button class="tb-btn undo" id="redoBtn" title="Redo">↪</button>
+      <button class="tb-btn export-btn" id="exportBtn">Export ↓</button>
+      <button class="tb-btn signout-btn" id="signOutBtn">Sign Out ←</button>
+    </div>
+  </div>
+  <div class="main-layout">
+    <nav class="side-rail" id="sideRail" aria-label="Sections">
       <button class="tab-btn active" data-mode="fb" data-tab="quickfill">⚡ FB Menu</button>
       <button class="tab-btn" data-mode="fb" data-tab="textboxes">Text Boxes</button>
       <button class="tab-btn" data-mode="fb" data-tab="photo">Photo</button>
@@ -671,14 +728,7 @@
       <button class="tab-btn static-tab" data-mode="site" data-tab="static-samedaily">📅 Same Daily</button>
       <button class="tab-btn static-tab" data-mode="site" data-tab="static-hours">🕒 Hours</button>
       <button class="tab-btn static-tab" data-mode="site" data-tab="static-settings">⚙ Settings</button>
-    </div>
-    <div class="tb-actions">      <button class="tb-btn undo" id="undoBtn" title="Undo">↩</button>
-      <button class="tb-btn undo" id="redoBtn" title="Redo">↪</button>
-      <button class="tb-btn export-btn" id="exportBtn">Export ↓</button>
-      <button class="tb-btn signout-btn" id="signOutBtn">Sign Out ←</button>
-    </div>
-  </div>
-  <div class="main-layout">
+    </nav>
     <!-- LEFT side panel — only visible when the Daily Board tab is active, hosts the Lunch editor -->
     <div class="side-panel side-panel-left" id="sidePanelLeft" style="display:none;border-left:none;border-right:1px solid var(--border);">
       <div class="mpc"><span class="mpc-title">Lunch Editor</span><button class="mpc-btn" id="closeSidePanelLeft">Done</button></div>
@@ -897,6 +947,8 @@ function setEditorMode(mode){
   document.querySelectorAll('.topbar-tabs .topbar-sep').forEach(function(s){ s.style.display='none'; });
   var pick = document.getElementById('modePick');
   if(pick) pick.classList.add('hidden');
+  document.body.classList.toggle('mode-site', mode === 'site');
+  document.body.classList.toggle('mode-fb', mode === 'fb');
   // Keep the top-bar switcher showing where you are.
   document.querySelectorAll('.mode-seg-btn').forEach(function(b){
     var on = b.dataset.pick === mode;
