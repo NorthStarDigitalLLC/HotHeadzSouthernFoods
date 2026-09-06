@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Post Today's Lunch — Hot Headz</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#141013; --card:#1E1719; --line:rgba(255,255,255,.10);
+  --ink:#FFF3E8; --mid:#B49C90; --dim:#7A6659;
+  --hot:#FF6B1A; --hot-2:#E5391A; --green:#2FBF71; --red:#E5293E; --amber:#E8A830;
+  --disp:'Bebas Neue',Impact,sans-serif; --body:'DM Sans',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--disp);font-weight:400;letter-spacing:.02em;margin:0;line-height:1}
+.wrap{width:min(720px,94vw);margin:0 auto;padding:22px 0 60px}
+
+.top{display:flex;align-items:center;gap:12px;padding:16px 0 20px;border-bottom:1px solid var(--line);margin-bottom:22px}
+.logo{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,var(--hot),var(--hot-2));display:grid;place-items:center;font-family:var(--disp);font-size:19px;color:#fff;flex:0 0 auto}
+.top h1{font-size:25px}
+.top small{display:block;font-family:var(--body);font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-top:3px}
+.top .spacer{flex:1}
+.link{font-size:13px;font-weight:700;color:var(--mid)}
+
+/* status banner — stays put until it is dealt with */
+.banner{border-radius:14px;padding:16px 18px;margin-bottom:20px;border:1px solid var(--line);display:none}
+.banner.show{display:block}
+.banner b{display:block;font-size:15px;margin-bottom:4px}
+.banner.ok{background:rgba(47,191,113,.11);border-color:rgba(47,191,113,.4)}
+.banner.ok b{color:var(--green)}
+.banner.bad{background:rgba(229,41,62,.11);border-color:rgba(229,41,62,.45)}
+.banner.bad b{color:var(--red)}
+.banner.warn{background:rgba(232,168,48,.11);border-color:rgba(232,168,48,.42)}
+.banner.warn b{color:var(--amber)}
+.banner p{margin:0;font-size:14px;color:var(--mid)}
+.banner .acts{margin-top:12px;display:flex;gap:9px;flex-wrap:wrap}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
+.card h2{font-size:22px;margin-bottom:4px}
+.card .hint{font-size:13px;color:var(--dim);margin-bottom:14px}
+
+label{display:block;font-size:12px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--mid);margin-bottom:8px}
+input,textarea,select{
+  width:100%;padding:15px 16px;border-radius:12px;border:1px solid var(--line);
+  background:rgba(255,255,255,.05);color:var(--ink);font-family:inherit;font-size:16px;
+}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--hot);background:rgba(255,255,255,.08)}
+textarea{min-height:150px;resize:vertical;line-height:1.7}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row>*{flex:1;min-width:150px}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:16px 24px;
+  border-radius:13px;font-weight:800;font-size:16px;border:none;cursor:pointer;font-family:inherit;
+  transition:transform .15s,filter .2s;
+}
+.btn:active{transform:scale(.985)}
+.btn-go{background:linear-gradient(135deg,var(--hot),var(--hot-2));color:#fff;width:100%;font-size:18px;padding:19px;box-shadow:0 10px 30px rgba(255,107,26,.28)}
+.btn-go:disabled{opacity:.55;cursor:not-allowed;box-shadow:none}
+.btn-sm{padding:10px 16px;font-size:14px;background:rgba(255,255,255,.09);color:var(--ink)}
+
+.count{font-size:12px;color:var(--dim);margin-top:7px}
+.live{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--mid);margin-bottom:18px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--dim)}
+.dot.on{background:var(--green);box-shadow:0 0 10px var(--green)}
+.dot.off{background:var(--amber);box-shadow:0 0 10px var(--amber)}
+
+/* pin gate */
+.gate{position:fixed;inset:0;background:var(--bg);display:grid;place-items:center;z-index:50;padding:24px}
+.gate.hide{display:none}
+.gate-in{width:min(380px,92vw);text-align:center}
+.gate h2{font-size:30px;margin-bottom:6px}
+.gate p{color:var(--mid);font-size:14px;margin:0 0 22px}
+.pin{letter-spacing:.5em;text-align:center;font-size:26px;font-family:var(--disp)}
+.gate-err{color:var(--red);font-size:13.5px;font-weight:700;margin-top:12px;min-height:20px}
+</style>
+</head>
+<body>
+
+<!-- ══ PIN GATE ══ -->
+<div class="gate" id="gate">
+  <div class="gate-in">
+    <div class="logo" style="margin:0 auto 16px">HH</div>
+    <h2>POST TODAY'S LUNCH</h2>
+    <p>Enter the staff PIN to continue.</p>
+    <input class="pin" id="pinInput" type="password" inputmode="numeric" autocomplete="off" placeholder="••••••" aria-label="Staff PIN">
+    <div class="gate-err" id="pinErr"></div>
+    <button class="btn btn-go" id="pinBtn" style="margin-top:8px">Unlock</button>
+    <p style="margin-top:18px"><a class="link" href="/menu">View the public menu</a></p>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div class="wrap" id="app" hidden>
+
+  <div class="top">
+    <div class="logo">HH</div>
+    <div>
+      <h1>Post Today's Lunch</h1>
+      <small>Hot Headz Southern Foods</small>
+    </div>
+    <div class="spacer"></div>
+    <a class="link" href="/editor">Full editor →</a>
+  </div>
+
+  <div class="banner" id="banner" role="status" aria-live="polite"></div>
+
+  <div class="live"><span class="dot" id="liveDot"></span><span id="liveTxt">Checking what's live…</span></div>
+
+  <div class="card">
+    <h2>THE DAY</h2>
+    <p class="hint">Defaults to today. Change it only if you're posting ahead.</p>
+    <div class="row">
+      <div>
+        <label for="dateIn">Date</label>
+        <input id="dateIn" type="date">
+      </div>
+      <div style="flex:0 0 auto;display:flex;align-items:flex-end">
+        <button class="btn btn-sm" id="todayBtn" type="button">Use today</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>MEATS</h2>
+    <p class="hint">One per line. Add a description after a <b>|</b> if you want one — otherwise just the name.</p>
+    <label for="meatsIn" class="sr-only" style="position:absolute;left:-9999px">Meats</label>
+    <textarea id="meatsIn" placeholder="Fried Fish | Golden-fried with a crispy, seasoned coating&#10;Smoked Chicken&#10;Red Beans &amp; Rice"></textarea>
+    <div class="count" id="meatsCount">0 meats</div>
+  </div>
+
+  <div class="card">
+    <h2>SIDES</h2>
+    <p class="hint">One per line, same idea.</p>
+    <label for="sidesIn" class="sr-only" style="position:absolute;left:-9999px">Sides</label>
+    <textarea id="sidesIn" placeholder="Cabbage&#10;Greens&#10;Tomatoes &amp; Okra&#10;Mac &amp; Cheese"></textarea>
+    <div class="count" id="sidesCount">0 sides</div>
+  </div>
+
+  <div class="card">
+    <h2>EXTRAS</h2>
+    <div class="row">
+      <div>
+        <label for="crawfishIn">Crawfish today?</label>
+        <select id="crawfishIn"><option value="no">No</option><option value="yes">Yes — show crawfish</option></select>
+      </div>
+      <div>
+        <label for="dessertIn">Dessert (optional)</label>
+        <input id="dessertIn" placeholder="Banana Pudding">
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-go" id="goBtn">Publish To The Website</button>
+  <p class="count" style="text-align:center;margin-top:12px">Publishing replaces whatever is showing for that date.</p>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var PIN_HASH='77334823791bea53e508ba59387c1287c8da962026769657b4686756db4b7bc8';
+  var $=function(id){return document.getElementById(id);};
+
+  /* ── pin ─────────────────────────────────────────────── */
+  async function hashPin(pin){
+    var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pin));
+    return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+  }
+  function getPin(){ try{ return sessionStorage.getItem('hhPin')||''; }catch(e){ return ''; } }
+  function setPin(p){ try{ sessionStorage.setItem('hhPin',p); }catch(e){} }
+
+  function openApp(){ $('gate').classList.add('hide'); $('app').hidden=false; init(); }
+
+  async function tryUnlock(){
+    var v=($('pinInput').value||'').trim();
+    if(!v){ $('pinErr').textContent='Enter the PIN.'; return; }
+    var h=await hashPin(v);
+    if(h!==PIN_HASH){ $('pinErr').textContent='That PIN is not right.'; $('pinInput').value=''; return; }
+    setPin(v); $('pinErr').textContent=''; openApp();
+  }
+  $('pinBtn').addEventListener('click',tryUnlock);
+  $('pinInput').addEventListener('keydown',function(e){ if(e.key==='Enter') tryUnlock(); });
+
+  // Already unlocked this session? Go straight in.
+  if(getPin()) openApp();
+
+  /* ── banner: stays until dealt with, unlike a toast ──── */
+  function banner(kind,title,msg,actions){
+    var b=$('banner');
+    b.className='banner show '+kind;
+    var html='<b>'+title+'</b><p>'+msg+'</p>';
+    if(actions&&actions.length){
+      html+='<div class="acts">'+actions.map(function(a,i){
+        return '<button class="btn btn-sm" data-act="'+i+'">'+a.label+'</button>';
+      }).join('')+'</div>';
+    }
+    b.innerHTML=html;
+    if(actions){
+      actions.forEach(function(a,i){
+        var el=b.querySelector('[data-act="'+i+'"]');
+        if(el) el.addEventListener('click',a.fn);
+      });
+    }
+    b.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+  function clearBanner(){ $('banner').className='banner'; $('banner').innerHTML=''; }
+
+  /* ── parsing ─────────────────────────────────────────── */
+  function parseLines(text){
+    return String(text||'').split('\n').map(function(l){return l.trim();}).filter(Boolean).map(function(line){
+      var p=line.split('|');
+      return { name:(p[0]||'').trim(), desc:p.slice(1).join('|').trim() };
+    }).filter(function(i){return i.name;});
+  }
+  function todayISO(){
+    var d=new Date();
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+
+  function counts(){
+    $('meatsCount').textContent=parseLines($('meatsIn').value).length+' meats';
+    $('sidesCount').textContent=parseLines($('sidesIn').value).length+' sides';
+  }
+
+  /* ── what is live right now ──────────────────────────── */
+  async function refreshLive(){
+    var date=$('dateIn').value||todayISO();
+    try{
+      var r=await fetch('/api/menu-read',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({table:'lunch_dates',limit:100})});
+      var j=await r.json();
+      var rows=(j&&j.rows)||[];
+      var hit=rows.filter(function(x){return x.lunch_date===date;})[0];
+      if(hit){
+        var m=((hit.data||{}).lunch||{}).meats||[];
+        var s=((hit.data||{}).lunch||{}).sides||[];
+        $('liveDot').className='dot on';
+        $('liveTxt').textContent='Posted for '+date+' — '+m.length+' meats, '+s.length+' sides.';
+        // Prefill so an edit is a tweak, not a retype.
+        if(!$('meatsIn').value && m.length) $('meatsIn').value=m.map(fmt).join('\n');
+        if(!$('sidesIn').value && s.length) $('sidesIn').value=s.map(fmt).join('\n');
+        counts();
+      }else{
+        $('liveDot').className='dot off';
+        $('liveTxt').textContent='Nothing posted for '+date+' yet.';
+      }
+    }catch(e){
+      $('liveDot').className='dot';
+      $('liveTxt').textContent='Could not check what is live.';
+    }
+  }
+  function fmt(i){ return i.desc ? (i.name+' | '+i.desc) : i.name; }
+
+  /* ── publish ─────────────────────────────────────────── */
+  async function publish(){
+    clearBanner();
+    var date=$('dateIn').value||todayISO();
+    var meats=parseLines($('meatsIn').value);
+    var sides=parseLines($('sidesIn').value);
+
+    if(!meats.length){
+      banner('bad','Add at least one meat','A lunch post needs meats before it can go on the website.');
+      $('meatsIn').focus(); return;
+    }
+
+    var dessertName=($('dessertIn').value||'').trim();
+    var payload={
+      lunch:{
+        show:true,
+        meats:meats,
+        sides:sides,
+        sameDaily:[],                     // empty = fall back to the global Same Daily list
+        items:[].concat(meats,sides)      // flattened copy, for the older reader path
+      },
+      dessert:{ items: dessertName ? [{name:dessertName,desc:''}] : [] },
+      crawfish:{ show: $('crawfishIn').value==='yes' }
+    };
+
+    var btn=$('goBtn');
+    btn.disabled=true; btn.textContent='Publishing…';
+
+    try{
+      var r=await fetch('/api/menu-save',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ pin:getPin(), op:'upsert', table:'lunch_dates',
+          row:{ lunch_date:date, data:payload, saved_by:'Hot Headz staff' } })});
+      var txt=await r.text();
+      var body=null; try{ body=txt?JSON.parse(txt):null; }catch(e){}
+
+      if(r.status===403){
+        // The single most common real failure: the phone dropped the tab and
+        // sessionStorage went with it. That is not a wrong PIN, so do not say so.
+        try{ sessionStorage.removeItem('hhPin'); }catch(e){}
+        banner('warn','Your sign-in expired','Nothing was lost — your menu is still typed in below. Enter the PIN again and it will publish.',
+          [{label:'Enter PIN', fn:function(){
+              $('gate').classList.remove('hide');
+              $('pinInput').value=''; $('pinInput').focus();
+              $('pinErr').textContent='';
+              // After unlocking, come straight back and finish the publish.
+              var once=setInterval(function(){ if(getPin()){ clearInterval(once); publish(); } },400);
+          }}]);
+        return;
+      }
+      if(!r.ok){
+        banner('bad','It did not publish',(body&&body.error)||('The website returned '+r.status+'.')+' Nothing was changed.',
+          [{label:'Try again', fn:publish}]);
+        return;
+      }
+
+      banner('ok','Published','Today\'s lunch is live on the website — '+meats.length+' meats and '+sides.length+' sides.',
+        [{label:'View the menu', fn:function(){ location.href='/menu'; }}]);
+      refreshLive();
+    }catch(e){
+      banner('bad','It did not publish','Could not reach the website ('+e.message+'). Nothing was changed — check your signal and try again.',
+        [{label:'Try again', fn:publish}]);
+    }finally{
+      btn.disabled=false; btn.textContent='Publish To The Website';
+    }
+  }
+
+  /* ── init ────────────────────────────────────────────── */
+  function init(){
+    if(init.done) return; init.done=true;
+    $('dateIn').value=todayISO();
+    $('todayBtn').addEventListener('click',function(){ $('dateIn').value=todayISO(); refreshLive(); });
+    $('dateIn').addEventListener('change',refreshLive);
+    $('meatsIn').addEventListener('input',counts);
+    $('sidesIn').addEventListener('input',counts);
+    $('goBtn').addEventListener('click',publish);
+    counts();
+    refreshLive();
+  }
+})();
+</script>
+</body>
+</html>
