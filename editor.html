@@ -685,6 +685,9 @@
     <button class="mob-card mob-card-sm" data-def-tab="static-lunchplates">
       <div class="mob-card-emoji">💵</div><div class="mob-card-text"><div class="mob-card-title">Lunch Plates &amp; Pricing</div></div><div class="mob-card-arrow">›</div>
     </button>
+    <button class="mob-card mob-card-sm" data-def-tab="static-todaylunch">
+      <div class="mob-card-emoji">🍽</div><div class="mob-card-text"><div class="mob-card-title">Today's Lunch — Meats &amp; Sides</div></div><div class="mob-card-arrow">›</div>
+    </button>
     <button class="mob-card mob-card-sm" data-def-tab="static-drinks">
       <div class="mob-card-emoji">🥤</div><div class="mob-card-text"><div class="mob-card-title">Drinks</div></div><div class="mob-card-arrow">›</div>
     </button>
@@ -764,6 +767,7 @@
       <div class="topbar-sep" style="margin:0 4px;"></div>
       <button class="tab-btn static-tab" data-mode="site" data-tab="static-breakfast">🍳 Breakfast</button>
       <button class="tab-btn static-tab" data-mode="site" data-tab="static-lunchplates">💵 Lunch Plates</button>
+      <button class="tab-btn static-tab" data-mode="site" data-tab="static-todaylunch">🍽 Today's Lunch</button>
       <button class="tab-btn static-tab" data-mode="site" data-tab="static-drinks">🥤 Drinks</button>
       <button class="tab-btn static-tab" data-mode="site" data-tab="static-beer">🍺 Beer</button>
       <button class="tab-btn static-tab" data-mode="site" data-tab="static-salad">🥗 Salad Bar</button>
@@ -1709,7 +1713,7 @@ function dateOffsetAdj(n){
 function statusPillHTML(){if(menuDefaultsStatus==='loading')return '<span class="status-pill loading">Loading…</span>';if(menuDefaultsStatus==='loaded')return '<span class="status-pill loaded">Loaded from cloud</span>';if(menuDefaultsStatus==='error')return '<span class="status-pill error">Cloud error</span>';return '';}
 
 function buildStaticBreakfast(){var d=menuDefaultsCache?.breakfast||{subtitle:'',plates:[],items:[]};var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83c\udf73 Breakfast</span>'+statusPillHTML()+'</div><div class="acc-body">';h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Edit the breakfast menu shown on the public website.</p>';h+='<div class="static-card"><div class="static-card-title">Subtitle</div><input class="fi" id="bkSub" value="'+esc(d.subtitle||'')+'" placeholder="(Same Daily – Served at opening)"></div>';h+='<div class="static-card"><div class="static-card-title">Plates & Pricing (one per line)</div><textarea class="fi fi-ta" id="bkPlates" rows="4" placeholder="Breakfast Plate – $9.99 (1 Meat)">'+esc((d.plates||[]).join('\n'))+'</textarea></div>';h+='<div class="static-card"><div class="static-card-title">Breakfast Items (one per line)</div><textarea class="fi fi-ta" id="bkItems" rows="14" placeholder="Scrambled Eggs">'+esc((d.items||[]).join('\n'))+'</textarea></div>';h+='<div class="btn-row"><button class="sm-btn success" id="bkSave">\ud83d\udcbe Save Breakfast</button><button class="sm-btn" id="bkReload">\ud83d\udd04 Reload</button><button class="sm-btn danger" id="bkReset">\u21ba Reset</button></div></div></div>';return h;}
-function buildStaticLunchPlates(){var d=menuDefaultsCache?.lunch||{subtitle:'',plates:[]};var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83d\udcb5 Lunch Plates & Pricing</span>'+statusPillHTML()+'</div><div class="acc-body">';h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">The lunch plate prices. Daily lunch ITEMS are in the Lunch Forecast tab.</p>';h+='<div class="static-card"><div class="static-card-title">Subtitle</div><input class="fi" id="lpSub" value="'+esc(d.subtitle||'')+'" placeholder="(Changes Daily)"></div>';h+='<div class="static-card"><div class="static-card-title">Plates & Pricing (one per line)</div><textarea class="fi fi-ta" id="lpPlates" rows="8" placeholder="Lunch Plate – $12.99 (1 Meat, 2 Sides)">'+esc((d.plates||[]).join('\n'))+'</textarea></div>';h+='<div class="btn-row"><button class="sm-btn success" id="lpSave">\ud83d\udcbe Save</button><button class="sm-btn" id="lpReload">\ud83d\udd04 Reload</button><button class="sm-btn danger" id="lpReset">\u21ba Reset</button></div></div></div>';return h;}
+function buildStaticLunchPlates(){var d=menuDefaultsCache?.lunch||{subtitle:'',plates:[]};var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83d\udcb5 Lunch Plates & Pricing</span>'+statusPillHTML()+'</div><div class="acc-body">';h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">The lunch plate <b>prices</b>, which rarely change. Today\'s <b>meats and sides</b> are in the <b>🍽 Today\'s Lunch</b> tab.</p>';h+='<div class="static-card"><div class="static-card-title">Subtitle</div><input class="fi" id="lpSub" value="'+esc(d.subtitle||'')+'" placeholder="(Changes Daily)"></div>';h+='<div class="static-card"><div class="static-card-title">Plates & Pricing (one per line)</div><textarea class="fi fi-ta" id="lpPlates" rows="8" placeholder="Lunch Plate – $12.99 (1 Meat, 2 Sides)">'+esc((d.plates||[]).join('\n'))+'</textarea></div>';h+='<div class="btn-row"><button class="sm-btn success" id="lpSave">\ud83d\udcbe Save</button><button class="sm-btn" id="lpReload">\ud83d\udd04 Reload</button><button class="sm-btn danger" id="lpReset">\u21ba Reset</button></div></div></div>';return h;}
 function buildStaticDrinks(){var d=menuDefaultsCache?.drinks||{items:[]};var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83e\udd64 Drinks</span>'+statusPillHTML()+'</div><div class="acc-body">';h+='<div class="static-card"><div class="static-card-title">Drinks (one per line)</div><textarea class="fi fi-ta" id="drItems" rows="12">'+esc((d.items||[]).join('\n'))+'</textarea></div>';h+='<div class="btn-row"><button class="sm-btn success" id="drSave">\ud83d\udcbe Save</button><button class="sm-btn" id="drReload">\ud83d\udd04 Reload</button><button class="sm-btn danger" id="drReset">\u21ba Reset</button></div></div></div>';return h;}
 function buildStaticBeer(){var d=menuDefaultsCache?.beer||[];var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83c\udf7a Beer</span>'+statusPillHTML()+'</div><div class="acc-body">';h+='<div class="static-card"><div class="static-card-title">Beer (one per line)</div><textarea class="fi fi-ta" id="beItems" rows="10">'+esc(d.join('\n'))+'</textarea></div>';h+='<div class="btn-row"><button class="sm-btn success" id="beSave">\ud83d\udcbe Save</button><button class="sm-btn" id="beReload">\ud83d\udd04 Reload</button><button class="sm-btn danger" id="beReset">\u21ba Reset</button></div></div></div>';return h;}
 function buildStaticSalad(){var d=menuDefaultsCache?.salad||{subtitle:'',items:[],saladBar:{lettuce:[],toppings:[],dressing:[]}};var sb=d.saladBar||{};var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83e\udd57 Salad Bar</span>'+statusPillHTML()+'</div><div class="acc-body">';h+='<div class="static-card"><div class="static-card-title">Subtitle</div><input class="fi" id="sdSub" value="'+esc(d.subtitle||'')+'"></div>';h+='<div class="static-card"><div class="static-card-title">Pricing (one per line)</div><textarea class="fi fi-ta" id="sdItems" rows="3">'+esc((d.items||[]).join('\n'))+'</textarea></div>';h+='<div class="static-card"><div class="static-card-title">Lettuce</div><textarea class="fi fi-ta" id="sdLettuce" rows="3">'+esc((sb.lettuce||[]).join('\n'))+'</textarea></div>';h+='<div class="static-card"><div class="static-card-title">Toppings</div><textarea class="fi fi-ta" id="sdToppings" rows="10">'+esc((sb.toppings||[]).join('\n'))+'</textarea></div>';h+='<div class="static-card"><div class="static-card-title">Dressings</div><textarea class="fi fi-ta" id="sdDressing" rows="5">'+esc((sb.dressing||[]).join('\n'))+'</textarea></div>';h+='<div class="btn-row"><button class="sm-btn success" id="sdSave">\ud83d\udcbe Save</button><button class="sm-btn" id="sdReload">\ud83d\udd04 Reload</button><button class="sm-btn danger" id="sdReset">\u21ba Reset</button></div></div></div>';return h;}
@@ -1717,6 +1721,65 @@ function buildStaticDessert(){var d=menuDefaultsCache?.dessert||{subtitle:'',ite
 function buildStaticCrawfish(){var d=menuDefaultsCache?.crawfish||{subtitle:'',items:[]};var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">\u25b6</span><span class="acc-title">\ud83e\udd9e Crawfish</span>'+statusPillHTML()+'</div><div class="acc-body">';h+='<div class="static-card"><div class="static-card-title">Subtitle</div><input class="fi" id="cfSub" value="'+esc(d.subtitle||'')+'"></div>';h+='<div class="static-card"><div class="static-card-title">Details (one per line)</div><textarea class="fi fi-ta" id="cfItems" rows="6">'+esc((d.items||[]).join('\n'))+'</textarea></div>';h+='<div class="btn-row"><button class="sm-btn success" id="cfSave">\ud83d\udcbe Save</button><button class="sm-btn" id="cfReload">\ud83d\udd04 Reload</button><button class="sm-btn danger" id="cfReset">\u21ba Reset</button></div></div></div>';return h;}
 
 /* ═══ NEW: Same Daily global tab ═══ */
+/* ── TODAY'S LUNCH ────────────────────────────────────────────────────────
+   The one thing on this site that changes every day, and until now the only
+   thing with nowhere to type it in the Website editor. Everything else here
+   writes a key into menu_defaults; this writes a dated row into lunch_dates,
+   which is what menu.html looks up for "today". Shape must stay
+   {lunch:{show,meats,sides,sameDaily,items}} — menu.html prefers meats/sides,
+   falls back to items, and pulls sameDaily from the global list when the day
+   carries no override. */
+var todayLunchDate = null;      // yyyy-mm-dd currently being edited
+var todayLunchCache = null;     // the row for that date, or null if none
+var todayLunchStatus = 'idle';  // idle | loading | ready | error
+
+function tlToday(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function tlFmt(i){return i&&i.desc?(i.name+' | '+i.desc):((i&&i.name)||'');}
+function tlParse(text){
+  return String(text||'').split('\n').map(function(l){return l.trim();}).filter(Boolean).map(function(line){
+    var p=line.split('|');
+    return {name:(p[0]||'').trim(),desc:p.slice(1).join('|').trim()};
+  }).filter(function(i){return i.name;});
+}
+
+async function loadTodayLunch(date,force){
+  if(todayLunchStatus==='loading') return;
+  if(!force && todayLunchDate===date && todayLunchStatus==='ready') return;
+  todayLunchDate=date; todayLunchStatus='loading';
+  try{
+    var rows=await sbGet('lunch_dates?select=lunch_date,data,updated_at');
+    todayLunchCache=(Array.isArray(rows)?rows:[]).filter(function(r){return r.lunch_date===date;})[0]||null;
+    todayLunchStatus='ready';
+  }catch(e){ todayLunchCache=null; todayLunchStatus='error'; }
+  rebuildSidePanel();
+}
+
+function buildStaticTodayLunch(){
+  var date=todayLunchDate||tlToday();
+  var lunch=(todayLunchCache&&todayLunchCache.data&&todayLunchCache.data.lunch)||null;
+  var meats=(lunch&&lunch.meats)||[];
+  var sides=(lunch&&lunch.sides)||[];
+  var dessert=((todayLunchCache&&todayLunchCache.data&&todayLunchCache.data.dessert&&todayLunchCache.data.dessert.items)||[])[0];
+  var crawfish=!!(todayLunchCache&&todayLunchCache.data&&todayLunchCache.data.crawfish&&todayLunchCache.data.crawfish.show);
+
+  var pill = todayLunchStatus==='loading' ? '<span class="status-pill">Loading…</span>'
+           : todayLunchStatus==='error'   ? '<span class="status-pill" style="color:#ff8080">Could not load</span>'
+           : todayLunchCache ? '<span class="status-pill" style="color:#7CE6A8">Posted for '+esc(date)+'</span>'
+           : '<span class="status-pill" style="color:#E8A830">Not posted yet</span>';
+
+  var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">▶</span><span class="acc-title">🍽 Today\'s Lunch</span>'+pill+'</div><div class="acc-body">';
+  h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">The meats and sides for one day. This is what shows under <b>Lunch</b> on the website. One per line — add a description after a <b>|</b> if you want one.</p>';
+  h+='<div class="static-card"><div class="static-card-title">Date</div><div style="display:flex;gap:8px"><input class="fi" id="tlDate" type="date" value="'+esc(date)+'" style="flex:1"><button class="sm-btn" id="tlToday">Today</button></div></div>';
+  h+='<div class="static-card"><div class="static-card-title">Meats ('+meats.length+')</div><textarea class="fi fi-ta" id="tlMeats" rows="6" placeholder="Fried Fish | Golden-fried with a crispy coating\nSmoked Chicken\nRed Beans &amp; Rice">'+esc(meats.map(tlFmt).join('\n'))+'</textarea></div>';
+  h+='<div class="static-card"><div class="static-card-title">Sides ('+sides.length+')</div><textarea class="fi fi-ta" id="tlSides" rows="8" placeholder="Cabbage\nGreens\nTomatoes &amp; Okra\nMac &amp; Cheese">'+esc(sides.map(tlFmt).join('\n'))+'</textarea></div>';
+  h+='<div class="static-card"><div class="static-card-title">Dessert today (optional)</div><input class="fi" id="tlDessert" value="'+esc(dessert?dessert.name:'')+'" placeholder="Banana Pudding"></div>';
+  h+='<div class="static-card"><div class="static-card-title">Crawfish</div><label style="display:flex;gap:9px;align-items:center;font-size:13px;cursor:pointer"><input type="checkbox" id="tlCrawfish"'+(crawfish?' checked':'')+'> Show crawfish on the site today</label></div>';
+  h+='<div class="btn-row"><button class="sm-btn success" id="tlSave">💾 Publish To Website</button><button class="sm-btn" id="tlReload">🔄 Reload</button></div>';
+  h+='<p style="font-size:11.5px;color:var(--text2);margin-top:10px;line-height:1.5;">Publishing replaces whatever is showing for that date. There is also a phone-sized version of this screen at <b>/today</b>.</p>';
+  h+='</div></div>';
+  return h;
+}
+
 function buildStaticSameDaily(){
   var d = menuDefaultsCache?.sameDaily || { items:[] };
   var items = d.items || [];
@@ -1750,6 +1813,36 @@ async function wireStaticPanel(){
   // LUNCH PLATES
   var lpSave=document.getElementById('lpSave');
   if(lpSave){lpSave.addEventListener('click',async()=>{var data={subtitle:(document.getElementById('lpSub').value||'').trim(),plates:linesTo(document.getElementById('lpPlates').value)};if(await saveMenuDefaultKey('lunch',data))rebuildSidePanel();});document.getElementById('lpReload').addEventListener('click',async()=>{await loadMenuDefaults(true);rebuildSidePanel();});document.getElementById('lpReset').addEventListener('click',async()=>{if(await resetMenuDefaultKey('lunch'))rebuildSidePanel();});}
+  // TODAY'S LUNCH — writes a dated row into lunch_dates, not a menu_defaults key
+  var tlSave=document.getElementById('tlSave');
+  if(tlSave){
+    var tlDateEl=document.getElementById('tlDate');
+    tlDateEl.addEventListener('change',function(){ loadTodayLunch(tlDateEl.value||tlToday(),true); });
+    document.getElementById('tlToday').addEventListener('click',function(){ loadTodayLunch(tlToday(),true); });
+    document.getElementById('tlReload').addEventListener('click',function(){ loadTodayLunch(tlDateEl.value||tlToday(),true); });
+    tlSave.addEventListener('click',async function(){
+      var date=tlDateEl.value||tlToday();
+      var meats=tlParse(document.getElementById('tlMeats').value);
+      var sides=tlParse(document.getElementById('tlSides').value);
+      if(!meats.length){ toast('Add at least one meat before publishing','error'); return; }
+      var dessertName=(document.getElementById('tlDessert').value||'').trim();
+      var data={
+        lunch:{ show:true, meats:meats, sides:sides,
+                sameDaily:[],                    // empty = use the global Same Daily list
+                items:[].concat(meats,sides) },  // flattened, for the older reader path
+        dessert:{ items: dessertName?[{name:dessertName,desc:''}]:[] },
+        crawfish:{ show: !!document.getElementById('tlCrawfish').checked }
+      };
+      try{
+        await cloudWrite('upsert','lunch_dates',{row:{lunch_date:date,data:data,saved_by:getCloudName()||'Hot Headz staff'}});
+        toast('Published — '+meats.length+' meats, '+sides.length+' sides live for '+date,'success');
+        loadTodayLunch(date,true);
+      }catch(e){
+        // cloudWrite already turns a 403 into a plain-English expired-session message.
+        toast(e.message,'error');
+      }
+    });
+  }
   // DRINKS
   var drSave=document.getElementById('drSave');
   if(drSave){drSave.addEventListener('click',async()=>{var data={items:linesTo(document.getElementById('drItems').value)};if(await saveMenuDefaultKey('drinks',data))rebuildSidePanel();});document.getElementById('drReload').addEventListener('click',async()=>{await loadMenuDefaults(true);rebuildSidePanel();});document.getElementById('drReset').addEventListener('click',async()=>{if(await resetMenuDefaultKey('drinks'))rebuildSidePanel();});}
@@ -1954,6 +2047,13 @@ function rebuildSidePanel(){
   else if (currentTab==='board')       { c.innerHTML=buildBoardTab(); wireBoardTab(); return; }
   else if (currentTab==='static-breakfast') { c.innerHTML=buildStaticBreakfast(); wireStaticPanel(); wireSiteTools(); return; }
   else if (currentTab==='static-lunchplates') { c.innerHTML=buildStaticLunchPlates(); wireStaticPanel(); wireSiteTools(); return; }
+  else if (currentTab==='static-todaylunch') {
+    c.innerHTML=buildStaticTodayLunch(); wireStaticPanel(); wireSiteTools();
+    // First open (or a date with nothing cached) needs the row fetched; the
+    // load re-renders when it lands. Guarded so it cannot loop.
+    if (todayLunchStatus==='idle') loadTodayLunch(todayLunchDate||tlToday());
+    return;
+  }
   else if (currentTab==='static-drinks') { c.innerHTML=buildStaticDrinks(); wireStaticPanel(); wireSiteTools(); return; }
   else if (currentTab==='static-beer') { c.innerHTML=buildStaticBeer(); wireStaticPanel(); wireSiteTools(); return; }
   else if (currentTab==='static-salad') { c.innerHTML=buildStaticSalad(); wireStaticPanel(); wireSiteTools(); return; }
@@ -2929,6 +3029,7 @@ const mob = {
     else if(tabId === 'photo')      html = buildPH();
     else if(tabId === 'static-breakfast')   html = buildStaticBreakfast();
     else if(tabId === 'static-lunchplates') html = buildStaticLunchPlates();
+    else if(tabId === 'static-todaylunch')  { html = buildStaticTodayLunch(); if(todayLunchStatus==='idle') loadTodayLunch(todayLunchDate||tlToday()); }
     else if(tabId === 'static-drinks')      html = buildStaticDrinks();
     else if(tabId === 'static-beer')        html = buildStaticBeer();
     else if(tabId === 'static-salad')       html = buildStaticSalad();
