@@ -140,36 +140,12 @@
     var bar=document.createElement("div");
     bar.className="hh-staff-bar";
 
-    var label=document.createElement("span");
-    label.className="hh-staff-label";
-    label.textContent="Staff";
-    bar.appendChild(label);
-
-    [
-      {href:"/today",  text:"\u{1F37D} Post today’s lunch", primary:true},
-      {href:"/editor", text:"⚙ Edit the website",           primary:false}
-    ].forEach(function(item){
-      var a=document.createElement("a");
-      a.className="hh-staff-btn"+(item.primary?" is-primary":"");
-      a.href=item.href;
-      a.rel="nofollow";
-      a.textContent=item.text;
-      bar.appendChild(a);
-    });
-
-    /* The schedule/time-clock portal is a separate app on its own password,
-       so it gets a quiet text link rather than a button beside the two menu
-       tools — otherwise it reads as "same PIN", which it is not. Until now
-       nothing on the site linked to it at all. */
-    var note=document.createElement("p");
-    note.className="hh-staff-note";
-    note.appendChild(document.createTextNode("Both ask for the staff PIN · "));
-    var portal=document.createElement("a");
-    portal.href="/staff-portal";
-    portal.rel="nofollow";
-    portal.textContent="Schedules & time clock";
-    note.appendChild(portal);
-    bar.appendChild(note);
+    var a=document.createElement("a");
+    a.className="hh-staff-btn";
+    a.href="/editor";
+    a.rel="nofollow";
+    a.textContent="Staff";
+    bar.appendChild(a);
 
     host.appendChild(bar);
   }
