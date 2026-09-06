@@ -1732,6 +1732,8 @@ function buildStaticCrawfish(){var d=menuDefaultsCache?.crawfish||{subtitle:'',i
 var todayLunchDate = null;      // yyyy-mm-dd currently being edited
 var todayLunchCache = null;     // the row for that date, or null if none
 var todayLunchStatus = 'idle';  // idle | loading | ready | error
+var todayLunchAll = {};         // every posted date -> row, so the calendar can mark them
+var todayLunchMonth = null;     // yyyy-mm the calendar is showing
 
 function tlToday(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function tlFmt(i){return i&&i.desc?(i.name+' | '+i.desc):((i&&i.name)||'');}
@@ -1742,16 +1744,76 @@ function tlParse(text){
   }).filter(function(i){return i.name;});
 }
 
+/* Always read past the cache here. The storefront is allowed a cached menu;
+   the person deciding whether their publish worked is not — being shown a
+   stale answer is what made a working save look broken. */
+async function tlFetchAll(){
+  var r=await fetch('/api/menu-read',{method:'POST',cache:'no-store',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({table:'lunch_dates',limit:400,fresh:true})});
+  var t=await r.text(); var d=null; try{ d=t?JSON.parse(t):null; }catch(e){}
+  if(!r.ok) throw new Error((d&&d.error)||('HTTP '+r.status));
+  return (d&&d.rows)||[];
+}
+
 async function loadTodayLunch(date,force){
   if(todayLunchStatus==='loading') return;
   if(!force && todayLunchDate===date && todayLunchStatus==='ready') return;
-  todayLunchDate=date; todayLunchStatus='loading';
+  todayLunchDate=date;
+  if(!todayLunchMonth) todayLunchMonth=String(date).slice(0,7);
+  todayLunchStatus='loading';
   try{
-    var rows=await sbGet('lunch_dates?select=lunch_date,data,updated_at');
-    todayLunchCache=(Array.isArray(rows)?rows:[]).filter(function(r){return r.lunch_date===date;})[0]||null;
+    var rows=await tlFetchAll();
+    todayLunchAll={};
+    rows.forEach(function(r){ if(r&&r.lunch_date) todayLunchAll[r.lunch_date]=r; });
+    todayLunchCache=todayLunchAll[date]||null;
     todayLunchStatus='ready';
   }catch(e){ todayLunchCache=null; todayLunchStatus='error'; }
   rebuildSidePanel();
+}
+
+/* Month grid. Days that already have a menu are marked, so staff can see at a
+   glance what is covered and what is not — which is most of the value here. */
+function tlCalendar(){
+  var sel=todayLunchDate||tlToday(), today=tlToday();
+  var ym=todayLunchMonth||sel.slice(0,7);
+  var y=parseInt(ym.slice(0,4),10), m=parseInt(ym.slice(5,7),10)-1;
+  var first=new Date(y,m,1), startDow=first.getDay(), days=new Date(y,m+1,0).getDate();
+  var label=first.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+
+  var h='<div class="static-card"><div class="static-card-title">Pick a day</div>';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px">'
+   + '<button class="sm-btn" id="tlPrev" type="button">‹</button>'
+   + '<div style="font-weight:800;font-size:13.5px">'+esc(label)+'</div>'
+   + '<button class="sm-btn" id="tlNext" type="button">›</button></div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px">';
+  ['S','M','T','W','T','F','S'].forEach(function(d){
+    h+='<div style="text-align:center;font-size:10px;font-weight:800;color:var(--text2);padding:2px 0">'+d+'</div>';
+  });
+  h+='</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">';
+  for(var i=0;i<startDow;i++) h+='<div></div>';
+  for(var day=1;day<=days;day++){
+    var iso=y+'-'+String(m+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+    var posted=!!todayLunchAll[iso], isSel=(iso===sel), isToday=(iso===today);
+    var bg=isSel?'background:var(--fire,#FF7A18);color:#fff;'
+         :posted?'background:rgba(124,230,168,.16);color:#7CE6A8;'
+         :'background:rgba(255,255,255,.04);color:var(--text2);';
+    var ring=isToday&&!isSel?'box-shadow:inset 0 0 0 1.5px rgba(255,122,24,.75);':'';
+    h+='<button type="button" class="tl-day" data-date="'+iso+'" title="'+iso+(posted?' — menu posted':' — nothing posted')+'"'
+     + ' style="'+bg+ring+'border:none;border-radius:7px;padding:7px 0;font-size:12px;font-weight:700;cursor:pointer;position:relative">'
+     + day
+     + (posted&&!isSel?'<span style="position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:#7CE6A8"></span>':'')
+     + '</button>';
+  }
+  h+='</div>';
+  h+='<div style="display:flex;gap:12px;margin-top:10px;font-size:10.5px;color:var(--text2)">'
+   + '<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(124,230,168,.5);margin-right:4px"></span>Menu posted</span>'
+   + '<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;box-shadow:inset 0 0 0 1.5px rgba(255,122,24,.75);margin-right:4px"></span>Today</span>'
+   + '</div>';
+  h+='<div style="margin-top:10px;display:flex;gap:8px"><button class="sm-btn" id="tlToday" type="button">Jump to today</button>'
+   + '<input class="fi" id="tlDate" type="date" value="'+esc(sel)+'" style="flex:1"></div>';
+  h+='</div>';
+  return h;
 }
 
 function buildStaticTodayLunch(){
@@ -1769,7 +1831,7 @@ function buildStaticTodayLunch(){
 
   var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">▶</span><span class="acc-title">🍽 Today\'s Lunch</span>'+pill+'</div><div class="acc-body">';
   h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">The meats and sides for one day. This is what shows under <b>Lunch</b> on the website. One per line — add a description after a <b>|</b> if you want one.</p>';
-  h+='<div class="static-card"><div class="static-card-title">Date</div><div style="display:flex;gap:8px"><input class="fi" id="tlDate" type="date" value="'+esc(date)+'" style="flex:1"><button class="sm-btn" id="tlToday">Today</button></div></div>';
+  h+=tlCalendar();
   h+='<div class="static-card"><div class="static-card-title">Meats ('+meats.length+')</div><textarea class="fi fi-ta" id="tlMeats" rows="6" placeholder="Fried Fish | Golden-fried with a crispy coating\nSmoked Chicken\nRed Beans &amp; Rice">'+esc(meats.map(tlFmt).join('\n'))+'</textarea></div>';
   h+='<div class="static-card"><div class="static-card-title">Sides ('+sides.length+')</div><textarea class="fi fi-ta" id="tlSides" rows="8" placeholder="Cabbage\nGreens\nTomatoes &amp; Okra\nMac &amp; Cheese">'+esc(sides.map(tlFmt).join('\n'))+'</textarea></div>';
   h+='<div class="static-card"><div class="static-card-title">Dessert today (optional)</div><input class="fi" id="tlDessert" value="'+esc(dessert?dessert.name:'')+'" placeholder="Banana Pudding"></div>';
@@ -1817,11 +1879,33 @@ async function wireStaticPanel(){
   var tlSave=document.getElementById('tlSave');
   if(tlSave){
     var tlDateEl=document.getElementById('tlDate');
-    tlDateEl.addEventListener('change',function(){ loadTodayLunch(tlDateEl.value||tlToday(),true); });
-    document.getElementById('tlToday').addEventListener('click',function(){ loadTodayLunch(tlToday(),true); });
+    tlDateEl.addEventListener('change',function(){ todayLunchMonth=(tlDateEl.value||'').slice(0,7)||todayLunchMonth; loadTodayLunch(tlDateEl.value||tlToday(),true); });
+    document.getElementById('tlToday').addEventListener('click',function(){ todayLunchMonth=tlToday().slice(0,7); loadTodayLunch(tlToday(),true); });
     document.getElementById('tlReload').addEventListener('click',function(){ loadTodayLunch(tlDateEl.value||tlToday(),true); });
+
+    // Month navigation redraws the grid only — no refetch, the dates are cached.
+    function hop(delta){
+      var ym=todayLunchMonth||tlToday().slice(0,7);
+      var y=parseInt(ym.slice(0,4),10), m=parseInt(ym.slice(5,7),10)-1+delta;
+      var d=new Date(y,m,1);
+      todayLunchMonth=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+      rebuildSidePanel();
+    }
+    var pv=document.getElementById('tlPrev'), nx=document.getElementById('tlNext');
+    if(pv) pv.addEventListener('click',function(){hop(-1);});
+    if(nx) nx.addEventListener('click',function(){hop(1);});
+
+    // Picking a day swaps the editor to that date's menu.
+    document.querySelectorAll('.tl-day').forEach(function(b){
+      b.addEventListener('click',function(){
+        var d=b.dataset.date;
+        todayLunchDate=d; todayLunchCache=todayLunchAll[d]||null; todayLunchStatus='ready';
+        rebuildSidePanel();
+      });
+    });
+
     tlSave.addEventListener('click',async function(){
-      var date=tlDateEl.value||tlToday();
+      var date=tlDateEl.value||todayLunchDate||tlToday();
       var meats=tlParse(document.getElementById('tlMeats').value);
       var sides=tlParse(document.getElementById('tlSides').value);
       if(!meats.length){ toast('Add at least one meat before publishing','error'); return; }
@@ -1835,8 +1919,20 @@ async function wireStaticPanel(){
       };
       try{
         await cloudWrite('upsert','lunch_dates',{row:{lunch_date:date,data:data,saved_by:getCloudName()||'Hot Headz staff'}});
-        toast('Published — '+meats.length+' meats, '+sides.length+' sides live for '+date,'success');
-        loadTodayLunch(date,true);
+        // Do not claim success on the strength of the write alone — read it
+        // back past the cache and check the row is really there. "It said it
+        // saved and I don't see it on the site" is the exact complaint this
+        // is here to stop.
+        var rows=await tlFetchAll();
+        todayLunchAll={}; rows.forEach(function(r){ if(r&&r.lunch_date) todayLunchAll[r.lunch_date]=r; });
+        var landed=todayLunchAll[date];
+        var got=landed&&landed.data&&landed.data.lunch&&landed.data.lunch.meats ? landed.data.lunch.meats.length : 0;
+        if(got===meats.length){
+          toast('Live on the site — '+meats.length+' meats, '+sides.length+' sides for '+date,'success');
+        }else{
+          toast('Saved, but the site still shows something else for '+date+'. Press Reload in a moment.','error');
+        }
+        todayLunchCache=landed||null; todayLunchStatus='ready'; rebuildSidePanel();
       }catch(e){
         // cloudWrite already turns a 403 into a plain-English expired-session message.
         toast(e.message,'error');

@@ -233,8 +233,10 @@ textarea{min-height:150px;resize:vertical;line-height:1.7}
   async function refreshLive(){
     var date=$('dateIn').value||todayISO();
     try{
-      var r=await fetch('/api/menu-read',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({table:'lunch_dates',limit:100})});
+      // fresh:true — whoever is on this screen is deciding whether their
+      // publish worked, and a cached answer is worse than a slow one.
+      var r=await fetch('/api/menu-read',{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({table:'lunch_dates',limit:400,fresh:true})});
       var j=await r.json();
       var rows=(j&&j.rows)||[];
       var hit=rows.filter(function(x){return x.lunch_date===date;})[0];

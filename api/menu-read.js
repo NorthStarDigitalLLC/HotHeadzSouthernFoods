@@ -61,9 +61,17 @@ export default async function handler(req, res) {
       res.setHeader('Cache-Control', 'no-store');
       return res.status(response.status).json(payload);
     }
-    // The menu changes a handful of times a day, so a short shared cache keeps
-    // the storefront quick without staff waiting to see a publish land.
-    res.setHeader('Cache-Control', 'public, max-age=30, stale-while-revalidate=300');
+    // The storefront wants a cache; whoever just pressed Publish does not.
+    // stale-while-revalidate=300 meant the person who published could be shown
+    // the old menu for five minutes and reasonably conclude the save had
+    // failed — which is exactly what happened. `fresh:true` opts out, and the
+    // revalidate window is short enough that an ordinary visitor is never far
+    // behind either.
+    if (source.fresh) {
+      res.setHeader('Cache-Control', 'no-store');
+    } else {
+      res.setHeader('Cache-Control', 'public, max-age=15, stale-while-revalidate=45');
+    }
     return res.status(200).json(payload);
   } catch (error) {
     res.setHeader('Cache-Control', 'no-store');
