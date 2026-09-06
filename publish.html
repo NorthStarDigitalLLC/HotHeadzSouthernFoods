@@ -269,11 +269,17 @@ textarea{min-height:150px;resize:vertical;line-height:1.7}
     }
     return isoOf(now);
   }
+  /* "Saturday, Sep 5", not "2026-09-05". The year is printed only when the
+     date is in another year, where it actually tells you something. */
   function dayLabel(iso){
     var p=String(iso||'').split('-');
     if(p.length!==3) return iso||'';
-    return new Date(+p[0],+p[1]-1,+p[2]).toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+    var d=new Date(+p[0],+p[1]-1,+p[2]);
+    var o={weekday:'long',month:'short',day:'numeric'};
+    if(d.getFullYear()!==new Date().getFullYear()) o.year='numeric';
+    return d.toLocaleDateString('en-US',o);
   }
+  function plural(n,word){ return n+' '+word+(n===1?'':'s'); }
   function paintLiveDayNote(){
     var el=document.getElementById('liveDayNote');
     if(!el) return;
@@ -306,14 +312,14 @@ textarea{min-height:150px;resize:vertical;line-height:1.7}
         var m=((hit.data||{}).lunch||{}).meats||[];
         var s=((hit.data||{}).lunch||{}).sides||[];
         $('liveDot').className='dot on';
-        $('liveTxt').textContent='Posted for '+date+' — '+m.length+' meats, '+s.length+' sides.';
+        $('liveTxt').textContent='Posted for '+dayLabel(date)+' — '+plural(m.length,'meat')+', '+plural(s.length,'side')+'.';
         // Prefill so an edit is a tweak, not a retype.
         if(!$('meatsIn').value && m.length) $('meatsIn').value=m.map(fmt).join('\n');
         if(!$('sidesIn').value && s.length) $('sidesIn').value=s.map(fmt).join('\n');
         counts();
       }else{
         $('liveDot').className='dot off';
-        $('liveTxt').textContent='Nothing posted for '+date+' yet.';
+        $('liveTxt').textContent='Nothing posted for '+dayLabel(date)+' yet.';
       }
     }catch(e){
       $('liveDot').className='dot';
@@ -379,10 +385,10 @@ textarea{min-height:150px;resize:vertical;line-height:1.7}
 
       // Only promise "live" when the date is the day the site actually shows.
       if(date===siteDayISO()){
-        banner('ok','Published','It is live on the website now — '+meats.length+' meats and '+sides.length+' sides for '+dayLabel(date)+'.',
+        banner('ok','Published','It is live on the website now — '+plural(meats.length,'meat')+' and '+plural(sides.length,'side')+' for '+dayLabel(date)+'.',
           [{label:'View the menu', fn:function(){ location.href='/menu'; }}]);
       }else{
-        banner('ok','Saved for '+dayLabel(date),meats.length+' meats and '+sides.length+' sides. The website is showing '+dayLabel(siteDayISO())+' right now, so this goes public on '+dayLabel(date)+'.',
+        banner('ok','Saved for '+dayLabel(date),plural(meats.length,'meat')+' and '+plural(sides.length,'side')+'. The website is showing '+dayLabel(siteDayISO())+' right now, so this goes public on '+dayLabel(date)+'.',
           [{label:'View the menu', fn:function(){ location.href='/menu'; }}]);
       }
       refreshLive();

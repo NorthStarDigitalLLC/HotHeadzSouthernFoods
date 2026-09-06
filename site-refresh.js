@@ -115,6 +115,7 @@
       if(href===path)link.setAttribute("aria-current","page");
     });
     qsAll("[data-hh-year]").forEach(function(el){el.textContent=String(new Date().getFullYear());});
+    mountStaffBar();
     qsAll('a[target="_blank"]').forEach(function(link){
       var rel=(link.getAttribute("rel")||"").split(/\s+/).filter(Boolean);
       ["noopener","noreferrer"].forEach(function(token){if(rel.indexOf(token)<0)rel.push(token);});
@@ -124,6 +125,55 @@
       if(!img.closest(".hero")&&!img.closest("[data-hh-promo]"))img.loading="lazy";
     });
   }
+  /* Staff entry point, injected rather than pasted into four files.
+     Two different footers exist on this site — .hh-site-footer on the dark
+     utility pages, footer.foot on the homepage and About — so find whichever
+     one this page has and hang the bar off the end of it. Bail quietly if a
+     page already carries one, or has no footer at all. */
+  function mountStaffBar(){
+    if(document.querySelector(".hh-staff-bar"))return;
+    var host=document.querySelector(".hh-site-footer")
+          || document.querySelector("footer.foot .wrap")
+          || document.querySelector("footer.foot");
+    if(!host)return;
+
+    var bar=document.createElement("div");
+    bar.className="hh-staff-bar";
+
+    var label=document.createElement("span");
+    label.className="hh-staff-label";
+    label.textContent="Staff";
+    bar.appendChild(label);
+
+    [
+      {href:"/today",  text:"\u{1F37D} Post today’s lunch", primary:true},
+      {href:"/editor", text:"⚙ Edit the website",           primary:false}
+    ].forEach(function(item){
+      var a=document.createElement("a");
+      a.className="hh-staff-btn"+(item.primary?" is-primary":"");
+      a.href=item.href;
+      a.rel="nofollow";
+      a.textContent=item.text;
+      bar.appendChild(a);
+    });
+
+    /* The schedule/time-clock portal is a separate app on its own password,
+       so it gets a quiet text link rather than a button beside the two menu
+       tools — otherwise it reads as "same PIN", which it is not. Until now
+       nothing on the site linked to it at all. */
+    var note=document.createElement("p");
+    note.className="hh-staff-note";
+    note.appendChild(document.createTextNode("Both ask for the staff PIN · "));
+    var portal=document.createElement("a");
+    portal.href="/staff-portal";
+    portal.rel="nofollow";
+    portal.textContent="Schedules & time clock";
+    note.appendChild(portal);
+    bar.appendChild(note);
+
+    host.appendChild(bar);
+  }
+
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);
   else init();
 })();

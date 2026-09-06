@@ -1690,8 +1690,15 @@ async function resetMenuDefaultKey(key){
 function linesTo(text){return String(text||'').split('\n').map(s=>s.trim()).filter(Boolean);}
 
 function todayISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function isoToDay(iso){const[y,m,d]=iso.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:'long'});}
-function isoToLabel(iso){const[y,m,d]=iso.split('-').map(Number);const dt=new Date(y,m-1,d);return dt.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});}
+/* Date formatting for people, in one place.
+   Staff read these all day; "2026-09-05" is noise on every line of a screen
+   that only ever deals with this week. The year is printed only when the date
+   is genuinely in another year, where it actually tells you something. */
+function isoParts(iso){const p=String(iso||'').split('-');return p.length===3?new Date(+p[0],+p[1]-1,+p[2]):null;}
+function isoYearOpt(dt){return dt.getFullYear()===new Date().getFullYear()?{}:{year:'numeric'};}
+function isoToDay(iso){const dt=isoParts(iso);return dt?dt.toLocaleDateString(undefined,{weekday:'long'}):String(iso||'');}
+function isoToLabel(iso){const dt=isoParts(iso);return dt?dt.toLocaleDateString(undefined,Object.assign({weekday:'short',month:'short',day:'numeric'},isoYearOpt(dt))):String(iso||'');}
+function isoToLong(iso){const dt=isoParts(iso);return dt?dt.toLocaleDateString(undefined,Object.assign({weekday:'long',month:'short',day:'numeric'},isoYearOpt(dt))):String(iso||'');}
 function getClosingMinutes(dayName){const hours=(menuDefaultsCache&&menuDefaultsCache.hours&&menuDefaultsCache.hours.weekly)||[];const entry=hours.find(h=>String(h.day||'').toLowerCase()===String(dayName||'').toLowerCase());if(!entry||!entry.close)return 14*60;const m=entry.close.match(/(\d+):(\d+)\s*(AM|PM)/i);if(!m)return 14*60;let h=parseInt(m[1]),mn=parseInt(m[2]);if(m[3].toUpperCase()==='PM'&&h!==12)h+=12;if(m[3].toUpperCase()==='AM'&&h===12)h=0;return h*60+mn;}
 function isClosedDay(dayName){const hours=(menuDefaultsCache&&menuDefaultsCache.hours&&menuDefaultsCache.hours.weekly)||[];const entry=hours.find(h=>String(h.day||'').toLowerCase()===String(dayName||'').toLowerCase());// No entry OR no open/close = closed
 return !entry || (!entry.open && !entry.close);}
@@ -1775,12 +1782,9 @@ function tlSiteDay(){
   return tlISO(now);
 }
 function tlRolled(){ return tlSiteDay()!==tlToday(); }
-function tlLabel(iso){
-  var p=String(iso||'').split('-');
-  if(p.length!==3) return iso||'';
-  var d=new Date(+p[0],+p[1]-1,+p[2]);
-  return d.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
-}
+function tlPlural(n,word){ return n+' '+word+(n===1?'':'s'); }
+function tlLabel(iso){ return isoToLong(iso); }   // "Saturday, Sep 5"
+function tlShort(iso){ return isoToLabel(iso); }  // "Sat, Sep 5"
 function tlFmt(i){return i&&i.desc?(i.name+' | '+i.desc):((i&&i.name)||'');}
 function tlParse(text){
   return String(text||'').split('\n').map(function(l){return l.trim();}).filter(Boolean).map(function(line){
@@ -1848,7 +1852,7 @@ function tlCalendar(){
     // pointing at -- posting to any other day changes nothing a customer sees.
     var ring=isLive&&!isSel?'box-shadow:inset 0 0 0 2px rgba(255,122,24,.95);'
            :(isToday&&!isSel?'box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.26);':'');
-    var tip=iso+(posted?' — menu posted':' — nothing posted')+(isLive?' — showing on the site now':'');
+    var tip=tlShort(iso)+(posted?' — menu posted':' — nothing posted')+(isLive?' — showing on the site now':'');
     h+='<button type="button" class="tl-day" data-date="'+iso+'" title="'+tip+'"'
      + ' style="'+bg+ring+'border:none;border-radius:7px;padding:7px 0;font-size:12px;font-weight:700;cursor:pointer;position:relative">'
      + day
@@ -1877,7 +1881,7 @@ function buildStaticTodayLunch(){
 
   var pill = todayLunchStatus==='loading' ? '<span class="status-pill">Loading…</span>'
            : todayLunchStatus==='error'   ? '<span class="status-pill" style="color:#ff8080">Could not load</span>'
-           : todayLunchCache ? '<span class="status-pill" style="color:#7CE6A8">Posted for '+esc(date)+'</span>'
+           : todayLunchCache ? '<span class="status-pill" style="color:#7CE6A8">Posted for '+esc(tlLabel(date))+'</span>'
            : '<span class="status-pill" style="color:#E8A830">Not posted yet</span>';
 
   var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">▶</span><span class="acc-title">🍽 Today\'s Lunch</span>'+pill+'</div><div class="acc-body">';
@@ -2002,12 +2006,12 @@ async function wireStaticPanel(){
           // "Saved" and "customers can see it" are different claims. Only make
           // the second one when the date really is the day the site displays.
           if(date===tlSiteDay()){
-            toast('Live on the site — '+meats.length+' meats, '+sides.length+' sides for '+tlLabel(date),'success');
+            toast('Live on the site — '+tlPlural(meats.length,'meat')+', '+tlPlural(sides.length,'side')+' for '+tlLabel(date),'success');
           }else{
-            toast('Saved for '+tlLabel(date)+' ('+meats.length+' meats, '+sides.length+' sides). The website is showing '+tlLabel(tlSiteDay())+' right now, so this goes public on '+tlLabel(date)+'.','success');
+            toast('Saved for '+tlLabel(date)+' ('+tlPlural(meats.length,'meat')+', '+tlPlural(sides.length,'side')+'). The website is showing '+tlLabel(tlSiteDay())+' right now, so this goes public on '+tlLabel(date)+'.','success');
           }
         }else{
-          toast('Saved, but the site still shows something else for '+date+'. Press Reload in a moment.','error');
+          toast('Saved, but the site still shows something else for '+tlLabel(date)+'. Press Reload in a moment.','error');
         }
         todayLunchCache=landed||null; todayLunchStatus='ready'; rebuildSidePanel();
       }catch(e){
@@ -2598,8 +2602,8 @@ async function refreshSavedDatesList(){
     if(pastCount>0)html='<div style="font-size:11px;color:var(--text2);padding:6px 0;margin-bottom:6px;">Total: '+keys.length+' \u2022 <span style="color:#ff7a7a;font-weight:700;">'+pastCount+' past</span></div>'+html;
     else html='<div style="font-size:11px;color:var(--text2);padding:6px 0;margin-bottom:6px;">Total: '+keys.length+' dates</div>'+html;
     el.innerHTML=html;
-    el.querySelectorAll('.savedDateDel').forEach(btn=>{btn.addEventListener('click',async()=>{const date=btn.dataset.date;const day=btn.dataset.day;if(!confirm('Delete lunch for '+day+' ('+date+')?'))return;const ok=await deleteLunchForDate(date);if(ok)refreshSavedDatesList();});});
-    el.querySelectorAll('.savedDateLoad').forEach(btn=>{btn.addEventListener('click',()=>{const date=btn.dataset.date;const dayBtn=document.querySelector('.lunchDateBtn[data-date="'+date+'"]');if(dayBtn){dayBtn.click();}else{toast('Date '+date+' outside 7-day range','info');}});});
+    el.querySelectorAll('.savedDateDel').forEach(btn=>{btn.addEventListener('click',async()=>{const date=btn.dataset.date;const day=btn.dataset.day;if(!confirm('Delete lunch for '+isoToLong(date)+'?'))return;const ok=await deleteLunchForDate(date);if(ok)refreshSavedDatesList();});});
+    el.querySelectorAll('.savedDateLoad').forEach(btn=>{btn.addEventListener('click',()=>{const date=btn.dataset.date;const dayBtn=document.querySelector('.lunchDateBtn[data-date="'+date+'"]');if(dayBtn){dayBtn.click();}else{toast(isoToLabel(date)+' is outside the 7-day range','info');}});});
     window._lastSavedDates=dates;
   }catch(e){el.innerHTML='<div style="font-size:11px;color:var(--danger);padding:6px;">Error: '+e.message+'</div>';}
 }
@@ -2659,7 +2663,7 @@ function wireMenuPanel(){
       const globalSameDaily = (menuDefaultsCache?.sameDaily?.items) || [];
       const globalSdText = globalSameDaily.map(i => typeof i === 'object' ? i.name : i).join(', ');
 
-      let lh='<div style="font-size:12px;font-weight:700;color:var(--fire);margin-bottom:8px;">'+isoToDay(date)+' \u2022 '+date+'</div>';
+      let lh='<div style="font-size:12px;font-weight:700;color:var(--fire);margin-bottom:8px;">'+esc(isoToLong(date))+'</div>';
 
       lh+='<div class="lunch-section-card">';
       lh+='<div class="lunch-section-title meats">\ud83c\udf57 Meats</div>';
@@ -2736,7 +2740,7 @@ function wireMenuPanel(){
       });
 
       document.getElementById('deleteLunchDate')?.addEventListener('click', async () => {
-        if (!confirm('Clear lunch for '+date+'?')) return;
+        if (!confirm('Clear lunch for '+isoToLong(date)+'?')) return;
         await deleteLunchForDate(date);
         btn.click();
         refreshSavedDatesList();
