@@ -882,6 +882,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:10000;
     <div class="ticker-track"><div class="ticker-inner" id="tickerInner"></div></div>
   </div>
   <nav class="day-tabs-wrap"><div class="day-tabs"><button class="day-tab active" id="tabToday">Today</button><button class="day-tab" id="tabTomorrow">Tomorrow</button><button class="day-tab" id="tabAdvanced">Weekly Forecast</button></div></nav>
+  <p id="rolledNote" class="hide" style="margin:0 auto 10px;max-width:920px;padding:0 16px;text-align:center;font-size:12.5px;line-height:1.5;opacity:.72"></p>
   <div class="panel visible" id="panelToday"><div class="hours-line" id="todayHours"></div><hr class="section-divider"/><div class="cat-layout"><nav class="cat-top-bar" id="todayTopBar"></nav><div class="cat-sections-wrap" id="todayCatSections"></div></div><div class="closed-state hide" id="todayClosed"><h2>Closed Today</h2><p id="todayClosedMsg">See you next time!</p></div></div>
   <div class="panel" id="panelTomorrow"><div class="hours-line" id="tomorrowHours"></div><hr class="section-divider"/><div class="cat-layout"><nav class="cat-top-bar" id="tomorrowTopBar"></nav><div class="cat-sections-wrap" id="tomorrowCatSections"></div></div><div class="closed-state hide" id="tomorrowClosed"><h2>Closed</h2><p id="tomorrowClosedMsg">See you next time!</p></div></div>
   <div class="panel" id="panelAdvanced"><div class="hours-line" id="advDisclaimer"></div><div class="adv-day-tabs" id="advDayTabs"></div><div id="advCards"></div></div>
@@ -1481,6 +1482,15 @@ function initPage(){
   var dTI=tI,dTN=tN,dToI=toI,dToN=toN,ct=gCl(tN);
   if(pastCl(tN)&&!(ct&&ct.closed)){dTI=toI;dTN=toN;var da=new Date(now);da.setDate(now.getDate()+2);dToI=toISO(da);dToN=wkD(da)}
   $("tabToday").textContent=dTN;$("tabTomorrow").textContent=dToN;
+  /* Past closing, the first tab is tomorrow, not today. The tab does say the
+     weekday, but nobody reads a tab label when they came looking for today's
+     plate -- and staff who had just posted concluded the site was broken.
+     Say it in words. */
+  var rn=$("rolledNote");
+  if(rn){
+    if(dTI!==tI){ rn.textContent="Today's service has ended — showing "+dTN+"'s menu."; rn.classList.remove("hide"); }
+    else { rn.classList.add("hide"); }
+  }
   panelConfigs=[];initP("today",dTI,dTN);initP("tomorrow",dToI,dToN);
   bAdv(dTI);uSt(dTN,dTI);window._dTN=dTN;window._dTI=dTI;
   updateSpecialsBanner(dTI);

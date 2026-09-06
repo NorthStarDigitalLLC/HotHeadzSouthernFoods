@@ -114,14 +114,15 @@ textarea{min-height:150px;resize:vertical;line-height:1.7}
 
   <div class="card">
     <h2>THE DAY</h2>
-    <p class="hint">Defaults to today. Change it only if you're posting ahead.</p>
+    <p class="hint">Defaults to whichever day the website is showing. Change it only if you're posting further ahead.</p>
+    <div id="liveDayNote" style="display:none;border-radius:9px;padding:9px 11px;margin-bottom:11px;font-size:13px;line-height:1.5;background:rgba(255,122,24,.10);border:1px solid rgba(255,122,24,.35)"></div>
     <div class="row">
       <div>
         <label for="dateIn">Date</label>
         <input id="dateIn" type="date">
       </div>
       <div style="flex:0 0 auto;display:flex;align-items:flex-end">
-        <button class="btn btn-sm" id="todayBtn" type="button">Use today</button>
+        <button class="btn btn-sm" id="todayBtn" type="button">Use the live day</button>
       </div>
     </div>
   </div>
@@ -219,9 +220,69 @@ textarea{min-height:150px;resize:vertical;line-height:1.7}
       return { name:(p[0]||'').trim(), desc:p.slice(1).join('|').trim() };
     }).filter(function(i){return i.name;});
   }
-  function todayISO(){
-    var d=new Date();
-    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  function isoOf(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function todayISO(){ return isoOf(new Date()); }
+
+  /* WHICH DAY THE PUBLIC SITE IS SHOWING.
+     menu.html rolls its "Today" tab forward to tomorrow once the current day
+     is past closing time. Staff posting after close were writing a perfect
+     row to a day the website had already left behind, then reading "Lunch not
+     posted yet" and concluding the save had failed. It had not. Same rule as
+     menu.html and the editor -- change all three together. */
+  var siteHours=null, siteClosures=null;
+  async function loadSiteHours(){
+    try{
+      var r=await fetch('/api/menu-read',{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({table:'menu_defaults',fresh:true})});
+      var j=await r.json(), rows=(j&&j.rows)||[];
+      function val(k){
+        for(var i=0;i<rows.length;i++) if(rows[i].key===k){
+          var v=rows[i].value;
+          if(typeof v==='string'){ try{ v=JSON.parse(v); }catch(e){} }
+          return v;
+        }
+        return null;
+      }
+      siteHours=val('hours'); siteClosures=val('closures');
+    }catch(e){ /* fall back to the built-in hours below */ }
+  }
+  function closeMins(dayName){
+    var wk=(siteHours&&siteHours.weekly)||[], l=String(dayName||'').toLowerCase(), e=null;
+    for(var i=0;i<wk.length;i++) if(String(wk[i].day||'').toLowerCase()===l){ e=wk[i]; break; }
+    var s=(e&&e.close) || (l==='sunday'?'3:00 PM':'2:00 PM');
+    var m=String(s).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if(!m) return null;
+    var h=+m[1],mn=+m[2],ap=m[3].toUpperCase();
+    if(ap==='PM'&&h!==12)h+=12; if(ap==='AM'&&h===12)h=0;
+    return h*60+mn;
+  }
+  function closedAllDay(dayName){
+    var c=siteClosures||{}, ks=Object.keys(c), l=String(dayName||'').toLowerCase();
+    for(var i=0;i<ks.length;i++) if(ks[i].toLowerCase()===l) return !!(c[ks[i]]&&c[ks[i]].closed);
+    return false;
+  }
+  function siteDayISO(){
+    var now=new Date(), name=now.toLocaleDateString('en-US',{weekday:'long'});
+    var cl=closeMins(name), mins=now.getHours()*60+now.getMinutes();
+    if(cl!=null && mins>=cl && !closedAllDay(name)){
+      var t=new Date(now); t.setDate(now.getDate()+1); return isoOf(t);
+    }
+    return isoOf(now);
+  }
+  function dayLabel(iso){
+    var p=String(iso||'').split('-');
+    if(p.length!==3) return iso||'';
+    return new Date(+p[0],+p[1]-1,+p[2]).toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+  }
+  function paintLiveDayNote(){
+    var el=document.getElementById('liveDayNote');
+    if(!el) return;
+    var live=siteDayISO(), sel=($('dateIn').value||live);
+    var h='🌐 The website is showing <b>'+dayLabel(live)+'</b> right now.';
+    if(live!==todayISO()) h+=' Today’s service is over, so it has already rolled forward to tomorrow.';
+    if(sel!==live) h+='<br><span style="color:#F0C069">⚠️ You are posting to <b>'+dayLabel(sel)+'</b> — it will not show up publicly until then.</span>';
+    el.innerHTML=h;
+    el.style.display='';
   }
 
   function counts(){
@@ -231,7 +292,8 @@ textarea{min-height:150px;resize:vertical;line-height:1.7}
 
   /* ── what is live right now ──────────────────────────── */
   async function refreshLive(){
-    var date=$('dateIn').value||todayISO();
+    paintLiveDayNote();
+    var date=$('dateIn').value||siteDayISO();
     try{
       // fresh:true — whoever is on this screen is deciding whether their
       // publish worked, and a cached answer is worse than a slow one.
@@ -263,7 +325,7 @@ textarea{min-height:150px;resize:vertical;line-height:1.7}
   /* ── publish ─────────────────────────────────────────── */
   async function publish(){
     clearBanner();
-    var date=$('dateIn').value||todayISO();
+    var date=$('dateIn').value||siteDayISO();
     var meats=parseLines($('meatsIn').value);
     var sides=parseLines($('sidesIn').value);
 
@@ -315,8 +377,14 @@ textarea{min-height:150px;resize:vertical;line-height:1.7}
         return;
       }
 
-      banner('ok','Published','Today\'s lunch is live on the website — '+meats.length+' meats and '+sides.length+' sides.',
-        [{label:'View the menu', fn:function(){ location.href='/menu'; }}]);
+      // Only promise "live" when the date is the day the site actually shows.
+      if(date===siteDayISO()){
+        banner('ok','Published','It is live on the website now — '+meats.length+' meats and '+sides.length+' sides for '+dayLabel(date)+'.',
+          [{label:'View the menu', fn:function(){ location.href='/menu'; }}]);
+      }else{
+        banner('ok','Saved for '+dayLabel(date),meats.length+' meats and '+sides.length+' sides. The website is showing '+dayLabel(siteDayISO())+' right now, so this goes public on '+dayLabel(date)+'.',
+          [{label:'View the menu', fn:function(){ location.href='/menu'; }}]);
+      }
       refreshLive();
     }catch(e){
       banner('bad','It did not publish','Could not reach the website ('+e.message+'). Nothing was changed — check your signal and try again.',
@@ -329,9 +397,18 @@ textarea{min-height:150px;resize:vertical;line-height:1.7}
   /* ── init ────────────────────────────────────────────── */
   function init(){
     if(init.done) return; init.done=true;
-    $('dateIn').value=todayISO();
-    $('todayBtn').addEventListener('click',function(){ $('dateIn').value=todayISO(); refreshLive(); });
+    $('dateIn').value=siteDayISO();
+    $('todayBtn').addEventListener('click',function(){ $('dateIn').value=siteDayISO(); refreshLive(); });
     $('dateIn').addEventListener('change',refreshLive);
+    // Hours decide which day the site is on, so re-derive the default once
+    // they land. Until then the built-in fallback hours are already correct
+    // for every day Hot Headz currently keeps.
+    loadSiteHours().then(function(){
+      if(!$('dateIn').dataset.touched) $('dateIn').value=siteDayISO();
+      paintLiveDayNote(); refreshLive();
+    });
+    $('dateIn').addEventListener('input',function(){ $('dateIn').dataset.touched='1'; paintLiveDayNote(); });
+    paintLiveDayNote();
     $('meatsIn').addEventListener('input',counts);
     $('sidesIn').addEventListener('input',counts);
     $('goBtn').addEventListener('click',publish);

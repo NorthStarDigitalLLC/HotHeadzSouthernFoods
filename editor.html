@@ -1736,6 +1736,51 @@ var todayLunchAll = {};         // every posted date -> row, so the calendar can
 var todayLunchMonth = null;     // yyyy-mm the calendar is showing
 
 function tlToday(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function tlISO(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+
+/* WHICH DAY THE PUBLIC SITE IS ACTUALLY SHOWING.
+   menu.html does not always show today. Once the current day is past its
+   closing time it rolls the "Today" tab forward to tomorrow, because a
+   visitor at 9pm wants tomorrow's plate, not a lunch that sold out seven
+   hours ago. That is correct for customers and invisible to staff: publish
+   at 9:37pm and the row saves perfectly, but the site has already moved on
+   to tomorrow, so the screen still reads "Lunch not posted yet" and the save
+   looks broken when it is not. Everything below exists so the editor can say
+   out loud which day is on the site right now.
+   This mirrors menu.html's rule exactly (pastCl + closures) -- if you change
+   one, change the other. */
+function tlCloseMins(dayName){
+  var wk=(menuDefaultsCache&&menuDefaultsCache.hours&&menuDefaultsCache.hours.weekly)||[];
+  var e=null,l=String(dayName||'').toLowerCase();
+  for(var i=0;i<wk.length;i++){ if(String(wk[i].day||'').toLowerCase()===l){ e=wk[i]; break; } }
+  var s=e&&e.close;
+  if(!s) s = (l==='sunday') ? '3:00 PM' : '2:00 PM';   // menu.html's own fallback hours
+  var m=String(s).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if(!m) return null;
+  var h=+m[1],mn=+m[2],ap=m[3].toUpperCase();
+  if(ap==='PM'&&h!==12)h+=12; if(ap==='AM'&&h===12)h=0;
+  return h*60+mn;
+}
+function tlClosedAllDay(dayName){
+  var c=(menuDefaultsCache&&menuDefaultsCache.closures)||{},ks=Object.keys(c),l=String(dayName||'').toLowerCase();
+  for(var i=0;i<ks.length;i++) if(ks[i].toLowerCase()===l) return !!(c[ks[i]]&&c[ks[i]].closed);
+  return false;
+}
+function tlSiteDay(){
+  var now=new Date(), name=now.toLocaleDateString('en-US',{weekday:'long'});
+  var close=tlCloseMins(name), mins=now.getHours()*60+now.getMinutes();
+  if(close!=null && mins>=close && !tlClosedAllDay(name)){
+    var t=new Date(now); t.setDate(now.getDate()+1); return tlISO(t);
+  }
+  return tlISO(now);
+}
+function tlRolled(){ return tlSiteDay()!==tlToday(); }
+function tlLabel(iso){
+  var p=String(iso||'').split('-');
+  if(p.length!==3) return iso||'';
+  var d=new Date(+p[0],+p[1]-1,+p[2]);
+  return d.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+}
 function tlFmt(i){return i&&i.desc?(i.name+' | '+i.desc):((i&&i.name)||'');}
 function tlParse(text){
   return String(text||'').split('\n').map(function(l){return l.trim();}).filter(Boolean).map(function(line){
@@ -1775,7 +1820,7 @@ async function loadTodayLunch(date,force){
 /* Month grid. Days that already have a menu are marked, so staff can see at a
    glance what is covered and what is not — which is most of the value here. */
 function tlCalendar(){
-  var sel=todayLunchDate||tlToday(), today=tlToday();
+  var sel=todayLunchDate||tlSiteDay(), today=tlToday(), live=tlSiteDay();
   var ym=todayLunchMonth||sel.slice(0,7);
   var y=parseInt(ym.slice(0,4),10), m=parseInt(ym.slice(5,7),10)-1;
   var first=new Date(y,m,1), startDow=first.getDay(), days=new Date(y,m+1,0).getDate();
@@ -1794,12 +1839,17 @@ function tlCalendar(){
   for(var i=0;i<startDow;i++) h+='<div></div>';
   for(var day=1;day<=days;day++){
     var iso=y+'-'+String(m+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
-    var posted=!!todayLunchAll[iso], isSel=(iso===sel), isToday=(iso===today);
+    var posted=!!todayLunchAll[iso], isSel=(iso===sel), isToday=(iso===today), isLive=(iso===live);
     var bg=isSel?'background:var(--fire,#FF7A18);color:#fff;'
          :posted?'background:rgba(124,230,168,.16);color:#7CE6A8;'
          :'background:rgba(255,255,255,.04);color:var(--text2);';
-    var ring=isToday&&!isSel?'box-shadow:inset 0 0 0 1.5px rgba(255,122,24,.75);':'';
-    h+='<button type="button" class="tl-day" data-date="'+iso+'" title="'+iso+(posted?' — menu posted':' — nothing posted')+'"'
+    // The ring marks the day the website is displaying right now. After
+    // closing time that is tomorrow, not today, and that is the day worth
+    // pointing at -- posting to any other day changes nothing a customer sees.
+    var ring=isLive&&!isSel?'box-shadow:inset 0 0 0 2px rgba(255,122,24,.95);'
+           :(isToday&&!isSel?'box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.26);':'');
+    var tip=iso+(posted?' — menu posted':' — nothing posted')+(isLive?' — showing on the site now':'');
+    h+='<button type="button" class="tl-day" data-date="'+iso+'" title="'+tip+'"'
      + ' style="'+bg+ring+'border:none;border-radius:7px;padding:7px 0;font-size:12px;font-weight:700;cursor:pointer;position:relative">'
      + day
      + (posted&&!isSel?'<span style="position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:#7CE6A8"></span>':'')
@@ -1808,16 +1858,17 @@ function tlCalendar(){
   h+='</div>';
   h+='<div style="display:flex;gap:12px;margin-top:10px;font-size:10.5px;color:var(--text2)">'
    + '<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(124,230,168,.5);margin-right:4px"></span>Menu posted</span>'
-   + '<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;box-shadow:inset 0 0 0 1.5px rgba(255,122,24,.75);margin-right:4px"></span>Today</span>'
+   + '<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;box-shadow:inset 0 0 0 2px rgba(255,122,24,.95);margin-right:4px"></span>On the site now</span>'
+   + (live!==today?'<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.26);margin-right:4px"></span>Today</span>':'')
    + '</div>';
-  h+='<div style="margin-top:10px;display:flex;gap:8px"><button class="sm-btn" id="tlToday" type="button">Jump to today</button>'
+  h+='<div style="margin-top:10px;display:flex;gap:8px"><button class="sm-btn" id="tlToday" type="button">Jump to the live day</button>'
    + '<input class="fi" id="tlDate" type="date" value="'+esc(sel)+'" style="flex:1"></div>';
   h+='</div>';
   return h;
 }
 
 function buildStaticTodayLunch(){
-  var date=todayLunchDate||tlToday();
+  var date=todayLunchDate||tlSiteDay();
   var lunch=(todayLunchCache&&todayLunchCache.data&&todayLunchCache.data.lunch)||null;
   var meats=(lunch&&lunch.meats)||[];
   var sides=(lunch&&lunch.sides)||[];
@@ -1831,6 +1882,24 @@ function buildStaticTodayLunch(){
 
   var h='<div class="acc open"><div class="acc-head"><span class="acc-arrow">▶</span><span class="acc-title">🍽 Today\'s Lunch</span>'+pill+'</div><div class="acc-body">';
   h+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;">The meats and sides for one day. This is what shows under <b>Lunch</b> on the website. One per line — add a description after a <b>|</b> if you want one.</p>';
+
+  /* Say which day is actually on the website, and warn plainly when the day
+     being edited is not that day. Without this the editor happily saves a
+     perfect row to a day nobody will ever see. */
+  var live=tlSiteDay();
+  h+='<div style="border-radius:9px;padding:9px 11px;margin-bottom:10px;font-size:12px;line-height:1.5;'
+   + 'background:rgba(255,122,24,.10);border:1px solid rgba(255,122,24,.35);">'
+   + '🌐 The website is showing <b>'+esc(tlLabel(live))+'</b> right now.'
+   + (tlRolled()?' <span style="color:var(--text2)">Today’s service is over, so the menu page has already rolled forward to tomorrow.</span>':'')
+   + '</div>';
+  if(date!==live){
+    h+='<div style="border-radius:9px;padding:9px 11px;margin-bottom:10px;font-size:12px;line-height:1.5;'
+     + 'background:rgba(232,168,48,.12);border:1px solid rgba(232,168,48,.45);color:#F0C069;">'
+     + '⚠️ You are editing <b>'+esc(tlLabel(date))+'</b>, which is <b>not</b> the day on the site. '
+     + 'Saving is fine — it just will not change anything a customer sees until '+esc(tlLabel(date))+'. '
+     + '<button class="sm-btn" id="tlGoLive" type="button" style="margin-top:7px">Switch to '+esc(tlLabel(live))+'</button>'
+     + '</div>';
+  }
   h+=tlCalendar();
   h+='<div class="static-card"><div class="static-card-title">Meats ('+meats.length+')</div><textarea class="fi fi-ta" id="tlMeats" rows="6" placeholder="Fried Fish | Golden-fried with a crispy coating\nSmoked Chicken\nRed Beans &amp; Rice">'+esc(meats.map(tlFmt).join('\n'))+'</textarea></div>';
   h+='<div class="static-card"><div class="static-card-title">Sides ('+sides.length+')</div><textarea class="fi fi-ta" id="tlSides" rows="8" placeholder="Cabbage\nGreens\nTomatoes &amp; Okra\nMac &amp; Cheese">'+esc(sides.map(tlFmt).join('\n'))+'</textarea></div>';
@@ -1879,13 +1948,15 @@ async function wireStaticPanel(){
   var tlSave=document.getElementById('tlSave');
   if(tlSave){
     var tlDateEl=document.getElementById('tlDate');
-    tlDateEl.addEventListener('change',function(){ todayLunchMonth=(tlDateEl.value||'').slice(0,7)||todayLunchMonth; loadTodayLunch(tlDateEl.value||tlToday(),true); });
-    document.getElementById('tlToday').addEventListener('click',function(){ todayLunchMonth=tlToday().slice(0,7); loadTodayLunch(tlToday(),true); });
-    document.getElementById('tlReload').addEventListener('click',function(){ loadTodayLunch(tlDateEl.value||tlToday(),true); });
+    tlDateEl.addEventListener('change',function(){ todayLunchMonth=(tlDateEl.value||'').slice(0,7)||todayLunchMonth; loadTodayLunch(tlDateEl.value||tlSiteDay(),true); });
+    document.getElementById('tlToday').addEventListener('click',function(){ var L=tlSiteDay(); todayLunchMonth=L.slice(0,7); loadTodayLunch(L,true); });
+    var tlGoLive=document.getElementById('tlGoLive');
+    if(tlGoLive) tlGoLive.addEventListener('click',function(){ var L=tlSiteDay(); todayLunchMonth=L.slice(0,7); loadTodayLunch(L,true); });
+    document.getElementById('tlReload').addEventListener('click',function(){ loadTodayLunch(tlDateEl.value||tlSiteDay(),true); });
 
     // Month navigation redraws the grid only — no refetch, the dates are cached.
     function hop(delta){
-      var ym=todayLunchMonth||tlToday().slice(0,7);
+      var ym=todayLunchMonth||tlSiteDay().slice(0,7);
       var y=parseInt(ym.slice(0,4),10), m=parseInt(ym.slice(5,7),10)-1+delta;
       var d=new Date(y,m,1);
       todayLunchMonth=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
@@ -1905,7 +1976,7 @@ async function wireStaticPanel(){
     });
 
     tlSave.addEventListener('click',async function(){
-      var date=tlDateEl.value||todayLunchDate||tlToday();
+      var date=tlDateEl.value||todayLunchDate||tlSiteDay();
       var meats=tlParse(document.getElementById('tlMeats').value);
       var sides=tlParse(document.getElementById('tlSides').value);
       if(!meats.length){ toast('Add at least one meat before publishing','error'); return; }
@@ -1928,7 +1999,13 @@ async function wireStaticPanel(){
         var landed=todayLunchAll[date];
         var got=landed&&landed.data&&landed.data.lunch&&landed.data.lunch.meats ? landed.data.lunch.meats.length : 0;
         if(got===meats.length){
-          toast('Live on the site — '+meats.length+' meats, '+sides.length+' sides for '+date,'success');
+          // "Saved" and "customers can see it" are different claims. Only make
+          // the second one when the date really is the day the site displays.
+          if(date===tlSiteDay()){
+            toast('Live on the site — '+meats.length+' meats, '+sides.length+' sides for '+tlLabel(date),'success');
+          }else{
+            toast('Saved for '+tlLabel(date)+' ('+meats.length+' meats, '+sides.length+' sides). The website is showing '+tlLabel(tlSiteDay())+' right now, so this goes public on '+tlLabel(date)+'.','success');
+          }
         }else{
           toast('Saved, but the site still shows something else for '+date+'. Press Reload in a moment.','error');
         }
@@ -2147,7 +2224,7 @@ function rebuildSidePanel(){
     c.innerHTML=buildStaticTodayLunch(); wireStaticPanel(); wireSiteTools();
     // First open (or a date with nothing cached) needs the row fetched; the
     // load re-renders when it lands. Guarded so it cannot loop.
-    if (todayLunchStatus==='idle') loadTodayLunch(todayLunchDate||tlToday());
+    if (todayLunchStatus==='idle') loadTodayLunch(todayLunchDate||tlSiteDay());
     return;
   }
   else if (currentTab==='static-drinks') { c.innerHTML=buildStaticDrinks(); wireStaticPanel(); wireSiteTools(); return; }
@@ -3125,7 +3202,7 @@ const mob = {
     else if(tabId === 'photo')      html = buildPH();
     else if(tabId === 'static-breakfast')   html = buildStaticBreakfast();
     else if(tabId === 'static-lunchplates') html = buildStaticLunchPlates();
-    else if(tabId === 'static-todaylunch')  { html = buildStaticTodayLunch(); if(todayLunchStatus==='idle') loadTodayLunch(todayLunchDate||tlToday()); }
+    else if(tabId === 'static-todaylunch')  { html = buildStaticTodayLunch(); if(todayLunchStatus==='idle') loadTodayLunch(todayLunchDate||tlSiteDay()); }
     else if(tabId === 'static-drinks')      html = buildStaticDrinks();
     else if(tabId === 'static-beer')        html = buildStaticBeer();
     else if(tabId === 'static-salad')       html = buildStaticSalad();
